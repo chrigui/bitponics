@@ -34,5 +34,10 @@ app.get('/', function(req, res){
   });
 });
 
-app.listen(3000);
+var port = process.env.PORT || 3000;
+app.listen(port, function(){
+  console.log("Listening on " + port);
+});
+
+
 console.log("Express server listening on port %d", app.address().port);
