@@ -8,7 +8,7 @@ var http = require('http');
 var app = module.exports = express.createServer();
 //var net = require('net');
 var port = (process.env.VMC_APP_PORT || 3000);
-var host = (process.env.VCAP_APP_HOST || 'localhost');
+var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 
 //tcpGuests = [];
 // Configuration
