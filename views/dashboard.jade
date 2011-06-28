@@ -1,3 +1,15 @@
 h1
 	| Dashboard 
 div 
+
+script
+	//var socket = io.connect('http://184.73.237.221:3000');
+	var socket = io.connect('http://localhost:3000');
+	socket.on('sensor_event', function (data) {
+		console.log(data);
+	});
+	var increment = 0;
+	setInterval(function(){
+		socket.emit('sensor_event', { timestamp: new Date(), value: increment++});
+
+	}, 5000);

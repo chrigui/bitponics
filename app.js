@@ -3,14 +3,15 @@
  * Module dependencies.
  */
 
-var express = require('express');
-var http = require('http');
-var app = module.exports = express.createServer();
-//var net = require('net');
-var port = (process.env.VMC_APP_PORT || 3000);
-var host = (process.env.VCAP_APP_HOST || '0.0.0.0');
+var express = require('express')
+	, http = require('http')
+	, app = module.exports = express.createServer()
+	, net = require('net')
+	, io = require('socket.io').listen(app)
+	, port = (process.env.VMC_APP_PORT || 3000)
+	, host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 
-//tcpGuests = [];
+var tcpGuests = [];
 // Configuration
 if(process.env.VCAP_SERVICES){
   var env = JSON.parse(process.env.VCAP_SERVICES);
@@ -94,14 +95,14 @@ var print_visits = function(req, res){
 // Routes
 
 app.get('/dashboard', function(req, res){
-	print_visits(req, res);
+	//print_visits(req, res);
 	
-	/*
+
   res.render('dashboard', {
     title: 'Express',
 	locals : { temp: 1 }
   });
-*/
+
 });
 
 app.get('/', function(req, res){
@@ -120,14 +121,16 @@ app.listen(port, host, function(){
 
 
 
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('sensor_event', function (data) {
+    socket.broadcast.emit('sensor_event', data);
+  });
+});
 
 
-/*
 
-
-
-
-//tcp socekt server
+//tcp socket server
 var tcpServer = net.createServer(function (socket) {
   console.log('tcp server running on port 1337');
 });
@@ -151,4 +154,3 @@ tcpServer.on('connection',function(socket){
     })
 });
 tcpServer.listen(1337);
-*/

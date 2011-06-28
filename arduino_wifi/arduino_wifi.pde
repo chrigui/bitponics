@@ -2,12 +2,12 @@
 #include "Credentials.h"
 
 
-//byte server[] = { 66, 249, 89, 104 }; // Google
-byte server[] = { 192, 168, 1, 2 };
 
-Client client(server, 3000);
+byte server[] = { 184, 73, 237, 221 }; // bitponics on ec2
 
-//Client client("wikipedia.org", 80);
+Client client(server, 1337);
+
+//Client client("http://ec2-184-73-237-221.compute-1.amazonaws.com/", 3000); // doesn't work with just a domain. need IP
 
 void setup() {
   
