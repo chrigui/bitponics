@@ -1,6 +1,10 @@
 h1
-	| Dashboard 
-div 
+	| bitponics
+div#light-sensor-graph
+ 
+
+
+
 
 script
 	var socket = io.connect('http://184.73.237.221:3000');
@@ -21,3 +25,12 @@ script
 
 	}, 5000);
 	*/
+	
+	g = new Dygraph(
+		document.getElementById("graphdiv"),  // containing div
+		"Date,Temperature\n" +                // the data series
+		"2008-05-07,75\n" +
+		"2008-05-08,70\n" +
+		"2008-05-09,80\n",
+		{ }                                   // the options
+		);
