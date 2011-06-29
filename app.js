@@ -9,7 +9,8 @@ var express = require('express')
 	, net = require('net')
 	, io = require('socket.io').listen(app)
 	, port = (process.env.VMC_APP_PORT || 3000)
-	, host = (process.env.VCAP_APP_HOST || '0.0.0.0');
+	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
+	, ioSockets = [];
 
 var tcpGuests = [];
 // Configuration
@@ -126,6 +127,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('sensor_event', function (data) {
     socket.broadcast.emit('sensor_event', data);
   });
+	ioSockets.push(socket);
 });
 
 
@@ -149,11 +151,11 @@ tcpServer.on('connection',function(socket){
         
 		console.log('io', io);
         var socks = io.sockets.sockets;
-		for (s in socks) {
-			if (socks.hasOwnProperty(s)){
+		for (s in ioSockets) {
+
 				console.log('emitting to a client');
 				s.emit({message:["arduino",data.toString('ascii',0,data.length)]});
-			}
+
 		}
 		/*
 		//send data to guest socket.io chat server
