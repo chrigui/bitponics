@@ -152,9 +152,10 @@ tcpServer.on('connection',function(socket){
 		console.log('io', io);
         var socks = io.sockets.sockets;
 		for (s in ioSockets) {
+			if (s.emit){
 			console.log('emitting to a client');
 			s.emit('sensor_event', {message:["arduino",data.toString('ascii',0,data.length)]});
-
+}
 		}
 		/*
 		//send data to guest socket.io chat server
