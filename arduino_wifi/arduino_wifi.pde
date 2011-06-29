@@ -13,7 +13,7 @@ Client client(server, 1337);
 
 int lightSensorPin = A0;
 int lightSensorValue = 0;
-int outPin = 13;
+int outPin = 12;
 
 void setup() {
 
@@ -21,6 +21,7 @@ void setup() {
   Serial.begin(9600);
     Serial.println("launched");
   WiFly.begin();
+  Serial.println("wifly began");
 //  if (!WiFly.join(ssid, passphrase)) { // For home
   if (!WiFly.join(ssid, passphrase, false)) { // For ITP
     Serial.println("Association failed.");
@@ -52,13 +53,13 @@ void loop() {
       digitalWrite(outPin, HIGH);
     }
     digitalWrite(outPin, LOW);
-    /*
+    
     lightSensorValue = map(analogRead(lightSensorPin), 0, 400, 0, 100);
-    String toSend = "{ \"sensorType\": \"light\", \"value\": ";
-    toSend += lightSensorValue + "}";
-    client.print(toSend);
-    Serial.print(toSend);
-    */
+    String toSend1 = "{ \"sensorType\": \"light\", \"value\": ";
+    String toSend2 = toSend1 + lightSensorValue + "}";
+    client.print(toSend2);
+    Serial.print(toSend2);
+    
     delay(2000);
   }
   

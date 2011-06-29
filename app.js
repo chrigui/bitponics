@@ -9,8 +9,7 @@ var express = require('express')
 	, net = require('net')
 	, io = require('socket.io').listen(app)
 	, port = (process.env.VMC_APP_PORT || 3000)
-	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
-	, ioSockets = [];
+	, host = (process.env.VCAP_APP_HOST || '0.0.0.0');
 
 var tcpGuests = [];
 // Configuration
@@ -127,7 +126,6 @@ io.sockets.on('connection', function (socket) {
   socket.on('sensor_event', function (data) {
     socket.broadcast.emit('sensor_event', data);
   });
-	ioSockets.push(socket);
 });
 
 
@@ -144,21 +142,42 @@ tcpServer.on('connection',function(socket){
     tcpGuests.push(socket);
     
     socket.on('data',function(data){
-		var processedData = data.toString('ascii',0,data.length);
-		//data = JSON.parse(data);
-		//data.timestamp = new Date();
-        console.log('received on tcp socket:', processedData);
+		
+		console.log('received on tcp socket:', processedData);
         socket.write('msg received\r\n');
 		socket.write(data);
+		socket.write('\r\n');
 		socket.write('end msg\r\n');
-        
-        var socks = io.sockets.sockets;
-		for (s in socks) {
-			if (socks[s] && socks[s].emit){
-				console.log('emitting to a client');
-				socks[s].emit('sensor_event', processedData); //{message:["arduino",data.toString('ascii',0,data.length)]});
+		
+		
+		try{
+			var processedData = data.toString('ascii',0,data.length);
+			processedData = JSON.parse(processedData);
+			processedData.timestamp = new Date();
+			
+			require('mongodb').connect(mongourl, function(err, conn){
+			    conn.collection('ips', function(err, coll){
+			      /* Simple object to insert: ip address and date */
+			      /* Insert the object then print in response */
+			      /* Note the _id has been created */
+			      coll.insert( processedData, {safe:true}, function(err){
+			        if(err) { console.log(err.stack); }
+			      });
+			    });
+			  });
+			
+			var socks = io.sockets.sockets;
+			for (s in socks) {
+				if (socks[s] && socks[s].emit){
+					console.log('emitting to a client');
+					socks[s].emit('sensor_event', processedData); //{message:["arduino",data.toString('ascii',0,data.length)]});
+				}
 			}
-		}
+		} catch(e){ console.log("Error parsing TCP data : ", e);}
+
+        
+        
+        
 		/*
 		//send data to guest socket.io chat server
         for (g in io.clients) {
