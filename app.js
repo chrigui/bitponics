@@ -156,10 +156,9 @@ tcpServer.on('connection',function(socket){
 			processedData.timestamp = new Date();
 			
 			require('mongodb').connect(mongourl, function(err, conn){
-			    conn.collection('ips', function(err, coll){
-			      /* Simple object to insert: ip address and date */
-			      /* Insert the object then print in response */
-			      /* Note the _id has been created */
+				console.write('connected to mongodb');
+			    conn.collection('sensor_logs', function(err, coll){
+					console.write('writing to sensor_logs');
 			      coll.insert( processedData, {safe:true}, function(err){
 			        if(err) { console.log(err.stack); }
 			      });
