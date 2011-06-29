@@ -26,8 +26,8 @@ script
 	}, 5000);
 	*/
 	
-	g = new Dygraph(
-		document.getElementById("graphdiv"),  // containing div
+	var g = new Dygraph(
+		document.getElementById("light-sensor-graph"),  // containing div
 		"Date,Temperature\n" +                // the data series
 		"2008-05-07,75\n" +
 		"2008-05-08,70\n" +
