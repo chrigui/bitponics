@@ -7,10 +7,11 @@ div#light-sensor-graph
 
 
 script
+	var global = {};
+	global.lightSensorData = [];
+	
 	$(function () {
-		var lightSensorData = []
-			, lightGraph = $('#light-sensor-graph');
-
+		var lightGraph = $('#light-sensor-graph');
 		
 		var socket = io.connect('http://184.73.237.221:3000');
 		//var socket = io.connect('http://localhost:3000');
@@ -43,13 +44,14 @@ script
 		};
 		
 		socket.on('sensor_event', function (data) {
-			console.log(data);
+			//console.log(data);
 			var point = [];
 			point[0] = (new Date(data.timestamp)).getTime();
 			point[1] = data.value;
-			lightSensorData.push(point);
+			console.log(point);
+			global.lightSensorData.push(point);
 			
-			$.plot(lightGraph, lightSensorData, options);
+			$.plot(lightGraph, global.lightSensorData, options);
 		});
 		
 		//$.plot(lightGraph, [ d1, d2, d3 ]);
