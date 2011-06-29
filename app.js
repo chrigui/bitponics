@@ -144,9 +144,10 @@ tcpServer.on('connection',function(socket){
     tcpGuests.push(socket);
     
     socket.on('data',function(data){
+		var processedData = data.toString('ascii',0,data.length)]};
 		//data = JSON.parse(data);
 		//data.timestamp = new Date();
-        console.log('received on tcp socket:', data);
+        console.log('received on tcp socket:', processedData);
         socket.write('msg received\r\n');
 		socket.write(data);
 		socket.write('end msg\r\n');
@@ -155,7 +156,7 @@ tcpServer.on('connection',function(socket){
 		for (s in socks) {
 			if (socks[s] && socks[s].emit){
 				console.log('emitting to a client');
-				socks[s].emit('sensor_event', data); //{message:["arduino",data.toString('ascii',0,data.length)]});
+				socks[s].emit('sensor_event', processedData); //{message:["arduino",data.toString('ascii',0,data.length)]});
 			}
 		}
 		/*
