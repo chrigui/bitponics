@@ -147,12 +147,13 @@ tcpServer.on('connection',function(socket){
 		socket.write(data);
 		socket.write('end msg\r\n');
         
-		if (!io.clients){
-			console.log('no io.clients');
-			console.log(io);
-		}
         
-		io.socket.broadcast({message:["arduino",data.toString('ascii',0,data.length)]});
+		for (s in io.server.sockets.sockets) {
+			if (io.server.sockets.sockets.hasOwnProperty(s)){
+				console.log('emitting to a client');
+				s.emit({message:["arduino",data.toString('ascii',0,data.length)]});
+			}
+		}
 		/*
 		//send data to guest socket.io chat server
         for (g in io.clients) {
