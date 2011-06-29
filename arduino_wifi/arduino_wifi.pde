@@ -13,16 +13,14 @@ Client client(server, 1337);
 
 int lightSensorPin = A0;
 int lightSensorValue = 0;
+int outPin = 13;
 
 void setup() {
-  
+  pinMode(outPin, OUTPUT);
   Serial.begin(115200);
-  Serial.println("WebClient example at 38400 baud.");
-
   WiFly.begin();
-Serial.println("wifly began");
-  if (!WiFly.join(ssid, passphrase)) { // For home
-//  if (!WiFly.join(ssid, passphrase, false)) { // For ITP
+//  if (!WiFly.join(ssid, passphrase)) { // For home
+  if (!WiFly.join(ssid, passphrase, false)) { // For ITP
     Serial.println("Association failed.");
     while (1) {
       // Hang on failure.
@@ -49,12 +47,14 @@ void loop() {
     while(client.available()){
       char c = client.read();
       Serial.print(c);
+      digitalWrite(outPin, HIGH);
     }
+    digitalWrite(outPin, LOW);
     
-    lightSensorValue = map(analogRead(lightSensorPin), 0, 300, 0, 1000);    
-    client.print(lightSensorValue);
-    //Serial.print(lightSensorValue);
-    delay(5000);
+    lightSensorValue = map(analogRead(lightSensorPin), 0, 400, 0, 100);    
+    client.print("{ \"sensorType\": \"light\", \"value\": " + lightSensorValue + "}");
+    Serial.print(lightSensorValue);
+    delay(2000);
   }
   
   if (!client.connected()) {
@@ -67,6 +67,7 @@ void loop() {
 
 
 /*
+// Version for node.js running locally, communication over serial
 #define SERIAL_BAUDRATE 115200
 #define OPC_PIN_MODE         0x01
 #define OPC_DIGITAL_READ     0x02

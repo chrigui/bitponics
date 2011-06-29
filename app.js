@@ -144,19 +144,19 @@ tcpServer.on('connection',function(socket){
     tcpGuests.push(socket);
     
     socket.on('data',function(data){
-        console.log('received on tcp socket:'+data);
+		data = JSON.parse(data);
+		data.timestamp = new Date();
+        console.log('received on tcp socket:', data);
         socket.write('msg received\r\n');
 		socket.write(data);
 		socket.write('end msg\r\n');
         
-		console.log('io', io);
         var socks = io.sockets.sockets;
 		for (s in socks) {
-			console.log('socks', s, socks[s]);
-			if (socks[s].emit){
-			console.log('emitting to a client');
-			socks[s].emit('sensor_event', {message:["arduino",data.toString('ascii',0,data.length)]});
-}
+			if (socks[s] && socks[s].emit){
+				console.log('emitting to a client');
+				socks[s].emit('sensor_event', data); //{message:["arduino",data.toString('ascii',0,data.length)]});
+			}
 		}
 		/*
 		//send data to guest socket.io chat server
