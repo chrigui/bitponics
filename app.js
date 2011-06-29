@@ -144,13 +144,19 @@ tcpServer.on('connection',function(socket){
     socket.on('data',function(data){
         console.log('received on tcp socket:'+data);
         socket.write('msg received\r\n');
+		socket.write(data);
+		socket.write('end msg\r\n');x
         
-        //send data to guest socket.io chat server
+        
+		io.broadcast({message:["arduino",data.toString('ascii',0,data.length)]});
+		/*
+		//send data to guest socket.io chat server
         for (g in io.clients) {
             var client = io.clients[g];
             client.send({message:["arduino",data.toString('ascii',0,data.length)]});
             
         }
+		*/
     })
 });
 tcpServer.listen(1337);

@@ -9,12 +9,8 @@ script
 		console.log(data);
 	});
 	socket.on('message', function(obj){
-		if ('buffer' in obj){
-			//ignore this
-		} 
-		else {
-			console.log(obj);
-		}
+		console.log(obj);
+		
 	});
 	var increment = 0;
 	setInterval(function(){
