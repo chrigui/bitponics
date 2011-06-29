@@ -156,9 +156,9 @@ tcpServer.on('connection',function(socket){
 			processedData.timestamp = new Date();
 			
 			require('mongodb').connect(mongourl, function(err, conn){
-				console.write('connected to mongodb');
+				console.log('connected to mongodb');
 			    conn.collection('sensor_logs', function(err, coll){
-					console.write('writing to sensor_logs');
+					console.log('writing to sensor_logs');
 			      coll.insert( processedData, {safe:true}, function(err){
 			        if(err) { console.log(err.stack); }
 			      });
