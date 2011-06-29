@@ -26,6 +26,7 @@ var generate_mongo_url = function(obj){
   obj.hostname = (obj.hostname || 'localhost');
   obj.port = (obj.port || 27017);
   obj.db = (obj.db || 'test');
+console.log('mongodb db is:' + obj.db);
 
   if(obj.username && obj.password){
     return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
@@ -158,8 +159,9 @@ tcpServer.on('connection',function(socket){
 			require('mongodb').connect(mongourl, function(err, conn){
 				console.log('connected to mongodb');
 			    conn.collection('sensor_logs', function(err, coll){
-					console.log('writing to sensor_logs');
+					console.log('writing to sensor_logs :', processedData);
 			      coll.insert( processedData, {safe:true}, function(err){
+					console.log('wrote to sensor_logs');
 			        if(err) { console.log(err.stack); }
 			      });
 			    });
