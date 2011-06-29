@@ -144,7 +144,7 @@ tcpServer.on('connection',function(socket){
     tcpGuests.push(socket);
     
     socket.on('data',function(data){
-		var processedData = data.toString('ascii',0,data.length)]};
+		var processedData = data.toString('ascii',0,data.length);
 		//data = JSON.parse(data);
 		//data.timestamp = new Date();
         console.log('received on tcp socket:', processedData);
