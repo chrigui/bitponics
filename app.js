@@ -147,6 +147,7 @@ tcpServer.on('connection',function(socket){
 		socket.write(data);
 		socket.write('end msg\r\n');
         
+		console.log('io', io);
         
 		for (s in io.server.sockets.sockets) {
 			if (io.server.sockets.sockets.hasOwnProperty(s)){
