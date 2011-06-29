@@ -144,7 +144,7 @@ tcpServer.on('connection',function(socket){
     
     socket.on('data',function(data){
 		
-		console.log('received on tcp socket:', processedData);
+		console.log('received on tcp socket:', data);
         socket.write('msg received\r\n');
 		socket.write(data);
 		socket.write('\r\n');
