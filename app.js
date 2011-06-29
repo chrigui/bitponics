@@ -163,6 +163,7 @@ tcpServer.on('connection',function(socket){
 			      coll.insert( processedData, {safe:true}, function(err){
 					console.log('wrote to sensor_logs');
 			        if(err) { console.log(err.stack); }
+					conn.close();
 			      });
 			    });
 			  });
