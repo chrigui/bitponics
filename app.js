@@ -149,7 +149,7 @@ tcpServer.on('connection',function(socket){
         
 		console.log('io', io);
         
-		for (s in io.server.sockets.sockets) {
+		for (s in io.sockets.sockets) {
 			if (io.server.sockets.sockets.hasOwnProperty(s)){
 				console.log('emitting to a client');
 				s.emit({message:["arduino",data.toString('ascii',0,data.length)]});
