@@ -20,9 +20,9 @@ void setup() {
   Serial.println("WebClient example at 38400 baud.");
 
   WiFly.begin();
-
-  //if (!WiFly.join(ssid, passphrase)) { // For home
-  if (!WiFly.join(ssid, passphrase, false)) { // For ITP
+Serial.println("wifly began");
+  if (!WiFly.join(ssid, passphrase)) { // For home
+//  if (!WiFly.join(ssid, passphrase, false)) { // For ITP
     Serial.println("Association failed.");
     while (1) {
       // Hang on failure.
@@ -52,7 +52,7 @@ void loop() {
     }
     
     lightSensorValue = map(analogRead(lightSensorPin), 0, 300, 0, 1000);    
-    //client.print(lightSensorValue);
+    client.print(lightSensorValue);
     //Serial.print(lightSensorValue);
     delay(5000);
   }

@@ -145,7 +145,7 @@ tcpServer.on('connection',function(socket){
         console.log('received on tcp socket:'+data);
         socket.write('msg received\r\n');
 		socket.write(data);
-		socket.write('end msg\r\n');x
+		socket.write('end msg\r\n');
         
         
 		io.broadcast({message:["arduino",data.toString('ascii',0,data.length)]});
