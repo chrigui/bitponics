@@ -8,6 +8,14 @@ script
 	socket.on('sensor_event', function (data) {
 		console.log(data);
 	});
+	socket.on('message', function(obj){
+		if ('buffer' in obj){
+			//ignore this
+		} 
+		else {
+			console.log(obj);
+		}
+	});
 	var increment = 0;
 	setInterval(function(){
 		socket.emit('sensor_event', { timestamp: new Date(), value: increment++});

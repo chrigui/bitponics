@@ -6,8 +6,13 @@
 byte server[] = { 184, 73, 237, 221 }; // bitponics on ec2
 
 Client client(server, 1337);
+//Client client("google.com", 80);
 
 //Client client("http://ec2-184-73-237-221.compute-1.amazonaws.com/", 3000); // doesn't work with just a domain. need IP
+
+
+int lightSensorPin = A0;
+int lightSensorValue = 0;
 
 void setup() {
   
@@ -16,7 +21,8 @@ void setup() {
 
   WiFly.begin();
 
-  if (!WiFly.join(ssid, passphrase)) {
+  //if (!WiFly.join(ssid, passphrase)) { // For home
+  if (!WiFly.join(ssid, passphrase, false)) { // For ITP
     Serial.println("Association failed.");
     while (1) {
       // Hang on failure.
@@ -37,25 +43,24 @@ void setup() {
   
 }
 
-int count = 0;
-
 void loop() {
   if (client.available()) {
-    char c = client.read();
-    Serial.print(c);
-    count++;
-    if (count > 80) {
-      count = 0;
-      Serial.println();
+    
+    while(client.available()){
+      char c = client.read();
+      Serial.print(c);
     }
+    
+    lightSensorValue = map(analogRead(lightSensorPin), 0, 300, 0, 1000);    
+    //client.print(lightSensorValue);
+    //Serial.print(lightSensorValue);
+    delay(5000);
   }
   
   if (!client.connected()) {
     Serial.println();
     Serial.println("disconnecting.");
     client.stop();
-    for(;;)
-      ;
   }
 }
 
