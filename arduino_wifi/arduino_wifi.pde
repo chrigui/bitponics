@@ -16,8 +16,10 @@ int lightSensorValue = 0;
 int outPin = 13;
 
 void setup() {
+
   pinMode(outPin, OUTPUT);
-  Serial.begin(115200);
+  Serial.begin(9600);
+    Serial.println("launched");
   WiFly.begin();
 //  if (!WiFly.join(ssid, passphrase)) { // For home
   if (!WiFly.join(ssid, passphrase, false)) { // For ITP
@@ -50,10 +52,13 @@ void loop() {
       digitalWrite(outPin, HIGH);
     }
     digitalWrite(outPin, LOW);
-    
-    lightSensorValue = map(analogRead(lightSensorPin), 0, 400, 0, 100);    
-    client.print("{ \"sensorType\": \"light\", \"value\": " + lightSensorValue + "}");
-    Serial.print(lightSensorValue);
+    /*
+    lightSensorValue = map(analogRead(lightSensorPin), 0, 400, 0, 100);
+    String toSend = "{ \"sensorType\": \"light\", \"value\": ";
+    toSend += lightSensorValue + "}";
+    client.print(toSend);
+    Serial.print(toSend);
+    */
     delay(2000);
   }
   
