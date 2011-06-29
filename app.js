@@ -148,9 +148,9 @@ tcpServer.on('connection',function(socket){
 		socket.write('end msg\r\n');
         
 		console.log('io', io);
-        
-		for (s in io.sockets.sockets) {
-			if (io.server.sockets.sockets.hasOwnProperty(s)){
+        var socks = io.sockets.sockets;
+		for (s in socks) {
+			if (socks.hasOwnProperty(s)){
 				console.log('emitting to a client');
 				s.emit({message:["arduino",data.toString('ascii',0,data.length)]});
 			}
