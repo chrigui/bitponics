@@ -113,7 +113,16 @@ app.get('/', function(req, res){
 /*
 record_visit(req, res);
 */
-	res.render('index', { layout:false});
+	fs.readFile('./public/html/index.htm', function(error, content) {
+		if (error) {
+			res.send(error.message, 500);
+		}
+
+        else {
+			res.send(content, 200);
+		}
+	});
+	res.send();
 });
 
 
