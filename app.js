@@ -8,7 +8,7 @@ var express = require('express')
 	, app = module.exports = express.createServer()
 	, net = require('net')
 	, io = require('socket.io').listen(app)
-	, port = 80//(process.env.VMC_APP_PORT || 3000)
+	, port = 8080//(process.env.VMC_APP_PORT || 3000)
 	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
 	, fs = require('fs');
 
