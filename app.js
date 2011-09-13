@@ -115,11 +115,13 @@ record_visit(req, res);
 */
 	fs.readFile('./public/html/index.htm', function(error, content) {
 		if (error) {
+			console.log('error in fs readfile', error);
 			res.send(error.message, 500);
 		}
 
         else {
-			res.send(content, 200);
+			console.log('success in fs readfile, sending');
+			res.send(content);
 		}
 	});
 	res.send();
