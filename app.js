@@ -113,7 +113,7 @@ app.get('/', function(req, res){
 /*
 record_visit(req, res);
 */
-	fs.readFile('./public/html/index.htm', function(error, content) {
+	fs.readFile('./public/html/index.html', function(error, content) {
 		if (error) {
 			console.log('error in fs readfile', error);
 			res.send(error.message, 500);
