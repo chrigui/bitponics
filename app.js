@@ -121,7 +121,9 @@ record_visit(req, res);
 
         else {
 			console.log('success in fs readfile, sending');
-			res.send(content);
+			res.writeHead(200, { 'Content-Type': 'text/html' });
+			res.write(content);
+			res.end();
 		}
 	});
 });
