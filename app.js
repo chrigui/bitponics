@@ -8,8 +8,9 @@ var express = require('express')
 	, app = module.exports = express.createServer()
 	, net = require('net')
 	, io = require('socket.io').listen(app)
-	, port = (process.env.VMC_APP_PORT || 3000)
-	, host = (process.env.VCAP_APP_HOST || '0.0.0.0');
+	, port = 80//(process.env.VMC_APP_PORT || 3000)
+	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
+	, fs = require('fs');
 
 var tcpGuests = [];
 // Configuration
@@ -26,7 +27,7 @@ var generate_mongo_url = function(obj){
   obj.hostname = (obj.hostname || 'localhost');
   obj.port = (obj.port || 27017);
   obj.db = (obj.db || 'test');
-console.log('mongodb db is:' + obj.db);
+  console.log('mongodb db is:' + obj.db);
 
   if(obj.username && obj.password){
     return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
@@ -41,6 +42,7 @@ var mongourl = generate_mongo_url(mongo);
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  app.register('.html', require('jade'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
@@ -93,6 +95,7 @@ var print_visits = function(req, res){
   });
 }
 
+
 // Routes
 
 app.get('/dashboard', function(req, res){
@@ -107,12 +110,10 @@ app.get('/dashboard', function(req, res){
 });
 
 app.get('/', function(req, res){
-record_visit(req, res);
 /*
-res.render('index', {
-    title: 'Express'
-  });
+record_visit(req, res);
 */
+	res.render('index', { layout:false});
 });
 
 
