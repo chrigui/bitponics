@@ -124,7 +124,6 @@ record_visit(req, res);
 			res.send(content);
 		}
 	});
-	res.send();
 });
 
 
