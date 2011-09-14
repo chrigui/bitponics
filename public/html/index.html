@@ -1,40 +1,132 @@
-<!doctype html>
-<head>
-  <meta charset="utf-8">
-
-  <title></title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-  
-  <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="/stylesheets/style.css?v=1">
- 
-</head>
-
-<body>
-
-  <div id="container">
-    <header>
-		<h1>bitponics</h1>
-    </header>
-    <div id="main" role="main">
+<html>
+	<head>
+		<title>Bitponics</title>
 		
-    </div>
-    
-    <footer>
+		<link href='http://fonts.googleapis.com/css?family=Raleway:100' rel='stylesheet' type='text/css'>
+		
+		<style type="text/css">
+		
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+			/* HTML5 display-role reset for older browsers */
+			article, aside, details, figcaption, figure, 
+			footer, header, hgroup, menu, nav, section {
+				display: block;
+			}
+			body {
+				line-height: 1;
+			}
+			ol, ul {
+				list-style: none;
+			}
+			blockquote, q {
+				quotes: none;
+			}
+			blockquote:before, blockquote:after,
+			q:before, q:after {
+				content: '';
+				content: none;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+			}
+			
+			/* END RESET */
+			
+			body{
+				font-family: "Raleway", sans-serif;
+			
+			
+			}
+			#content{
+				background:url('/img/bg.png') no-repeat;
+				width: 800px;
+				height: 800px;
+				margin: 10px auto;
+			}
+			#description{
+				left: 250px;
+				top: 40px;
+				position: relative;
+				width:550px;
+				height: 250px;
+				line-height: 140%;
+				font-size: 14pt;
+			}
+			#bottom{
+				position: relative;
+				left:20px;
+				top: 300px;
+			}
+			#oshw{
+				position:absolute;
+				right: 20px;
+				top: -60px;
+			}
+			b{
+				color: orange;
+			}
+			a{
+				color: inherit;
+			}
+			a:hover{
+				text-decoration: none;
+			}
+			
+		</style>
+		
+	</head>
+	
+	
+	
+	<body>
+	
+		<div id="content">
+			<p id="description">
+			Bitponics is an open source networked home hydroponics monitoring system. It tracks light, humidity, temperature, pH, and PPM and transmits these readings via WIFI to a web database. Once online, custom software allows us to analyze and visualize this data. The web interface also controls the intervals of any pumps or lighting in the system. It is geared to educate and give a better understanding of how plants grow and function.<b> The system is currently in development, so please contact or follow us on <a href="http://twitter.com/bitponics">twitter</a> to be notified of updates.</b>
+			</p>
+	
+			<div id="bottom">
+				<hr>
+				
+				<script type="text/javascript">var host = (("https:" == document.location.protocol) ? "https://secure." : "http://");document.write(unescape("%3Cscript src='" + host + "wufoo.com/scripts/embed/form.js' type='text/javascript'%3E%3C/script%3E"));</script>
+				
+				<script type="text/javascript">
+				var m7x4a3 = new WufooForm();
+				m7x4a3.initialize({
+				'userName':'greatsoles', 
+				'formHash':'m7x4a3', 
+				'autoResize':true,
+				'height':'514',
+				'header':'show'});
+				m7x4a3.display();
+				</script>
+				
+				
+				<a href="http://freedomdefined.org/OSHW"><img id="oshw"title="oshwv1" src="http://www.openhardwaresummit.org/wp-content/uploads/2011/08/oshw-logo-100-px.png" alt="" width="50"/>
+		
+			</div> <!-- END bottom -->
+		</div><!-- END content -->
 
-    </footer>
-  </div> <!--! end of #container -->
-
-
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-  <script>
-    var _gaq=[["_setAccount","UA-XXXXX-X"],["_trackPageview"]];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-    g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-    s.parentNode.insertBefore(g,s)}(document,"script"));
-  </script>
-
-</body>
+	
+	</body>
 </html>
