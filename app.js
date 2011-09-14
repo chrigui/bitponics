@@ -10,7 +10,8 @@ var express = require('express')
 	, io = require('socket.io').listen(app)
 	, port = 8080//(process.env.VMC_APP_PORT || 3000)
 	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
-	, fs = require('fs');
+	, fs = require('fs')
+	, cache = {};
 
 var tcpGuests = [];
 // Configuration
@@ -110,22 +111,29 @@ app.get('/dashboard', function(req, res){
 });
 
 app.get('/', function(req, res){
-/*
-record_visit(req, res);
-*/
-	fs.readFile('./public/html/index.html', function(error, content) {
-		if (error) {
-			console.log('error in fs readfile', error);
-			res.send(error.message, 500);
-		}
+	if (cache['index']) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.write(cache['index']);
+		res.end();
+	}
+	else {
+		fs.readFile('./public/html/index.html', function(error, content) {
+			if (error) {
+				console.log('error in fs readfile', error);
+				res.send(error.message, 500);
+			}
 
-        else {
-			console.log('success in fs readfile, sending');
-			res.writeHead(200, { 'Content-Type': 'text/html' });
-			res.write(content);
-			res.end();
-		}
-	});
+			else {
+				console.log('success in fs readfile, sending');
+				
+				cache['index'] = content;
+				
+				res.writeHead(200, { 'Content-Type': 'text/html' });
+				res.write(content);
+				res.end();
+			}
+		});
+	}
 });
 
 
