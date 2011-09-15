@@ -1,5 +1,5 @@
 body {
-  padding: 50px;
+  padding: 30px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -7,7 +7,7 @@ a {
   color: #00B7FF;
 }
 
-h1 {color: #2BB540;}
+h1 {color: #2BB540; margin-bottom:30px;}
 
 #light-sensor-graph {
 	width:800px;

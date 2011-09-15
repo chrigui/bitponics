@@ -54,7 +54,8 @@ void loop() {
     }
     digitalWrite(outPin, LOW);
     
-    lightSensorValue = map(analogRead(lightSensorPin), 0, 400, 0, 100);
+    Serial.println(analogRead(lightSensorPin));
+    lightSensorValue = map(analogRead(lightSensorPin), 0, 20, 0, 100);
     String toSend1 = "{ \"sensorType\": \"light\", \"value\": ";
     String toSend2 = toSend1 + lightSensorValue + "}";
     client.print(toSend2);
