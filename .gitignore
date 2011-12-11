@@ -33,7 +33,9 @@
 ehthumbs.db
 Icon?
 Thumbs.db
-*.swp # tmp files by MacVim
+
+ # tmp files by MacVim
+*.swp
 
 node_modules
 
