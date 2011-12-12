@@ -5,6 +5,7 @@
 
 var express = require('express')
 	, http = require('http')
+	, mongodb = require('mongodb')
 	, app = module.exports = express.createServer()
 	, net = require('net')
 	, io = require('socket.io').listen(app)
@@ -58,11 +59,10 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-
 // Methods
 var record_visit = function(req, res){
   /* Connect to the DB and auth */
-  require('mongodb').connect(mongourl, function(err, conn){
+  mongodb.connect(mongourl, function(err, conn){
     conn.collection('ips', function(err, coll){
       /* Simple object to insert: ip address and date */
       object_to_insert = { 'ip': req.connection.remoteAddress, 'ts': new Date() };
@@ -81,7 +81,7 @@ var record_visit = function(req, res){
 
 var print_visits = function(req, res){
   /* Connect to the DB and auth */
-  require('mongodb').connect(mongourl, function(err, conn){
+  mongodb.connect(mongourl, function(err, conn){
     conn.collection('ips', function(err, coll){
       coll.find({}, {limit:10, sort:[['_id','desc']]}, function(err, cursor){
         cursor.toArray(function(err, items){
@@ -136,6 +136,15 @@ app.get('/', function(req, res){
 	}
 });
 
+
+app.get('/splash', function(req, res) {
+
+	res.render('splash', {
+		title: "Bitponics"
+	});
+
+
+});
 
 app.listen(port, host, function(){
   console.log("Express server listening on port %d", app.address().port);
