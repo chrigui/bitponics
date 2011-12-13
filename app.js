@@ -104,7 +104,7 @@ app.get('/dashboard', function(req, res){
 	//print_visits(req, res);
 	
 
-  res.render('dashboard', {
+  res.render('jade/dashboard', {
     title: 'Express',
 	locals : { temp: 1 }
   });
@@ -140,7 +140,7 @@ app.get('/', function(req, res){
 
 app.get('/splash', function(req, res) {
 
-	res.render('splash', {
+	res.render('jade/splash', {
 		title: "Bitponics"
 	});
 
