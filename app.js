@@ -12,6 +12,7 @@ var express = require('express')
 	, port = 8080//(process.env.VMC_APP_PORT || 3000)
 	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
 	, fs = require('fs')
+	, stylus = require('stylus')
 	, cache = {};
 
 var tcpGuests = [];
@@ -39,17 +40,30 @@ var generate_mongo_url = function(obj){
   }
 }
 
-var mongourl = generate_mongo_url(mongo);
+var mongoUrl   = generate_mongo_url(mongo),
+	viewEngine = 'jade';
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
+  var stylusMiddleware = stylus.middleware({
+    src: __dirname + '/stylus/', // .styl files are located in `/stylus`
+    dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
+    debug: true,
+    compile: function(str, path) { // optional, but recommended
+      return stylus(str)
+        .set('filename', path)
+        .set('warn', true)
+        .set('compress', true);
+    }
+  });
+  app.set('views', __dirname + '/views/' + viewEngine);
+  app.set('view engine', viewEngine);
   app.register('.html', require('jade'));
+  app.use(stylusMiddleware);
   app.use(express.logger(':method :url :status'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+  app.use(express['static'](__dirname + '/public'));
 });
 
 app.configure('development', function(){
@@ -63,7 +77,7 @@ app.configure('production', function(){
 // Methods
 var record_visit = function(req, res){
   /* Connect to the DB and auth */
-  mongodb.connect(mongourl, function(err, conn){
+  mongodb.connect(mongoUrl, function(err, conn){
     conn.collection('ips', function(err, coll){
       /* Simple object to insert: ip address and date */
       object_to_insert = { 'ip': req.connection.remoteAddress, 'ts': new Date() };
@@ -82,7 +96,7 @@ var record_visit = function(req, res){
 
 var print_visits = function(req, res){
   /* Connect to the DB and auth */
-  mongodb.connect(mongourl, function(err, conn){
+  mongodb.connect(mongoUrl, function(err, conn){
     conn.collection('ips', function(err, coll){
       coll.find({}, {limit:10, sort:[['_id','desc']]}, function(err, cursor){
         cursor.toArray(function(err, items){
@@ -104,7 +118,7 @@ app.get('/dashboard', function(req, res){
 	//print_visits(req, res);
 	
 
-  res.render('jade/dashboard', {
+  res.render('dashboard', {
     title: 'Express',
 	locals : { temp: 1 }
   });
@@ -140,7 +154,7 @@ app.get('/', function(req, res){
 
 app.get('/splash', function(req, res) {
 
-	res.render('jade/splash', {
+	res.render('splash', {
 		title: "Bitponics"
 	});
 
@@ -187,7 +201,7 @@ tcpServer.on('connection',function(socket){
 			processedData = JSON.parse(processedData);
 			processedData.timestamp = new Date();
 			
-			require('mongodb').connect(mongourl, function(err, conn){
+			require('mongodb').connect(mongoUrl, function(err, conn){
 				console.log('connected to mongodb');
 			    conn.collection('sensor_logs', function(err, coll){
 					console.log('writing to sensor_logs :', processedData);
