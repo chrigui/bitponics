@@ -3,11 +3,11 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-      "express"   : "2.3.11"
+      "express"   : "2.5.1"
     , "jade"      : ">= 0.0.1"
 	, "mongodb"   : ">=0.9.1"
 	, "nib"       : ">= 0.0.1"
-	, "socket.io" : "0.7"
+	, "socket.io" : "0.8"
 	, "stylus"    : ">= 0.0.1"
   }
 }
