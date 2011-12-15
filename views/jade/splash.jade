@@ -1,11 +1,10 @@
-div(id="", class="wrapper")
+div(id="content", class="wrapper")
 	div(id="top")
 		p(id="description") Bitponics is an open source networked home hydroponics monitoring system. It tracks light, humidity, temperature, pH, and PPM and transmits these readings via WIFI to a web database. Once online, you are able to analyze and visualize this data from a web dashboard. The interface also controls the intervals of pumps and lighting in your system. It is geared to educate and give a better understanding of how plants grow and function.<b> The system is currently in development, so follow us on <a href="http://twitter.com/bitponics">twitter</a> or subscribe to our mailing list to be notified of updates.</b>
 
 		a(href="http://freedomdefined.org/OSHW")
 			img(id="oshw", title="oshwv1", src="http://www.openhardwaresummit.org/wp-content/uploads/2011/08/oshw-logo-100-px.png", alt="Open Hardware Summit", width="50")
-	hr
-	div(id="mailing-list")
+	div(id="mailing-list", class="block")
 		link(href="http://cdn-images.mailchimp.com/embedcode/slim-081711.css", rel="stylesheet", type="text/css")
 		style(type="text/css")
 			#mc_embed_signup{background:#fff; clear:left; font:14px; }
@@ -20,30 +19,30 @@ div(id="", class="wrapper")
 					div(class="clear")
 						input(type="submit", value="Subscribe", name="subscribe", id="mc-embedded-subscribe", class="button")
 			
-		div(id="contact")
-			h2 Send us your feedback; we'd love to hear your thoughts on the project	
-			script(type="text/javascript")
-				var host = (("https:" == document.location.protocol) ? "https://secure." : "http://");document.write(unescape("%3Cscript src='" + host + "wufoo.com/scripts/embed/form.js' type='text/javascript'%3E%3C/script%3E"));
-			// keep these two script blocks separate, otherwise form will not fire
-			script(type="text/javascript")
-				var m7x4a3 = new WufooForm();
-				m7x4a3.initialize({
-					'userName':'greatsoles', 
-					'formHash':'m7x4a3', 
-					'autoResize':true,
-					'height':'514',
-					'header':'hide'
-				});
-				m7x4a3.display();
-
+	div(id="contact", class="block")
+		h2 Send us your feedback; we'd love to hear your thoughts on the project	
 		script(type="text/javascript")
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-25720930-1']);
-			_gaq.push(['_trackPageview']);
-			(function() {
-				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
+			var host = (("https:" == document.location.protocol) ? "https://secure." : "http://");document.write(unescape("%3Cscript src='" + host + "wufoo.com/scripts/embed/form.js' type='text/javascript'%3E%3C/script%3E"));
+		// keep these two script blocks separate, otherwise form will not fire
+		script(type="text/javascript")
+			var m7x4a3 = new WufooForm();
+			m7x4a3.initialize({
+				'userName':'greatsoles', 
+				'formHash':'m7x4a3', 
+				'autoResize':true,
+				'height':'514',
+				'header':'hide'
+			});
+			m7x4a3.display();
+
+	script(type="text/javascript")
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-25720930-1']);
+		_gaq.push(['_trackPageview']);
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
 
 
