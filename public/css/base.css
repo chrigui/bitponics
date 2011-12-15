@@ -1,4 +1,5 @@
-body{font-family:"Open Sans",sans-serif}
+body{font-family:"Open Sans",sans-serif;padding:30px;font:14px "Lucida Grande",Helvetica,Arial,sans-serif}
+h1{color:#2bb540;margin-bottom:30px}
 h2{font-size:18px;font-weight:normal;line-height:1.2em;margin-bottom:1em}
 label{font-weight:normal;font-size:18px;line-height:1.2em}
 #content{background:url("/img/bg.png") no-repeat;margin:10px auto;width:800px}
@@ -7,5 +8,6 @@ label{font-weight:normal;font-size:18px;line-height:1.2em}
 #mailing-list,#contact{margin:20px}
 #oshw{position:absolute;right:20px;top:-60px}
 b{color:#ed2024}
-a{color:inherit;}
+a{color:#00b7ff;}
 a:hover{text-decoration:none}
+#light-sensor-graph{width:800px;height:600px}
