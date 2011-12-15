@@ -3,28 +3,36 @@
  * Module dependencies.
  */
 
-var express = require('express')
-	, http = require('http')
-	, mongodb = require('mongodb')
-	, app = module.exports = express.createServer()
-	, net = require('net')
-	, io = require('socket.io').listen(app)
-	, port = 8080//(process.env.VMC_APP_PORT || 3000)
-	, host = (process.env.VCAP_APP_HOST || '0.0.0.0')
-	, fs = require('fs')
-	, stylus = require('stylus')
-	, cache = {};
+var express    = require('express')
+	, http       = require('http')
+	, mongodb    = require('mongodb')
+	, app        = module.exports = express.createServer()
+	, net        = require('net')
+	, io         = require('socket.io').listen(app)
+	, port       = process.env.VCAP_APP_PORT || 8080
+	, host       = (process.env.VCAP_APP_HOST || '0.0.0.0')
+	, fs         = require('fs')
+	, stylus     = require('stylus')
+	, nib        = require('nib')
+	, cache      = {}
+	, tcpGuests  = []
+	, viewEngine = 'jade'
+	, env, mongo;
 
-var tcpGuests = [];
-// Configuration
-if(process.env.VCAP_SERVICES){
-  var env = JSON.parse(process.env.VCAP_SERVICES);
-  var mongo = env['mongodb-1.8'][0]['credentials'];
-}
-else{
-  var mongo = {"hostname":"localhost","port":27017,"username":"",
-    "password":"","name":"","db":"db"}
-}
+	// Configuration
+	if(process.env.VCAP_SERVICES){
+  	env = JSON.parse(process.env.VCAP_SERVICES);
+  	mongo = env['mongodb-1.8'][0]['credentials'];
+	} else {
+		mongo = { 
+			"hostname": "localhost",
+			"port": 27017,
+			"username": "", 
+			"password": "",
+			"name": "",
+			"db":"db"
+  	};
+	}
 
 var generate_mongo_url = function(obj){
   obj.hostname = (obj.hostname || 'localhost');
@@ -34,16 +42,14 @@ var generate_mongo_url = function(obj){
 
   if(obj.username && obj.password){
     return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  }
-  else{
+  } else{
     return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
   }
 }
 
-var mongoUrl   = generate_mongo_url(mongo),
-	viewEngine = 'jade';
+var mongoUrl   = generate_mongo_url(mongo);
 
-app.configure(function(){
+app.configure('development', function(){
   var stylusMiddleware = stylus.middleware({
     src: __dirname + '/stylus/', // .styl files are located in `/stylus`
     dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
@@ -52,26 +58,27 @@ app.configure(function(){
       return stylus(str)
         .set('filename', path)
         .set('warn', true)
-        .set('compress', true);
+        .set('compress', true)
+				.use(nib());
     }
   });
+	app.use(stylusMiddleware);  
+	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler()); 
+});
+
+app.configure(function(){
   app.set('views', __dirname + '/views/' + viewEngine);
   app.set('view engine', viewEngine);
   app.register('.html', require('jade'));
-  app.use(stylusMiddleware);
   app.use(express.logger(':method :url :status'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
-});
-
-app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-});
-
-app.configure('production', function(){
-  app.use(express.errorHandler()); 
 });
 
 // Methods
@@ -117,7 +124,6 @@ var print_visits = function(req, res){
 app.get('/dashboard', function(req, res){
 	//print_visits(req, res);
 	
-
   res.render('dashboard', {
     title: 'Express',
 	locals : { temp: 1 }
@@ -130,8 +136,7 @@ app.get('/', function(req, res){
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.write(cache['index']);
 		res.end();
-	}
-	else {
+	} else {
 		fs.readFile('./public/html/index.html', function(error, content) {
 			if (error) {
 				console.log('error in fs readfile', error);
