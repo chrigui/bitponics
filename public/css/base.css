@@ -1,0 +1,11 @@
+body{font-family:"Open Sans",sans-serif}
+h2{font-size:18px;font-weight:normal;line-height:1.2em;margin-bottom:1em}
+label{font-weight:normal;font-size:18px;line-height:1.2em}
+#content{background:url("/img/bg.png") no-repeat;margin:10px auto;width:800px}
+#top{height:625px}
+#description{font-size:14pt;height:250px;left:250px;line-height:130%;position:relative;top:40px;width:550px}
+#mailing-list,#contact{margin:20px}
+#oshw{position:absolute;right:20px;top:-60px}
+b{color:#ed2024}
+a{color:inherit;}
+a:hover{text-decoration:none}
