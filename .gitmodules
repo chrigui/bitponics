@@ -1,0 +1,3 @@
+[submodule "public/js/libs/Marker"]
+	path = public/js/libs/Marker
+	url = https://github.com/bbarr/Marker.git
