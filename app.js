@@ -138,12 +138,14 @@ app.get('/dashboard', function (req, res){
 });
 
 app.get('/', function (req, res){
+  app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
 	res.render('splash', {
 		title: "Bitponics"
 	});
 });
 
 app.get('/signup', function(req, res) {
+  app.set('view options', { layout: "./views/jade/shell.jade" });
 	res.render('signup', {
 		title: "Bitponics - Sign Up"
 	});
