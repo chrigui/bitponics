@@ -1,0 +1,11 @@
+link(rel="stylesheet", href="//cdn-images.mailchimp.com/embedcode/slim-081711.css")
+- if (isDevMode) {
+link(rel='stylesheet', href='/assets/css/libs/resets.css')
+link(rel='stylesheet', href='/assets/css/helpers.css')
+link(rel='stylesheet', href='/assets/css/base.css')
+link(rel='stylesheet', href='/assets/css/mobile.css', media='screen and (max-width: 639px)')
+link(rel='stylesheet', href='/assets/css/tablet.css',  media='screen and (min-width: 640px)')
+link(rel='stylesheet', href='/assets/css/desktop.css',  media='screen and (min-width: 1024px)')
+- } else {
+link(rel='stylesheet', href='/assets/css/all.css',  media='screen and (min-width: 1024px)')
+- }
