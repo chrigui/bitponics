@@ -127,7 +127,7 @@ var print_visits = function(req, res){
 
 // Routes
 
-app.get('/dashboard', function(req, res){
+app.get('/dashboard', function (req, res){
 	//print_visits(req, res);
 	
   res.render('dashboard', {
@@ -137,9 +137,15 @@ app.get('/dashboard', function(req, res){
 
 });
 
-app.get('/', function(req, res){
+app.get('/', function (req, res){
 	res.render('splash', {
 		title: "Bitponics"
+	});
+});
+
+app.get('/signup', function(req, res) {
+	res.render('signup', {
+		title: "Bitponics - Sign Up"
 	});
 });
 
