@@ -13,7 +13,8 @@ var express    = require('express')
 	, host       = (process.env.VCAP_APP_HOST || '0.0.0.0')
 	, fs         = require('fs')
 	, stylus     = require('stylus')
-	, nib        = require('nib')
+	, bootstrap  = require('bootstrap-stylus')
+	
 	, cache      = {}
 	, tcpGuests  = []
 	, viewEngine = 'jade'
@@ -50,17 +51,17 @@ var generate_mongo_url = function(obj){
 var mongoUrl   = generate_mongo_url(mongo);
 
 app.configure('development', function(){
-  var stylusMiddleware = stylus.middleware({
-    src: __dirname + '/stylus/', // .styl files are located in `/stylus`
-    dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
-    debug: true,
-    compile: function(str, path) { // optional, but recommended
-      return stylus(str)
-        .set('filename', path)
-        .set('warn', true)
-        .set('compress', true)
-				.use(nib());
-    }
+	var stylusMiddleware = stylus.middleware({
+		src: __dirname + '/stylus/', // .styl files are located in `/stylus`
+		dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
+		debug: true,
+		compile: function(str, path) { // optional, but recommended
+			return stylus(str)
+				.set('filename', path)
+				.set('warn', true)
+				.set('compress', true)
+				.use(bootstrap());
+			}
   });
 	app.use(stylusMiddleware);  
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -79,6 +80,11 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
+	app.dynamicHelpers({
+    isDevMode: function (req, res) {
+      return (process.env.NODE_ENV || 'development') === 'development';
+    }
+	});
 });
 
 // Methods
@@ -132,45 +138,14 @@ app.get('/dashboard', function(req, res){
 });
 
 app.get('/', function(req, res){
-	if (cache['index']) {
-		res.writeHead(200, { 'Content-Type': 'text/html' });
-		res.write(cache['index']);
-		res.end();
-	} else {
-		fs.readFile('./public/html/index.html', function(error, content) {
-			if (error) {
-				console.log('error in fs readfile', error);
-				res.send(error.message, 500);
-			}
-
-			else {
-				console.log('success in fs readfile, sending');
-				
-				cache['index'] = content;
-				
-				res.writeHead(200, { 'Content-Type': 'text/html' });
-				res.write(content);
-				res.end();
-			}
-		});
-	}
-});
-
-
-app.get('/splash', function(req, res) {
-
 	res.render('splash', {
 		title: "Bitponics"
 	});
-
-
 });
 
 app.listen(port, host, function(){
   console.log("Express server listening on port %d", app.address().port);
 });
-
-
 
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
@@ -178,8 +153,6 @@ io.sockets.on('connection', function (socket) {
     socket.broadcast.emit('sensor_event', data);
   });
 });
-
-
 
 //tcp socket server
 var tcpServer = net.createServer(function (socket) {
