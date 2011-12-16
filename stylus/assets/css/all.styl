@@ -5,8 +5,11 @@
 // ===== ./base
 @import "./base"
 // ===== ./mobile
-@import "./mobile"
+@media screen and (max-width: 639px)
+	@import "./mobile"
 // ===== ./tablet
-@import "./tablet"
+@media screen and (min-width: 640px)
+	@import "./tablet"
 // ===== ./desktop
-@import "./desktop"
+@media screen and (min-width: 1024px)
+	@import "./desktop"
