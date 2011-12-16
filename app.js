@@ -6,15 +6,15 @@
 var express    = require('express')
 	, http       = require('http')
 	, mongodb    = require('mongodb')
-	, app        = module.exports = express.createServer()
 	, net        = require('net')
-	, io         = require('socket.io').listen(app)
-	, port       = process.env.VCAP_APP_PORT || 8080
-	, host       = (process.env.VCAP_APP_HOST || '0.0.0.0')
 	, fs         = require('fs')
 	, stylus     = require('stylus')
-	, bootstrap  = require('bootstrap-stylus')
-	
+  , nib        = require('nib')	
+	, io         = require('socket.io').listen(app)
+	, app        = module.exports = express.createServer()
+	, PORT       = process.env.VCAP_APP_PORT || 8080
+	, HOST       = process.env.VCAP_APP_HOST || '0.0.0.0'
+  , ENV        = process.env.NODE_ENV || 'development' 
 	, cache      = {}
 	, tcpGuests  = []
 	, viewEngine = 'jade'
@@ -60,7 +60,7 @@ app.configure('development', function(){
 				.set('filename', path)
 				.set('warn', true)
 				.set('compress', true)
-				.use(bootstrap());
+				.use(nib());
 			}
   });
 	app.use(stylusMiddleware);  
@@ -150,7 +150,7 @@ app.get('/signup', function(req, res) {
 	});
 });
 
-app.listen(port, host, function(){
+app.listen(PORT, HOST, function(){
   console.log("Express server listening on port %d", app.address().port);
 });
 
