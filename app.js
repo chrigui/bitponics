@@ -4,36 +4,36 @@
  */
 
 var express    = require('express')
-	, http       = require('http')
-	, mongodb    = require('mongodb')
-	, net        = require('net')
-	, fs         = require('fs')
-	, stylus     = require('stylus')
-  , nib        = require('nib')	
-	, io         = require('socket.io').listen(app)
-	, app        = module.exports = express.createServer()
-	, PORT       = process.env.VCAP_APP_PORT || 8080
-	, HOST       = process.env.VCAP_APP_HOST || '0.0.0.0'
+  , http       = require('http')
+  , mongodb    = require('mongodb')
+  , net        = require('net')
+  , fs         = require('fs')
+  , stylus     = require('stylus')
+  , nib        = require('nib') 
+  , app        = module.exports = express.createServer()
+  , io         = require('socket.io').listen(app)
+  , PORT       = process.env.VCAP_APP_PORT || 8080
+  , HOST       = process.env.VCAP_APP_HOST || '0.0.0.0'
   , ENV        = process.env.NODE_ENV || 'development' 
-	, cache      = {}
-	, tcpGuests  = []
-	, viewEngine = 'jade'
-	, env, mongo;
+  , cache      = {}
+  , tcpGuests  = []
+  , viewEngine = 'jade'
+  , env, mongo;
 
-	// Configuration
-	if(process.env.VCAP_SERVICES){
-  	env = JSON.parse(process.env.VCAP_SERVICES);
-  	mongo = env['mongodb-1.8'][0]['credentials'];
-	} else {
-		mongo = { 
-			"hostname": "localhost",
-			"port": 27017,
-			"username": "", 
-			"password": "",
-			"name": "",
-			"db":"db"
-  	};
-	}
+  // Configuration
+  if(process.env.VCAP_SERVICES){
+    env = JSON.parse(process.env.VCAP_SERVICES);
+    mongo = env['mongodb-1.8'][0]['credentials'];
+  } else {
+    mongo = { 
+      "hostname": "localhost",
+      "port": 27017,
+      "username": "", 
+      "password": "",
+      "name": "",
+      "db":"db"
+    };
+  }
 
 var generate_mongo_url = function(obj){
   obj.hostname = (obj.hostname || 'localhost');
@@ -51,20 +51,20 @@ var generate_mongo_url = function(obj){
 var mongoUrl   = generate_mongo_url(mongo);
 
 app.configure('development', function(){
-	var stylusMiddleware = stylus.middleware({
-		src: __dirname + '/stylus/', // .styl files are located in `/stylus`
-		dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
-		debug: true,
-		compile: function(str, path) { // optional, but recommended
-			return stylus(str)
-				.set('filename', path)
-				.set('warn', true)
-				.set('compress', true)
-				.use(nib());
-			}
+  var stylusMiddleware = stylus.middleware({
+    src: __dirname + '/stylus/', // .styl files are located in `/stylus`
+    dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
+    debug: true,
+    compile: function(str, path) { // optional, but recommended
+      return stylus(str)
+        .set('filename', path)
+        .set('warn', true)
+        .set('compress', true)
+        .use(nib());
+      }
   });
-	app.use(stylusMiddleware);  
-	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(stylusMiddleware);  
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 });
 
 app.configure('production', function(){
@@ -79,11 +79,11 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
-	app.dynamicHelpers({
+  app.dynamicHelpers({
     isDevMode: function (req, res) {
       return (process.env.NODE_ENV || 'development') === 'development';
     }
-	});
+  });
 });
 
 // Methods
@@ -127,27 +127,27 @@ var print_visits = function(req, res){
 // Routes
 
 app.get('/dashboard', function (req, res){
-	//print_visits(req, res);
-	
+  //print_visits(req, res);
+  
   res.render('dashboard', {
     title: 'Express',
-	locals : { temp: 1 }
+  locals : { temp: 1 }
   });
 
 });
 
 app.get('/', function (req, res){
   app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
-	res.render('splash', {
-		title: "Bitponics"
-	});
+  res.render('splash', {
+    title: "Bitponics"
+  });
 });
 
 app.get('/signup', function(req, res) {
   app.set('view options', { layout: __dirname + "/views/jade/shell.jade" });
-	res.render('signup', {
-		title: "Bitponics - Sign Up"
-	});
+  res.render('signup', {
+    title: "Bitponics - Sign Up"
+  });
 });
 
 app.listen(PORT, HOST, function(){
@@ -173,51 +173,51 @@ tcpServer.on('connection',function(socket){
     tcpGuests.push(socket);
     
     socket.on('data',function(data){
-		
-		console.log('received on tcp socket:', data);
+    
+    console.log('received on tcp socket:', data);
         socket.write('msg received\r\n');
-		socket.write(data);
-		socket.write('\r\n');
-		socket.write('end msg\r\n');
-		
-		
-		try{
-			var processedData = data.toString('ascii',0,data.length);
-			processedData = JSON.parse(processedData);
-			processedData.timestamp = new Date();
-			
-			require('mongodb').connect(mongoUrl, function(err, conn){
-				console.log('connected to mongodb');
-			    conn.collection('sensor_logs', function(err, coll){
-					console.log('writing to sensor_logs :', processedData);
-			      coll.insert( processedData, {safe:true}, function(err){
-					console.log('wrote to sensor_logs');
-			        if(err) { console.log(err.stack); }
-					conn.close();
-			      });
-			    });
-			  });
-			
-			var socks = io.sockets.sockets;
-			for (s in socks) {
-				if (socks[s] && socks[s].emit){
-					console.log('emitting to a client');
-					socks[s].emit('sensor_event', processedData); //{message:["arduino",data.toString('ascii',0,data.length)]});
-				}
-			}
-		} catch(e){ console.log("Error parsing TCP data : ", e);}
+    socket.write(data);
+    socket.write('\r\n');
+    socket.write('end msg\r\n');
+    
+    
+    try{
+      var processedData = data.toString('ascii',0,data.length);
+      processedData = JSON.parse(processedData);
+      processedData.timestamp = new Date();
+      
+      require('mongodb').connect(mongoUrl, function(err, conn){
+        console.log('connected to mongodb');
+          conn.collection('sensor_logs', function(err, coll){
+          console.log('writing to sensor_logs :', processedData);
+            coll.insert( processedData, {safe:true}, function(err){
+          console.log('wrote to sensor_logs');
+              if(err) { console.log(err.stack); }
+          conn.close();
+            });
+          });
+        });
+      
+      var socks = io.sockets.sockets;
+      for (s in socks) {
+        if (socks[s] && socks[s].emit){
+          console.log('emitting to a client');
+          socks[s].emit('sensor_event', processedData); //{message:["arduino",data.toString('ascii',0,data.length)]});
+        }
+      }
+    } catch(e){ console.log("Error parsing TCP data : ", e);}
 
         
         
         
-		/*
-		//send data to guest socket.io chat server
+    /*
+    //send data to guest socket.io chat server
         for (g in io.clients) {
             var client = io.clients[g];
             client.send({message:["arduino",data.toString('ascii',0,data.length)]});
             
         }
-		*/
+    */
     })
 });
 tcpServer.listen(1337);
