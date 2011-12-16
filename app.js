@@ -74,7 +74,6 @@ app.configure('production', function(){
 app.configure(function(){
   app.set('views', __dirname + '/views/' + viewEngine);
   app.set('view engine', viewEngine);
-  app.register('.html', require('jade'));
   app.use(express.logger(':method :url :status'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
@@ -145,7 +144,7 @@ app.get('/', function (req, res){
 });
 
 app.get('/signup', function(req, res) {
-  app.set('view options', { layout: "./views/jade/shell.jade" });
+  app.set('view options', { layout: __dirname + "/views/jade/shell.jade" });
 	res.render('signup', {
 		title: "Bitponics - Sign Up"
 	});
