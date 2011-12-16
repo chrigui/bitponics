@@ -12,8 +12,6 @@ abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}
 table{border-collapse:collapse;border-spacing:0}
 hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}
 input,select{vertical-align:middle}
-.position-r{position:relative}
-.position-a{position:absolute}
 html,body{margin:0;padding:0}
 h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,cite,code,del,dfn,em,img,q,s,samp,small,strike,strong,sub,sup,tt,var,dd,dl,dt,li,ol,ul,fieldset,form,label,legend,button,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;font-weight:normal;font-style:normal;font-size:100%;line-height:1;font-family:inherit}
 table{border-collapse:collapse;border-spacing:0}
@@ -435,6 +433,8 @@ footer{margin-top:17px;padding-top:17px;border-top:1px solid #eee}
 .media-grid a{float:left;padding:4px;margin:0 0 18px 20px;border:1px solid #ddd;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0,0,0,0.07);-moz-box-shadow:0 1px 1px rgba(0,0,0,0.07);box-shadow:0 1px 1px rgba(0,0,0,0.07);}
 .media-grid a img{display:block}
 .media-grid a:hover{border-color:#0069d6;-webkit-box-shadow:0 1px 4px rgba(0,105,214,0.25);-moz-box-shadow:0 1px 4px rgba(0,105,214,0.25);box-shadow:0 1px 4px rgba(0,105,214,0.25)}
+.position-r{position:relative}
+.position-a{position:absolute}
 body{font-family:"Open Sans",sans-serif;padding:30px;font:14px "Lucida Grande",Helvetica,Arial,sans-serif}
 h1{color:#2bb540;margin-bottom:30px}
 h2{font-size:18px;font-weight:normal;line-height:1.2em;margin-bottom:1em}
@@ -444,7 +444,7 @@ label{font-weight:normal;font-size:18px;line-height:1.2em}
 #top{height:625px}
 #description{font-size:14pt;height:250px;left:250px;line-height:130%;position:relative;top:40px;width:550px}
 #mailing-list,#contact{padding:20px}
-#oshw{right:20px;top:-25px}
+#oshw{position:absolute;right:20px;top:-60px}
 b{color:#ed2024}
 a{color:#00b7ff;}
 a:hover{text-decoration:none}
@@ -453,8 +453,9 @@ a:hover{text-decoration:none}
 #mc_embed_signup form{padding:0;}
 #mc_embed_signup form label{font-weight:normal;padding:0;margin-bottom:1em;font-size:18px}
 #mc_embed_signup input.email{margin-bottom:18px}
-.no-mobile{display:none}
+@media screen and (max-width: 639px){.no-mobile{display:none}
 .wrapper{padding-left:20px;padding-right:20px}
-.mobile{display:none}
+}@media screen and (min-width: 640px){.mobile{display:none}
 .wrapper{margin:0 auto;width:90.234%;position:relative}
-.wrapper{max-width:1140px}
+}@media screen and (min-width: 1024px){.wrapper{max-width:1140px}
+}
