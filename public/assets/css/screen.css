@@ -1,0 +1,153 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+/* line 17, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* line 20, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+body {
+  line-height: 1;
+}
+
+/* line 22, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 24, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 26, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 28, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 101, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 30, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 114, ../../../../../../../../Users/amit/.rvm/gems/ruby-1.9.2-p290/gems/compass-0.11.7/frameworks/compass/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('fonts/din_medium.eot');
+  src: url('fonts/din_medium.eot?iefix') format('eot'), url('fonts/din_medium.woff') format('woff'), url('fonts/din_medium.ttf') format('truetype'), url('fonts/din_medium.svg') format('svg');
+}
+
+@font-face {
+  font-family: "DIN";
+  src: url('fonts/din_medium.eot');
+  font-weight: bold;
+  src: url('fonts/din_medium.eot?iefix') format('eot'), url('fonts/din_bold.woff') format('woff'), url('fonts/din_bold.ttf') format('truetype'), url('fonts/din_bold.svg') format('svg');
+}
+
+/* line 27, icons */
+.icons-sprite, header section.last a .icon {
+  background: url('../../img/icons-s66ef789bc1.png') no-repeat;
+}
+
+/* line 9, ../../../scss/screen.scss */
+body {
+  background: #f4f4f4;
+  color: #333333;
+  font-family: DIN, Helvetica, Arial, sans-serif;
+}
+
+/* line 15, ../../../scss/screen.scss */
+header {
+  overflow: hidden;
+  *zoom: 1;
+  background: #333333;
+  color: #f4f4f4;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #dfdfdf;
+}
+/* line 24, ../../../scss/screen.scss */
+header section {
+  position: relative;
+  border-right: 1px solid #fff;
+  border-left: 1px solid #dfdfdf;
+}
+/* line 29, ../../../scss/screen.scss */
+header section a {
+  display: block;
+  padding: 20px;
+  font-size: 20px;
+  text-decoration: none;
+  color: #f4f4f4;
+}
+/* line 37, ../../../scss/screen.scss */
+header section.first {
+  border-left-width: 0;
+  width: 180px;
+  float: left;
+}
+/* line 42, ../../../scss/screen.scss */
+header section.first a {
+  font-size: 16px;
+}
+/* line 47, ../../../scss/screen.scss */
+header section.last {
+  border-right-width: 0;
+  width: 180px;
+  float: right;
+}
+/* line 52, ../../../scss/screen.scss */
+header section.last a {
+  font-size: 16px;
+}
+/* line 55, ../../../scss/screen.scss */
+header section.last a .icon {
+  background-position: 0 0;
+  display: block;
+  float: right;
+  height: 18px;
+  width: 18px;
+}
+/* line 65, ../../../scss/screen.scss */
+header section.growing-plan {
+  padding: 0 240px;
+}
+/* line 67, ../../../scss/screen.scss */
+header section.growing-plan a {
+  font-weight: bold;
+}

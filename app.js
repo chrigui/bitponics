@@ -126,9 +126,8 @@ var print_visits = function(req, res){
 
 // Routes
 
-app.get('/dashboard', function (req, res){
+app.get('/socket_graph_test', function (req, res){
   //print_visits(req, res);
-  
   res.render('dashboard', {
     title: 'Express',
   locals : { temp: 1 }
@@ -137,7 +136,7 @@ app.get('/dashboard', function (req, res){
 });
 
 app.get('/', function (req, res){
-  app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
+  app.set('view options', { layout: __dirname + "/views/jade/layout-splash.jade" });
   res.render('splash', {
     title: "Bitponics"
   });
@@ -147,6 +146,13 @@ app.get('/signup', function(req, res) {
   app.set('view options', { layout: __dirname + "/views/jade/shell.jade" });
   res.render('signup', {
     title: "Bitponics - Sign Up"
+  });
+});
+
+app.get('/dashboard', function(req, res) {
+  app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
+  res.render('dashboard', {
+    title: "Bitponics - Dashboard"
   });
 });
 
