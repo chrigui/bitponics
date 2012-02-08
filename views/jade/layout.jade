@@ -1,11 +1,16 @@
-!!!
+!!! 5
 html
 	head
 		title= title
 		meta(charset="UTF-8")
 		meta(name="viewport", content="initial-scale=1, maximum-scale=1")
-		!= partial('./partials/head/splash-head-content')
+		link(rel='stylesheet', href='/assets/css/screen.css')
 		script(src='//code.jquery.com/jquery-1.7.1.min.js')
 		script(src='/socket.io/socket.io.js')
-		script(src='/javascripts/jquery.flot.js')
-	body!= body
+		script(src='/assets/js/plugins/jquery.flot.js')
+	body
+		!= body
+		
+		!= partial('./partials/footer/main')
+		
+	
