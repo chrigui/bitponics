@@ -1,0 +1,62 @@
+h1
+	| bitponics
+div#light-sensor-graph
+
+
+
+
+
+script
+	var global = {};
+	global.lightSensorData = [];
+	
+	$(function () {
+		var lightGraph = $('#light-sensor-graph');
+		
+		var socket = io.connect('http://184.73.237.221:3000');
+		//var socket = io.connect('http://localhost:3000');
+		
+		
+		global.options = {
+			colors: ['#123658', '#000000'],
+			series: {
+				lines: { show: true, lineWidth: 2 },
+				points: {
+					show: false
+				}
+			},
+			shadowSize: 3,
+			grid: {
+				hoverable: true,
+				clickable: false,
+				borderWidth: 1,
+				backgroundColor: '#ddf0ff'
+			},
+			legend: {
+				show: false
+				//position: "nw"
+			},
+			xaxis: {
+				mode: "time",
+				timeformat: "%H:%M:%S",
+				minTickSize: [1, "minute"] 
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			}
+		};
+		
+		socket.on('sensor_event', function (data) {
+			//console.log(data);
+			var point = [];
+			point[0] = (new Date(data.timestamp)).getTime();
+			point[1] = data.value;
+			console.log(point);
+			global.lightSensorData.push(point);
+			
+			$.plot(lightGraph, [global.lightSensorData], global.options);
+		});
+		
+		//$.plot(lightGraph, [ d1, d2, d3 ]);
+	});
