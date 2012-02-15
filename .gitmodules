@@ -1,0 +1,6 @@
+[submodule "stylus/assets/css/stacklayout"]
+	path = stylus/assets/css/stacklayout
+	url = git@github.com:dtan/stacklayout-stylus.git
+[submodule "stylus/assets/css/libs/stacklayout"]
+	path = stylus/assets/css/libs/stacklayout
+	url = git@github.com:dtan/stacklayout-stylus.git
