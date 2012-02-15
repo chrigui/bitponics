@@ -3,36 +3,36 @@
  * Module dependencies.
  */
 
-var express    = require('express')
-  , http       = require('http')
-  , mongodb    = require('mongodb')
-  , net        = require('net')
-  , fs         = require('fs')
-  , stylus     = require('stylus')
-  , nib        = require('nib') 
-  , app        = module.exports = express.createServer()
-  , io         = require('socket.io').listen(app)
-  , PORT       = process.env.VCAP_APP_PORT || 8080
-  , HOST       = process.env.VCAP_APP_HOST || '0.0.0.0'
-  , ENV        = process.env.NODE_ENV || 'development' 
-  , cache      = {}
-  , tcpGuests  = []
-  , viewEngine = 'jade'
-  , env, mongo;
+var express    = require('express'),
+  routes     = require('./routes'),
+  http       = require('http'),
+  mongodb    = require('mongodb'),
+  net        = require('net'),
+  fs         = require('fs'),
+  stylus     = require('stylus'),
+  nib        = require('nib'),
+  app        = module.exports = express.createServer(),
+  io         = require('socket.io').listen(app),
+  PORT       = process.env.VCAP_APP_PORT || 8080,
+  HOST       = process.env.VCAP_APP_HOST || '0.0.0.0',
+  ENV        = process.env.NODE_ENV || 'development',
+  cache      = {},
+  tcpGuests  = [],
+  viewEngine = 'jade',
+  mongo = { 
+    "hostname": "localhost",
+    "port": 27017,
+    "username": "", 
+    "password": "",
+    "name": "",
+    "db":"db"
+  },
+  env, mongo;
 
   // Configuration
   if(process.env.VCAP_SERVICES){
     env = JSON.parse(process.env.VCAP_SERVICES);
-    mongo = env['mongodb-1.8'][0]['credentials'];
-  } else {
-    mongo = { 
-      "hostname": "localhost",
-      "port": 27017,
-      "username": "", 
-      "password": "",
-      "name": "",
-      "db":"db"
-    };
+    mongo = env['mongodb-1.8'][0].credentials;
   }
 
 var generate_mongo_url = function(obj){
@@ -72,6 +72,7 @@ app.configure('production', function(){
 });
 
 app.configure(function(){
+  app.set('view options', { pretty: true });
   app.set('views', __dirname + '/views/' + viewEngine);
   app.set('view engine', viewEngine);
   app.use(express.logger(':method :url :status'));
@@ -80,8 +81,11 @@ app.configure(function(){
   app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
   app.dynamicHelpers({
-    isDevMode: function (req, res) {
+    is_dev_mode: function (req, res) {
       return (process.env.NODE_ENV || 'development') === 'development';
+    },
+    css_files: function (req, res) {
+      console.log('res: ', req);
     }
   });
 });
@@ -153,6 +157,13 @@ app.get('/dashboard', function(req, res) {
   app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
   res.render('dashboard', {
     title: "Bitponics - Dashboard"
+  });
+});
+
+app.get('/assistant', function (req, res) {
+  app.set('view options', { layout: __dirname + "/views/jade/layout-stylus.jade", pretty: true });
+  res.render('assistant', {
+    title: "Bitponics - Assistant"
   });
 });
 
