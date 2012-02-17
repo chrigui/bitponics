@@ -9,7 +9,8 @@ html
     script(src='/socket.io/socket.io.js')
     script(src='/assets/js/plugins/jquery.flot.js')
   body
-    != body
+    div.stack.wrapper
+      != body
     
     != partial('./partials/footer/main')
     
