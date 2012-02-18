@@ -1,0 +1,39 @@
+@import "../../global/defaults"
+
+.user-page nav {
+  border-top default-border()
+  color med-white
+  & ul {
+    background dark-gray
+    & li {
+
+      & a {
+        padding: 20px;
+        & span {
+
+          }
+      }
+    }
+    & li.first {
+      & a {
+        border-right default-border()
+      }
+    }
+    & li.last {
+      & a {
+        border-left default-border()
+      }
+    }
+    & li.user {
+    }
+  }
+}
+
+.triangle-up
+  create-triangle('up', 5px, med-white)
+.triangle-down
+  create-triangle('down', 5px, med-white)
+.triangle-left
+  create-triangle('left', 5px, med-white)
+.triangle-right
+  create-triangle('right', 5px, med-white)

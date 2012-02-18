@@ -1,0 +1,21 @@
+
+create-triangle(dir, size, color)
+  height 0
+  width 0
+  if dir == 'up'
+    border-left size solid transparent
+    border-right size solid transparent
+    border-bottom size solid color
+  else if dir == 'down'
+	  border-left size solid transparent
+  	border-right size solid transparent
+	  border-top size solid color
+  else if dir == 'left'
+    border-right size solid color
+    border-top size solid transparent
+    border-bottom size solid transparent
+  else if dir == 'right'
+	  border-left size solid color
+	  border-top size solid transparent
+  	border-bottom size solid transparent
+

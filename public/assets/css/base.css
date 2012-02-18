@@ -1,18 +1,1 @@
-body{font-family:"Open Sans",sans-serif;padding:30px;font:14px "Lucida Grande",Helvetica,Arial,sans-serif}
-h1{color:#2bb540;margin-bottom:30px}
-h2{font-size:18px;font-weight:normal;line-height:1.2em;margin-bottom:1em}
-label{font-weight:normal;font-size:18px;line-height:1.2em}
-.block{border-top:2px solid #eee}
-#content{background:url("/img/bg.png") no-repeat;margin:10px auto;width:800px}
-#top{height:625px}
-#description{font-size:14pt;height:250px;left:250px;line-height:130%;position:relative;top:40px;width:550px}
-#mailing-list,#contact{padding:20px}
-#oshw{position:absolute;right:20px;top:-25px}
-b{color:#ed2024}
-a{color:#00b7ff;}
-a:hover{text-decoration:none}
-#light-sensor-graph{width:800px;height:600px}
-#mc_embed_signup{background:#fff;clear:left;font:14px;}
-#mc_embed_signup form{padding:0;}
-#mc_embed_signup form label{font-weight:normal;padding:0;margin-bottom:1em;font-size:18px}
-#mc_embed_signup input.email{margin-bottom:18px}
+body{background-color:#f4f4f4}
