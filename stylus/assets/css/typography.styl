@@ -1,9 +1,7 @@
-// Colors
-medium-white=#f4f4f4
-dark-gray=#333
-gray=#dfdfdf
+@import "./global/defaults"
+
 font-url='./fonts/'
-font-types=('eot') ('woff') ('ttf' 'truetype') ('svg')
+font-types=('eot' 'embedded-opentype') ('woff') ('ttf' 'truetype') ('svg')
 
 fontface-url(local-id font-url font-file)
   url = 'local("' + local-id + '")'
@@ -24,7 +22,7 @@ fontface(name, font-file, weight="normal", style="normal", local="~!#$")
   file-path = font-url font-file
   @font-face
     font-family name
-    src url(font-url font-file '.eot') // ie stuff
+    src url(font-url font-file '.eot')
     src fontface-url(local, font-url, font-file)
     font-weight weight
     font-style style
@@ -34,5 +32,12 @@ fontface("DIN", 'din_medium')
 fontface("DIN", 'din_bold', 'bold', 'bold', '@#$%')
 
 .stackContent
-  font-family Helvetica, Arial, sans-serif
+  font-family "DIN", Helvetica, Arial, sans-serif
 
+a {
+  color med-white
+  text-decoration none
+  &:hover {
+    text-decoration underline
+  }
+}
