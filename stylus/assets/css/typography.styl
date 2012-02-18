@@ -6,7 +6,7 @@ font-url='./fonts/'
 font-types=('eot') ('woff') ('ttf' 'truetype') ('svg')
 
 fontface-url(font-url font-file)
-  _url = 'local("~!@\")'
+  _url = 'local("~!@")'
   len = length(font-types)
   for type, i in font-types
     ext =  type[0]
@@ -15,18 +15,18 @@ fontface-url(font-url font-file)
       _type = type[1]
     if ext == 'eot'
       ext = ext + '?iefix'
-    file = font-url+font-file+'.'+ext 
+    file = font-url + font-file + '.' + ext
     if ext == 'svg'
       file = file + '#webfont'
     append(_url, unquote(s('url(%s) format(%s)', file, unquote(_type))))
-  _url
+  unquote(join(',', _url))
 
 fontface(name, font-file, weight="normal", style="normal")
   file-path = font-url font-file
   @font-face
     font-family name
     src url(font-url font-file '.eot') // ie stuff
-    src unquote(join(',', fontface-url(font-url, font-file)))
+    src fontface-url(font-url, font-file)
     font-weight weight
     font-style style
 
