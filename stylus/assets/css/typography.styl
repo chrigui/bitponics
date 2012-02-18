@@ -6,20 +6,19 @@ font-url='./fonts/'
 font-types=('eot') ('woff') ('ttf' 'truetype') ('svg')
 
 fontface-url(local-id font-url font-file)
-  _url = 'local("' + local-id + '")'
-  len = length(font-types)
-  for type, i in font-types
-    ext =  type[0]
-    _type = type[0]
-    if type[1]
-      _type = type[1]
+  url = 'local("' + local-id + '")'
+  for typeobj, i in font-types
+    ext =  typeobj[0]
+    type = typeobj[0]
+    if typeobj[1]
+      type = typeobj[1]
     if ext == 'eot'
       ext = ext + '?iefix'
     file = font-url + font-file + '.' + ext
     if ext == 'svg'
       file = file + '#webfont'
-    append(_url, unquote(s('url(%s) format(%s)', file, unquote(_type))))
-  unquote(join(',', _url))
+    append(url, unquote(s('url(%s) format(%s)', file, unquote(type))))
+  unquote(join(',', url))
 
 fontface(name, font-file, weight="normal", style="normal", local="~!#$")
   file-path = font-url font-file
