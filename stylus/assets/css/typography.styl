@@ -5,8 +5,8 @@ gray=#dfdfdf
 font-url='./fonts/'
 font-types=('eot') ('woff') ('ttf' 'truetype') ('svg')
 
-fontface-url(font-url font-file)
-  _url = 'local("~!@")'
+fontface-url(local-id font-url font-file)
+  _url = 'local("' + local-id + '")'
   len = length(font-types)
   for type, i in font-types
     ext =  type[0]
@@ -21,18 +21,18 @@ fontface-url(font-url font-file)
     append(_url, unquote(s('url(%s) format(%s)', file, unquote(_type))))
   unquote(join(',', _url))
 
-fontface(name, font-file, weight="normal", style="normal")
+fontface(name, font-file, weight="normal", style="normal", local="~!#$")
   file-path = font-url font-file
   @font-face
     font-family name
     src url(font-url font-file '.eot') // ie stuff
-    src fontface-url(font-url, font-file)
+    src fontface-url(local, font-url, font-file)
     font-weight weight
     font-style style
 
 
 fontface("DIN", 'din_medium')
-fontface("DIN", 'din_bold', 'bold', 'bold')
+fontface("DIN", 'din_bold', 'bold', 'bold', '@#$%')
 
 .stackContent
   font-family Helvetica, Arial, sans-serif
