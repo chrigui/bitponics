@@ -3,7 +3,7 @@
 .user-page nav ul li a{padding:20px;}
 .user-page nav ul li.first a{border-right:1px solid #f4f4f4}
 .user-page nav ul li.last a{border-left:1px solid #f4f4f4}
-.triangle-up{height:0;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #f4f4f4}
-.triangle-down{height:0;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #f4f4f4}
-.triangle-left{height:0;width:0;border-right:5px solid #f4f4f4;border-top:5px solid transparent;border-bottom:5px solid transparent}
-.triangle-right{height:0;width:0;border-left:5px solid #f4f4f4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.triangle-up{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #f4f4f4}
+.triangle-down{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #f4f4f4}
+.triangle-left{height:0;position:absolute;width:0;border-right:5px solid #f4f4f4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.triangle-right{height:0;position:absolute;width:0;border-left:5px solid #f4f4f4;border-top:5px solid transparent;border-bottom:5px solid transparent}
