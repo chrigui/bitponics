@@ -3,45 +3,30 @@ medium-white=#f4f4f4
 dark-gray=#333
 gray=#dfdfdf
 font-url='./fonts/'
-font-types='eot' 'woff' 'ttf|truetype' 'svg'
-
-@font-face
-  font-family "DIN"
-  font-weight normal
-  font-style normal
-  src url(font-url 'din_medium.eot')
-  src local('~'), url(font-url 'din_medium.eot?iefix') format('eot'), url(font-url 'din_medium.woff') format('woff'), url(font-url 'din_medium.ttf') format('truetype'), url(font-url + 'din_medium.svg#webfont') format('svg')
-
-@font-face
-  font-family "DIN";
-  font-weight bold
-  font-style bold
-  src url('fonts/din_medium.eot');
-  src url('fonts/din_medium.eot?iefix') format('eot'), url('fonts/din_bold.woff') format('woff'), url('fonts/din_bold.ttf') format('truetype'), url('fonts/din_bold.svg') format('svg#webfont')
-//fontface("DIN", ["din_bold.woff", woff, "din_bold.ttf", truetype, "din_bold.svg", svg], "din_medium.eot", "bold");
+font-types=('eot') ('woff') ('ttf' 'truetype') ('svg')
 
 fontface-url(font-url font-file)
-  _url = local('@#$@')
+  _url = 'local("~!@\")'
   len = length(font-types)
   for type, i in font-types
-    _type = ''
-    splits = type
-    if length(splits) == 2
-      type = splits[1]
-    if type == 'eot'
-      _type = type + '?iefix'
-    else
-      _type = type
-    file = path _type
-    push(_url, s('url(%s) format(%s)', path, unquote(_type)))
-  join(',',_url)
+    ext =  type[0]
+    _type = type[0]
+    if type[1]
+      _type = type[1]
+    if ext == 'eot'
+      ext = ext + '?iefix'
+    file = font-url+font-file+'.'+ext 
+    if ext == 'svg'
+      file = file + '#webfont'
+    append(_url, unquote(s('url(%s) format(%s)', file, unquote(_type))))
+  _url
 
 fontface(name, font-file, weight="normal", style="normal")
   file-path = font-url font-file
   @font-face
     font-family name
     src url(font-url font-file '.eot') // ie stuff
-    fontface-url(font-url, font-file)
+    src unquote(join(',', fontface-url(font-url, font-file)))
     font-weight weight
     font-style style
 
