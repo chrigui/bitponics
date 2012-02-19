@@ -1,1 +1,5 @@
 body{background-color:#f4f4f4}
+.padding-20{padding:20px}
+.uppercase{text-transform:uppercase}
+.lowercase{text-transform:lowercase}
+.border-b-default{border-bottom:1px solid #333}

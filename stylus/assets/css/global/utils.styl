@@ -1,3 +1,6 @@
+med-white=#f4f4f4
+dark-gray=#333
+gray=#dfdfdf
 
 create-triangle(dir, size, color)
   height 0
@@ -20,3 +23,11 @@ create-triangle(dir, size, color)
 	  border-top size solid transparent
   	border-bottom size solid transparent
 
+set-border(color)
+  1px solid color
+
+default-border()
+  1px solid med-white
+
+default-gray-border()
+  1px solid dark-gray
