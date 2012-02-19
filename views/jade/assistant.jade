@@ -2,13 +2,53 @@ div#dashboard.user-page
   nav
     ul
       li.first.logo.stack1of5
-        a(href="#").stackContent bitponics
+        a(href="#").stackContent.padding-20 bitponics
       li.growing-plan.stack3of5
-        a(href="#").stackContent Tomatoes
+        a(href="#").stackContent.padding-20 Tomatoes
           span.triangle-down
       li.last.user.stack1of5
-        a(href="#").stackContent Amit Kumar
+        a(href="#").stackContent.padding-20 Amit Kumar
           span.icon
   section
-    header
-      h1.stackContent Friday, November 18, 2011
+    header.border-b-default
+      h1.stack4of5.date
+        span.stackContent.padding-20 Friday, November 18, 2011
+      h2.stack1of5.time
+        span.stackContent.padding-20 8:32 AM
+    ul
+      li.stack1of4
+        section.light.stackContent
+          header 
+            h2.uppercase Light
+            span.warning
+          span
+            span.icon
+            span.number 18
+            span.metric.uppercase hrs/day
+      li.stack1of4
+        section.ectds.stackContent
+          header 
+            h2.uppercase ec/tds
+            span.warning
+          span
+            span.icon
+            span.number 550
+            span.metric.uppercase ppm
+      li.stack1of4
+        section.air.stackContent
+          header
+            h2.uppercase air
+            span.warning
+          span
+            span.icon
+            span.number 75
+            span.metric.uppercase &deg;F
+      li.stack1of4
+        section.water.stackContent
+          header
+            h2.uppercase water
+            span.warning
+          span
+            span.icon
+            span.number 75 
+            span.metric.uppercase &deg;F

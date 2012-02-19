@@ -1,30 +1,49 @@
-@import "../../global/defaults"
+@import "../../global/utils"
 
-.user-page nav {
-  border-top default-border()
-  color med-white
-  & ul {
-    background dark-gray
-    & li {
+.user-page {
+  nav {
+    border-top default-border()
+    color med-white
+    & ul {
+      background dark-gray
+      & li {
 
-      & a {
-        padding: 20px;
-        & span {
+        & a {
+          & span {
 
+            }
+        }
+      }
+      & li.first {
+        & a {
+          border-right default-border()
+        }
+      }
+      & li.last {
+        & a {
+          border-left default-border()
+        }
+      }
+      & li.growing-plan {
+        & a {
+          
+        }
+        & .triangle-down {
+          margin 5px 0 0 5px
+        }
+      }
+      & li.user {
+      }
+    }
+  }
+  section {
+    header {
+      h1 {
+        &.date {
+          span {
           }
+        }
       }
-    }
-    & li.first {
-      & a {
-        border-right default-border()
-      }
-    }
-    & li.last {
-      & a {
-        border-left default-border()
-      }
-    }
-    & li.user {
     }
   }
 }
