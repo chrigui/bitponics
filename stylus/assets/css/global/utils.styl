@@ -26,8 +26,11 @@ create-triangle(dir, size, color)
 set-border(color)
   1px solid color
 
-default-border()
-  1px solid med-white
+def-border-white()
+  set-border(med-white)
 
-default-gray-border()
-  1px solid dark-gray
+def-border-dark-gray()
+  set-border(dark-gray)
+
+def-border-gray()
+  set-border(gray)

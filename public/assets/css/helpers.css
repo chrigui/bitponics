@@ -1,4 +1,35 @@
-.position-r{position:relative}
-.position-a{position:absolute}
 .full-width{width:100%}
 .full-height{height:100%}
+.posiiton-f{position:fixed}
+.position-r{position:relative}
+.position-a{position:absolute}
+.display-b{display:block}
+.display-n{display:none}
+.display-i{display:inline}
+.display-ib{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-t{display:table}
+.clear-b{clear:both}
+.clear-l{clear:left}
+.clear-r{clear:right}
+.clearfix{zoom:1}
+.clearfix:before,.clearfix:after{content:"";display:table}
+.clearfix:after{clear:both}
+.float-l{float:left}
+.float-r{float:right}
+.float-n{float:none}
+.top-0{top:0}
+.bottom-0{bottom:0}
+.left-0{left:0}
+.right-0{right:0}
+.uppercase{text-transform:uppercase}
+.lowercase{text-transform:lowercase}
+.text-align-c{text-align:center}
+.text-align-r{text-align:right}
+.text-align-l{text-align:left}
+.text-align-j{text-align:justify}
+.padding-20{padding:20px}
+.centered{margin-left:auto;margin-right:auto}
+.default-border-b{border-bottom:1px solid #333}
+.default-border-t{border-top:1px solid #333}
+.default-border-r{border-right:1px solid #333}
+.default-border-l{border-left:1px solid #333}
