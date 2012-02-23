@@ -38,6 +38,7 @@ Thumbs.db
 *.swp
 
 node_modules
+db
 
 .sass-cache/*
 scss/.sass-cache/*
