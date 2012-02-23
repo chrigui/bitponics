@@ -5,6 +5,7 @@
 
 var express    = require('express'),
   routes     = require('./routes'),
+  dashboard  = require('./routes/dashboard'),
   http       = require('http'),
   mongodb    = require('mongodb'),
   net        = require('net'),
@@ -57,6 +58,7 @@ app.configure('development', function(){
     debug: true,
     compile: function(str, path) { // optional, but recommended
       return stylus(str)
+        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
         .set('filename', path)
         .set('warn', true)
         .set('compress', true)
@@ -65,6 +67,7 @@ app.configure('development', function(){
   });
   app.use(stylusMiddleware);  
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.set('view options', { layout: __dirname + "/views/jade/layout-stylus.jade", pretty: true });
 });
 
 app.configure('production', function(){
@@ -72,7 +75,6 @@ app.configure('production', function(){
 });
 
 app.configure(function(){
-  app.set('view options', { pretty: true });
   app.set('views', __dirname + '/views/' + viewEngine);
   app.set('view engine', viewEngine);
   app.use(express.logger(':method :url :status'));
@@ -140,19 +142,18 @@ app.get('/socket_graph_test', function (req, res){
 });
 
 app.get('/', function (req, res){
-  app.set('view options', { layout: __dirname + "/views/jade/layout-splash.jade" });
+  app.set('view options', { locals: { layout: __dirname + "/views/jade/layout-splash.jade" } });
   res.render('splash', {
     title: "Bitponics"
   });
 });
 
 app.get('/signup', function(req, res) {
-  app.set('view options', { layout: __dirname + "/views/jade/shell.jade" });
   res.render('signup', {
     title: "Bitponics - Sign Up"
   });
 });
-
+/*
 app.get('/dashboard', function(req, res) {
   app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
   res.render('dashboard', {
@@ -161,11 +162,14 @@ app.get('/dashboard', function(req, res) {
 });
 
 app.get('/assistant', function (req, res) {
-  app.set('view options', { layout: __dirname + "/views/jade/layout-stylus.jade", pretty: true });
   res.render('assistant', {
     title: "Bitponics - Assistant"
   });
 });
+*/
+
+app.get('/dashboard', dashboard.index);
+app.get('/assistant', dashboard.assistant);
 
 app.listen(PORT, HOST, function(){
   console.log("Express server listening on port %d", app.address().port);
