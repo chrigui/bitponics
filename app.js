@@ -4,8 +4,8 @@
  */
 
 var express    = require('express'),
-  routes     = require('./routes'),
-  dashboard  = require('./routes/dashboard'),
+  Routes     = require('./routes'),
+  Dashboard  = require('./routes/dashboard'),
   http       = require('http'),
   mongodb    = require('mongodb'),
   net        = require('net'),
@@ -87,7 +87,7 @@ app.configure(function(){
       return (process.env.NODE_ENV || 'development') === 'development';
     },
     css_files: function (req, res) {
-      console.log('res: ', req);
+      //console.log('res: ', req);
     }
   });
 });
@@ -153,23 +153,9 @@ app.get('/signup', function(req, res) {
     title: "Bitponics - Sign Up"
   });
 });
-/*
-app.get('/dashboard', function(req, res) {
-  app.set('view options', { layout: __dirname + "/views/jade/layout.jade" });
-  res.render('dashboard', {
-    title: "Bitponics - Dashboard"
-  });
-});
 
-app.get('/assistant', function (req, res) {
-  res.render('assistant', {
-    title: "Bitponics - Assistant"
-  });
-});
-*/
-
-app.get('/dashboard', dashboard.index);
-app.get('/assistant', dashboard.assistant);
+app.get('/dashboard', Dashboard.index);
+app.get('/assistant', Dashboard.assistant);
 
 app.listen(PORT, HOST, function(){
   console.log("Express server listening on port %d", app.address().port);
