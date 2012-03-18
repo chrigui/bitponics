@@ -7,49 +7,28 @@ var express    = require('express'),
   Routes     = require('./routes'),
   Dashboard  = require('./routes/dashboard'),
   http       = require('http'),
-  mongodb    = require('mongodb'),
   net        = require('net'),
   fs         = require('fs'),
   stylus     = require('stylus'),
   nib        = require('nib'),
+  everyauth  = require('everyauth'),
   app        = module.exports = express.createServer(),
   io         = require('socket.io').listen(app),
-  PORT       = process.env.VCAP_APP_PORT || 8080,
-  HOST       = process.env.VCAP_APP_HOST || '0.0.0.0',
-  ENV        = process.env.NODE_ENV || 'development',
   cache      = {},
   tcpGuests  = [],
-  viewEngine = 'jade',
-  mongo = { 
-    "hostname": "localhost",
-    "port": 27017,
-    "username": "", 
-    "password": "",
-    "name": "",
-    "db":"db"
-  },
-  env, mongo;
+  viewEngine = 'jade';
 
-  // Configuration
-  if(process.env.VCAP_SERVICES){
-    env = JSON.parse(process.env.VCAP_SERVICES);
-    mongo = env['mongodb-1.8'][0].credentials;
-  }
 
-var generate_mongo_url = function(obj){
-  obj.hostname = (obj.hostname || 'localhost');
-  obj.port = (obj.port || 27017);
-  obj.db = (obj.db || 'test');
-  console.log('mongodb db is:' + obj.db);
 
-  if(obj.username && obj.password){
-    return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  } else{
-    return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  }
-}
 
-var mongoUrl   = generate_mongo_url(mongo);
+
+/**
+ * Configure the app instance
+ */
+require('./lib/config')(app);
+require('./lib/boot-mongo')(app);
+
+
 
 app.configure('development', function(){
   var stylusMiddleware = stylus.middleware({
@@ -80,8 +59,16 @@ app.configure(function(){
   app.use(express.logger(':method :url :status'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
+  
+  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
+  app.use(express.cookieParser()); 
+  app.use(express.session({ secret: 'somethingrandom'}));
+  
+  app.mongoose.connect(app.config.mongoUrl);
+  app.use(app.mongooseAuth.middleware());
+  app.mongooseAuth.helpExpress(app);
+
   app.dynamicHelpers({
     is_dev_mode: function (req, res) {
       return (process.env.NODE_ENV || 'development') === 'development';
@@ -90,18 +77,94 @@ app.configure(function(){
       //console.log('res: ', req);
     }
   });
+
+  // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
+  //app.use(app.router); 
+
 });
 
+
+
+
+// Routes
+
+app.get('/socket_graph_test', function (req, res){
+  //print_visits(req, res);
+  res.render('dashboard', {
+    title: 'Express',
+    locals : { temp: 1 }
+  });
+
+});
+
+app.get('/', function (req, res){
+  res.render('index', {
+    title: "Bitponics"
+  });
+  /*
+  app.set('view options', { locals: { layout: __dirname + "/views/jade/layout-splash.jade" } });
+  res.render('splash', {
+    title: "Bitponics"
+  });
+  */
+});
+
+app.get('/signup', function(req, res) {
+  res.render('signup', {
+    title: "Bitponics - Sign Up"
+  });
+});
+
+app.get('/logout', function (req, res) {
+  req.logout();
+  res.redirect('/');
+});
+
+app.get('/dashboard', Dashboard.index);
+app.get('/assistant', Dashboard.assistant);
+
+app.listen(app.config.port, app.config.host, function(){
+  console.log("Express server listening on port %d", app.address().port);
+  console.log(app.config.appUrl); 
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Legacy POC code
+ *
 // Methods
 var record_visit = function(req, res){
-  /* Connect to the DB and auth */
+  // Connect to the DB and auth 
   mongodb.connect(mongoUrl, function(err, conn){
     conn.collection('ips', function(err, coll){
-      /* Simple object to insert: ip address and date */
+      // Simple object to insert: ip address and date 
       object_to_insert = { 'ip': req.connection.remoteAddress, 'ts': new Date() };
 
-      /* Insert the object then print in response */
-      /* Note the _id has been created */
+      // Insert the object then print in response 
+      // Note the _id has been created 
       coll.insert( object_to_insert, {safe:true}, function(err){
         if(err) { console.log(err.stack); }
         res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -113,7 +176,7 @@ var record_visit = function(req, res){
 }
 
 var print_visits = function(req, res){
-  /* Connect to the DB and auth */
+  // Connect to the DB and auth 
   mongodb.connect(mongoUrl, function(err, conn){
     conn.collection('ips', function(err, coll){
       coll.find({}, {limit:10, sort:[['_id','desc']]}, function(err, cursor){
@@ -128,38 +191,13 @@ var print_visits = function(req, res){
     });
   });
 }
+*/
 
 
-// Routes
+/**
+ * Device communication
+ */
 
-app.get('/socket_graph_test', function (req, res){
-  //print_visits(req, res);
-  res.render('dashboard', {
-    title: 'Express',
-  locals : { temp: 1 }
-  });
-
-});
-
-app.get('/', function (req, res){
-  app.set('view options', { locals: { layout: __dirname + "/views/jade/layout-splash.jade" } });
-  res.render('splash', {
-    title: "Bitponics"
-  });
-});
-
-app.get('/signup', function(req, res) {
-  res.render('signup', {
-    title: "Bitponics - Sign Up"
-  });
-});
-
-app.get('/dashboard', Dashboard.index);
-app.get('/assistant', Dashboard.assistant);
-
-app.listen(PORT, HOST, function(){
-  console.log("Express server listening on port %d", app.address().port);
-});
 
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
@@ -227,4 +265,4 @@ tcpServer.on('connection',function(socket){
     */
     })
 });
-tcpServer.listen(1337);
+//tcpServer.listen(1337); 
