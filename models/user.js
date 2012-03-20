@@ -4,7 +4,9 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
 	GrowingPlan = require('./growingPlan').model,
-	mongooseAuth = require('mongoose-auth');
+	mongooseAuth = require('mongoose-auth'),
+	UserSchema = undefined,
+	User = undefined;
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -26,8 +28,7 @@ var GrowingPlanInstanceSchema = new Schema({
 GrowingPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 
-
-var UserSchema = new Schema({
+UserSchema = new Schema({
   email : { 
   	type : mongoose.SchemaTypes.Email, 
   	required : true, 
@@ -64,7 +65,7 @@ UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the sche
 module.exports = function(app){
 
 	// Auth
-	UserSchema.plugin(app.mongooseAuth, {
+	UserSchema.plugin(mongooseAuth, {
 		everymodule: {
 	          everyauth: {
 	              User: function () {
@@ -72,17 +73,38 @@ module.exports = function(app){
 	            }
 	        }
 	    },
+	    facebook: {
+	      	everyauth: {
+	      		myHostname: app.config.appUrl,
+	          	appId: app.config.auth.fb.appId,
+	        	appSecret: app.config.auth.fb.appSecret,
+	        	redirectPath: '/',
+	        	scope: 'email'
+	      	}
+	    },
+	    google: {
+			everyauth: {
+				myHostname: app.config.appUrl,
+				appId: app.config.auth.google.clientId,
+				appSecret: app.config.auth.clientSecret,
+				redirectPath: '/',
+				scope: 'https://www.googleapis.com/auth/userinfo.email',
+
+			}
+		},
 	    twitter: {
 			everyauth: {
 				myHostname: app.config.appUrl,
 			  	consumerKey: app.config.auth.twitter.consumerKey,
 				consumerSecret: app.config.auth.twitter.consumerSecret,
-				redirectPath: 'oob'
+				redirectPath: '/'
 			}
 		}
 	});
 
+	User = mongoose.model('User', UserSchema);
+
 	return {
-		model : mongoose.model('User', UserSchema)
+		model : User
 	}
 };

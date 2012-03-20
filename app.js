@@ -12,6 +12,9 @@ var express    = require('express'),
   stylus     = require('stylus'),
   nib        = require('nib'),
   everyauth  = require('everyauth'),
+  mongodb    = require('mongodb'),
+  mongoose   = require('mongoose'),
+  mongooseAuth = require('mongoose-auth'),
   app        = module.exports = express.createServer(),
   io         = require('socket.io').listen(app),
   cache      = {},
@@ -47,6 +50,10 @@ app.configure('development', function(){
   app.use(stylusMiddleware);  
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
   app.set('view options', { layout: __dirname + "/views/jade/layout-stylus.jade", pretty: true });
+
+  everyauth.debug = true;
+  everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
+  
 });
 
 app.configure('production', function(){
@@ -65,9 +72,9 @@ app.configure(function(){
   app.use(express.cookieParser()); 
   app.use(express.session({ secret: 'somethingrandom'}));
   
-  app.mongoose.connect(app.config.mongoUrl);
-  app.use(app.mongooseAuth.middleware());
-  app.mongooseAuth.helpExpress(app);
+  mongoose.connect(app.config.mongoUrl);
+  app.use(mongooseAuth.middleware());
+  mongooseAuth.helpExpress(app);
 
   app.dynamicHelpers({
     is_dev_mode: function (req, res) {
