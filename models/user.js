@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
 	ObjectId = Schema.ObjectId,
 	GrowingPlan = require('./growingPlan').model,
 	mongooseAuth = require('mongoose-auth'),
+	everyauth = require('everyauth'),
 	UserSchema = undefined,
 	User = undefined;
 
@@ -92,19 +93,63 @@ module.exports = function(app){
 
 			}
 		},
-	    twitter: {
+		password: {
+	        loginWith: 'email', // Or loginWith: 'phone'
+
 			everyauth: {
-				myHostname: app.config.appUrl,
-			  	consumerKey: app.config.auth.twitter.consumerKey,
-				consumerSecret: app.config.auth.twitter.consumerSecret,
-				redirectPath: '/'
-			}
-		}
+	            getLoginPath: '/login',
+	          	postLoginPath: '/login',
+	          	loginView: 'login.jade',
+	          	getRegisterPath: '/register',
+	          	postRegisterPath: '/register',
+	          	registerView: 'register.jade',
+	          	loginSuccessRedirect: '/',
+	         	registerSuccessRedirect: '/'
+	        }
+	    }
 	});
+
+
+	// now that we've initialized the mongoose-auth plugin, override any functions
+
+	// override createWithFB
+	UserSchema.static('createWithFB', function (fbUserMeta, accessToken, expires, callback) {
+	    console.log('in da override wuttup');
+	    var expiresDate = new Date;
+	    expiresDate.setSeconds(expiresDate.getSeconds() + expires);
+
+	    var params =  {
+	      fb: {
+	          id: fbUserMeta.id
+	        , accessToken: accessToken
+	        , expires: expiresDate
+	        , name: {
+	              full: fbUserMeta.name
+	            , first: fbUserMeta.first_name
+	            , last: fbUserMeta.last_name
+	          }
+	        , alias: fbUserMeta.link.match(/^http:\/\/www.facebook\.com\/(.+)/)[1]
+	        , gender: fbUserMeta.gender
+	        , email: fbUserMeta.email
+	        , timezone: fbUserMeta.timezone
+	        , locale: fbUserMeta.locale
+	        , verified: fbUserMeta.verified
+	        , updatedTime: fbUserMeta.updated_time
+	      }
+	    };
+
+	    // password.loginKey() is email
+	    params[everyauth.password.loginKey()] = fbUserMeta.email; 
+	    params.email = fbUserMeta.email;
+
+	    this.create(params, callback);
+	  });
+
 
 	User = mongoose.model('User', UserSchema);
 
+
 	return {
 		model : User
-	}
+	};
 };
