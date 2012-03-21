@@ -3,6 +3,9 @@
 font-url='./fonts/'
 font-types=('eot' 'embedded-opentype') ('woff') ('ttf' 'truetype') ('svg')
 
+.stack,.stack1of2,.stack1of3,.stack2of3,.stack1of4,.stack3of4,.stack1of5,.stack2of5,.stack3of5,.stack4of5,.stackAuto,.semanticClass 
+  letter-spacing normal
+
 fontface-url(local-id font-url font-file)
   url = 'local("' + local-id + '")'
   for typeobj, i in font-types
@@ -33,6 +36,7 @@ fontface("DIN", 'din_bold', 'bold', 'bold', '@#$%')
 
 .stackContent
   font-family "DIN", Helvetica, Arial, sans-serif
+  letter-spacing:normal;
 
 a {
   color med-white
