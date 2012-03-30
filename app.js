@@ -116,21 +116,12 @@ app.get('/', function (req, res){
   */
 });
 
-/*
-app.get('/signup', function(req, res) {
-  res.render('signup', {
-    title: "Bitponics - Sign Up"
-  });
-});
-*/
-
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
 
 app.get('/dashboard', Dashboard.index);
-app.get('/assistant', Dashboard.assistant);
 
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);

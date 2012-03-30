@@ -100,6 +100,9 @@ module.exports = function(app){
 	            getLoginPath: '/login',
 	          	postLoginPath: '/login',
 	          	loginView: 'login.jade',
+	          	loginLocals : {
+	          		title : 'Login - Bitponics'
+	          	},
 	          	getRegisterPath: '/signup',
 	          	postRegisterPath: '/signup',
 	          	registerView: 'signup.jade',
