@@ -116,11 +116,13 @@ app.get('/', function (req, res){
   */
 });
 
+/*
 app.get('/signup', function(req, res) {
   res.render('signup', {
     title: "Bitponics - Sign Up"
   });
 });
+*/
 
 app.get('/logout', function (req, res) {
   req.logout();

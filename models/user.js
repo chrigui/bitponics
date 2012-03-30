@@ -94,15 +94,18 @@ module.exports = function(app){
 			}
 		},
 		password: {
-	        loginWith: 'email', // Or loginWith: 'phone'
+	        loginWith: 'email', 
 
 			everyauth: {
 	            getLoginPath: '/login',
 	          	postLoginPath: '/login',
 	          	loginView: 'login.jade',
-	          	getRegisterPath: '/register',
-	          	postRegisterPath: '/register',
-	          	registerView: 'register.jade',
+	          	getRegisterPath: '/signup',
+	          	postRegisterPath: '/signup',
+	          	registerView: 'signup.jade',
+	          	registerLocals: {
+			      title: 'Sign Up - Bitponics'
+				},
 	          	loginSuccessRedirect: '/',
 	         	registerSuccessRedirect: '/'
 	        }
