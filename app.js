@@ -86,7 +86,7 @@ app.configure(function(){
   });
 
   // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
-  //app.use(app.router); 
+  app.use(app.router); 
 
 });
 

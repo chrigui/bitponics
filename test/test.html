@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title>Example tests</title>
+    <script src="nodeunit.js"></script>
+    <script src="test-user.js"></script>
+    <script src="test-growingPlan.js"></script>
+    <script src="example.js"></script>
+  </head>
+  <body>
+    <script>
+      nodeunit.run({
+        'test_user': test_user,
+        'test_growingPlan': test_growingPlan,
+        'testCase': testCase
+      });
+    </script>
+  </body>
+</html>
