@@ -87,7 +87,7 @@ module.exports = function(app){
 			everyauth: {
 				myHostname: app.config.appUrl,
 				appId: app.config.auth.google.clientId,
-				appSecret: app.config.auth.clientSecret,
+				appSecret: app.config.auth.google.clientSecret,
 				redirectPath: '/',
 				scope: 'https://www.googleapis.com/auth/userinfo.email',
 
@@ -120,7 +120,8 @@ module.exports = function(app){
 
 	// override createWithFB
 	UserSchema.static('createWithFB', function (fbUserMeta, accessToken, expires, callback) {
-	    console.log('in da override wuttup');
+	    console.log('in da fb override wuttup');
+	    //console.log(fbUserMeta, accessToken, expires, callback);
 	    var expiresDate = new Date;
 	    expiresDate.setSeconds(expiresDate.getSeconds() + expires);
 
@@ -147,10 +148,31 @@ module.exports = function(app){
 	    // password.loginKey() is email
 	    params[everyauth.password.loginKey()] = fbUserMeta.email; 
 	    params.email = fbUserMeta.email;
-
 	    this.create(params, callback);
 	  });
 
+	// override createWithGoogleOAuth
+	UserSchema.static('createWithGoogleOAuth', function (googleUser, accessToken, accessTokenExtra, callback) {
+	    console.log('in da google override wuttup');
+	    var expiresDate = new Date;
+	    expiresDate.setSeconds(expiresDate.getSeconds() +  accessTokenExtra.expires_in);
+
+	    var params = {
+	      google: {
+	          email: googleUser.id
+	        , expires: expiresDate
+	        , accessToken: accessToken
+	        , refreshToken: accessTokenExtra.refresh_token
+	      }
+	    };
+
+	    // TODO Only do this if password module is enabled
+	    //      Currently, this is not a valid way to check for enabled
+	    if (everyauth.password)
+	      params[everyauth.password.loginKey()] = "google:" + googleUser.id; // Hack because of way mongodb treate unique indexes
+	  	params.email = googleUser.email;
+	    this.create(params, callback);
+	  });
 
 	User = mongoose.model('User', UserSchema);
 
