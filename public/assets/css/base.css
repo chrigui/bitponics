@@ -1,3 +1,4 @@
-body{background-color:#f4f4f4}
+body{background-color:#f5f5f4;font-size:16px}
 ul{list-style:none;}
 ul li{list-style-type:none}
+*{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}

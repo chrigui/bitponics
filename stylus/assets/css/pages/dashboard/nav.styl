@@ -1,58 +1,135 @@
-@import "../../global/utils"
+//@import "../../global/utils"
+@import "../../helpers"
+@import "../../typography"
 
 .user-page {
   nav {
-    border-top set-border(med-white)
-    color med-white
-    & ul {
-      background dark-gray
-      & li {
+    //border-top set-border(med-white)
+    //color med-white
+    ul {
+      font-size: 0; //fix whitespace dependent inline-block
+      border-bottom set-border(border-light)
+      width 100%
+      overflow hidden
+      li {
+        width 16%
+        @extends .display-ib
+        @extends .text-normalize
+        @extends .ellipsis
+        height: 100%;
 
-        & a {
-          & span {
+        a {
+          @extends .padding-20
+          @extends .din-text
+          @extends .content-box
+          width: 100%;
+          border-right set-border(border-light)
+          height: 100%;
+          span {
 
-            }
+          }
         }
       }
-      & li.first {
-        & a {
-          border-right set-border(med-white)
-        }
-      }
-      & li.last {
-        & a {
-          border-left set-border(med-white)
-        }
-      }
-      & li.growing-plan {
-        & a {
+      li.first {
+        a {
           
         }
-        & .triangle-down {
-          margin 5px 0 0 5px
+      }
+      li.last {
+        a {
+          border 0 none
         }
       }
-      & li.user {
+      li.logo {
+        @extends .hide-text
+        background url('/img/logo.png') no-repeat 20px 45%
+        background-size auto 50%
+      }
+      li.growing-plan {
+
+        width 50%
+        a {
+          position: relative
+
+        }
+        .triangle-down {
+          margin 5px 0 0 5px
+          right 20px
+        }
+      }
+      li.user {
+      }
+      li.language {
+        width: 13%;
+      }
+      li.settings {
+        width: 4.9999%;
       }
     }
   }
   section {
     header {
-      h1 {
-        &.date {
-          span {
-          }
+      font-size: 0;
+      h1, h2 {
+        @extends .display-ib
+        @extends .text-normalize
+      }
+      .date, .time {
+        @extends .din-text  
+        @extends .padding-20
+      }
+      .date {
+        width 80%
+        text-align left
+      }
+      .time{
+        width 20%
+        text-align right
+      }
+    }
+    ul {
+      font-size: 0;
+      li {
+        width 25%
+        @extends .display-ib
+        @extends .text-normalize
+        @extends .ellipsis
+        
+        h2, span {
+          @extends .din-text
+          text-align center
         }
       }
+    }
+    #graph-timeline {
+      position absolute
+      top 148px
+      bottom 100px
+      width 100%
+      //TODO: get include working for this:
+      //create-repeating-linear-gradient("45deg,transparent,transparent 2px,rgba(255, 255, 255, 0.5) 4px,rgba(255, 255, 255, 0.5) 8px")
+      background-image -webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255, 255, 255, 0.5) 4px,rgba(255, 255, 255, 0.5) 8px)
+      .progress{
+        background #99d264
+        height 100%
+        width 25%
+      }
+    }
+    #graph-nav {
+      position absolute
+      bottom 0
+      height 100px
+      width 100%
+      border-top set-border(border-light)
     }
   }
 }
 
 .triangle-up
-  create-triangle('up', 5px, med-white)
+  create-triangle('up', 5px, dark-gray)
 .triangle-down
-  create-triangle('down', 5px, med-white)
+  create-triangle('down', 5px, dark-gray)
 .triangle-left
-  create-triangle('left', 5px, med-white)
+  create-triangle('left', 5px, dark-gray)
 .triangle-right
-  create-triangle('right', 5px, med-white)
+  create-triangle('right', 5px, dark-gray)

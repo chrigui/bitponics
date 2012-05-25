@@ -6,6 +6,7 @@
 var express    = require('express'),
   Routes     = require('./routes'),
   Dashboard  = require('./routes/dashboard'),
+  Styleguide  = require('./routes/styleguide'),
   http       = require('http'),
   net        = require('net'),
   fs         = require('fs'),
@@ -122,6 +123,14 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/dashboard', Dashboard.index);
+
+app.get('/styleguide', function(req, res) {
+  res.render('styleguide', {
+    'title': 'Styleguide',
+    'layout': __dirname + "/views/jade/styleguide-layout.jade",
+    'pretty': true
+  })
+});
 
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);

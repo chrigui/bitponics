@@ -19,6 +19,7 @@
 		, "socket.io" : "0.8"
 		, "stylus"    : ">= 0.0.1"
     	, "bootstrap-stylus": ">= 0.0.1"
-    	, "node-unit" : ">=0.7.4"
+    	, "nodeunit" : ">=0.7.4"
+    	, "zombie"   : ">=1.1.1"
 	}
 }

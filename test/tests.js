@@ -1,8 +1,6 @@
 var app = require('../app.js'),
 nodeunit = require('nodeunit'),
-httputil = nodeunit.utils.httputil,
 testCase  = nodeunit.testCase
-sinon = require('sinon'),
 user = require('../models/user')(app),
 zombie = require('zombie');
 

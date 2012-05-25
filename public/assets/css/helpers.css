@@ -1,6 +1,6 @@
 .full-width{width:100%}
 .full-height{height:100%}
-.posiiton-f{position:fixed}
+.position-f{position:fixed}
 .position-r{position:relative}
 .position-a{position:absolute}
 .display-b{display:block}
@@ -33,3 +33,8 @@
 .default-border-t{border-top:1px solid #333}
 .default-border-r{border-right:1px solid #333}
 .default-border-l{border-left:1px solid #333}
+.content-box{display:block;letter-spacing:normal;word-spacing:normal;text-align:left;}
+.content-box:after{content:"";display:block;height:0;clear:both;visibility:hidden}
+.text-normalize{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
+.hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
+.ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
