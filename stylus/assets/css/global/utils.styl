@@ -1,6 +1,9 @@
-med-white=#f4f4f4
+med-white=#f5f5f4
 dark-gray=#333
 gray=#dfdfdf
+border-light=#999
+
+base-font-size=16px
 
 create-triangle(dir, size, color)
   height 0
@@ -34,3 +37,10 @@ def-border-dark-gray()
 
 def-border-gray()
   set-border(gray)
+
+create-repeating-linear-gradient(string-args)
+  background-image -webkit-repeating-linear-gradient(string-args)
+  background-image -moz-repeating-linear-gradient(string-args)
+  background-image -o-repeating-linear-gradient(string-args)
+  background-image -ms-repeating-linear-gradient(string-args)
+  background-image repeating-linear-gradient(string-args)

@@ -1,23 +1,29 @@
 div#dashboard.user-page
   nav
     ul
-      li.first.logo.stack1of5
-        a(href="#").stackContent.padding-20 bitponics
-      li.growing-plan.stack3of5
-        a(href="#").stackContent.padding-20 Tomatoes
+      li.first.logo
+        a(href="#") bitponics
+      li.growing-plan
+        a(href="#") Tomatoes
           span.triangle-down
-      li.last.user.stack1of5
-        a(href="#").stackContent.padding-20 Amit Kumar
+      li.user
+        a(href="#") Amit Kumar
+          span.icon
+      li.language
+        a(href="#") English
+          span.icon
+      li.last.settings
+        a(href="#") Settings
           span.icon
   section
     header.default-border-b
-      h1.stack4of5.date
-        span.stackContent.padding-20 Friday, November 18, 2011
-      h2.stack1of5.time
-        span.stackContent.padding-20.text-align-r 8:32 AM
+      h1.date
+        span Friday, November 18, 2011
+      h2.time
+        span.text-align-r 8:32 AM
     ul.default-border-b.clearfix
-      li.stack1of4.first
-        section.light.stackContent.default-border-r
+      li.first
+        section.light.default-border-r
           header 
             h2.uppercase.text-align-c Light
             span.warning
@@ -25,8 +31,8 @@ div#dashboard.user-page
             span.icon
             span.number 18
             span.metric.uppercase hrs/day
-      li.stack1of4
-        section.ectds.stackContent.default-border-r
+      li
+        section.ectds.default-border-r
           header 
             h2.uppercase.text-align-c ec/tds
             span.warning
@@ -34,8 +40,8 @@ div#dashboard.user-page
             span.icon
             span.number 550
             span.metric.uppercase ppm
-      li.stack1of4
-        section.air.stackContent.default-border-r
+      li
+        section.air.default-border-r
           header
             h2.uppercase.text-align-c air
             span.warning
@@ -43,8 +49,8 @@ div#dashboard.user-page
             span.icon
             span.number 75
             span.metric.uppercase &deg;F
-      li.stack1of4.last
-        section.water.stackContent
+      li.last
+        section.water
           header
             h2.uppercase.text-align-c water
             span.warning
@@ -54,6 +60,7 @@ div#dashboard.user-page
             span.metric.uppercase &deg;F
   section
     div#graph-timeline
+      div.progress
     nav#graph-nav
       div.arrow-left.xlarge
       div.arrow-right.xlarge

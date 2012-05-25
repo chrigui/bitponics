@@ -8,7 +8,7 @@
   height 100%
 
 // positioning
-.posiiton-f
+.position-f
   position fixed
 
 .position-r
@@ -115,3 +115,32 @@
 
 .default-border-l
   border-left def-border-dark-gray()
+
+.content-box
+  display: block;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-align: left;
+  &:after
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+
+.text-normalize
+  font-family: 'Courier New',monospace;
+  letter-spacing: -.63em;
+  text-align: center;
+  vertical-align: top;
+  font-size: base-font-size;
+
+.hide-text
+  text-indent: -100%;
+  white-space: nowrap;
+  overflow: hidden;
+
+.ellipsis
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
