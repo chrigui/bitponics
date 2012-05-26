@@ -47,8 +47,8 @@ a:hover{text-decoration:underline}
 .user-page nav ul li{width:16%;height:100%;}
 .user-page nav ul li a{width:100%;border-right:1px solid #999;height:100%;}
 .user-page nav ul li.last a{border:0 none}
-.user-page nav ul li.logo{background:url("/img/logo.png") no-repeat 20px 45%;background-size:auto 50%}
-.user-page nav ul li.growing-plan{width:50%;}
+.user-page nav ul li.logo{background:url("/img/logo.png") no-repeat 20px 45%;background-size:auto 50%;width:22.5%}
+.user-page nav ul li.growing-plan{width:43.5%;}
 .user-page nav ul li.growing-plan a{position:relative}
 .user-page nav ul li.growing-plan .triangle-down{margin:5px 0 0 5px;right:20px}
 .user-page nav ul li.language{width:13%}
@@ -59,7 +59,8 @@ a:hover{text-decoration:underline}
 .user-page section ul{font-size:0;}
 .user-page section ul li{width:25%;}
 .user-page section ul li h2,.user-page section ul li span{text-align:center}
-.user-page section #graph-timeline{position:absolute;top:148px;bottom:100px;width:100%;background-image:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.5) 4px,rgba(255,255,255,0.5) 8px);}
+.user-page section ul li section.light .data-graph{height:50px}
+.user-page section #graph-timeline{position:absolute;top:198px;bottom:100px;width:100%;background:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.5) 4px,rgba(255,255,255,0.5) 8px);}
 .user-page section #graph-timeline .progress{background:#99d264;height:100%;width:25%}
 .user-page section #graph-nav{position:absolute;bottom:0;height:100px;width:100%;border-top:1px solid #999}
 .triangle-up{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #333}

@@ -44,10 +44,11 @@
         @extends .hide-text
         background url('/img/logo.png') no-repeat 20px 45%
         background-size auto 50%
+        width: 22.5%
       }
       li.growing-plan {
 
-        width 50%
+        width 43.5%
         a {
           position: relative
 
@@ -99,16 +100,25 @@
           @extends .din-text
           text-align center
         }
+
+        section.light {
+          .data-graph {
+            height: 50px;
+          }
+        }
+
       }
     }
+
     #graph-timeline {
       position absolute
-      top 148px
+      top 198px
       bottom 100px
       width 100%
       //TODO: get include working for this:
       //create-repeating-linear-gradient("45deg,transparent,transparent 2px,rgba(255, 255, 255, 0.5) 4px,rgba(255, 255, 255, 0.5) 8px")
-      background-image -webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255, 255, 255, 0.5) 4px,rgba(255, 255, 255, 0.5) 8px)
+      background -webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255, 255, 255, 0.5) 4px,rgba(255, 255, 255, 0.5) 8px)
+      //background: rgba(255, 255, 255, 0.5)
       .progress{
         background #99d264
         height 100%
