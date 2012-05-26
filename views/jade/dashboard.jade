@@ -21,7 +21,7 @@ div#dashboard.user-page
         span Friday, November 18, 2011
       h2.time
         span.text-align-r 8:32 AM
-    ul.default-border-b.clearfix
+    ul#data-panels.default-border-b.clearfix
       li.first
         section.light.default-border-r
           header 
@@ -31,6 +31,7 @@ div#dashboard.user-page
             span.icon
             span.number 18
             span.metric.uppercase hrs/day
+          div.data-graph
       li
         section.ectds.default-border-r
           header 
@@ -40,6 +41,7 @@ div#dashboard.user-page
             span.icon
             span.number 550
             span.metric.uppercase ppm
+          div.data-graph
       li
         section.air.default-border-r
           header
@@ -49,6 +51,7 @@ div#dashboard.user-page
             span.icon
             span.number 75
             span.metric.uppercase &deg;F
+          div.data-graph
       li.last
         section.water
           header
@@ -58,6 +61,7 @@ div#dashboard.user-page
             span.icon
             span.number 75 
             span.metric.uppercase &deg;F
+          div.data-graph
   section
     div#graph-timeline
       div.progress
