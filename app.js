@@ -207,7 +207,7 @@ var print_visits = function(req, res){
  * Device communication
  */
 
-
+/*
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
   socket.on('sensor_event', function (data) {
@@ -271,7 +271,8 @@ tcpServer.on('connection',function(socket){
             client.send({message:["arduino",data.toString('ascii',0,data.length)]});
             
         }
-    */
+    *//*
     })
 });
+*/
 //tcpServer.listen(1337); 
