@@ -132,6 +132,23 @@ app.get('/styleguide', function(req, res) {
   })
 });
 
+/**
+ * @param req : json object. Should have properties for deviceId, timestamp, log types + log values
+ */
+app.post('/log', function(req, res) {
+  res.json({
+    'request' : {
+      'deviceId' : req.param('deviceId', ''),
+      'deviceKey' : req.param('deviceKey', ''),
+      'logs' : req.param('logs', [])
+    },
+    'targetControlStates' : {
+      'control1' : true,
+      'control2' : false
+    }
+  });
+});
+
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);
   console.log(app.config.appUrl); 
