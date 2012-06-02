@@ -132,10 +132,41 @@ app.get('/styleguide', function(req, res) {
   })
 });
 
+
 /**
  * @param req : json object. Should have properties for deviceId, timestamp, log types + log values
+
+    POST sample:
+      POST /log HTTP/1.1
+      Accept: application/json
+      Content-Encoding: identity
+      Content-Type: application/json
+
+      {"deviceId":"testDeviceId","userKey":"testUserKey","logs":[{"type":"light","value":12.5,"timestamp":1338609482898}]}
+
  */
 app.post('/log', function(req, res) {
+  // TODO : do some sort of device+key verification 
+  // TODO : log the log to mongo
+
+  console.log(req);
+  var logs = req.param('logs', []);
+  for (var i = 0, length = logs.length; i < length; i++){
+    
+  }
+
+  mongodb.connect(app.config.mongoUrl, function(err, conn){
+    console.log('connected to mongodb');
+    conn.collection('sensor_logs', function(err, coll){
+      console.log('writing to sensor_logs :', logs[0]);
+      coll.insert( logs[0], {safe:true}, function(err){
+        console.log('wrote to sensor_logs');
+        if(err) { console.log(err.stack); }
+        conn.close();
+      });
+    });
+  });
+
   res.json({
     'request' : {
       'deviceId' : req.param('deviceId', ''),
