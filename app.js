@@ -109,12 +109,6 @@ app.get('/', function (req, res){
   res.render('index', {
     title: "Bitponics"
   });
-  /*
-  app.set('view options', { locals: { layout: __dirname + "/views/jade/layout-splash.jade" } });
-  res.render('splash', {
-    title: "Bitponics"
-  });
-  */
 });
 
 app.get('/logout', function (req, res) {
@@ -179,6 +173,14 @@ app.post('/log', function(req, res) {
     }
   });
 });
+
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('sensor_event', function (data) {
+    socket.broadcast.emit('sensor_event', data);
+  });
+});
+
 
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);
