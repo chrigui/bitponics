@@ -16,7 +16,7 @@ var express    = require('express'),
   mongoose   = require('mongoose'),
   mongooseAuth = require('mongoose-auth'),
   app        = module.exports = express.createServer(),
-  //io         = require('socket.io').listen(app),
+  io         = require('socket.io').listen(app),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
@@ -190,7 +190,9 @@ app.post('/log', function(req, res) {
 
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);
+  app.config.appUrl = 'http://' + app.address().address + ':' + app.address().port;
   console.log(app.config.appUrl); 
+  console.log(app.address());
 });
 
 
