@@ -16,7 +16,7 @@ var express    = require('express'),
   mongoose   = require('mongoose'),
   mongooseAuth = require('mongoose-auth'),
   app        = module.exports = express.createServer(),
-  io         = require('socket.io').listen(app),
+  //io         = require('socket.io').listen(app),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
@@ -32,12 +32,12 @@ var express    = require('express'),
 require('./lib/config')(app);
 require('./lib/boot-mongo')(app);
 
-// force long-polling for heroku. https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+/*
 io.configure(function () { 
     io.set("transports", ["xhr-polling"]); 
     io.set("polling duration", 10); 
 });
-
+*/
 
 app.configure('development', function(){
   var stylusMiddleware = stylus.middleware({
