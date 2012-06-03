@@ -5,7 +5,6 @@
 
 var express    = require('express'),
   Routes     = require('./routes'),
-  Dashboard  = require('./routes/dashboard'),
   Styleguide  = require('./routes/styleguide'),
   http       = require('http'),
   net        = require('net'),
@@ -20,7 +19,8 @@ var express    = require('express'),
   io         = require('socket.io').listen(app),
   cache      = {},
   tcpGuests  = [],
-  viewEngine = 'jade';
+  viewEngine = 'jade',
+  Dashboard  = require('./routes/dashboard')(app);
 
 
 
@@ -115,7 +115,7 @@ app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
-
+console.log(app.config);
 app.get('/dashboard', Dashboard.index);
 
 app.get('/styleguide', function(req, res) {

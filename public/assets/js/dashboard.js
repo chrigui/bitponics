@@ -52,3 +52,9 @@ iv = setInterval( function() {
     air_graph.render();
 
 }, tv );
+
+$(function () {
+    var lightGraph = $('#light-sensor-graph');
+        
+    Bitponics.socket = io.connect(Bitponics.appUrl);
+});
