@@ -56,10 +56,7 @@ iv = setInterval( function() {
 $(function () {
     var lightGraph = $('#light-sensor-graph');
     
-    io.configure(function () { 
-        io.set("transports", ["xhr-polling"]); 
-        io.set("polling duration", 10); 
-    });
 
-    Bitponics.socket = io.connect(Bitponics.appUrl);
+    //Bitponics.socket = io.connect(Bitponics.appUrl);
+    Bitponics.socket = io.connect(window.location.origin);
 });
