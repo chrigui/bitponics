@@ -1,10 +1,17 @@
-var app = require('../app');
+//var app = require('../app');
 /*
  * GET home page.
  */
-exports.index = function (req, res) {
-  res.render('dashboard', {
-    title: "Bitponics - Dashboard"
-  });
+module.exports = function(app){
+	return {
+		index : function (req, res) {
+			console.log('Dashboard index');
+			console.log(app.config);
+			res.render('dashboard', {
+		    	title: "Bitponics - Dashboard",
+			    appUrl : app.config.appUrl
+			});
+		}
+	};
 };
 
