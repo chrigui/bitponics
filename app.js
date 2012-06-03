@@ -32,12 +32,10 @@ var express    = require('express'),
 require('./lib/config')(app);
 require('./lib/boot-mongo')(app);
 
-/*
 io.configure(function () { 
     io.set("transports", ["xhr-polling"]); 
     io.set("polling duration", 10); 
 });
-*/
 
 app.configure('development', function(){
   var stylusMiddleware = stylus.middleware({
@@ -180,13 +178,12 @@ app.post('/log', function(req, res) {
 });
 
 
-/*io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
   socket.on('sensor_event', function (data) {
     socket.broadcast.emit('sensor_event', data);
   });
 });
-*/
 
 app.listen(app.config.port, app.config.host, function(){
   console.log("Express server listening on port %d", app.address().port);
