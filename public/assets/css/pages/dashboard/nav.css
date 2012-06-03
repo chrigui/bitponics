@@ -57,12 +57,29 @@ a:hover{text-decoration:underline}
 .user-page section header .date{width:80%;text-align:left}
 .user-page section header .time{width:20%;text-align:right}
 .user-page section ul{font-size:0;}
-.user-page section ul li{width:25%;}
+.user-page section ul li{width:25%;position:relative;}
 .user-page section ul li h2,.user-page section ul li span{text-align:center}
+.user-page section ul li section{padding:0 1px}
 .user-page section ul li section.light .data-graph{height:50px}
-.user-page section #graph-timeline{position:absolute;top:198px;bottom:100px;width:100%;background:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.50) 4px,rgba(255,255,255,0.50) 8px);}
+.user-page section #graph-timeline{position:absolute;top:198px;bottom:200px;width:100%;background:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.50) 4px,rgba(255,255,255,0.50) 8px);}
 .user-page section #graph-timeline .progress{background:#99d264;height:100%;width:25%}
-.user-page section #graph-nav{position:absolute;bottom:0;height:100px;width:100%;border-top:1px solid #999}
+.user-page section #graph-timeline #main-data-graph{position:absolute;width:100%;height:50%;bottom:0}
+.user-page section #graph-nav{position:absolute;bottom:0;height:200px;width:100%;border-top:1px solid #000;}
+.user-page section #graph-nav .photo-stream{height:100px;position:relative;overflow:hidden;}
+.user-page section #graph-nav .photo-stream ul li{width:100px;height:100px;}
+.user-page section #graph-nav .photo-stream ul li img{width:100px;height:100px;margin:0 1px 0}
+.user-page section #graph-nav .photo-stream .add-photo{position:absolute;right:0;top:0;width:100px;height:100px;border-left:2px solid #000;background:#f5f5f4;}
+.user-page section #graph-nav .photo-stream .add-photo img{height:35px;margin-top:30px;margin-left:25px;opacity:.85}
+.user-page section #graph-nav .notifications{border-top:1px solid #000;border-bottom:1px solid #000;height:100px;position:relative;}
+.user-page section #graph-nav .notifications .arrow-left,.user-page section #graph-nav .notifications .arrow-right{height:100px;width:100px;float:left;border-right:2px solid #000;}
+.user-page section #graph-nav .notifications .arrow-left img,.user-page section #graph-nav .notifications .arrow-right img{width:35px;height:35px;margin-top:35px;margin-left:25px}
+.user-page section #graph-nav .notifications .arrow-right img{margin-left:35px}
+.user-page section #graph-nav .notifications .notification{height:100%;overflow:hidden;}
+.user-page section #graph-nav .notifications .notification .calendar{float:left;width:100px;height:100%;}
+.user-page section #graph-nav .notifications .notification .calendar img{width:35px;height:35px;opacity:.85;margin:30px 0 0 30px}
+.user-page section #graph-nav .notifications .text{color:#333;margin-left:100px;line-height:100px}
+.user-page section #graph-nav .add-log{position:absolute;top:0;right:0;width:100px;height:100px;background:#f5f5f4;border-left:2px solid #000;}
+.user-page section #graph-nav .add-log img{width:35px;margin-top:30px;margin-left:30px;opacity:.85}
 .triangle-up{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #333}
 .triangle-down{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #333}
 .triangle-left{height:0;position:absolute;width:0;border-right:5px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent}

@@ -180,18 +180,19 @@ app.post('/log', function(req, res) {
 
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
-  socket.on('sensor_event', function (data) {
+  socket.on('client event', function (data) {
+    console.log("GGOIJSOPIDJOPSIJDPOSDKPSODK")
     socket.broadcast.emit('sensor_event', data);
   });
 });
 
 app.listen(app.config.port, app.config.host, function(){
-  console.log("Express server listening on port %d", app.address().port);
+  console.log('Express server listening at ' + app.address().address + ', port ' + app.address().port);
+  //console.log("Express server listening on port %d", app.address().port);
   app.config.appUrl = 'http://' + app.address().address + ':' + app.address().port;
-  console.log(app.config.appUrl); 
-  console.log(app.address());
+  //console.log(app.config.appUrl); 
+  //console.log(app.address());
 });
-
 
 
 
