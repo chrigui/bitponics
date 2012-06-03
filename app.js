@@ -32,6 +32,11 @@ var express    = require('express'),
 require('./lib/config')(app);
 require('./lib/boot-mongo')(app);
 
+// force long-polling for heroku. https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+io.configure(function () { 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
+});
 
 
 app.configure('development', function(){
