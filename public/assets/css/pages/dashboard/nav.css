@@ -61,7 +61,7 @@ a:hover{text-decoration:underline}
 .user-page section ul li h2,.user-page section ul li span{text-align:center}
 .user-page section ul li section{padding:0 1px}
 .user-page section ul li section.light .data-graph{height:50px}
-.user-page section #graph-timeline{position:absolute;top:198px;bottom:200px;width:100%;background:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.50) 4px,rgba(255,255,255,0.50) 8px);}
+.user-page section #graph-timeline{position:absolute;top:198px;bottom:200px;width:100%;background:-webkit-repeating-linear-gradient(45deg,transparent,transparent 2px,rgba(255,255,255,0.5) 4px,rgba(255,255,255,0.5) 8px);}
 .user-page section #graph-timeline .progress{background:#99d264;height:100%;width:25%}
 .user-page section #graph-timeline #main-data-graph{position:absolute;width:100%;height:50%;bottom:0}
 .user-page section #graph-nav{position:absolute;bottom:0;height:200px;width:100%;border-top:1px solid #000;}
