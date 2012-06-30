@@ -19,6 +19,7 @@ UserSchema = new Schema({
         first: String
       , last: String
     },
+  locale: String,
   active : { type : Boolean, default : true }
 },
 { strict: true });

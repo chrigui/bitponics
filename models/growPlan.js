@@ -1,26 +1,45 @@
 var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId,
-  GrowSystemSchema = require('./GrowSystem').schema;
+	mongooseTypes = require('mongoose-types'),
+	useTimestamps = mongooseTypes.useTimestamps,
+  	Schema = mongoose.Schema,
+  	ObjectId = Schema.ObjectId,
+  	GrowSystemSchema = require('./GrowSystem').schema;
 
 var GrowPlanSchema = new Schema({
 	title: { type: String, required: true },
-	growSystem: { type: ObjectId, ref: 'GrowSystem' }
-	//hydro_system_type: { type : ObjectId, ref : 'GrowSystem'},
-	/*description: { type: String, required: true },    
-	tags: { type: String },
-	star_rating_average: { type: String },
-	users_who_rated_stars: { type: Array },
-	expertise level: { type: String },
-	users_who_rated_expertise: { type: Array },
-	hydro_system_type_of: { type: String },
-	lighting_type: { type: String },
-	number_of_plants: { type: String },
-	growing_medium: { type: String },
+	growSystemType: { type: String, enum: [
+		'ebb & flow',
+		'nutrient film technique (NFT)',
+		'deep water culture',
+		'aquaponics'
+	]},
+	description: { type: String, required: true },    
+	tags: [String],
+	expertiseLevel: { type: String, enum: [
+		'beginner',
+		'intermediate',
+		'expert'
+	]},
+	supplementalLightingType: { type: String, enum: [
+		'fluorescent',
+		'metal halide',
+		'none',
+		'high pressure sodium (HPS)'
+	]},
+	numberOfPlants: Number,
+	growingMedium: { type: String, enum: [
+		'hydroton',
+		'cocoa chips',
+		'cocoa coir',
+		'perlite',
+		'soil',
+		'rockwool',
+		'other'
+	]},
 	reservoir_size: { type: String },
 	nutrients: { type: Array },
 	sensor_list: { type: Array }, 
-	phases: { type: Array }*/
+	phases: { type: Array }
 },
 { strict: true });
 
