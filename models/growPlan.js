@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
   ObjectId = Schema.ObjectId,
   GrowSystemSchema = require('./GrowSystem').schema;
 
-var GrowingPlanSchema = new Schema({
+var GrowPlanSchema = new Schema({
 	title: { type: String, required: true },
 	growSystem: { type: ObjectId, ref: 'GrowSystem' }
 	//hydro_system_type: { type : ObjectId, ref : 'GrowSystem'},
@@ -24,6 +24,6 @@ var GrowingPlanSchema = new Schema({
 },
 { strict: true });
 
-GrowingPlanSchema.plugin(useTimestamps);
+GrowPlanSchema.plugin(useTimestamps);
 
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);
