@@ -20,8 +20,7 @@ var express    = require('express'),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
-  Dashboard  = require('./routes/dashboard')(app),
-  GrowPlanModel = require('./models/growingPlan').model;
+  Dashboard  = require('./routes/dashboard')(app);
 
 
 
@@ -204,7 +203,7 @@ app.listen(app.config.port, app.config.host, function(){
 /*
  * API
  */
-require('./api/api');
+require('./api/api')(app);
 
 
 
