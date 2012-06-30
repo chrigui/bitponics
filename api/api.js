@@ -45,7 +45,7 @@ module.exports = function(app) {
     console.log(req.body);
     grow_plan = new GrowPlanModel({
       title: req.body.title,
-      hydro_system_type: req.body.hydro_system_type
+      growSystem: {}
     });
     grow_plan.save(function (err) {
       if (!err) {

@@ -1,13 +1,12 @@
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   ObjectId = Schema.ObjectId,
-  HydroSystem = require('./HydroSystem').schema;
+  GrowSystemSchema = require('./GrowSystem').schema;
 
-var GrowingPlan = new Schema({
-	id: ObjectId,
+var GrowingPlanSchema = new Schema({
 	title: { type: String, required: true },
-	hydro_system_type: [HydroSystem],
-	//hydro_system_type: { type : ObjectId, ref : 'HydroSystem'},
+	growSystem: { type: ObjectId, ref: 'GrowSystem' }
+	//hydro_system_type: { type : ObjectId, ref : 'GrowSystem'},
 	/*description: { type: String, required: true },    
 	tags: { type: String },
 	star_rating_average: { type: String },
@@ -22,7 +21,9 @@ var GrowingPlan = new Schema({
 	nutrients: { type: Array },
 	sensor_list: { type: Array }, 
 	phases: { type: Array }*/
-	modified: { type: Date, default: Date.now }
-});
+},
+{ strict: true });
 
-exports.model = mongoose.model('GrowingPlan', GrowingPlan);
+GrowingPlanSchema.plugin(useTimestamps);
+
+exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

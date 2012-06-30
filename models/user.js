@@ -1,33 +1,14 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-	useTimestamps = mongooseTypes.useTimestamps;
+	useTimestamps = mongooseTypes.useTimestamps,
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
-	GrowingPlan = require('./growingPlan').model,
 	mongooseAuth = require('mongoose-auth'),
 	everyauth = require('everyauth'),
 	UserSchema = undefined,
 	User = undefined;
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
-
-
-
-/**
- * GrowingPlanInstance : Schema, only intended for use as an embedded document in a User instance. 
- */
-var GrowingPlanInstanceSchema = new Schema({
-	// embedded docs get ids, so we don't need to add one explicitly (http://mongoosejs.com/docs/embedded-documents.html)
-	growingPlan : { type : ObjectId, ref : 'GrowingPlan'},
-	photos : {
-		url : { type : mongoose.SchemaTypes.Url, required: true},
-		createdAt : { type : Date, default: Date.now},
-		tags: { type : [String]}
-	}
-});
-
-GrowingPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
-
 
 UserSchema = new Schema({
   email : { 
@@ -38,9 +19,9 @@ UserSchema = new Schema({
         first: String
       , last: String
     },
-  active : { type : Boolean, default : true },
-  growingPlanInstances : [GrowingPlanInstanceSchema]
-});
+  active : { type : Boolean, default : true }
+},
+{ strict: true });
 
 UserSchema.virtual('name.full')
 	.get(function () {
