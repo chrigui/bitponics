@@ -1,3 +1,6 @@
+/*
+ * API overview page
+ */
 app.get('/api', function (req, res) {
   res.render('api', {
     title: "Bitponics API",
