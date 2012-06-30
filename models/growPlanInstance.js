@@ -3,14 +3,14 @@ var mongoose = require('mongoose'),
 	useTimestamps = mongooseTypes.useTimestamps,
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
-	GrowPlan = require('./growingPlan').model,
+	GrowPlan = require('./growPlan').model,
 	User = requre('./user').model;
 
 /**
  * GrowPlanInstance 
  */
 var GrowPlanInstanceSchema = new Schema({
-	growPlan : { type : ObjectId, ref : 'GrowingPlan', required: true},
+	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
 	users : [{ type: ObjectId, ref: 'User'}],
 	photos : {
 		url : { type : mongoose.SchemaTypes.Url, required: true},
