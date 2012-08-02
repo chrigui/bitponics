@@ -6,28 +6,20 @@ var mongoose = require('mongoose'),
   	GrowSystemSchema = require('./GrowSystem').schema;
 
 var GrowPlanSchema = new Schema({
-	title: { type: String, required: true },
-	growSystemType: { type: String, enum: [
-		'ebb & flow',
-		'nutrient film technique (NFT)',
-		'deep water culture',
-		'aquaponics'
-	]},
-	description: { type: String, required: true },    
+	parentGrowPlanId: { type: ObjectId },
+	createdByUserId: { type: ObjectId },
+	name: { type: String, required: true },
+	description: { type: String, required: true },
 	tags: [String],
 	expertiseLevel: { type: String, enum: [
 		'beginner',
 		'intermediate',
 		'expert'
 	]},
-	supplementalLightingType: { type: String, enum: [
-		'fluorescent',
-		'metal halide',
-		'none',
-		'high pressure sodium (HPS)'
-	]},
+	growSystemType: { type: ObjectId, ref: 'GrowSystem' },
+	light: [{ type: ObjectId, ref: 'Light'}],
 	numberOfPlants: Number,
-	growingMedium: { type: String, enum: [
+	growMedium: { type: String, enum: [
 		'hydroton',
 		'cocoa chips',
 		'cocoa coir',
@@ -36,13 +28,30 @@ var GrowPlanSchema = new Schema({
 		'rockwool',
 		'other'
 	]},
-	reservoir_size: { type: String },
-	nutrients: { type: Array },
-	sensor_list: { type: Array }, 
-	phases: { type: Array }
+	reservoir_size: { type: Number },
+	nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
+	sensor_list: [{ type: ObjectId, ref: 'Sensor' }],
+	controls: [{ type: ObjectId, ref: 'Control'}],
+	phases: [{ type: ObjectId, ref: 'Phase' }]
 },
 { strict: true });
 
 GrowPlanSchema.plugin(useTimestamps);
+GrowPlanSchema.virtual('reservoirSizeWithUnits')
+	/**
+	 * Setter takes an object of the form { value: Number, unit: String}
+	 * unit must be 'liters' or 'gallons'
+	 */
+	.set(function(reservoirSizeWithUnits){
+		var unit = reservoirSizeWithUnits.unit || 'gallons',
+			value = reservoirSizeWithUnits.value;
+
+		if (unit === 'liters'){
+			// 1 liter = 0.264172052 gallons
+			this.set('reservoirSize', value * 0.264172052);
+		} else {
+			this.set('reservoirSize', value);
+		}
+	});
 
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

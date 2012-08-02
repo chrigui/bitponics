@@ -10,5 +10,15 @@ var GrowSystemSchema = new Schema({
 
 GrowSystemSchema.plugin(useTimestamps);
 
+//
+GrowSystemSchema.suggestions = {
+	name: [
+		'ebb & flow',
+		'nutrient film technique (NFT)',
+		'deep water culture',
+		'aquaponics'
+	]
+}
+
 exports.schema = GrowSystemSchema;
 exports.model = mongoose.model('GrowSystem', GrowSystemSchema);

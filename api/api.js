@@ -45,7 +45,7 @@ module.exports = function(app) {
     console.log(req.body);
     grow_plan = new GrowPlanModel({
       title: req.body.title,
-      growSystem: {}
+      description: req.body.description
     });
     grow_plan.save(function (err) {
       if (!err) {
