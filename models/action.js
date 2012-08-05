@@ -10,7 +10,7 @@ var ActionSchema = new Schema({
 		control: { type: ObjectId, ref: 'Control', required: true },
 		value: { type: Number } //0-255?
 	},
-	relativeStartTime: { type: Number },
+	startTime: { type: Number },
 	recurrence: {
 		repeatType: { type: String, enum: {
 			'minutes',
