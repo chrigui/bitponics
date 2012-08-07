@@ -5,13 +5,18 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var GrowSystemSchema = new Schema({
+	
 	name: { type: String, required: true },
+	
 	description: { type: String, required: false },
+	
 	type: { type: String, required: true },
+	
 	/**
 	 * reservoirSize is number of gallons
 	 */
 	reservoirSize: { type: Number },
+	
 	numberOfPlants: { type: Number, required: true }
 });
 

@@ -5,39 +5,42 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var ActionSchema = new Schema({
-	message: { type: String, required: true },
-	controlTrigger: {
-		control: { type: ObjectId, ref: 'Control', required: true },
-		value: { type: Number } //0-255?
-	},
-	startTime: { type: Number },
-	recurrence: {
-		repeatType: { type: String, enum: {
-			'minutes',
-			'hours',
-			'days',
-			'weeks',
-			'months'
-		},
-		frequency: { type: Number },
-		repeatNumberOfTimes: { type: Number }
+	
+	description: { type: String, required: true },
+	
+	control: { type: ObjectId, ref: 'Control', required: false },
+	
+	cycle: {
+	
+		states: [
+			{
+				controlValue: { type: String},
+
+				durationType: { type: String, enum: {
+					'milliseconds',
+					'seconds'
+					'minutes',
+					'hours',
+					'days',
+					'weeks',
+					'months',
+					'untilPhaseEnd'
+				},
+				
+				duration: { type: Number },
+				
+				message: { type: String }
+			}
+		],
+
+		/**
+		 * undefined means repeat infinitely.
+		 */
+		stopAfterRepetitionCount: { type: Number }
 	}
 });
 
 ActionSchema.plugin(useTimestamps);
-
-ActionSchema.suggestions = {
-	// 'name': [
-	// 	'Brightness',
-	// 	'pH',
-	// 	'EC (Electrical Connectivity)',
-	// 	'TDS (Total Disolved Solids)',
-	// 	'Water Temperature',
-	// 	'Air Temperature',
-	// 	'Humidity',
-	// 	'Water Level'
-	// ]
-}
 
 exports.schema = ActionSchema;
 exports.model = mongoose.model('Action', ActionSchema);
