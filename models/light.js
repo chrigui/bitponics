@@ -5,29 +5,21 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var LightSchema = new Schema({
-	name: { type: String, required: true, enum: [
-		'fluorescent',
-		'metal halide',
-		'none',
-		'high pressure sodium (HPS)',
-		'mixed'
-	]},
-	wattage: { type: Number }
+	type: { type: String, required: true },
+	watts: { type: Number },
+	brand : { type : String },
+	name : { type : String }
 });
 
 LightSchema.plugin(useTimestamps);
 
 LightSchema.suggestions = {
-	// 'name': [
-	// 	'Brightness',
-	// 	'pH',
-	// 	'EC (Electrical Connectivity)',
-	// 	'TDS (Total Disolved Solids)',
-	// 	'Water Temperature',
-	// 	'Air Temperature',
-	// 	'Humidity',
-	// 	'Water Level'
-	// ]
+	type: [
+		'fluorescent',
+		'metal halide',
+		'high pressure sodium (HPS)',
+		'LED'
+	]
 }
 
 exports.schema = LightSchema;

@@ -17,16 +17,7 @@ var GrowPlanSchema = new Schema({
 		'expert'
 	]},
 	growSystem: { type: ObjectId, ref: 'GrowSystem' },
-	light: [{ type: ObjectId, ref: 'Light'}],
-	growMedium: { type: String, enum: [
-		'hydroton',
-		'cocoa chips',
-		'cocoa coir',
-		'perlite',
-		'soil',
-		'rockwool',
-		'other'
-	]},
+	growMedium: { type: String },
 	nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
 	sensors: [{ type: ObjectId, ref: 'Sensor' }],
 	controls: [{ type: ObjectId, ref: 'Control'}],
@@ -35,5 +26,16 @@ var GrowPlanSchema = new Schema({
 { strict: true });
 
 GrowPlanSchema.plugin(useTimestamps);
+
+GrowPlanSchema.suggestions = {
+	growMedium : [
+		'hydroton',
+		'cocoa chips',
+		'cocoa coir',
+		'perlite',
+		'soil',
+		'rockwool'
+	]
+};
 
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

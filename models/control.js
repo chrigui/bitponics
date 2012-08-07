@@ -11,17 +11,7 @@ var ControlSchema = new Schema({
 ControlSchema.plugin(useTimestamps);
 
 ControlSchema.suggestions = {
-	// 'name': [
-	// 	'Brightness',
-	// 	'pH',
-	// 	'EC (Electrical Connectivity)',
-	// 	'TDS (Total Disolved Solids)',
-	// 	'Water Temperature',
-	// 	'Air Temperature',
-	// 	'Humidity',
-	// 	'Water Level'
-	// ]
-}
+};
 
 exports.schema = ControlSchema;
 exports.model = mongoose.model('Control', ControlSchema);
