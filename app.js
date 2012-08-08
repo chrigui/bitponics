@@ -203,13 +203,18 @@ app.listen(app.config.port, app.config.host, function(){
 /*
  * API
  */
-require('./api/api')(app);
-
-
-
-
-
-
+require('./api/action')(app);
+require('./api/control')(app);
+require('./api/device')(app);
+require('./api/growPlan')(app);
+require('./api/growPlanInstance')(app);
+require('./api/growSystem')(app);
+require('./api/idealRange')(app);
+require('./api/light')(app);
+require('./api/nutrient')(app);
+require('./api/phase')(app);
+require('./api/sensor')(app);
+require('./api/user')(app);
 
 
 

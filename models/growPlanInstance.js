@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
 	GrowPlan = require('./growPlan').model,
-	User = requre('./user').model;
+	User = require('./user').model;
 
 /**
  * GrowPlanInstance 
@@ -33,7 +33,7 @@ var GrowPlanInstanceSchema = new Schema({
 	}],
 	
 	controlLogs: [{
-		control: { type: ObjectId, ref: 'Control', , required: true },
+		control: { type: ObjectId, ref: 'Control', required: true },
 		value: { type: Number },
 		timestamp: { type: Date, required: true }
 	}],
