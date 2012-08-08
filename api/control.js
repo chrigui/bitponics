@@ -1,4 +1,4 @@
-var GrowPlanModel = require('../models/growPlan').model;
+var ControlModel = require('../models/control').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -6,23 +6,14 @@ var GrowPlanModel = require('../models/growPlan').model;
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
 module.exports = function(app) {
-  /*
-   * API overview page
-   */
-  app.get('/api', function (req, res) {
-    res.render('api', {
-      title: "Bitponics API",
-      appUrl : app.config.appUrl
-    });
-  });
 
-   //List grow plans
-  app.get('/api/grow_plans', function (req, res){
-    console.log("in grow_plans callback");
-    return GrowPlanModel.find(function (err, grow_plans) {
-      console.log("in GrowPlanModel callback");
+   //List controls
+  app.get('/api/controls', function (req, res){
+    console.log("in controls callback");
+    return ControlModel.find(function (err, controls) {
+      console.log("in ControlModel callback");
       if (!err) {
-        return res.send(grow_plans);
+        return res.send(controls);
       } else {
         return console.log(err);
       }
@@ -30,48 +21,47 @@ module.exports = function(app) {
   });
 
   /*
-   * Create single grow plan
+   * Create single control
    *
    *  Test with:
-   *  jQuery.post("/api/grow_plans", {
-   *    "title": "GrowPlan #1"
+   *  jQuery.post("/api/controls", {
+   *    "name": "pump"
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plans', function (req, res){
-    var grow_plan;
+  app.post('/api/controls', function (req, res){
+    var control;
     console.log("POST: ");
     console.log(req.body);
-    grow_plan = new GrowPlanModel({
-      title: req.body.title,
-      description: req.body.description
+    control = new ControlModel({
+      name: req.body.name,
     });
-    grow_plan.save(function (err) {
+    control.save(function (err) {
       if (!err) {
-        return console.log("created grow_plan");
+        return console.log("created control");
       } else {
         return console.log(err);
       }
     });
-    return res.send(grow_plan);
+    return res.send(control);
   });
 
   /*
-   * Read a grow plan
+   * Read an control
    *
    * To test:
-   * jQuery.get("/api/grow_plans/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/controls/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plans/:id', function (req, res){
-    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+  app.get('/api/controls/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
       if (!err) {
-        return res.send(grow_plan);
+        return res.send(control);
       } else {
         return console.log(err);
       }
@@ -79,14 +69,14 @@ module.exports = function(app) {
   });
 
   /*
-   * Update a grow plan
+   * Update an control
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plan/${id}",
+   *     url: "/api/control/${id}",
    *     type: "PUT",
    *     data: {
-   *       "title": "New Grow Plan Title"
+   *       "name": "updated pump"
    *     },
    *     success: function (data, textStatus, jqXHR) {
    *         console.log("Post response:");
@@ -96,26 +86,26 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plans/:id', function (req, res){
-    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
-      grow_plan.title = req.body.title;
-      return grow_plan.save(function (err) {
+  app.put('/api/controls/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
+      control.title = req.body.title;
+      return control.save(function (err) {
         if (!err) {
-          console.log("updated grow_plan");
+          console.log("updated control");
         } else {
           console.log(err);
         }
-        return res.send(grow_plan);
+        return res.send(control);
       });
     });
   });
 
   /*
-   * Delete a grow plan
+   * Delete an control
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plans/${id}", 
+   *     url: "/api/controls/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -125,9 +115,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plans/:id', function (req, res){
-    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
-      return grow_plan.remove(function (err) {
+  app.delete('/api/controls/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
+      return control.remove(function (err) {
         if (!err) {
           console.log("removed");
           return res.send('');

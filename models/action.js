@@ -16,16 +16,16 @@ var ActionSchema = new Schema({
 			{
 				controlValue: { type: String},
 
-				durationType: { type: String, enum: {
+				durationType: { type: String, enum: [
 					'milliseconds',
-					'seconds'
+					'seconds',
 					'minutes',
 					'hours',
 					'days',
 					'weeks',
 					'months',
 					'untilPhaseEnd'
-				},
+				]},
 				
 				duration: { type: Number },
 				

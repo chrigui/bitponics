@@ -6,8 +6,8 @@ var mongoose = require('mongoose'),
   	GrowSystemSchema = require('./GrowSystem').schema;
 
 var GrowPlanSchema = new Schema({
-	parentGrowPlanId: { type: ObjectId },
-	createdByUserId: { type: ObjectId },
+	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
+	createdByUserId: { type: ObjectId, ref: 'User' },
 	name: { type: String, required: true },
 	description: { type: String, required: true },
 	plants: [String],
