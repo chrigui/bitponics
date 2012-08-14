@@ -20,7 +20,8 @@ var express    = require('express'),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
-  Dashboard  = require('./routes/dashboard')(app);
+  Dashboard  = require('./routes/dashboard')(app),
+  nodemailer = require('nodemailer');
 
 
 
@@ -90,7 +91,8 @@ app.configure(function(){
   });
 
   // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
-  app.use(app.router); 
+  // per mongoose-auth readme, don't need this since express handles it
+  //app.use(app.router); 
 
 });
 
@@ -119,17 +121,60 @@ app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
-console.log(app.config);
+
 app.get('/dashboard', Dashboard.index);
 
 app.get('/styleguide', function(req, res) {
   res.render('styleguide', {
-    'title': 'Styleguide',
-    'layout': __dirname + "/views/jade/styleguide-layout.jade",
-    'pretty': true
+    title: 'Styleguide',
+    layout: __dirname + "/views/jade/styleguide-layout.jade",
+    pretty: true
   })
 });
 
+/*
+ * Admin
+ * Require authenticated user with property admin=true
+ */
+app.all('/admin*', function(req, res, next) {
+  console.dir(req.user);
+  console.dir(req.loggedIn);
+  if (req.user.admin) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+});
+
+/* 
+ * Admin landing
+ */
+app.get('/admin/', function(req, res) {
+  res.render('admin', {
+    title: 'Bitponics Admin',
+    appUrl : app.config.appUrl
+  })
+});
+
+
+/*
+ * Email verification\
+ * TODO: set verified flag on user obj
+ * TODO: check for hash in db, only then set verified flag
+ */
+app.get('/signup', function(req, res) {
+  var UserModel = require('../models/user')(app).model;
+  return UserModel.find({ verify_token: req.query['verify'] }, function (err, user) {
+    if (!err) {
+      res.render('signup', {
+        title: 'Verify',
+        appUrl : app.config.appUrl
+      });
+    } else {
+      return console.log(err);
+    }
+  });
+});
 
 /**
  * @param req : json object. Should have properties for deviceId, timestamp, log types + log values
@@ -215,7 +260,6 @@ require('./api/nutrient')(app);
 require('./api/phase')(app);
 require('./api/sensor')(app);
 require('./api/user')(app);
-
 
 
 

@@ -21,5 +21,6 @@
     	, "bootstrap-stylus": ">= 0.0.1"
     	, "nodeunit" : ">=0.7.4"
     	, "zombie"   : ">=1.1.1"
+    	, "nodemailer" : ">=0.3"
 	}
 }
