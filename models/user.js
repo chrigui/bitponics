@@ -6,7 +6,14 @@ var mongoose = require('mongoose'),
 	mongooseAuth = require('mongoose-auth'),
 	everyauth = require('everyauth'),
 	UserSchema = undefined,
-	User = undefined;
+	User = undefined,
+	crypto = require('crypto'),
+	activation_token = "";
+
+//create random string to verify against
+crypto.randomBytes(48, function(ex, buf) {
+  token = buf.toString('hex');
+});
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -20,7 +27,9 @@ UserSchema = new Schema({
       , last: String
     },
   locale: String,
-  active : { type : Boolean, default : true }
+  active : { type : Boolean, default : false },
+  admin :  { type : Boolean, default : false },
+  activation_token : { type : String, default : activation_token }
 },
 { strict: true });
 
