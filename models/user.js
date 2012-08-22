@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
 	everyauth = require('everyauth'),
 	UserSchema = undefined,
 	User = undefined,
+	nodemailer = require('nodemailer'),
 	crypto = require('crypto'),
 	activation_token = "";
 
@@ -48,12 +49,21 @@ UserSchema.pre('save', function(next){
 	var user = this,
 		token = "";
 
-	//create random string to verify against
-	crypto.randomBytes(48, function(ex, buf) {
-	  token = buf.toString('hex');
-	  user.activation_token = token;
-	  next();
-	});
+	//give user activation token if needed
+	if(user.activation_token === '' || user.activation_token === null) {
+		//create random string to verify against
+		crypto.randomBytes(48, function(ex, buf) {
+		  token = buf.toString('hex');
+		  user.activation_token = token;
+		  next();
+		});
+	}
+
+	//send activation email if not activated user
+	if(!user.active){
+		//TODO:send email with activation_token in link back to /register
+
+	}
 
 });
 
