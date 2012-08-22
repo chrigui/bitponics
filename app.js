@@ -162,16 +162,25 @@ app.get('/admin/', function(req, res) {
  * TODO: set verified flag on user obj
  * TODO: check for hash in db, only then set verified flag
  */
-app.get('/signup', function(req, res) {
-  var UserModel = require('../models/user')(app).model;
-  return UserModel.find({ verify_token: req.query['verify'] }, function (err, user) {
-    if (!err) {
-      res.render('signup', {
-        title: 'Verify',
+app.get('/register', function(req, res) {
+  var UserModel = require('./models/user')(app).model;
+  console.log('req.query.verify: '+req.query.verify);
+  return UserModel.findOne({ activation_token: req.query.verify }, function (err, user) {
+    if (!err && user) {
+      console.log('user:');
+      console.dir(user);
+      user.active = true;
+      res.render('register', {
+        title: 'Register Success',
+        newUser: user,
         appUrl : app.config.appUrl
       });
     } else {
-      return console.log(err);
+      console.log(err);
+      res.render('register', {
+        title: 'Register Failed - No matching token.',
+        appUrl : app.config.appUrl
+      });
     }
   });
 });
