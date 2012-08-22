@@ -10,11 +10,6 @@ var mongoose = require('mongoose'),
 	crypto = require('crypto'),
 	activation_token = "";
 
-//create random string to verify against
-crypto.randomBytes(48, function(ex, buf) {
-  token = buf.toString('hex');
-});
-
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
 UserSchema = new Schema({
@@ -49,6 +44,18 @@ UserSchema.virtual('name.full')
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
+UserSchema.pre('save', function(next){
+	var user = this,
+		token = "";
+
+	//create random string to verify against
+	crypto.randomBytes(48, function(ex, buf) {
+	  token = buf.toString('hex');
+	  user.activation_token = token;
+	  next();
+	});
+
+});
 
 /**
  * exported object is a function. Needs to be passed the app instance so that appropriate configs can be retrieved and used to complete initialization. 
@@ -103,7 +110,7 @@ module.exports = function(app){
 			      appUrl : app.config.appUrl
 				},
 	          	loginSuccessRedirect: '/',
-	         	registerSuccessRedirect: '/'
+	         	registerSuccessRedirect: '/register'
 	        }
 	    }
 	});
