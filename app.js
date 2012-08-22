@@ -20,8 +20,7 @@ var express    = require('express'),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
-  Dashboard  = require('./routes/dashboard')(app),
-  nodemailer = require('nodemailer');
+  Dashboard  = require('./routes/dashboard')(app);
 
 
 
@@ -158,25 +157,21 @@ app.get('/admin/', function(req, res) {
 
 
 /*
- * Email verification\
- * TODO: set verified flag on user obj
- * TODO: check for hash in db, only then set verified flag
+ * Email verification
+ * 
  */
 app.get('/register', function(req, res) {
   var UserModel = require('./models/user')(app).model;
-  console.log('req.query.verify: '+req.query.verify);
   return UserModel.findOne({ activation_token: req.query.verify }, function (err, user) {
-    if (!err && user) {
-      console.log('user:');
-      console.dir(user);
+    if (!err && user && activation_token !== '') {
       user.active = true;
+      user.save();
       res.render('register', {
-        title: 'Register Success',
+        title: 'Register Success - Active user.',
         newUser: user,
         appUrl : app.config.appUrl
       });
     } else {
-      console.log(err);
       res.render('register', {
         title: 'Register Failed - No matching token.',
         appUrl : app.config.appUrl
