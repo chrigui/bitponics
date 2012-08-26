@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
     GrowPlanInstanceModel = require('../models/growPlanInstance').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
-
+    
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
  * 
@@ -17,6 +17,7 @@ module.exports = function(app) {
       if (!err) {
         return res.send(devices);
       } else {
+        res.send(500);
         return console.log(err);
       }
     });
@@ -58,6 +59,7 @@ module.exports = function(app) {
       if (!err) {
         return console.log("created device");
       } else {
+        res.send(500);
         return console.log(err);
       }
     });
@@ -80,6 +82,7 @@ module.exports = function(app) {
       if (!err) {
         return res.send(device);
       } else {
+        res.send(500);
         return console.log(err);
       }
     });
@@ -110,6 +113,7 @@ module.exports = function(app) {
         if (!err) {
           console.log("updated device");
         } else {
+          res.send(500);
           console.log(err);
         }
         return res.send(device);
@@ -188,9 +192,64 @@ module.exports = function(app) {
           console.log("removed");
           return res.send('');
         } else {
+          res.send(500);
           console.log(err);
         }
       });
     });
   });
+
+
+  /*
+   * Get the current cycle data for the device. 
+   * Pulls from the active GrowPlanInstance that's paired with the device.
+   *
+   */
+  app.get('/api/device/:id/getcurrentcycles', function (req, res){
+    //var format =  req. 'deviceCSV' : 'json';
+  
+  console.log(req);  
+  
+  delete req.session.cookie;
+  req.session.destroy();
+
+  res.status(200);
+  
+  //{outletId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
+  // 16 hours = 57600000ms
+  res.header('Content-Type', 'text/csv; format=device');
+  //res.header('X-Powered-By', '');
+  //res.header('Set-Cookie', '');
+
+res.write('1,0,1,57600000,0,28800000;');  
+res.end();
+
+/*
+  res.header('Transfer-Encoding', 'chunked');
+  res.header('Connection', 'keep-alive');
+  
+  var countdown = 10;
+
+  var write = function(){
+    res.write('1,0,1,57600000,0,28800000');  
+    countdown--;
+    if (!countdown){
+      res.end();
+    } else {
+      setTimeout(write, 200);
+    }
+  };
+
+  write();
+  */
+    /*
+    return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
+      if (!err) {
+        //return res.send(device);
+      } else {
+        return console.log(err);
+      }
+      */
+  });  
+
 };
