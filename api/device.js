@@ -154,12 +154,40 @@ module.exports = function(app) {
   app.get('/api/device/:id/getcurrentcycles', function (req, res){
     //var format =  req. 'deviceCSV' : 'json';
   
-  console.log(req.accepted);  
+  console.log(req);  
+  
+  delete req.session.cookie;
+  req.session.destroy();
+
   res.status(200);
+  
   //{outletId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
   // 16 hours = 57600000ms
   res.header('Content-Type', 'text/csv; format=device');
-  res.send('1,0,1,57600000,0,28800000');
+  //res.header('X-Powered-By', '');
+  //res.header('Set-Cookie', '');
+
+res.write('1,0,1,57600000,0,28800000;');  
+res.end();
+
+/*
+  res.header('Transfer-Encoding', 'chunked');
+  res.header('Connection', 'keep-alive');
+  
+  var countdown = 10;
+
+  var write = function(){
+    res.write('1,0,1,57600000,0,28800000');  
+    countdown--;
+    if (!countdown){
+      res.end();
+    } else {
+      setTimeout(write, 200);
+    }
+  };
+
+  write();
+  */
     /*
     return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
       if (!err) {
