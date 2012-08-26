@@ -7,8 +7,8 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model;
  */
 module.exports = function(app) {
 
-   //List grow_plan_instances
-  app.get('/api/grow_plan_instances', function (req, res){
+   //List grow_plan_instance
+  app.get('/api/grow_plan_instance', function (req, res){
     return GrowPlanInstanceModel.find(function (err, growPlanInstances) {
       if (!err) {
         return res.send(growPlanInstances);
@@ -22,25 +22,43 @@ module.exports = function(app) {
    * Create single growPlanInstance
    *
    *  Test with:
-   *  jQuery.post("/api/grow_plan_instances", {
-   *    users : ['5035831eb4a6ae33b0000002'],
-   *    growPlan : '5021e2cd8330ec0000000010',
-   *    device : '5021e2cd8330ec0000000010',
-   *    startDate: 1346009640013,
-   *    endDate: 1346010888429,
-   *    active: true,
-   *    phases: [],
-   *    sensorLogs: [],
-   *    controlLogs: [],
-   *    photoLogs: [],
-   *    genericLogs: []
+   *  jQuery.post("/api/grow_plan_instance", {
+   *    users : [{ type: ObjectId, ref: 'User'}],
+   *    growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
+   *    device : { type : ObjectId, ref : 'Device', required: false },
+   *    startDate: { type: Date, required: true },
+   *    phases: [{
+   *      phase: { type: ObjectId, ref: 'Phase' },
+   *      startDate: { type: Date },
+   *      endDate: { type: Date },
+   *      active: { type: Boolean }
+   *    }],
+   *    sensorLogs: [{
+   *      sensor: { type: ObjectId, ref: 'Sensor', required: true },
+   *      value: { type: Number },
+   *      timestamp: { type: Date, required: true }
+   *    }],
+   *    controlLogs: [{
+   *      control: { type: ObjectId, ref: 'Control', , required: true },
+   *      value: { type: Number },
+   *      timestamp: { type: Date, required: true }
+   *    }],
+   *    photoLogs: [{
+   *      url: { type : mongoose.SchemaTypes.Url, required: true},
+   *      tags: { type : [String]},
+   *      timestamp: { type: Date, required: true }
+   *    }],
+   *    genericLogs: [{
+   *      entry: { type: String, required: true },
+   *      tags: { type : [String]},
+   *      logType: { type: String },
+   *      timestamp: { type: Date, required: true }
+   *    }]
    *  }, function (data, textStatus, jqXHR) {
-   *  console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
+   *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
-   *  
-   *  
    */
-  app.post('/api/grow_plan_instances', function (req, res){
+  app.post('/api/grow_plan_instance', function (req, res){
     var growPlanInstance;
     console.log("POST: ");
     console.log(req.body);
@@ -49,8 +67,6 @@ module.exports = function(app) {
       growPlan : req.body.growPlan,
       device : req.body.device,
       startDate: req.body.startDate,
-      endDate: req.body.endDate,
-      active: req.body.active,
       phases: req.body.phases,
       sensorLogs: req.body.sensorLogs,
       controlLogs: req.body.controlLogs,
@@ -71,14 +87,14 @@ module.exports = function(app) {
    * Read an growPlanInstance
    *
    * To test:
-   * jQuery.get("/api/grow_plan_instances/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/grow_plan_instance/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plan_instances/:id', function (req, res){
+  app.get('/api/grow_plan_instance/:id', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       if (!err) {
         return res.send(growPlanInstance);
@@ -92,7 +108,7 @@ module.exports = function(app) {
    * Update an growPlanInstance
    *
    * To test:
-   * jQuery.put("/api/grow_plan_instances", {
+   * jQuery.put("/api/grow_plan_instance", {
    *   users : ['5035831eb4a6ae33b0000002'],
    *   startDate: 1346009640013,
    *   endDate: 1346010888429,
@@ -102,7 +118,7 @@ module.exports = function(app) {
    * console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    * });
   */
-  app.put('/api/grow_plan_instances/:id', function (req, res){
+  app.put('/api/grow_plan_instance/:id', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       growPlanInstance.users = req.body.users;
       growPlanInstance.startDate = req.body.startDate;
@@ -125,7 +141,7 @@ module.exports = function(app) {
    * Sensor Logs nested
    *
    *   jQuery.ajax({
-   *      url: "/api/grow_plan_instances/503a86812e57c70000000001/sensorlog",
+   *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensorlog",
    *      type: "PUT",
    *      data: {
    *        sensorLogs: [{
@@ -148,14 +164,15 @@ module.exports = function(app) {
    *      }
    *  });
    */
-  app.put('/api/grow_plan_instances/:id/sensorlog', function (req, res){
+  app.put('/api/grow_plan_instance/:id/sensorlog', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       return growPlanInstance.save(function (err) {
         if (!err) {
           req.body.sensorLogs.forEach(function(log){
-            growPlanInstance.sensorLogs.push(log);  
+            growPlanInstance.sensorLogs.push(log);
           })
           growPlanInstance.save();
+          console.dir(req);
           console.log("logged data to growPlanInstance");
           return res.csv([
             ['endDate', growPlanInstance.endDate]
@@ -168,13 +185,12 @@ module.exports = function(app) {
     });
   });
 
-   
   /*
    * Delete an growPlanInstance
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plan_instances/${id}", 
+   *     url: "/api/grow_plan_instance/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -184,7 +200,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plan_instances/:id', function (req, res){
+  app.delete('/api/grow_plan_instance/:id', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       return growPlanInstance.remove(function (err) {
         if (!err) {

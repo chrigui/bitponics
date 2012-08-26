@@ -8,7 +8,7 @@ var SensorModel = require('../models/sensor').model;
 module.exports = function(app) {
 
    //List sensors
-  app.get('/api/sensors', function (req, res){
+  app.get('/api/sensor', function (req, res){
     return SensorModel.find(function (err, sensors) {
       if (!err) {
         return res.send(sensors);
@@ -22,14 +22,14 @@ module.exports = function(app) {
    * Create single sensor
    *
    *  Test with:
-   *  jQuery.post("/api/sensors", {
+   *  jQuery.post("/api/sensor", {
    *    "name": "humidity",
    *    "unitOfMeasurement": "unit"
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/sensors', function (req, res){
+  app.post('/api/sensor', function (req, res){
     var sensor;
     console.log("POST: ");
     console.log(req.body);
@@ -51,14 +51,14 @@ module.exports = function(app) {
    * Read an sensor
    *
    * To test:
-   * jQuery.get("/api/sensors/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/sensor/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/sensors/:id', function (req, res){
+  app.get('/api/sensor/:id', function (req, res){
     return SensorModel.findById(req.params.id, function (err, sensor) {
       if (!err) {
         return res.send(sensor);
@@ -86,7 +86,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/sensors/:id', function (req, res){
+  app.put('/api/sensor/:id', function (req, res){
     return SensorModel.findById(req.params.id, function (err, sensor) {
       sensor.actionBelowMin = req.body.actionBelowMin;
       return sensor.save(function (err) {
@@ -105,7 +105,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/sensors/${id}", 
+   *     url: "/api/sensor/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -115,7 +115,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/sensors/:id', function (req, res){
+  app.delete('/api/sensor/:id', function (req, res){
     return SensorModel.findById(req.params.id, function (err, sensor) {
       return sensor.remove(function (err) {
         if (!err) {
