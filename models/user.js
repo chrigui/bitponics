@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 	User = undefined,
 	nodemailer = require('nodemailer'),
 	crypto = require('crypto'),
-	activation_token = "";
+	activationToken = "";
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -25,7 +25,8 @@ UserSchema = new Schema({
   locale: String,
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
-  activation_token : { type : String, default : activation_token }
+  activationToken : { type : String, default : activationToken },
+  sentEmail : { type: Boolean, default: false }
 },
 { strict: true });
 
@@ -45,25 +46,66 @@ UserSchema.virtual('name.full')
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
-UserSchema.pre('save', function(next){
+UserSchema.pre('save', function(next){ //TODO: need to wait for all callbacks before calling next()
 	var user = this,
-		token = "";
+		token = "",
+		verifyUrl = "";
 
 	//give user activation token if needed
-	if(user.activation_token === '' || user.activation_token === null) {
+	if(user.activationToken === '' || user.activationToken === null) {
 		//create random string to verify against
 		crypto.randomBytes(48, function(ex, buf) {
 		  token = buf.toString('hex');
-		  user.activation_token = token;
-		  next();
+		  user.activationToken = token;
+		  verifyUrl = 'http://bitponics.com/register?verify=' + user.activationToken;
+		  
+		  	//send activation email if not activated user
+			if(!user.active && !user.sentEmail){
+				//TODO:send email with activationToken in link back to /register
+				// create reusable transport method (opens pool of SMTP connections)
+				var smtpTransport = nodemailer.createTransport("SMTP",{
+				    service: "Gmail",
+				    auth: {
+				        user: "jack@bitponics.com",
+				        pass: "voonhyvenvlyfonq" //app specific password on jack's account
+				    }
+				});
+
+				// setup e-mail data with unicode symbols
+				var mailOptions = {
+				    from: "Bitponics ✔ <jack@bitponics.com>", // sender address
+				    to: user.email, // can be list of receivers
+				    subject: "Hello ✔", // Subject line
+				    text: "Hello world ✔", // plaintext body
+				    html: '<b>Hello world ✔</b><p><a href="' + verifyUrl + '">Verify</a></p>' // html body
+				}
+
+				// send mail with defined transport object
+				smtpTransport.sendMail(mailOptions, function(error, response){
+				    if(error){
+				        console.log(error);
+				    }else{
+				        console.log("Message sent: " + response.message);
+				        user.sentEmail = true;
+				    }
+
+				    // if you don't want to use this transport object anymore, uncomment following line
+				    smtpTransport.close(); // shut down the connection pool, no more messages
+				    
+				    next();
+				});
+
+			}
+
+
+
 		});
 	}
 
-	//send activation email if not activated user
-	if(!user.active){
-		//TODO:send email with activation_token in link back to /register
+	console.log('user.active:'+user.active)
+	console.log('user.sentEmail:'+user.sentEmail)
 
-	}
+	
 
 });
 

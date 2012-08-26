@@ -7,7 +7,7 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model;
  */
 module.exports = function(app) {
 
-   //List grow_plan_instances
+   //List grow_plan_instance
   app.get('/api/grow_plan_instance', function (req, res){
     return GrowPlanInstanceModel.find(function (err, growPlanInstances) {
       if (!err) {
@@ -108,30 +108,75 @@ module.exports = function(app) {
    * Update an growPlanInstance
    *
    * To test:
-   * jQuery.ajax({
-   *     url: "/api/growPlanInstance/${id}",
-   *     type: "PUT",
-   *     data: {
-   *       sensorLogs: [{
-   *         sensor: "sensorid",
-   *         value: 60,
-   *         timestamp: new Date()
-   *       }],
-   *     },
-   *     success: function (data, textStatus, jqXHR) {
-   *         console.log("Post response:");
-   *         console.dir(data);
-   *         console.log(textStatus);
-   *         console.dir(jqXHR);
-   *     }
+   * jQuery.put("/api/grow_plan_instance", {
+   *   users : ['5035831eb4a6ae33b0000002'],
+   *   startDate: 1346009640013,
+   *   endDate: 1346010888429,
+   *   active: true,
+   *   phases: []
+   * }, function (data, textStatus, jqXHR) {
+   * console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    * });
-   */
+  */
   app.put('/api/grow_plan_instance/:id', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
-      growPlanInstance.sensorLogs = req.body.sensorLogs;
+      growPlanInstance.users = req.body.users;
+      growPlanInstance.startDate = req.body.startDate;
+      growPlanInstance.endDate = req.body.endDate;
+      growPlanInstance.active = req.body.active;
+      growPlanInstance.phases = req.body.phases;
+
       return growPlanInstance.save(function (err) {
         if (!err) {
           console.log("updated growPlanInstance");
+        } else {
+          console.log(err);
+        }
+        return res.send(growPlanInstance);
+      });
+    });
+  });
+
+  /*
+   * Sensor Logs nested
+   *
+   *   jQuery.ajax({
+   *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensorlog",
+   *      type: "PUT",
+   *      data: {
+   *        sensorLogs: [{
+   *          sensor: "503a79426d25620000000001",
+   *          value: 25,
+   *          timestamp: new Date()
+   *        },
+   *        {
+   *          sensor: "503a79426d25620000000001",
+   *          value: 24,
+   *          timestamp: new Date()
+   *        }
+   *        ],
+   *      },
+   *      success: function (data, textStatus, jqXHR) {
+   *          console.log("Post response:");
+   *          console.dir(data);
+   *          console.log(textStatus);
+   *          console.dir(jqXHR);
+   *      }
+   *  });
+   */
+  app.put('/api/grow_plan_instance/:id/sensorlog', function (req, res){
+    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+      return growPlanInstance.save(function (err) {
+        if (!err) {
+          req.body.sensorLogs.forEach(function(log){
+            growPlanInstance.sensorLogs.push(log);
+          })
+          growPlanInstance.save();
+          console.dir(req);
+          console.log("logged data to growPlanInstance");
+          return res.csv([
+            ['endDate', growPlanInstance.endDate]
+          ]);
         } else {
           console.log(err);
         }
