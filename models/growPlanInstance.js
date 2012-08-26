@@ -11,13 +11,17 @@ var mongoose = require('mongoose'),
  */
 var GrowPlanInstanceSchema = new Schema({
 
-	users : [{ type: ObjectId, ref: 'User'}],
+	users : [{ type: ObjectId, ref: 'User' }],
 	
 	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
 	
-	device : { type : ObjectId, ref : 'Device', required: false },
+	device : { type : ObjectId, ref : 'Device', required: false }, //the bitponics device
 	
 	startDate: { type: Date, required: true },
+
+	endDate: { type: Date, required: true },
+
+    active: { type: Boolean, required: true },
 
 	phases: [{
 		phase: { type: ObjectId, ref: 'Phase' },

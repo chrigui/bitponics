@@ -34,7 +34,7 @@ module.exports = function(app) {
     console.log("POST: ");
     console.log(req.body);
     sensor = new SensorModel({
-      name: req.body.type,
+      name: req.body.name,
       unitOfMeasurement: req.body.unitOfMeasurement
     });
     sensor.save(function (err) {

@@ -23,6 +23,7 @@ module.exports = function(app) {
    *
    *  Test with:
    *  jQuery.post("/api/devices", {
+   *    "id": "macaddress"
    *    "name": "pump",
    *    "users": ["userid", "userid1", "userid2"],
    *    "sensors": ["sensorid", "sensorid1", "sensorid2"],
@@ -43,6 +44,7 @@ module.exports = function(app) {
     console.log("POST: ");
     console.log(req.body);
     device = new DeviceModel({
+      id: req.body.id,
       name: req.body.name,
       users : req.body.users,
       sensors : req.body.sensors,
