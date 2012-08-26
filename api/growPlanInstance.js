@@ -67,6 +67,8 @@ module.exports = function(app) {
       growPlan : req.body.growPlan,
       device : req.body.device,
       startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      active: req.body.active,
       phases: req.body.phases,
       sensorLogs: req.body.sensorLogs,
       controlLogs: req.body.controlLogs,
@@ -107,25 +109,29 @@ module.exports = function(app) {
   /*
    * Update an growPlanInstance
    *
-   * To test:
-   * jQuery.put("/api/grow_plan_instance", {
-   *   users : ['5035831eb4a6ae33b0000002'],
-   *   startDate: 1346009640013,
-   *   endDate: 1346010888429,
-   *   active: true,
-   *   phases: []
-   * }, function (data, textStatus, jqXHR) {
-   * console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
+   * jQuery.ajax({
+   *     url: "/api/grow_plan_instance/503a86812e57c70000000001",
+   *     type: "PUT",
+   *     data: {
+   *       "device": "503a86812e57c70000000001"
+   *     },
+   *     success: function (data, textStatus, jqXHR) {
+   *         console.log("Post response:");
+   *         console.dir(data);
+   *         console.log(textStatus);
+   *         console.dir(jqXHR);
+   *     }
    * });
-  */
+   */
   app.put('/api/grow_plan_instance/:id', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
-      growPlanInstance.users = req.body.users;
-      growPlanInstance.startDate = req.body.startDate;
-      growPlanInstance.endDate = req.body.endDate;
-      growPlanInstance.active = req.body.active;
-      growPlanInstance.phases = req.body.phases;
-
+      if(req.body.users){ growPlanInstance.users = req.body.users; }
+      if(req.body.device){ growPlanInstance.device = req.body.device; }
+      if(req.body.startDate){ growPlanInstance.startDate = req.body.startDate; }
+      if(req.body.endDate){ growPlanInstance.endDate = req.body.endDate; }
+      if(req.body.active){ growPlanInstance.active = req.body.active; }
+      if(req.body.phases){ growPlanInstance.phases = req.body.phases; }
+      
       return growPlanInstance.save(function (err) {
         if (!err) {
           console.log("updated growPlanInstance");
@@ -138,7 +144,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Sensor Logs nested
+   * DEPRECATED - Sensor Logs nested - MOVED TO /api/device/:id/sensorlog
    *
    *   jQuery.ajax({
    *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensorlog",
@@ -166,13 +172,11 @@ module.exports = function(app) {
    */
   app.put('/api/grow_plan_instance/:id/sensorlog', function (req, res){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+      req.body.sensorLogs.forEach(function(log){
+        growPlanInstance.sensorLogs.push(log);
+      });
       return growPlanInstance.save(function (err) {
         if (!err) {
-          req.body.sensorLogs.forEach(function(log){
-            growPlanInstance.sensorLogs.push(log);
-          })
-          growPlanInstance.save();
-          console.dir(req);
           console.log("logged data to growPlanInstance");
           return res.csv([
             ['endDate', growPlanInstance.endDate]

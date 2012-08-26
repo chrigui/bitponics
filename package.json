@@ -22,5 +22,6 @@
     	, "nodeunit" : ">=0.7.4"
     	, "zombie"   : ">=1.1.1"
     	, "nodemailer" : ">=0.3"
+    	, "express-csv" : ">=0.4.1"
 	}
 }
