@@ -155,7 +155,11 @@ module.exports = function(app) {
     //var format =  req. 'deviceCSV' : 'json';
   
   console.log(req.accepted);  
-  res.send('');
+  res.status(200);
+  //{outletId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
+  // 16 hours = 57600000ms
+  res.header('Content-Type', 'text/csv; format=device');
+  res.send('1,0,1,57600000,0,28800000');
     /*
     return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
       if (!err) {
