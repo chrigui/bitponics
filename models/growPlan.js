@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 	useTimestamps = mongooseTypes.useTimestamps,
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
-  	GrowSystemSchema = require('./GrowSystem').schema;
+  	GrowSystemSchema = require('./growSystem').schema;
 
 var GrowPlanSchema = new Schema({
 	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
