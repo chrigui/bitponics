@@ -9,7 +9,7 @@ var app = require('../app.js'),
 module.exports = function(app) {
 
    //List users
-  app.get('/api/users', function (req, res){
+  app.get('/api/user', function (req, res){
     return UserModel.find(function (err, users) {
       if (!err) {
         return res.send(users);
@@ -23,7 +23,7 @@ module.exports = function(app) {
    * Create single user
    *
    *  Test with:
-   *  jQuery.post("/api/users", {
+   *  jQuery.post("/api/user", {
    *    "email" : "test@test.com",
    *    "name" : { "first": "Jim", "last": "Bo" },
    *    "locale": "en_US",
@@ -32,7 +32,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/users', function (req, res){
+  app.post('/api/user', function (req, res){
     var user;
     console.log("POST: ");
     console.log(req.body);
@@ -56,14 +56,14 @@ module.exports = function(app) {
    * Read an user
    *
    * To test:
-   * jQuery.get("/api/users/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/user/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/users/:id', function (req, res){
+  app.get('/api/user/:id', function (req, res){
     return UserModel.findById(req.params.id, function (err, user) {
       if (!err) {
         return res.send(user);
@@ -91,7 +91,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/users/:id', function (req, res){
+  app.put('/api/user/:id', function (req, res){
     return UserModel.findById(req.params.id, function (err, user) {
       user.actionBelowMin = req.body.actionBelowMin;
       return user.save(function (err) {
@@ -110,7 +110,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/users/${id}", 
+   *     url: "/api/user/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -120,7 +120,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/users/:id', function (req, res){
+  app.delete('/api/user/:id', function (req, res){
     return UserModel.findById(req.params.id, function (err, user) {
       return user.remove(function (err) {
         if (!err) {

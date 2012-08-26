@@ -17,7 +17,7 @@ module.exports = function(app) {
   });
 
    //List grow plans
-  app.get('/api/grow_plans', function (req, res){
+  app.get('/api/grow_plan', function (req, res){
     console.log("in grow_plans callback");
     return GrowPlanModel.find(function (err, grow_plans) {
       console.log("in GrowPlanModel callback");
@@ -33,7 +33,7 @@ module.exports = function(app) {
    * Create single grow plan
    *
    *  Test with:
-   *  jQuery.post("/api/grow_plans", {
+   *  jQuery.post("/api/grow_plan", {
    *    "parentGrowPlanId": "growplanid",
    *    "createdByUserId": "userid",
    *    "name": "Jack's Grow Plan",
@@ -50,7 +50,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plans', function (req, res){
+  app.post('/api/grow_plan', function (req, res){
     var grow_plan;
     console.log("POST: ");
     console.log(req.body);
@@ -82,14 +82,14 @@ module.exports = function(app) {
    * Read a grow plan
    *
    * To test:
-   * jQuery.get("/api/grow_plans/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/grow_plan/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plans/:id', function (req, res){
+  app.get('/api/grow_plan/:id', function (req, res){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       if (!err) {
         return res.send(grow_plan);
@@ -117,7 +117,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plans/:id', function (req, res){
+  app.put('/api/grow_plan/:id', function (req, res){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       grow_plan.title = req.body.title;
       return grow_plan.save(function (err) {
@@ -136,7 +136,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plans/${id}", 
+   *     url: "/api/grow_plan/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -146,7 +146,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plans/:id', function (req, res){
+  app.delete('/api/grow_plan/:id', function (req, res){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       return grow_plan.remove(function (err) {
         if (!err) {

@@ -8,7 +8,7 @@ var IdealRangeModel = require('../models/idealRange').model;
 module.exports = function(app) {
 
    //List ideal_ranges
-  app.get('/api/ideal_ranges', function (req, res){
+  app.get('/api/ideal_range', function (req, res){
     return IdealRangeModel.find(function (err, idealRanges) {
       if (!err) {
         return res.send(idealRanges);
@@ -22,7 +22,7 @@ module.exports = function(app) {
    * Create single idealRange
    *
    *  Test with:
-   *  jQuery.post("/api/ideal_ranges", {
+   *  jQuery.post("/api/ideal_range", {
    *    "sensor": "sensorid",
    *    "min": 0,
    *    "max": 10,
@@ -36,7 +36,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/ideal_ranges', function (req, res){
+  app.post('/api/ideal_range', function (req, res){
     var idealRange;
     console.log("POST: ");
     console.log(req.body);
@@ -62,14 +62,14 @@ module.exports = function(app) {
    * Read an idealRange
    *
    * To test:
-   * jQuery.get("/api/ideal_ranges/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/ideal_range/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/ideal_ranges/:id', function (req, res){
+  app.get('/api/ideal_range/:id', function (req, res){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (!err) {
         return res.send(idealRange);
@@ -97,7 +97,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/ideal_ranges/:id', function (req, res){
+  app.put('/api/ideal_range/:id', function (req, res){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       idealRange.actionBelowMin = req.body.actionBelowMin;
       return idealRange.save(function (err) {
@@ -116,7 +116,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/ideal_ranges/${id}", 
+   *     url: "/api/ideal_range/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -126,7 +126,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/ideal_ranges/:id', function (req, res){
+  app.delete('/api/ideal_range/:id', function (req, res){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       return idealRange.remove(function (err) {
         if (!err) {
