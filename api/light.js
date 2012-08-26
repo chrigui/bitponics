@@ -8,7 +8,7 @@ var LightModel = require('../models/light').model;
 module.exports = function(app) {
 
    //List lights
-  app.get('/api/lights', function (req, res){
+  app.get('/api/light', function (req, res){
     return LightModel.find(function (err, lights) {
       if (!err) {
         return res.send(lights);
@@ -22,7 +22,7 @@ module.exports = function(app) {
    * Create single light
    *
    *  Test with:
-   *  jQuery.post("/api/lights", {
+   *  jQuery.post("/api/light", {
    *    "type": "light type",
    *    "watts": "60",
    *    "brand" : "light brand",
@@ -32,7 +32,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/lights', function (req, res){
+  app.post('/api/light', function (req, res){
     var light;
     console.log("POST: ");
     console.log(req.body);
@@ -56,14 +56,14 @@ module.exports = function(app) {
    * Read an light
    *
    * To test:
-   * jQuery.get("/api/lights/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/light/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/lights/:id', function (req, res){
+  app.get('/api/light/:id', function (req, res){
     return LightModel.findById(req.params.id, function (err, light) {
       if (!err) {
         return res.send(light);
@@ -91,7 +91,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/lights/:id', function (req, res){
+  app.put('/api/light/:id', function (req, res){
     return LightModel.findById(req.params.id, function (err, light) {
       light.actionBelowMin = req.body.actionBelowMin;
       return light.save(function (err) {
@@ -110,7 +110,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/lights/${id}", 
+   *     url: "/api/light/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -120,7 +120,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/lights/:id', function (req, res){
+  app.delete('/api/light/:id', function (req, res){
     return LightModel.findById(req.params.id, function (err, light) {
       return light.remove(function (err) {
         if (!err) {

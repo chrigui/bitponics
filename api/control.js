@@ -8,7 +8,7 @@ var ControlModel = require('../models/control').model;
 module.exports = function(app) {
 
    //List controls
-  app.get('/api/controls', function (req, res){
+  app.get('/api/control', function (req, res){
     console.log("in controls callback");
     return ControlModel.find(function (err, controls) {
       console.log("in ControlModel callback");
@@ -24,13 +24,13 @@ module.exports = function(app) {
    * Create single control
    *
    *  Test with:
-   *  jQuery.post("/api/controls", {
+   *  jQuery.post("/api/control", {
    *    "name": "pump"
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/controls', function (req, res){
+  app.post('/api/control', function (req, res){
     var control;
     console.log("POST: ");
     console.log(req.body);
@@ -51,14 +51,14 @@ module.exports = function(app) {
    * Read an control
    *
    * To test:
-   * jQuery.get("/api/controls/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/control/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/controls/:id', function (req, res){
+  app.get('/api/control/:id', function (req, res){
     return ControlModel.findById(req.params.id, function (err, control) {
       if (!err) {
         return res.send(control);
@@ -86,7 +86,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/controls/:id', function (req, res){
+  app.put('/api/control/:id', function (req, res){
     return ControlModel.findById(req.params.id, function (err, control) {
       control.title = req.body.title;
       return control.save(function (err) {
@@ -105,7 +105,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/controls/${id}", 
+   *     url: "/api/control/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -115,7 +115,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/controls/:id', function (req, res){
+  app.delete('/api/control/:id', function (req, res){
     return ControlModel.findById(req.params.id, function (err, control) {
       return control.remove(function (err) {
         if (!err) {
