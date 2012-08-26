@@ -20,7 +20,8 @@ var express    = require('express'),
   cache      = {},
   tcpGuests  = [],
   viewEngine = 'jade',
-  Dashboard  = require('./routes/dashboard')(app);
+  Dashboard  = require('./routes/dashboard')(app),
+  csv =  require('express-csv');
 
 
 
@@ -162,22 +163,31 @@ app.get('/admin/', function(req, res) {
  */
 app.get('/register', function(req, res) {
   var UserModel = require('./models/user')(app).model;
-  return UserModel.findOne({ activation_token: req.query.verify }, function (err, user) {
-    if (!err && user && activation_token !== '') {
-      user.active = true;
-      user.save();
-      res.render('register', {
-        title: 'Register Success - Active user.',
-        newUser: user,
-        appUrl : app.config.appUrl
-      });
-    } else {
-      res.render('register', {
-        title: 'Register Failed - No matching token.',
-        appUrl : app.config.appUrl
-      });
-    }
-  });
+  if(req.query.verify){ //user coming back to verify account
+    return UserModel.findOne({ activation_token: req.query.verify }, function (err, user) {
+      if (!err && user && activation_token !== '') {
+        user.active = true;
+        user.save();
+        res.render('register', {
+          title: 'Register Success - Active user.',
+          newUser: user,
+          appUrl : app.config.appUrl
+        });
+      } else {
+        res.render('register', {
+          title: 'Register Failed - No matching token.',
+          appUrl : app.config.appUrl
+        });
+      }
+    });
+  }else{ //user just signed up
+    console.log('req.user:');
+    console.dir(req.user);
+    res.render('register', {
+      title: 'Thanks for signing up. Check your email.',
+      appUrl : app.config.appUrl
+    });
+  }
 });
 
 /**

@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var DeviceSchema = new Schema({
-	name : { type: String, required: false },
+	id: { type: String, required: true, unique: true },
+	name : { type: String },
 	users : [ { type: ObjectId, ref: 'User', required: true }],
 	sensors : [ { type: ObjectId, ref: 'Sensor', required: true }],
 	controlMap : [ 
