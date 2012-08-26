@@ -1,4 +1,8 @@
-var DeviceModel = require('../models/device').model;
+var mongoose = require('mongoose'),
+    DeviceModel = require('../models/device').model,
+    GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+    Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -109,6 +113,55 @@ module.exports = function(app) {
           console.log(err);
         }
         return res.send(device);
+      });
+    });
+  });
+
+  /*
+   * Sensor Logs -> route to current grow plan instance for this device
+   *
+   *   jQuery.ajax({
+   *      url: "/api/device/${id}/sensorlog",
+   *      type: "PUT",
+   *      data: {
+   *        sensorLogs: [{
+   *          sensor: "503a79426d25620000000001",
+   *          value: 25,
+   *          timestamp: new Date()
+   *        },
+   *        {
+   *          sensor: "503a79426d25620000000001",
+   *          value: 24,
+   *          timestamp: new Date()
+   *        }
+   *        ],
+   *      },
+   *      success: function (data, textStatus, jqXHR) {
+   *          console.log("Post response:");
+   *          console.dir(data);
+   *          console.log(textStatus);
+   *          console.dir(jqXHR);
+   *      }
+   *   });
+   *
+   *
+   *  TODO: route to grow plan instance
+   */
+  app.put('/api/device/:id/sensorlog', function (req, res){
+    //get device's current grow plan
+    return GrowPlanInstanceModel.findOne({ device: req.params.id }, function (err, growPlanInstance) {
+      req.body.sensorLogs.forEach(function(log){
+        growPlanInstance.sensorLogs.push(log);
+      });
+      return growPlanInstance.save(function (err) {
+        if (!err) {
+          return res.csv([
+            ['someresponse', 'someresponse122412']
+          ]);
+        } else {
+          console.log(err);
+        }
+        //return res.send(growPlanInstance);
       });
     });
   });
