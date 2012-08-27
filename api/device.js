@@ -221,12 +221,12 @@ module.exports = function(app) {
   //res.header('X-Powered-By', '');
   //res.header('Set-Cookie', '');
 
-res.write('1,0,1,57600000,0,28800000;');  
 
 // To end response for the firmware, send the Bell character
-res.write(String.fromCharCode(7)); 
+res.send('1,0,1,57600000,0,28800000;' + String.fromCharCode(7));  
 
-res.end();
+
+
 
 /*
   res.header('Transfer-Encoding', 'chunked');
