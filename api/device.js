@@ -223,8 +223,8 @@ module.exports = function(app) {
 
 res.write('1,0,1,57600000,0,28800000;');  
 
-// To end response for the firmware, send the EOT (End of Transmission) character
-res.write(String.fromCharCode(4)); 
+// To end response for the firmware, send the Bell character
+res.write(String.fromCharCode(7)); 
 
 res.end();
 
