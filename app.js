@@ -238,6 +238,10 @@ app.post('/log', function(req, res) {
 });
 
 
+app.get('/robots.txt', function(req, res){
+  res.send('User-agent: *\r\nDisallow: /');
+});
+
 io.sockets.on('connection', function (socket) {
   socket.emit('news', { hello: 'world' });
   socket.on('client event', function (data) {
