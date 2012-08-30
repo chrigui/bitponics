@@ -20,7 +20,8 @@ var express    = require('express'),
   cache      = {},
   tcpGuests  = [],
   Dashboard  = require('./routes/dashboard')(app),
-  csv =  require('express-csv');
+  csv        = require('express-csv'),
+  winston    = require('winston');
 
 
 
@@ -45,7 +46,6 @@ app.configure('development', function(){
 
   everyauth.debug = true;
   everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
-  
 });
 
 app.configure('production', function(){
@@ -88,6 +88,11 @@ app.configure(function(){
     everyauth: everyauth
   });
 
+  winston.add(require('winston-loggly').Loggly, {
+    subdomain : app.config.loggly.subdomain,
+    inputToken : app.config.loggly.tokens[app.settings.env],
+    level : 'error'
+  });  
   
   // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
   // per mongoose-auth readme, don't need this since express handles it
