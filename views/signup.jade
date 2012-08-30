@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  .stackContent
+    h1(class="h1") Sign Up
+
+  - if ('undefined' !== typeof errors && errors.length)
+    .stackContent
+      ul#errors
+        - each error in errors
+          li.error= error
+
+  .stackContent
+    form(id="register-form", method="POST", action="/signup")
+      .stack1of3
+      .stack2of3
+        .stack1of4
+          .stackContent
+            label(for=everyauth.password.loginFormFieldName) Email
+        .stack3of4
+          .stackContent
+            input(id=everyauth.password.loginFormFieldName, name=everyauth.password.loginFormFieldName, type="email") 
+        .stack1of4
+          .stackContent
+            label(for=everyauth.password.passwordFormFieldName) Password
+        .stack3of4
+          .stackContent
+            input(id=everyauth.password.passwordFormFieldName, name=everyauth.password.passwordFormFieldName, type="password") 
+        .stackContent  
+          input(type="submit", value="Sign Up")

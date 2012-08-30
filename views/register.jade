@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  .stackContent
+    h1(class="h1") Register your account by verifying your email address.
+
+  - if ('undefined' !== typeof errors && errors.length)
+    .stackContent
+      ul#errors
+        - each error in errors
+          li.error= error
+
+  - else
+    h2 #{'undefined' !== typeof newUser}
+    - if ('undefined' !== typeof newUser)
+      h2 #{newUser.id} - #{title}
+    - else
+      h2 Error - #{title}
