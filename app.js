@@ -69,6 +69,11 @@ app.configure(function(){
   app.set('views', __dirname + '/views/' + viewEngine);
   app.set('view engine', viewEngine);
   app.use(express.logger(':method :url :status'));
+  express.bodyParser.parse['text/csv'] = function(req, options, callback){
+    console.dir(req);
+    console.dir(options);
+    console.dir(callback);
+  };
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express['static'](__dirname + '/public'));
