@@ -1,4 +1,4 @@
-var GrowPlanInstanceModel = require('../models/growPlanInstance').model;
+var GrowPlanInstanceModel = require('../../models/growPlanInstance').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 

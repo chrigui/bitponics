@@ -1,4 +1,4 @@
-var GrowPlanModel = require('../models/growPlan').model;
+var GrowPlanModel = require('../../models/growPlan').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
