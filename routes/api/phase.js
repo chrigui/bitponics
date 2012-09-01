@@ -1,4 +1,4 @@
-var SensorModel = require('../models/sensor').model;
+var PhaseModel = require('../../models/phase').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -7,11 +7,11 @@ var SensorModel = require('../models/sensor').model;
  */
 module.exports = function(app) {
 
-   //List sensors
-  app.get('/api/sensor', function (req, res){
-    return SensorModel.find(function (err, sensors) {
+   //List phases
+  app.get('/api/phase', function (req, res){
+    return PhaseModel.find(function (err, phases) {
       if (!err) {
-        return res.send(sensors);
+        return res.send(phases);
       } else {
         return console.log(err);
       }
@@ -19,49 +19,55 @@ module.exports = function(app) {
   });
 
   /*
-   * Create single sensor
+   * Create single phase
    *
    *  Test with:
-   *  jQuery.post("/api/sensor", {
-   *    "name": "humidity",
-   *    "unitOfMeasurement": "unit"
+   *  jQuery.post("/api/phase", {
+   *    "name": "Bloom",
+   *    "expectedNumberOfDays": 25,
+   *    "light": "lightid",
+   *    "actions": ["actionid1", "actionid2", "actionid3"],
+   *    "idealRanges": ["idealRangeid1", "idealRange2"],
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/sensor', function (req, res){
-    var sensor;
+  app.post('/api/phase', function (req, res){
+    var phase;
     console.log("POST: ");
     console.log(req.body);
-    sensor = new SensorModel({
-      name: req.body.name,
-      unitOfMeasurement: req.body.unitOfMeasurement
+    phase = new PhaseModel({
+      name: req.body.type,
+      expectedNumberOfDays: req.body.expectedNumberOfDays,
+      light: req.body.light,
+      actions: req.body.actions,
+      idealRanges: req.body.idealRanges,
     });
-    sensor.save(function (err) {
+    phase.save(function (err) {
       if (!err) {
-        return console.log("created sensor");
+        return console.log("created phase");
       } else {
         return console.log(err);
       }
     });
-    return res.send(sensor);
+    return res.send(phase);
   });
 
   /*
-   * Read an sensor
+   * Read an phase
    *
    * To test:
-   * jQuery.get("/api/sensor/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/phase/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/sensor/:id', function (req, res){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
+  app.get('/api/phase/:id', function (req, res){
+    return PhaseModel.findById(req.params.id, function (err, phase) {
       if (!err) {
-        return res.send(sensor);
+        return res.send(phase);
       } else {
         return console.log(err);
       }
@@ -69,11 +75,11 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an sensor
+   * Update an phase
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/sensor/${id}",
+   *     url: "/api/phase/${id}",
    *     type: "PUT",
    *     data: {
    *       "actionBelowMin": "actionid"
@@ -86,26 +92,26 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/sensor/:id', function (req, res){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
-      sensor.actionBelowMin = req.body.actionBelowMin;
-      return sensor.save(function (err) {
+  app.put('/api/phase/:id', function (req, res){
+    return PhaseModel.findById(req.params.id, function (err, phase) {
+      phase.actionBelowMin = req.body.actionBelowMin;
+      return phase.save(function (err) {
         if (!err) {
-          console.log("updated sensor");
+          console.log("updated phase");
         } else {
           console.log(err);
         }
-        return res.send(sensor);
+        return res.send(phase);
       });
     });
   });
 
   /*
-   * Delete an sensor
+   * Delete an phase
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/sensor/${id}", 
+   *     url: "/api/phase/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -115,9 +121,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/sensor/:id', function (req, res){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
-      return sensor.remove(function (err) {
+  app.delete('/api/phase/:id', function (req, res){
+    return PhaseModel.findById(req.params.id, function (err, phase) {
+      return phase.remove(function (err) {
         if (!err) {
           console.log("removed");
           return res.send('');

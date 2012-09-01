@@ -1,4 +1,4 @@
-var PhaseModel = require('../models/phase').model;
+var LightModel = require('../../models/light').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -7,11 +7,11 @@ var PhaseModel = require('../models/phase').model;
  */
 module.exports = function(app) {
 
-   //List phases
-  app.get('/api/phase', function (req, res){
-    return PhaseModel.find(function (err, phases) {
+   //List lights
+  app.get('/api/light', function (req, res){
+    return LightModel.find(function (err, lights) {
       if (!err) {
-        return res.send(phases);
+        return res.send(lights);
       } else {
         return console.log(err);
       }
@@ -19,55 +19,54 @@ module.exports = function(app) {
   });
 
   /*
-   * Create single phase
+   * Create single light
    *
    *  Test with:
-   *  jQuery.post("/api/phase", {
-   *    "name": "Bloom",
-   *    "expectedNumberOfDays": 25,
-   *    "light": "lightid",
-   *    "actions": ["actionid1", "actionid2", "actionid3"],
-   *    "idealRanges": ["idealRangeid1", "idealRange2"],
+   *  jQuery.post("/api/light", {
+   *    "type": "light type",
+   *    "watts": "60",
+   *    "brand" : "light brand",
+   *    "name" : "big"
+   *    }
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/phase', function (req, res){
-    var phase;
+  app.post('/api/light', function (req, res){
+    var light;
     console.log("POST: ");
     console.log(req.body);
-    phase = new PhaseModel({
-      name: req.body.type,
-      expectedNumberOfDays: req.body.expectedNumberOfDays,
-      light: req.body.light,
-      actions: req.body.actions,
-      idealRanges: req.body.idealRanges,
+    light = new LightModel({
+      type: req.body.type,
+      watts: req.body.watts,
+      brand : req.body.brand,
+      name : req.body.name
     });
-    phase.save(function (err) {
+    light.save(function (err) {
       if (!err) {
-        return console.log("created phase");
+        return console.log("created light");
       } else {
         return console.log(err);
       }
     });
-    return res.send(phase);
+    return res.send(light);
   });
 
   /*
-   * Read an phase
+   * Read an light
    *
    * To test:
-   * jQuery.get("/api/phase/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/light/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/phase/:id', function (req, res){
-    return PhaseModel.findById(req.params.id, function (err, phase) {
+  app.get('/api/light/:id', function (req, res){
+    return LightModel.findById(req.params.id, function (err, light) {
       if (!err) {
-        return res.send(phase);
+        return res.send(light);
       } else {
         return console.log(err);
       }
@@ -75,11 +74,11 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an phase
+   * Update an light
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/phase/${id}",
+   *     url: "/api/light/${id}",
    *     type: "PUT",
    *     data: {
    *       "actionBelowMin": "actionid"
@@ -92,26 +91,26 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/phase/:id', function (req, res){
-    return PhaseModel.findById(req.params.id, function (err, phase) {
-      phase.actionBelowMin = req.body.actionBelowMin;
-      return phase.save(function (err) {
+  app.put('/api/light/:id', function (req, res){
+    return LightModel.findById(req.params.id, function (err, light) {
+      light.actionBelowMin = req.body.actionBelowMin;
+      return light.save(function (err) {
         if (!err) {
-          console.log("updated phase");
+          console.log("updated light");
         } else {
           console.log(err);
         }
-        return res.send(phase);
+        return res.send(light);
       });
     });
   });
 
   /*
-   * Delete an phase
+   * Delete an light
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/phase/${id}", 
+   *     url: "/api/light/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -121,9 +120,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/phase/:id', function (req, res){
-    return PhaseModel.findById(req.params.id, function (err, phase) {
-      return phase.remove(function (err) {
+  app.delete('/api/light/:id', function (req, res){
+    return LightModel.findById(req.params.id, function (err, light) {
+      return light.remove(function (err) {
         if (!err) {
           console.log("removed");
           return res.send('');
