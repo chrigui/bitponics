@@ -56,5 +56,8 @@ module.exports = function(app) {
     mongoUrl : generate_mongo_url(mongo),
     port : PORT
   };
+
+  require('./boot-mongo')(app);
+  require('./app-config')(app);
 };
 
