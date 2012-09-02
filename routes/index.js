@@ -109,13 +109,11 @@ module.exports = function(app){
 	  res.send('User-agent: *\r\nDisallow: /');
 	});
 
-	
-
-
 
 	require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
+	require('./demo')(app);
 	require('./styleguide')(app);
 
 };

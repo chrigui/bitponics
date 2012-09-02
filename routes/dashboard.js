@@ -6,12 +6,5 @@ module.exports = function(app){
 		    appUrl : app.config.appUrl
 		});
 	});
-
-	app.get('/dashboard-demo', function (req, res) {
-		res.render('dashboard-demo', {
-	    	title: "Bitponics - Dashboard Demo",
-		    appUrl : app.config.appUrl
-		});	
-	});
 };
 
