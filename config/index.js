@@ -1,35 +1,34 @@
 var loggly = {
-    subdomain : 'bitponics',
-    tokens : {
-      local : 'c8593ee1-8a09-426f-acd6-871b70b91fd0',
-      development : '5cc07897-f3f8-46ab-aaa1-888f88ae6683',
-      production : '437fee23-8d8a-4171-ab17-7e211c176003'
-    }  
-  },
-  mongo = { 
-    "hostname": "localhost",
-    "port": 27017,
-    "username": "", 
-    "password": "",
-    "name": "",
-    "db":"bitponics"
-  };
+      subdomain : 'bitponics',
+      tokens : {
+        local : 'c8593ee1-8a09-426f-acd6-871b70b91fd0',
+        development : '5cc07897-f3f8-46ab-aaa1-888f88ae6683',
+        production : '437fee23-8d8a-4171-ab17-7e211c176003'
+      }  
+    },
+    mongo = { 
+      "hostname": "localhost",
+      "port": 27017,
+      "username": "", 
+      "password": "",
+      "name": "",
+      "db":"bitponics"
+    },
+    generateMongoUrl = function(obj){
+      /*
+      obj.hostname = (obj.hostname || 'localhost');
+      obj.port = (obj.port || 27017);
+      obj.db = (obj.db || 'test');
+      console.log('mongodb db is:' + obj.db);
 
-var generate_mongo_url = function(obj){
-  /*
-  obj.hostname = (obj.hostname || 'localhost');
-  obj.port = (obj.port || 27017);
-  obj.db = (obj.db || 'test');
-  console.log('mongodb db is:' + obj.db);
+      if(obj.username && obj.password){
+        return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
+      } else{
+        return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
+      }*/
+      return process.env.MONGOLAB_URI || "mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local";
 
-  if(obj.username && obj.password){
-    return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  } else{
-    return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
-  }*/
-  return process.env.MONGOLAB_URI || "mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local";
-
-}
+    };
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -53,7 +52,7 @@ module.exports = function(app) {
     host : HOST,
     js : require('./js-config'),
     loggly : loggly,
-    mongoUrl : generate_mongo_url(mongo),
+    mongoUrl : generateMongoUrl(mongo),
     port : PORT
   };
 
