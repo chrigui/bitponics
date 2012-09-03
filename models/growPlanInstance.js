@@ -33,26 +33,27 @@ var GrowPlanInstanceSchema = new Schema({
 	sensorLogs: [{
 		sensor: { type: ObjectId, ref: 'Sensor', required: true },
 		value: { type: Number },
-		timestamp: { type: Date, required: true }
+		//timestamp: { type: Date, required: true }
+		timestamp: { type: Date, required: true, default: Date.now }
 	}],
 	
 	controlLogs: [{
 		control: { type: ObjectId, ref: 'Control', required: true },
 		value: { type: Number },
-		timestamp: { type: Date, required: true }
+		timestamp: { type: Date, required: true, default: Date.now }
 	}],
 	
 	photoLogs: [{
 		url: { type : mongoose.SchemaTypes.Url, required: true},
 		tags: { type : [String]},
-		timestamp: { type: Date, required: true }
+		timestamp: { type: Date, required: true, default: Date.now }
 	}],
 	
 	genericLogs: [{
 		entry: { type: String, required: true },
 		tags: { type : [String]},
 		logType: { type: String },
-		timestamp: { type: Date, required: true }
+		timestamp: { type: Date, required: true, default: Date.now }
 	}]
 
 },

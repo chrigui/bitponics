@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
     DeviceModel = require('../../models/device').model,
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+    ObjectId = Schema.ObjectId,
+    winston    = require('winston');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -134,12 +135,12 @@ module.exports = function(app) {
    *        sensorLogs: [{
    *          sensor: "503a79426d25620000000001",
    *          value: 25,
-   *          timestamp: new Date()
+   *          //timestamp: new Date().getTime()
    *        },
    *        {
    *          sensor: "503a79426d25620000000001",
    *          value: 24,
-   *          timestamp: new Date()
+   *          //timestamp: new Date().getTime()
    *        }
    *        ],
    *      },
@@ -157,18 +158,22 @@ module.exports = function(app) {
         csvLogs = "";
 
     console.log('req.body', req.body);
+    winston.log('info', req.body);
 
     //if csv format, convert to js obj
-    if(req.headers['content-type'] === 'text/csv' || req.headers['content-type'] === 'text/plain'){
-      console.log('req.body', req.body);
+    if(req.headers['content-type'] === 'text/csv'){
+      console.log('req.rawBody', req.rawBody);
       sensorLogs = [];
-      csvLogs = req.body.split(';');
+      csvLogs = req.rawBody.split(';');
       csvLogs.forEach(function(log){
-        sensorLogs.push({
-          'sensor': log.split(',')[0],
-          'value': log.split(',')[1],
-          'timestamp': new Date()
-        });
+        console.log('log: ');
+        if(log.length > 0){
+          sensorLogs.push({
+            'sensor': log.split(',')[0],
+            'value': log.split(',')[1]
+            //'timestamp': new Date()
+          });
+        }
       });
     }
 
@@ -185,9 +190,9 @@ module.exports = function(app) {
               ['someresponse', 'someresponse122412']
             ]);
           } else {
-            console.log(err);
+            console.log('growPlanInstance error: '+err);
           }
-          //return res.send(growPlanInstance);
+          return res.send(growPlanInstance);
         });
       });
     })
