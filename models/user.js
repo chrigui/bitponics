@@ -46,7 +46,7 @@ UserSchema.virtual('name.full')
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
-UserSchema.pre('save', function(next){ //TODO: need to wait for all callbacks before calling next()
+UserSchema.pre('save', function(next){
 	var user = this,
 		token = "",
 		verifyUrl = "";
