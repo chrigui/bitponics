@@ -49,6 +49,24 @@ module.exports = function(app){
 	  app.set('view engine', 'jade');
 	  
 	  app.use(express.logger(':method :url :status'));
+
+	  app.use (function(req, res, next) {
+		if(req.headers['content-type'] == 'text/csv'){
+		    var data='';
+		    req.setEncoding('utf8');
+		    req.on('data', function(chunk) { 
+		       data += chunk;
+		    });
+
+		    req.on('end', function() {
+		        req.rawBody = data;
+		        next();
+		    });
+		}else{
+			next();
+		}
+	  });
+
 	  app.use(express.bodyParser());
 	  app.use(express.methodOverride());
 	  
