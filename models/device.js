@@ -6,15 +6,10 @@ var mongoose = require('mongoose'),
 
 var DeviceSchema = new Schema({
 	id: { type: String, required: true, unique: true }, //mac address
+	deviceType: { type: ObjectId, ref: 'DeviceType', required: true },
 	name : { type: String },
 	users : [ { type: ObjectId, ref: 'User', required: true }],
-	//sensors : [ { type: ObjectId, ref: 'Sensor', required: true }],
-	sensorMap: [
-	  { 
-		control : { type: ObjectId, ref: 'Sensor' },
-		outletId : { type: String }
-	  }
-	],
+	sensorMap : [],
 	controlMap : [ 
 	  { 
 	    control : { type: ObjectId, ref: 'Control' },
@@ -24,6 +19,11 @@ var DeviceSchema = new Schema({
 });
 
 DeviceSchema.plugin(useTimestamps);
+
+DeviceSchema.pre('save', function(next){
+  //TODO: preload default sensorMap if no sensorMap defined
+  next();
+});
 
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);
