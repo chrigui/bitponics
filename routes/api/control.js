@@ -1,4 +1,4 @@
-var GrowSystemModel = require('../models/growSystem').model;
+var ControlModel = require('../../models/control').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -7,11 +7,13 @@ var GrowSystemModel = require('../models/growSystem').model;
  */
 module.exports = function(app) {
 
-   //List grow_systems
-  app.get('/api/grow_system', function (req, res){
-    return GrowSystemModel.find(function (err, growSystems) {
+   //List controls
+  app.get('/api/control', function (req, res){
+    console.log("in controls callback");
+    return ControlModel.find(function (err, controls) {
+      console.log("in ControlModel callback");
       if (!err) {
-        return res.send(growSystems);
+        return res.send(controls);
       } else {
         return console.log(err);
       }
@@ -19,55 +21,47 @@ module.exports = function(app) {
   });
 
   /*
-   * Create single growSystem
+   * Create single control
    *
    *  Test with:
-   *  jQuery.post("/api/grow_system", {
-   *    "name": "Raft System",
-   *    "description": "basic raft system",
-   *    "type": "aquaponics"
-   *    "reservoirSize": 5,
-   *    "numberOfPlants": 6
+   *  jQuery.post("/api/control", {
+   *    "name": "pump"
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_system', function (req, res){
-    var growSystem;
+  app.post('/api/control', function (req, res){
+    var control;
     console.log("POST: ");
     console.log(req.body);
-    growSystem = new GrowSystemModel({
+    control = new ControlModel({
       name: req.body.name,
-      description: req.body.description,
-      type: req.body.type,
-      reservoirSize: req.body.reservoirSize,
-      numberOfPlants: req.body.numberOfPlants,
     });
-    growSystem.save(function (err) {
+    control.save(function (err) {
       if (!err) {
-        return console.log("created growSystem");
+        return console.log("created control");
       } else {
         return console.log(err);
       }
     });
-    return res.send(growSystem);
+    return res.send(control);
   });
 
   /*
-   * Read an growSystem
+   * Read an control
    *
    * To test:
-   * jQuery.get("/api/grow_system/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/control/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_system/:id', function (req, res){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+  app.get('/api/control/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
       if (!err) {
-        return res.send(growSystem);
+        return res.send(control);
       } else {
         return console.log(err);
       }
@@ -75,14 +69,14 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an growSystem
+   * Update an control
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/growSystem/${id}",
+   *     url: "/api/control/${id}",
    *     type: "PUT",
    *     data: {
-   *       "description": "new description"
+   *       "name": "updated pump"
    *     },
    *     success: function (data, textStatus, jqXHR) {
    *         console.log("Post response:");
@@ -92,26 +86,26 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_system/:id', function (req, res){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      growSystem.description = req.body.description;
-      return growSystem.save(function (err) {
+  app.put('/api/control/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
+      control.title = req.body.title;
+      return control.save(function (err) {
         if (!err) {
-          console.log("updated growSystem");
+          console.log("updated control");
         } else {
           console.log(err);
         }
-        return res.send(growSystem);
+        return res.send(control);
       });
     });
   });
 
   /*
-   * Delete an growSystem
+   * Delete an control
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_system/${id}", 
+   *     url: "/api/control/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -121,9 +115,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_system/:id', function (req, res){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      return growSystem.remove(function (err) {
+  app.delete('/api/control/:id', function (req, res){
+    return ControlModel.findById(req.params.id, function (err, control) {
+      return control.remove(function (err) {
         if (!err) {
           console.log("removed");
           return res.send('');

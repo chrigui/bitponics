@@ -1,4 +1,4 @@
-var ActionModel = require('../models/action').model;
+var ActionModel = require('../../models/action').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
