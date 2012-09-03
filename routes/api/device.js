@@ -123,6 +123,9 @@ module.exports = function(app) {
 
   /*
    * Sensor Logs -> route to current grow plan instance for this device
+   * - id is mac address of device
+   * - devices will send csv for now in a form something like (TBD):
+   *   sensor_id,value;sensor_id,value;sensor_id,value;sensor_id,value;
    *
    *   jQuery.ajax({
    *      url: "/api/device/${id}/sensorlog",
@@ -148,26 +151,46 @@ module.exports = function(app) {
    *      }
    *   });
    *
-   *
-   *  TODO: route to grow plan instance
    */
   app.put('/api/device/:id/sensorlog', function (req, res){
-    //get device's current grow plan
-    return GrowPlanInstanceModel.findOne({ device: req.params.id }, function (err, growPlanInstance) {
-      req.body.sensorLogs.forEach(function(log){
-        growPlanInstance.sensorLogs.push(log);
+    var sensorLogs = req.body.sensorLogs,
+        csvLogs = "";
+
+    console.log('req.body', req.body);
+
+    //if csv format, convert to js obj
+    if(req.headers['content-type'] === 'text/csv' || req.headers['content-type'] === 'text/plain'){
+      console.log('req.body', req.body);
+      sensorLogs = [];
+      csvLogs = req.body.split(';');
+      csvLogs.forEach(function(log){
+        sensorLogs.push({
+          'sensor': log.split(',')[0],
+          'value': log.split(',')[1],
+          'timestamp': new Date()
+        });
       });
-      return growPlanInstance.save(function (err) {
-        if (!err) {
-          return res.csv([
-            ['someresponse', 'someresponse122412']
-          ]);
-        } else {
-          console.log(err);
-        }
-        //return res.send(growPlanInstance);
+    }
+
+    //get device by mac address id
+    return DeviceModel.findOne({ id: req.params.id }, function(err, device) {
+      //get device's current grow plan and push logs to it
+      return GrowPlanInstanceModel.findOne({ device: device._id }, function (err, growPlanInstance) {
+        sensorLogs.forEach(function(log){
+          growPlanInstance.sensorLogs.push(log);
+        });
+        return growPlanInstance.save(function (err) {
+          if (!err) {
+            return res.csv([
+              ['someresponse', 'someresponse122412']
+            ]);
+          } else {
+            console.log(err);
+          }
+          //return res.send(growPlanInstance);
+        });
       });
-    });
+    })
   });
 
   /*
