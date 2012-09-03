@@ -9,7 +9,12 @@ var DeviceSchema = new Schema({
 	deviceType: { type: ObjectId, ref: 'DeviceType', required: true },
 	name : { type: String },
 	users : [ { type: ObjectId, ref: 'User', required: true }],
-	sensorMap : [],
+	sensorMap : [
+      { 
+	    sensor : { type: ObjectId, ref: 'Sensor' },
+	    outletId : { type: String }
+	  }
+	],
 	controlMap : [ 
 	  { 
 	    control : { type: ObjectId, ref: 'Control' },
