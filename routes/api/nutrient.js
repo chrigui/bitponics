@@ -1,4 +1,4 @@
-var LightModel = require('../models/light').model;
+var NutrientModel = require('../../models/nutrient').model;
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -7,11 +7,11 @@ var LightModel = require('../models/light').model;
  */
 module.exports = function(app) {
 
-   //List lights
-  app.get('/api/light', function (req, res){
-    return LightModel.find(function (err, lights) {
+   //List nutrients
+  app.get('/api/nutrient', function (req, res){
+    return NutrientModel.find(function (err, nutrients) {
       if (!err) {
-        return res.send(lights);
+        return res.send(nutrients);
       } else {
         return console.log(err);
       }
@@ -19,54 +19,50 @@ module.exports = function(app) {
   });
 
   /*
-   * Create single light
+   * Create single nutrient
    *
    *  Test with:
-   *  jQuery.post("/api/light", {
-   *    "type": "light type",
-   *    "watts": "60",
-   *    "brand" : "light brand",
+   *  jQuery.post("/api/nutrient", {
+   *    "brand" : "nutrient brand",
    *    "name" : "big"
    *    }
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/light', function (req, res){
-    var light;
+  app.post('/api/nutrient', function (req, res){
+    var nutrient;
     console.log("POST: ");
     console.log(req.body);
-    light = new LightModel({
-      type: req.body.type,
-      watts: req.body.watts,
+    nutrient = new NutrientModel({
       brand : req.body.brand,
       name : req.body.name
     });
-    light.save(function (err) {
+    nutrient.save(function (err) {
       if (!err) {
-        return console.log("created light");
+        return console.log("created nutrient");
       } else {
         return console.log(err);
       }
     });
-    return res.send(light);
+    return res.send(nutrient);
   });
 
   /*
-   * Read an light
+   * Read an nutrient
    *
    * To test:
-   * jQuery.get("/api/light/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/nutrient/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/light/:id', function (req, res){
-    return LightModel.findById(req.params.id, function (err, light) {
+  app.get('/api/nutrient/:id', function (req, res){
+    return NutrientModel.findById(req.params.id, function (err, nutrient) {
       if (!err) {
-        return res.send(light);
+        return res.send(nutrient);
       } else {
         return console.log(err);
       }
@@ -74,11 +70,11 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an light
+   * Update an nutrient
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/light/${id}",
+   *     url: "/api/nutrient/${id}",
    *     type: "PUT",
    *     data: {
    *       "actionBelowMin": "actionid"
@@ -91,26 +87,26 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/light/:id', function (req, res){
-    return LightModel.findById(req.params.id, function (err, light) {
-      light.actionBelowMin = req.body.actionBelowMin;
-      return light.save(function (err) {
+  app.put('/api/nutrient/:id', function (req, res){
+    return NutrientModel.findById(req.params.id, function (err, nutrient) {
+      nutrient.actionBelowMin = req.body.actionBelowMin;
+      return nutrient.save(function (err) {
         if (!err) {
-          console.log("updated light");
+          console.log("updated nutrient");
         } else {
           console.log(err);
         }
-        return res.send(light);
+        return res.send(nutrient);
       });
     });
   });
 
   /*
-   * Delete an light
+   * Delete an nutrient
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/light/${id}", 
+   *     url: "/api/nutrient/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -120,9 +116,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/light/:id', function (req, res){
-    return LightModel.findById(req.params.id, function (err, light) {
-      return light.remove(function (err) {
+  app.delete('/api/nutrient/:id', function (req, res){
+    return NutrientModel.findById(req.params.id, function (err, nutrient) {
+      return nutrient.remove(function (err) {
         if (!err) {
           console.log("removed");
           return res.send('');

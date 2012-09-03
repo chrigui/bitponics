@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
-    DeviceModel = require('../models/device').model,
-    GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+    DeviceModel = require('../../models/device').model,
+    GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
     

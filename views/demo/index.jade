@@ -1,5 +1,4 @@
-extends layout
-
+extends ../layout
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/dashboard/nav.css')
@@ -73,7 +72,8 @@ block content
             div.data-graph
     section
       div#graph-timeline
-        div#phases-graph
+        div.progress
+        div#main-data-graph
       nav#graph-nav
         .photo-stream
           ul
@@ -132,5 +132,4 @@ block content
             img(src="img/icons/notepad.gif")
 
 block footer-scripts
-  script(src='/assets/js/libs/d3.v2.js')
-  script(src='/assets/js/dashboard.js')
+  script(src='/assets/js/demo/dashboard.js')
