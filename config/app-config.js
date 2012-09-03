@@ -27,6 +27,9 @@ module.exports = function(app){
 	  app.use(express.errorHandler()); 
 	});
 
+	/**
+	 * Standard config
+	 */
 	app.configure(function(){
 	  var stylusMiddleware = stylus.middleware({
 	    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`

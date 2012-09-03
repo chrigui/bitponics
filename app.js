@@ -13,7 +13,10 @@ require('./config')(app);
 require('./routes')(app);
 
 // Finally, start up the server
-app.listen(app.config.port, app.config.host, function(){
+var server = app.listen(process.env.PORT || 80, function(){
+  console.dir(server.address());
+  var address = server.address();
+  app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
   console.log('Express server running at ' + app.config.appUrl);
 });
 
