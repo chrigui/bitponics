@@ -246,7 +246,7 @@ module.exports = function(app) {
 
 
 // To end response for the firmware, send the Bell character
-res.send('1,0,1,57600000,0,28800000;' + String.fromCharCode(7));  
+res.send('1,0,1,57600000,0,28800000;2,0,1,14400000,0,7200000;' + String.fromCharCode(7));  
 
 
 
