@@ -4,6 +4,6 @@ html
     title= title
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0")
-    != partial('./partials/head/styleguide')
+    include includes/head/styleguide')
   body
-      != body
+      block content

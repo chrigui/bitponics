@@ -15,13 +15,13 @@ var express    = require('express'),
   mongodb    = require('mongodb'),
   mongoose   = require('mongoose'),
   mongooseAuth = require('mongoose-auth'),
-  app        = module.exports = express.createServer(),
+  app        = module.exports = express(),
   io         = require('socket.io').listen(app),
   cache      = {},
   tcpGuests  = [],
-  viewEngine = 'jade',
   Dashboard  = require('./routes/dashboard')(app),
-  csv =  require('express-csv');
+  csv        = require('express-csv'),
+  winston    = require('winston');
 
 
 
@@ -39,6 +39,20 @@ io.configure(function () {
 });
 
 app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  
+  // make the response markup pretty-printed
+  app.locals({pretty: true });
+
+  everyauth.debug = true;
+  everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler()); 
+});
+
+app.configure(function(){
   var stylusMiddleware = stylus.middleware({
     src: __dirname + '/stylus/', // .styl files are located in `/stylus`
     dest: __dirname + '/public/', // .styl resources are compiled `/stylesheets/*.css`
@@ -53,21 +67,9 @@ app.configure('development', function(){
       }
   });
   app.use(stylusMiddleware);  
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  app.set('view options', { layout: __dirname + "/views/jade/layout-stylus.jade", pretty: true });
-
-  everyauth.debug = true;
-  everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
   
-});
-
-app.configure('production', function(){
-  app.use(express.errorHandler()); 
-});
-
-app.configure(function(){
-  app.set('views', __dirname + '/views/' + viewEngine);
-  app.set('view engine', viewEngine);
+  app.set('view engine', 'jade');
+  
   app.use(express.logger(':method :url :status'));
   express.bodyParser.parse['text/csv'] = function(req, options, callback){
     console.dir(req);
@@ -76,25 +78,27 @@ app.configure(function(){
   };
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express['static'](__dirname + '/public'));
+  
+  app.use(express.static(__dirname + '/public'));
   
   // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
   app.use(express.cookieParser()); 
   app.use(express.session({ secret: 'somethingrandom'}));
   
   mongoose.connect(app.config.mongoUrl);
-  app.use(mongooseAuth.middleware());
+  app.use(mongooseAuth.middleware(app));
   mongooseAuth.helpExpress(app);
 
-  app.dynamicHelpers({
-    is_dev_mode: function (req, res) {
-      return (process.env.NODE_ENV || 'development') === 'development';
-    },
-    css_files: function (req, res) {
-      //console.log('res: ', req);
-    }
+  app.locals({
+    everyauth: everyauth
   });
 
+  winston.add(require('winston-loggly').Loggly, {
+    subdomain : app.config.loggly.subdomain,
+    inputToken : app.config.loggly.tokens[app.settings.env],
+    level : 'error'
+  });  
+  
   // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
   // per mongoose-auth readme, don't need this since express handles it
   //app.use(app.router); 
@@ -256,11 +260,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 app.listen(app.config.port, app.config.host, function(){
-  console.log('Express server listening at ' + app.address().address + ', port ' + app.address().port);
-  //console.log("Express server listening on port %d", app.address().port);
-  app.config.appUrl = 'http://' + app.address().address + ':' + app.address().port;
-  //console.log(app.config.appUrl); 
-  //console.log(app.address());
+  console.log('Express server running at ' + app.config.appUrl);
 });
 
 

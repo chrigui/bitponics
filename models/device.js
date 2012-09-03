@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var DeviceSchema = new Schema({
-	id: { type: String, required: true, unique: true },
+	id: { type: String, required: true, unique: true }, //mac address
 	name : { type: String },
 	users : [ { type: ObjectId, ref: 'User', required: true }],
 	sensors : [ { type: ObjectId, ref: 'Sensor', required: true }],
