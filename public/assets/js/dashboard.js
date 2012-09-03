@@ -106,6 +106,8 @@ $(function () {
 
     var phase1GRotate = 0;
     setInterval(function(){
-        phase1G.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-    }, 15)
+        phase1G.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ') rotate(' + phase1GRotate + ')');
+        phase1GRotate += .5;
+        if (phase1GRotate == 360){ phase1GRotate = 0; }
+    }, 30)
 });
