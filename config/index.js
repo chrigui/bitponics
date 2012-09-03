@@ -36,11 +36,9 @@ var loggly = {
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
 module.exports = function(app) {
-  var // on local machine, routing bitponics.com to localhost in order to have external oauth's (goog, fb) route back without complaining 
-      PORT = process.env.PORT || 80, // run node as sudo to use port 80
-      HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
-
-      appUrl = 'http://' + HOST + (PORT == 80 ? '' : ':' + PORT);
+  //var // on local machine, routing bitponics.com to localhost in order to have external oauth's (goog, fb) route back without complaining 
+      //PORT = process.env.PORT || 80, // run node as sudo to use port 80
+      //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
 
       console.log("ENVIRONMENT VARIABLES");
       console.log(process.env);
@@ -48,12 +46,10 @@ module.exports = function(app) {
   app.config = {
     auth : require('./auth-config'),
     css : require('./css-config'),
-    appUrl : appUrl,
-    host : HOST,
+    appUrl : 'not set yet',
     js : require('./js-config'),
     loggly : loggly,
-    mongoUrl : generateMongoUrl(mongo),
-    port : PORT
+    mongoUrl : generateMongoUrl(mongo)
   };
 
   require('./boot-mongo')(app);
