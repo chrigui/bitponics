@@ -7,7 +7,8 @@
 	    "npm":  "1.0.x"
 	  }
 	, "dependencies": {
-		"express"     : "3.0.0rc3"
+		"connect"	  : "=2.4.3"
+		, "express"   : "3.0.0rc3"
 		, "everyauth" : "=0.3.0"
 		, "jade"      : ">= 0.27.2"
 		, "mkdirp"    : ">= 0.0.1"

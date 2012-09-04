@@ -1,4 +1,5 @@
-var express = require('express'),
+var connect    = require('connect'),
+	express    = require('express'),
 	http       = require('http'),
 	net        = require('net'),
 	fs         = require('fs'),
@@ -13,6 +14,10 @@ var express = require('express'),
 
 module.exports = function(app){
 	
+
+	app.configure('local', function(){
+	});
+
 	app.configure('development', function(){
 	  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	  
@@ -21,10 +26,19 @@ module.exports = function(app){
 
 	  everyauth.debug = true;
 	  everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
+
+	  app.use(connect.basicAuth('bitponics', '8bitpass'));
 	});
 
+	app.configure('staging', function(){
+		app.use(connect.basicAuth('bitponics', '8bitpass'));
+	});
+	
 	app.configure('production', function(){
 	  app.use(express.errorHandler()); 
+
+	  // TEMP : remove basic auth after launch
+	  app.use(connect.basicAuth('bitponics', '8bitpass'));
 	});
 
 	/**
