@@ -14,7 +14,7 @@ var loggly = {
       "name": "",
       "db":"bitponics"
     },
-    generateMongoUrl = function(obj){
+    generateMongoUrl = function(app){
       /*
       obj.hostname = (obj.hostname || 'localhost');
       obj.port = (obj.port || 27017);
@@ -26,9 +26,25 @@ var loggly = {
       } else{
         return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
       }*/
-      return process.env.MONGOLAB_URI || "mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local";
 
-    };
+      var result = process.env.MONGOLAB_URI;
+
+      if (result){
+        return result;
+      } else {
+        switch(app.settings.env){
+          case 'local':
+            return 'mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local';
+          case 'development':
+            return 'mongodb://admin:1SHar3db1t@ds037597.mongolab.com:37597/bitponics-development';  
+          case 'staging':
+            return 'mongodb://admin:1SHar3db1t@ds037617.mongolab.com:37617/bitponics-staging';
+          case 'production':
+            return 'mongodb://admin:1SHar3db1t@ds037587.mongolab.com:37587/bitponics-production';
+          // no default. app.settings.env defaults to 'development' if NODE_ENV isn't explicitly set
+        }  
+      }
+  };
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -49,7 +65,7 @@ module.exports = function(app) {
     appUrl : 'not set yet',
     js : require('./js-config'),
     loggly : loggly,
-    mongoUrl : generateMongoUrl(mongo)
+    mongoUrl : generateMongoUrl(app)
   };
 
   require('./boot-mongo')(app);
