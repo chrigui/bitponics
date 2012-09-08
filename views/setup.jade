@@ -1,0 +1,47 @@
+extends layout
+
+block css 
+  link(rel='stylesheet', href='/assets/css/pages/setup.css')
+
+block content
+  - if (!everyauth.loggedIn)
+    .stackContent
+      header.default-border-b
+           h1.stack1of1 
+            span.stackContent Not Authenticated
+
+      section.stack1of1 
+         div.padding-20
+          #signup
+            a(href='/signup?return=setup', style='text-decoration:underline;color:#333') Sign up
+          #password-login
+            a(href='/login?return=setup', style='text-decoration:underline;color:#333') Login
+          
+      section.stack1of1 
+        div.stackContent.padding-20
+          h2 Or login using one of the following services:
+          div
+            #fb-login(style='float: left; margin-left: 5px')
+              a(href='/auth/facebook', style='border: 0px')
+                img(style='border: 0px', src='http://github.com/intridea/authbuttons/raw/master/png/facebook_64.png')
+            #google-login(style='float: left; margin-left: 5px')
+              a(href='/auth/google', style='border: 0px')
+                img(style='border: 0px', src='http://github.com/intridea/authbuttons/raw/master/png/google_64.png')
+            
+  - else
+    .stackContent
+      h1 Setting up your Bitponics device
+      ol
+        li 
+          div Plug your device into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:
+            div.led-indicator.scan
+            | This indicates that it's scanning the available WiFi networks. Once it starts a slower green blinking:
+            div.led-indicator.adhoc
+            | you're ready for the next step:
+        li 
+          div Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it.
+        li
+          div 
+
+block footer-scripts
+  script(src='/assets/js/setup.js')
