@@ -18,8 +18,7 @@ module.exports = function(app){
 	 */
 	app.get('/admin/', function(req, res) {
 	  res.render('admin', {
-	    title: 'Bitponics Admin',
-	    appUrl : app.config.appUrl
+	    title: 'Bitponics Admin'
 	  })
 	});
 };

@@ -151,15 +151,13 @@ module.exports = function(app){
 	          	postLoginPath: '/login',
 	          	loginView: 'login.jade',
 	          	loginLocals : {
-	          		title : 'Login - Bitponics',
-	          		appUrl : app.config.appUrl
+	          		title : 'Login - Bitponics'
 	          	},
 	          	getRegisterPath: '/signup',
 	          	postRegisterPath: '/signup',
 	          	registerView: 'signup.jade',
 	          	registerLocals: {
-			      title: 'Sign Up - Bitponics',
-			      appUrl : app.config.appUrl
+			      title: 'Sign Up - Bitponics'
 				},
 	          	loginSuccessRedirect: '/',
 	         	registerSuccessRedirect: '/register'
