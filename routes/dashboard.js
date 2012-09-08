@@ -2,8 +2,7 @@
 module.exports = function(app){
 	app.get('/dashboard', function (req, res) {
 		res.render('dashboard', {
-	    	title: "Bitponics - Dashboard",
-		    appUrl : app.config.appUrl
+	    	title: "Bitponics - Dashboard"
 		});
 	});
 };

@@ -10,8 +10,7 @@ module.exports = function(app){
 
 	app.get('/', function (req, res){
 	  res.render('index', {
-	    title: "Bitponics",
-	    appUrl : app.config.appUrl
+	    title: "Bitponics"
 	  });
 	});
 
@@ -114,6 +113,7 @@ module.exports = function(app){
 	require('./api')(app);
 	require('./dashboard')(app);
 	require('./demo')(app);
+	require('./setup')(app);
 	require('./styleguide')(app);
 
 };
