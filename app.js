@@ -17,12 +17,6 @@ var server = app.listen(process.env.PORT || 80, function(){
   //var address = server.address();
   //app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
   
-  // locals are passed down to the views
-  app.locals({
-      appUrl: app.config.appUrl,
-      className: undefined
-    });
-
   console.log('Express server running at ' + JSON.stringify(server.address()));
   console.log('app.config.appUrl = ' + app.config.appUrl);
 });
