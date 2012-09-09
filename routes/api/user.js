@@ -6,7 +6,7 @@
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
 module.exports = function(app) {
-  var UserModel = require('../../models/user')(app).model; //note we must pass (app) to user.js
+  var UserModel = require('../../models/user').model;
 
    //List users
   app.get('/api/user', function (req, res){

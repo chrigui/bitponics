@@ -5,10 +5,9 @@ var connect    = require('connect'),
 	fs         = require('fs'),
 	stylus     = require('stylus'),
 	nib        = require('nib'),
-	everyauth  = require('everyauth'),
 	mongodb    = require('mongodb'),
 	mongoose   = require('mongoose'),
-	mongooseAuth = require('mongoose-auth'),
+	passport   = require('passport'),
 	csv        = require('express-csv'),
 	winston    = require('winston');
 
@@ -23,9 +22,6 @@ module.exports = function(app){
 	  
 	  // make the response markup pretty-printed
 	  app.locals({pretty: true });
-
-	  everyauth.debug = true;
-	  everyauth.everymodule.moduleTimeout(-1); // to turn off timeouts
 
 	  app.use(connect.basicAuth('bitponics', '8bitpass'));
 	});
@@ -91,12 +87,8 @@ module.exports = function(app){
 	  app.use(express.session({ secret: 'somethingrandom'}));
 	  
 	  mongoose.connect(app.config.mongoUrl);
-	  app.use(mongooseAuth.middleware(app));
-	  mongooseAuth.helpExpress(app);
-
-	  app.locals({
-	    everyauth: everyauth
-	  });
+	  app.use(passport.initialize());
+ 	  app.use(passport.session());
 
 	  winston.add(require('winston-loggly').Loggly, {
 	    subdomain : app.config.loggly.subdomain,

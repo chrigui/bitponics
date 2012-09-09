@@ -3,7 +3,6 @@ extends layout
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/dashboard/nav.css')
-  link(rel='stylesheet', href='/assets/css/pages/dashboard/assistant.css')
 
 
 block content
@@ -30,50 +29,8 @@ block content
           span Friday, November 18, 2011
         h2.time
           span.text-align-r 8:32 AM
-      ul#data-panels.default-border-b.clearfix
-        li.first
-          section.light.default-border-r
-            header 
-              h2.uppercase.text-align-c Light
-              span.warning
-            span.display-t.centered
-              span.icon
-              span.number 18
-              span.metric.uppercase hrs/day
-            div.data-graph
-        li
-          section.ectds.default-border-r
-            header 
-              h2.uppercase.text-align-c ec/tds
-              span.warning
-            span.display-t.centered
-              span.icon
-              span.number 550
-              span.metric.uppercase ppm
-            div.data-graph
-        li
-          section.air.default-border-r
-            header
-              h2.uppercase.text-align-c air
-              span.warning
-            span.display-t.centered
-              span.icon
-              span.number 75
-              span.metric.uppercase &deg;F
-            div.data-graph
-        li.last
-          section.water
-            header
-              h2.uppercase.text-align-c water
-              span.warning
-            span.display-t.centered
-              span.icon
-              span.number 75 
-              span.metric.uppercase &deg;F
-            div.data-graph
     section
-      div#graph-timeline
-        div#phases-graph
+      div#phases-graph
       nav#graph-nav
         .photo-stream
           ul

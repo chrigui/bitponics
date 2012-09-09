@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  - if (!everyauth.loggedIn)
+  - if (!user)
     .stackContent
       header.default-border-b
            h1.stack1of1 
@@ -14,7 +14,7 @@ block content
           #password-login
             a(href='/login', style='text-decoration:underline;color:#333') Login
           
-      section.stack1of1 
+      // section.stack1of1 
         div.stackContent.padding-20
           h2 Or login using one of the following services:
           div
@@ -30,15 +30,6 @@ block content
       .stack1of1
         h2 Authenticated
         #user-id 
-          | Logged in with `user.id` #{user.id} - aka `everyauth.user.id` #{everyauth.user.id}
-        - if (everyauth.facebook)
-          h3 Facebook User Data
-          p= JSON.stringify(everyauth.facebook.user)
-        - if (everyauth.google)
-          h3 Google User Data
-          p= JSON.stringify(everyauth.google.user)
-        - if (everyauth.password)
-          h3 User Data
-          p Email #{everyauth.user.email}
+          | Logged in with `user.id` #{user.id}, 'user.email' #{user.email}
         h3
           a(href='/logout', style='text-decoration:underline;color:#333') Logout

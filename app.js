@@ -14,16 +14,17 @@ require('./routes')(app);
 
 // Finally, start up the server
 var server = app.listen(process.env.PORT || 80, function(){
-  console.dir(server.address());
-  var address = server.address();
-  app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
+  //var address = server.address();
+  //app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
   
   // locals are passed down to the views
   app.locals({
       appUrl: app.config.appUrl,
       className: undefined
     });
-  console.log('Express server running at ' + app.config.appUrl);
+
+  console.log('Express server running at ' + JSON.stringify(server.address()));
+  console.log('app.config.appUrl = ' + app.config.appUrl);
 });
 
 

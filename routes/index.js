@@ -1,4 +1,17 @@
+var User = require('../models/user').model,
+	passport = require('passport');
+
 module.exports = function(app){
+
+	// global middleware
+	app.all('*', function (req, res, next){
+		res.locals({
+			user : req.user
+		});
+		next();
+	});
+
+
 	app.get('/socket_graph_test', function (req, res){
 	  //print_visits(req, res);
 	  res.render('dashboard', {
@@ -14,6 +27,49 @@ module.exports = function(app){
 	  });
 	});
 
+	app.get('/login', function (req, res){
+		res.render('login', {
+			title: 'Login'
+		});
+	});
+
+	app.post('/login', function (req, res, next){
+		passport.authenticate('local', function(err, user, info) {
+		    if (err) { return next(err) }
+		    if (!user) {
+		      req.flash('error', info.message);
+		      return res.redirect('/login')
+		    }
+		    req.logIn(user, function(err) {
+		      if (err) { return next(err); }
+		      return res.redirect(req.query.redirect || '/dashboard');
+		    });
+	    })(req, res, next);
+	});
+
+	app.get('/signup', function (req, res){
+		res.render('signup', {
+			title : 'Signup'
+		});
+	});
+
+	app.post('/signup', function (req, res){
+		User.createUserWithPassword({
+			email: req.param('email')
+		},
+		req.param('password'),
+		function(err, user){
+			// TODO : handle error
+			if (err) { throw err;}
+
+			req.logIn(user, function(err) {
+		      if (err) { throw err; }
+		      res.redirect('/register');
+		    });
+		});
+		
+	});
+		
 	app.get('/logout', function (req, res) {
 	  req.logout();
 	  res.redirect('/');
@@ -28,7 +84,7 @@ module.exports = function(app){
 	 * 
 	 */
 	app.get('/register', function(req, res) {
-	  var UserModel = require('./models/user')(app).model;
+	  var UserModel = require('../models/user').model;
 	  if(req.query.verify){ //user coming back to verify account
 	    return UserModel.findOne({ activation_token: req.query.verify }, function (err, user) {
 	      if (!err && user && activation_token !== '') {
@@ -50,8 +106,7 @@ module.exports = function(app){
 	    console.log('req.user:');
 	    console.dir(req.user);
 	    res.render('register', {
-	      title: 'Thanks for signing up. Check your email.',
-	      appUrl : app.config.appUrl
+	      title: 'Thanks for signing up. Check your email.'
 	    });
 	  }
 	});

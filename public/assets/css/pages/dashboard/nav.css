@@ -84,3 +84,14 @@ a:hover{text-decoration:underline}
 .triangle-down{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #333}
 .triangle-left{height:0;position:absolute;width:0;border-right:5px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent}
 .triangle-right{height:0;position:absolute;width:0;border-left:5px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent}
+@-moz-keyframes full-circle{0%,100%{transform:rotate(0)}
+50%{transform:rotate(180deg)}
+}@-webkit-keyframes full-circle{0%,100%{transform:rotate(0)}
+50%{transform:rotate(180deg)}
+}@-o-keyframes full-circle{0%,100%{transform:rotate(0)}
+50%{transform:rotate(180deg)}
+}@-ms-keyframes full-circle{0%,100%{transform:rotate(0)}
+50%{transform:rotate(180deg)}
+}@keyframes full-circle{0%,100%{transform:rotate(0)}
+50%{transform:rotate(180deg)}
+}
