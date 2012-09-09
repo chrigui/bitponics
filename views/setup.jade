@@ -6,20 +6,18 @@ block css
 block content
 
    - if (!user)
-    .stackContent
-      header.default-border-b
-           h1.stack1of1 
-            span.stackContent Not Authenticated
+    header.default-border-b
+         h1
+          span Not Authenticated
 
-      section.stack1of1 
-         div.padding-20
-          #signup
-            a(href='/signup?redirect=setup', style='text-decoration:underline;color:#333') Sign up
-          #password-login
-            a(href='/login?redirect=setup', style='text-decoration:underline;color:#333') Login
-            
+    section.stack1of1 
+       div
+        #signup
+          a(href='/signup?redirect=setup', style='text-decoration:underline;color:#333') Sign up
+        #password-login
+          a(href='/login?redirect=setup', style='text-decoration:underline;color:#333') Login
+          
    - else
-    .stackContent
       h1 Setting up your Bitponics device
       ol
         li 
@@ -31,7 +29,8 @@ block content
         li 
           div Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it.
         li
-          div 
+          div Once you're connected, click 
+            a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to device 
 
 block footer-scripts
   script(src='/assets/js/setup.js')

@@ -43,15 +43,17 @@
 body,.din-text{font-family:"DIN",Helvetica,Arial,sans-serif;letter-spacing:normal}
 a{color:#333;text-decoration:none;}
 a:hover{text-decoration:underline}
-.setup .led-indicator{animation-duration:1s;animation-name:led-indicator;animation-iteration-count:infinite;width:20px;height:20px;border-radius:5px}
+.setup .led-indicator{-webkit-animation-duration:1s;-webkit-animation-name:led-indicator;-webkit-animation-iteration-count:infinite;width:20px;height:20px;border-radius:5px;border:1px solid #ccc;}
+.setup .led-indicator.scan{background:#ff0;-webkit-animation-duration:.5s}
+.setup .led-indicator.adhoc{background:#008000}
 @-moz-keyframes led-indicator{0%,100%{opacity:0}
-50%{opacity:1 k}
+50%{opacity:1}
 }@-webkit-keyframes led-indicator{0%,100%{opacity:0}
-50%{opacity:1 k}
+50%{opacity:1}
 }@-o-keyframes led-indicator{0%,100%{opacity:0}
-50%{opacity:1 k}
+50%{opacity:1}
 }@-ms-keyframes led-indicator{0%,100%{opacity:0}
-50%{opacity:1 k}
+50%{opacity:1}
 }@keyframes led-indicator{0%,100%{opacity:0}
-50%{opacity:1 k}
+50%{opacity:1}
 }
