@@ -83,6 +83,13 @@ module.exports = function(app) {
     mongoUrl : mongoUrl
   };
 
+  // locals are passed down to the views
+  app.locals({
+    title : 'Bitponics',
+    appUrl: app.config.appUrl,
+    className: undefined
+  });
+
   require('./auth-config')(app);
   require('./app-config')(app);
 };

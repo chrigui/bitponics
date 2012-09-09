@@ -8,19 +8,28 @@
   }
  
   50% {
-    opacity:1k
+    opacity:1
   }
 }
 
 .setup {
 	.led-indicator {
-		animation-duration: 1s;
-  		animation-name: led-indicator;
-  		animation-iteration-count: infinite;
+		  -webkit-animation-duration: 1s;
+  		-webkit-animation-name: led-indicator;
+  		-webkit-animation-iteration-count: infinite;
 
   		width:20px;
   		height:20px;
   		border-radius: 5px;
-	}	
+      border: 1px solid #ccc;
 
+      &.scan {
+        background: yellow;
+        -webkit-animation-duration: .5s;
+      }
+
+      &.adhoc {
+        background:green;
+      }
+  }	
 }
