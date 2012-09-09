@@ -5,12 +5,15 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var IdealRangeSchema = new Schema({
+	name: { type: String },
+
 	sensor: { type: ObjectId, ref: 'Sensor', required: true },
 		
-	min: { type: Number, required: true },
-	
-	max: { type: Number, required: true },
-	
+	valueRange: {
+		min: { type: Number, required: true },
+		max: { type: Number, required: true }
+	},
+
 	actionBelowMin: { type: ObjectId, ref: 'Action', required: true },
 
 	actionAboveMax: { type: ObjectId, ref: 'Action', required: true },

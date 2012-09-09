@@ -24,6 +24,7 @@ module.exports = function(app) {
    *  Test with:
    *  jQuery.post("/api/sensor", {
    *    "name": "humidity",
+   *    "abbrev": "hum",
    *    "unitOfMeasurement": "unit"
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
@@ -35,6 +36,7 @@ module.exports = function(app) {
     console.log(req.body);
     sensor = new SensorModel({
       name: req.body.name,
+      abbrev: req.body.abbrev,
       unitOfMeasurement: req.body.unitOfMeasurement
     });
     sensor.save(function (err) {

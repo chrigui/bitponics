@@ -8,9 +8,8 @@ var DeviceTypeSchema = new Schema({
 	name: { type: String, required: true }, //‘Bitponics Beta Device 1’
 	firmwareVersion: { type: Number, required: true }, //‘0.1’
 	microprocessor: { type: String, required: true },
-	sensorMap: [
-	{
-		outputId: { type: String, required: true }, //‘pH’
+	sensorMap: [{
+		outputId: { type: String, required: true }, //‘ph’
 		sensor : { type: ObjectId, ref: 'Sensor', required: true }
 	}]
 });

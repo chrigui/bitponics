@@ -5,13 +5,10 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var SensorSchema = new Schema({
-	
 	name: { type: String, required: true },
-	
-	/**
-	 * 
-	 */
-	unitOfMeasurement: { type: String, required: true }
+	abbrev: {type: String },
+	unitOfMeasurement: { type: String, required: true },
+	code: { type: String, required: true }
 });
 
 SensorSchema.plugin(useTimestamps);
