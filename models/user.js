@@ -1,15 +1,13 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-	useTimestamps = mongooseTypes.useTimestamps,
+	mongoosePlugins = require('../lib/mongoose-plugins'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
-	mongooseAuth = require('mongoose-auth'),
-	everyauth = require('everyauth'),
 	UserSchema = undefined,
 	User = undefined,
 	nodemailer = require('nodemailer'),
 	crypto = require('crypto'),
-	activationToken = "";
+	bcrypt = require('bcrypt');
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -17,15 +15,18 @@ UserSchema = new Schema({
   email : { 
   	type : mongoose.SchemaTypes.Email, 
   	required : true, 
-  	unique: true },
+  	unique: true 
+  },
   name : {
         first: String
       , last: String
     },
+  salt: { type: String, required: true },
+  hash: { type: String, required: true },
   locale: String,
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
-  activationToken : { type : String, default : activationToken },
+  activationToken : { type : String, default : '' },
   sentEmail : { type: Boolean, default: false }
 },
 { strict: true });
@@ -43,8 +44,56 @@ UserSchema.virtual('name.full')
 		this.set('name.last', lastName);
 	});
 
+/*
+UserSchema.virtual('password')
+	.get(function () {
+	  //return this._password;
+	  return this.hash;
+	})
+	.set(function (password) {
+	  //this._password = password;
+	  var salt = this.salt = bcrypt.genSaltSync(10);
+	  this.hash = bcrypt.hashSync(password, salt);
+	});
+*/
 
-UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+UserSchema.static('createUserWithPassword', function(userProperties, password, callback){
+	var newUser = new User(userProperties);
+
+	bcrypt.genSalt(10, function(err, salt) {
+    	if (err) { return callback(err); }
+    	newUser.salt = salt;
+    	
+    	bcrypt.hash(password, salt, function(err, hash) {
+    		if (err) { return callback(err); }
+
+      		newUser.hash = hash;
+
+      		newUser.save(function(err) {
+		      if (err) { return callback(err); }
+		      callback(null, newUser);
+		    });
+		});
+	});
+});
+
+UserSchema.method('verifyPassword', function(password, callback) {
+  bcrypt.compare(password, this.hash, callback);
+});
+
+UserSchema.static('authenticate', function(email, password, callback) {
+  this.findOne({ email: email }, function(err, user) {
+      if (err) { return callback(err); }
+      if (!user) { return callback(null, false); }
+      user.verifyPassword(password, function(err, passwordCorrect) {
+        if (err) { return callback(err); }
+        if (!passwordCorrect) { return callback(null, false); }
+        return callback(null, user);
+      });
+    });
+});
+
+UserSchema.plugin(mongoosePlugins.useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 UserSchema.pre('save', function(next){
 	var user = this,
@@ -104,17 +153,16 @@ UserSchema.pre('save', function(next){
 
 	console.log('user.active:'+user.active)
 	console.log('user.sentEmail:'+user.sentEmail)
-
-	
-
 });
 
-/**
- * exported object is a function. Needs to be passed the app instance so that appropriate configs can be retrieved and used to complete initialization. 
- * @param app: node.js app instance. assumed to have a 
- */
-module.exports = function(app){
 
+User = mongoose.model('User', UserSchema);
+
+module.exports.schema = UserSchema;
+module.exports.model = User;
+
+
+/*
 	// Auth
 	UserSchema.plugin(mongooseAuth, {
 		everymodule: {
@@ -223,11 +271,6 @@ module.exports = function(app){
 	  	params.email = googleUser.email;
 	    this.create(params, callback);
 	  });
+*/
 
-	User = mongoose.model('User', UserSchema);
-
-
-	return {
-		model : User
-	};
-};
+	

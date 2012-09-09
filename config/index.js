@@ -26,24 +26,6 @@ var loggly = {
       } else{
         return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
       }*/
-
-      var result = process.env.MONGOLAB_URI;
-
-      if (result){
-        return result;
-      } else {
-        switch(app.settings.env){
-          case 'local':
-            return 'mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local';
-          case 'development':
-            return 'mongodb://admin:1SHar3db1t@ds037597.mongolab.com:37597/bitponics-development';  
-          case 'staging':
-            return 'mongodb://admin:1SHar3db1t@ds037617.mongolab.com:37617/bitponics-staging';
-          case 'production':
-            return 'mongodb://admin:1SHar3db1t@ds037587.mongolab.com:37587/bitponics-production';
-          // no default. app.settings.env defaults to 'development' if NODE_ENV isn't explicitly set
-        }  
-      }
   };
 
 /**
@@ -56,19 +38,52 @@ module.exports = function(app) {
       //PORT = process.env.PORT || 80, // run node as sudo to use port 80
       //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
 
-      console.log("ENVIRONMENT VARIABLES");
-      console.log(process.env);
+  console.log('NODE_ENV ' + process.env.NODE_ENV);
+
+  var mongoUrl = process.env.MONGOLAB_URI,
+      appDomain = process.env.BITPONICS_APP_DOMAIN,
+      appUrl;
+
+  // TODO: app.settings.env automatically reads from process.env.NODE_ENV & defaults to 'development'.
+  //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
+  //       Setting it manually for now, but figure out what's going on
+  app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
+
+  switch(app.settings.env){
+    case 'local':
+      appDomain = appDomain || 'bitponics.com';
+      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local';
+      break;
+    case 'development':
+      appDomain = appDomain || 'dev.bitponics.com';
+      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds037597.mongolab.com:37597/bitponics-development';  
+      break;
+    case 'staging':
+      appDomain = appDomain || 'staging.bitponics.com';
+      mongoUrl =  mongoUrl || 'mongodb://admin:1SHar3db1t@ds037617.mongolab.com:37617/bitponics-staging';
+      break;
+    case 'production':
+      appDomain = appDomain || 'prod.bitponics.com';
+      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds037587.mongolab.com:37587/bitponics-production';
+      break;
+    // no default; app.settings.env defaults to 'development' if process.env.NODE_ENV isn't set
+  }
+
+  appUrl = 'http://' + appDomain;
+
+  console.log("ENVIRONMENT VARIABLES");
+  console.log(process.env);
       
   app.config = {
-    auth : require('./auth-config'),
+    //auth : require('./auth-config'),
     css : require('./css-config'),
-    appUrl : 'not set yet',
+    appUrl : appUrl,
     js : require('./js-config'),
     loggly : loggly,
-    mongoUrl : generateMongoUrl(app)
+    mongoUrl : mongoUrl
   };
 
-  require('./boot-mongo')(app);
+  require('./auth-config')(app);
   require('./app-config')(app);
 };
 

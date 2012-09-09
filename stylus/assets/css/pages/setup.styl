@@ -1,0 +1,26 @@
+@import "../helpers"
+@import "../typography"
+
+
+@keyframes led-indicator {
+  0%, 100% {
+    opacity:0;
+  }
+ 
+  50% {
+    opacity:1k
+  }
+}
+
+.setup {
+	.led-indicator {
+		animation-duration: 1s;
+  		animation-name: led-indicator;
+  		animation-iteration-count: infinite;
+
+  		width:20px;
+  		height:20px;
+  		border-radius: 5px;
+	}	
+
+}
