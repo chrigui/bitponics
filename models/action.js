@@ -8,7 +8,7 @@ var ActionSchema = new Schema({
 	
 	description: { type: String, required: true },
 	
-	control: { type: ObjectId, ref: 'Control', required: false },
+	control: { type: ObjectId, ref: 'Control'},
 	
 	cycle: {
 	
