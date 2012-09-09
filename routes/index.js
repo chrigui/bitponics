@@ -28,9 +28,17 @@ module.exports = function(app){
 	});
 
 	app.get('/login', function (req, res){
-		res.render('login', {
-			title: 'Login'
-		});
+		var redirect = req.query.redirect,
+			locals = {
+				title: 'Login',
+				formAction : '/login'
+			};
+
+		if (redirect){
+			locals.formAction += '?redirect=' + redirect;
+		}
+
+		res.render('login', locals);
 	});
 
 	app.post('/login', function (req, res, next){
