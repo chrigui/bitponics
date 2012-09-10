@@ -116,7 +116,7 @@ UserSchema.pre('save', function(next){
 		  	user.apiPrivateKey = privateKey;
 
 		  	next();
-	  	}
+	  	});
 	}
 });
 
