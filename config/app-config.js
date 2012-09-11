@@ -13,32 +13,10 @@ var connect    = require('connect'),
 
 module.exports = function(app){
 	
-
-	app.configure('local', function(){
-	});
-
-	app.configure('development', function(){
-	  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-	  
-	  // make the response markup pretty-printed
-	  app.locals({pretty: true });
-
-	  app.use(connect.basicAuth('bitponics', '8bitpass'));
-	});
-
-	app.configure('staging', function(){
-		app.use(connect.basicAuth('bitponics', '8bitpass'));
-	});
-	
-	app.configure('production', function(){
-	  app.use(express.errorHandler()); 
-
-	  // TEMP : remove basic auth after launch
-	  app.use(connect.basicAuth('bitponics', '8bitpass'));
-	});
-
 	/**
-	 * Standard config
+	 * Standard config. 
+	 * Should go first so env-specific ones are simply adding on to it 
+	 * & guaranteeing that their middleware executes after this is all set up
 	 */
 	app.configure(function(){
 	  var stylusMiddleware = stylus.middleware({
@@ -100,5 +78,51 @@ module.exports = function(app){
 	  // per mongoose-auth readme, don't need this since express handles it
 	  //app.use(app.router); 
 
+	});
+
+	switch(app.settings.env){
+	    case 'local':
+	      	break;
+	    case 'development':
+	    case 'staging':
+	    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+	  
+			// make the response markup pretty-printed
+			app.locals({pretty: true });
+	    case 'production':
+	    	// Ensure that this is an authenticated request.
+	    	// If it doesn't already have a req.user, 
+	    	// check whether it's attempting HMAC auth,
+	    	// and finally fallback to checking Basic auth
+	    	app.use(function(req, res, next){
+	    		var authorization = req.headers.authorization;
+
+	    		if (!req.user){
+	    			if (authorization && authorization.split(' ')[0] == 'HMAC'){
+	    				// TODO : call the HMAC Passport strategy 
+	    				/*
+						passport.authenticate('hmac', function(err, user, info){
+	
+						})(req, res, next);
+	    				*/
+	    			} else {
+	    				connect.basicAuth('bitponics', '8bitpass')(req, res, next);
+	    			}
+				}
+	    	});
+	      	break;
+	}
+
+	app.configure('local', function(){
+	});
+
+	app.configure('development', function(){
+	});
+
+	app.configure('staging', function(){
+	});
+	
+	app.configure('production', function(){
+	  app.use(express.errorHandler()); 
 	});
 };
