@@ -27,7 +27,13 @@ UserSchema = new Schema({
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
-  sentEmail : { type: Boolean, default: false }
+  sentEmail : { type: Boolean, default: false },
+  notificationPreferences: {
+  	email: { type: Boolean, default: false },
+  	sms: { type: Boolean, default: false }
+  },
+  apiPublicKey : String,
+  apiPrivateKey : String
 },
 { strict: true });
 
@@ -95,13 +101,35 @@ UserSchema.static('authenticate', function(email, password, callback) {
 
 UserSchema.plugin(mongoosePlugins.useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
+// give user API keys if needed 
+UserSchema.pre('save', function(next){
+	var user = this;
+	
+	if (!user.apiPublicKey || !user.apiPrivateKey){
+		crypto.randomBytes(48, function(ex, buf) {
+			if (ex) throw ex;
+		  	var keysSource = buf.toString(),
+		  		publicKey = keysSource.substr(0, 16),
+		  		privateKey = keysSource(16, 32);
+		  	
+		  	user.apiPublicKey = publicKey;
+		  	user.apiPrivateKey = privateKey;
+
+		  	next();
+	  	});
+	}
+});
+
+
 UserSchema.pre('save', function(next){
 	var user = this,
 		token = "",
 		verifyUrl = "";
 
+
+
 	//give user activation token if needed
-	if(user.activationToken === '' || user.activationToken === null) {
+	if(!user.activationToken === '' || user.activationToken === null) {
 		//create random string to verify against
 		crypto.randomBytes(48, function(ex, buf) {
 		  token = buf.toString('hex');
