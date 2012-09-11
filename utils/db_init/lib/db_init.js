@@ -118,6 +118,46 @@ async.series([
 	},
     function(callback){
         /**
+		 * Users
+		 */
+	
+		var dataType = 'users',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+
+     		models.user.createUserWithPassword({
+				email : _data.email,
+			  	name : _data.name,
+			  	locale: _data.locale,
+			  	active : _data.active,
+			  	admin :  _data.admin,
+			  	activationToken : _data.activationToken,
+			  	sentEmail : _data.sentEmail
+			},
+			"bitponics", //password
+			function(err, user){
+				//TODO: this isnt firing...
+			  console.log('inside user create save callback')
+			  if (!err) {
+				savedObjectIds[dataType][_data.email] = user.id;
+			    if (dataCount === 1) {
+			      callback(null, null);
+			    }
+			    dataCount--;
+				console.log("created user");
+		      } else {
+		        console.log(err);
+		      }
+
+			});
+
+		});
+    },
+    function(callback){
+        /**
 		 * Sensors
 		 */
 		var dataType = 'sensors',
@@ -134,6 +174,7 @@ async.series([
 			});
 			
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.code] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -141,13 +182,41 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created sensor");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
 
 		    });
 
+		});
+    },
+    function(callback){
+        /**
+		 * Controls
+		 */
+		var dataType = 'controls',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+		    var dataObj = new models.control({
+				name: _data.name
+			});
+			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		      if (!err) {
+		        console.log("created controls");
+		      } else {
+		        console.log(err);
+		      }
+
+		    });
 		});
     },
     function(callback){
@@ -166,6 +235,7 @@ async.series([
 			});
 			
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -173,7 +243,6 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created sensor");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
@@ -192,28 +261,78 @@ async.series([
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
+		
+			_data.sensorMap.forEach(function(s){
+				s.sensor = eval(s.sensor);
+			});
+
+			console.dir(_data.sensorMap);
+
+		    var dataObj = new models.deviceType({
+				name: _data.name,
+				firmwareVersion: _data.firmwareVersion,
+				microprocessor: _data.microprocessor,
+				sensorMap: _data.sensorMap
+			});
+
+			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		      if (!err) {
+		        console.log("created: " + dataType);
+		      } else {
+		        console.log(err);
+		      }
+
+		    });
+		    
+		});
+    },
+    function(callback){
+        /**
+		 * Devices
+		 */
+		var dataType = 'devices',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
 			
 			//first, for each type of sensor in sensorMap, get ObjectId
 			models.sensor.find(function (err, sensors) {
-				sensors.forEach(function(s){
-					_data.sensorMap.forEach(function(ss, index){
-						if(ss.outputId.toLowerCase() === s.code){
-							//link sensor type to its ObjectId
-							ss.sensor = s._id;
-						}
+
+				_data.users.forEach(function(u){
+					u = eval(u);
+				});
+
+				if(_data.sensorMap.length){
+					_data.sensorMap.forEach(function(s){
+						s.sensor = eval(s.sensor);
 					});
+				}
+
+				_data.controlMap.forEach(function(c){
+					c.control = eval(c.control);
 				});
 
 				console.dir(_data.sensorMap);
 
-			    var dataObj = new models.deviceType({
-					name: _data.name,
-					firmwareVersion: _data.firmwareVersion,
-					microprocessor: _data.microprocessor,
-					sensorMap: _data.sensorMap
+			    var dataObj = new models.device({
+					id: _data.id,
+					deviceType: eval(_data.deviceType),
+					name : _data.name,
+					users : users,
+					sensorMap : [sensorMap],
+					controlMap : [controlMap]
 				});
 
 				dataObj.save(function (err, doc) {
+			      savedObjectIds[dataType][_data.name] = doc.id;
 			      if (dataCount === 1) {
 			      	 callback(null, null);
 			      }
@@ -221,7 +340,6 @@ async.series([
 			      
 			      if (!err) {
 			        console.log("created: " + dataType);
-			        savedObjectIds[dataType][_data.name] = doc.id;
 			      } else {
 			        console.log(err);
 			      }
@@ -248,6 +366,7 @@ async.series([
 				name: _data.name
 			});
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -255,7 +374,6 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created light");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
@@ -281,6 +399,7 @@ async.series([
 				numberOfPlants: _data.numberOfPlants
 			});
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -288,7 +407,6 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created grow system");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
@@ -310,6 +428,7 @@ async.series([
 				name: _data.name
 			});
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -317,7 +436,6 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created controls");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
@@ -338,7 +456,7 @@ async.series([
 
 			if(_data.controlMessage){
 				if(_data.controlMessage.controlReference){
-					_data.controlMessage.controlReference = savedObjectIds['lights']['fluorescent'];
+					_data.controlMessage.controlReference = eval(_data.controlReference);
 				}else{
 					_data.controlMessage.controlReference = "";
 				}
@@ -356,13 +474,16 @@ async.series([
 				recurrence: _data.recurrence
 			});
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.description] = doc.id;
+
 		      if (dataCount === 1) {
-		      	savedObjectIds[dataType][_data.description] = doc.id;
 		      	callback(null, null);
 		      }
+		      
 		      dataCount--;
 		      
 		      if (!err) {
+		      	console.log(dataCount);
 		        console.log("created action");
 		      } else {
 		        console.log(err);
@@ -376,27 +497,24 @@ async.series([
 		 * idealRanges
 		 */
 	
-	/*	var dataType = 'idealRanges',
+		var dataType = 'idealRanges',
 			dataCount = data[dataType].length;
 
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-			
-			console.log("savedObjectIds['actions']['Light levels have dropped. Turn on supplemental lighting.']" + 
-				savedObjectIds['actions']['Light levels have dropped. Turn on supplemental lighting.'])
-			console.log("savedObjectIds['actions']['Light levels above recommendations. Turn off any supplemental lights.']" + 
-				savedObjectIds['actions']['Light levels above recommendations. Turn off any supplemental lights.'])
-		    
+
 		    var dataObj = new models.idealRange({
 				name: _data.name,
-				sensor: savedObjectIds['lights']['fluorescent'],
+				sensor: eval(_data.sensor),
 				valueRange: _data.valueRange,
 				applicableTimeSpan: _data.applicableTimeSpan,
-				actionBelowMin : savedObjectIds['actions']['Light levels have dropped. Turn on supplemental lighting.'],
-				actionAboveMax : savedObjectIds['actions']['Light levels above recommendations. Turn off any supplemental lights.']
+				actionBelowMin : eval(_data.actionBelowMin),
+				actionAboveMax : eval(_data.actionAboveMax)
 			});
+
 			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
@@ -404,13 +522,105 @@ async.series([
 		      
 		      if (!err) {
 		        console.log("created idealRange");
-		        savedObjectIds[dataType][_data.name] = doc.id;
 		      } else {
 		        console.log(err);
 		      }
 
 		    });
 		});
-	*/
+    },
+    function(callback){
+        /**
+		 * Phases
+		 */
+	
+		var dataType = 'phases',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+			var actions = [], idealRanges = [];
+			_data.actions.forEach(function(action){
+				actions.push(eval(action));
+			})
+			_data.idealRanges.forEach(function(idealRange){
+				idealRanges.push(eval(idealRange));
+			})
+
+		    var dataObj = new models.phase({
+				name: _data.name,
+				expectedNumberOfDays: _data.expectedNumberOfDays,
+				light: eval(_data.light),
+				actions: actions,
+				idealRanges: idealRanges
+			});
+
+			dataObj.save(function (err, doc) {
+			  savedObjectIds[dataType][_data.name] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		      if (!err) {
+		        console.log("created phase");
+		      } else {
+		        console.log(err);
+		      }
+
+		    });
+		});
+    },
+    function(callback){
+        /**
+		 * Grow Plans
+		 */
+	
+		var dataType = 'growPlans',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+			var actions = [], idealRanges = [];
+			_data.actions.forEach(function(action){
+				actions.push(eval(action));
+			})
+			_data.idealRanges.forEach(function(idealRange){
+				idealRanges.push(eval(idealRange));
+			})
+
+		    var dataObj = new models.growPlans({
+				createdByUserId: eval(_data.createdByUserId),
+				name: _data.name,
+				description: _data.description,
+				plants: _data.plants,
+				expertiseLevel: _data.expertiseLevel,
+				growSystem: eval(_data.growSystem),
+				growMedium: _data.growMedium,
+				nutrients: _data.nutrients.map(function(item){ return eval(item) }),
+				sensors: _data.sensors.map(function(item){ return eval(item) }),
+				controls: _data.controls.map(function(item){ return eval(item) }),
+				phases: _data.phases.map(function(item){ return eval(item) })
+			});
+
+		    console.log(dataObj);
+
+			dataObj.save(function (err, doc) {
+			  savedObjectIds[dataType][_data.name] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		      if (!err) {
+		        console.log("created phase");
+		      } else {
+		        console.log(err);
+		      }
+
+		    });
+		});
     }
 ]);
