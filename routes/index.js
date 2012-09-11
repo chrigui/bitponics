@@ -100,13 +100,11 @@ module.exports = function(app){
 	        user.save();
 	        res.render('register', {
 	          title: 'Register Success - Active user.',
-	          newUser: user,
-	          appUrl : app.config.appUrl
+	          newUser: user
 	        });
 	      } else {
 	        res.render('register', {
-	          title: 'Register Failed - No matching token.',
-	          appUrl : app.config.appUrl
+	          title: 'Register Failed - No matching token.'
 	        });
 	      }
 	    });
