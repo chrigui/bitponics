@@ -9,7 +9,7 @@ var DeviceTypeSchema = new Schema({
 	firmwareVersion: { type: Number, required: true }, //‘0.1’
 	microprocessor: { type: String, required: true },
 	sensorMap: [{
-		outputId: { type: String, required: true }, //‘ph’
+		outletId: { type: String, required: true }, //‘ph’
 		sensor : { type: ObjectId, ref: 'Sensor', required: true }
 	}]
 });
