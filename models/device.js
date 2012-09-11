@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
   	useTimestamps = mongooseTypes.useTimestamps,
-  	ObjectId = Schema.ObjectId;
+  	ObjectId = Schema.ObjectId,
+  	DeviceTypeModel = require('./deviceType').model;
 
 var DeviceSchema = new Schema({
 	id: { type: String, required: true, unique: true }, //mac address
@@ -26,8 +27,17 @@ var DeviceSchema = new Schema({
 DeviceSchema.plugin(useTimestamps);
 
 DeviceSchema.pre('save', function(next){
-  //TODO: preload default sensorMap if no sensorMap defined
-  next();
+  var device = this;
+
+  //if sensorMap is undefined then use the deviceType's default sensorMap
+  if(!device.sensorMap){
+  	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
+  		if(!err){
+  			device.sensorMap = deviceType.sensorMap;
+  			next();
+  		}
+  	});
+  }
 });
 
 exports.schema = DeviceSchema;
