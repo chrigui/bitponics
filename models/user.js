@@ -152,7 +152,7 @@ UserSchema.pre('save', function(next){
 		  
 		  	//send activation email if not activated user
 			if(!user.active && !user.sentEmail){
-				//TODO:send email with activationToken in link back to /register
+				
 				// create reusable transport method (opens pool of SMTP connections)
 				var smtpTransport = nodemailer.createTransport("SMTP",{
 				    service: "Gmail",

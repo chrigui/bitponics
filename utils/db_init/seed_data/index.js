@@ -1,4 +1,28 @@
 var data = {
+
+
+	users: [
+		{
+			email : "jack.bishop1@gmail.com",
+		  	name : "Jack Bishop",
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "1234567890",
+		  	sentEmail : false
+		},
+		{
+			email : "jack@bitponics.com",
+		  	name : "Jack Bishop",
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+	],
+
+
 	sensors: [
 		{
 			name : "pH",
@@ -66,6 +90,30 @@ var data = {
 			code: "vis"
 		}
 	],
+
+
+	controls: [
+		{
+			name: "Water Pump"
+		},
+		{
+			name: "Humidifier"
+		},
+		{
+			name: "Heater"
+		},
+		{
+			name: "Fan"
+		},
+		{
+			name: "Air Conditioner"
+		},
+		{
+			name: "Light"
+		}
+	],
+
+
 	nutrients: [
 		{
 			brand: "Humbolt Nutrients",
@@ -80,6 +128,8 @@ var data = {
 			name: "Micro"
 		},
 	],
+
+
 	deviceTypes: [
 		{
 			name: "Bitponics Beta Device 1",
@@ -87,55 +137,81 @@ var data = {
 			microprocessor: "blah",
 			sensorMap: [
 				{ 
-					outputId: "ph",
-					sensor: "{sensor}" // ref to pH Sensor instance"s ObjectId
+					outletId: "ph",
+					sensor: "savedObjectIds['sensors']['ph']" // ref to pH Sensor instance"s ObjectId
 				},
-				{	outputId: "ec",
-					sensor:	"{sensor}"
-				},
-				{
-					outputId: "tds",
-					sensor: "{sensor}"
+				{	outletId: "ec",
+					sensor:	"savedObjectIds['sensors']['ec']"
 				},
 				{
-					outputId: "sal",
-					sensor: "{sensor}"
+					outletId: "tds",
+					sensor: "savedObjectIds['sensors']['tds']"
 				},
 				{
-					outputId: "air",
-					sensor: "{sensor}"
+					outletId: "sal",
+					sensor: "savedObjectIds['sensors']['sal']"
 				},
 				{
-					outputId: "water",
-					sensor: "{sensor}"
+					outletId: "air",
+					sensor: "savedObjectIds['sensors']['air']"
 				},
 				{
-					outputId: "hum",
-					sensor: "{sensor}"
+					outletId: "water",
+					sensor: "savedObjectIds['sensors']['water']"
 				},
 				{
-					outputId: "co2",
-					sensor: "{sensor}"
+					outletId: "hum",
+					sensor: "savedObjectIds['sensors']['hum']"
 				},
 				{
-					outputId: "lux",
-					sensor: "{sensor}"
+					outletId: "co2",
+					sensor: "savedObjectIds['sensors']['co2']"
 				},
 				{
-					outputId: "ir",
-					sensor: "{sensor}"
+					outletId: "lux",
+					sensor: "savedObjectIds['sensors']['lux']"
+				},
+				{
+					outletId: "ir",
+					sensor: "savedObjectIds['sensors']['ir']"
 				},
 				{	
-					outputId: "full",
-					sensor: "{sensor}"
+					outletId: "full",
+					sensor: "savedObjectIds['sensors']['full']"
 				},
 				{
-					outputId: "vis",
-					sensor: "{sensor}"
+					outletId: "vis",
+					sensor: "savedObjectIds['sensors']['vis']"
 				}
 			]
 		}
 	],
+
+	devices: [
+		{
+			id: "1234567890", //mac address
+			deviceType: "savedObjectIds['deviceTypes']['Bitponics Beta Device 1']",
+			name : "Bitponics Device 1",
+			users : ["savedObjectIds['users']['jack@bitponics.com']"],
+			// sensorMap : [
+		 //      { 
+			//     sensor : { type: ObjectId, ref: 'Sensor' },
+			//     outletId : { type: String }
+			//   }
+			// ],
+			controlMap : [ 
+			  {
+			    control : "savedObjectIds['control']['Fan']",
+			    outletId : "0"
+			  },
+			  {
+			    control : "savedObjectIds['control']['Humidifier']",
+			    outletId : "1"
+			  }
+			]
+		}
+	],
+
 	lights: [
 		{
 			type: "fluorescent",
@@ -144,14 +220,20 @@ var data = {
 			name : "fluorescent"
 		},
 		{
+			type: "compact fluorescent",
+			watts: 40,
+			brand : "lights.com",
+			name : "compact fluorescent"
+		},
+		{
 			type: "metal halide",
-			watts: 90,
+			watts: 250,
 			brand : "lights.com",
 			name : "metal halide"
 		},
 		{
 			type: "high pressure sodium (HPS)",
-			watts: 120,
+			watts: 300,
 			brand : "lights.com",
 			name : "high pressure sodium (HPS)"
 		},
@@ -160,8 +242,16 @@ var data = {
 			watts: 10,
 			brand : "lights.com",
 			name : "LED"
+		},
+		{
+			type: "LED",
+			watts: 10,
+			brand : "lights.com",
+			name : "LED"
 		}
 	],
+
+
 	growSystems: [
 		{
 			name: "Drip",
@@ -192,17 +282,8 @@ var data = {
 			numberOfPlants: 6
 		}
 	],
-	controls: [
-		{
-			name: "Water Pump"
-		},
-		{
-			name: "Humidifier"
-		},
-		{
-			name: "Some Control"
-		}
-	],
+
+
 	actions: [
 		{
 			description: "Transplant seedlings into the grow bed",
@@ -224,7 +305,7 @@ var data = {
 		}, // end flush Action
 		{
 			description: "Water pump cycle",
-			control: "{Pump}", // reference to Pump control
+			control: "savedObjectIds['controls']['Water Pump']", // reference to Pump control
 			startTime: 0,
 			cycle: {
 				states: [
@@ -246,7 +327,7 @@ var data = {
 		{
 			description: "Turn light on",
 			controlMessage: {
-				controlReference : "{Light}",
+				controlReference : "savedObjectIds['lights']['fluorescent']",
 				valueToSend: 255
 			},
 			startTime: 21600000, //6 hours
@@ -259,7 +340,7 @@ var data = {
 		{
 			description: "Turn light off",
 			controlMessage: {
-				controlReference : "{Light}",
+				controlReference : "savedObjectIds['lights']['fluorescent']",
 				valueToSend: 0
 			},
 			startTime: 72000000, //20 hours
@@ -272,22 +353,50 @@ var data = {
 		{
 			description: "Light levels have dropped. Turn on supplemental lighting.",
 			controlMessage: {
-				controlReference: "{Light}",
+				controlReference: "savedObjectIds['lights']['fluorescent']",
 				valueToSend: 255
 			}
 		},
 		{
 			description: "Light levels above recommendations. Turn off any supplemental lights.",
 			controlMessage: {
-				controlReference: "{Light}",
+				controlReference: "savedObjectIds['lights']['fluorescent']",
 				valueToSend: 0
 			}
+		},
+		{
+			description: "Air temperature is too high. Turn on air conditioner.",
+			controlMessage: {
+				controlReference: "savedObjectIds['controls']['Air Conditioner']",
+				valueToSend: 255
+			}
+		},
+		{
+			description: "Air temperature is too low. Turn on heater.",
+			controlMessage: {
+				controlReference: "savedObjectIds['controls']['Heater']",
+				valueToSend: 255
+			}
+		},
+		{
+			message: "Pollinate any new blossoms using a watercolor brush to distribute",
+			controlMessage: undefined,
+			startTime: 0, // trigger as soon as the phase starts
+			recurrence: {
+				repeatType: "Weekly",
+				frequency: 2,
+				numberOfTimes: undefined  // undefined for infinite recurrence
+			},
+			cycle: undefined
 		}
+
 	],
+
+
 	idealRanges: [
 		{
-			name: "Ideal Light",
-			sensor: "{light sensor}",
+			name: "Ideal Light - Vegetative",
+			sensor: "savedObjectIds['lights']['fluorescent']",
 			valueRange: {
 				min: 2000,
 				max: 10000
@@ -296,22 +405,221 @@ var data = {
 				startTime: 21600000, //6am
 				endTime: 64800000 //10pm
 			},
-			actionBelowMin : "{turn on light action}",
-			actionAboveMax : "{turn off light action}"
+			actionBelowMin : "savedObjectIds['actions']['Light levels have dropped. Turn on supplemental lighting.']",
+			actionAboveMax : "savedObjectIds['actions']['Light levels above recommendations. Turn off any supplemental lights.']"
+		},
+		{
+			name: "Ideal Light - Bloom",
+			sensor: "savedObjectIds['lights']['fluorescent']",
+			valueRange: {
+				min: 2000,
+				max: 10000
+			},
+			applicableTimeSpan: {
+				startTime: 28800000, //8am
+				endTime: 72000000 //8pm
+			},
+			actionBelowMin : "savedObjectIds['actions']['Light levels have dropped. Turn on supplemental lighting.']",
+			actionAboveMax : "savedObjectIds['actions']['Light levels above recommendations. Turn off any supplemental lights.']"
+		},
+		{
+			name: "Ideal Air Temp",
+			sensor: "savedObjectIds['sensors']['air']",
+			valueRange: {
+				min: 30,
+				max: 60
+			},
+			actionBelowMin : "savedObjectIds['actions']['Air temperature is too low. Turn on heater.']",
+			actionAboveMax : "savedObjectIds['actions']['Air temperature is too high. Turn on air conditioner.']"
 		}
 	],
+
+
 	phases: [
-		{}
+		{
+			name : 'Vegetative',
+			description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
+			expectedTimeSpan: undefined,
+			lightingType: "savedObjectIds['lights']['metal halide']",
+			actions: [
+				"savedObjectIds['actions']['Transplant seedlings into the grow bed']",
+				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
+				"savedObjectIds['actions']['Water pump cycle']",
+				"savedObjectIds['actions']['Turn light on']",
+				"savedObjectIds['actions']['Turn light off']"
+			],
+			idealRanges: [
+				"savedObjectIds['idealRanges']['Ideal Light - Vegetative']",
+				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+			]
+		},
+		{
+			name : "Blooming",
+			description: "Open-ended booming phase. After about 70 days, you should begin to see blossoms.",
+			expectedTimeSpan: undefined,
+			lightingType: "savedObjectIds['lights']['metal halide']",
+			actions: [
+				"savedObjectIds['actions']['Pollinate any new blossoms using a watercolor brush to distribute']",
+				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
+				"savedObjectIds['actions']['Water pump cycle']",
+				"savedObjectIds['actions']['Turn light on']",
+				"savedObjectIds['actions']['Turn light off']"
+			],
+			idealRanges: [
+				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
+				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+			]
+		},
+		{
+			name : "Fruiting",
+			description: "Fruiting phase. Continue to pollinate blossoms and harvest fruit when fully ripened (red).",
+			expectedTimeSpan: undefined,
+			lightingType: "savedObjectIds['lights']['compact fluorescent']",
+			actions: [
+				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
+				"savedObjectIds['actions']['Water pump cycle']",
+				"savedObjectIds['actions']['Turn light on']",
+				"savedObjectIds['actions']['Turn light off']"
+			],
+			idealRanges: [
+				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
+				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+			]
+		}
 	],
-	grow_plans: [
-		{}
+
+	growPlans: [
+		{
+			//parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
+			createdByUserId: "savedObjectIds['users']['jack@bitponics.com']",
+			name: "Tomato",
+			description: "Growing indeterminate organic tomatoes (Redfield Beauty OG) for year round fruiting. Growing in a 3’x3’ grow bed filled with 4\" of hydroton.",
+			plants: ["tomatoes"],
+			expertiseLevel: "intermediate",
+			growSystem: "savedObjectIds['growSystems']['Drip']",
+			growMedium: "hydroton",
+			nutrients: [
+				"savedObjectIds['nutrients']['Grow']",
+				"savedObjectIds['nutrients']['Bloom']",
+				"savedObjectIds['nutrients']['Micro']"
+			],
+			sensors: [
+				"savedObjectIds['sensors']['ph']",
+				"savedObjectIds['sensors']['air']",
+				"savedObjectIds['sensors']['water']",
+				"savedObjectIds['sensors']['ec']",
+				"savedObjectIds['sensors']['humidity']"
+			],
+			controls: [
+				"savedObjectIds['controls']['Light']"
+			],
+			phases: [
+				"savedObjectIds['phases']['Vegetative']",
+				"savedObjectIds['phases']['Blooming']",
+				"savedObjectIds['phases']['Fruiting']"
+			]
+		}
 	],
-	grow_plan_instances: [
-		{}
-	],
-	users: [
-		{}
+
+
+	growPlanInstances: [
+		{
+			users : [
+				"savedObjectIds['users']['jack@bitponics.com']"
+			],
+			growPlan : "savedObjectIds['growPlans']['Tomato']",
+			device : "savedObjectIds['devices']['1234567890']", //TODO: bitponics device
+			startDate: 1347364818821, // 09/11/2012
+			endDate: 1351742400000, // 11/01/2012
+		    active: true,
+			phases: [
+				{
+					phase: "savedObjectIds['phases']['Vegetative']",
+					startDate: 1347364818821, // 09/11/2012
+					endDate: 1351742400000, // 11/01/2012
+					active: true
+				},
+				{
+					phase: "savedObjectIds['phases']['Blooming']",
+					startDate: 1351828800000, // 11/02/2012
+					endDate: 1357016400000, // 01/01/2013
+					active: false
+				},
+				{
+					phase: "savedObjectIds['phases']['Fruiting']",
+					startDate: 1357102800000, // 01/02/2013
+					endDate: 1362200400000, // 03/01/2013
+					active: false
+				}
+			],
+			sensorLogs: [
+				{
+					sensor: "savedObjectIds['sensors']['ph']",
+					value: 6.25
+				},
+				{
+					sensor: "savedObjectIds['sensors']['ph']",
+					value: 7.25
+				},
+				{
+					sensor: "savedObjectIds['sensors']['ph']",
+					value: 8.25
+				},
+				{
+					sensor: "savedObjectIds['sensors']['ph']",
+					value: 6.25
+				},
+				{
+					sensor: "savedObjectIds['sensors']['ph']",
+					value: 6.25
+				},
+				{
+					sensor: "savedObjectIds['sensors']['air']",
+					value: 30
+				},
+				{
+					sensor: "savedObjectIds['sensors']['air']",
+					value: 35
+				},
+				{
+					sensor: "savedObjectIds['sensors']['water']",
+					value: 25
+				}
+			],
+			controlLogs: [
+				{
+					control: "savedObjectIds['controls']['Fan']",
+					value: 0
+				},
+				{
+					control: "savedObjectIds['controls']['Fan']",
+					value: 1
+				},
+				{
+					control: "savedObjectIds['controls']['Fan']",
+					value: 0
+				}
+			],
+			photoLogs: [
+				{
+					url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
+					tags: ["tomato, seedling, grow"]
+				},
+				{
+					url: "http://blog.japantimes.co.jp/japan-pulse/files/2012/08/tomato1.jpg",
+					tags: ["tomato, fruiting"]
+				}
+			],
+			genericLogs: [
+				{
+					entry: "Tomatoes are awesome.",
+					tags: ["awesome"],
+					logType: ""
+				}
+			]
+		}
 	]
+
 }
 
 module.exports = data;
