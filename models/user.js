@@ -87,6 +87,7 @@ UserSchema.method('verifyPassword', function(password, callback) {
   bcrypt.compare(password, this.hash, callback);
 });
 
+
 UserSchema.static('authenticate', function(email, password, callback) {
   this.findOne({ email: email }, function(err, user) {
       if (err) { return callback(err); }
@@ -97,6 +98,19 @@ UserSchema.static('authenticate', function(email, password, callback) {
         return callback(null, user);
       });
     });
+});
+
+
+/**
+ * Used by Passport HMAC strategy
+ */
+UserSchema.static('getByPublicKey', function(apiPublicKey, callback) {
+  User.findOne({ apiPublicKey: apiPublicKey }, function(err, user) {
+      if (err) { return callback(err); }
+      if (!user) { return callback(null, false); }
+
+      return callback(null, user, user.apiPrivateKey);
+  });
 });
 
 UserSchema.plugin(mongoosePlugins.useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
@@ -110,7 +124,7 @@ UserSchema.pre('save', function(next){
 			if (ex) throw ex;
 		  	var keysSource = buf.toString(),
 		  		publicKey = keysSource.substr(0, 16),
-		  		privateKey = keysSource(16, 32);
+		  		privateKey = keysSource.substr(16, 32);
 		  	
 		  	user.apiPublicKey = publicKey;
 		  	user.apiPrivateKey = privateKey;

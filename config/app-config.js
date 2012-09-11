@@ -39,7 +39,8 @@ module.exports = function(app){
 	  app.use(express.logger(':method :url :status'));
 
 	  app.use (function(req, res, next) {
-		if(req.headers['content-type'] == 'text/csv'){
+		if(req.headers['content-type'] == 'text/csv' || 
+			(req.headers['authorization'] && req.headers['authorization'].indexOf('HMAC') === 0)){
 		    var data='';
 		    req.setEncoding('utf8');
 		    req.on('data', function(chunk) { 
@@ -82,7 +83,6 @@ module.exports = function(app){
 
 	switch(app.settings.env){
 	    case 'local':
-	      	break;
 	    case 'development':
 	    case 'staging':
 	    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
@@ -99,12 +99,7 @@ module.exports = function(app){
 
 	    		if (!req.user){
 	    			if (authorization && authorization.split(' ')[0] == 'HMAC'){
-	    				// TODO : call the HMAC Passport strategy 
-	    				/*
-						passport.authenticate('hmac', function(err, user, info){
-	
-						})(req, res, next);
-	    				*/
+	    				passport.authenticate('hmac', {session: false})(req, res, next);
 	    			} else {
 	    				connect.basicAuth('bitponics', '8bitpass')(req, res, next);
 	    			}

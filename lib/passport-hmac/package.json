@@ -1,0 +1,27 @@
+{
+  "name": "passport-hmac",
+  "version": "0.1.6",
+  "description": "HMAC authentication strategy for Passport.",
+  "author": {
+    "name": "Amit Kumar",
+    "email": "themit@gmail.com",
+    "url": "http://www.amitkumar.com/"
+  },
+  "main": "./index.js",
+  "engines": {
+    "node": ">= 0.4.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
+  "keywords": [
+    "passport",
+    "local",
+    "auth",
+    "authn",
+    "authentication"
+  ]
+}

@@ -1,5 +1,6 @@
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    HmacStrategy = require('../lib/passport-hmac').Strategy,
     User = require('../models/user').model,    
     oauthConfigs = {
         fb: {
@@ -25,6 +26,9 @@ passport.use(new LocalStrategy({
     });
   }
 ));
+
+passport.use(new HmacStrategy(User.getByPublicKey));
+
       
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
