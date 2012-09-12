@@ -31,6 +31,7 @@ module.exports = function(app) {
    *  jQuery.post("/api/devices", {
    *    "id": "macaddress"
    *    "name": "pump",
+   *    "owner": "userid",
    *    "users": ["userid", "userid1", "userid2"],
    *    "sensors": ["sensorid", "sensorid1", "sensorid2"],
    *    "controlMap": [{ 
@@ -42,7 +43,7 @@ module.exports = function(app) {
    *        "outletId": "outlet2"
    *    }]
    *  }, function (data, textStatus, jqXHR) {
-   *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
+   *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
   app.post('/api/device', function (req, res){
@@ -52,19 +53,22 @@ module.exports = function(app) {
     device = new DeviceModel({
       id: req.body.id,
       name: req.body.name,
+      deviceType: req.body.deviceType,
+      owner: req.body.owner,
       users : req.body.users,
       sensors : req.body.sensors,
-      controlMap : req.body.controlMap,
+      controlMap : req.body.controlMap
     });
     device.save(function (err) {
       if (!err) {
-        return console.log("created device");
+        console.log("created device");
+        return res.send(device);
       } else {
         res.send(500);
         return console.log(err);
       }
     });
-    return res.send(device);
+    
   });
 
   /*
@@ -79,7 +83,7 @@ module.exports = function(app) {
    * });
    */
   app.get('/api/device/:id', function (req, res){
-    return DeviceModel.findById(req.params.id, function (err, device) {
+    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       if (!err) {
         return res.send(device);
       } else {
@@ -108,7 +112,7 @@ module.exports = function(app) {
    * });
    */
   app.put('/api/device/:id', function (req, res){
-    return DeviceModel.findById(req.params.id, function (err, device) {
+    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       device.title = req.body.title;
       return device.save(function (err) {
         if (!err) {
@@ -178,22 +182,50 @@ module.exports = function(app) {
     }
 
     //get device by mac address id
-    return DeviceModel.findOne({ id: req.params.id }, function(err, device) {
+    return DeviceModel.findOne({ deviceId: req.params.id }, function(err, device) {
+      if (err){ 
+        res.send(500);
+        return winston.log(err);
+      }
+      if (!device){ 
+        res.send(500);
+        return console.log('attempted log to nonexistent device');
+      }
+
+      device.recentSensorLogs = device.recentSensorLogs || [];
+      sensorLogs.forEach(function(log){
+        device.recentSensorLogs.push(log);
+      });
+      device.save(function (err) {
+        if (err) winston.error(err);
+      });
+
       //get device's current grow plan and push logs to it
-      return GrowPlanInstanceModel.findOne({ device: device._id }, function (err, growPlanInstance) {
-        sensorLogs.forEach(function(log){
-          growPlanInstance.sensorLogs.push(log);
-        });
-        return growPlanInstance.save(function (err) {
-          if (!err) {
-            return res.csv([
-              ['someresponse', 'someresponse122412']
-            ]);
-          } else {
-            console.log('growPlanInstance error: '+err);
-          }
-          return res.send(growPlanInstance);
-        });
+      return GrowPlanInstanceModel.findOne({ device: device._id, active: true }, function (err, growPlanInstance) {
+        if (err){ 
+          res.send(500);
+          return winston.log(err);
+        }
+        if (!growPlanInstance){ 
+          
+          return console.log('no grow plan instance for the device ' + device._id);
+        } 
+        // Else we have a growPlanInstance
+        else {
+          sensorLogs.forEach(function(log){
+            growPlanInstance.sensorLogs.push(log);
+          });
+          return growPlanInstance.save(function (err) {
+            if (!err) {
+              return res.csv([
+                ['someresponse', 'someresponse122412']
+              ]);
+            } else {
+              console.log('growPlanInstance error: '+err);
+            }
+            return res.send(growPlanInstance);
+          });
+        }
       });
     })
   });
@@ -214,7 +246,7 @@ module.exports = function(app) {
    * });
    */
   app.delete('/api/device/:id', function (req, res){
-    return DeviceModel.findById(req.params.id, function (err, device) {
+    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       return device.remove(function (err) {
         if (!err) {
           console.log("removed");

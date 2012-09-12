@@ -1,14 +1,16 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	useTimestamps = mongooseTypes.useTimestamps,
+  	mongoosePlugins = require('../lib/mongoose-plugins'),
+	useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId,
   	DeviceTypeModel = require('./deviceType').model;
 
 var DeviceSchema = new Schema({
-	id: { type: String, required: true, unique: true }, //mac address
-	deviceType: { type: ObjectId, ref: 'DeviceType', required: true },
+	deviceId: { type: String, required: true, unique: true }, //mac address
+	deviceType: { type: ObjectId, ref: 'DeviceType', required: false },
 	name : { type: String },
+	owner : { type: ObjectId, ref: 'User', required: true},
 	users : [ { type: ObjectId, ref: 'User', required: true }],
 	sensorMap : [
       { 
@@ -21,6 +23,14 @@ var DeviceSchema = new Schema({
 	    control : { type: ObjectId, ref: 'Control' },
 	    outletId : { type: String }
 	  }
+	],
+	recentSensorLogs : [
+		{
+			sensor: { type: ObjectId, ref: 'Sensor', required: true },
+			value: { type: Number },
+			//timestamp: { type: Date, required: true }
+			timestamp: { type: Date, required: true, default: Date.now }
+		}
 	]
 });
 

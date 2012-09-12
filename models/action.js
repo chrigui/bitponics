@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	useTimestamps = mongooseTypes.useTimestamps,
+  	mongoosePlugins = require('../lib/mongoose-plugins'),
+	useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId;
 
 var ActionSchema = new Schema({

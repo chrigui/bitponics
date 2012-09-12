@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
+	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
 	UserSchema = undefined,
@@ -113,7 +114,7 @@ UserSchema.static('getByPublicKey', function(apiPublicKey, callback) {
   });
 });
 
-UserSchema.plugin(mongoosePlugins.useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 // give user API keys if needed 
 UserSchema.pre('save', function(next){
