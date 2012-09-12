@@ -5,7 +5,7 @@ block css
 
 block content
 
-   - if (!user)
+   - if (!( user && user.id))
     header.default-border-b
          h1
           span Not Authenticated
@@ -31,7 +31,30 @@ block content
         li
           div Once you're connected, click 
             a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to device 
+        li#enter-wifi-data
+          div Hooray! We've connected to your Bitponics device, and now you're ready to tell it how to connect to your WiFi network. 
+            form#wifi-form(action='')
+              ul 
+                li
+                  label(for='wifi-ssid') SSID
+                    input#wifi-ssid(name='wifi-ssid')
+                li
+                  label(for='wifi-pass') PASS
+                    input#wifi-pass(name='wifi-pass')
+                li
+                  label(for='wifi-mode') MODE
+                    input#wifi-mode(name='wifi-mode')
+                li
+                  button#submit-wifi-form(type='submit') Go
              
 
 block footer-scripts
+  - if (user && user._id)
+    script
+      Bitponics.currentUser = {
+        email: '!{user.email}',
+        publicKey: '!{user.apiPublicKey}',
+        privateKey: '!{user.apiPrivateKey}'
+      };
+
   script(src='/assets/js/setup.js')
