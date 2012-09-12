@@ -1,5 +1,6 @@
 $(function(){
-	var deviceUrl = 'http://169.254.1.1';
+	var deviceUrl = 'http://169.254.1.1',
+		macAddress = '';
 
 
 	var postToDevice = function(){
@@ -11,11 +12,11 @@ $(function(){
 			SKEY: '16 char string22'   
 		},
 		postDataString = 
-			'SSID=' + postData.SSID + '&' +
-			'PASS=' + postData.PASS + '&' +
-			'MODE=' + postData.MODE + '&' +
-			'SKEY=' + encodeURIComponent(postData.SKEY) + '&' +
-			'PKEY=' + encodeURIComponent(postData.PKEY);
+			'SSID=' + $('#wifi-ssid').val() + '&' +
+			'PASS=' + $('#wifi-pass').val() + '&' +
+			'MODE=' + $('#wifi-mode').val() + '&' +
+			'SKEY=' + encodeURIComponent(Bitponics.currentUser.privateKey) + '&' +
+			'PKEY=' + encodeURIComponent(Bitponics.currentUser.publicKey);
 
 		$.ajax({
 			url: deviceUrl,
@@ -33,6 +34,12 @@ $(function(){
 		});	
 	};
 
+	$('#wifi-form').submit(function(e){
+		e.preventDefault();
+
+		postToDevice();
+	});
+
 	$('#connect-to-device').click(function(){
 		$.ajax({
 			url : deviceUrl,
@@ -41,9 +48,12 @@ $(function(){
 			success: function(data){
 				console.log(data);
 				
-				var macAddress = data.mac;
+				macAddress = data.mac;
 
-				postToDevice();
+				$('#enter-wifi-data').show();
+				//postToDevice();
+
+
 			},
 			error: function(jqXHR, textStatus, error){
 				console.log('error', jqXHR, textStatus, error);
