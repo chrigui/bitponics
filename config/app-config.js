@@ -97,13 +97,15 @@ module.exports = function(app){
 	    	app.use(function(req, res, next){
 	    		var authorization = req.headers.authorization;
 
-	    		if (!req.user){
+	    		if (req.user){ 
+	    			next();
+	    		} else {
 	    			if (authorization && authorization.split(' ')[0] == 'HMAC'){
 	    				passport.authenticate('hmac', {session: false})(req, res, next);
 	    			} else {
 	    				connect.basicAuth('bitponics', '8bitpass')(req, res, next);
 	    			}
-				}
+				} 
 	    	});
 	      	break;
 	}
