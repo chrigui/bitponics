@@ -1,6 +1,7 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-	useTimestamps = mongooseTypes.useTimestamps,
+	mongoosePlugins = require('../lib/mongoose-plugins'),
+	useTimestamps = mongoosePlugins.useTimestamps,
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
   	GrowSystemSchema = require('./growSystem').schema;

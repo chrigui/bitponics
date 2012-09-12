@@ -48,7 +48,7 @@ module.exports = function(app) {
   //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
   //       Setting it manually for now, but figure out what's going on
   app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
-
+console.log(app.settings.env);
   switch(app.settings.env){
     case 'local':
       appDomain = appDomain || 'bitponics.com';
