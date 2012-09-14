@@ -21,6 +21,17 @@ var server = app.listen(process.env.PORT || 80, function(){
   console.log('app.config.appUrl = ' + app.config.appUrl);
 });
 
+if (app.settings.env === 'local'){
+  console.log('starting up https server');
+  var fs = require('fs'),
+      https = require('https');
+  var options = {
+    key: fs.readFileSync('config/ssl/local/server.key'),
+    cert: fs.readFileSync('config/ssl/local/server.crt')
+  };
+  https.createServer(options, app).listen(443);
+}
+
 
 
 /*
