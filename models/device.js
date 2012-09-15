@@ -36,19 +36,30 @@ var DeviceSchema = new Schema({
 
 DeviceSchema.plugin(useTimestamps);
 
-DeviceSchema.pre('save', function(next){
-  var device = this;
-
-  //if sensorMap is undefined then use the deviceType's default sensorMap
-  if(!device.sensorMap){
-  	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
-  		if(!err){
-  			device.sensorMap = deviceType.sensorMap;
-  			next();
-  		}
-  	});
-  }
-});
+// DeviceSchema.pre('save', function(next){
+//   var device = this;
+//   console.log('device:')
+//   console.log(device)
+//   //if sensorMap is undefined then use the deviceType's default sensorMap
+//   if(!device.sensorMap){
+//   	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
+//   		if(!err){
+//   			console.log('device.sensorMap:');
+//   			console.log(device.sensorMap);
+//   			device.sensorMap = deviceType.sensorMap;
+//   			console.log('deviceType.sensorMap:');
+//   			console.log(deviceType.sensorMap);
+//   			console.log('device.sensorMap:');
+//   			console.log(device.sensorMap);
+//   			next();
+//   		}else{
+//   			console.log('err: '+err)
+//   		}
+//   	});
+//   }else{
+//   	next();
+//   }
+// });
 
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);

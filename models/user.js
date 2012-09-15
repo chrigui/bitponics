@@ -132,6 +132,8 @@ UserSchema.pre('save', function(next){
 
 		  	next();
 	  	});
+	}else{
+		next();
 	}
 });
 
@@ -142,15 +144,14 @@ UserSchema.pre('save', function(next){
 		verifyUrl = "";
 
 
-
 	//give user activation token if needed
-	if(!user.activationToken === '' || user.activationToken === null) {
+	if(!user.activationToken) {
 		//create random string to verify against
 		crypto.randomBytes(48, function(ex, buf) {
 		  token = buf.toString('hex');
 		  user.activationToken = token;
 		  verifyUrl = 'http://bitponics.com/register?verify=' + user.activationToken;
-		  
+
 		  	//send activation email if not activated user
 			if(!user.active && !user.sentEmail){
 				
@@ -187,11 +188,15 @@ UserSchema.pre('save', function(next){
 				    next();
 				});
 
+			}else{
+				next();
 			}
 
 
 
 		});
+	}else{
+		next();
 	}
 
 	console.log('user.active:'+user.active)
