@@ -31,6 +31,7 @@ var mongoose   = require('mongoose'),
 		sensors: {},
 		nutrients: {},
 		deviceTypes: {},
+		devices: {},
 		lights: {},
 		growSystems: {},
 		controls: {},
@@ -101,16 +102,17 @@ async.series([
 					innerCallback(null,null);
 				});
 			},
-			function(innerCallback){
-				models.growPlan.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.growPlanInstance.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			}],
+			// function(innerCallback){
+			// 	models.growPlan.find().remove(function(err){
+			// 		innerCallback(null,null);
+			// 	});
+			// },
+			// function(innerCallback){
+			// 	models.growPlanInstance.find().remove(function(err){
+			// 		innerCallback(null,null);
+			// 	});
+			// }
+			],
 			function(err, results){
 				callback(null, null);
 			}
@@ -139,8 +141,6 @@ async.series([
 			},
 			"bitponics", //password
 			function(err, user){
-				//TODO: this isnt firing...
-			  console.log('inside user create save callback')
 			  if (!err) {
 				savedObjectIds[dataType][_data.email] = user.id;
 			    if (dataCount === 1) {
@@ -306,11 +306,11 @@ async.series([
 			//first, for each type of sensor in sensorMap, get ObjectId
 			models.sensor.find(function (err, sensors) {
 
-				_data.users.forEach(function(u){
-					u = eval(u);
+				_data.users.forEach(function(u,index){
+					_data.users[index] = eval(u);
 				});
 
-				if(_data.sensorMap.length){
+				if(_data.sensorMap){
 					_data.sensorMap.forEach(function(s){
 						s.sensor = eval(s.sensor);
 					});
@@ -320,30 +320,41 @@ async.series([
 					c.control = eval(c.control);
 				});
 
-				console.dir(_data.sensorMap);
-
-			    var dataObj = new models.device({
-					id: _data.id,
-					deviceType: eval(_data.deviceType),
-					name : _data.name,
-					users : users,
-					sensorMap : [sensorMap],
-					controlMap : [controlMap]
+				_data.recentSensorLogs.forEach(function(rsl){
+					rsl.sensor = eval(rsl.sensor);
 				});
 
+			    var dataObj = new models.device({
+					deviceId: _data.deviceId,
+					deviceType: eval(_data.deviceType),
+					name : _data.name,
+					owner: eval(_data.owner),
+					users : _data.users,
+					sensorMap : _data.sensorMap,
+					controlMap : _data.controlMap,
+					recentSensorLogs: _data.recentSensorLogs
+				});
+
+			    console.dir(_data)
+			    console.dir(dataObj)
+				
 				dataObj.save(function (err, doc) {
-			      savedObjectIds[dataType][_data.name] = doc.id;
+				  if (!err) {
+			        console.log("created: " + dataType);
+			      } else {
+			      	console.dir(dataObj)
+			      	console.log("err:");
+			        console.log(err);
+			      }
+
+			      //savedObjectIds[dataType][_data.name] = doc.deviceId;
 			      if (dataCount === 1) {
 			      	 callback(null, null);
 			      }
 			      dataCount--;
-			      
-			      if (!err) {
-			        console.log("created: " + dataType);
-			      } else {
-			        console.log(err);
-			      }
 
+			      
+			      
 			    });
 			    
 			});

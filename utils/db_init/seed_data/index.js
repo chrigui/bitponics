@@ -25,7 +25,7 @@ var data = {
 
 	sensors: [
 		{
-			name : "pH",
+			name: "pH",
 			unit: "pH",
 			code: "ph"
 		},
@@ -189,10 +189,11 @@ var data = {
 
 	devices: [
 		{
-			id: "1234567890", //mac address
+			deviceId: "12345678901", //mac address
 			deviceType: "savedObjectIds['deviceTypes']['Bitponics Beta Device 1']",
 			name : "Bitponics Device 1",
 			users : ["savedObjectIds['users']['jack@bitponics.com']"],
+			owner: "savedObjectIds['users']['jack@bitponics.com']",
 			// sensorMap : [
 		 //      { 
 			//     sensor : { type: ObjectId, ref: 'Sensor' },
@@ -201,15 +202,38 @@ var data = {
 			// ],
 			controlMap : [ 
 			  {
-			    control : "savedObjectIds['control']['Fan']",
+			    control : "savedObjectIds['controls']['Fan']",
 			    outletId : "0"
 			  },
 			  {
-			    control : "savedObjectIds['control']['Humidifier']",
+			    control : "savedObjectIds['controls']['Humidifier']",
 			    outletId : "1"
 			  }
+			],
+			recentSensorLogs : [
+				{
+					sensor: "savedObjectIds['sensors']['vis']",
+					value: 12121
+				},
+				{
+					sensor: "savedObjectIds['sensors']['vis']",
+					value: 122222112
+				}
 			]
 		}
+		// ,
+		// {
+		// 	deviceId : "00:06:66:72:11:cf",
+		// 	owner :,
+		// 	name : "Chris' Bitponics Device 2",
+		// 	controlMap : [ ],
+		// 	sensors : [
+		// 		ObjectId("503a79426d25620000000001")
+		// 	],
+		// 	users : [
+		// 		ObjectId("5021e2cd8330ec0000000010")
+		// 	]
+		// }
 	],
 
 	lights: [
