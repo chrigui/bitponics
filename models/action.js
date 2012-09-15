@@ -12,10 +12,10 @@ var ActionSchema = new Schema({
 
 	controlMessage: {
 		controlReference : { type: ObjectId, ref: 'Light'},
-		valueToSend: 255
+		valueToSend: { type: Number, required: true }
 	},
 
-	startTime: { type: Number, required: true } //this is offset, so 0 = trigger as soon as the phase starts
+	startTime: { type: Number, required: true }, //this is offset, so 0 = trigger as soon as the phase starts
 
 	cycle: {
 		states: [
