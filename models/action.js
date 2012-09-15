@@ -1,8 +1,7 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	mongoosePlugins = require('../lib/mongoose-plugins'),
-	useTimestamps = mongoosePlugins.useTimestamps,
+  	useTimestamps = mongooseTypes.useTimestamps,
   	ObjectId = Schema.ObjectId;
 
 var ActionSchema = new Schema({
@@ -10,34 +9,29 @@ var ActionSchema = new Schema({
 	description: { type: String, required: true },
 	
 	control: { type: ObjectId, ref: 'Control'},
-	
+
+	controlMessage: {
+		controlReference : { type: ObjectId, ref: 'Light'},
+		valueToSend: 255
+	},
+
+	startTime: { type: Number, required: true } //this is offset, so 0 = trigger as soon as the phase starts
+
 	cycle: {
-	
 		states: [
 			{
 				controlValue: { type: String},
-
-				durationType: { type: String, enum: [
-					'milliseconds',
-					'seconds',
-					'minutes',
-					'hours',
-					'days',
-					'weeks',
-					'months',
-					'untilPhaseEnd'
-				]},
-				
 				duration: { type: Number },
-				
 				message: { type: String }
 			}
 		],
+		stopAfterRepetitionCount: { type: Number },
+	},
 
-		/**
-		 * undefined means repeat infinitely.
-		 */
-		stopAfterRepetitionCount: { type: Number }
+	recurrence: {
+		repeatType: { type: String },
+		frequency: { type: Number },
+		numOfTimes: { type: Number }
 	}
 });
 
