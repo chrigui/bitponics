@@ -8,7 +8,7 @@ var GrowSystemModel = require('../../models/growSystem').model;
 module.exports = function(app) {
 
    //List grow_systems
-  app.get('/api/grow_system', function (req, res){
+  app.get('/api/grow_systems', function (req, res){
     return GrowSystemModel.find(function (err, growSystems) {
       if (!err) {
         return res.send(growSystems);
@@ -22,7 +22,7 @@ module.exports = function(app) {
    * Create single growSystem
    *
    *  Test with:
-   *  jQuery.post("/api/grow_system", {
+   *  jQuery.post("/api/grow_systems", {
    *    "name": "Raft System",
    *    "description": "basic raft system",
    *    "type": "aquaponics"
@@ -32,7 +32,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_system', function (req, res){
+  app.post('/api/grow_systems', function (req, res){
     var growSystem;
     console.log("POST: ");
     console.log(req.body);
@@ -57,14 +57,14 @@ module.exports = function(app) {
    * Read an growSystem
    *
    * To test:
-   * jQuery.get("/api/grow_system/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/grow_systems/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_system/:id', function (req, res){
+  app.get('/api/grow_systems/:id', function (req, res){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
       if (!err) {
         return res.send(growSystem);
@@ -79,7 +79,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/growSystem/${id}",
+   *     url: "/api/grow_systems/${id}",
    *     type: "PUT",
    *     data: {
    *       "description": "new description"
@@ -92,7 +92,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_system/:id', function (req, res){
+  app.put('/api/grow_systems/:id', function (req, res){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
       growSystem.description = req.body.description;
       return growSystem.save(function (err) {
@@ -111,7 +111,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_system/${id}", 
+   *     url: "/api/grow_systems/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -121,7 +121,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_system/:id', function (req, res){
+  app.delete('/api/grow_systems/:id', function (req, res){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
       return growSystem.remove(function (err) {
         if (!err) {
