@@ -12,6 +12,8 @@ var mongoose = require('mongoose'),
  */
 var GrowPlanInstanceSchema = new Schema({
 
+	gpid: { type: Number },
+
 	users : [{ type: ObjectId, ref: 'User' }],
 	
 	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},

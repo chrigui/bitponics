@@ -8,30 +8,35 @@ var ActionSchema = new Schema({
 	
 	description: { type: String, required: true },
 	
-	control: { type: ObjectId, ref: 'Control'},
-
-	controlMessage: {
-		controlReference : { type: ObjectId, ref: 'Light'},
-		valueToSend: { type: Number, required: true }
-	},
-
-	startTime: { type: Number, required: true }, //this is offset, so 0 = trigger as soon as the phase starts
-
+	control: { type: ObjectId, ref: 'Control', required: false },
+	
 	cycle: {
+	
 		states: [
 			{
 				controlValue: { type: String},
+
+				durationType: { type: String, enum: [
+					'milliseconds',
+					'seconds',
+					'minutes',
+					'hours',
+					'days',
+					'weeks',
+					'months',
+					'untilPhaseEnd'
+				]},
+				
 				duration: { type: Number },
+				
 				message: { type: String }
 			}
 		],
-		stopAfterRepetitionCount: { type: Number },
-	},
 
-	recurrence: {
-		repeatType: { type: String },
-		frequency: { type: Number },
-		numOfTimes: { type: Number }
+		/**
+		 * undefined means repeat infinitely.
+		 */
+		stopAfterRepetitionCount: { type: Number }
 	}
 });
 
