@@ -13,7 +13,7 @@ var mongoose = require('mongoose'),
 module.exports = function(app) {
 
    //List devices
-  app.get('/api/device', function (req, res){
+  app.get('/api/devices', function (req, res){
     return DeviceModel.find(function (err, devices) {
       if (!err) {
         return res.send(devices);
@@ -46,7 +46,7 @@ module.exports = function(app) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/device', function (req, res){
+  app.post('/api/devices', function (req, res){
     var device;
     console.log("POST: ");
     console.log(req.body);
@@ -75,14 +75,14 @@ module.exports = function(app) {
    * Read an device
    *
    * To test:
-   * jQuery.get("/api/device/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/devices/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/device/:id', function (req, res){
+  app.get('/api/devices/:id', function (req, res){
     return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       if (!err) {
         return res.send(device);
@@ -98,7 +98,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/device/${id}",
+   *     url: "/api/devices/${id}",
    *     type: "PUT",
    *     data: {
    *       "name": "updated pump"
@@ -111,7 +111,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/device/:id', function (req, res){
+  app.put('/api/devices/:id', function (req, res){
     return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       device.title = req.body.title;
       return device.save(function (err) {
@@ -133,7 +133,7 @@ module.exports = function(app) {
    *   sensor_id,value;sensor_id,value;sensor_id,value;sensor_id,value;
    *
    *   jQuery.ajax({
-   *      url: "/api/device/${id}/sensorlog",
+   *      url: "/api/devices/${id}/sensorlog",
    *      type: "PUT",
    *      data: {
    *        sensorLogs: [{
@@ -157,7 +157,7 @@ module.exports = function(app) {
    *   });
    *
    */
-  app.put('/api/device/:id/sensorlog', function (req, res){
+  app.put('/api/devices/:id/sensorlog', function (req, res){
     var sensorLogs = req.body.sensorLogs,
         csvLogs = "";
 
@@ -235,7 +235,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/device/${id}", 
+   *     url: "/api/devices/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -245,7 +245,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/device/:id', function (req, res){
+  app.delete('/api/devices/:id', function (req, res){
     return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
       return device.remove(function (err) {
         if (!err) {
@@ -265,7 +265,7 @@ module.exports = function(app) {
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
    */
-  app.get('/api/device/:id/getcurrentcycles', function (req, res){
+  app.get('/api/devices/:id/getcurrentcycles', function (req, res){
     //var format =  req. 'deviceCSV' : 'json';
   
     console.log(req);  

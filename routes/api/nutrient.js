@@ -8,7 +8,7 @@ var NutrientModel = require('../../models/nutrient').model;
 module.exports = function(app) {
 
    //List nutrients
-  app.get('/api/nutrient', function (req, res){
+  app.get('/api/nutrients', function (req, res){
     return NutrientModel.find(function (err, nutrients) {
       if (!err) {
         return res.send(nutrients);
@@ -22,7 +22,7 @@ module.exports = function(app) {
    * Create single nutrient
    *
    *  Test with:
-   *  jQuery.post("/api/nutrient", {
+   *  jQuery.post("/api/nutrients", {
    *    "brand" : "nutrient brand",
    *    "name" : "big"
    *    }
@@ -30,7 +30,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/nutrient', function (req, res){
+  app.post('/api/nutrients', function (req, res){
     var nutrient;
     console.log("POST: ");
     console.log(req.body);
@@ -52,14 +52,14 @@ module.exports = function(app) {
    * Read an nutrient
    *
    * To test:
-   * jQuery.get("/api/nutrient/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/nutrients/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/nutrient/:id', function (req, res){
+  app.get('/api/nutrients/:id', function (req, res){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
       if (!err) {
         return res.send(nutrient);
@@ -74,7 +74,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/nutrient/${id}",
+   *     url: "/api/nutrients/${id}",
    *     type: "PUT",
    *     data: {
    *       "actionBelowMin": "actionid"
@@ -87,7 +87,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/nutrient/:id', function (req, res){
+  app.put('/api/nutrients/:id', function (req, res){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
       nutrient.actionBelowMin = req.body.actionBelowMin;
       return nutrient.save(function (err) {
@@ -106,7 +106,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/nutrient/${id}", 
+   *     url: "/api/nutrients/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -116,7 +116,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/nutrient/:id', function (req, res){
+  app.delete('/api/nutrients/:id', function (req, res){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
       return nutrient.remove(function (err) {
         if (!err) {
