@@ -28,6 +28,7 @@
 var mongoose   = require('mongoose'),
 	async = require('async'),
 	models = require('../../../models'),
+	mongoUrls = require('../../../config/mongo-config').urls,
 	db_url = process.argv.slice(2)[0], //get's first cmd line arg
 	clear = process.argv.slice(2)[1], //get's second cmd line arg
 	data = require('../seed_data'),
@@ -47,6 +48,19 @@ var mongoose   = require('mongoose'),
 		growPlanInstances: {},
 		users: {}
 	};
+
+switch(db_url){
+	case 'local':
+		db_url = mongoUrls.local;
+		break;
+	case 'dev':
+		db_url = mongoUrls.development;
+		break;
+	case 'staging':
+		db_url = mongoUrls.staging;
+		break;
+	default:
+}
 
 console.log(db_url);
 console.log(clear);
