@@ -265,7 +265,7 @@ module.exports = function(app) {
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
    */
-  app.get('/api/devices/:id/getcurrentcycles', function (req, res){
+  app.get('/api/devices/:id/get_current_cycles', function (req, res){
     //var format =  req. 'deviceCSV' : 'json';
   
     console.log(req);  
