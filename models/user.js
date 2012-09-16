@@ -13,15 +13,24 @@ var mongoose = require('mongoose'),
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
 UserSchema = new Schema({
+  name : {
+	    first: String
+	  , last: String
+	},
   email : { 
   	type : mongoose.SchemaTypes.Email, 
   	required : true, 
   	unique: true 
   },
-  name : {
-        first: String
-      , last: String
-    },
+  phone : { type : String },
+  address : {
+  	line1 : String,
+  	line2 : String,
+  	city : String,
+  	state : String,
+  	zip : String,
+  	country : { type: String, default: 'United States'}
+  },
   salt: { type: String, required: true },
   hash: { type: String, required: true },
   locale: String,
@@ -123,7 +132,7 @@ UserSchema.pre('save', function(next){
 	if (!user.apiPublicKey || !user.apiPrivateKey){
 		crypto.randomBytes(48, function(ex, buf) {
 			if (ex) throw ex;
-		  	var keysSource = buf.toString(),
+		  	var keysSource = buf.toString('hex'),
 		  		publicKey = keysSource.substr(0, 16),
 		  		privateKey = keysSource.substr(16, 32);
 		  	
