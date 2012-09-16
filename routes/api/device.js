@@ -36,11 +36,11 @@ module.exports = function(app) {
    *    "sensors": ["sensorid", "sensorid1", "sensorid2"],
    *    "controlMap": [{ 
    *        "control": "controlid",
-   *        "outletId": "outlet1"
+   *        "outputId": "outlet1"
    *      },
    *      { 
    *        "control": "controlid",
-   *        "outletId": "outlet2"
+   *        "outputId": "outlet2"
    *    }]
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
@@ -268,44 +268,44 @@ module.exports = function(app) {
   app.get('/api/device/:id/getcurrentcycles', function (req, res){
     //var format =  req. 'deviceCSV' : 'json';
   
-  console.log(req);  
-  
-  delete req.session.cookie;
-  req.session.destroy();
+    console.log(req);  
+    
+    delete req.session.cookie;
+    req.session.destroy();
 
-  res.status(200);
-  
-  //{outletId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
-  // 16 hours = 57600000ms
-  res.header('Content-Type', 'text/csv; format=device');
-  //res.header('X-Powered-By', '');
-  //res.header('Set-Cookie', '');
-
-
-// To end response for the firmware, send the Bell character
-res.send('1,0,1,57600000,0,28800000;2,0,1,14400000,0,7200000;' + String.fromCharCode(7));  
+    res.status(200);
+    
+    //{outputId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
+    // 16 hours = 57600000ms
+    res.header('Content-Type', 'text/csv; format=device');
+    //res.header('X-Powered-By', '');
+    //res.header('Set-Cookie', '');
 
 
+  // To end response for the firmware, send the Bell character
+  res.send('1,0,1,57600000,0,28800000;2,0,1,14400000,0,7200000;' + String.fromCharCode(7));  
 
 
-/*
-  res.header('Transfer-Encoding', 'chunked');
-  res.header('Connection', 'keep-alive');
-  
-  var countdown = 10;
 
-  var write = function(){
-    res.write('1,0,1,57600000,0,28800000');  
-    countdown--;
-    if (!countdown){
-      res.end();
-    } else {
-      setTimeout(write, 200);
-    }
-  };
 
-  write();
-  */
+  /*
+    res.header('Transfer-Encoding', 'chunked');
+    res.header('Connection', 'keep-alive');
+    
+    var countdown = 10;
+
+    var write = function(){
+      res.write('1,0,1,57600000,0,28800000');  
+      countdown--;
+      if (!countdown){
+        res.end();
+      } else {
+        setTimeout(write, 200);
+      }
+    };
+
+    write();
+    */
     /*
     return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
       if (!err) {
