@@ -23,7 +23,7 @@ $(function(){
 			'PASS=' + $('#wifi-pass').val() + '\n' +
 			'MODE=' + $('#wifi-mode').val() + '\n' +
 			'SKEY=' + Bitponics.currentUser.privateKey + '\n' +
-			'PKEY=' + Bitponics.currentUser.publicKey;
+			'PKEY=' + Bitponics.currentUser.publicKey; 
 
 		$.ajax({
 			url: deviceUrl,
