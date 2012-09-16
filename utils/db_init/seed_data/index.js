@@ -218,18 +218,18 @@ var data = {
 					inputId: "vis",
 					sensor: "savedObjectIds['sensors']['vis']"
 				}
+			],
+			controlMap : [
+				{
+					outputId: "1",
+					sensor: "savedObjectIds['controls']['Light']"
+				},
+				{
+					outputId: "2",
+					sensor: "savedObjectIds['controls']['Water Pump']"
+				}
 			]
 		},
-		controlMap : [
-			{
-				outputId: "1",
-				sensor: "savedObjectIds['controls']['Light']"
-			},
-			{
-				outputId: "2",
-				sensor: "savedObjectIds['controls']['Water Pump']"
-			}
-		]
 	],
 
 	devices: [

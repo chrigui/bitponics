@@ -12,11 +12,11 @@ var DeviceTypeSchema = new Schema({
 	sensorMap: [{
 		inputId: { type: String, required: true }, //‘ph’
 		sensor : { type: ObjectId, ref: 'Sensor', required: true }
-	},
+	}],
 	controlMap : [{
 		outputId: { type: String, required: true }, //‘ph’
 		control : { type: ObjectId, ref: 'Control', required: true }	
-	}]]
+	}]
 });
 
 DeviceTypeSchema.plugin(useTimestamps);
