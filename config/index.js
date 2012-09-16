@@ -1,4 +1,5 @@
-var loggly = {
+var mongoConfig = require('./mongo-config'),
+    loggly = {
       subdomain : 'bitponics',
       tokens : {
         local : 'c8593ee1-8a09-426f-acd6-871b70b91fd0',
@@ -41,6 +42,7 @@ module.exports = function(app) {
   console.log('NODE_ENV ' + process.env.NODE_ENV);
 
   var mongoUrl = process.env.MONGOLAB_URI,
+      mongoUrls = mongoConfig.urls,
       appDomain = process.env.BITPONICS_APP_DOMAIN,
       appUrl;
 
@@ -48,23 +50,25 @@ module.exports = function(app) {
   //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
   //       Setting it manually for now, but figure out what's going on
   app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
-console.log(app.settings.env);
+
+  console.log(app.settings.env);
+  
   switch(app.settings.env){
     case 'local':
       appDomain = appDomain || 'bitponics.com';
-      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local';
+      mongoUrl = mongoUrl || mongoUrls.local;
       break;
     case 'development':
       appDomain = appDomain || 'dev.bitponics.com';
-      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds037597.mongolab.com:37597/bitponics-development';  
+      mongoUrl = mongoUrl || mongoUrls.development;  
       break;
     case 'staging':
       appDomain = appDomain || 'staging.bitponics.com';
-      mongoUrl =  mongoUrl || 'mongodb://admin:1SHar3db1t@ds037617.mongolab.com:37617/bitponics-staging';
+      mongoUrl =  mongoUrl || mongoUrls.staging;
       break;
     case 'production':
       appDomain = appDomain || 'prod.bitponics.com';
-      mongoUrl = mongoUrl || 'mongodb://admin:1SHar3db1t@ds037587.mongolab.com:37587/bitponics-production';
+      mongoUrl = mongoUrl || mongoUrls.production;
       break;
     // no default; app.settings.env defaults to 'development' if process.env.NODE_ENV isn't set
   }
