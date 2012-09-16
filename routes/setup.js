@@ -1,9 +1,11 @@
 module.exports = function(app){
 	app.get('/setup', function (req, res){
-	  res.render('setup', {
+	  var locals = {
 	    title: 'Bitponics Device Setup',
 	    className : 'setup'
-	  });
+	  };
+
+	  res.render('setup', locals);
 
 	});
 };
