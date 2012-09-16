@@ -133,7 +133,7 @@ module.exports = function(app) {
    *   sensor_id,value;sensor_id,value;sensor_id,value;sensor_id,value;
    *
    *   jQuery.ajax({
-   *      url: "/api/devices/${id}/sensorlog",
+   *      url: "/api/devices/${id}/sensor_logs",
    *      type: "PUT",
    *      data: {
    *        sensorLogs: [{
@@ -157,7 +157,7 @@ module.exports = function(app) {
    *   });
    *
    */
-  app.put('/api/devices/:id/sensorlog', function (req, res){
+  app.put('/api/devices/:id/sensor_logs', function (req, res){
     var sensorLogs = req.body.sensorLogs,
         csvLogs = "";
 

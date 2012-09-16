@@ -11,12 +11,12 @@
  * Usage:
  *   1. cd bitponics/utils/db_init
  *   2. npm link
- *   3. db_init mongodb://whatever-db-you-need [clear]
+ *   3. db_init [local|dev|staging|mongodb://whatever-db-you-need] [clear]
  *   
  *   example: 
- *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local
+ *		db_init local
  *   example with clear:
- *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local clear
+ *		db_init dev clear
  *  
  *	 This script optionally removes all collections, then adds data from /bitponics/utils/db_init/seed_data/.
  *
@@ -60,6 +60,7 @@ switch(db_url){
 		db_url = mongoUrls.staging;
 		break;
 	default:
+		// if not one of those, assume it was a mongodb:// url, so leave it alone
 }
 
 console.log(db_url);
