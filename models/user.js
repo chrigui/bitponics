@@ -39,7 +39,7 @@ UserSchema = new Schema({
   activationToken : { type : String, default : '' },
   sentEmail : { type: Boolean, default: false },
   notificationPreferences: {
-  	email: { type: Boolean, default: false },
+  	email: { type: Boolean, default: true },
   	sms: { type: Boolean, default: false }
   },
   apiPublicKey : String,
