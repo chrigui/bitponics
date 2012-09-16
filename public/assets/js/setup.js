@@ -14,8 +14,8 @@ $(function(){
 			'SSID=' + postData.SSID + '&' +
 			'PASS=' + postData.PASS + '&' +
 			'MODE=' + postData.MODE + '&' +
-			'SKEY=' + postData.SKEY + '&' +
-			'PKEY=' + postData.PKEY;
+			'SKEY=' + encodeURIComponent(postData.SKEY) + '&' +
+			'PKEY=' + encodeURIComponent(postData.PKEY);
 
 		$.ajax({
 			url: deviceUrl,
