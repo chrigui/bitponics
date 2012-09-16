@@ -11,10 +11,14 @@
  * Usage:
  *   1. cd bitponics/utils/db_init
  *   2. npm link
- *   3. db_init mongodb://whatever-db-you-need
- *   example: db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local
- *
- *   This script first removes all collections, then adds data from /bitponics/utils/db_init/seed_data/.
+ *   3. db_init mongodb://whatever-db-you-need [clear]
+ *   
+ *   example: 
+ *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local
+ *   example with clear:
+ *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local clear
+ *  
+ *	 This script optionally removes all collections, then adds data from /bitponics/utils/db_init/seed_data/.
  *
  */
 
@@ -25,6 +29,7 @@ var mongoose   = require('mongoose'),
 	async = require('async'),
 	models = require('../../../models'),
 	db_url = process.argv.slice(2)[0], //get's first cmd line arg
+	clear = process.argv.slice(2)[1], //get's second cmd line arg
 	data = require('../seed_data'),
 	dataType = undefined,
 	savedObjectIds = {
@@ -44,7 +49,8 @@ var mongoose   = require('mongoose'),
 	};
 
 console.log(db_url);
-console.log(data);
+console.log(clear);
+//console.log(data);
 
 mongoose.connect(db_url);
 
@@ -54,69 +60,83 @@ mongoose.connect(db_url);
 async.series([
 	function(callback){
 		/**
-		 * clear old data in parallel
+		 * clear old data in parallel if clear option
 		 */
-		async.parallel([
-			function(innerCallback){
-				models.sensor.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.nutrient.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.deviceType.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.light.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.growSystem.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.control.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.action.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.idealRange.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			function(innerCallback){
-				models.phase.find().remove(function(err){
-					innerCallback(null,null);
-				});
-			},
-			// function(innerCallback){
-			// 	models.growPlan.find().remove(function(err){
-			// 		innerCallback(null,null);
-			// 	});
-			// },
-			// function(innerCallback){
-			// 	models.growPlanInstance.find().remove(function(err){
-			// 		innerCallback(null,null);
-			// 	});
-			// }
-			],
-			function(err, results){
-				callback(null, null);
-			}
-		);
+		if(clear) {
+			async.parallel([
+				function(innerCallback){
+					models.user.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.sensor.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.nutrient.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.deviceType.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.device.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.light.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.growSystem.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.control.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.action.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.idealRange.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.phase.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.growPlan.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				},
+				function(innerCallback){
+					models.growPlanInstance.find().remove(function(err){
+						innerCallback(null,null);
+					});
+				}
+				],
+				function(err, results){
+					callback(null, null);
+				}
+			);
+		}else{
+			callback(null,null);
+		}
 	},
     function(callback){
         /**
@@ -139,7 +159,7 @@ async.series([
 			  	activationToken : _data.activationToken,
 			  	sentEmail : _data.sentEmail
 			},
-			"bitponics", //password
+			"8bitpass", //default password
 			function(err, user){
 			  if (!err) {
 				savedObjectIds[dataType][_data.email] = user.id;
@@ -525,17 +545,19 @@ async.series([
 			});
 
 			dataObj.save(function (err, doc) {
+		      if (!err) {
+		        console.log("created idealRange");
+		      } else {
+		        console.log(err);
+		      }
+
 		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
 		      dataCount--;
 		      
-		      if (!err) {
-		        console.log("created idealRange");
-		      } else {
-		        console.log(err);
-		      }
+		      
 
 		    });
 		});
@@ -568,17 +590,19 @@ async.series([
 			});
 
 			dataObj.save(function (err, doc) {
-			  savedObjectIds[dataType][_data.name] = doc.id;
+			  if (!err) {
+		        console.log("created phase");
+		      } else {
+		        console.log(err);
+		      }
+
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
 		      dataCount--;
 		      
-		      if (!err) {
-		        console.log("created phase");
-		      } else {
-		        console.log(err);
-		      }
+		      
 
 		    });
 		});
@@ -594,15 +618,8 @@ async.series([
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-			var actions = [], idealRanges = [];
-			_data.actions.forEach(function(action){
-				actions.push(eval(action));
-			})
-			_data.idealRanges.forEach(function(idealRange){
-				idealRanges.push(eval(idealRange));
-			})
 
-		    var dataObj = new models.growPlans({
+		    var dataObj = new models.growPlan({
 				createdByUserId: eval(_data.createdByUserId),
 				name: _data.name,
 				description: _data.description,
@@ -619,18 +636,73 @@ async.series([
 		    console.log(dataObj);
 
 			dataObj.save(function (err, doc) {
-			  savedObjectIds[dataType][_data.name] = doc.id;
+			  if (!err) {
+		        console.log("created phase");
+		      } else {
+		        console.log(err);
+		      }
+		      savedObjectIds[dataType][_data.name] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }
 		      dataCount--;
 		      
-		      if (!err) {
-		        console.log("created phase");
+		      
+
+		    });
+		});
+    },
+    function(callback){
+        /**
+		 * Grow Plan Instances
+		 */
+	
+		var dataType = 'growPlanInstances',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+
+			_data.phases.forEach(function(item){
+				item.phase = eval(item.phase);
+			});
+			_data.sensorLogs.forEach(function(item){
+				item.sensor = eval(item.sensor);
+			});
+			_data.controlLogs.forEach(function(item){
+				item.control = eval(item.control);
+			});
+
+		    var dataObj = new models.growPlanInstance({
+		    	gpid: _data.gpid,
+				users: _data.users.map(function(item){ return eval(item) }),
+				growPlan: eval(_data.growPlan),
+				device: eval(_data.device),
+				startDate: _data.startDate,
+				endDate: _data.endDate,
+			    active: _data.active,
+				phases: _data.phases,
+				sensorLogs: _data.sensorLogs,
+				controlLogs: _data.controlLogs,
+				photoLogs: _data.photLogs,
+				genericLogs: _data.genericLogs
+			});
+
+		    console.log(dataObj);
+
+			dataObj.save(function (err, doc) {
+			  if (!err) {
+		        console.log("created grow plan instance");
 		      } else {
 		        console.log(err);
 		      }
-
+		      savedObjectIds[dataType][_data.gpid] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
 		    });
 		});
     }
