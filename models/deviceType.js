@@ -10,9 +10,13 @@ var DeviceTypeSchema = new Schema({
 	firmwareVersion: { type: String, required: true }, //‘0.1’
 	microprocessor: { type: String, required: true },
 	sensorMap: [{
-		outletId: { type: String, required: true }, //‘ph’
+		inputId: { type: String, required: true }, //‘ph’
 		sensor : { type: ObjectId, ref: 'Sensor', required: true }
-	}]
+	},
+	controlMap : [{
+		outputId: { type: String, required: true }, //‘ph’
+		control : { type: ObjectId, ref: 'Control', required: true }	
+	}]]
 });
 
 DeviceTypeSchema.plugin(useTimestamps);

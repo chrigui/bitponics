@@ -15,13 +15,13 @@ var DeviceSchema = new Schema({
 	sensorMap : [
       { 
 	    sensor : { type: ObjectId, ref: 'Sensor' },
-	    outletId : { type: String }
+	    inputId : { type: String }
 	  }
 	],
 	controlMap : [ 
 	  { 
 	    control : { type: ObjectId, ref: 'Control' },
-	    outletId : { type: String }
+	    outputId : { type: String }
 	  }
 	],
 	recentSensorLogs : [
