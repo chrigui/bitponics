@@ -32,6 +32,8 @@ var mongoose   = require('mongoose'),
 	db_url = process.argv.slice(2)[0], //get's first cmd line arg
 	clear = process.argv.slice(2)[1], //get's second cmd line arg
 	data = require('../seed_data'),
+	appDomains = require('../../../config/app-domain-config'),
+	appDomain = 'bitponics.com',
 	dataType = undefined,
 	savedObjectIds = {
 		sensors: {},
@@ -52,12 +54,15 @@ var mongoose   = require('mongoose'),
 switch(db_url){
 	case 'local':
 		db_url = mongoUrls.local;
+		appDomain = appDomains.local;
 		break;
 	case 'dev':
 		db_url = mongoUrls.development;
+		appDomain = appDomains.development;
 		break;
 	case 'staging':
 		db_url = mongoUrls.staging;
+		appDomain = appDomains.staging;
 		break;
 	default:
 		// if not one of those, assume it was a mongodb:// url, so leave it alone
@@ -382,7 +387,7 @@ async.series([
 			        console.log(err);
 			      }
 
-			      //savedObjectIds[dataType][_data.name] = doc.deviceId;
+			      savedObjectIds[dataType][_data.deviceId] = doc.id;
 			      if (dataCount === 1) {
 			      	 callback(null, null);
 			      }
@@ -688,6 +693,9 @@ async.series([
 			_data.controlLogs.forEach(function(item){
 				item.control = eval(item.control);
 			});
+
+			//console.log(savedObjectIds);
+			console.log('device ' + _data.device + ' ' + eval(_data.device));
 
 		    var dataObj = new models.growPlanInstance({
 		    	gpid: _data.gpid,
