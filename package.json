@@ -7,7 +7,8 @@
 	    "npm":  "1.0.x"
 	  }
 	, "dependencies": {
-		"bcrypt": ">= 0.5.0"
+		  "async" : "=0.1.22"
+		, "bcrypt": ">= 0.5.0"
 		, "connect"	  : "=2.4.3"
 		, "express"   : "3.0.0rc3"
 		, "jade"      : ">= 0.27.2"

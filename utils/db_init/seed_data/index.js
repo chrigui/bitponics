@@ -21,9 +21,35 @@ var data = {
 		  	sentEmail : true
 		},
 		{
+			email : "chris@bitponics.com",
+		  	name : "Chris Piuggi",
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
+			email : "michael@bitponics.com",
+		  	name : "Michael Doherty",
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
 			email : "amit@bitponics.com",
 		  	name : "Amit Kumar",
 		  	locale: "en_US",
+		  	phone : "13104908091",
+		  	address : {
+		  		line1 : "160 South 3rd St, Apt 15",
+		  		city : "Brooklyn",
+		  		state : "NY",
+		  		zip : "11211",
+		  		country : "United States"
+		  	},
 		  	active : true,
 		  	admin :  true,
 		  	activationToken : "12345678900",
@@ -146,77 +172,92 @@ var data = {
 			microprocessor: "blah",
 			sensorMap: [
 				{ 
-					outletId: "ph",
+					inputId: "ph",
 					sensor: "savedObjectIds['sensors']['ph']" // ref to pH Sensor instance"s ObjectId
 				},
-				{	outletId: "ec",
+				{	inputId: "ec",
 					sensor:	"savedObjectIds['sensors']['ec']"
 				},
 				{
-					outletId: "tds",
+					inputId: "tds",
 					sensor: "savedObjectIds['sensors']['tds']"
 				},
 				{
-					outletId: "sal",
+					inputId: "sal",
 					sensor: "savedObjectIds['sensors']['sal']"
 				},
 				{
-					outletId: "air",
+					inputId: "air",
 					sensor: "savedObjectIds['sensors']['air']"
 				},
 				{
-					outletId: "water",
+					inputId: "water",
 					sensor: "savedObjectIds['sensors']['water']"
 				},
 				{
-					outletId: "hum",
+					inputId: "hum",
 					sensor: "savedObjectIds['sensors']['hum']"
 				},
 				{
-					outletId: "co2",
+					inputId: "co2",
 					sensor: "savedObjectIds['sensors']['co2']"
 				},
 				{
-					outletId: "lux",
+					inputId: "lux",
 					sensor: "savedObjectIds['sensors']['lux']"
 				},
 				{
-					outletId: "ir",
+					inputId: "ir",
 					sensor: "savedObjectIds['sensors']['ir']"
 				},
 				{	
-					outletId: "full",
+					inputId: "full",
 					sensor: "savedObjectIds['sensors']['full']"
 				},
 				{
-					outletId: "vis",
+					inputId: "vis",
 					sensor: "savedObjectIds['sensors']['vis']"
 				}
+			],
+			controlMap : [
+				{
+					outputId: "1",
+					sensor: "savedObjectIds['controls']['Light']"
+				},
+				{
+					outputId: "2",
+					sensor: "savedObjectIds['controls']['Water Pump']"
+				}
 			]
-		}
+		},
 	],
 
 	devices: [
 		{
-			deviceId: "12345678901", //mac address
+			deviceId: "0006667211cf", //mac address
 			deviceType: "savedObjectIds['deviceTypes']['Bitponics Beta Device 1']",
 			name : "Bitponics Device 1",
-			users : ["savedObjectIds['users']['jack@bitponics.com']"],
+			users : [
+				"savedObjectIds['users']['jack@bitponics.com']", 
+				"savedObjectIds['users']['chris@bitponics.com']",
+				"savedObjectIds['users']['amit@bitponics.com']",
+				"savedObjectIds['users']['michael@bitponics.com']"
+			 ],
 			owner: "savedObjectIds['users']['jack@bitponics.com']",
 			// sensorMap : [
 		 //      { 
 			//     sensor : { type: ObjectId, ref: 'Sensor' },
-			//     outletId : { type: String }
+			//     inputId : { type: String }
 			//   }
 			// ],
 			controlMap : [ 
 			  {
-			    control : "savedObjectIds['controls']['Fan']",
-			    outletId : "0"
+			    control : "savedObjectIds['controls']['Light']",
+			    outputId : "1"
 			  },
 			  {
-			    control : "savedObjectIds['controls']['Humidifier']",
-			    outletId : "1"
+			    control : "savedObjectIds['controls']['Water Pump']",
+			    outputId : "2"
 			  }
 			],
 			recentSensorLogs : [
