@@ -5,24 +5,86 @@ block content
     li
       section.colors
         h2 Colors
-          ul
-            li.brand Brand
-              h3 Logo
-              div.logo.color #7da451
-            li.brand Components
-              h3 Default Background
-              div.defualt-background.color #f5f5f4
-    li
-      section.layout
-        h2 Layouts
-          ul
-            li.blah Blah
-              h3 User Timeline
-              div.user-timeline.layout Some layout...
+        ul
+          li
+            h3 Logo: #23b500
+            div.logo.color
+          li
+            h3 Default Background #fff
+            div.default-background.color
+          li
+            h3 Bitponics Light Green #46f121
+            h3.bitponics-light-green.color
+          li
+            h3 Bitponics Medium Green #24d321
+            h3.bitponics-medium-green.color 
+          li
+            h3 Light Sensor: #c8c300
+            h3.sensor-light.color
+
+
     li
       section.typography
         h2 Typography
-          ul
-            li.blah Blah
-              h3 Headings
-              div.headings.typography Some typography stuff...
+        ul
+          li
+            h3 Main Heading
+            section.wrapper
+              h3.heading.main-heading Example Main Heading
+          li
+            h3 Sub Heading
+            section.wrapper
+              h3.heading.sub-heading Example Sub Heading
+
+
+    li
+      section.layout
+        h2 Layouts
+        ul
+          li
+            h3 Content Module Full Width
+            section.wrapper
+              section.content-module
+                h3.main-heading Controls
+                div.control.display-ib Pump
+                div.control.display-ib Light
+                div.control.display-ib Fan
+          li
+            h3 Content Module Medium
+            section.wrapper
+              section.content-module.medium
+                h3.main-heading Controls
+                div.control.display-ib Pump
+                div.control.display-ib Light
+                div.control.display-ib Fan
+          li
+            h3 Content Module Small
+            section.wrapper
+              section.content-module.small
+                h3.main-heading Controls
+                div.control.display-ib Pump
+                div.control.display-ib Light
+                div.control.display-ib Fan
+          li
+            h3 Data Module Collapsed
+            section.data-module.light.closed
+              h3.main-heading Light
+              div.sensor-data
+                div.sensor-value 18
+                div.sensor-value-unit Hrs/Day
+              div.message Check
+              div.settings Settings
+          li
+            h3 Data Module Open
+            section.data-module.light
+              h3.main-heading Light
+              div.sensor-data
+                div.sensor-value 18
+                div.sensor-value-unit
+                  span Hrs/
+                  span Day
+              div.sensor-type.icon Light Sensor
+              div.message Check
+              div.settings.icon Settings
+          
+
