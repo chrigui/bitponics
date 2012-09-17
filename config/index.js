@@ -1,6 +1,7 @@
 var winston = require('winston'),
     winstonConfig = require('./winston-config')(),
     mongoConfig = require('./mongo-config'),
+    appDomains = require('./app-domain-config'),
     mongo = { 
       "hostname": "localhost",
       "port": 27017,
@@ -49,26 +50,9 @@ module.exports = function(app) {
 
   winston.info(app.settings.env);
   
-  switch(app.settings.env){
-    case 'local':
-      appDomain = appDomain || 'bitponics.com';
-      mongoUrl = mongoUrl || mongoUrls.local;
-      break;
-    case 'development':
-      appDomain = appDomain || 'dev.bitponics.com';
-      mongoUrl = mongoUrl || mongoUrls.development;  
-      break;
-    case 'staging':
-      appDomain = appDomain || 'staging.bitponics.com';
-      mongoUrl =  mongoUrl || mongoUrls.staging;
-      break;
-    case 'production':
-      appDomain = appDomain || 'prod.bitponics.com';
-      mongoUrl = mongoUrl || mongoUrls.production;
-      break;
-    // no default; app.settings.env defaults to 'development' if process.env.NODE_ENV isn't set
-  }
-
+  appDomain = appDomain || appDomains[app.settings.env];
+  mongoUrl = mongoUrl || mongoUrls[app.settings.env];
+  
   appUrl = 'http://' + appDomain;
 
   winston.info("ENVIRONMENT VARIABLES");
@@ -81,6 +65,8 @@ module.exports = function(app) {
     js : require('./js-config'),
     mongoUrl : mongoUrl
   };
+
+  require('../models/user').setVerificationEmailDomain(appDomain);
 
   // locals are passed down to the views
   app.locals({

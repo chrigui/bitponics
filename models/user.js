@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
 	crypto = require('crypto'),
 	bcrypt = require('bcrypt'),
 	winston = require('winston'),
-	app = require('../app');
+	verificationEmailDomain = 'bitponics.com';
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -155,7 +155,7 @@ UserSchema.pre('save', function(next){
 		
 		token = buf.toString('hex');
 		user.activationToken = token;
-		verifyUrl = app.config.appUrl + '/register?verify=' + user.activationToken;
+		verifyUrl = 'http://' + verificationEmailDomain + '/register?verify=' + user.activationToken;
 
 	  	//send activation email if not activated user
 		if(user.active && user.sentEmail){ return next(); }
@@ -196,6 +196,10 @@ UserSchema.pre('save', function(next){
 
 
 User = mongoose.model('User', UserSchema);
+
+module.exports.setVerificationEmailDomain = function(domain){
+	verificationEmailDomain = domain;
+};
 
 module.exports.schema = UserSchema;
 module.exports.model = User;
