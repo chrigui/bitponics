@@ -1,4 +1,5 @@
-var PhaseModel = require('../../models/phase').model;
+var PhaseModel = require('../../models/phase').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,13 +9,10 @@ var PhaseModel = require('../../models/phase').model;
 module.exports = function(app) {
 
    //List phases
-  app.get('/api/phases', function (req, res){
+  app.get('/api/phases', function (req, res, next){
     return PhaseModel.find(function (err, phases) {
-      if (!err) {
-        return res.send(phases);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(phases);
     });
   });
 
@@ -32,10 +30,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/phases', function (req, res){
+  app.post('/api/phases', function (req, res, next){
     var phase;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     phase = new PhaseModel({
       name: req.body.type,
       expectedNumberOfDays: req.body.expectedNumberOfDays,
@@ -44,13 +42,9 @@ module.exports = function(app) {
       idealRanges: req.body.idealRanges,
     });
     phase.save(function (err) {
-      if (!err) {
-        return console.log("created phase");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(phase);
     });
-    return res.send(phase);
   });
 
   /*
@@ -64,13 +58,10 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/phases/:id', function (req, res){
+  app.get('/api/phases/:id', function (req, res, next){
     return PhaseModel.findById(req.params.id, function (err, phase) {
-      if (!err) {
-        return res.send(phase);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(phase);
     });
   });
 
@@ -92,15 +83,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/phases/:id', function (req, res){
+  app.put('/api/phases/:id', function (req, res, next){
     return PhaseModel.findById(req.params.id, function (err, phase) {
+      if (err) { return next(err); }
       phase.actionBelowMin = req.body.actionBelowMin;
       return phase.save(function (err) {
-        if (!err) {
-          console.log("updated phase");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(phase);
       });
     });
@@ -121,15 +109,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/phases/:id', function (req, res){
+  app.delete('/api/phases/:id', function (req, res, next){
     return PhaseModel.findById(req.params.id, function (err, phase) {
+      if (err) { return next(err); }
       return phase.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });

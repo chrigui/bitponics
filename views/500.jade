@@ -1,0 +1,10 @@
+extends error
+
+block content
+  h1 Error: #{error.message}
+  if settings['verbose errors']
+    pre= error.stack
+  else
+    p An error occured while processing your request. We've been notified and will look into it as soon as we can. If you need to get in touch with us, you can do so 
+      a(href="#") here
+      | .

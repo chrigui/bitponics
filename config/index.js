@@ -1,12 +1,6 @@
-var mongoConfig = require('./mongo-config'),
-    loggly = {
-      subdomain : 'bitponics',
-      tokens : {
-        local : 'c8593ee1-8a09-426f-acd6-871b70b91fd0',
-        development : '5cc07897-f3f8-46ab-aaa1-888f88ae6683',
-        production : '437fee23-8d8a-4171-ab17-7e211c176003'
-      }  
-    },
+var winston = require('winston'),
+    winstonConfig = require('./winston-config')(),
+    mongoConfig = require('./mongo-config'),
     mongo = { 
       "hostname": "localhost",
       "port": 27017,
@@ -39,7 +33,7 @@ module.exports = function(app) {
       //PORT = process.env.PORT || 80, // run node as sudo to use port 80
       //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
 
-  console.log('NODE_ENV ' + process.env.NODE_ENV);
+  winston.info('NODE_ENV ');
 
   var mongoUrl = process.env.MONGOLAB_URI,
       mongoUrls = mongoConfig.urls,
@@ -51,7 +45,9 @@ module.exports = function(app) {
   //       Setting it manually for now, but figure out what's going on
   app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
 
-  console.log(app.settings.env);
+  winstonConfig.setupLoggly(app.settings.env);
+
+  winston.info(app.settings.env);
   
   switch(app.settings.env){
     case 'local':
@@ -75,15 +71,14 @@ module.exports = function(app) {
 
   appUrl = 'http://' + appDomain;
 
-  console.log("ENVIRONMENT VARIABLES");
-  console.log(process.env);
+  winston.info("ENVIRONMENT VARIABLES");
+  winston.info(JSON.stringify(process.env));
       
   app.config = {
     //auth : require('./auth-config'),
     css : require('./css-config'),
     appUrl : appUrl,
     js : require('./js-config'),
-    loggly : loggly,
     mongoUrl : mongoUrl
   };
 

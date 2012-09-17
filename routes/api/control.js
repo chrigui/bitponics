@@ -1,4 +1,5 @@
-var ControlModel = require('../../models/control').model;
+var ControlModel = require('../../models/control').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,15 +9,13 @@ var ControlModel = require('../../models/control').model;
 module.exports = function(app) {
 
    //List controls
-  app.get('/api/controls', function (req, res){
-    console.log("in controls callback");
+  app.get('/api/controls', function (req, res, next){
+    winston.info("in controls callback");
     return ControlModel.find(function (err, controls) {
-      console.log("in ControlModel callback");
-      if (!err) {
-        return res.send(controls);
-      } else {
-        return console.log(err);
-      }
+      winston.info("in ControlModel callback");
+      if (err) { return next(err); }
+
+      return res.send(controls);
     });
   });
 
@@ -30,20 +29,21 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/controls', function (req, res){
+  app.post('/api/controls', function (req, res, next){
     var control;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     control = new ControlModel({
       name: req.body.name,
     });
     control.save(function (err) {
-      if (!err) {
-        return console.log("created control");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+
+      return winston.info("created control");
+      
     });
+
+    // TODO : move this response to the callback of .save
     return res.send(control);
   });
 
@@ -58,13 +58,11 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/controls/:id', function (req, res){
+  app.get('/api/controls/:id', function (req, res, next){
     return ControlModel.findById(req.params.id, function (err, control) {
-      if (!err) {
-        return res.send(control);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+
+      return res.send(control);
     });
   });
 
@@ -86,15 +84,14 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/controls/:id', function (req, res){
+  app.put('/api/controls/:id', function (req, res, next){
     return ControlModel.findById(req.params.id, function (err, control) {
       control.title = req.body.title;
       return control.save(function (err) {
-        if (!err) {
-          console.log("updated control");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        
+        winston.info("updated control");
+        
         return res.send(control);
       });
     });
@@ -115,15 +112,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/controls/:id', function (req, res){
+  app.delete('/api/controls/:id', function (req, res, next){
     return ControlModel.findById(req.params.id, function (err, control) {
       return control.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+
+        return res.send('');
       });
     });
   });

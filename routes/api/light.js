@@ -1,4 +1,5 @@
-var LightModel = require('../../models/light').model;
+var LightModel = require('../../models/light').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,14 +9,11 @@ var LightModel = require('../../models/light').model;
 module.exports = function(app) {
 
    //List lights
-  app.get('/api/lights', function (req, res){
+  app.get('/api/lights', function (req, res, next){
     return LightModel.find(function (err, lights) {
-      if (!err) {
-        return res.send(lights);
-      } else {
-        return console.log(err);
-      }
-    });
+      if (err) { return next(err); }
+      return res.send(lights);
+      });
   });
 
   /*
@@ -32,10 +30,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/lights', function (req, res){
+  app.post('/api/lights', function (req, res, next){
     var light;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     light = new LightModel({
       type: req.body.type,
       watts: req.body.watts,
@@ -43,13 +41,9 @@ module.exports = function(app) {
       name : req.body.name
     });
     light.save(function (err) {
-      if (!err) {
-        return console.log("created light");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(light);
     });
-    return res.send(light);
   });
 
   /*
@@ -63,18 +57,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/lights/:id', function (req, res){
+  app.get('/api/lights/:id', function (req, res, next){
     return LightModel.findById(req.params.id, function (err, light) {
-      if (!err) {
-        return res.send(light);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(light);
     });
   });
 
   /*
-   * Update an light
+   * Update a light
    *
    * To test:
    * jQuery.ajax({
@@ -91,22 +82,19 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/lights/:id', function (req, res){
+  app.put('/api/lights/:id', function (req, res, next){
     return LightModel.findById(req.params.id, function (err, light) {
+      if (err) { return next(err); }
       light.actionBelowMin = req.body.actionBelowMin;
       return light.save(function (err) {
-        if (!err) {
-          console.log("updated light");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(light);
       });
     });
   });
 
   /*
-   * Delete an light
+   * Delete a light
    *
    * To test:
    * jQuery.ajax({
@@ -120,15 +108,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/lights/:id', function (req, res){
+  app.delete('/api/lights/:id', function (req, res, next){
     return LightModel.findById(req.params.id, function (err, light) {
+      if (err) { return next(err); }
       return light.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });

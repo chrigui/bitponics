@@ -1,4 +1,5 @@
-
+var UserModel = require('../../models/user').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -6,16 +7,12 @@
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
 module.exports = function(app) {
-  var UserModel = require('../../models/user').model;
-
-   //List users
-  app.get('/api/users', function (req, res){
+  
+  //List users
+  app.get('/api/users', function (req, res, next){
     return UserModel.find(function (err, users) {
-      if (!err) {
-        return res.send(users);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(users);
     });
   });
 
@@ -32,10 +29,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/users', function (req, res){
+  app.post('/api/users', function (req, res, next){
     var user;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     user = new UserModel({
       email : req.body.email,
       name : req.body.name,
@@ -43,17 +40,13 @@ module.exports = function(app) {
       active : req.body.active
     });
     user.save(function (err) {
-      if (!err) {
-        return console.log("created user");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(user);
     });
-    return res.send(user);
   });
 
   /*
-   * Read an user
+   * Read a user
    *
    * To test:
    * jQuery.get("/api/users/${id}", function(data, textStatus, jqXHR) {
@@ -63,18 +56,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/users/:id', function (req, res){
+  app.get('/api/users/:id', function (req, res, next){
     return UserModel.findById(req.params.id, function (err, user) {
-      if (!err) {
-        return res.send(user);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(user);
     });
   });
 
   /*
-   * Update an user
+   * Update a user
    *
    * To test:
    * jQuery.ajax({
@@ -91,22 +81,19 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/users/:id', function (req, res){
+  app.put('/api/users/:id', function (req, res, next){
     return UserModel.findById(req.params.id, function (err, user) {
+      if (err) { return next(err); }
       user.actionBelowMin = req.body.actionBelowMin;
       return user.save(function (err) {
-        if (!err) {
-          console.log("updated user");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(user);
       });
     });
   });
 
   /*
-   * Delete an user
+   * Delete a user
    *
    * To test:
    * jQuery.ajax({
@@ -120,15 +107,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/users/:id', function (req, res){
+  app.delete('/api/users/:id', function (req, res, next){
     return UserModel.findById(req.params.id, function (err, user) {
+      if (err) { return next(err); }
       return user.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });

@@ -1,4 +1,5 @@
-var NutrientModel = require('../../models/nutrient').model;
+var NutrientModel = require('../../models/nutrient').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,13 +9,10 @@ var NutrientModel = require('../../models/nutrient').model;
 module.exports = function(app) {
 
    //List nutrients
-  app.get('/api/nutrients', function (req, res){
+  app.get('/api/nutrients', function (req, res, next){
     return NutrientModel.find(function (err, nutrients) {
-      if (!err) {
-        return res.send(nutrients);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(nutrients);
     });
   });
 
@@ -30,22 +28,18 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/nutrients', function (req, res){
+  app.post('/api/nutrients', function (req, res, next){
     var nutrient;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     nutrient = new NutrientModel({
       brand : req.body.brand,
       name : req.body.name
     });
     nutrient.save(function (err) {
-      if (!err) {
-        return console.log("created nutrient");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(nutrient);
     });
-    return res.send(nutrient);
   });
 
   /*
@@ -59,13 +53,10 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/nutrients/:id', function (req, res){
+  app.get('/api/nutrients/:id', function (req, res, next){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
-      if (!err) {
-        return res.send(nutrient);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(nutrient);
     });
   });
 
@@ -87,15 +78,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/nutrients/:id', function (req, res){
+  app.put('/api/nutrients/:id', function (req, res, next){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
+      if (err) { return next(err); }
       nutrient.actionBelowMin = req.body.actionBelowMin;
       return nutrient.save(function (err) {
-        if (!err) {
-          console.log("updated nutrient");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(nutrient);
       });
     });
@@ -116,15 +104,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/nutrients/:id', function (req, res){
+  app.delete('/api/nutrients/:id', function (req, res, next){
     return NutrientModel.findById(req.params.id, function (err, nutrient) {
+      if (err) { return next(err); }
       return nutrient.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });

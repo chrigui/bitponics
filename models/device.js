@@ -36,21 +36,39 @@ var DeviceSchema = new Schema({
 
 DeviceSchema.plugin(useTimestamps);
 
+/**
+ * Add indexes. Probably wise to do it here after all the fields have been added
+ *
+ */
+
+
+
+/**
+ *  If sensorMap is undefined then use the deviceType's default sensorMap
+ */
 DeviceSchema.pre('save', function(next){
-  var device = this;
-  //if sensorMap is undefined then use the deviceType's default sensorMap
-  if(!device.sensorMap){
-  	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
-  		if(!err){
-  			device.sensorMap = deviceType.sensorMap;
-  			next();
-  		}else{
-  			console.log('err: '+err)
-  		}
-  	});
-  }else{
-  	next();
-  }
+	var device = this;
+	if(device.sensorMap){ return next(); }
+
+	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
+		if (err) { return next(err); }
+		device.sensorMap = deviceType.sensorMap;
+		next();
+	});
+});
+
+/**
+ *  If controlMap is undefined then use the deviceType's default controlMap
+ */
+DeviceSchema.pre('save', function(next){
+	var device = this;
+	if(device.controlMap){ return next(); }
+
+	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
+		if (err) { return next(err); }
+		device.controlMap = deviceType.controlMap;
+		next();
+	});
 });
 
 exports.schema = DeviceSchema;

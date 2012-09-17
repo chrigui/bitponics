@@ -1,4 +1,5 @@
-var GrowSystemModel = require('../../models/growSystem').model;
+var GrowSystemModel = require('../../models/growSystem').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,13 +9,10 @@ var GrowSystemModel = require('../../models/growSystem').model;
 module.exports = function(app) {
 
    //List grow_systems
-  app.get('/api/grow_systems', function (req, res){
+  app.get('/api/grow_systems', function (req, res, next){
     return GrowSystemModel.find(function (err, growSystems) {
-      if (!err) {
-        return res.send(growSystems);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(growSystems);
     });
   });
 
@@ -32,10 +30,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_systems', function (req, res){
+  app.post('/api/grow_systems', function (req, res, next){
     var growSystem;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     growSystem = new GrowSystemModel({
       name: req.body.name,
       description: req.body.description,
@@ -44,13 +42,10 @@ module.exports = function(app) {
       numberOfPlants: req.body.numberOfPlants,
     });
     growSystem.save(function (err) {
-      if (!err) {
-        return console.log("created growSystem");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(growSystem);  
     });
-    return res.send(growSystem);
+    
   });
 
   /*
@@ -64,13 +59,10 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_systems/:id', function (req, res){
+  app.get('/api/grow_systems/:id', function (req, res, next){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      if (!err) {
-        return res.send(growSystem);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(growSystem);
     });
   });
 
@@ -92,15 +84,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_systems/:id', function (req, res){
+  app.put('/api/grow_systems/:id', function (req, res, next){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+      if (err) { return next(err); }
       growSystem.description = req.body.description;
       return growSystem.save(function (err) {
-        if (!err) {
-          console.log("updated growSystem");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(growSystem);
       });
     });
@@ -121,15 +110,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_systems/:id', function (req, res){
+  app.delete('/api/grow_systems/:id', function (req, res, next){
     return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+      if (err) { return next(err); }
       return growSystem.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });
