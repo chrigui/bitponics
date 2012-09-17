@@ -40,7 +40,7 @@
 .ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @font-face{font-family:"DIN";src:url("./fonts/din_medium.eot");src:local("~!#$"),url('./fonts/din_medium.eot?iefix') format(embedded-opentype),url('./fonts/din_medium.woff') format(woff),url('./fonts/din_medium.ttf') format(truetype),url('./fonts/din_medium.svg#webfont') format(svg);font-weight:"normal";font-style:"normal"}
 @font-face{font-family:"DIN";src:url("./fonts/din_bold.eot");src:local("@#$%"),url('./fonts/din_bold.eot?iefix') format(embedded-opentype),url('./fonts/din_bold.woff') format(woff),url('./fonts/din_bold.ttf') format(truetype),url('./fonts/din_bold.svg#webfont') format(svg);font-weight:'bold';font-style:'bold'}
-body,.din-text{font-family:"DIN",Helvetica,Arial,sans-serif;letter-spacing:normal}
+body,.din-text{font-family:Helvetica,Arial,sans-serif;letter-spacing:normal}
 a{color:#333;text-decoration:none;}
 a:hover{text-decoration:underline}
 .setup .led-indicator{-webkit-animation-duration:1s;-webkit-animation-name:led-indicator;-webkit-animation-iteration-count:infinite;width:20px;height:20px;border-radius:5px;border:1px solid #ccc;}

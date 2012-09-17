@@ -45,6 +45,20 @@
 body,.din-text,.user-page nav ul li a,.user-page section header .date,.user-page section header .time,.user-page section ul li h2,.user-page section ul li span{font-family:Helvetica,Arial,sans-serif;letter-spacing:normal}
 a{color:#333;text-decoration:none;}
 a:hover{text-decoration:underline}
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}
+body{line-height:1}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+nav ul{list-style:none}
+blockquote,q{quotes:none}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}
+a{margin:0;padding:0;font-size:100%;vertical-align:baseline;background:transparent}
+ins{background-color:#ff9;color:#000;text-decoration:none}
+mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}
+del{text-decoration:line-through}
+abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}
+table{border-collapse:collapse;border-spacing:0}
+hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}
+input,select{vertical-align:middle}
 .user-page nav ul{font-size:0;border-bottom:1px solid #999;width:100%;overflow:hidden;}
 .user-page nav ul li{width:16%;height:100%;}
 .user-page nav ul li a{width:100%;border-right:1px solid #999;height:100%;}
@@ -86,14 +100,3 @@ a:hover{text-decoration:underline}
 .triangle-down{height:0;position:absolute;width:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #333}
 .triangle-left{height:0;position:absolute;width:0;border-right:5px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent}
 .triangle-right{height:0;position:absolute;width:0;border-left:5px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent}
-@-moz-keyframes full-circle{0%,100%{transform:rotate(0)}
-50%{transform:rotate(180deg)}
-}@-webkit-keyframes full-circle{0%,100%{transform:rotate(0)}
-50%{transform:rotate(180deg)}
-}@-o-keyframes full-circle{0%,100%{transform:rotate(0)}
-50%{transform:rotate(180deg)}
-}@-ms-keyframes full-circle{0%,100%{transform:rotate(0)}
-50%{transform:rotate(180deg)}
-}@keyframes full-circle{0%,100%{transform:rotate(0)}
-50%{transform:rotate(180deg)}
-}
