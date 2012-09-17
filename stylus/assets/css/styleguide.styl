@@ -1,22 +1,229 @@
+@import "./libs/resets"
 @import "./global/utils"
 @import "helpers"
-@import "typography"
-@import "./pages/dashboard/nav"
 
-color-primary-component=#99d264 //(ie. timeline entries)
-color-secondary-dark=#000000 //(ie. timeline ruler)
-color-logo-green=#7da451
-color-secondary-dark=#333333
-color-global-background=#f5f5f5
+color-logo-green=#23b500
+color-medium-green=#24d321
+color-light-green=#46f121
+color-global-background=#fff
+color-sensor-light=#c8c300
+
+/*
+ * styleguide specific
+ */
+.styleguide
+	
+	background rgba(70, 241, 33, 0.45)
+	
+	ul {
+	  margin: 1em 0;
+	  padding: 0;
+	  list-style none
+	  & li {
+	    list-style-type none
+	  }
+	}
+	.colors
+		.main-heading
+			background-color color-main-heading
+		.sub-heading
+			background-color color-sub-heading
+	.heading
+		//
+	section.colors
+		//
+	//section.layout
+	section.wrapper
+		background-color color-global-background
+		padding 1em
+	li
+		padding 1em
+	.default-background
+		background-color color-global-background
+	.logo
+		background-color color-logo-green
+	.bitponics-light-green
+		background-color color-light-green
+	.bitponics-medium-green
+		background-color color-medium-green
+	.color
+		padding 1em
+		width 1em
+		height 1em
+		@extends .circle
 
 body
-  background-color color-global-background
-  font-family "DIN", Helvetica, Arial, sans-serif
-  letter-spacing:normal;
+	margin: 0;
+	color: #333
+	font 112.5%/1.5 Helvetica, Arial, sans-serif
+	margin 0 auto
+	background color-global-background
 
-ul {
-  list-style none
-  & li {
-    list-style-type none
-  }
+* 
+	-webkit-box-sizing border-box
+	-moz-box-sizing border-box
+	box-sizing border-box
+
+h1,h2,h3,h4,h5,h6
+	font-weight normal
+
+/*
+ * Modules
+ */
+.content-module
+	min-width: 9em;
+	border-top: 4px solid color-light-green
+	&.small
+		width 25%
+	&.medium
+		width 50%
+	&.large
+		width 100%
+
+.data-module {
+	color white
+	text-align center
+	position relative
+	background-color color-medium-green
+	max-width 10.75em
+	height 9.58em
+	text-transform uppercase
+
+	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
+		position absolute
+	}
+
+	.main-heading {
+		color white
+		font-size .75em
+		margin 0
+		top .25em
+		left .5em
+	}
+	.message {
+		bottom .25em
+		right .75em
+	}
+	.settings {
+		top .5em
+		right .75em
+	}
+	.message, .sensor-value-unit {
+		font-size .55em //~10px
+	}
+	.sensor-value-unit {
+		top 1em
+		right 1.85em
+		line-height 1em
+		text-align left
+
+		span {
+			display block
+		}
+	}
+	.sensor-data {
+		display inline-block
+		vertical-align middle
+		position: absolute;
+		top 1.45em
+		left 0
+		width 100%
+		border-top 1px solid white
+	}
+	.sensor-value {
+		font-size 8.3333em
+		letter-spacing -.18em
+		line-height 1.25em
+		margin -.15em 0 0 -.45em
+		text-align center
+	}
+	.sensor-type {
+		bottom: .75em;
+		left: .75em;
+	}
+
+	&.closed {
+		min-height 1.5em
+		height auto
+
+		.main-heading {
+			position static
+			display inline-block
+			vertical-align middle
+			width 84%
+			text-align left
+			text-indent .45em
+		}
+		.sensor-value-unit, .message, .settings {
+			display none
+		}
+		.sensor-data {
+			width 9%
+			text-align right
+			position relative
+			right .25em
+			top 0
+			border none 0
+			
+		}
+		.sensor-value {
+			font-size .75em
+			position static
+			letter-spacing normal
+			margin 0
+			position relative
+			right 0.15em
+			text-align left
+			
+		}
+
+	}
+
+	&:before {
+	    content ''
+	    display inline-block
+	    height 100%
+	    vertical-align middle
+	    margin-right -0.25em
+	}
 }
+
+/*
+ * headings
+ */
+.main-heading
+	color color-light-green
+	margin .65em 0
+.sub-heading
+	color color-medium-green
+	margin .65em 0
+
+
+/*
+ *
+ */
+.icon
+	text-indent -500px
+	overflow hidden
+	font 10px monospace
+	letter-spacing -10px
+	width 1.45em //15px
+	height 1.45em
+	background white //TODO: temp until icon font created
+
+/*
+ * controls
+ */
+.control
+	@extends .circle
+	background-color color-medium-green
+	width 8em
+	height 8em
+
+
+/*
+ * sensors
+ */
+.sensor-light
+	background-color color-sensor-light
+
