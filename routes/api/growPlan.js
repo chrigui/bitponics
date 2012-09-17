@@ -1,4 +1,5 @@
-var GrowPlanModel = require('../../models/growPlan').model;
+var GrowPlanModel = require('../../models/growPlan').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -17,15 +18,10 @@ module.exports = function(app) {
   });
 
    //List grow plans
-  app.get('/api/grow_plan', function (req, res){
-    console.log("in grow_plans callback");
+  app.get('/api/grow_plans', function (req, res, next){
     return GrowPlanModel.find(function (err, grow_plans) {
-      console.log("in GrowPlanModel callback");
-      if (!err) {
-        return res.send(grow_plans);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(grow_plans);
     });
   });
 
@@ -33,7 +29,7 @@ module.exports = function(app) {
    * Create single grow plan
    *
    *  Test with:
-   *  jQuery.post("/api/grow_plan", {
+   *  jQuery.post("/api/grow_plans", {
    *    "parentGrowPlanId": "growplanid",
    *    "createdByUserId": "userid",
    *    "name": "Jack's Grow Plan",
@@ -50,10 +46,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plan', function (req, res){
+  app.post('/api/grow_plans', function (req, res, next){
     var grow_plan;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     grow_plan = new GrowPlanModel({
       parentGrowPlanId: req.body.parentGrowPlanId,
       createdByUserId: req.body.createdByUserId,
@@ -69,33 +65,26 @@ module.exports = function(app) {
       phases: req.body.phases
     });
     grow_plan.save(function (err) {
-      if (!err) {
-        return console.log("created grow_plan");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(grow_plan);
     });
-    return res.send(grow_plan);
   });
 
   /*
    * Read a grow plan
    *
    * To test:
-   * jQuery.get("/api/grow_plan/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/grow_plans/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plan/:id', function (req, res){
+  app.get('/api/grow_plans/:id', function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
-      if (!err) {
-        return res.send(grow_plan);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(grow_plan);
     });
   });
 
@@ -104,7 +93,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plan/${id}",
+   *     url: "/api/grow_plans/${id}",
    *     type: "PUT",
    *     data: {
    *       "title": "New Grow Plan Title"
@@ -117,15 +106,13 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plan/:id', function (req, res){
+  app.put('/api/grow_plans/:id', function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+      if (err) { return next(err); }
+
       grow_plan.title = req.body.title;
       return grow_plan.save(function (err) {
-        if (!err) {
-          console.log("updated grow_plan");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(grow_plan);
       });
     });
@@ -136,7 +123,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plan/${id}", 
+   *     url: "/api/grow_plans/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -146,15 +133,13 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plan/:id', function (req, res){
+  app.delete('/api/grow_plans/:id', function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+      if (err) { return next(err); }
+
       return grow_plan.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });

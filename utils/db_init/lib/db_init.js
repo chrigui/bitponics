@@ -11,12 +11,12 @@
  * Usage:
  *   1. cd bitponics/utils/db_init
  *   2. npm link
- *   3. db_init mongodb://whatever-db-you-need [clear]
+ *   3. db_init [local|dev|staging|mongodb://whatever-db-you-need] [clear]
  *   
  *   example: 
- *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local
+ *		db_init local
  *   example with clear:
- *		db_init mongodb://admin:1SHar3db1t@ds033097.mongolab.com:33097/bitponics-local clear
+ *		db_init dev clear
  *  
  *	 This script optionally removes all collections, then adds data from /bitponics/utils/db_init/seed_data/.
  *
@@ -28,6 +28,7 @@
 var mongoose   = require('mongoose'),
 	async = require('async'),
 	models = require('../../../models'),
+	mongoUrls = require('../../../config/mongo-config').urls,
 	db_url = process.argv.slice(2)[0], //get's first cmd line arg
 	clear = process.argv.slice(2)[1], //get's second cmd line arg
 	data = require('../seed_data'),
@@ -47,6 +48,20 @@ var mongoose   = require('mongoose'),
 		growPlanInstances: {},
 		users: {}
 	};
+
+switch(db_url){
+	case 'local':
+		db_url = mongoUrls.local;
+		break;
+	case 'dev':
+		db_url = mongoUrls.development;
+		break;
+	case 'staging':
+		db_url = mongoUrls.staging;
+		break;
+	default:
+		// if not one of those, assume it was a mongodb:// url, so leave it alone
+}
 
 console.log(db_url);
 console.log(clear);

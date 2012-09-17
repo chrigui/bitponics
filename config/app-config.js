@@ -51,7 +51,7 @@ module.exports = function(app){
 		        req.rawBody = data;
 		        next();
 		    });
-		}else{
+		} else{
 			next();
 		}
 	  });
@@ -68,17 +68,6 @@ module.exports = function(app){
 	  mongoose.connect(app.config.mongoUrl);
 	  app.use(passport.initialize());
  	  app.use(passport.session());
-
-	  winston.add(require('winston-loggly').Loggly, {
-	    subdomain : app.config.loggly.subdomain,
-	    inputToken : app.config.loggly.tokens[app.settings.env],
-	    level : 'error'
-	  });  
-
-	  // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
-	  // per mongoose-auth readme, don't need this since express handles it
-	  //app.use(app.router); 
-
 	});
 
 	switch(app.settings.env){
@@ -122,4 +111,7 @@ module.exports = function(app){
 	app.configure('production', function(){
 	  app.use(express.errorHandler()); 
 	});
+
+
+	
 };
