@@ -68,17 +68,24 @@ module.exports = function(app){
 	  mongoose.connect(app.config.mongoUrl);
 	  app.use(passport.initialize());
  	  app.use(passport.session());
+
+ 	  // custom "verbose errors" setting
+	  // which we can use in the templates
+	  // via settings['verbose errors']
+	  app.enable('verbose errors');
 	});
 
 	switch(app.settings.env){
 	    case 'local':
 	    case 'development':
 	    case 'staging':
+	    	app.set
 	    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	  
 			// make the response markup pretty-printed
 			app.locals({pretty: true });
 	    case 'production':
+	    	app.disable('verbose errors');
 	    	// Ensure that this is an authenticated request.
 	    	// If it doesn't already have a req.user, 
 	    	// check whether it's attempting HMAC auth,
