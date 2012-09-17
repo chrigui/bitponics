@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
-    winston    = require('winston');
+    winston = require('winston');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -13,14 +13,10 @@ var mongoose = require('mongoose'),
 module.exports = function(app) {
 
    //List devices
-  app.get('/api/devices', function (req, res){
+  app.get('/api/devices', function (req, res, next){
     return DeviceModel.find(function (err, devices) {
-      if (!err) {
-        return res.send(devices);
-      } else {
-        res.send(500);
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(devices);
     });
   });
 
@@ -46,10 +42,10 @@ module.exports = function(app) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/devices', function (req, res){
+  app.post('/api/devices', function (req, res, next){
     var device;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     device = new DeviceModel({
       id: req.body.id,
       name: req.body.name,
@@ -60,13 +56,9 @@ module.exports = function(app) {
       controlMap : req.body.controlMap
     });
     device.save(function (err) {
-      if (!err) {
-        console.log("created device");
-        return res.send(device);
-      } else {
-        res.send(500);
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      winston.info("created device");
+      return res.send(device);
     });
     
   });
@@ -82,14 +74,10 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/devices/:id', function (req, res){
+  app.get('/api/devices/:id', function (req, res, next){
     return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
-      if (!err) {
-        return res.send(device);
-      } else {
-        res.send(500);
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(device);
     });
   });
 
@@ -111,17 +99,40 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/devices/:id', function (req, res){
+  app.put('/api/devices/:id', function (req, res, next){
     return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+      if (err) { return next(err); }
       device.title = req.body.title;
       return device.save(function (err) {
-        if (!err) {
-          console.log("updated device");
-        } else {
-          res.send(500);
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        winston.info("updated device");
         return res.send(device);
+      });
+    });
+  });
+
+  /*
+   * Delete an device
+   *
+   * To test:
+   * jQuery.ajax({
+   *     url: "/api/devices/${id}", 
+   *     type: "DELETE",
+   *     success: function (data, textStatus, jqXHR) { 
+   *         console.log("Post resposne:"); 
+   *         console.dir(data); 
+   *         console.log(textStatus); 
+   *         console.dir(jqXHR); 
+   *     }
+   * });
+   */
+  app.delete('/api/devices/:id', function (req, res, next){
+    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+      if (err) { return next(err); }
+      return device.remove(function (err) {
+        if (err) { return next(err); }  
+        winston.info("removed");
+        return res.send('');
       });
     });
   });
@@ -157,20 +168,20 @@ module.exports = function(app) {
    *   });
    *
    */
-  app.put('/api/devices/:id/sensor_logs', function (req, res){
+  app.put('/api/devices/:id/sensor_logs', function (req, res, next){
     var sensorLogs = req.body.sensorLogs,
         csvLogs = "";
 
-    console.log('req.body', req.body);
-    winston.log('info', req.body);
+    winston.info('req.body', req.body);
+    winston.info('info', req.body);
 
     //if csv format, convert to js obj
     if(req.headers['content-type'] === 'text/csv'){
-      console.log('req.rawBody', req.rawBody);
+      winston.info('req.rawBody', req.rawBody);
       sensorLogs = [];
       csvLogs = req.rawBody.split(';');
       csvLogs.forEach(function(log){
-        console.log('log: ');
+        winston.info('log: ');
         if(log.length > 0){
           sensorLogs.push({
             'sensor': log.split(',')[0],
@@ -182,14 +193,11 @@ module.exports = function(app) {
     }
 
     //get device by mac address id
-    return DeviceModel.findOne({ deviceId: req.params.id }, function(err, device) {
-      if (err){ 
-        res.send(500);
-        return winston.log(err);
-      }
+    return DeviceModel.findOne({ device: req.params.id }, function(err, device) {
+      if (err) { return next(err); }
       if (!device){ 
-        res.send(500);
-        return console.log('attempted log to nonexistent device');
+        res.send(500, 'attempted to log to a nonexistent device');
+        return winston.info('attempted log to nonexistent device');
       }
 
       device.recentSensorLogs = device.recentSensorLogs || [];
@@ -202,13 +210,10 @@ module.exports = function(app) {
 
       //get device's current grow plan and push logs to it
       return GrowPlanInstanceModel.findOne({ device: device._id, active: true }, function (err, growPlanInstance) {
-        if (err){ 
-          res.send(500);
-          return winston.log(err);
-        }
+        if (err) { return next(err); }
         if (!growPlanInstance){ 
-          
-          return console.log('no grow plan instance for the device ' + device._id);
+          winston.info('no grow plan instance for the device ' + device._id)
+          return res.send(500, 'no grow plan instance for the device ' + device._id);
         } 
         // Else we have a growPlanInstance
         else {
@@ -216,14 +221,11 @@ module.exports = function(app) {
             growPlanInstance.sensorLogs.push(log);
           });
           return growPlanInstance.save(function (err) {
-            if (!err) {
-              return res.csv([
-                ['someresponse', 'someresponse122412']
-              ]);
-            } else {
-              console.log('growPlanInstance error: '+err);
-            }
-            return res.send(growPlanInstance);
+            if (err) { return next(err); }
+            return res.csv([
+              ['someresponse', 'someresponse122412']
+            ]);
+            
           });
         }
       });
@@ -231,44 +233,14 @@ module.exports = function(app) {
   });
 
   /*
-   * Delete an device
-   *
-   * To test:
-   * jQuery.ajax({
-   *     url: "/api/devices/${id}", 
-   *     type: "DELETE",
-   *     success: function (data, textStatus, jqXHR) { 
-   *         console.log("Post resposne:"); 
-   *         console.dir(data); 
-   *         console.log(textStatus); 
-   *         console.dir(jqXHR); 
-   *     }
-   * });
-   */
-  app.delete('/api/devices/:id', function (req, res){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
-      return device.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          res.send(500);
-          console.log(err);
-        }
-      });
-    });
-  });
-
-
-  /*
    * Get the current cycle data for the device. 
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
    */
-  app.get('/api/devices/:id/get_current_cycles', function (req, res){
+  app.get('/api/devices/:id/get_current_cycles', function (req, res, next){
     //var format =  req. 'deviceCSV' : 'json';
   
-    console.log(req);  
+    winston.info(req);  
     
     delete req.session.cookie;
     req.session.destroy();

@@ -1,4 +1,5 @@
-var ActionModel = require('../../models/action').model;
+var ActionModel = require('../../models/action').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,15 +9,13 @@ var ActionModel = require('../../models/action').model;
 module.exports = function(app) {
 
    //List actions
-  app.get('/api/actions', function (req, res){
-    console.log("in actions callback");
+  app.get('/api/actions', function (req, res, next){
+    winston.info("in actions callback");
     return ActionModel.find(function (err, actions) {
-      console.log("in ActionModel callback");
-      if (!err) {
-        return res.send(actions);
-      } else {
-        return console.log(err);
-      }
+      winston.info("in ActionModel callback");
+      if (err) { return next(err); }
+
+      return res.send(actions);
     });
   });
 
@@ -45,22 +44,22 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/actions', function (req, res){
+  app.post('/api/actions', function (req, res, next){
     var action;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winsotn.info(req.body);
     action = new ActionModel({
       description: req.body.description,
       control: req.body.control,
       cycle: req.body.cycle
     });
     action.save(function (err) {
-      if (!err) {
-        return console.log("created action");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+
+      return winston.info("created action");
+      
     });
+    // TODO: send this response in the callback of save
     return res.send(action);
   });
 
@@ -75,13 +74,11 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/actions/:id', function (req, res){
+  app.get('/api/actions/:id', function (req, res, next){
     return ActionModel.findById(req.params.id, function (err, action) {
-      if (!err) {
-        return res.send(action);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+
+      return res.send(action);
     });
   });
 
@@ -103,15 +100,13 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/actions/:id', function (req, res){
+  app.put('/api/actions/:id', function (req, res, next){
     return ActionModel.findById(req.params.id, function (err, action) {
       action.description = req.body.description;
       return action.save(function (err) {
-        if (!err) {
-          console.log("updated action");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        
+        winston.info("updated action");
         return res.send(action);
       });
     });
@@ -132,15 +127,13 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/actions/:id', function (req, res){
+  app.delete('/api/actions/:id', function (req, res, next){
     return ActionModel.findById(req.params.id, function (err, action) {
       return action.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+
+        winston.info("removed");
+        return res.send('');
       });
     });
   });

@@ -1,4 +1,5 @@
-var IdealRangeModel = require('../../models/idealRange').model;
+var IdealRangeModel = require('../../models/idealRange').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,13 +9,10 @@ var IdealRangeModel = require('../../models/idealRange').model;
 module.exports = function(app) {
 
    //List ideal_ranges
-  app.get('/api/ideal_ranges', function (req, res){
+  app.get('/api/ideal_ranges', function (req, res, next){
     return IdealRangeModel.find(function (err, idealRanges) {
-      if (!err) {
-        return res.send(idealRanges);
-      } else {
-        return console.log(err);
-      }
+      if (err){ next(err); }
+      return res.send(idealRanges);
     });
   });
 
@@ -36,10 +34,10 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/ideal_ranges', function (req, res){
+  app.post('/api/ideal_ranges', function (req, res, next){
     var idealRange;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.info("POST: ");
+    winston.info(req.body);
     idealRange = new IdealRangeModel({
       sensor: req.body.sensor,
       min: req.body.min,
@@ -49,13 +47,9 @@ module.exports = function(app) {
       applicableTimeSpan: req.body.applicableTimeSpan 
     });
     idealRange.save(function (err) {
-      if (!err) {
-        return console.log("created idealRange");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(idealRange);
     });
-    return res.send(idealRange);
   });
 
   /*
@@ -69,13 +63,10 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/ideal_ranges/:id', function (req, res){
+  app.get('/api/ideal_ranges/:id', function (req, res, next){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
-      if (!err) {
-        return res.send(idealRange);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(idealRange);
     });
   });
 
@@ -97,15 +88,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/ideal_ranges/:id', function (req, res){
+  app.put('/api/ideal_ranges/:id', function (req, res, next){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
+      if (err) { return next(err); }
       idealRange.actionBelowMin = req.body.actionBelowMin;
       return idealRange.save(function (err) {
-        if (!err) {
-          console.log("updated idealRange");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
         return res.send(idealRange);
       });
     });
@@ -126,15 +114,12 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/ideal_ranges/:id', function (req, res){
+  app.delete('/api/ideal_ranges/:id', function (req, res, next){
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
+      if (err) { return next(err); }
       return idealRange.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        return res.send('');
       });
     });
   });
