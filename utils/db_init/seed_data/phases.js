@@ -8,7 +8,7 @@ module.exports = [
 				"savedObjectIds['actions']['Transplant seedlings into the grow bed']",
 				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
 				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Turn light on and off.']"
+				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
 			],
 			idealRanges: [
 				"savedObjectIds['idealRanges']['Ideal Light - Vegetative']",
@@ -24,7 +24,7 @@ module.exports = [
 				"savedObjectIds['actions']['Pollinate any new blossoms using a watercolor brush to distribute']",
 				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
 				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Turn light on and off.']"
+				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
 			],
 			idealRanges: [
 				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
@@ -39,7 +39,7 @@ module.exports = [
 			actions: [
 				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
 				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Turn light on and off.']"
+				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
 			],
 			idealRanges: [
 				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
