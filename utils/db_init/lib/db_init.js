@@ -520,11 +520,17 @@ async.series([
 
 		    var dataObj = new models.action({
 				description: _data.description,
-				controlMessage: _data.controlMessage,
-				startTime: _data.startTime,
-				recurrence: _data.recurrence
+				control: eval(_data.control),
+				cycle: _data.cycle
 			});
 			dataObj.save(function (err, doc) {
+  			  if (!err) {
+		      	console.log(dataCount);
+		        console.log("created action");
+		      } else {
+		        console.log(err);
+		      }
+
 		      savedObjectIds[dataType][_data.description] = doc.id;
 
 		      if (dataCount === 1) {
@@ -533,12 +539,7 @@ async.series([
 		      
 		      dataCount--;
 		      
-		      if (!err) {
-		      	console.log(dataCount);
-		        console.log("created action");
-		      } else {
-		        console.log(err);
-		      }
+		      
 
 		    });
 		});

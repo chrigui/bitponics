@@ -16,7 +16,7 @@ module.exports = [
 						message: "Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient."
 					}
 				],
-				stopAfterRepetitionCount: undefined
+				repeat: true
 			}
 		}, // end flush Action
 		{
@@ -37,33 +37,41 @@ module.exports = [
 						message: "Turn pump off for 15 minutes"
 					}
 				],
-				stopAfterRepetitionCount : undefined
+				repeat: true
 			}
 		}, // end "Water pump cycle" action	
 		{
-			description: "Turn light on and off.",
-			control: "savedObjectIds['lights']['fluorescent']",
+			description: "Light cycle, with lights on between 6am and 10pm.",
+			control: "savedObjectIds['controls']['Light']",
 			cycle: {
 				states: [
+					// start the day with 6 hours off
 					{
 						controlValue: 1,
 						durationType: 'hours',
 						duration: 6,
-						message: "Turn light on."
+						message: "Turn light off."
 					},
 					{
 						controlValue: 0,
 						durationType: 'hours',
-						duration: 20,
+						duration: 16,
+						message: "Turn light on."
+					},
+					// finish off the 24 hour day with off
+					{
+						controlValue: 1,
+						durationType: 'hours',
+						duration: 2,
 						message: "Turn light off."
-					}
+					},
 				],
-				stopAfterRepetitionCount : undefined
+				repeat: true
 			}
 		},
 		{
-			description: "Light levels have dropped. Turn on supplemental lighting.",
-			control: "savedObjectIds['lights']['fluorescent']",
+			description: "Turn on supplemental lighting.",
+			control: "savedObjectIds['controls']['Light']",
 			cycle: {
 				states: [
 					{
@@ -71,12 +79,12 @@ module.exports = [
 						message: "Light levels have dropped. Turn on supplemental lighting.",
 					}
 				],
-				stopAfterRepetitionCount: 1
+				repeat : false
 			}
 		},
 		{
-			description: "Light levels above recommendations. Turn off any supplemental lights.",
-			control: "savedObjectIds['lights']['fluorescent']",
+			description: "Turn off any supplemental lights.",
+			control: "savedObjectIds['controls']['Light']",
 			cycle: {
 				states: [
 					{
@@ -84,11 +92,11 @@ module.exports = [
 						message: "Light levels above recommendations. Turn off any supplemental lights."
 					}
 				],
-				stopAfterRepetitionCount: 1
+				repeat : false
 			}
 		},
 		{
-			description: "Air temperature is too high. Turn on air conditioner.",
+			description: "Turn on air conditioner.",
 			control: "savedObjectIds['controls']['Air Conditioner']",
 			cycle: {
 				states: [
@@ -97,11 +105,11 @@ module.exports = [
 						message: "Air temperature is too high. Turn on air conditioner."
 					}
 				],
-				stopAfterRepetitionCount: 1
+				repeat : false
 			}
 		},
 		{
-			description: "Air temperature is too low. Turn on heater.",
+			description: "Turn on heater.",
 			control: "savedObjectIds['controls']['Heater']",
 			cycle: {
 				states: [
@@ -110,7 +118,7 @@ module.exports = [
 						message: "Air temperature is too low. Turn on heater."
 					}
 				],
-				stopAfterRepetitionCount: 1
+				repeat: false
 			}
 		},
 		{
