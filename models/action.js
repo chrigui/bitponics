@@ -86,15 +86,15 @@ ActionSchema.statics.convertDurationToMilliseconds = function(durationType, dura
 	}
 };
 
-ActionSchema.methods.getStatesInDeviceFormat = function(callback){
+ActionSchema.methods.getStatesInDeviceFormat = function(finalCallback){
 	var action = this,
 		states = action.cycle.states,
-		result = [],
+		resultArray = [],
 		convertDurationToMilliseconds = ActionModel.convertDurationToMilliseconds;
 
 	switch(states.length){
 		case 1:
-			return callback(new Error('Cannot convert single-state cycle to device format'));
+			return finalCallback(new Error('Cannot convert single-state cycle to device format'));
 			break;
 		case 2:
 			var state0 = states[0],
@@ -102,18 +102,33 @@ ActionSchema.methods.getStatesInDeviceFormat = function(callback){
 			
 			async.series([
 				function(callback){
-					result.push(state0.controlValue + ',');
-					convertDurationToMilliseconds(state0.durationType, state0.duration, callback);
+					resultArray.push(state0.controlValue + ',');
+					convertDurationToMilliseconds(
+						state0.durationType, 
+						state0.duration, 
+						function(err, duration){
+							if (err) { return callback(err);}
+							resultArray.push(duration + ',');
+							callback();		
+						});
 				},
-				function(duration, callback){
-					result.push(duration + ',');
-					result.push(state1.controlValue + ',');
-					convertDurationToMilliseconds(state1.durationType, state1.duration, callback);	
-				},
-				function(duration, callback){
-					result.push(duration);
+				function(callback){
+					resultArray.push(state1.controlValue + ',');
+					convertDurationToMilliseconds(
+						state1.durationType, 
+						state1.duration, 
+						function(err, duration){
+							if (err) { return callback(err);}
+							resultArray.push(duration);
+							callback();		
+						}
+					);	
 				}
-				], function(err, result){ if (err) { return callback(err);} }
+				], 
+				function(err, result){ 
+					if (err) { return callback(err);} 
+					return finalCallback(null, resultArray.join(''));
+				}
 			);
 			
 			break;
@@ -122,35 +137,52 @@ ActionSchema.methods.getStatesInDeviceFormat = function(callback){
 				state1 = states[1],
 				state2 = states[2],
 				firstDuration;
+			
 			// If a 3-state cycle, the 1st and 3rd must be contiguous, so they
-			result.push(state0.controlValue + ',');
-			async.parallel([
-				function(callback){
-					convertDurationToMilliseconds(state0.durationType, state0.duration, callback);
-				},
-				function(callback){
-					convertDurationToMilliseconds(state2.durationType, state2.duration, callback);
-				}
-			], function(err, result){ 
-				if (err) { return callback(err);} 
-				result.push( (result[0] + result[1]) + ',');
-			});
-
 			async.series([
 				function(callback){
-					result.push(state1.controlValue + ',');
-					convertDurationToMilliseconds(state1.durationType, state1.duration, callback);	
+					convertDurationToMilliseconds(
+						state0.durationType, 
+						state0.duration, 
+						function(err, duration){
+							if (err) { return callback(err);}
+							firstDuration = duration;
+							callback();		
+						}
+					);
 				},
-				function(duration, callback){
-					result.push(duration);
+				function(callback){
+					convertDurationToMilliseconds(
+						state2.durationType, 
+						state2.duration, 
+						function(err, duration){
+							if (err) { return callback(err);}
+							firstDuration += duration;
+							resultArray.push(state0.controlValue + ',');
+							resultArray.push( firstDuration + ',');	
+							callback();		
+						}
+					);
+				},
+				function(callback){
+					resultArray.push(state1.controlValue + ',');
+					convertDurationToMilliseconds(
+						state1.durationType, 
+						state1.duration, 
+						function(err, duration){
+							if (err) { return callback(err);}
+							resultArray.push(duration);
+							callback();		
+						});	
 				}
-				], function(err, result){ if (err) { return callback(err);} }
+				], 
+				function(err, result){ 
+					if (err) { return callback(err);} 
+					return finalCallback(null, resultArray.join(''));
+				}
 			);
-
 			break;
 	}
-
-	callback(null, result.join(''));
 };
 
 /**
@@ -169,11 +201,11 @@ ActionSchema.pre('save', function(next){
 		cycle = action.cycle,
 		states;
 	
-	if (!cycle){ return next(); }
+	if (!cycle.states.length){ return next(); }
 
 	states = cycle.states;
-	// if a cycle is defined, it must have 1-3 states.
-	if (!states || (states.length < 1) || (states.length < 3)){
+	
+	if ((states.length > 3)){
 		return next(new Error('Invalid number of cycle states'));
 	}
 

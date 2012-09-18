@@ -465,35 +465,7 @@ async.series([
 		    });
 		});
     },
-    function(callback){
-        /**
-		 * Controls
-		 */
-		var dataType = 'controls',
-			dataCount = data[dataType].length;
-
-		console.log('####### ' + dataType + ' #######');
-
-		data[dataType].forEach(function(_data){
-		    var dataObj = new models.control({
-				name: _data.name
-			});
-			dataObj.save(function (err, doc) {
-		      savedObjectIds[dataType][_data.name] = doc.id;
-		      if (dataCount === 1) {
-		      	 callback(null, null);
-		      }
-		      dataCount--;
-		      
-		      if (!err) {
-		        console.log("created controls");
-		      } else {
-		        console.log(err);
-		      }
-
-		    });
-		});
-    },
+    
     function(callback){
         /**
 		 * Actions
@@ -504,21 +476,8 @@ async.series([
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-
-			if(_data.controlMessage){
-				if(_data.controlMessage.controlReference){
-					_data.controlMessage.controlReference = eval(_data.controlReference);
-				}else{
-					_data.controlMessage.controlReference = "";
-				}
-				if(_data.controlMessage.valueToSend){
-					_data.controlMessage.valueToSend = _data.controlMessage.valueToSend;
-				}else{
-					_data.controlMessage.valueToSend = "";
-				}
-			}
-
-		    var dataObj = new models.action({
+console.log(_data.description)
+			var dataObj = new models.action({
 				description: _data.description,
 				control: eval(_data.control),
 				cycle: _data.cycle
@@ -539,8 +498,6 @@ async.series([
 		      
 		      dataCount--;
 		      
-		      
-
 		    });
 		});
     },
