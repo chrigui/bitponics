@@ -64,7 +64,7 @@ module.exports = [
 						durationType: 'hours',
 						duration: 2,
 						message: "Turn light off."
-					},
+					}
 				],
 				repeat: true
 			}

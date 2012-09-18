@@ -253,8 +253,6 @@ module.exports = function(app) {
     delete req.session.cookie;
     req.session.destroy();
 
-    
-
     //get device by mac address id. 
     //get the active GPI that's using the device.
     //get the active phase of the GPI.
@@ -296,7 +294,8 @@ module.exports = function(app) {
         // loop to get the actions the device can handle
         async.forEachSeries(device.controlMap, 
           function(controlOutputPair, iteratorCallback){
-            var controlAction = actions.filter(function(action){ return action.control === controlOutputPair.control;})[0],
+            console.log(actions, controlOutputPair);
+            var controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
                 cycleStates;
             winston.info('controlAction');
             winston.info(controlAction);
@@ -330,52 +329,12 @@ module.exports = function(app) {
       if (err) { return next(err);}
 
       res.status(200);
-      //res.header('Content-Type', 'text/csv; format=device');
+      res.header('Content-Type', 'text/csv; format=device');
       // To end response for the firmware, send the Bell character
-      responseData += String.fromCharCode(7)
+      responseData += String.fromCharCode(7);
       res.send(responseData);
     });
 
-  /*
-    return DeviceModel.findOne({ device: req.params.id }, function(err, device) {
-    });
-    res.status(200);
-    res.header('Content-Type', 'text/csv; format=device');
-    
-    //{outputId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds};
-    // 16 hours = 57600000ms
-    // To end response for the firmware, send the Bell character
-    res.send('1,0,1,57600000,0,28800000;2,0,1,14400000,0,7200000;' + String.fromCharCode(7));  
-
-*/
-
-
-  /*
-    res.header('Transfer-Encoding', 'chunked');
-    res.header('Connection', 'keep-alive');
-    
-    var countdown = 10;
-
-    var write = function(){
-      res.write('1,0,1,57600000,0,28800000');  
-      countdown--;
-      if (!countdown){
-        res.end();
-      } else {
-        setTimeout(write, 200);
-      }
-    };
-
-    write();
-    */
-    /*
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
-      if (!err) {
-        //return res.send(device);
-      } else {
-        return console.log(err);
-      }
-      */
   });  
 
 };
