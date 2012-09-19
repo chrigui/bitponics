@@ -27,7 +27,17 @@ passport.use(new LocalStrategy({
   }
 ));
 
-passport.use(new HmacStrategy(User.getByPublicKey));
+passport.use(new HmacStrategy({
+  name : 'device',
+  scheme : 'BPN_DEVICE',
+  getUser : User.getByPublicDeviceKey
+}));
+
+passport.use(new HmacStrategy({
+  name : 'api',
+  scheme : 'BPN_API',
+  getUser : User.getByPublicApiKey
+}));
 
       
 // Passport session setup.
