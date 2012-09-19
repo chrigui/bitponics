@@ -38,15 +38,16 @@ module.exports = function(app){
 	  
 	  app.use(express.logger(':method :url :status'));
 
+	  // If we've got a device request or an HMAC-authed request, need the raw body
 	  app.use (function(req, res, next) {
-		if(req.headers['content-type'] == 'text/csv' || 
-			(req.headers['authorization'] && req.headers['authorization'].indexOf('HMAC') === 0)){
+	  	var contentType = req.headers['content-type'] || '';
+		
+		if( contentType.indexOf('application/vnd.bitponics') >= 0){
 		    var data='';
 		    req.setEncoding('utf8');
 		    req.on('data', function(chunk) { 
-		       data += chunk;
+		    	data += chunk;
 		    });
-
 		    req.on('end', function() {
 		        req.rawBody = data;
 		        next();

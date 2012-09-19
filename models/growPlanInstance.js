@@ -34,34 +34,43 @@ var GrowPlanInstanceSchema = new Schema({
 	}],
 
 	sensorLogs: [{
-		sensor: { type: ObjectId, ref: 'Sensor', required: true },
-		value: { type: Number },
-		//timestamp: { type: Date, required: true }
-		timestamp: { type: Date, required: true, default: Date.now }
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
+			sensor: { type: ObjectId, ref: 'Sensor', required: true },
+			value: { type: Number }
+		}]
 	}],
 	
 	controlLogs: [{
-		control: { type: ObjectId, ref: 'Control', required: true },
-		value: { type: Number },
-		timestamp: { type: Date, required: true, default: Date.now }
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
+			control: { type: ObjectId, ref: 'Control', required: true },
+			value: { type: Number }
+		}]
 	}],
 	
 	photoLogs: [{
-		url: { type : mongoose.SchemaTypes.Url, required: true},
-		tags: { type : [String]},
-		timestamp: { type: Date, required: true, default: Date.now }
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
+			url: { type : mongoose.SchemaTypes.Url, required: true},
+			tags: { type : [String]}
+		}]
 	}],
 	
 	genericLogs: [{
-		entry: { type: String, required: true },
-		tags: { type : [String]},
-		logType: { type: String },
-		timestamp: { type: Date, required: true, default: Date.now }
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
+			entry: { type: String, required: true },
+			tags: { type : [String]},
+			logType: { type: String }
+		}]
 	}]
-
 },
 { strict: true });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
+
+GrowPlanInstanceSchema.index({ device: 1, active: 1 });
 
 exports.model = mongoose.model('GrowPlanInstance', GrowPlanInstanceSchema);

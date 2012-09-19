@@ -361,7 +361,9 @@ async.series([
 				});
 
 				_data.recentSensorLogs.forEach(function(rsl){
-					rsl.sensor = eval(rsl.sensor);
+					rsl.logs.forEach(function(sl){
+						sl.sensor = eval(sl.sensor);
+					});
 				});
 
 			    var dataObj = new models.device({
@@ -598,7 +600,7 @@ console.log(_data.description)
 		data[dataType].forEach(function(_data){
 
 		    var dataObj = new models.growPlan({
-				createdByUserId: eval(_data.createdByUserId),
+				createdBy: eval(_data.createdBy),
 				name: _data.name,
 				description: _data.description,
 				plants: _data.plants,
@@ -646,10 +648,15 @@ console.log(_data.description)
 				item.phase = eval(item.phase);
 			});
 			_data.sensorLogs.forEach(function(item){
-				item.sensor = eval(item.sensor);
+				item.logs.forEach(function(log){
+					log.sensor = eval(log.sensor);
+				});
+				
 			});
 			_data.controlLogs.forEach(function(item){
-				item.control = eval(item.control);
+				item.logs.forEach(function(log){
+					log.control = eval(log.control);	
+				});
 			});
 
 			//console.log(savedObjectIds);

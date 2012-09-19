@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     GrowPlanModel = require('../../models/growPlan').model,
     PhaseModel = require('../../models/phase').model,
     ActionModel = require('../../models/action').model,
+    SensorModel = require('../../models/sensor').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
     winston = require('winston'),
@@ -152,14 +153,12 @@ module.exports = function(app) {
    *      type: "PUT",
    *      data: {
    *        sensorLogs: [{
-   *          sensor: "503a79426d25620000000001",
-   *          value: 25,
-   *          //timestamp: new Date().getTime()
+   *          sensorCode: "air",
+   *          value: 25
    *        },
    *        {
-   *          sensor: "503a79426d25620000000001",
-   *          value: 24,
-   *          //timestamp: new Date().getTime()
+   *          sensorCode: "ph",
+   *          value: 6.2
    *        }
    *        ],
    *      },
@@ -173,31 +172,74 @@ module.exports = function(app) {
    *
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
-    var sensorLogs = req.body.sensorLogs,
-        csvLogs = "";
+    var deviceId = req.params.id.replace(/:/g,''),
+        pendingSensorLogs = req.body.sensorLogs || [],
+        deviceLogs = "",
+        sensors,
+        device;
 
     winston.info('req.body', req.body);
     winston.info('info', req.body);
 
-    //if csv format, convert to js obj
-    if(req.headers['content-type'] === 'text/csv'){
-      winston.info('req.rawBody', req.rawBody);
-      sensorLogs = [];
-      csvLogs = req.rawBody.split(';');
-      csvLogs.forEach(function(log){
-        winston.info('log: ');
-        if(log.length > 0){
-          sensorLogs.push({
-            'sensor': log.split(',')[0],
-            'value': log.split(',')[1]
-            //'timestamp': new Date()
-          });
-        }
-      });
+    // For now, only accept requests that use the device content-type
+    if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
+      return res.send('Invalid content-type');
     }
 
-    //get device by mac address id
-    return DeviceModel.findOne({ device: req.params.id }, function(err, device) {
+    if(req.headers['content-type'].indexOf('format=device') > -1){
+      winston.info('req.rawBody', req.rawBody);
+      pendingSensorLogs = JSON.parse(req.rawBody);
+      winston.info('JSON.parse raw body ', deviceLogs);
+    }
+
+    async.waterfall([
+        function(wfCallback1){
+          async.parallel([
+            function(callback){
+              SensorModel.find().exec(callback);
+            },
+            function(callback){
+              DeviceModel.findOne({ deviceId: deviceId }, callback);
+            }
+          ],
+          function(err, results){
+            if (err) { return callback(err);}
+
+            winston.info('wf1 final step');
+            winston.info(results);
+
+            sensors = results[0];
+            device = results[1];
+
+            if (!device){ 
+              wfCallback1(new Error('attempted to log to a nonexistent device'));
+            }
+
+            wfCallback1();
+          });
+          
+        }
+        function(callback){
+          DeviceModel.findOne({ deviceId: deviceId }, callback);
+        },
+        function(device, callback){
+              
+
+          device.recentSensorLogs = device.recentSensorLogs || [];
+            sensorLogs.forEach(function(log){
+              device.recentSensorLogs.push(log);
+            });
+            device.save(function (err) {
+              if (err) winston.error(err);
+            });
+        }
+      ],
+      function(err, result){
+        if (err) { return res.send(500, err.message); }
+        
+      });
+
+    return DeviceModel.findOne({ deviceId: deviceId }, function(err, device) {
       if (err) { return next(err); }
       if (!device){ 
         res.send(500, 'attempted to log to a nonexistent device');
@@ -243,8 +285,9 @@ module.exports = function(app) {
    *
    * For now, only responds with device CSV. 
    */
-  app.get('/api/devices/:id/get_current_cycles', function (req, res, next){
-    var device,
+  app.get('/api/devices/:id/cycles', function (req, res, next){
+    var deviceId = req.params.id.replace(/:/g,''),
+        device,
         growPlanInstance,
         activePhaseMetadata; 
 
@@ -260,7 +303,7 @@ module.exports = function(app) {
 
     async.waterfall([
       function (callback){
-        DeviceModel.findOne({ deviceId: req.params.id }, callback);  
+        DeviceModel.findOne({ deviceId: deviceId }, callback);  
       },
       function (deviceResult, callback){
         if (!deviceResult){ 

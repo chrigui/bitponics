@@ -31,67 +31,101 @@ module.exports = [
 			],
 			sensorLogs: [
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
+					timestamp: 1347364818821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 6.25
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 30
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 35
+						}
+					]
 				},
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 7.25
+					timestamp: 1347364828821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 7.25
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 33
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 34
+						}
+					]
 				},
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 8.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['air']",
-					value: 30
-				},
-				{
-					sensor: "savedObjectIds['sensors']['air']",
-					value: 35
-				},
-				{
-					sensor: "savedObjectIds['sensors']['water']",
-					value: 25
+					timestamp: 1347364838821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 6.5
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 34
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 33
+						}
+					]
 				}
 			],
 			controlLogs: [
 				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 0
-				},
-				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 1
-				},
-				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 0
+					timestamp: 1347364838821,
+					logs : [
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 0
+						},
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 1
+						},
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 0
+						}	
+					]
 				}
 			],
 			photoLogs: [
 				{
-					url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
-					tags: ["tomato, seedling, grow"]
-				},
-				{
-					url: "http://blog.japantimes.co.jp/japan-pulse/files/2012/08/tomato1.jpg",
-					tags: ["tomato, fruiting"]
+					timestamp: 1347364838821,
+					logs : [
+						{
+							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
+							tags: ["tomato, seedling, grow"]
+						},
+						{
+							url: "http://blog.japantimes.co.jp/japan-pulse/files/2012/08/tomato1.jpg",
+							tags: ["tomato, fruiting"]
+						}
+					]
 				}
 			],
 			genericLogs: [
 				{
-					entry: "Tomatoes are awesome.",
-					tags: ["awesome"],
-					logType: ""
+					timestamp: 1347364838821,
+					logs : [
+						{
+							entry: "Tomatoes are awesome.",
+							tags: ["awesome"],
+							logType: ""
+						}
+					]
 				}
 			]
 		},
@@ -106,7 +140,7 @@ module.exports = [
 			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012
-		    active: true,
+		    active: false,
 			phases: [
 				{
 					phase: "savedObjectIds['phases']['Vegetative']",
@@ -129,67 +163,101 @@ module.exports = [
 			],
 			sensorLogs: [
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
+					timestamp: 1347364818821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 6.25
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 30
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 35
+						}
+					]
 				},
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 7.25
+					timestamp: 1347364828821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 7.25
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 33
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 34
+						}
+					]
 				},
 				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 8.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['ph']",
-					value: 6.25
-				},
-				{
-					sensor: "savedObjectIds['sensors']['air']",
-					value: 30
-				},
-				{
-					sensor: "savedObjectIds['sensors']['air']",
-					value: 35
-				},
-				{
-					sensor: "savedObjectIds['sensors']['water']",
-					value: 25
+					timestamp: 1347364838821,
+					logs : [
+						{
+							sensor: "savedObjectIds['sensors']['ph']",
+							value: 6.5
+						},
+						{
+							sensor: "savedObjectIds['sensors']['air']",
+							value: 34
+						},
+						{
+							sensor: "savedObjectIds['sensors']['water']",
+							value: 33
+						}
+					]
 				}
 			],
 			controlLogs: [
 				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 0
-				},
-				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 1
-				},
-				{
-					control: "savedObjectIds['controls']['Fan']",
-					value: 0
+					timestamp: 1347364838821,
+					logs : [
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 0
+						},
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 1
+						},
+						{
+							control: "savedObjectIds['controls']['Fan']",
+							value: 0
+						}	
+					]
 				}
 			],
 			photoLogs: [
 				{
-					url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
-					tags: ["tomato, seedling, grow"]
-				},
-				{
-					url: "http://blog.japantimes.co.jp/japan-pulse/files/2012/08/tomato1.jpg",
-					tags: ["tomato, fruiting"]
+					timestamp: 1347364838821,
+					logs : [
+						{
+							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
+							tags: ["tomato, seedling, grow"]
+						},
+						{
+							url: "http://blog.japantimes.co.jp/japan-pulse/files/2012/08/tomato1.jpg",
+							tags: ["tomato, fruiting"]
+						}
+					]
 				}
 			],
 			genericLogs: [
 				{
-					entry: "Tomatoes are awesome.",
-					tags: ["awesome"],
-					logType: ""
+					timestamp: 1347364838821,
+					logs : [
+						{
+							entry: "Tomatoes are awesome.",
+							tags: ["awesome"],
+							logType: ""
+						}
+					]
 				}
 			]
 		}
