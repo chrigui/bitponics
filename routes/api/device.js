@@ -148,135 +148,100 @@ module.exports = function(app) {
    * - devices will send csv for now in a form something like (TBD):
    *   sensor_id,value;sensor_id,value;sensor_id,value;sensor_id,value;
    *
-   *   jQuery.ajax({
-   *      url: "/api/devices/${id}/sensor_logs",
-   *      type: "PUT",
-   *      data: {
-   *        sensorLogs: [{
-   *          sensorCode: "air",
-   *          value: 25
-   *        },
-   *        {
-   *          sensorCode: "ph",
-   *          value: 6.2
-   *        }
-   *        ],
-   *      },
-   *      success: function (data, textStatus, jqXHR) {
-   *          console.log("Post response:");
-   *          console.dir(data);
-   *          console.log(textStatus);
-   *          console.dir(jqXHR);
-   *      }
-   *   });
    *
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
     var deviceId = req.params.id.replace(/:/g,''),
-        pendingSensorLogs = req.body.sensorLogs || [],
-        deviceLogs = "",
+        pendingSensorLog = {timestamp : Date.now(), logs : []},
+        pendingDeviceLogs,
         sensors,
-        device;
+        device,
+        growPlanInstance;
 
     winston.info('req.body', req.body);
     winston.info('info', req.body);
 
     // For now, only accept requests that use the device content-type
     if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
-      return res.send('Invalid content-type');
+      return next(new Error('Invalid Content-Type'));
     }
 
-    if(req.headers['content-type'].indexOf('format=device') > -1){
+    if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
       winston.info('req.rawBody', req.rawBody);
-      pendingSensorLogs = JSON.parse(req.rawBody);
-      winston.info('JSON.parse raw body ', deviceLogs);
+      pendingDeviceLogs = JSON.parse(req.rawBody);
+      winston.info('JSON.parse req.rawBody ', pendingDeviceLogs);
     }
 
     async.waterfall([
-        function getSensorsAndDevice(wfCallback1){
-          async.parallel([
-            function(callback){
+      function wf1(wf1Callback){
+        // In parallel, get the Device and all Sensors
+        async.parallel([
+            function parallel1(callback){
               SensorModel.find().exec(callback);
             },
-            function(callback){
+            function parallel2(callback){
               DeviceModel.findOne({ deviceId: deviceId }, callback);
             }
           ],
-          function(err, results){
+          // When those parallel ops are done, create the sensorLog entry and also retrieve 
+          // the active GrowPlanInstance
+          function parallelFinal(err, results){
             if (err) { return callback(err);}
-
             winston.info('wf1 final step');
-            winston.info(results);
 
             sensors = results[0];
             device = results[1];
-
-
-
             if (!device){ 
-              wfCallback1(new Error('attempted to log to a nonexistent device'));
+              wf1Callback(new Error('Attempted to log to a nonexistent device'));
             }
 
-            wfCallback1();
-          });
-        },
-        function (callback){
-          DeviceModel.findOne({ deviceId: deviceId }, callback);
-        },
-        function(device, callback){
-              
+            Object.keys(pendingDeviceLogs).forEach(function(key){
+              var sensor = sensors.filter(function(s){ return s.code === key; })[0];
+              if (sensor){
+                pendingSensorLog.logs.push({
+                  sensor : sensor._id,
+                  value : pendingDeviceLogs[key]
+                });
+              }              
+            })
+            winston.info('pendingSensorLog');
+            winston.info(pendingSensorLog);            
 
-          device.recentSensorLogs = device.recentSensorLogs || [];
-            sensorLogs.forEach(function(log){
-              device.recentSensorLogs.push(log);
-            });
-            device.save(function (err) {
-              if (err) winston.error(err);
-            });
-        }
-      ],
-      function(err, result){
-        if (err) { return res.send(500, err.message); }
-        
-      });
-
-    return DeviceModel.findOne({ deviceId: deviceId }, function(err, device) {
-      if (err) { return next(err); }
-      if (!device){ 
-        res.send(500, 'attempted to log to a nonexistent device');
-        return winston.info('attempted log to nonexistent device');
-      }
-
-      device.recentSensorLogs = device.recentSensorLogs || [];
-      sensorLogs.forEach(function(log){
-        device.recentSensorLogs.push(log);
-      });
-      device.save(function (err) {
-        if (err) winston.error(err);
-      });
-
-      //get device's current grow plan and push logs to it
-      return GrowPlanInstanceModel.findOne({ device: device._id, active: true }, function (err, growPlanInstance) {
-        if (err) { return next(err); }
-        if (!growPlanInstance){ 
-          winston.info('no grow plan instance for the device ' + device._id)
-          return res.send(500, 'no grow plan instance for the device ' + device._id);
-        } 
-        // Else we have a growPlanInstance
-        else {
-          sensorLogs.forEach(function(log){
-            growPlanInstance.sensorLogs.push(log);
-          });
-          return growPlanInstance.save(function (err) {
+            GrowPlanInstanceModel.findOne({ device: device._id, active: true },  wf1Callback);        
+          }
+        );
+      },
+      function wf2(growPlanInstance, wf2Callback){
+        // Now. In parallel, we can persist the pendingSensorLog to 
+        // the device & the growPlanInstance
+        async.parallel([
+            function parallel1(callback){
+              device.recentSensorLogs = device.recentSensorLogs || [];
+              device.recentSensorLogs.push(pendingSensorLog);
+              device.save(callback);
+            },
+            function parallel2(callback){
+              growPlanInstance.sensorLogs = growPlanInstance.sensorLogs || [];
+              growPlanInstance.sensorLogs.push(pendingSensorLog);          
+              growPlanInstance.save(callback);
+            }
+          ], 
+          function parallelFinal(err, result){
             if (err) { return next(err); }
-            return res.csv([
-              ['someresponse', 'someresponse122412']
-            ]);
-            
-          });
-        }
-      });
-    })
+            var responseBody = '';
+            res.status(200);
+            res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+            // To end response for the firmware, send the Bell character
+            responseBody += String.fromCharCode(7);
+            res.send(responseBody);              
+          }
+        );
+
+      }],
+      function(err, result){
+        if (err) { return next(err); }
+      }
+    );
   });
 
 
@@ -328,7 +293,7 @@ module.exports = function(app) {
       function (phaseResult, callback){
         winston.info('in callback 4');
         var actions,
-            responseData = '';
+            responseBody = '';
 
         // get the actions that have a control reference & a cycle definition
         actions = phaseResult.actions || [];
@@ -352,31 +317,31 @@ module.exports = function(app) {
             // startTimeOffsetInMilliseconds could be negative, in the example of a 16 hour light cycle. it would be 6 off, 16 on, 2 off. 1st and 3rd get concated together, but with a neg startOffset to pull the start time back to 6am
             // TODO : account for cycle.repeat
 
-            responseData += controlOutputPair.outputId + ',' + // outputId
+            responseBody += controlOutputPair.outputId + ',' + // outputId
                         '0,';
 
             controlAction.getStatesInDeviceFormat(function(err, result){
               if (err) { return next(err);}
-              responseData += result + ';';
+              responseBody += result + ';';
               iteratorCallback();
             });
             
           },
           function(err){ 
             if (err) {return next(err)};
-            callback(null, responseData);    
+            callback(null, responseBody);    
           }
         );
       }
     ],
-    function(err, responseData) {
+    function(err, responseBody) {
       if (err) { return next(err);}
 
       res.status(200);
       res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       // To end response for the firmware, send the Bell character
-      responseData += String.fromCharCode(7);
-      res.send(responseData);
+      responseBody += String.fromCharCode(7);
+      res.send(responseBody);
     });
 
   });  
