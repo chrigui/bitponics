@@ -50,6 +50,8 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	active : true,
 		  	admin :  true,
 		  	activationToken : "12345678900",
-		  	sentEmail : true
+		  	sentEmail : true,
+		  	apiPublicKey : "6f4e46749a224810",
+		  	apiPrivateKey : "0284e7b141b30e3367ec05f794df9f69"
 		}
 	];

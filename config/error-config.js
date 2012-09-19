@@ -7,7 +7,7 @@ module.exports = function(){
 
   app.use(function(req, res, next){
     res.status(404);
-    
+    winston.info('404\'ed');
     // respond with html page
     if (req.accepts('html')) {
       res.render('404', { url: req.url });

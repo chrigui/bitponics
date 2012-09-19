@@ -24,14 +24,18 @@ var DeviceSchema = new Schema({
 	    outputId : { type: String }
 	  }
 	],
-	recentSensorLogs : [
-		{
+	/*
+	 // TODO: 
+	currentGrowPlanInstance : { type: ObjectId, ref: 'GrowPlanInstance' },
+	currentPhase : { type : ObjectId, ref: 'Phase'},
+	*/
+	recentSensorLogs : [{
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
 			sensor: { type: ObjectId, ref: 'Sensor', required: true },
-			value: { type: Number },
-			//timestamp: { type: Date, required: true }
-			timestamp: { type: Date, required: true, default: Date.now }
-		}
-	]
+			value: { type: Number }
+		}]
+	}]
 });
 
 DeviceSchema.plugin(useTimestamps);
