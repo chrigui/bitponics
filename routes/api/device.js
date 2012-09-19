@@ -192,9 +192,8 @@ module.exports = function(app) {
       winston.info('JSON.parse raw body ', deviceLogs);
     }
 
-/*
     async.waterfall([
-        function(wfCallback1){
+        function getSensorsAndDevice(wfCallback1){
           async.parallel([
             function(callback){
               SensorModel.find().exec(callback);
@@ -212,15 +211,16 @@ module.exports = function(app) {
             sensors = results[0];
             device = results[1];
 
+
+
             if (!device){ 
               wfCallback1(new Error('attempted to log to a nonexistent device'));
             }
 
             wfCallback1();
           });
-          
-        }
-        function(callback){
+        },
+        function (callback){
           DeviceModel.findOne({ deviceId: deviceId }, callback);
         },
         function(device, callback){
@@ -239,7 +239,7 @@ module.exports = function(app) {
         if (err) { return res.send(500, err.message); }
         
       });
-*/
+
     return DeviceModel.findOne({ deviceId: deviceId }, function(err, device) {
       if (err) { return next(err); }
       if (!device){ 
@@ -373,7 +373,7 @@ module.exports = function(app) {
       if (err) { return next(err);}
 
       res.status(200);
-      res.header('Content-Type', 'text/csv; format=device');
+      res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       // To end response for the firmware, send the Bell character
       responseData += String.fromCharCode(7);
       res.send(responseData);
