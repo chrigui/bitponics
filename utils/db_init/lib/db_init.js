@@ -178,8 +178,8 @@ async.series([
 			  	admin :  _data.admin,
 			  	activationToken : _data.activationToken,
 			  	sentEmail : _data.sentEmail,
-			  	apiPublicKey : _data.apiPublicKey,
-			  	apiPrivateKey : _data.apiPrivateKey
+			  	deviceKey : _data.deviceKey,
+			  	apiKey : _data.apiKey
 			},
 			"8bitpass", //default password
 			function(err, user){

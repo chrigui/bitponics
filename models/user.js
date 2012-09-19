@@ -44,8 +44,26 @@ UserSchema = new Schema({
   	email: { type: Boolean, default: true },
   	sms: { type: Boolean, default: false }
   },
-  apiPublicKey : String,
-  apiPrivateKey : String
+  deviceKey : {
+  	/**
+  	 * Public device key is a 16-char random hex string
+  	 */
+  	public : String,
+  	/**
+  	 * Private device key is a 16-char random hex string
+  	 */
+  	private : String
+  },
+  apiKey : {
+  	/**
+  	 * Public API key is a 16-char random hex string
+  	 */
+  	public: String,
+  	/**
+  	 * Private API key is a 32-char random hex string
+  	 */
+  	private: String
+  }
 },
 { strict: true });
 
@@ -102,18 +120,50 @@ UserSchema.static('authenticate', function(email, password, next) {
 
 
 /**
- * Used by Passport HMAC strategy
+ * Used by Passport BPN_DEVICE strategy
  */
-UserSchema.static('getByPublicKey', function(apiPublicKey, next) {
-  User.findOne({ apiPublicKey: apiPublicKey }, function(err, user) {
+UserSchema.static('getByPublicDeviceKey', function(key, next) {
+  User.findOne({ 'deviceKey.public': key }, function(err, user) {
+  	var x= 3;
       if (err) { return next(err); }
       if (!user) { return next(null, false); }
 
-      return next(null, user, user.apiPrivateKey);
+      return next(null, user, user.deviceKey.private);
+  });
+});
+
+UserSchema.static('getByPublicApiKey', function(key, next) {
+  User.findOne({ 'apiKey.public': key }, function(err, user) {
+      if (err) { return next(err); }
+      if (!user) { return next(null, false); }
+
+      return next(null, user, user.apiKey.private);
   });
 });
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
+/**
+ *  Give user device keys if needed 
+ */
+UserSchema.pre('save', function(next){
+	var user = this;
+	
+	if (user.deviceKey && user.deviceKey.public && user.deviceKey.private){ return next(); }
+
+	crypto.randomBytes(32, function(ex, buf) {
+		if (ex) { return next(ex); }
+	  	var keysSource = buf.toString('hex'),
+	  		publicKey = keysSource.substr(0, 16),
+	  		privateKey = keysSource.substr(16, 16);
+	  	
+	  	user.deviceKey = {
+	  		public : publicKey,
+	  		private : privateKey
+	  	};
+	  	next();
+  	});
+});
 
 /**
  *  Give user API keys if needed 
@@ -121,7 +171,7 @@ UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the sche
 UserSchema.pre('save', function(next){
 	var user = this;
 	
-	if (user.apiPublicKey && user.apiPrivateKey){ return next(); }
+	if (user.apiKey && user.apiKey.public && user.apiKey.private){ return next(); }
 
 	crypto.randomBytes(48, function(ex, buf) {
 		if (ex) { return next(ex); }
@@ -129,9 +179,10 @@ UserSchema.pre('save', function(next){
 	  		publicKey = keysSource.substr(0, 16),
 	  		privateKey = keysSource.substr(16, 32);
 	  	
-	  	user.apiPublicKey = publicKey;
-	  	user.apiPrivateKey = privateKey;
-
+	  	user.apiKey = {
+	  		public : publicKey,
+	  		private : privateKey
+	  	};
 	  	next();
   	});
 });
@@ -194,6 +245,9 @@ UserSchema.pre('save', function(next){
 	});
 });
 
+UserSchema.index({ 'email': 1 });
+UserSchema.index({ 'deviceKey.public': 1 });
+UserSchema.index({ 'apiKey.public': 1 });
 
 User = mongoose.model('User', UserSchema);
 

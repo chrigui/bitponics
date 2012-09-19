@@ -80,7 +80,6 @@ module.exports = function(app){
 	    case 'local':
 	    case 'development':
 	    case 'staging':
-	    	app.set
 	    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
 	  
 			// make the response markup pretty-printed
@@ -92,17 +91,24 @@ module.exports = function(app){
 	    	// check whether it's attempting HMAC auth,
 	    	// and finally fallback to checking Basic auth
 	    	app.use(function(req, res, next){
-	    		var authorization = req.headers.authorization;
+	    		var authorization = req.headers.authorization,
+	    			scheme;
 
 	    		if (req.user){ 
-	    			next();
+	    			return next();
 	    		} else {
-	    			if (authorization && authorization.split(' ')[0] == 'HMAC'){
-	    				passport.authenticate('hmac', {session: false})(req, res, next);
-	    			} else {
-	    				connect.basicAuth('bitponics', '8bitpass')(req, res, next);
+	    			if (authorization){
+	    				scheme = authorization.split(' ')[0];
+		    			switch(scheme){
+		    				case 'BPN_DEVICE':
+		    					return passport.authenticate('device', {session: false})(req, res, next);
+		    				case 'BPN_API':
+		    					return passport.authenticate('api', {session: false})(req, res, next);
+	    					// no default. just let it flow down to the connect.basicAuth
+	    				}
 	    			}
-				} 
+					return connect.basicAuth('bitponics', '8bitpass')(req, res, next);	
+	    		}
 	    	});
 	      	break;
 	}
