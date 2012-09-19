@@ -192,6 +192,7 @@ module.exports = function(app) {
       winston.info('JSON.parse raw body ', deviceLogs);
     }
 
+/*
     async.waterfall([
         function(wfCallback1){
           async.parallel([
@@ -238,7 +239,7 @@ module.exports = function(app) {
         if (err) { return res.send(500, err.message); }
         
       });
-
+*/
     return DeviceModel.findOne({ deviceId: deviceId }, function(err, device) {
       if (err) { return next(err); }
       if (!device){ 
