@@ -1,35 +1,25 @@
 $(function(){
 	var deviceUrl = 'http://169.254.1.1',
-		macAddress = '';
+		devicePostFormat = 'SSID={{SSID}}\nPASS={{PASS}}\nMODE={{MODE}}\nSKEY={{SKEY}}\nPKEY={{PKEY}}',
+		$connectToDevice = $('#connect-to-device'),
+		$wifiForm = $('#wifi-form'),
+		$wifiSsid = $('#wifi-ssid'),
+		$wifiPass = $('#wifi-pass'),
+		$wifiMode = $('#wifi-mode');
 
 
 	var postToDevice = function(){
-		var samplePostData = {
-			MODE: 'WPA_MODE',
-			SSID: 'TheWorld',
-			PASS: '1234123412',
-			PKEY: '16 char string11', // hex values decoded into string
-			SKEY: '16 char string22'   
-		},
-		postDataStringURI = 
-			'SSID=' + encodeURIComponent($('#wifi-ssid').val()) + '&' +
-			'PASS=' + encodeURIComponent($('#wifi-pass').val()) + '&' +
-			'MODE=' + $('#wifi-mode').val() + '&' +
-			'SKEY=' + Bitponics.currentUser.privateKey + '&' +
-			'PKEY=' + Bitponics.currentUser.publicKey;
-
-
-		var postDataStringPlain = 'SSID=' + $('#wifi-ssid').val() + '\n' +
+		var postDataStringPlainText = 'SSID=' + $('#wifi-ssid').val() + '\n' +
 			'PASS=' + $('#wifi-pass').val() + '\n' +
 			'MODE=' + $('#wifi-mode').val() + '\n' +
-			'SKEY=' + Bitponics.currentUser.privateKey + '\n' +
-			'PKEY=' + Bitponics.currentUser.publicKey; 
+			'SKEY=' + Bitponics.currentUser.privateDeviceKey + '\n' +
+			'PKEY=' + Bitponics.currentUser.publicDeviceKey; 
 
 		$.ajax({
 			url: deviceUrl,
 			type: 'POST',
 			contentType : 'text/plain; charset=UTF-8',
-			data: postDataStringPlain,
+			data: postDataStringPlainText,
 			processData : false,
 			success: function(data){
 				console.log(data);

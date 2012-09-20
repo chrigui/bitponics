@@ -45,7 +45,6 @@ module.exports = function(app){
 
 	app.post('/login', function (req, res, next){
 		passport.authenticate('local', function(err, user, info) {
-			return next(new Error('testing nested exception'));
 		    if (err) { return next(err); }
 		    if (!user) {
 		      req.flash('error', info.message);

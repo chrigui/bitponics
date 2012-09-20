@@ -24,14 +24,32 @@ var DeviceSchema = new Schema({
 	    outputId : { type: String }
 	  }
 	],
-	recentSensorLogs : [
-		{
+	recentSensorLogs : [{
+		timestamp: { type: Date, required: true, default: Date.now },
+		logs : [{
 			sensor: { type: ObjectId, ref: 'Sensor', required: true },
-			value: { type: Number },
-			//timestamp: { type: Date, required: true }
-			timestamp: { type: Date, required: true, default: Date.now }
-		}
-	]
+			value: { type: Number }
+		}]
+	}],
+	activeGrowPlanInstance : {type: ObjectId, ref: 'GrowPlanInstance', required:false},
+	activePhase : {type: ObjectId, ref: 'GrowPlanInstance', required:false },
+	activeActions : {
+		actions : [{type: ObjectId, ref: 'Action'}],
+		deviceMessage : String,
+		lastSent : Date,
+		expires : Date,
+		deviceRefreshRequired : { type: Boolean, default: true }
+	},
+	/**
+	 * activeActionOverrides are any automatically or manually triggered actions. 
+	 * They override the phase cycles until they expire.
+	 */
+	activeActionOverrides : {
+		actions: [{type: ObjectId, ref: 'Action'}],
+		deviceMessage : String,
+		lastSent: Date,
+		expires : Date
+	}
 });
 
 DeviceSchema.plugin(useTimestamps);
@@ -71,5 +89,12 @@ DeviceSchema.pre('save', function(next){
 	});
 });
 
+
+
+var deviceUtils = {
+	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
+};
+
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);
+exports.utils = deviceUtils;

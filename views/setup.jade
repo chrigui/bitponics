@@ -53,8 +53,8 @@ block footer-scripts
     script
       Bitponics.currentUser = {
         email: '!{user.email}',
-        publicKey: '!{user.apiPublicKey}',
-        privateKey: '!{user.apiPrivateKey}'
+        publicDeviceKey: '!{user.deviceKey.public}',
+        privateDeviceKey: '!{user.deviceKey.private}'
       };
 
   script(src='/assets/js/setup.js')
