@@ -1,1 +1,64 @@
-.mobile{display:none}
+.full-width{width:100%}
+.full-height{height:100%}
+.position-f{position:fixed}
+.position-r{position:relative}
+.position-a{position:absolute}
+.display-b{display:block}
+.display-n{display:none}
+.display-i{display:inline}
+.display-ib,.data-module{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-t{display:table}
+.clear-b{clear:both}
+.clear-l{clear:left}
+.clear-r{clear:right}
+.clearfix{zoom:1}
+.clearfix:before,.clearfix:after{content:"";display:table}
+.clearfix:after{clear:both}
+.float-l{float:left}
+.float-r{float:right}
+.float-n{float:none}
+.top-0{top:0}
+.bottom-0{bottom:0}
+.left-0{left:0}
+.right-0{right:0}
+.uppercase{text-transform:uppercase}
+.lowercase{text-transform:lowercase}
+.text-align-c{text-align:center}
+.text-align-r{text-align:right}
+.text-align-l{text-align:left}
+.text-align-j{text-align:justify}
+.padding-20{padding:20px}
+.centered{margin-left:auto;margin-right:auto}
+.default-border-b{border-bottom:1px solid #333}
+.default-border-t{border-top:1px solid #333}
+.default-border-r{border-right:1px solid #333}
+.default-border-l{border-left:1px solid #333}
+.content-box{display:block;letter-spacing:normal;word-spacing:normal;text-align:left;}
+.content-box:after{content:"";display:block;height:0;clear:both;visibility:hidden}
+.text-normalize{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
+.hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
+.ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.circle{text-align:center;border-radius:50em;}
+.circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.content-module{float:left;}
+.content-module.side{width:100%;margin:2em 0 0 0}
+.content-module.middle{width:100%;padding:100% 0 0 0;border:0 none;clear:both}
+.data-module{width:50%;margin:.125em -2px}
+section#header,section#main,section#footer{padding:1em}
+section#main{padding:6em 1em 1em;}
+section#main #visualizer div.circle{top:1.5em;left:1.5em;bottom:1.5em;right:1.5em}
+section#main #controls,section#main #reminders{float:right}
+#logo,#setup,#user{float:left;width:25%}
+#setup{width:35%;margin-right:10%}
+#user{padding:0}
+@media screen and (min-width: 60em){.content-module{float:left;}
+.content-module.side{width:20%}
+.content-module.middle{width:60%;padding:60% 0 0 0;clear:none}
+.data-module{width:100%;margin:.125em 0}
+section#footer{width:100%;}
+section#footer .content-module{margin:0}
+section#footer #date{float:left}
+section#footer #notifications{float:right;text-align:right}
+#logo,#setup,#user{width:20%}
+#setup{width:30%;margin-right:30%}
+}

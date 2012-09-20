@@ -38,3 +38,5 @@
 .text-normalize{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
 .hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
 .ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.circle{text-align:center;border-radius:50em;}
+.circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
