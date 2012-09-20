@@ -133,9 +133,9 @@ var actionUtils = {
 	 * 
 	 * Assumes it's passed an action with states with controlValues.
 	 */
-	updateCycleTemplateWithStates : function(cycleTemplate, action){
+	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates){
 		var result = cycleTemplate,
-			states = action.cycle.states,
+			states = actionCycleStates,
 			convertDurationToMilliseconds = actionUtils.convertDurationToMilliseconds;
 
 		switch(states.length){
@@ -169,6 +169,13 @@ var actionUtils = {
 				result = result.replace(/{duration1}/, totalFirstDuration);
 				result = result.replace(/{value2}/, state1.controlValue);
 				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
+				break;
+			default: 
+				winston.info('Serializing a blank actionCycleState');
+				result = result.replace(/{value1}/, '0');
+				result = result.replace(/{duration1}/, '0');
+				result = result.replace(/{value2}/, '0');
+				result = result.replace(/{duration2}/, '0');
 				break;
 		}
 		return result;

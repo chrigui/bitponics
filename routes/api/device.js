@@ -264,6 +264,7 @@ module.exports = function(app) {
         phase,
         actions,
         responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7),
+        responseBody = responseBodyTemplate,
         cycleTemplate = DeviceUtils.cycleTemplate;
 
     winston.info(JSON.stringify(req.headers));  
@@ -312,22 +313,28 @@ module.exports = function(app) {
         // loop to get the actions the device can handle
         async.forEachSeries(device.controlMap, 
           function(controlOutputPair, iteratorCallback){
-            winston.info(actions, controlOutputPair);
-            
-            var controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+            var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
             
             winston.info('controlAction');
             winston.info(controlAction);
             
-            if (!controlAction){ return iteratorCallback(); }
-
-            // TODO : account for cycle.repeat
-
-            var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId);
-            thisCycleString = thisCycleString.replace('{override}','1');
-            // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
-            thisCycleString = thisCycleString.replace('{offset}','0');
-            thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction);
+            // Need an entry for every control, even if there's no associated cycle
+            if (!controlAction){ 
+              // if no action, just 0 everything out
+              thisCycleString = thisCycleString.replace('{override}','0');
+              thisCycleString = thisCycleString.replace('{offset}','0');
+              thisCycleString = thisCycleString.replace('{value1}','0');    
+              thisCycleString = thisCycleString.replace('{duration1}','0');    
+              thisCycleString = thisCycleString.replace('{value2}','0');    
+              thisCycleString = thisCycleString.replace('{duration2}','0');     
+            } else {
+              // TODO : account for cycle.repeat
+              thisCycleString = thisCycleString.replace('{override}','1');
+              // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
+              thisCycleString = thisCycleString.replace('{offset}','0');
+              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+            }
 
             allCyclesString += thisCycleString;
             iteratorCallback();
@@ -348,7 +355,7 @@ module.exports = function(app) {
       res.header('X-Bpn-ResourceName', 'cycles');
       res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       
-      var responseBody = responseBodyTemplate.replace('{cycles}', allCyclesString);
+      responseBody = responseBody.replace('{cycles}', allCyclesString);
 
       device.activeGrowPlanInstance = growPlanInstance;
       device.activePhase = phase;
@@ -386,6 +393,7 @@ module.exports = function(app) {
    * Get the current refresh status for the device. Response indicates whether 
    * the device should refresh its current cycles & whether there are any control overrides
    * 
+   * https://docs.google.com/a/bitponics.com/document/d/1YD6AFDxeuUVzQuMhvIh3W5AKRe9otmEI_scxCohP9u4/edit#
    */
   app.get('/api/devices/:id/refresh_status', function (req, res, next){
     var deviceId = req.params.id.replace(/:/g,''),
@@ -393,10 +401,10 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        responseTemplate = ""; 
+        cycleTemplate = DeviceUtils.cycleTemplate,
+        responseBodyTemplate = "REFRESH={refresh}\r\nOVERRIDES={overrides}" + String.fromCharCode(7),
+        responseBody = responseBodyTemplate;
 
-    winston.info(req);  
-    
     req.session.destroy();
     res.clearCookie('connect.sid', { path: '/' }); 
     
@@ -410,6 +418,11 @@ module.exports = function(app) {
             return callback(new Error('No device found for id ' + req.params.id));
           }
           device = deviceResult;
+
+          // Set whether we need to ask the device to refresh its cycles
+          responseBody = responseBody.replace('{refresh}', device.activeActions.deviceRefreshRequired ? '1' : '0');
+
+
           GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
         },
         function (growPlanInstanceResult, callback){
