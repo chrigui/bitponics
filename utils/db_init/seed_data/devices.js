@@ -10,12 +10,6 @@ module.exports = [
 				"savedObjectIds['users']['michael@bitponics.com']"
 			 ],
 			owner: "savedObjectIds['users']['jack@bitponics.com']",
-			// sensorMap : [
-		 //      { 
-			//     sensor : { type: ObjectId, ref: 'Sensor' },
-			//     inputId : { type: String }
-			//   }
-			// ],
 			controlMap : [ 
 			  {
 			    control : "savedObjectIds['controls']['Light']",
@@ -42,17 +36,4 @@ module.exports = [
 				}
 			]
 		}
-		// ,
-		// {
-		// 	deviceId : "00:06:66:72:11:cf",
-		// 	owner :,
-		// 	name : "Chris' Bitponics Device 2",
-		// 	controlMap : [ ],
-		// 	sensors : [
-		// 		ObjectId("503a79426d25620000000001")
-		// 	],
-		// 	users : [
-		// 		ObjectId("5021e2cd8330ec0000000010")
-		// 	]
-		// }
 	];

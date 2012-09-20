@@ -56,137 +56,7 @@ ActionSchema = new Schema({
 
 ActionSchema.plugin(useTimestamps);
 
-ActionSchema.statics.convertDurationToMilliseconds = function(durationType, duration, callback){
-	switch(durationType){
-		case 'milliseconds':
-			return callback(null, duration);
-			break;
-		case 'seconds':
-			return callback(null, duration * 1000);
-			break;
-		case 'minutes':
-			return callback(null, duration * 1000 * 60);
-			break;
-		case'hours':
-			return callback(null, duration * 1000 * 60 * 60);
-			break;
-		case 'days':
-			return callback(null, duration * 1000 * 60 * 60 * 24);
-			break;
-		case 'weeks':
-			return callback(null, duration * 1000 * 60 * 60 * 24 * 7);
-			break;
-		case 'months':
-			// TODO : Figure out a proper way to handle month-long durations. variable day spans.
-			return callback(null, duration * 1000 * 60 * 60 * 24 * 30);
-			break;
-		case 'untilPhaseEnd':
-		default:
-			return callback(null, -1);
-			//return callback(new Error('Cannot convert the durationType' + durationType + ' to milliseconds'))
-	}
-};
 
-ActionSchema.methods.getStatesInDeviceFormat = function(finalCallback){
-	var action = this,
-		states = action.cycle.states,
-		resultArray = [],
-		convertDurationToMilliseconds = ActionModel.convertDurationToMilliseconds;
-
-	switch(states.length){
-		case 1:
-			var infiniteStateControlValue = states[0].controlValue;
-			resultArray.push(infiniteStateControlValue + ',' + infiniteStateControlValue )
-			//return finalCallback(new Error('Cannot convert single-state cycle to device format'));
-			break;
-		case 2:
-			var state0 = states[0],
-				state1 = states[1];
-			
-			async.series([
-				function(callback){
-					resultArray.push(state0.controlValue + ',');
-					convertDurationToMilliseconds(
-						state0.durationType, 
-						state0.duration, 
-						function(err, duration){
-							if (err) { return callback(err);}
-							resultArray.push(duration + ',');
-							callback();		
-						});
-				},
-				function(callback){
-					resultArray.push(state1.controlValue + ',');
-					convertDurationToMilliseconds(
-						state1.durationType, 
-						state1.duration, 
-						function(err, duration){
-							if (err) { return callback(err);}
-							resultArray.push(duration);
-							callback();		
-						}
-					);	
-				}
-				], 
-				function(err, result){ 
-					if (err) { return callback(err);} 
-					return finalCallback(null, resultArray.join(''));
-				}
-			);
-			
-			break;
-		case 3:
-			var state0 = states[0],
-				state1 = states[1],
-				state2 = states[2],
-				firstDuration;
-			
-			// If a 3-state cycle, the 1st and 3rd must be contiguous, so they
-			async.series([
-				function(callback){
-					convertDurationToMilliseconds(
-						state0.durationType, 
-						state0.duration, 
-						function(err, duration){
-							if (err) { return callback(err);}
-							firstDuration = duration;
-							callback();		
-						}
-					);
-				},
-				function(callback){
-					convertDurationToMilliseconds(
-						state2.durationType, 
-						state2.duration, 
-						function(err, duration){
-							if (err) { return callback(err);}
-							firstDuration += duration;
-							resultArray.push(state0.controlValue + ',');
-							resultArray.push( firstDuration + ',');	
-							callback();		
-						}
-					);
-				},
-				function(callback){
-					resultArray.push(state1.controlValue + ',');
-					convertDurationToMilliseconds(
-						state1.durationType, 
-						state1.duration, 
-						function(err, duration){
-							if (err) { return callback(err);}
-							resultArray.push(duration);
-							callback();		
-						});	
-				}
-				], 
-				function(err, result){ 
-					if (err) { return callback(err);} 
-					return finalCallback(null, resultArray.join(''));
-				}
-			);
-			break;
-	}
-};
 
 /**
  *  Validate cycle states
@@ -231,5 +101,186 @@ ActionSchema.pre('save', function(next){
 
 ActionModel = mongoose.model('Action', ActionSchema);
 
+
+var actionUtils = {
+	convertDurationToMilliseconds : function(durationType, duration){
+		switch(durationType){
+			case 'milliseconds':
+				return duration;
+			case 'seconds':
+				return duration * 1000;
+			case 'minutes':
+				return duration * 1000 * 60;
+			case'hours':
+				return duration * 1000 * 60 * 60;
+			case 'days':
+				return duration * 1000 * 60 * 60 * 24;
+			case 'weeks':
+				return duration * 1000 * 60 * 60 * 24 * 7;
+			case 'months':
+				// TODO : Figure out a proper way to handle month-long durations. variable day spans.
+				return duration * 1000 * 60 * 60 * 24 * 30;
+			case 'untilPhaseEnd':
+			default:
+				// an infinite duration.
+				return -1;
+		}
+	},
+
+	/**
+	 * Takes a string in the form '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
+	 * and replaces the {value} and {duration} fields with the proper values 
+	 * 
+	 * Assumes it's passed an action with states with controlValues.
+	 */
+	updateCycleTemplateWithStates : function(cycleTemplate, action){
+		var result = cycleTemplate,
+			states = action.cycle.states,
+			convertDurationToMilliseconds = actionUtils.convertDurationToMilliseconds;
+
+		switch(states.length){
+			case 1:
+				var infiniteStateControlValue = states[0].controlValue;
+				result = result.replace(/{value1}/, infiniteStateControlValue);
+				result = result.replace(/{value2}/, infiniteStateControlValue);
+				result = result.replace(/{duration1}/, 1);
+				result = result.replace(/{duration2}/, 1);
+				break;
+			case 2:
+				var state0 = states[0],
+					state1 = states[1];
+				
+				result = result.replace(/{value1}/, state0.controlValue);
+				result = result.replace(/{duration1}/, convertDurationToMilliseconds(state0.durationType, state0.duration));
+				result = result.replace(/{value2}/, state1.controlValue);
+				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
+				break;
+			case 3:
+				// If a 3-state cycle, the 1st and 3rd must be contiguous (have the same controlValue)
+
+				var state0 = states[0],
+					state1 = states[1],
+					state2 = states[2],
+					firstDuration = convertDurationToMilliseconds(state0.durationType, state0.duration),
+					thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
+					totalFirstDuration = firstDuration + thirdDuration;
+				
+				result = result.replace(/{value1}/, state0.controlValue);
+				result = result.replace(/{duration1}/, totalFirstDuration);
+				result = result.replace(/{value2}/, state1.controlValue);
+				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
+				break;
+		}
+		return result;
+	}
+};
+
+
 exports.schema = ActionSchema;
 exports.model = ActionModel;
+exports.utils = actionUtils;
+
+
+
+/**
+updateDeviceCycleTemplateWithStates : function(deviceCycleTemplate, finalCallback){
+		var action = this,
+			states = action.cycle.states,
+			resultArray = [],
+			convertDurationToMilliseconds = ActionModel.convertDurationToMilliseconds;
+
+		switch(states.length){
+			case 1:
+				var infiniteStateControlValue = states[0].controlValue;
+				resultArray.push(infiniteStateControlValue + ',' + infiniteStateControlValue )
+				//return finalCallback(new Error('Cannot convert single-state cycle to device format'));
+				break;
+			case 2:
+				var state0 = states[0],
+					state1 = states[1];
+				
+				async.series([
+					function(callback){
+						resultArray.push(state0.controlValue + ',');
+						convertDurationToMilliseconds(
+							state0.durationType, 
+							state0.duration, 
+							function(err, duration){
+								if (err) { return callback(err);}
+								resultArray.push(duration + ',');
+								callback();		
+							});
+					},
+					function(callback){
+						resultArray.push(state1.controlValue + ',');
+						convertDurationToMilliseconds(
+							state1.durationType, 
+							state1.duration, 
+							function(err, duration){
+								if (err) { return callback(err);}
+								resultArray.push(duration);
+								callback();		
+							}
+						);	
+					}
+					], 
+					function(err, result){ 
+						if (err) { return callback(err);} 
+						return finalCallback(null, resultArray.join(''));
+					}
+				);
+				
+				break;
+			case 3:
+				var state0 = states[0],
+					state1 = states[1],
+					state2 = states[2],
+					firstDuration;
+				
+				// If a 3-state cycle, the 1st and 3rd must be contiguous, so they
+				async.series([
+					function(callback){
+						convertDurationToMilliseconds(
+							state0.durationType, 
+							state0.duration, 
+							function(err, duration){
+								if (err) { return callback(err);}
+								firstDuration = duration;
+								callback();		
+							}
+						);
+					},
+					function(callback){
+						convertDurationToMilliseconds(
+							state2.durationType, 
+							state2.duration, 
+							function(err, duration){
+								if (err) { return callback(err);}
+								firstDuration += duration;
+								resultArray.push(state0.controlValue + ',');
+								resultArray.push( firstDuration + ',');	
+								callback();		
+							}
+						);
+					},
+					function(callback){
+						resultArray.push(state1.controlValue + ',');
+						convertDurationToMilliseconds(
+							state1.durationType, 
+							state1.duration, 
+							function(err, duration){
+								if (err) { return callback(err);}
+								resultArray.push(duration);
+								callback();		
+							});	
+					}
+					], 
+					function(err, result){ 
+						if (err) { return callback(err);} 
+						return finalCallback(null, resultArray.join(''));
+					}
+				);
+				break;
+		}
+	}
+*/
