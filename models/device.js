@@ -89,5 +89,12 @@ DeviceSchema.pre('save', function(next){
 	});
 });
 
+
+
+var deviceUtils = {
+	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
+};
+
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);
+exports.utils = deviceUtils;
