@@ -1,5 +1,7 @@
 var mongoose = require('mongoose'),
-    DeviceModel = require('../../models/device').model,
+    Device = require('../../models/device'),
+    DeviceModel = Device.model,
+    DeviceUtils = Device.utils,
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     GrowPlanModel = require('../../models/growPlan').model,
     PhaseModel = require('../../models/phase').model,
@@ -261,8 +263,8 @@ module.exports = function(app) {
         growPlanInstancePhase,
         phase,
         actions,
-        responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7);
-        cycleTemplate = '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'; 
+        responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7),
+        cycleTemplate = DeviceUtils.cycleTemplate;
 
     winston.info(JSON.stringify(req.headers));  
     
