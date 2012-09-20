@@ -335,9 +335,7 @@ module.exports = function(app) {
               thisCycleString = thisCycleString.replace('{offset}','0');
               thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
             }
-
             allCyclesString += thisCycleString;
-            
           }
         );
         return callback(null, allCyclesString);
@@ -345,12 +343,8 @@ module.exports = function(app) {
     ],
     function (err, allCyclesString) {
       if (err) { return next(err);}
-
+      
       var now = Date.now();
-
-      res.status(200);
-      res.header('X-Bpn-ResourceName', 'cycles');
-      res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       
       responseBody = responseBody.replace('{cycles}', allCyclesString);
 
@@ -380,6 +374,9 @@ module.exports = function(app) {
       // We don't need to make the response wait for this particular save. 
       device.save();
 
+      res.status(200);
+      res.header('X-Bpn-ResourceName', 'cycles');
+      res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       res.send(responseBody);
     });
 
@@ -398,6 +395,7 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
+        activeActionOverridesActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\r\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate;
@@ -414,33 +412,64 @@ module.exports = function(app) {
           if (!deviceResult){ 
             return callback(new Error('No device found for id ' + req.params.id));
           }
+          var allCyclesString = '';
+
           device = deviceResult;
 
           // Set whether we need to ask the device to refresh its cycles
           responseBody = responseBody.replace('{refresh}', device.activeActions.deviceRefreshRequired ? '1' : '0');
 
-
-          GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
-        },
-        function (growPlanInstanceResult, callback){
-          if (!growPlanInstanceResult){ 
-            return callback(new Error('No active grow plan instance found for device'));
+          if (device.activeActionOverrides.expires > Date.now()){
+            responseBody = responseBody.replace('{overrides}', device.activeActionOverrides.deviceMessage);
+            return callback();
+          } else {
+            device.controlMap.forEach(
+              function(controlOutputPair){
+                var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
+                    controlAction = device.activeActionOverrides.actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+                  
+                // Need an entry for every control, even if there's no associated cycle
+                if (!controlAction){ 
+                  // if no action, just 0 everything out
+                  thisCycleString = thisCycleString.replace('{override}','0');
+                  thisCycleString = thisCycleString.replace('{offset}','0');
+                  thisCycleString = thisCycleString.replace('{value1}','0');    
+                  thisCycleString = thisCycleString.replace('{duration1}','0');    
+                  thisCycleString = thisCycleString.replace('{value2}','0');    
+                  thisCycleString = thisCycleString.replace('{duration2}','0');     
+                } else {
+                  thisCycleString = thisCycleString.replace('{override}','1');
+                  thisCycleString = thisCycleString.replace('{offset}','0');
+                  thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+                }
+                allCyclesString += thisCycleString;  
+              }
+            );  
+            responseBody = responseBody.replace('{overrides}', allCyclesString);
+            return callback();  
           }
-          growPlanInstance = growPlanInstanceResult;
-          callback();
+        
+          callback();  
         }
       ],
-      function(err, responseBody){
+      function(err){
         if (err) { return next(err);}
-
+        
         var now = Date.now();
+        // TODO : populate this correctly. actions should be...something
+        device.activeActionOverrides = {
+          actions: [],
+          deviceMessage : responseBody,
+          lastSent : now,
+          expires : now + (365*24*60*60*1000) // just make it expire in a year
+        };
+        
+        // We don't need to make the response wait for this particular save. 
+        device.save();
 
         res.status(200);
         res.header('X-Bpn-ResourceName', 'refresh_status');
         res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-        // To end response for the firmware, send the Bell character
-        responseBody += String.fromCharCode(7);
-
         res.send(responseBody);
       }
     );
