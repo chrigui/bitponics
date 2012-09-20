@@ -1,93 +1,175 @@
 extends layout
 
 
-block css 
-  link(rel='stylesheet', href='/assets/css/pages/dashboard/nav.css')
+block css
 
 
 block content
-  div#dashboard.user-page
-    nav
-      ul
-        li.first.logo
-          a(href="#") bitponics
-        li.growing-plan
-          a(href="#") Tomatoes
-            span.triangle-down
-        li.user
-          a(href="#") Amit Kumar
-            span.icon
-        li.language
-          a(href="#") English
-            span.icon
-        li.last.settings
-          a(href="#") Settings
-            span.icon
-    section
-      header.default-border-b
-        h1.date
-          span Friday, November 18, 2011
-        h2.time
-          span.text-align-r 8:32 AM
-    section
-      div#phases-graph
-      nav#graph-nav
-        .photo-stream
-          ul
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-            li 
-              img(src="img/placeholders/hydro7.jpg")  
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-          .add-photo
-            img(src="img/icons/camera.gif")
+  section#header
+    header#logo(role="banner") Bitponics
+    div#setup.select-block
+      h2.main-heading Grow Plans
+      h3.sub-heading Mixed Leafy Greens
+    div#user.select-block
+      h2.main-heading User
+      h3.sub-heading Amit Kumar
+  section#main(role="main")
+    div#sensors.content-module.side
+      h2.main-heading Sensors
+      section#lux.data-module 
+        h3.main-heading 
+          abbr(title="Luminous Flux") Lux
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#ir.data-module 
+        h3.main-heading 
+          abbr(title="Infrared") IR
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#full.data-module 
+        h3.main-heading 
+          abbr(title="Full Light") Full
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#vis.data-module 
+        h3.main-heading 
+          abbr(title="Visible Light") Vis
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#air.data-module 
+        h3.main-heading 
+          | Air Temp
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#hum.data-module 
+        h3.main-heading 
+          abbr(title="Humidity") Hum
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#co2.data-module 
+        h3.main-heading 
+          abbr(title="Carbon Dioxide") CO2
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#water.data-module 
+        h3.main-heading
+            | Water Temp
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#ph.data-module 
+        h3.main-heading 
+          | pH
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#ec.data-module 
+        h3.main-heading 
+          abbr(title="Electrical Conductivity") EC
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#tds.data-module 
+        h3.main-heading 
+          abbr(title="Total Dissolved Solids") TDS
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
+      section#sal.data-module 
+        h3.main-heading 
+          | Salinity
+        div.sensor-data
+          div.sensor-value 18
+          div.sensor-value-unit
+            span Hrs/
+            span Day
+        div.sensor-type.icon Light Sensor
+        div.message Check
+        div.settings.icon Settings
 
-        .notifications
+    div#visualizer.content-module.middle
+      div#phases-graph.circle.centered
+    div#controls.content-module.side
+      h2.main-heading Controls
+      div.control Pump
+      div.control Fan
+      div.control Light
+    div#reminders.content-module.side
+      h2.main-heading Reminders
+      div.data-module Hey!
+      div.data-module Yo?
+  section#footer
+    div#date.content-module.side
+      div.date.main-heading October 17, 2012
+      div.time.sub-heading 3:23 PM
+    div#notifications.content-module.side
+      div.sub-heading.notification Notification #1
+      div.sub-heading.notification Notification #2
 
-          .arrow-left
-            img(src="img/icons/arrow-left.gif")
-          .arrow-right
-            img(src="img/icons/arrow-right.gif")
-          .notification
-            .calendar
-              img(src="img/icons/calendar.gif")
-            .text Flush reservior and refill. Mix 1/4 cup "Grow" nutrient, then 1/4 cup "Micro" nutrient, then 1/2 cup "Bloom" nutrient.
-          .add-log 
-            img(src="img/icons/notepad.gif")
+
 
 block footer-scripts
   script(src='/assets/js/libs/d3.v2.js')
-  script(src='/assets/js/dashboard.js')
+  script(src='/assets/js/dashboard.js') 
