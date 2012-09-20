@@ -667,6 +667,7 @@ console.log(_data.description)
 		    var dataObj = new models.growPlanInstance({
 		    	gpid: _data.gpid,
 				users: _data.users.map(function(item){ return eval(item) }),
+				owner : eval(_data.owner),
 				growPlan: eval(_data.growPlan),
 				device: eval(_data.device),
 				startDate: _data.startDate,
@@ -696,4 +697,16 @@ console.log(_data.description)
 		    });
 		});
     }
-]);
+],
+function(err, results){
+	console.log('ALL DONE');
+	if(err){
+		console.log('FAILED');
+		console.log(err);
+		process.exit(1);
+	} else {
+		console.log('SUCCEEDED');
+		process.exit(0);
+	}
+}
+);

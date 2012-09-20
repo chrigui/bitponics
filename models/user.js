@@ -67,6 +67,8 @@ UserSchema = new Schema({
 },
 { strict: true });
 
+UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
 UserSchema.virtual('name.full')
 	.get(function () {
 		return this.name.first + ' ' + this.name.last;
@@ -80,6 +82,8 @@ UserSchema.virtual('name.full')
 		this.set('name.last', lastName);
 	});
 
+
+/************************** STATIC METHODS  ***************************/
 
 UserSchema.static('createUserWithPassword', function(userProperties, password, next){
 	var newUser = new User(userProperties);
@@ -99,10 +103,6 @@ UserSchema.static('createUserWithPassword', function(userProperties, password, n
 		    });
 		});
 	});
-});
-
-UserSchema.method('verifyPassword', function(password, next) {
-  bcrypt.compare(password, this.hash, next);
 });
 
 
@@ -140,19 +140,34 @@ UserSchema.static('getByPublicApiKey', function(key, next) {
       return next(null, user, user.apiKey.private);
   });
 });
+/************************** END STATIC METHODS  ***************************/
 
-UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
+
+/************** INSTANCE METHODS ********************/
+
+UserSchema.method('verifyPassword', function(password, next) {
+  bcrypt.compare(password, this.hash, next);
+});
+
+/************** END INSTANCE METHODS ********************/
+
+
+
+
+/***************** MIDDLEWARE **********************/
 
 /**
- *  Give user device keys if needed 
+ *  Give user device keys if needed. This can be done in parallel with other pre save hooks.
+ *  http://mongoosejs.com/docs/middleware.html
  */
-UserSchema.pre('save', function(next){
+UserSchema.pre('save', true, function(next, done){
 	var user = this;
-	
-	if (user.deviceKey && user.deviceKey.public && user.deviceKey.private){ return next(); }
+	next();
+	if (user.deviceKey && user.deviceKey.public && user.deviceKey.private){ return done(); }
 
 	crypto.randomBytes(32, function(ex, buf) {
-		if (ex) { return next(ex); }
+		if (ex) { return done(ex); }
 	  	var keysSource = buf.toString('hex'),
 	  		publicKey = keysSource.substr(0, 16),
 	  		privateKey = keysSource.substr(16, 16);
@@ -161,20 +176,24 @@ UserSchema.pre('save', function(next){
 	  		public : publicKey,
 	  		private : privateKey
 	  	};
-	  	next();
+	  	done();
+	  	
   	});
 });
 
 /**
- *  Give user API keys if needed 
+ *  Give user API keys if needed. Can be done in parallel with other pre save hooks. 
+ *  http://mongoosejs.com/docs/middleware.html
  */
-UserSchema.pre('save', function(next){
+UserSchema.pre('save', function(next, done){
 	var user = this;
 	
-	if (user.apiKey && user.apiKey.public && user.apiKey.private){ return next(); }
+	next();
+	
+	if (user.apiKey && user.apiKey.public && user.apiKey.private){ return done(); }
 
 	crypto.randomBytes(48, function(ex, buf) {
-		if (ex) { return next(ex); }
+		if (ex) { return done(ex); }
 	  	var keysSource = buf.toString('hex'),
 	  		publicKey = keysSource.substr(0, 16),
 	  		privateKey = keysSource.substr(16, 32);
@@ -183,33 +202,35 @@ UserSchema.pre('save', function(next){
 	  		public : publicKey,
 	  		private : privateKey
 	  	};
-	  	next();
+	  	done();
   	});
 });
 
 /**
- *  Give user activation token if needed
+ *  Give user activation token if needed. This also can be done in parallel.
  */
-UserSchema.pre('save', function(next){
+UserSchema.pre('save', function(next, done){
 	var user = this,
 		token = "",
 		verifyUrl = "";
 
+	next();
+
 	winston.info('user.active:'+user.active)
 	winston.info('user.sentEmail:'+user.sentEmail)
 
-	if(user.activationToken && user.active) { return next(); }
+	if(user.activationToken && user.active) { return done(); }
 	
 	//create random string to verify against
 	crypto.randomBytes(48, function(ex, buf) {
-		if (ex) { return next(ex); }
+		if (ex) { return done(ex); }
 		
 		token = buf.toString('hex');
 		user.activationToken = token;
 		verifyUrl = 'http://' + verificationEmailDomain + '/register?verify=' + user.activationToken;
 
 	  	//send activation email if not activated user
-		if(user.active && user.sentEmail){ return next(); }
+		if(user.active && user.sentEmail){ return done(); }
 			
 		// create reusable transport method (opens pool of SMTP connections)
 		var smtpTransport = nodemailer.createTransport("SMTP",{
@@ -231,23 +252,27 @@ UserSchema.pre('save', function(next){
 
 		// send mail with defined transport object
 		smtpTransport.sendMail(mailOptions, function(err, response){
-		    if(err){ return next(err); }
+		    if(err){ return done(err); }
 		    winston.info("Message sent: " + response.message);
 	        // if you don't want to use this transport object anymore, uncomment following line
 		    smtpTransport.close(); // shut down the connection pool, no more messages
 
 	        user.sentEmail = true;
 		    user.save(function(err){
-		    	if (err) { return next(err); }
-		    	return next();
+		    	if (err) { return done(err); }
+		    	return done();
 		    });
 		});
 	});
 });
+/***************** END MIDDLEWARE **********************/
 
+
+/***************** INDEXES ************************************/
 UserSchema.index({ 'email': 1 });
 UserSchema.index({ 'deviceKey.public': 1 });
 UserSchema.index({ 'apiKey.public': 1 });
+/***************** END INDEXES ********************************/
 
 User = mongoose.model('User', UserSchema);
 

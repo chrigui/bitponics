@@ -4,6 +4,7 @@ module.exports = [
 			users : [
 				"savedObjectIds['users']['jack@bitponics.com']"
 			],
+			owner : "savedObjectIds['users']['jack@bitponics.com']",
 			growPlan : "savedObjectIds['growPlans']['Tomato']",
 			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
@@ -136,6 +137,7 @@ module.exports = [
 			users : [
 				"savedObjectIds['users']['jack@bitponics.com']"
 			],
+			owner : "savedObjectIds['users']['jack@bitponics.com']",
 			growPlan : "savedObjectIds['growPlans']['Tomato']",
 			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012

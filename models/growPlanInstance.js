@@ -16,13 +16,15 @@ var GrowPlanInstanceSchema = new Schema({
 
 	users : [{ type: ObjectId, ref: 'User' }],
 	
+	owner : { type: ObjectId, ref: 'User', required: true },
+
 	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
 	
 	device : { type : ObjectId, ref : 'Device', required: false }, //the bitponics device
 	
 	startDate: { type: Date, required: true },
 
-	endDate: { type: Date, required: true },
+	endDate: { type: Date },
 
     active: { type: Boolean, required: true },
 
@@ -41,6 +43,7 @@ var GrowPlanInstanceSchema = new Schema({
 		}]
 	}],
 	
+	/*
 	controlLogs: [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
@@ -48,7 +51,39 @@ var GrowPlanInstanceSchema = new Schema({
 			value: { type: Number }
 		}]
 	}],
-	
+	*/
+
+
+	actionLogs: [{
+		/**
+		 * The time that this action was first requested, either through a sensor trigger or a manual trigger
+		 */
+		timeRequested: { type: Date, required: true, default: Date.now },
+		
+		/**
+		 * The time this action was actually sent, either to the device or user
+		 */
+		timeSent: { type: Date },
+		
+		/**
+		 * Reference to the action
+		 */
+		action : {type: ObjectId, ref: 'Action', required: true},
+		
+		/**
+		 * Boolean indicating whether this action has been sent. This will be
+		 * what queries are run against in order to pick up pending actions
+		 */
+		sent: {type: Boolean, default : false},
+		
+		/**
+		 * "Done" status of the action. Device actions are automatically marked as done.
+		 * Actions that require user action might require the user to mark it as done...but
+		 * that's not implemented. For now we'll just mark this as true whenever an action is _sent_.
+		 */
+		done: {type : Boolean, default : false}
+	}],
+
 	photoLogs: [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
@@ -70,7 +105,8 @@ var GrowPlanInstanceSchema = new Schema({
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
-
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
+
+
 
 exports.model = mongoose.model('GrowPlanInstance', GrowPlanInstanceSchema);
