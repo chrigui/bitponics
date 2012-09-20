@@ -30,7 +30,8 @@ passport.use(new LocalStrategy({
 passport.use(new HmacStrategy({
   name : 'device',
   scheme : 'BPN_DEVICE',
-  getUser : User.getByPublicDeviceKey
+  getUser : User.getByPublicDeviceKey,
+  headerSaltField : 'X-Bpn-Fert'
 }));
 
 passport.use(new HmacStrategy({
