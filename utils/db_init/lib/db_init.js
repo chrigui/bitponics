@@ -32,6 +32,8 @@ var mongoose   = require('mongoose'),
 	db_url = process.argv.slice(2)[0], //get's first cmd line arg
 	clear = process.argv.slice(2)[1], //get's second cmd line arg
 	data = require('../seed_data'),
+	appDomains = require('../../../config/app-domain-config'),
+	appDomain = 'bitponics.com',
 	dataType = undefined,
 	savedObjectIds = {
 		sensors: {},
@@ -52,12 +54,15 @@ var mongoose   = require('mongoose'),
 switch(db_url){
 	case 'local':
 		db_url = mongoUrls.local;
+		appDomain = appDomains.local;
 		break;
 	case 'dev':
 		db_url = mongoUrls.development;
+		appDomain = appDomains.development;
 		break;
 	case 'staging':
 		db_url = mongoUrls.staging;
+		appDomain = appDomains.staging;
 		break;
 	default:
 		// if not one of those, assume it was a mongodb:// url, so leave it alone
@@ -172,7 +177,9 @@ async.series([
 			  	active : _data.active,
 			  	admin :  _data.admin,
 			  	activationToken : _data.activationToken,
-			  	sentEmail : _data.sentEmail
+			  	sentEmail : _data.sentEmail,
+			  	deviceKey : _data.deviceKey,
+			  	apiKey : _data.apiKey
 			},
 			"8bitpass", //default password
 			function(err, user){
@@ -356,7 +363,9 @@ async.series([
 				});
 
 				_data.recentSensorLogs.forEach(function(rsl){
-					rsl.sensor = eval(rsl.sensor);
+					rsl.logs.forEach(function(sl){
+						sl.sensor = eval(sl.sensor);
+					});
 				});
 
 			    var dataObj = new models.device({
@@ -382,7 +391,7 @@ async.series([
 			        console.log(err);
 			      }
 
-			      //savedObjectIds[dataType][_data.name] = doc.deviceId;
+			      savedObjectIds[dataType][_data.deviceId] = doc.id;
 			      if (dataCount === 1) {
 			      	 callback(null, null);
 			      }
@@ -460,35 +469,7 @@ async.series([
 		    });
 		});
     },
-    function(callback){
-        /**
-		 * Controls
-		 */
-		var dataType = 'controls',
-			dataCount = data[dataType].length;
-
-		console.log('####### ' + dataType + ' #######');
-
-		data[dataType].forEach(function(_data){
-		    var dataObj = new models.control({
-				name: _data.name
-			});
-			dataObj.save(function (err, doc) {
-		      savedObjectIds[dataType][_data.name] = doc.id;
-		      if (dataCount === 1) {
-		      	 callback(null, null);
-		      }
-		      dataCount--;
-		      
-		      if (!err) {
-		        console.log("created controls");
-		      } else {
-		        console.log(err);
-		      }
-
-		    });
-		});
-    },
+    
     function(callback){
         /**
 		 * Actions
@@ -499,27 +480,20 @@ async.series([
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-
-			if(_data.controlMessage){
-				if(_data.controlMessage.controlReference){
-					_data.controlMessage.controlReference = eval(_data.controlReference);
-				}else{
-					_data.controlMessage.controlReference = "";
-				}
-				if(_data.controlMessage.valueToSend){
-					_data.controlMessage.valueToSend = _data.controlMessage.valueToSend;
-				}else{
-					_data.controlMessage.valueToSend = "";
-				}
-			}
-
-		    var dataObj = new models.action({
+console.log(_data.description)
+			var dataObj = new models.action({
 				description: _data.description,
-				controlMessage: _data.controlMessage,
-				startTime: _data.startTime,
-				recurrence: _data.recurrence
+				control: eval(_data.control),
+				cycle: _data.cycle
 			});
 			dataObj.save(function (err, doc) {
+  			  if (!err) {
+		      	console.log(dataCount);
+		        console.log("created action");
+		      } else {
+		        console.log(err);
+		      }
+
 		      savedObjectIds[dataType][_data.description] = doc.id;
 
 		      if (dataCount === 1) {
@@ -528,13 +502,6 @@ async.series([
 		      
 		      dataCount--;
 		      
-		      if (!err) {
-		      	console.log(dataCount);
-		        console.log("created action");
-		      } else {
-		        console.log(err);
-		      }
-
 		    });
 		});
     },
@@ -635,7 +602,7 @@ async.series([
 		data[dataType].forEach(function(_data){
 
 		    var dataObj = new models.growPlan({
-				createdByUserId: eval(_data.createdByUserId),
+				createdBy: eval(_data.createdBy),
 				name: _data.name,
 				description: _data.description,
 				plants: _data.plants,
@@ -683,15 +650,24 @@ async.series([
 				item.phase = eval(item.phase);
 			});
 			_data.sensorLogs.forEach(function(item){
-				item.sensor = eval(item.sensor);
+				item.logs.forEach(function(log){
+					log.sensor = eval(log.sensor);
+				});
+				
 			});
 			_data.controlLogs.forEach(function(item){
-				item.control = eval(item.control);
+				item.logs.forEach(function(log){
+					log.control = eval(log.control);	
+				});
 			});
+
+			//console.log(savedObjectIds);
+			console.log('device ' + _data.device + ' ' + eval(_data.device));
 
 		    var dataObj = new models.growPlanInstance({
 		    	gpid: _data.gpid,
 				users: _data.users.map(function(item){ return eval(item) }),
+				owner : eval(_data.owner),
 				growPlan: eval(_data.growPlan),
 				device: eval(_data.device),
 				startDate: _data.startDate,
@@ -721,4 +697,16 @@ async.series([
 		    });
 		});
     }
-]);
+],
+function(err, results){
+	console.log('ALL DONE');
+	if(err){
+		console.log('FAILED');
+		console.log(err);
+		process.exit(1);
+	} else {
+		console.log('SUCCEEDED');
+		process.exit(0);
+	}
+}
+);

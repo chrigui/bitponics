@@ -30,27 +30,6 @@ module.exports = function(app) {
    *      startDate: { type: Date },
    *      endDate: { type: Date },
    *      active: { type: Boolean }
-   *    }],
-   *    sensorLogs: [{
-   *      sensor: { type: ObjectId, ref: 'Sensor', required: true },
-   *      value: { type: Number },
-   *      timestamp: { type: Date, required: true }
-   *    }],
-   *    controlLogs: [{
-   *      control: { type: ObjectId, ref: 'Control', , required: true },
-   *      value: { type: Number },
-   *      timestamp: { type: Date, required: true }
-   *    }],
-   *    photoLogs: [{
-   *      url: { type : mongoose.SchemaTypes.Url, required: true},
-   *      tags: { type : [String]},
-   *      timestamp: { type: Date, required: true }
-   *    }],
-   *    genericLogs: [{
-   *      entry: { type: String, required: true },
-   *      tags: { type : [String]},
-   *      logType: { type: String },
-   *      timestamp: { type: Date, required: true }
    *    }]
    *  }, function (data, textStatus, jqXHR) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
@@ -98,7 +77,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an growPlanInstance
+   * Update a growPlanInstance
    *
    * jQuery.ajax({
    *     url: "/api/grow_plan_instances/503a86812e57c70000000001",
@@ -130,24 +109,38 @@ module.exports = function(app) {
     });
   });
 
+
+
   /*
-   * DEPRECATED - Sensor Logs nested - MOVED TO /api/device/:id/sensorlog
+   * Sensor Logs nested resource
+   */
+  app.get('/api/grow_plan_instances/:id/sensor_logs', function (req, res, next){
+    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      return res.send(growPlanInstance.sensorLogs);
+    });
+  });
+  
+  /*
+   *   Append logs to the grow plan instance's sensorLogs document. 
    *
    *   jQuery.ajax({
-   *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensorlog",
+   *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensor_logs",
    *      type: "PUT",
    *      data: {
    *        sensorLogs: [{
-   *          sensor: "503a79426d25620000000001",
-   *          value: 25,
-   *          timestamp: new Date()
-   *        },
-   *        {
-   *          sensor: "503a79426d25620000000001",
-   *          value: 24,
-   *          timestamp: new Date()
+   *          timestamp: new Date(),
+   *          logs : [
+   *            {
+   *              sensor: "503a79426d25620000000001",
+   *              value: 25
+   *            },
+   *            {
+   *              sensor: "503a79426d25620000000001",
+   *              value: 24    
+   *            }
+   *          ]
    *        }
-   *        ],
    *      },
    *      success: function (data, textStatus, jqXHR) {
    *          console.log("Post response:");
@@ -157,7 +150,7 @@ module.exports = function(app) {
    *      }
    *  });
    */
-  app.put('/api/grow_plan_instances/:id/sensorlog', function (req, res, next){
+  app.post('/api/grow_plan_instances/:id/sensor_logs', function (req, res, next){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       if (err) { return next(err); }
       req.body.sensorLogs.forEach(function(log){
@@ -165,15 +158,13 @@ module.exports = function(app) {
       });
       return growPlanInstance.save(function (err) {
         if (err) { return next(err); }
-        return res.csv([
-          ['endDate', growPlanInstance.endDate]
-        ]);
+        return res.send('successfully logged');
       });
     });
   });
 
   /*
-   * Delete an growPlanInstance
+   * Delete a growPlanInstance
    *
    * To test:
    * jQuery.ajax({

@@ -1,9 +1,18 @@
 var mongoose = require('mongoose'),
-    DeviceModel = require('../../models/device').model,
+    Device = require('../../models/device'),
+    DeviceModel = Device.model,
+    DeviceUtils = Device.utils,
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
+    GrowPlanModel = require('../../models/growPlan').model,
+    PhaseModel = require('../../models/phase').model,
+    Action = require('../../models/action'),
+    ActionModel = Action.model,
+    ActionUtils = Action.utils,
+    SensorModel = require('../../models/sensor').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
-    winston = require('winston');
+    winston = require('winston'),
+    async = require('async');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -64,7 +73,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Read an device
+   * Read a device
    *
    * To test:
    * jQuery.get("/api/devices/${id}", function(data, textStatus, jqXHR) {
@@ -82,7 +91,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an device
+   * Update a device
    *
    * To test:
    * jQuery.ajax({
@@ -112,7 +121,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Delete an device
+   * Delete a device
    *
    * To test:
    * jQuery.ajax({
@@ -143,149 +152,326 @@ module.exports = function(app) {
    * - devices will send csv for now in a form something like (TBD):
    *   sensor_id,value;sensor_id,value;sensor_id,value;sensor_id,value;
    *
-   *   jQuery.ajax({
-   *      url: "/api/devices/${id}/sensor_logs",
-   *      type: "PUT",
-   *      data: {
-   *        sensorLogs: [{
-   *          sensor: "503a79426d25620000000001",
-   *          value: 25,
-   *          //timestamp: new Date().getTime()
-   *        },
-   *        {
-   *          sensor: "503a79426d25620000000001",
-   *          value: 24,
-   *          //timestamp: new Date().getTime()
-   *        }
-   *        ],
-   *      },
-   *      success: function (data, textStatus, jqXHR) {
-   *          console.log("Post response:");
-   *          console.dir(data);
-   *          console.log(textStatus);
-   *          console.dir(jqXHR);
-   *      }
-   *   });
    *
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
-    var sensorLogs = req.body.sensorLogs,
-        csvLogs = "";
+    var deviceId = req.params.id.replace(/:/g,''),
+        pendingSensorLog = {timestamp : Date.now(), logs : []},
+        pendingDeviceLogs,
+        sensors,
+        device,
+        growPlanInstance;
 
     winston.info('req.body', req.body);
     winston.info('info', req.body);
 
-    //if csv format, convert to js obj
-    if(req.headers['content-type'] === 'text/csv'){
-      winston.info('req.rawBody', req.rawBody);
-      sensorLogs = [];
-      csvLogs = req.rawBody.split(';');
-      csvLogs.forEach(function(log){
-        winston.info('log: ');
-        if(log.length > 0){
-          sensorLogs.push({
-            'sensor': log.split(',')[0],
-            'value': log.split(',')[1]
-            //'timestamp': new Date()
-          });
-        }
-      });
+    // For now, only accept requests that use the device content-type
+    if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
+      return next(new Error('Invalid Content-Type'));
     }
 
-    //get device by mac address id
-    return DeviceModel.findOne({ device: req.params.id }, function(err, device) {
-      if (err) { return next(err); }
-      if (!device){ 
-        res.send(500, 'attempted to log to a nonexistent device');
-        return winston.info('attempted log to nonexistent device');
-      }
+    if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
+      winston.info('req.rawBody', req.rawBody);
+      pendingDeviceLogs = JSON.parse(req.rawBody);
+      winston.info('JSON.parse req.rawBody ', pendingDeviceLogs);
+    }
 
-      device.recentSensorLogs = device.recentSensorLogs || [];
-      sensorLogs.forEach(function(log){
-        device.recentSensorLogs.push(log);
-      });
-      device.save(function (err) {
-        if (err) winston.error(err);
-      });
+    async.waterfall([
+      function wf1(wf1Callback){
+        // In parallel, get the Device and all Sensors
+        async.parallel([
+            function parallel1(callback){
+              SensorModel.find().exec(callback);
+            },
+            function parallel2(callback){
+              DeviceModel.findOne({ deviceId: deviceId }, callback);
+            }
+          ],
+          // When those parallel ops are done, create the sensorLog entry and also retrieve 
+          // the active GrowPlanInstance
+          function parallelFinal(err, results){
+            if (err) { return callback(err);}
+            winston.info('wf1 final step');
 
-      //get device's current grow plan and push logs to it
-      return GrowPlanInstanceModel.findOne({ device: device._id, active: true }, function (err, growPlanInstance) {
-        if (err) { return next(err); }
-        if (!growPlanInstance){ 
-          winston.info('no grow plan instance for the device ' + device._id)
-          return res.send(500, 'no grow plan instance for the device ' + device._id);
-        } 
-        // Else we have a growPlanInstance
-        else {
-          sensorLogs.forEach(function(log){
-            growPlanInstance.sensorLogs.push(log);
-          });
-          return growPlanInstance.save(function (err) {
+            sensors = results[0];
+            device = results[1];
+            if (!device){ 
+              wf1Callback(new Error('Attempted to log to a nonexistent device'));
+            }
+
+            Object.keys(pendingDeviceLogs).forEach(function(key){
+              var sensor = sensors.filter(function(s){ return s.code === key; })[0];
+              if (sensor){
+                pendingSensorLog.logs.push({
+                  sensor : sensor._id,
+                  value : pendingDeviceLogs[key]
+                });
+              }              
+            })
+            winston.info('pendingSensorLog');
+            winston.info(pendingSensorLog);            
+
+            GrowPlanInstanceModel.findOne({ device: device._id, active: true },  wf1Callback);        
+          }
+        );
+      },
+      function wf2(growPlanInstance, wf2Callback){
+        // Now. In parallel, we can persist the pendingSensorLog to 
+        // the device & the growPlanInstance
+        async.parallel([
+            function parallel1(callback){
+              device.recentSensorLogs = device.recentSensorLogs || [];
+              device.recentSensorLogs.push(pendingSensorLog);
+              device.save(callback);
+            },
+            function parallel2(callback){
+              growPlanInstance.sensorLogs = growPlanInstance.sensorLogs || [];
+              growPlanInstance.sensorLogs.push(pendingSensorLog);          
+              growPlanInstance.save(callback);
+            }
+          ], 
+          function parallelFinal(err, result){
             if (err) { return next(err); }
-            return res.csv([
-              ['someresponse', 'someresponse122412']
-            ]);
-            
-          });
-        }
-      });
-    })
+            var responseBody = 'success';
+            res.status(200);
+            res.header('X-Bpn-ResourceName', 'sensor_logs');
+            res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+            // To end response for the firmware, send the Bell character
+            responseBody += String.fromCharCode(7);
+            res.send(responseBody);              
+          }
+        );
+
+      }],
+      function(err, result){
+        if (err) { return next(err); }
+      }
+    );
   });
+
 
   /*
    * Get the current cycle data for the device. 
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
+   * For now, only responds with device CSV. 
    */
-  app.get('/api/devices/:id/get_current_cycles', function (req, res, next){
-    //var format =  req. 'deviceCSV' : 'json';
-  
-    winston.info(req);  
+  app.get('/api/devices/:id/cycles', function (req, res, next){
+    var deviceId = req.params.id.replace(/:/g,''),
+        device,
+        growPlanInstance,
+        growPlanInstancePhase,
+        phase,
+        actions,
+        responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7),
+        responseBody = responseBodyTemplate,
+        cycleTemplate = DeviceUtils.cycleTemplate;
+
+    winston.info(JSON.stringify(req.headers));  
     
-    delete req.session.cookie;
     req.session.destroy();
-
-    res.status(200);
+    res.clearCookie('connect.sid', { path: '/' }); 
     
-    //{outputId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}
-    // 16 hours = 57600000ms
-    res.header('Content-Type', 'text/csv; format=device');
-    //res.header('X-Powered-By', '');
-    //res.header('Set-Cookie', '');
+    //get device by mac address id. 
+    //get the active GPI that's using the device.
+    //get the active phase of the GPI.
+    //get the actions/cycles of the phase.
 
+    async.waterfall([
+      function (callback){
+        DeviceModel.findOne({ deviceId: deviceId }, callback);  
+      },
+      function (deviceResult, callback){
+        if (!deviceResult){ 
+          return callback(new Error('No device found for id ' + req.params.id));
+        }
+        device = deviceResult;
+        GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
+      },
+      function (growPlanInstanceResult, callback) {
+        if (!growPlanInstanceResult){ 
+          return callback(new Error('No active grow plan instance found for device'));
+        }
+        growPlanInstance = growPlanInstanceResult;
+        growPlanInstancePhase = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+        
+        if (!growPlanInstancePhase){
+          return callback(new Error('No active phase found for this grow plan instance.'));
+        }
+        PhaseModel.findById(growPlanInstancePhase.phase).populate('actions').exec(callback);
+      },
+      function (phaseResult, callback){
+        winston.info('in callback 4');
+        var allCyclesString = '';
 
-  // To end response for the firmware, send the Bell character
-  res.send('1,0,1,57600000,0,28800000;2,0,1,14400000,0,7200000;' + String.fromCharCode(7));  
-
-
-
-
-  /*
-    res.header('Transfer-Encoding', 'chunked');
-    res.header('Connection', 'keep-alive');
-    
-    var countdown = 10;
-
-    var write = function(){
-      res.write('1,0,1,57600000,0,28800000');  
-      countdown--;
-      if (!countdown){
-        res.end();
-      } else {
-        setTimeout(write, 200);
+        phase = phaseResult;
+        // get the actions that have a control reference & a cycle definition
+        actions = phase.actions || [];
+        actions = actions.filter(function(action){ return !!action.control && !!action.cycle; });
+   
+        // get the device's controlMap. Use this as the outer
+        // loop to get the actions the device can handle
+        device.controlMap.forEach(
+          function(controlOutputPair){
+            var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+            
+            winston.info('controlAction');
+            winston.info(controlAction);
+            
+            // Need an entry for every control, even if there's no associated cycle
+            if (!controlAction){ 
+              // if no action, just 0 everything out
+              thisCycleString = thisCycleString.replace('{override}','0');
+              thisCycleString = thisCycleString.replace('{offset}','0');
+              thisCycleString = thisCycleString.replace('{value1}','0');    
+              thisCycleString = thisCycleString.replace('{duration1}','0');    
+              thisCycleString = thisCycleString.replace('{value2}','0');    
+              thisCycleString = thisCycleString.replace('{duration2}','0');     
+            } else {
+              // TODO : account for cycle.repeat
+              thisCycleString = thisCycleString.replace('{override}','1');
+              // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
+              thisCycleString = thisCycleString.replace('{offset}','0');
+              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+            }
+            allCyclesString += thisCycleString;
+          }
+        );
+        return callback(null, allCyclesString);
       }
-    };
+    ],
+    function (err, allCyclesString) {
+      if (err) { return next(err);}
+      
+      var now = Date.now();
+      
+      responseBody = responseBody.replace('{cycles}', allCyclesString);
 
-    write();
-    */
-    /*
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, device) {
-      if (!err) {
-        //return res.send(device);
+      device.activeGrowPlanInstance = growPlanInstance;
+      device.activePhase = phase;
+      device.activeActions = {
+        actions: actions,
+        deviceMessage : responseBody,
+        lastSent : now,
+        deviceRefreshRequired : false
+      };
+      // Expires at the expected end of the current phase.
+      // now + (total expected phase time - elapsed phase time)
+      if (phase.expectedNumberOfDays){
+        device.activeActions.expires = 
+          now + 
+          (
+            (phase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
+            (now - growPlanInstancePhase.startDate)
+          );
       } else {
-        return console.log(err);
+        // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
+        // Make the device check back in in a year anyway.
+        device.activeActions.expires = now + (365*24*60*60*1000);
       }
-      */
+      
+      // We don't need to make the response wait for this particular save. 
+      device.save();
+
+      res.status(200);
+      res.header('X-Bpn-ResourceName', 'cycles');
+      res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+      res.send(responseBody);
+    });
+
   });  
 
+  
+  /*
+   * Get the current refresh status for the device. Response indicates whether 
+   * the device should refresh its current cycles & whether there are any control overrides
+   * 
+   * https://docs.google.com/a/bitponics.com/document/d/1YD6AFDxeuUVzQuMhvIh3W5AKRe9otmEI_scxCohP9u4/edit#
+   */
+  app.get('/api/devices/:id/refresh_status', function (req, res, next){
+    var deviceId = req.params.id.replace(/:/g,''),
+        device,
+        growPlanInstance,
+        growPlanInstancePhase,
+        phase,
+        activeActionOverridesActions,
+        cycleTemplate = DeviceUtils.cycleTemplate,
+        responseBodyTemplate = "REFRESH={refresh}\r\nOVERRIDES={overrides}" + String.fromCharCode(7),
+        responseBody = responseBodyTemplate;
+
+    req.session.destroy();
+    res.clearCookie('connect.sid', { path: '/' }); 
+    
+    async.waterfall(
+      [
+        function (callback){
+          DeviceModel.findOne({ deviceId: deviceId }, callback);  
+        },
+        function (deviceResult, callback){
+          if (!deviceResult){ 
+            return callback(new Error('No device found for id ' + req.params.id));
+          }
+          var allCyclesString = '';
+
+          device = deviceResult;
+
+          // Set whether we need to ask the device to refresh its cycles
+          responseBody = responseBody.replace('{refresh}', device.activeActions.deviceRefreshRequired ? '1' : '0');
+
+          if (device.activeActionOverrides.expires > Date.now()){
+            responseBody = responseBody.replace('{overrides}', device.activeActionOverrides.deviceMessage);
+            return callback();
+          } else {
+            device.controlMap.forEach(
+              function(controlOutputPair){
+                var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
+                    controlAction = device.activeActionOverrides.actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+                  
+                // Need an entry for every control, even if there's no associated cycle
+                if (!controlAction){ 
+                  // if no action, just 0 everything out
+                  thisCycleString = thisCycleString.replace('{override}','0');
+                  thisCycleString = thisCycleString.replace('{offset}','0');
+                  thisCycleString = thisCycleString.replace('{value1}','0');    
+                  thisCycleString = thisCycleString.replace('{duration1}','0');    
+                  thisCycleString = thisCycleString.replace('{value2}','0');    
+                  thisCycleString = thisCycleString.replace('{duration2}','0');     
+                } else {
+                  thisCycleString = thisCycleString.replace('{override}','1');
+                  thisCycleString = thisCycleString.replace('{offset}','0');
+                  thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+                }
+                allCyclesString += thisCycleString;  
+              }
+            );  
+            responseBody = responseBody.replace('{overrides}', allCyclesString);
+            return callback();  
+          }
+        
+          callback();  
+        }
+      ],
+      function(err){
+        if (err) { return next(err);}
+        
+        var now = Date.now();
+        // TODO : populate this correctly. actions should be...something
+        device.activeActionOverrides = {
+          actions: [],
+          deviceMessage : responseBody,
+          lastSent : now,
+          expires : now + (365*24*60*60*1000) // just make it expire in a year
+        };
+        
+        // We don't need to make the response wait for this particular save. 
+        device.save();
+
+        res.status(200);
+        res.header('X-Bpn-ResourceName', 'refresh_status');
+        res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+        res.send(responseBody);
+      }
+    );
+  });
 };

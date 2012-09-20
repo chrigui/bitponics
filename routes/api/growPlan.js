@@ -31,7 +31,7 @@ module.exports = function(app) {
    *  Test with:
    *  jQuery.post("/api/grow_plans", {
    *    "parentGrowPlanId": "growplanid",
-   *    "createdByUserId": "userid",
+   *    "createdBy": "userid",
    *    "name": "Jack's Grow Plan",
    *    "description": "Herbs on a raft.",
    *    "plants": ["basil", "rosemary", "dill", "swiss chard"],
@@ -52,7 +52,7 @@ module.exports = function(app) {
     winston.info(req.body);
     grow_plan = new GrowPlanModel({
       parentGrowPlanId: req.body.parentGrowPlanId,
-      createdByUserId: req.body.createdByUserId,
+      createdBy: req.body.createdBy,
       name: req.body.name,
       description: req.body.description,
       plants: req.body.plants,

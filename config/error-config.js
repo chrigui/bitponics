@@ -7,7 +7,7 @@ module.exports = function(){
 
   app.use(function(req, res, next){
     res.status(404);
-    
+    winston.info('404\'ed');
     // respond with html page
     if (req.accepts('html')) {
       res.render('404', { url: req.url });
@@ -27,7 +27,7 @@ module.exports = function(){
 
 
   app.use(function(err, req, res, next){
-    console.log('got in the error middleware');
+    winston.info('In the error middleware');
     winston.error(err);   
     res.status(err.status || 500);
     
