@@ -3,7 +3,9 @@ var mongoose = require('mongoose'),
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     GrowPlanModel = require('../../models/growPlan').model,
     PhaseModel = require('../../models/phase').model,
-    ActionModel = require('../../models/action').model,
+    Action = require('../../models/action'),
+    ActionModel = Action.model,
+    ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
@@ -258,7 +260,9 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        actions; 
+        actions,
+        responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7);
+        cycleTemplate = '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'; 
 
     winston.info(JSON.stringify(req.headers));  
     
@@ -295,7 +299,7 @@ module.exports = function(app) {
       },
       function (phaseResult, callback){
         winston.info('in callback 4');
-        var responseBody = '';
+        var allCyclesString = '';
 
         phase = phaseResult;
         // get the actions that have a control reference & a cycle definition
@@ -315,29 +319,25 @@ module.exports = function(app) {
             
             if (!controlAction){ return iteratorCallback(); }
 
-            //{outputId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}        
-            // TODO: startTimeOffsetInMilliseconds should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
-            // startTimeOffsetInMilliseconds could be negative, in the example of a 16 hour light cycle. it would be 6 off, 16 on, 2 off. 1st and 3rd get concated together, but with a neg startOffset to pull the start time back to 6am
             // TODO : account for cycle.repeat
 
-            responseBody += controlOutputPair.outputId + ',' + // outputId
-                        '0,';
+            var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId);
+            thisCycleString = thisCycleString.replace('{override}','1');
+            // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
+            thisCycleString = thisCycleString.replace('{offset}','0');
+            thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction);
 
-            controlAction.getStatesInDeviceFormat(function(err, result){
-              if (err) { return next(err);}
-              responseBody += result + ';';
-              iteratorCallback();
-            });
-            
+            allCyclesString += thisCycleString;
+            iteratorCallback();
           },
           function(err){ 
             if (err) {return next(err)};
-            callback(null, responseBody);    
+            callback(null, allCyclesString);    
           }
         );
       }
     ],
-    function (err, responseBody) {
+    function (err, allCyclesString) {
       if (err) { return next(err);}
 
       var now = Date.now();
@@ -345,8 +345,8 @@ module.exports = function(app) {
       res.status(200);
       res.header('X-Bpn-ResourceName', 'cycles');
       res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-      // To end response for the firmware, send the Bell character
-      responseBody += String.fromCharCode(7);
+      
+      var responseBody = responseBodyTemplate.replace('{cycles}', allCyclesString);
 
       device.activeGrowPlanInstance = growPlanInstance;
       device.activePhase = phase;
