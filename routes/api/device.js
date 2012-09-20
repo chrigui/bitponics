@@ -69,7 +69,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Read an device
+   * Read a device
    *
    * To test:
    * jQuery.get("/api/devices/${id}", function(data, textStatus, jqXHR) {
@@ -87,7 +87,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Update an device
+   * Update a device
    *
    * To test:
    * jQuery.ajax({
@@ -117,7 +117,7 @@ module.exports = function(app) {
   });
 
   /*
-   * Delete an device
+   * Delete a device
    *
    * To test:
    * jQuery.ajax({
@@ -228,8 +228,9 @@ module.exports = function(app) {
           ], 
           function parallelFinal(err, result){
             if (err) { return next(err); }
-            var responseBody = '';
+            var responseBody = 'success';
             res.status(200);
+            res.header('X-Bpn-ResourceName', 'sensor_logs');
             res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
             // To end response for the firmware, send the Bell character
             responseBody += String.fromCharCode(7);
@@ -255,13 +256,15 @@ module.exports = function(app) {
     var deviceId = req.params.id.replace(/:/g,''),
         device,
         growPlanInstance,
-        activePhaseMetadata; 
+        growPlanInstancePhase,
+        phase,
+        actions; 
 
-    winston.info(req);  
+    winston.info(JSON.stringify(req.headers));  
     
-    delete req.session.cookie;
     req.session.destroy();
-
+    res.clearCookie('connect.sid', { path: '/' }); 
+    
     //get device by mac address id. 
     //get the active GPI that's using the device.
     //get the active phase of the GPI.
@@ -283,34 +286,34 @@ module.exports = function(app) {
           return callback(new Error('No active grow plan instance found for device'));
         }
         growPlanInstance = growPlanInstanceResult;
-        activePhaseMetadata = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+        growPlanInstancePhase = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
         
-        if (!activePhaseMetadata){
+        if (!growPlanInstancePhase){
           return callback(new Error('No active phase found for this grow plan instance.'));
         }
-        PhaseModel.findById(activePhaseMetadata.phase).populate('actions').exec(callback);
+        PhaseModel.findById(growPlanInstancePhase.phase).populate('actions').exec(callback);
       },
       function (phaseResult, callback){
         winston.info('in callback 4');
-        var actions,
-            responseBody = '';
+        var responseBody = '';
 
+        phase = phaseResult;
         // get the actions that have a control reference & a cycle definition
-        actions = phaseResult.actions || [];
+        actions = phase.actions || [];
         actions = actions.filter(function(action){ return !!action.control && !!action.cycle; });
    
         // get the device's controlMap. Use this as the outer
         // loop to get the actions the device can handle
         async.forEachSeries(device.controlMap, 
           function(controlOutputPair, iteratorCallback){
-            console.log(actions, controlOutputPair);
-            var controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
-                cycleStates;
+            winston.info(actions, controlOutputPair);
+            
+            var controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+            
             winston.info('controlAction');
             winston.info(controlAction);
+            
             if (!controlAction){ return iteratorCallback(); }
-
-            cycleStates = controlAction.cycle;
 
             //{outputId},{startTimeOffsetInMilliseconds},{value},{durationInMilliseconds},{value},{durationInMilliseconds}        
             // TODO: startTimeOffsetInMilliseconds should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
@@ -334,16 +337,100 @@ module.exports = function(app) {
         );
       }
     ],
-    function(err, responseBody) {
+    function (err, responseBody) {
       if (err) { return next(err);}
 
+      var now = Date.now();
+
       res.status(200);
+      res.header('X-Bpn-ResourceName', 'cycles');
       res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
       // To end response for the firmware, send the Bell character
       responseBody += String.fromCharCode(7);
+
+      device.activeGrowPlanInstance = growPlanInstance;
+      device.activePhase = phase;
+      device.activeActions = {
+        actions: actions,
+        deviceMessage : responseBody,
+        lastSent : now,
+        deviceRefreshRequired : false
+      };
+      // Expires at the expected end of the current phase.
+      // now + (total expected phase time - elapsed phase time)
+      if (phase.expectedNumberOfDays){
+        device.activeActions.expires = 
+          now + 
+          (
+            (phase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
+            (now - growPlanInstancePhase.startDate)
+          );
+      } else {
+        // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
+        // Make the device check back in in a year anyway.
+        device.activeActions.expires = now + (365*24*60*60*1000);
+      }
+      
+      // We don't need to make the response wait for this particular save. 
+      device.save();
+
       res.send(responseBody);
     });
 
   });  
 
+  
+  /*
+   * Get the current refresh status for the device. Response indicates whether 
+   * the device should refresh its current cycles & whether there are any control overrides
+   * 
+   */
+  app.get('/api/devices/:id/refresh_status', function (req, res, next){
+    var deviceId = req.params.id.replace(/:/g,''),
+        device,
+        growPlanInstance,
+        growPlanInstancePhase,
+        phase,
+        responseTemplate = ""; 
+
+    winston.info(req);  
+    
+    req.session.destroy();
+    res.clearCookie('connect.sid', { path: '/' }); 
+    
+    async.waterfall(
+      [
+        function (callback){
+          DeviceModel.findOne({ deviceId: deviceId }, callback);  
+        },
+        function (deviceResult, callback){
+          if (!deviceResult){ 
+            return callback(new Error('No device found for id ' + req.params.id));
+          }
+          device = deviceResult;
+          GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
+        },
+        function (growPlanInstanceResult, callback){
+          if (!growPlanInstanceResult){ 
+            return callback(new Error('No active grow plan instance found for device'));
+          }
+          growPlanInstance = growPlanInstanceResult;
+          callback();
+        }
+      ],
+      function(err, responseBody){
+        if (err) { return next(err);}
+
+        var now = Date.now();
+
+        res.status(200);
+        res.header('X-Bpn-ResourceName', 'refresh_status');
+        res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+        // To end response for the firmware, send the Bell character
+        responseBody += String.fromCharCode(7);
+
+        res.send(responseBody);
+      }
+    );
+  });
 };

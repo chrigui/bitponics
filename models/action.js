@@ -82,7 +82,8 @@ ActionSchema.statics.convertDurationToMilliseconds = function(durationType, dura
 			break;
 		case 'untilPhaseEnd':
 		default:
-			return callback(new Error('Cannot convert the durationType' + durationType + ' to milliseconds'))
+			return callback(null, -1);
+			//return callback(new Error('Cannot convert the durationType' + durationType + ' to milliseconds'))
 	}
 };
 
@@ -94,7 +95,9 @@ ActionSchema.methods.getStatesInDeviceFormat = function(finalCallback){
 
 	switch(states.length){
 		case 1:
-			return finalCallback(new Error('Cannot convert single-state cycle to device format'));
+			var infiniteStateControlValue = states[0].controlValue;
+			resultArray.push(infiniteStateControlValue + ',' + infiniteStateControlValue )
+			//return finalCallback(new Error('Cannot convert single-state cycle to device format'));
 			break;
 		case 2:
 			var state0 = states[0],

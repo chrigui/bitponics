@@ -24,18 +24,32 @@ var DeviceSchema = new Schema({
 	    outputId : { type: String }
 	  }
 	],
-	/*
-	 // TODO: 
-	currentGrowPlanInstance : { type: ObjectId, ref: 'GrowPlanInstance' },
-	currentPhase : { type : ObjectId, ref: 'Phase'},
-	*/
 	recentSensorLogs : [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
 			sensor: { type: ObjectId, ref: 'Sensor', required: true },
 			value: { type: Number }
 		}]
-	}]
+	}],
+	activeGrowPlanInstance : {type: ObjectId, ref: 'GrowPlanInstance', required:false},
+	activePhase : {type: ObjectId, ref: 'GrowPlanInstance', required:false },
+	activeActions : {
+		actions : [{type: ObjectId, ref: 'Action'}],
+		deviceMessage : String,
+		lastSent : Date,
+		expires : Date,
+		deviceRefreshRequired : { type: Boolean, default: true }
+	},
+	/**
+	 * activeActionOverrides are any automatically or manually triggered actions. 
+	 * They override the phase cycles until they expire.
+	 */
+	activeActionOverrides : {
+		actions: [{type: ObjectId, ref: 'Action'}],
+		deviceMessage : String,
+		lastSent: Date,
+		expires : Date
+	}
 });
 
 DeviceSchema.plugin(useTimestamps);
