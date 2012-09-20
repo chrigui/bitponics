@@ -311,8 +311,8 @@ module.exports = function(app) {
    
         // get the device's controlMap. Use this as the outer
         // loop to get the actions the device can handle
-        async.forEachSeries(device.controlMap, 
-          function(controlOutputPair, iteratorCallback){
+        device.controlMap.forEach(
+          function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
                 controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
             
@@ -337,13 +337,10 @@ module.exports = function(app) {
             }
 
             allCyclesString += thisCycleString;
-            iteratorCallback();
-          },
-          function(err){ 
-            if (err) {return next(err)};
-            callback(null, allCyclesString);    
+            
           }
         );
+        return callback(null, allCyclesString);
       }
     ],
     function (err, allCyclesString) {
