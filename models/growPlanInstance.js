@@ -38,7 +38,10 @@ var GrowPlanInstanceSchema = new Schema({
 	sensorLogs: [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
-			sensor: { type: ObjectId, ref: 'Sensor', required: true },
+			/**
+			 * sCode references to Sensor.code
+			 */
+			sCode: { type: String, ref: 'Sensor', required: true },
 			value: { type: Number }
 		}]
 	}],
@@ -106,6 +109,7 @@ var GrowPlanInstanceSchema = new Schema({
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
+GrowPlanInstanceSchema.index({ 'sensorLogs.logs.timestamp sensorLogs.logs.sCode': -1 });
 
 
 

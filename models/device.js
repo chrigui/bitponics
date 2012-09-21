@@ -34,7 +34,8 @@ var DeviceSchema = new Schema({
 	recentSensorLogs : [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
-			sensor: { type: ObjectId, ref: 'Sensor', required: true },
+			// sCode references Sensor.code
+			sCode: { type: String, ref: 'Sensor', required: true },
 			value: { type: Number }
 		}]
 	}],

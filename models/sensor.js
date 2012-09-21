@@ -9,23 +9,10 @@ var SensorSchema = new Schema({
 	name: { type: String, required: true },
 	abbrev: {type: String },
 	unitOfMeasurement: { type: String, required: true },
-	code: { type: String, required: true }
+	code: { type: String, required: true, unique: true }
 });
 
 SensorSchema.plugin(useTimestamps);
-
-SensorSchema.suggestions = {
-	name: [
-		'Brightness',
-		'pH',
-		'EC (Electrical Connectivity)',
-		'TDS (Total Disolved Solids)',
-		'Water Temperature',
-		'Air Temperature',
-		'Humidity',
-		'Water Level'
-	]
-}
 
 exports.schema = SensorSchema;
 exports.model = mongoose.model('Sensor', SensorSchema);

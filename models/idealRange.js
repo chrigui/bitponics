@@ -8,7 +8,10 @@ var mongoose = require('mongoose'),
 var IdealRangeSchema = new Schema({
 	name: { type: String },
 
-	sensor: { type: ObjectId, ref: 'Sensor', required: true },
+	/**
+	 * sCode references Sensor.code
+	 */
+	sCode: { type: String, ref: 'Sensor', required: true },
 		
 	valueRange: {
 		min: { type: Number, required: true },
@@ -20,7 +23,12 @@ var IdealRangeSchema = new Schema({
 	actionAboveMax: { type: ObjectId, ref: 'Action', required: true },
 
 	/**
-	 * applicableTimeSpan. optional. values are milliseconds since * 00:00
+	 * applicableTimeSpan. optional. Describes the portion of a 24-hour day
+	 * during which this idealRange is operational.  
+	 *
+	 * values are milliseconds since * 00:00
+	 *
+	 * If undefined, idealRange is always operational
 	 */
 	applicableTimeSpan: { 
 		startTime: { type: Number },

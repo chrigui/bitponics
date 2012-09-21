@@ -61,7 +61,7 @@ module.exports = function(app) {
       deviceType: req.body.deviceType,
       owner: req.body.owner,
       users : req.body.users,
-      sensors : req.body.sensors,
+      sensorMap : req.body.sensorMap,
       controlMap : req.body.controlMap
     });
     device.save(function (err) {
@@ -199,15 +199,24 @@ module.exports = function(app) {
               wf1Callback(new Error('Attempted to log to a nonexistent device'));
             }
 
+
+            Object.keys(pendingDeviceLogs).forEach(function(key){
+              pendingSensorLog.logs.push({
+                sCode : key,
+                value : pendingDeviceLogs[key]
+              });
+            });
+            /*
             Object.keys(pendingDeviceLogs).forEach(function(key){
               var sensor = sensors.filter(function(s){ return s.code === key; })[0];
               if (sensor){
                 pendingSensorLog.logs.push({
-                  sensor : sensor._id,
+                  sCode : sensor.code,
                   value : pendingDeviceLogs[key]
                 });
               }              
-            })
+            });
+           */
             winston.info('pendingSensorLog');
             winston.info(pendingSensorLog);            
 
@@ -220,12 +229,11 @@ module.exports = function(app) {
         // the device & the growPlanInstance
         async.parallel([
             function parallel1(callback){
-              device.recentSensorLogs = device.recentSensorLogs || [];
               device.recentSensorLogs.push(pendingSensorLog);
               device.save(callback);
             },
             function parallel2(callback){
-              growPlanInstance.sensorLogs = growPlanInstance.sensorLogs || [];
+              winston.info('Pushing to growPlanInstance sensorLogs, gpid ' + growPlanInstance.id);
               growPlanInstance.sensorLogs.push(pendingSensorLog);          
               growPlanInstance.save(callback);
             }

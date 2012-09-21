@@ -1,7 +1,7 @@
 module.exports = [
 		{
 			name: "Ideal Light - Vegetative",
-			sensor: "savedObjectIds['lights']['fluorescent']",
+			sCode: "full",
 			valueRange: {
 				min: 2000,
 				max: 10000
@@ -15,7 +15,7 @@ module.exports = [
 		},
 		{
 			name: "Ideal Light - Bloom",
-			sensor: "savedObjectIds['lights']['fluorescent']",
+			sCode: "full",
 			valueRange: {
 				min: 2000,
 				max: 10000
@@ -29,7 +29,7 @@ module.exports = [
 		},
 		{
 			name: "Ideal Air Temp",
-			sensor: "savedObjectIds['sensors']['air']",
+			sCode: "air",
 			valueRange: {
 				min: 30,
 				max: 60
