@@ -9,145 +9,155 @@ block content
     header#logo(role="banner") Bitponics
     div#setup.select-block
       h2.main-heading Grow Plans
-      h3.sub-heading Mixed Leafy Greens
+      h3.sub-heading
+        select
+          each item in activeGrowPlans
+            option= item.growPlan.name
     div#user.select-block
       h2.main-heading User
-      h3.sub-heading Amit Kumar
+      h3.sub-heading
+        if user.name == ''
+         | #{user.name}
+        else
+         | #{user.email}
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
-      section#lux.data-module 
-        h3.main-heading 
-          abbr(title="Luminous Flux") Lux
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#ir.data-module 
-        h3.main-heading 
-          abbr(title="Infrared") IR
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#full.data-module 
-        h3.main-heading 
-          abbr(title="Full Light") Full
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#vis.data-module 
-        h3.main-heading 
-          abbr(title="Visible Light") Vis
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#air.data-module 
-        h3.main-heading 
-          | Air Temp
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#hum.data-module 
-        h3.main-heading 
-          abbr(title="Humidity") Hum
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#co2.data-module 
-        h3.main-heading 
-          abbr(title="Carbon Dioxide") CO2
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#water.data-module 
-        h3.main-heading
-            | Water Temp
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#ph.data-module 
-        h3.main-heading 
-          | pH
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#ec.data-module 
-        h3.main-heading 
-          abbr(title="Electrical Conductivity") EC
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#tds.data-module 
-        h3.main-heading 
-          abbr(title="Total Dissolved Solids") TDS
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
-      section#sal.data-module 
-        h3.main-heading 
-          | Salinity
-        div.sensor-data
-          div.sensor-value 18
-          div.sensor-value-unit
-            span Hrs/
-            span Day
-        div.sensor-type.icon Light Sensor
-        div.message Check
-        div.settings.icon Settings
+        each item in currentGrowPlanInstance.sensorLogs
+              div= item.timestamp
+              div= item.logs[0]
+      //- section#lux.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Luminous Flux") Lux
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#ir.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Infrared") IR
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#full.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Full Light") Full
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#vis.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Visible Light") Vis
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#air.data-module 
+      //-   h3.main-heading 
+      //-     | Air Temp
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#hum.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Humidity") Hum
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#co2.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Carbon Dioxide") CO2
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#water.data-module 
+      //-   h3.main-heading
+      //-       | Water Temp
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#ph.data-module 
+      //-   h3.main-heading 
+      //-     | pH
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#ec.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Electrical Conductivity") EC
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#tds.data-module 
+      //-   h3.main-heading 
+      //-     abbr(title="Total Dissolved Solids") TDS
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
+      //- section#sal.data-module 
+      //-   h3.main-heading 
+      //-     | Salinity
+      //-   div.sensor-data
+      //-     div.sensor-value 18
+      //-     div.sensor-value-unit
+      //-       span Hrs/
+      //-       span Day
+      //-   div.sensor-type.icon Light Sensor
+      //-   div.message Check
+      //-   div.settings.icon Settings
 
     div#visualizer.content-module.middle
       div#phases-graph.circle.centered

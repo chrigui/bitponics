@@ -40,6 +40,9 @@
 .ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .circle{text-align:center;border-radius:50em;}
 .circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;}
+.select-block select:focus{outline:none;border:none}
 .content-module{float:left;}
 .content-module.side{width:100%;margin:2em 0 0 0}
 .content-module.middle{width:100%;padding:100% 0 0 0;border:0 none;clear:both}
