@@ -398,7 +398,8 @@ module.exports = function(app) {
         activeActionOverridesActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
-        responseBody = responseBodyTemplate;
+        responseBody = responseBodyTemplate,
+        allCyclesString = '';
 
     req.session.destroy();
     res.clearCookie('connect.sid', { path: '/' }); 
@@ -412,16 +413,13 @@ module.exports = function(app) {
           if (!deviceResult){ 
             return callback(new Error('No device found for id ' + req.params.id));
           }
-          var allCyclesString = '';
-
           device = deviceResult;
 
           // Set whether we need to ask the device to refresh its cycles
           responseBody = responseBody.replace('{refresh}', device.activeActions.deviceRefreshRequired ? '1' : '0');
 
           if (device.activeActionOverrides.expires > Date.now()){
-            responseBody = responseBody.replace('{overrides}', device.activeActionOverrides.deviceMessage);
-            return callback();
+            allCyclesString = device.activeActionOverrides.deviceMessage;
           } else {
             device.controlMap.forEach(
               function(controlOutputPair){
@@ -445,11 +443,11 @@ module.exports = function(app) {
                 allCyclesString += thisCycleString;  
               }
             );  
-            responseBody = responseBody.replace('{overrides}', allCyclesString);
-            return callback();  
+            
           }
-        
-          callback();  
+          responseBody = responseBody.replace('{overrides}', allCyclesString);
+          return callback();  
+          
         }
       ],
       function(err){
@@ -459,7 +457,7 @@ module.exports = function(app) {
         // TODO : populate this correctly. actions should be...something
         device.activeActionOverrides = {
           actions: [],
-          deviceMessage : responseBody,
+          deviceMessage : allCyclesString,
           lastSent : now,
           expires : now + (365*24*60*60*1000) // just make it expire in a year
         };

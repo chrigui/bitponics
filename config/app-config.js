@@ -40,9 +40,12 @@ module.exports = function(app){
 
 	  // If we've got a device request or an HMAC-authed request, need the raw body
 	  app.use (function(req, res, next) {
-	  	var contentType = req.headers['content-type'] || '';
+	  	var contentType = req.headers['content-type'] || '',
+	  		acceptType = req.headers['accept'];
 		
-		if( contentType.indexOf('application/vnd.bitponics') >= 0){
+		if( (contentType.indexOf('application/vnd.bitponics') >= 0) ||
+			(acceptType.indexOf('application/vnd.bitponics') >= 0)
+			){
 		    var data='';
 		    req.setEncoding('utf8');
 		    req.on('data', function(chunk) { 
