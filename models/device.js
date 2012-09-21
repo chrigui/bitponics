@@ -12,6 +12,13 @@ var DeviceSchema = new Schema({
 	name : { type: String },
 	owner : { type: ObjectId, ref: 'User', required: true},
 	users : [ { type: ObjectId, ref: 'User', required: true }],
+	userAssignments : [
+		{
+			timestamp : { type : Date, default: Date.now, required : true},
+			user : { type : ObjectId, ref: 'User', required: true },
+			assignmentType: { type : String, enum : ['owner', 'member']}
+		}
+	],
 	sensorMap : [
       { 
 	    sensor : { type: ObjectId, ref: 'Sensor' },
@@ -60,6 +67,22 @@ DeviceSchema.plugin(useTimestamps);
  */
 
 
+
+/**
+ *  HACK : if DeviceType is unassigned, assign it the 'Bitponics Beta Device 1' DeviceType
+ *  In production, every device produced should actually get a database entry. And maybe 
+ *  we should have a blank deviceType or something as fallback
+ */
+DeviceSchema.pre('save', function(next){
+	var device = this;
+	if(device.deviceType){ return next(); }
+
+	DeviceTypeModel.findOne({ name: 'Bitponics Beta Device 1' }, function(err, deviceType){
+		if (err) { return next(err); }
+		device.deviceType = deviceType;
+		next();
+	});
+});
 
 /**
  *  If sensorMap is undefined then use the deviceType's default sensorMap
