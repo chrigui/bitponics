@@ -55,6 +55,10 @@ $(function(){
 			error: function(jqXHR, textStatus, error){
 				console.log('error', jqXHR, textStatus, error);
 				// TODO retry a certain number of times
+			},
+			complete: function(jqXHR, textStatus){
+				console.log('complete ', textStatus);
+				console.log(jqXHR);
 			}
 		});	
 	};
@@ -82,7 +86,7 @@ $(function(){
 		e.preventDefault();
 		selectedWifiNetwork = $.grep(scannedWifiNetworks, function(item, index){
 			return item.ssid === $wifiSsid.val();
-		});
+		})[0];
 		// TODO : validate
 
 		postToDevice();

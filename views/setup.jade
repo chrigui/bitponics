@@ -44,14 +44,16 @@ block content
                 li
                   button#submit-wifi-form(type='submit') Go
         li#wifi-data-submitted
-          p Great! The Bitponics device is now connecting to the 
+          p Great! The Bitponics device is now connecting to the&nbsp; 
             span.selectedNetworkSsid
             | network. 
-          p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
+          p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to&nbsp;  
             span.selectedNetworkSsid
             |.
-          p When you're back on your wifi, 
-            a(id="submit-device-info", href="javascript:void(0);")click here to connect your device to your Bitponics account.
+          p After you're back on the&nbsp; 
+            span.selectedNetworkSsid
+            | network,
+            a(id="submit-device-info", href="javascript:void(0);", style="color:blue;") click here so that we can pair your device to your Bitponics account.
         li#pairing-complete
           p Great, your device is now connected to your account. Let's take a look at the data we're getting:
 
