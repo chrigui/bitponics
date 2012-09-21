@@ -43,8 +43,8 @@ module.exports = function(app){
 	  	var contentType = req.headers['content-type'] || '',
 	  		acceptType = req.headers['accept'];
 		
-		if( (contentType.indexOf('application/vnd.bitponics') >= 0) ||
-			(acceptType.indexOf('application/vnd.bitponics') >= 0)
+		if( contentType === '' ||
+			(contentType.indexOf('application/vnd.bitponics') >= 0) 
 			){
 		    var data='';
 		    req.setEncoding('utf8');
