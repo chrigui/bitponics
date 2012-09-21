@@ -48,7 +48,8 @@ a:hover{text-decoration:underline}
 .setup .led-indicator{-webkit-animation-duration:1s;-webkit-animation-name:led-indicator;-webkit-animation-iteration-count:infinite;width:20px;height:20px;border-radius:5px;border:1px solid #ccc;}
 .setup .led-indicator.scan{background:#ff0;-webkit-animation-duration:.5s}
 .setup .led-indicator.adhoc{background:#008000}
-.setup #enter-wifi-data{display:none}
+.setup .selectedNetworkSsid{font-style:italic}
+.setup #enter-wifi-data,.setup #wifi-data-submitted,.setup #pairing-complete{display:none}
 @-moz-keyframes led-indicator{0%,100%{opacity:0}
 50%{opacity:1}
 }@-webkit-keyframes led-indicator{0%,100%{opacity:0}
