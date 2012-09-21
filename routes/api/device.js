@@ -397,7 +397,7 @@ module.exports = function(app) {
         phase,
         activeActionOverridesActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
-        responseBodyTemplate = "REFRESH={refresh}\r\nOVERRIDES={overrides}" + String.fromCharCode(7),
+        responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate;
 
     req.session.destroy();
