@@ -91,6 +91,9 @@ td{vertical-align:top}
 .ellipsis,.select-block .main-heading,.select-block .sub-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .circle,.control{text-align:center;border-radius:50em;}
 .circle:before,.control:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;}
+.select-block select:focus{outline:none;border:none}
 body{margin:0;color:#333;font:112.5%/1.5 Helvetica,Arial,sans-serif;margin:0 auto;background:#fff}
 *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 h1,h2,h3,h4,h5,h6{font-weight:normal}
