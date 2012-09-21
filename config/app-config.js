@@ -41,10 +41,11 @@ module.exports = function(app){
 	  // If we've got a device request or an HMAC-authed request, need the raw body
 	  app.use (function(req, res, next) {
 	  	var contentType = req.headers['content-type'] || '',
-	  		acceptType = req.headers['accept'];
+	  		authHeader = req.headers['authorization'] || '';
 		
-		if( contentType === '' ||
-			(contentType.indexOf('application/vnd.bitponics') >= 0) 
+		if( (contentType.indexOf('application/vnd.bitponics') >= 0) || 
+			(authHeader.indexOf('BPN_DEVICE') >= 0) ||
+			(authHeader.indexOf('BPN_API') >= 0) 
 			){
 		    var data='';
 		    req.setEncoding('utf8');
