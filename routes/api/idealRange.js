@@ -39,7 +39,7 @@ module.exports = function(app) {
     winston.info("POST: ");
     winston.info(req.body);
     idealRange = new IdealRangeModel({
-      sensor: req.body.sensor,
+      sCode: req.body.sensor,
       min: req.body.min,
       max: req.body.max,
       actionBelowMin: req.body.actionBelowMin,

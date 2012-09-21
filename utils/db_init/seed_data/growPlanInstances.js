@@ -35,15 +35,15 @@ module.exports = [
 					timestamp: 1347364818821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 6.25
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 30
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 35
 						}
 					]
@@ -52,15 +52,15 @@ module.exports = [
 					timestamp: 1347364828821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 7.25
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 33
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 34
 						}
 					]
@@ -69,15 +69,15 @@ module.exports = [
 					timestamp: 1347364838821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 6.5
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 34
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 33
 						}
 					]
@@ -168,15 +168,15 @@ module.exports = [
 					timestamp: 1347364818821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 6.25
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 30
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 35
 						}
 					]
@@ -185,15 +185,15 @@ module.exports = [
 					timestamp: 1347364828821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 7.25
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 33
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 34
 						}
 					]
@@ -202,15 +202,15 @@ module.exports = [
 					timestamp: 1347364838821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['ph']",
+							sCode: "ph",
 							value: 6.5
 						},
 						{
-							sensor: "savedObjectIds['sensors']['air']",
+							sCode: "air",
 							value: 34
 						},
 						{
-							sensor: "savedObjectIds['sensors']['water']",
+							sCode: "water",
 							value: 33
 						}
 					]

@@ -85,69 +85,98 @@ async.series([
 		if(clear) {
 			async.parallel([
 				function(innerCallback){
-					models.user.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['users'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('users collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.sensor.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['sensors'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('sensors collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.nutrient.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['nutrients'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('nutrients collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.deviceType.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['devicetypes'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('devicetypes collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.device.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['devices'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('devices collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.light.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['lights'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('lights collection dropped');
+					    innerCallback();
+					});
+
+				},
+				function(innerCallback){
+					mongoose.connection.collections['growsystems'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('growsystems collection dropped');
+					    innerCallback();
+					});
+					
+				},
+				function(innerCallback){
+					mongoose.connection.collections['controls'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('controls collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.growSystem.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['actions'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('actions collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.control.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['idealranges'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('idealranges collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.action.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['phases'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('phases collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.idealRange.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['growplans'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('growplans collection dropped');
+					    innerCallback();
 					});
 				},
 				function(innerCallback){
-					models.phase.find().remove(function(err){
-						innerCallback(null,null);
+					mongoose.connection.collections['growplaninstances'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('growplaninstances collection dropped');
+					    innerCallback();
 					});
-				},
-				function(innerCallback){
-					models.growPlan.find().remove(function(err){
-						innerCallback(null,null);
-					});
-				},
-				function(innerCallback){
-					models.growPlanInstance.find().remove(function(err){
-						innerCallback(null,null);
-					});
+					
 				}
 				],
 				function(err, results){
@@ -362,11 +391,13 @@ async.series([
 					c.control = eval(c.control);
 				});
 
+				/*
 				_data.recentSensorLogs.forEach(function(rsl){
 					rsl.logs.forEach(function(sl){
 						sl.sensor = eval(sl.sensor);
 					});
 				});
+				*/
 
 			    var dataObj = new models.device({
 					deviceId: _data.deviceId,
@@ -519,7 +550,7 @@ console.log(_data.description)
 
 		    var dataObj = new models.idealRange({
 				name: _data.name,
-				sensor: eval(_data.sensor),
+				sCode: _data.sCode,
 				valueRange: _data.valueRange,
 				applicableTimeSpan: _data.applicableTimeSpan,
 				actionBelowMin : eval(_data.actionBelowMin),

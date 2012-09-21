@@ -124,8 +124,7 @@ UserSchema.static('authenticate', function(email, password, next) {
  */
 UserSchema.static('getByPublicDeviceKey', function(key, next) {
   User.findOne({ 'deviceKey.public': key }, function(err, user) {
-  	var x= 3;
-      if (err) { return next(err); }
+	  if (err) { return next(err); }
       if (!user) { return next(null, false); }
 
       return next(null, user, user.deviceKey.private);

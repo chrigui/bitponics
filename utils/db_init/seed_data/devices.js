@@ -25,11 +25,11 @@ module.exports = [
 					timestamp: 1347364818821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['vis']",
+							sCode: "vis",
 							value: 12121
 						},
 						{
-							sensor: "savedObjectIds['sensors']['vis']",
+							sCode: "vis",
 							value: 122222112
 						}
 					]
@@ -59,11 +59,11 @@ module.exports = [
 					timestamp: 1347364818821,
 					logs : [
 						{
-							sensor: "savedObjectIds['sensors']['vis']",
+							sCode: "vis",
 							value: 12121
 						},
 						{
-							sensor: "savedObjectIds['sensors']['vis']",
+							sCode: "vis",
 							value: 122222112
 						}
 					]

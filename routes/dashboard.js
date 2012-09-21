@@ -8,12 +8,13 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 module.exports = function(app){
 	app.get('/dashboard', function (req, res) {
 		currentGrowPlanInstanceId = req.query.id;
-		if(req.user.id){
+		if(req.user && req.user.id){
 
 			//find GP instances by this user
 			GrowPlanInstanceModel
-				.find({ "owner": req.user.id })
+				.find({ "users": req.user })
 				.populate('growPlan')
+				.populate('device')
 				//.populate('sensorLogs.logs.sensor')
 				.exec(function (err, growPlanInstances) {
 			      	if (err) { return next(err); }
@@ -56,7 +57,7 @@ module.exports = function(app){
 						    	user: req.user,
 						    	activeGrowPlans: growPlanInstances,
 						    	currentGrowPlanInstance: currentGrowPlanInstance
-							});
+							});	
 			      	});
 
 			      	
