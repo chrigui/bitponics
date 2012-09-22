@@ -105,14 +105,16 @@ module.exports = function(app){
 
 				activeControlActions.forEach(function(controlAction){
 					var control = controls.filter(function(item){return item._id.equals(controlAction.control);})[0];
-					if (!locals.controls[control.name]){locals.controls[control.name] = [];}
-					locals.controls[control.name].push({
+					// HACK : pretending there cannot be more than one controlAction per control. probably a good assumption but it's not yet enforced anywhere
+					locals.controls[control.name] = {
+						name: control.name,
+						className : control.name.replace(/\s/g,'').toLowerCase(),
 						action : {
 							description : controlAction.description,
 							cycle : controlAction.cycle,
 							cycleString : ActionUtils.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states)
 						}
-					});	
+					};
 				});
 
 				sensors.forEach(function(sensor){
