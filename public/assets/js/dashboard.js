@@ -17,7 +17,90 @@ var sampleData = {
     ]
 };
 
+var getPhaseFillColor = function(data, index){
+    var num = data.data;
 
+
+console.log('num ' + num);
+    if (num == 0) { 
+        return '#46f121'
+    } else if (num == 2){
+        return '#24d321';
+    } else if (num < 1){
+        return '#D2E000';
+    } else {
+        return '#24d321';
+    }
+}
+
+var drawPhaseGraphs = function(){
+    var phases = Bitponics.user.currentGrowPlanInstance.phases,
+        phaseCount = phases.length,
+        $container = $('#phases-graph'),
+        outerMargin = 80,
+        width = $container.width() - (outerMargin * 2),
+        height = width,
+        radius = width / 2,
+        innerWhitespaceRadius = radius/(phaseCount + 1),
+        // sum of all arcSpans must fit between outer boundary and inner whitespace
+        arcSpan = (radius - innerWhitespaceRadius)/phaseCount,
+        arcMargin = 0,
+        colorScale = d3.scale.category20c(),
+        equalPie = d3.layout.pie(),
+        arcs = [],
+        innerArc = d3.svg.arc(),
+        outerArc = d3.svg.arc();
+
+    // disable data sorting & force all slices to be the same size
+    equalPie
+    .sort(null)
+    .value(function(d){
+        return 1;
+    });
+
+    
+
+    var svg = d3.select('#phases-graph')
+                    .append('svg:svg')
+                        .attr('width', width)
+                        .attr('height', height);
+
+    $.each(phases, function(index, phase){
+        var arc = d3.svg.arc(),
+            className = 'phase' + index,
+            phaseGroup;
+
+        var phaseDaySummaries = [];
+        for (var i = 0; i < phase.phase.expectedNumberOfDays; i++){
+            var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
+            //console.log('colorval ' + colorVal);
+            phaseDaySummaries.push(colorVal);
+        }
+
+        arc.outerRadius(radius - (arcSpan * index) - arcMargin)
+            .innerRadius(radius - (arcSpan * (index+1)) - arcMargin);
+
+        phaseGroup = svg.append('svg:g')
+            .classed(className, true)
+            .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+        phaseGroup.selectAll('path')
+        .data(equalPie(phaseDaySummaries))
+        .enter()
+            .append('svg:path')
+            .attr('d', arc)
+            .attr('stroke', '#fff')
+            .attr('stroke-width', 1)
+            .attr('fill', getPhaseFillColor);
+    });
+
+
+};
+
+$(function () {
+    drawPhaseGraphs();
+});
+/*
 $(function () {
     var i = 0,
         phase1 = sampleData.phases[0],
@@ -36,11 +119,11 @@ $(function () {
     }
     
     var width,
-        height = width = 400,
+        height = width = 600,
         radius = width / 2,
         colorScale = d3.scale.category20c(),
         equalPie = d3.layout.pie(),
-        arcSpan = 60,
+        arcSpan = 100,
         arcMargin = 0,
         innerArc = d3.svg.arc(),
         outerArc = d3.svg.arc();
@@ -83,7 +166,6 @@ $(function () {
         } else {
             return '#eee'
         }
-
     }
 
     phase1G.selectAll('path')
@@ -111,3 +193,4 @@ $(function () {
         if (phase1GRotate == 360){ phase1GRotate = 0; }
     }, 30)
 });
+*/
