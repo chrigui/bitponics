@@ -25,8 +25,10 @@ block content
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
-      each item in sensors
-        div(class="sensor data-module #{item.sCode}")
+      - var sensorStyle = ''
+      each item, key in sensors
+        div(class="sensor data-module #{sensorStyle} #{key}")
+            - sensorStyle = 'closed'
             h3.main-heading
               | #{item.abbrev}
             div.sensor-data
