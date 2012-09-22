@@ -210,8 +210,9 @@ module.exports = function(app) {
             
             // TODO : also use this opportunity to check if any IdealRanges have been exceeded.
             // if so, trigger the corresponding action...somehow. 
+            // On the gpi: add to actionLogs
             // On the device: expire activeActions and activeActionOverrides. Maybe refresh their deviceMessages at this point?
-            // On the gpi: add to actionLogs? 
+            
 
             winston.info('pendingSensorLog');
             winston.info(JSON.stringify(pendingSensorLog));
@@ -420,7 +421,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ deviceId: deviceId }, callback);  
+          DeviceModel.findOne({ deviceId: deviceId }).populate('activeActionOverrides.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 

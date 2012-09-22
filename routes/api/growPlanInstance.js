@@ -1,4 +1,6 @@
 var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
+    ActionModel = require('../../models/action').model,
+    DeviceModel = require('../../models/device').model,
     winston = require('winston');
 
 /**
@@ -110,19 +112,7 @@ module.exports = function(app) {
   });
 
 
-
-  /*
-   * Recent Sensor Logs nested resource
-   */
-  app.get('/api/grow_plan_instances/:id/recent_sensor_logs', function (req, res, next){
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
-      if (err) { return next(err); }
-      return res.send(growPlanInstance.recentSensorLogs);
-    });
-  });
-  
- 
-  /*
+/*
    * Delete a growPlanInstance
    *
    * To test:
@@ -143,6 +133,71 @@ module.exports = function(app) {
       return growPlanInstance.remove(function (err) {
         if (err) { return next(err); }
         return res.send('');
+      });
+    });
+  });
+
+
+  /*
+   * Recent Sensor Logs nested resource
+   */
+  app.get('/api/grow_plan_instances/:id/recent_sensor_logs', function (req, res, next){
+    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      return res.send(growPlanInstance.recentSensorLogs);
+    });
+  });
+  
+ 
+  /*
+   * Add an entry to actionLogs nested resource.
+   *
+   * params:
+   * data: {
+      timeRequested (optional)
+      actionId
+   }
+   */
+  app.post('/api/grow_plan_instances/:id/action_logs', function (req, res, next){
+    return GrowPlanInstanceModel
+    .findById(req.params.id)
+    .populate('device')
+    .exec(function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      
+      ActionModel.findById(req.body.actionId, function(err, action){
+        if (err) { return next(err);}
+        if (!action) { return next(new Error('Invalid action id'));}
+
+        // Create a new actionLog subdoc
+        // Persist it to the GPI
+        // If it's an action that has a control that the device has:
+        //   - expire the Device's activeActions
+        //   - Do something with Device.activeActionOverrides. 
+        var actionLog = {
+          timeRequested : (req.body.timeRequested ? new Date(req.body.timeRequested) : Date.now()),
+          action : action
+        };
+        
+        growPlanInstance.actionLogs.push(actionLog);
+        growPlanInstance.save(function(err){
+          if (err) { return next(err);}
+
+          // HACK : instead of figuring out how to properly remove
+          // actions from the override list, 
+          growPlanInstance.device.activeActionOverrides.actions = [action];
+          
+          // HACK: Another hack. We should actually set the expires to a future date,
+          // whenever the next overrideAction should expire.
+          // But instead we're going to take advantage of /device/id/cycles refresh_status
+          // logic of regenerating .deviceMessage string if expires is expired
+          growPlanInstance.device.activeActionOverrides.expires = Date.now() - 1000;
+          growPlanInstance.device.save(function(err){
+            if (err) { return next(err);}
+            return res.send('success');
+          });
+        });
       });
     });
   });

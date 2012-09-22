@@ -41,6 +41,13 @@ var DeviceSchema = new Schema({
 	}],
 	activeGrowPlanInstance : {type: ObjectId, ref: 'GrowPlanInstance', required:false},
 	activePhase : {type: ObjectId, ref: 'GrowPlanInstance', required:false },
+	
+	/**
+	 *  Cache of the active phase actions for this device. Right now it's
+	 *  refreshed inside of /api/device/:id/cycles
+	 *  
+
+	 */
 	activeActions : {
 		actions : [{type: ObjectId, ref: 'Action'}],
 		deviceMessage : String,
@@ -51,6 +58,8 @@ var DeviceSchema = new Schema({
 	/**
 	 * activeActionOverrides are any automatically or manually triggered actions. 
 	 * They override the phase cycles until they expire.
+	 * 
+	 *  If expired, it's refreshed inside refresh_status
 	 */
 	activeActionOverrides : {
 		actions: [{type: ObjectId, ref: 'Action'}],
