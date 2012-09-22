@@ -20,8 +20,7 @@ module.exports = function(app){
 	 */
 	app.configure(function(){
 	  
-	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
-	  app.use(express.static(__dirname + '/../public'));
+	  
 
 	  app.use(stylus.middleware({
 		    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
@@ -68,7 +67,8 @@ module.exports = function(app){
 	  app.use(express.bodyParser());
 	  app.use(express.methodOverride());
 	  
-
+	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
+	  app.use(express.static(__dirname + '/../public'));
 	  
 	  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
 	  app.use(express.cookieParser()); 
