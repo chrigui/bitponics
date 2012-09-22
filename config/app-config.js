@@ -19,20 +19,24 @@ module.exports = function(app){
 	 * & guaranteeing that their middleware executes after this is all set up
 	 */
 	app.configure(function(){
-	  var stylusMiddleware = stylus.middleware({
-	    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
-	    dest: __dirname + '/../public/', // .styl resources are compiled `/stylesheets/*.css`
-	    debug: true,
-	    compile: function(str, path) { // optional, but recommended
-	      return stylus(str)
-	        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
-	        .set('filename', path)
-	        .set('warn', true)
-	        .set('compress', true)
-	        .use(nib());
-	      }
-	  });
-	  app.use(stylusMiddleware);  
+	  
+	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
+	  app.use(express.static(__dirname + '/../public'));
+
+	  app.use(stylus.middleware({
+		    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
+		    dest: __dirname + '/../public/', // .styl resources are compiled `/stylesheets/*.css`
+		    debug: true,
+		    compile: function(str, path) { // optional, but recommended
+		      return stylus(str)
+		        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
+		        .set('filename', path)
+		        .set('warn', true)
+		        .set('compress', true)
+		        .use(nib());
+		      }
+		  })
+	  );  
 	  
 	  app.set('view engine', 'jade');
 	  
@@ -64,7 +68,7 @@ module.exports = function(app){
 	  app.use(express.bodyParser());
 	  app.use(express.methodOverride());
 	  
-	  app.use(express.static(__dirname + '/../public'));
+
 	  
 	  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
 	  app.use(express.cookieParser()); 

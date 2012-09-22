@@ -1,7 +1,10 @@
 module.exports = [ //default pw is "8bitpass" for all init users
 		{
 			email : "jack.bishop1@gmail.com",
-		  	name : "Jack Bishop",
+		  	name : {
+		  		first : "Jack",
+		  		last : "Bishop"
+	  		},
 		  	locale: "en_US",
 		  	active : true,
 		  	admin :  true,
@@ -10,7 +13,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		},
 		{
 			email : "jack@bitponics.com",
-		  	name : "Jack Bishop",
+		  	name : {
+		  		first : "Jack",
+		  		last : "Bishop"
+	  		},
 		  	locale: "en_US",
 		  	active : true,
 		  	admin :  true,
@@ -19,7 +25,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		},
 		{
 			email : "chris@bitponics.com",
-		  	name : "Chris Piuggi",
+		  	name : {
+		  		first : "Chris",
+		  		last : "Piuggi"
+	  		},
 		  	locale: "en_US",
 		  	active : true,
 		  	admin :  true,
@@ -32,7 +41,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		},
 		{
 			email : "michael@bitponics.com",
-		  	name : "Michael Doherty",
+		  	name : {
+		  		first : "Michael",
+		  		last : "Doherty"
+	  		},
 		  	locale: "en_US",
 		  	active : true,
 		  	admin :  true,
@@ -41,7 +53,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		},
 		{
 			email : "amit@bitponics.com",
-		  	name : "Amit Kumar",
+		  	name: {
+		  		first: "Amit",
+		  		last: "Kumar"
+		  	},
 		  	locale: "en_US",
 		  	phone : "13104908091",
 		  	address : {

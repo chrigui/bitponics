@@ -1,6 +1,7 @@
 module.exports = [
 		{
 			name: "pH",
+			abbrev: "pH",
 			unit: "pH",
 			code: "ph"
 		},
@@ -23,16 +24,19 @@ module.exports = [
 		}, 
 		{
 			name: "Air Temperature",
+			abbrev: "Air Temp",
 			unit: "celsius",
 			code: "air"
 		},
 		{
 			name: "Water Temperature",
+			abbrev: "Water Temp",
 			unit: "celsius",
 			code: "water"
 		},
 		{
 			name: "Humidity",
+			abbrev: "Humidity",
 			unit: "percentage",
 			code: "hum"
 		},
@@ -56,11 +60,13 @@ module.exports = [
 		},
 		{
 			name: "Full Light",
+			abbrev: "Full Light",
 			unit: "Lumens",
 			code: "full"
 		},
 		{
 			name: "Visible Light",
+			abbrev: "Visible Light",
 			unit: "Lumens",
 			code: "vis"
 		}

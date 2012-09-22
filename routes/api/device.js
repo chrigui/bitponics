@@ -206,19 +206,14 @@ module.exports = function(app) {
                 value : pendingDeviceLogs[key]
               });
             });
-            /*
-            Object.keys(pendingDeviceLogs).forEach(function(key){
-              var sensor = sensors.filter(function(s){ return s.code === key; })[0];
-              if (sensor){
-                pendingSensorLog.logs.push({
-                  sCode : sensor.code,
-                  value : pendingDeviceLogs[key]
-                });
-              }              
-            });
-           */
+            
+            // TODO : also use this opportunity to check if any IdealRanges have been exceeded.
+            // if so, trigger the corresponding action...somehow. 
+            // On the device: expire activeActions and activeActionOverrides. Maybe refresh their deviceMessages at this point?
+            // On the gpi: add to actionLogs? 
+
             winston.info('pendingSensorLog');
-            winston.info(pendingSensorLog);            
+            winston.info(JSON.stringify(pendingSensorLog));
 
             GrowPlanInstanceModel.findOne({ device: device._id, active: true },  wf1Callback);        
           }
@@ -233,7 +228,6 @@ module.exports = function(app) {
               device.save(callback);
             },
             function parallel2(callback){
-              winston.info('Pushing to growPlanInstance sensorLogs, gpid ' + growPlanInstance.id);
               growPlanInstance.sensorLogs.push(pendingSensorLog);          
               growPlanInstance.save(callback);
             }
