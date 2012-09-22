@@ -128,8 +128,8 @@ var actionUtils = {
 	},
 
 	/**
-	 * Takes a string in the form '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
-	 * and replaces the {value} and {duration} fields with the proper values 
+	 * Takes a string with the tokens '{value1},{duration1},{value2},{duration2};'
+	 * and replaces the {valueX} and {durationX} fields with the proper values 
 	 * 
 	 * Assumes it's passed an action with states with controlValues.
 	 */

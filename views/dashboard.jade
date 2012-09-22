@@ -198,7 +198,8 @@ block footer-scripts
          *  abbrev, unit of measurement, code, name, idealRange.
          *  Hash keyed by Sensor.code.
          */
-        sensors : !{JSON.stringify(sensors)}
+        sensors : !{JSON.stringify(sensors)},
+        controls : !{JSON.stringify(controls)}
       }
     }
   script(src='/assets/js/libs/d3.v2.js')
