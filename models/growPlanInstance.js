@@ -75,7 +75,8 @@ var GrowPlanInstanceSchema = new Schema({
 		
 		/**
 		 * Boolean indicating whether this action has been sent. This will be
-		 * what queries are run against in order to pick up pending actions
+		 * what queries are run against in order to pick up pending actions.
+		 * Might be redundant given timeSent...could just check that for null
 		 */
 		sent: {type: Boolean, default : false},
 		
@@ -109,7 +110,7 @@ var GrowPlanInstanceSchema = new Schema({
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
-GrowPlanInstanceSchema.index({ 'sensorLogs.logs.timestamp sensorLogs.logs.sCode': -1 });
+GrowPlanInstanceSchema.index({ 'sensorLogs.logs.timestamp sensorLogs.logs.sCode': -	1 });
 
 
 

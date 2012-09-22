@@ -2,7 +2,10 @@ module.exports = [
 		{
 			gpid: "1",
 			users : [
-				"savedObjectIds['users']['jack@bitponics.com']"
+				"savedObjectIds['users']['jack@bitponics.com']",
+				"savedObjectIds['users']['chris@bitponics.com']",
+				"savedObjectIds['users']['amit@bitponics.com']",
+				"savedObjectIds['users']['michael@bitponics.com']"
 			],
 			owner : "savedObjectIds['users']['jack@bitponics.com']",
 			growPlan : "savedObjectIds['growPlans']['Tomato']",

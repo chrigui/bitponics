@@ -91,6 +91,9 @@ td{vertical-align:top}
 .ellipsis,.select-block .main-heading,.select-block .sub-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .circle,.styleguide .color,.control{text-align:center;border-radius:50em;}
 .circle:before,.styleguide .color:before,.control:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;}
+.select-block select:focus{outline:none;border:none}
 .styleguide{background:rgba(70,241,33,0.45);}
 .styleguide ul{margin:1em 0;padding:0;list-style:none;}
 .styleguide ul li{list-style-type:none}
@@ -196,9 +199,13 @@ td{vertical-align:top}
 .ellipsis,.select-block .main-heading,.select-block .sub-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .circle,.control{text-align:center;border-radius:50em;}
 .circle:before,.control:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;}
+.select-block select:focus{outline:none;border:none}
 body{margin:0;color:#333;font:112.5%/1.5 Helvetica,Arial,sans-serif;margin:0 auto;background:#fff}
 *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 h1,h2,h3,h4,h5,h6{font-weight:normal}
+abbr[title]{border:none}
 .content-module{min-width:9em;margin:0 0 2.25em;border-top:4px solid #46f121;}
 .content-module.small{width:25%}
 .content-module.medium{width:50%}
@@ -225,7 +232,7 @@ h1,h2,h3,h4,h5,h6{font-weight:normal}
 .sub-heading{color:#24d321;margin:.65em 0}
 .select-block{line-height:1.66em;padding:0 .83em;}
 .select-block .main-heading,.select-block .sub-heading{margin:0;font-size:1.5em;width:100%}
-.select-block .sub-heading{position:relative;}
+.select-block .sub-heading{cursor:pointer;position:relative;}
 .select-block .sub-heading:after{position:absolute;content:'';right:0;top:.35em;width:1px;height:1px;height:0;position:absolute;width:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid rgba(67,240,32,0.5)}
 .icon{text-indent:-500px;overflow:hidden;font:10px monospace;letter-spacing:-10px;width:1.45em;height:1.45em;background:#fff}
 #visualizer div.circle{background-color:#24d321;position:absolute;top:.75em;left:.75em;bottom:.75em;right:.75em}
@@ -233,3 +240,6 @@ h1,h2,h3,h4,h5,h6{font-weight:normal}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
 #air,#hum,#co2{background-color:#24d321}
 #lux,#ir,#full,#vis{background-color:#d2e000}
+#phases-graph svg{display:inline-block;vertical-align:middle}
+section#footer{clear:both;}
+section#footer .content-module{background-color:#fff}

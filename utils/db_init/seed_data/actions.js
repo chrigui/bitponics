@@ -32,7 +32,7 @@ module.exports = [
 					},
 					{
 						controlValue: 0,
-						durationType: 'weeks',
+						durationType: 'minutes',
 						duration: 15, // 15 min in millisecond
 						message: "Turn pump off for 15 minutes"
 					}

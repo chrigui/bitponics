@@ -26,9 +26,11 @@ var IdealRangeSchema = new Schema({
 	 * applicableTimeSpan. optional. Describes the portion of a 24-hour day
 	 * during which this idealRange is operational.  
 	 *
-	 * values are milliseconds since * 00:00
+	 * Values are milliseconds since 00:00.
 	 *
-	 * If undefined, idealRange is always operational
+	 * If startTime is greater than endTime, it will be parsed as an "overnight" span. 
+	 * 
+	 * If undefined, idealRange is always operational.
 	 */
 	applicableTimeSpan: { 
 		startTime: { type: Number },

@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 var SensorSchema = new Schema({
 	name: { type: String, required: true },
 	abbrev: {type: String },
-	unitOfMeasurement: { type: String, required: true },
+	unit: { type: String, required: true },
 	code: { type: String, required: true, unique: true }
 });
 

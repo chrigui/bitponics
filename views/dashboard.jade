@@ -11,21 +11,30 @@ block content
       h2.main-heading Grow Plans
       h3.sub-heading
         select
-          each item in activeGrowPlans
+          each item in activeGrowPlanInstances
             option= item.growPlan.name
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
-        if user.name == ''
-         | #{user.name}
+        if user.name.full != ''
+         | #{user.name.full}
         else
          | #{user.email}
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
-        each item in currentGrowPlanInstance.sensorLogs
-              div= item.timestamp
-              div= item.logs[0]
+      each item in sensors
+        .sensor.data-module 
+            h3.main-heading
+              | #{item.abbrev}
+            div.sensor-data
+              div.sensor-value #{item.logs[0].value}
+              div.sensor-value-unit
+                span #{item.unit}
+            div.sensor-type.icon.#{item.sCode}
+            div.message Check
+            div.settings.icon Settings
+        
       //- section#lux.data-module 
       //-   h3.main-heading 
       //-     abbr(title="Luminous Flux") Lux
@@ -181,5 +190,16 @@ block content
 
 
 block footer-scripts
+  script
+    Bitponics.user = {
+      currentGrowPlanInstance : {
+        /**
+         *  Mashup of Sensor objects GPI's current Phase's IdealRanges.
+         *  abbrev, unit of measurement, code, name, idealRange.
+         *  Hash keyed by Sensor.code.
+         */
+        sensors : !{JSON.stringify(sensors)}
+      }
+    }
   script(src='/assets/js/libs/d3.v2.js')
   script(src='/assets/js/dashboard.js') 
