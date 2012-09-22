@@ -2,7 +2,7 @@ module.exports = [
 		{
 			name : 'Vegetative',
 			description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
-			expectedTimeSpan: undefined,
+			expectedNumberOfDays: 28,
 			lightingType: "savedObjectIds['lights']['metal halide']",
 			actions: [
 				"savedObjectIds['actions']['Transplant seedlings into the grow bed']",
@@ -18,7 +18,7 @@ module.exports = [
 		{
 			name : "Blooming",
 			description: "Open-ended booming phase. After about 70 days, you should begin to see blossoms.",
-			expectedTimeSpan: undefined,
+			expectedNumberOfDays: 7,
 			lightingType: "savedObjectIds['lights']['metal halide']",
 			actions: [
 				"savedObjectIds['actions']['Pollinate any new blossoms using a watercolor brush to distribute']",
@@ -34,7 +34,7 @@ module.exports = [
 		{
 			name : "Fruiting",
 			description: "Fruiting phase. Continue to pollinate blossoms and harvest fruit when fully ripened (red).",
-			expectedTimeSpan: undefined,
+			expectedNumberOfDays: 21,
 			lightingType: "savedObjectIds['lights']['compact fluorescent']",
 			actions: [
 				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",

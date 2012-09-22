@@ -24,7 +24,7 @@ block content
     div#sensors.content-module.side
       h2.main-heading Sensors
       each item in sensors
-        .sensor.data-module 
+        div(class="sensor data-module #{item.sCode}")
             h3.main-heading
               | #{item.abbrev}
             div.sensor-data
@@ -172,11 +172,11 @@ block content
       div#phases-graph.circle.centered
     div#controls.content-module.side
       h2.main-heading Controls
-      each item,name in controls
-        div.control #{name}
-      //div.control Pump
-      //div.control Fan
-      //div.control Light
+      each item in controls
+        div(class="control #{item.className}") #{item.name}
+      //-div.control Pump
+      //-div.control Fan
+      //-div.control Light
     div#reminders.content-module.side
       h2.main-heading Reminders
       div.data-module Hey!
