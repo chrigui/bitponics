@@ -172,9 +172,11 @@ block content
       div#phases-graph.circle.centered
     div#controls.content-module.side
       h2.main-heading Controls
-      div.control Pump
-      div.control Fan
-      div.control Light
+      each item,name in controls
+        div.control #{name}
+      //div.control Pump
+      //div.control Fan
+      //div.control Light
     div#reminders.content-module.side
       h2.main-heading Reminders
       div.data-module Hey!
