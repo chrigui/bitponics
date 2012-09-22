@@ -128,7 +128,7 @@ abbr[title]{border:none}
 .select-block .sub-heading:after{position:absolute;content:'';right:0;top:.35em;width:1px;height:1px;height:0;position:absolute;width:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid rgba(67,240,32,0.5)}
 .icon{text-indent:-500px;overflow:hidden;font:10px monospace;letter-spacing:-10px;width:1.45em;height:1.45em;background:#fff}
 #visualizer div.circle{position:absolute;top:.75em;left:.75em;bottom:.75em;right:.75em}
-.control{width:8em;height:10em;position:relative;text-align:center;vertical-align:bottom;color:#24d321;}
+.control{width:8em;height:10em;position:relative;text-align:center;color:#24d321;}
 .control svg{position:absolute;top:2em;left:0}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
 #air,#hum,#co2{background-color:#24d321}
