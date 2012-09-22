@@ -201,7 +201,8 @@ block footer-scripts
          *  Hash keyed by Sensor.code.
          */
         sensors : !{JSON.stringify(sensors)},
-        controls : !{JSON.stringify(controls)}
+        controls : !{JSON.stringify(controls)},
+        phases : !{JSON.stringify(currentGrowPlanInstancePhases)},
       }
     }
   script(src='/assets/js/libs/d3.v2.js')
