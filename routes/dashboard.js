@@ -1,4 +1,5 @@
-var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+var ControlModel = require('../models/control').model,
+GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 GrowPlanModel = require('../models/growPlan').model,
 SensorModel = require('../models/sensor').model,
 PhaseModel = require('../models/phase').model,
@@ -20,7 +21,9 @@ module.exports = function(app){
 		currentGrowPlanInstance,
 		activePhase,
 		activeIdealRanges,
-		activeActions;
+		activeActions,
+		activeControlActions = [],
+		controls;
 
 		async.waterfall(
 			[
@@ -32,6 +35,9 @@ module.exports = function(app){
 								SensorModel.find().exec(innerCallback);
 							},
 							function parallel2(innerCallback){
+								ControlModel.find().exec(innerCallback);
+							},
+							function parallel3(innerCallback){
 								GrowPlanInstanceModel
 								.find({ 'users': req.user })
 								.populate('growPlan')
@@ -46,7 +52,8 @@ module.exports = function(app){
 	          	if (err) { return next(err);}
 
 	          	sensors = results[0];
-	          	growPlanInstances = results[1];
+	          	controls = results[1];
+	          	growPlanInstances = results[2];
 
 	          	//set first GP default to show in dashboard, will match on id if present below
 	          	currentGrowPlanInstance = growPlanInstances[0];
@@ -66,6 +73,19 @@ module.exports = function(app){
 					activePhase = phaseResult;
 					activeIdealRanges = activePhase.idealRanges;
 					activeActions = activePhase.actions;
+
+					// get the actions that have a corresponding control in the associated device
+					activeActions.forEach(function(activeAction){
+						if (!activeAction.control){ return; }
+						var controlMapEntry = currentGrowPlanInstance.device.controlMap.filter(
+							function(controlMapEntry){
+								return (controlMapEntry.control.equals(activeAction.control));
+							});
+						controlMapEntry = (controlMapEntry.length > 0 ? controlMapEntry[0] : undefined);
+						if (controlMapEntry){
+							activeControlActions.push(activeAction);
+						}
+					});
 					callback();
 				}
 			],
@@ -76,8 +96,22 @@ module.exports = function(app){
 				var locals = {
 					activeGrowPlanInstances : growPlanInstances,
 					currentGrowPlanInstance: currentGrowPlanInstance,
-					sensors: {}	
+					sensors: {},
+					controls: {}
 				};
+
+
+				activeControlActions.forEach(function(controlAction){
+					var control = controls.filter(function(item){return item._id.equals(controlAction.control);})[0];
+					if (!locals.controls[control.name]){locals.controls[control.name] = [];}
+					locals.controls[control.name].push({
+						action : {
+							description : controlAction.description,
+							cycle : controlAction.cycle,
+							cycleString : ActionUtils.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states)
+						}
+					});	
+				});
 
 				sensors.forEach(function(sensor){
 					locals.sensors[sensor.code] = {
@@ -121,6 +155,7 @@ module.exports = function(app){
 						}
 					});
 				});
+				
 				Object.keys(locals.sensors).forEach(function(key){
 					if (locals.sensors[key].logs.length === 0){
 						delete locals.sensors[key];
