@@ -1,3 +1,161 @@
+Bitponics.pages.dashboard = {
+    getPhaseFillColor : function(data, index){
+        var num = data.data;
+
+        if (num == 0) { 
+            return '#46f121'
+        } else if (num == 2){
+            return '#24d321';
+        } else if (num < 1){
+            return '#D2E000';
+        } else {
+            return '#24d321';
+        }
+    },
+    drawPhaseGraphs : function(){
+        var phases = Bitponics.user.currentGrowPlanInstance.phases,
+            phaseCount = phases.length,
+            $container = $('#phases-graph'),
+            outerMargin = 80,
+            width = $container.width() - (outerMargin * 2),
+            height = width,
+            radius = width / 2,
+            innerWhitespaceRadius = radius/(phaseCount + 1),
+            // sum of all arcSpans must fit between outer boundary and inner whitespace
+            arcSpan = (radius - innerWhitespaceRadius)/phaseCount,
+            arcMargin = 0,
+            colorScale = d3.scale.category20c(),
+            equalPie = d3.layout.pie();
+
+        // disable data sorting & force all slices to be the same size
+        equalPie
+        .sort(null)
+        .value(function(d){
+            return 1;
+        });
+
+        var svg = d3.select('#phases-graph')
+                        .append('svg:svg')
+                            .attr('width', width)
+                            .attr('height', height);
+
+        $.each(phases, function(index, phase){
+            var arc = d3.svg.arc(),
+                className = 'phase' + index,
+                phaseGroup;
+
+            var phaseDaySummaries = [];
+            for (var i = 0; i < phase.phase.expectedNumberOfDays; i++){
+                var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
+                //console.log('colorval ' + colorVal);
+                phaseDaySummaries.push(colorVal);
+            }
+
+            arc.outerRadius(radius - (arcSpan * index) - arcMargin)
+                .innerRadius(radius - (arcSpan * (index+1)) - arcMargin);
+
+            phaseGroup = svg.append('svg:g')
+                .classed(className, true)
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+            phaseGroup.selectAll('path')
+            .data(equalPie(phaseDaySummaries))
+            .enter()
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1)
+                .attr('fill', Bitponics.pages.dashboard.getPhaseFillColor);
+        });
+    },
+    getControlFillColor : function(data, index){
+        var num = parseInt(data.data.value, 10);
+        
+        if (num == 0) { 
+            return '#46f121'
+        } else {
+            return '#24d321';
+        }
+    },
+    drawControlGraphs : function(){
+        var controls = Bitponics.user.currentGrowPlanInstance.controls,
+            $container = $('#controls'),
+            outerMargin = 0,
+            width = $container.find('.control').width() - (outerMargin * 2),
+            height = width,
+            radius = width / 2,
+            innerWhitespaceRadius = radius/2,
+            // sum of all arcSpans must fit between outer boundary and inner whitespace
+            arcSpan = (radius - innerWhitespaceRadius),
+            arcMargin = 0,
+            colorScale = d3.scale.category20c(),
+            pie = d3.layout.pie(),
+            dayMilliseconds = 24 * 60 * 60 * 1000;
+
+        // disable data sorting & force all slices to be the same size
+        pie
+        .sort(null)
+        .value(function(d){
+            return d.timespan;
+        });
+
+        $.each(controls, function(controlKey, control){
+            var svg = d3.select('#controls .control.' + control.className)
+                        .append('svg:svg')
+                            .attr('width', width)
+                            .attr('height', height);
+
+            var arc = d3.svg.arc(),
+                className = 'control-' + control.className,
+                svgGroup;
+
+            var cycleStringParts = control.action.cycleString.split(',');
+            var cycleStates = [];
+            cycleStates[0] = {
+                value : parseInt(cycleStringParts[0], 10),
+                timespan : parseInt(cycleStringParts[1], 10)
+            };
+            cycleStates[1] = {
+                value : parseInt(cycleStringParts[2], 10),
+                timespan : parseInt(cycleStringParts[3], 10)  
+            };
+            var overallCycleTimespan = cycleStates[0].timespan + cycleStates[1].timespan;
+            var numDayCycles = dayMilliseconds/overallCycleTimespan;
+            var cycleGraphData = [];
+            for (var i = 0; i < numDayCycles; i++){
+                cycleGraphData.push(cycleStates[0]);
+                cycleGraphData.push(cycleStates[1]);
+            }
+
+
+            arc.outerRadius(radius  - arcMargin)
+                .innerRadius(radius - arcSpan - arcMargin);
+
+            svgGroup = svg.append('svg:g')
+                .classed(className, true)
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+            svgGroup.selectAll('path')
+            .data(pie(cycleGraphData))
+            .enter()
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 1)
+                .attr('fill', Bitponics.pages.dashboard.getControlFillColor);
+        });
+    }
+};
+
+$(function () {
+    Bitponics.pages.dashboard.drawPhaseGraphs();
+    Bitponics.pages.dashboard.drawControlGraphs();
+});
+
+
+
+/*
+
 var sampleData = {
     phases : [
         {
@@ -17,90 +175,6 @@ var sampleData = {
     ]
 };
 
-var getPhaseFillColor = function(data, index){
-    var num = data.data;
-
-
-console.log('num ' + num);
-    if (num == 0) { 
-        return '#46f121'
-    } else if (num == 2){
-        return '#24d321';
-    } else if (num < 1){
-        return '#D2E000';
-    } else {
-        return '#24d321';
-    }
-}
-
-var drawPhaseGraphs = function(){
-    var phases = Bitponics.user.currentGrowPlanInstance.phases,
-        phaseCount = phases.length,
-        $container = $('#phases-graph'),
-        outerMargin = 80,
-        width = $container.width() - (outerMargin * 2),
-        height = width,
-        radius = width / 2,
-        innerWhitespaceRadius = radius/(phaseCount + 1),
-        // sum of all arcSpans must fit between outer boundary and inner whitespace
-        arcSpan = (radius - innerWhitespaceRadius)/phaseCount,
-        arcMargin = 0,
-        colorScale = d3.scale.category20c(),
-        equalPie = d3.layout.pie(),
-        arcs = [],
-        innerArc = d3.svg.arc(),
-        outerArc = d3.svg.arc();
-
-    // disable data sorting & force all slices to be the same size
-    equalPie
-    .sort(null)
-    .value(function(d){
-        return 1;
-    });
-
-    
-
-    var svg = d3.select('#phases-graph')
-                    .append('svg:svg')
-                        .attr('width', width)
-                        .attr('height', height);
-
-    $.each(phases, function(index, phase){
-        var arc = d3.svg.arc(),
-            className = 'phase' + index,
-            phaseGroup;
-
-        var phaseDaySummaries = [];
-        for (var i = 0; i < phase.phase.expectedNumberOfDays; i++){
-            var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
-            //console.log('colorval ' + colorVal);
-            phaseDaySummaries.push(colorVal);
-        }
-
-        arc.outerRadius(radius - (arcSpan * index) - arcMargin)
-            .innerRadius(radius - (arcSpan * (index+1)) - arcMargin);
-
-        phaseGroup = svg.append('svg:g')
-            .classed(className, true)
-            .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-        phaseGroup.selectAll('path')
-        .data(equalPie(phaseDaySummaries))
-        .enter()
-            .append('svg:path')
-            .attr('d', arc)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
-            .attr('fill', getPhaseFillColor);
-    });
-
-
-};
-
-$(function () {
-    drawPhaseGraphs();
-});
-/*
 $(function () {
     var i = 0,
         phase1 = sampleData.phases[0],

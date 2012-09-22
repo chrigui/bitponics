@@ -89,8 +89,8 @@ td{vertical-align:top}
 .text-normalize{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
 .hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
 .ellipsis,.select-block .main-heading,.select-block .sub-heading{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.circle,.control{text-align:center;border-radius:50em;}
-.circle:before,.control:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.circle{text-align:center;border-radius:50em;}
+.circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
 .select-block{overflow:hidden;}
 .select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;}
 .select-block select:focus{outline:none;border:none}
@@ -128,7 +128,8 @@ abbr[title]{border:none}
 .select-block .sub-heading:after{position:absolute;content:'';right:0;top:.35em;width:1px;height:1px;height:0;position:absolute;width:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:10px solid rgba(67,240,32,0.5)}
 .icon{text-indent:-500px;overflow:hidden;font:10px monospace;letter-spacing:-10px;width:1.45em;height:1.45em;background:#fff}
 #visualizer div.circle{position:absolute;top:.75em;left:.75em;bottom:.75em;right:.75em}
-.control{background-color:#24d321;width:8em;height:8em}
+.control{width:8em;height:10em;position:relative;text-align:center;vertical-align:bottom;color:#24d321;}
+.control svg{position:absolute;top:2em;left:0}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
 #air,#hum,#co2{background-color:#24d321}
 #lux,#ir,#full,#vis{background-color:#d2e000}
