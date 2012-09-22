@@ -11,5 +11,6 @@ module.exports = {
 	nutrient: require('./nutrient').model,
 	phase: require('./phase').model,
 	sensor: require('./sensor').model,
+	sensorLog: require('./sensorLog').model,
 	user: require('./user').model
 };

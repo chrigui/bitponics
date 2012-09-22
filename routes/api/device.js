@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
     ActionModel = Action.model,
     ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
+    SensorLogModel = require('../../models/sensorLog').model,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
     winston = require('winston'),
@@ -222,14 +223,20 @@ module.exports = function(app) {
       function wf2(growPlanInstance, wf2Callback){
         // Now. In parallel, we can persist the pendingSensorLog to 
         // the device & the growPlanInstance
+        pendingSensorLog.gpid = growPlanInstance.id;
+
         async.parallel([
             function parallel1(callback){
               device.recentSensorLogs.push(pendingSensorLog);
               device.save(callback);
             },
             function parallel2(callback){
-              growPlanInstance.sensorLogs.push(pendingSensorLog);          
+              growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
               growPlanInstance.save(callback);
+            },
+            function parallel3(callback){
+              var sensorLog = new SensorLogModel(pendingSensorLog);
+              sensorLog.save(callback);
             }
           ], 
           function parallelFinal(err, result){
@@ -269,6 +276,7 @@ module.exports = function(app) {
         responseBody = responseBodyTemplate,
         cycleTemplate = DeviceUtils.cycleTemplate;
 
+    winston.info('In /cycles');
     winston.info(JSON.stringify(req.headers));  
     
     req.session.destroy();
@@ -281,9 +289,11 @@ module.exports = function(app) {
 
     async.waterfall([
       function (callback){
+        winston.info('in callback 1');
         DeviceModel.findOne({ deviceId: deviceId }, callback);  
       },
       function (deviceResult, callback){
+        winston.info('in callback 2');
         if (!deviceResult){ 
           return callback(new Error('No device found for id ' + req.params.id));
         }
@@ -291,6 +301,7 @@ module.exports = function(app) {
         GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
       },
       function (growPlanInstanceResult, callback) {
+        winston.info('in callback 3');
         if (!growPlanInstanceResult){ 
           return callback(new Error('No active grow plan instance found for device'));
         }

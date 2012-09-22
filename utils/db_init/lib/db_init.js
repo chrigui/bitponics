@@ -48,7 +48,8 @@ var mongoose   = require('mongoose'),
 		phases: {},
 		growPlans: {},
 		growPlanInstances: {},
-		users: {}
+		users: {},
+		sensorLogs: {}
 	};
 
 switch(db_url){
@@ -85,6 +86,7 @@ async.series([
 		if(clear) {
 			async.parallel([
 				function(innerCallback){
+					if (!mongoose.connection.collections['users']){ return innerCallback();}
 					mongoose.connection.collections['users'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('users collection dropped');
@@ -92,6 +94,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['sensors']){ return innerCallback();}
 					mongoose.connection.collections['sensors'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('sensors collection dropped');
@@ -99,6 +102,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['nutrients']){ return innerCallback();}
 					mongoose.connection.collections['nutrients'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('nutrients collection dropped');
@@ -106,6 +110,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['devicetypes']){ return innerCallback();}
 					mongoose.connection.collections['devicetypes'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('devicetypes collection dropped');
@@ -113,6 +118,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['devices']){ return innerCallback();}
 					mongoose.connection.collections['devices'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('devices collection dropped');
@@ -120,6 +126,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['lights']){ return innerCallback();}
 					mongoose.connection.collections['lights'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('lights collection dropped');
@@ -128,6 +135,7 @@ async.series([
 
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['growsystems']){ return innerCallback();}
 					mongoose.connection.collections['growsystems'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('growsystems collection dropped');
@@ -136,6 +144,7 @@ async.series([
 					
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['controls']){ return innerCallback();}
 					mongoose.connection.collections['controls'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('controls collection dropped');
@@ -143,6 +152,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['actions']){ return innerCallback();}
 					mongoose.connection.collections['actions'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('actions collection dropped');
@@ -150,6 +160,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['idealranges']){ return innerCallback();}
 					mongoose.connection.collections['idealranges'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('idealranges collection dropped');
@@ -157,6 +168,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['phases']){ return innerCallback();}
 					mongoose.connection.collections['phases'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('phases collection dropped');
@@ -164,6 +176,7 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['growplans']){ return innerCallback();}
 					mongoose.connection.collections['growplans'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('growplans collection dropped');
@@ -171,12 +184,20 @@ async.series([
 					});
 				},
 				function(innerCallback){
+					if (!mongoose.connection.collections['growplaninstances']){ return innerCallback();}
 					mongoose.connection.collections['growplaninstances'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
 					    console.log('growplaninstances collection dropped');
 					    innerCallback();
 					});
-					
+				},
+				function(innerCallback){
+					if (!mongoose.connection.collections['sensorlogs']){ return innerCallback();}
+					mongoose.connection.collections['sensorlogs'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('sensorlogs collection dropped');
+					    innerCallback();
+					});
 				}
 				],
 				function(err, results){
@@ -240,7 +261,7 @@ async.series([
 		    var dataObj = new models.sensor({
 				name: _data.name,
 				abbrev: _data.abbrev,
-				unitOfMeasurement: _data.unit,
+				unit: _data.unit,
 				code: _data.code
 			});
 			
@@ -680,7 +701,7 @@ console.log(_data.description)
 			_data.phases.forEach(function(item){
 				item.phase = eval(item.phase);
 			});
-			_data.sensorLogs.forEach(function(item){
+			_data.recentSensorLogs.forEach(function(item){
 				item.logs.forEach(function(log){
 					log.sensor = eval(log.sensor);
 				});
@@ -705,7 +726,7 @@ console.log(_data.description)
 				endDate: _data.endDate,
 			    active: _data.active,
 				phases: _data.phases,
-				sensorLogs: _data.sensorLogs,
+				recentSensorLogs: _data.recentSensorLogs,
 				controlLogs: _data.controlLogs,
 				photoLogs: _data.photLogs,
 				genericLogs: _data.genericLogs
@@ -720,6 +741,41 @@ console.log(_data.description)
 		        console.log(err);
 		      }
 		      savedObjectIds[dataType][_data.gpid] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		    });
+		});
+    },
+    function(callback){
+        /**
+		 * Sensor Logs
+		 */
+	
+		var dataType = 'sensorLogs',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+			
+		    var dataObj = new models.sensorLog({
+		    	gpi: eval(_data.gpi),
+				timestamp : _data.timestamp,
+				logs : _data.logs
+			});
+
+		    console.log(dataObj);
+
+			dataObj.save(function (err, doc) {
+			  if (!err) {
+		        console.log("created sensor log");
+		      } else {
+		        console.log(err);
+		      }
+		      savedObjectIds[dataType][doc.id] = doc.id;
 		      if (dataCount === 1) {
 		      	 callback(null, null);
 		      }

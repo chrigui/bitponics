@@ -11,7 +11,8 @@ var data = {
 	idealRanges: require('./idealRanges'),
 	phases: require('./phases'),
 	growPlans: require('./growPlans'),
-	growPlanInstances: require('./growPlanInstances')
+	growPlanInstances: require('./growPlanInstances'),
+	sensorLogs: require('./sensorLogs')
 }
 
 module.exports = data;

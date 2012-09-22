@@ -35,7 +35,10 @@ var GrowPlanInstanceSchema = new Schema({
 		active: { type: Boolean }
 	}],
 
-	sensorLogs: [{
+	/**
+	 * Sensor logs for the past 24 hours.
+	 */
+	recentSensorLogs: [{
 		timestamp: { type: Date, required: true, default: Date.now },
 		logs : [{
 			/**
@@ -110,8 +113,25 @@ var GrowPlanInstanceSchema = new Schema({
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
-GrowPlanInstanceSchema.index({ 'sensorLogs.logs.timestamp sensorLogs.logs.sCode': -	1 });
 
 
+/**
+ * Remove old recentSensorLogs
+ */
+GrowPlanInstanceSchema.pre('save', function(next){
+	var now = Date.now(),
+		cutoff = now - (1000 * 60 * 2), // now - 2 hours
+		logsToRemove = [];
+	
+	this.recentSensorLogs.forEach(function(log){
+		if (log.timestamp < cutoff) { logsToRemove.push(log); }
+	});
+
+	logsToRemove.forEach(function(log){
+		log.remove();
+	});
+
+	next();
+});
 
 exports.model = mongoose.model('GrowPlanInstance', GrowPlanInstanceSchema);

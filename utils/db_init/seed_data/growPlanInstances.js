@@ -33,7 +33,7 @@ module.exports = [
 					active: false
 				}
 			],
-			sensorLogs: [
+			recentSensorLogs: [
 				{
 					timestamp: 1347364818821,
 					logs : [
@@ -166,7 +166,7 @@ module.exports = [
 					active: false
 				}
 			],
-			sensorLogs: [
+			recentSensorLogs: [
 				{
 					timestamp: 1347364818821,
 					logs : [
