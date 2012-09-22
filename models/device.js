@@ -113,7 +113,25 @@ DeviceSchema.pre('save', function(next){
 	});
 });
 
+/**
+ * Remove old recentSensorLogs
+ */
+DeviceSchema.pre('save', function(next){
+	var device = this,
+		now = Date.now(),
+		cutoff = now - (1000 * 60 * 2), // now - 2 hours
+		logsToRemove = [];
+	
+	device.recentSensorLogs.forEach(function(log){
+		if (log.timestamp < cutoff) { logsToRemove.push(log); }
+	});
 
+	logsToRemove.forEach(function(log){
+		log.remove();
+	});
+
+	next();
+});
 
 var deviceUtils = {
 	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'

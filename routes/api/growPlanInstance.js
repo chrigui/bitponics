@@ -47,7 +47,7 @@ module.exports = function(app) {
       endDate: req.body.endDate,
       active: req.body.active,
       phases: req.body.phases,
-      sensorLogs: req.body.sensorLogs,
+      recentSensorLogs: req.body.recentSensorLogs,
       controlLogs: req.body.controlLogs,
       photoLogs: req.body.photoLogs,
       genericLogs: req.body.genericLogs
@@ -112,57 +112,16 @@ module.exports = function(app) {
 
 
   /*
-   * Sensor Logs nested resource
+   * Recent Sensor Logs nested resource
    */
-  app.get('/api/grow_plan_instances/:id/sensor_logs', function (req, res, next){
+  app.get('/api/grow_plan_instances/:id/recent_sensor_logs', function (req, res, next){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       if (err) { return next(err); }
-      return res.send(growPlanInstance.sensorLogs);
+      return res.send(growPlanInstance.recentSensorLogs);
     });
   });
   
-  /*
-   *   Append logs to the grow plan instance's sensorLogs document. 
-   *
-   *   jQuery.ajax({
-   *      url: "/api/grow_plan_instance/503a86812e57c70000000001/sensor_logs",
-   *      type: "PUT",
-   *      data: {
-   *        sensorLogs: [{
-   *          timestamp: new Date(),
-   *          logs : [
-   *            {
-   *              sensor: "503a79426d25620000000001",
-   *              value: 25
-   *            },
-   *            {
-   *              sensor: "503a79426d25620000000001",
-   *              value: 24    
-   *            }
-   *          ]
-   *        }
-   *      },
-   *      success: function (data, textStatus, jqXHR) {
-   *          console.log("Post response:");
-   *          console.dir(data);
-   *          console.log(textStatus);
-   *          console.dir(jqXHR);
-   *      }
-   *  });
-   */
-  app.post('/api/grow_plan_instances/:id/sensor_logs', function (req, res, next){
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
-      if (err) { return next(err); }
-      req.body.sensorLogs.forEach(function(log){
-        growPlanInstance.sensorLogs.push(log);
-      });
-      return growPlanInstance.save(function (err) {
-        if (err) { return next(err); }
-        return res.send('successfully logged');
-      });
-    });
-  });
-
+ 
   /*
    * Delete a growPlanInstance
    *
