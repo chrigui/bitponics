@@ -19,6 +19,7 @@ module.exports = function(app){
 		var sensors,
 		growPlanInstances,
 		currentGrowPlanInstance,
+		phases,
 		activePhase,
 		activeIdealRanges,
 		activeActions,
@@ -42,6 +43,7 @@ module.exports = function(app){
 								.find({ 'users': req.user })
 								.populate('growPlan')
 								.populate('device')
+								.populate('phases.phase')
 								.sort('-startDate')
 								.exec(innerCallback);
 							}
@@ -95,7 +97,7 @@ module.exports = function(app){
 				// Now get the models ready for client-side
 				var locals = {
 					activeGrowPlanInstances : growPlanInstances,
-					currentGrowPlanInstance: currentGrowPlanInstance,
+					currentGrowPlanInstancePhases: currentGrowPlanInstance.phases,
 					sensors: {},
 					controls: {}
 				};
