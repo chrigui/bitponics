@@ -105,16 +105,20 @@ module.exports = function(app){
 				// TODO : Figure out if this is necessary. There's an index
 				// on sensorLogs.timestamp so maybe it's already in some sort 
 				// of order
-				var sortedSensorLogs = currentGrowPlanInstance.sensorLogs.sort(function(logA, logB){
+				var sortedSensorLogs = currentGrowPlanInstance.recentSensorLogs.sort(function(logA, logB){
 					return ( (logA.timestamp > logB) ? -1 : 1);
 				});
 
 				sortedSensorLogs.forEach(function(sensorsLog){
 					sensorsLog.logs.forEach(function(log){
-						locals.sensors[log.sCode].logs.push({
-							timestamp : sensorsLog.timestamp,
-							value : log.value
-						});
+						// HACK : we shouldn't need to check for existence of this sensor code in the hash
+						// once validation's setup in /api/devices/id/sensor_logs, remove the if(...) check
+						if (locals.sensors[log.sCode]){
+							locals.sensors[log.sCode].logs.push({
+								timestamp : sensorsLog.timestamp,
+								value : log.value
+							});	
+						}
 					});
 				});
 				Object.keys(locals.sensors).forEach(function(key){
@@ -132,5 +136,5 @@ module.exports = function(app){
 			}
 		);
 	});
-};
+};	
 
