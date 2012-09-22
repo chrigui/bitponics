@@ -157,6 +157,14 @@ module.exports = function(app) {
       timeRequested (optional)
       actionId
    }
+
+   jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/action_logs", 
+    { 
+      actionId: "505d551372b1680000000059"
+    }, 
+    function (data, textStatus, jqXHR) {
+      console.log("Post resposne:"); console.dir(data); console.log(textStatus);                                        
+    });
    */
   app.post('/api/grow_plan_instances/:id/action_logs', function (req, res, next){
     return GrowPlanInstanceModel
