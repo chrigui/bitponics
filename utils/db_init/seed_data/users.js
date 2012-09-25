@@ -52,6 +52,42 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			email : "ac@collectiveassembly.com",
+		  	name : {
+		  		first : "Andrew",
+		  		last : "Chee"
+	  		},
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
+			email : "md@collectiveassembly.com",
+		  	name : {
+		  		first : "Manuel",
+		  		last : "Dilone"
+	  		},
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
+			email : "vs@collectiveassembly.com",
+		  	name : {
+		  		first : "Virgilio",
+		  		last : "Santos"
+	  		},
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  true,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
 			email : "amit@bitponics.com",
 		  	name: {
 		  		first: "Amit",

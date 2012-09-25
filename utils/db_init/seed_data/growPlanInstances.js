@@ -5,7 +5,10 @@ module.exports = [
 				"savedObjectIds['users']['jack@bitponics.com']",
 				"savedObjectIds['users']['chris@bitponics.com']",
 				"savedObjectIds['users']['amit@bitponics.com']",
-				"savedObjectIds['users']['michael@bitponics.com']"
+				"savedObjectIds['users']['michael@bitponics.com']",
+				"savedObjectIds['users']['ac@collectiveassembly.com']",
+				"savedObjectIds['users']['md@collectiveassembly.com']",
+				"savedObjectIds['users']['vs@collectiveassembly.com']"
 			],
 			owner : "savedObjectIds['users']['jack@bitponics.com']",
 			growPlan : "savedObjectIds['growPlans']['Tomato']",
