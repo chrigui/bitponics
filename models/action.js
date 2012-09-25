@@ -17,10 +17,10 @@ ActionSchema = new Schema({
 	/**
 	 * Action schedules are represented by a cycle. 
 	 * Cycles have a series of states. Discreet actions are
-	 * those with a "stopAfterReptitionCount" of 1.
+	 * those with a "repeat" == false.
 	 * 
 	 * Actions trigger with phase start. They can be offset
-	 * using an intial cycle state with no message or value, j
+	 * using an intial cycle state with no message or value,
 	 * just a duration. 
 	 *
 	 * Cycles can have 1-3 states. See the pre-save hook below for validation details.
@@ -57,6 +57,11 @@ ActionSchema = new Schema({
 ActionSchema.plugin(useTimestamps);
 
 
+/**
+ * Now that schema is defined, add indices
+ */
+ // Want a sparse index on control (since it's an optional field)
+ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
 /**
  *  Validate cycle states
@@ -81,14 +86,18 @@ ActionSchema.pre('save', function(next){
 	if ((states.length > 3)){
 		return next(new Error('Invalid number of cycle states'));
 	}
-
-	// if a cycle has 3 states, the 1st and 3rd must have the same control value
+	
 	switch(states.length){
 		case 1:
+			// if a cycle has 1 state, it's considered a discrete action and must have a "repeat" of false
+			if (cycle.repeat){
+				return next(new Error('Actions with single-state cycles are considered discrete actions and must have "repeat" set to false'))
+			}
 			break;
 		case 2:
 			break;
 		case 3:
+			// if a cycle has 3 states, the 1st and 3rd must have the same control value
 			if (states[0].controlValue !== states[2].controlValue){
 				return next(new Error('First and last control values must be equal'))
 			}

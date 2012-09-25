@@ -177,7 +177,7 @@ block content
     div#controls.content-module.side
       h2.main-heading Controls
       each item in controls
-        div(class="control #{item.className}") #{item.name}
+        div(class="control #{item.className}", data-control-key="#{item.name}") #{item.name}
       //-div.control Pump
       //-div.control Fan
       //-div.control Light
