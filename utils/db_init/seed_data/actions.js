@@ -76,7 +76,7 @@ module.exports = [
 				states: [
 					{
 						controlValue: 255,
-						message: "Light levels have dropped. Turn on supplemental lighting.",
+						message: "Turn on supplemental lighting.",
 					}
 				],
 				repeat : false
@@ -89,7 +89,7 @@ module.exports = [
 				states: [
 					{
 						controlValue: 0,
-						message: "Light levels above recommendations. Turn off any supplemental lights."
+						message: "Turn off any supplemental lights."
 					}
 				],
 				repeat : false
@@ -102,7 +102,7 @@ module.exports = [
 				states: [
 					{
 						controlValue: 255,
-						message: "Air temperature is too high. Turn on air conditioner."
+						message: "Turn on air conditioner."
 					}
 				],
 				repeat : false
@@ -115,7 +115,7 @@ module.exports = [
 				states: [
 					{
 						controlValue: 255,
-						message: "Air temperature is too low. Turn on heater."
+						message: "Turn on heater."
 					}
 				],
 				repeat: false
