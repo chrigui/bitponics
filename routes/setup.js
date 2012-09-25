@@ -23,7 +23,7 @@ module.exports = function(app){
 	 * be an authenenticated user. We then assign the device to the user 
 	 */
 	app.post('/setup', function (req, res, next){
-	  	var deviceId = req.params('deviceMacAddress').replace(/:/g,''),
+	  	var deviceId = req.param('deviceMacAddress').replace(/:/g,''),
 	  		device,
 	  		now = Date.now();
 
