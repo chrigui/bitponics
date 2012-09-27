@@ -12,9 +12,13 @@ block content
     div#setup.select-block
       h2.main-heading Grow Plans
       h3.sub-heading
-        select
-          each item in activeGrowPlanInstances
-            option= item.growPlan.name
+        - if (typeof(activeGrowPlanInstances) != 'undefined')
+          select
+            each item in activeGrowPlanInstances
+              option= item.growPlan.name
+            option Create New Grow Plan
+        - else
+          option Create New Grow Plan
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
@@ -26,33 +30,56 @@ block content
     div#sensors.content-module.side
       h2.main-heading Sensors
       - var sensorStyle = ''
-      each item, key in sensors
-        div(class="sensor data-module #{sensorStyle} #{key}")
-            - sensorStyle = 'closed'
+      - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)
+        each item, key in sensors
+          div(class="sensor data-module #{sensorStyle} #{key}")
+              - sensorStyle = 'closed'
+              h3.main-heading
+                | #{item.abbrev}
+              div.sensor-data
+                div.sensor-value #{item.logs[0].value}
+                div.sensor-value-unit
+                  span #{item.unit}
+              div(class="sensor-type icon #{item.sCode}")
+                | <i aria-hidden="true" data-icon="&#x28"></i>
+                div.screen-reader-text #{item.sCode}
+              div.message Check
+              div(class="settings icon")
+                | <i aria-hidden="true" data-icon="&#x2e"></i>
+                div.screen-reader-text Settings
+      - else //show empty sensor or callout to setup sensors?
+        div(class="sub-heading notification")
+            //- | No active sensors
+        div(class="sensor data-module")
             h3.main-heading
-              | #{item.abbrev}
+              | Example Sensor
             div.sensor-data
-              div.sensor-value #{item.logs[0].value}
+              div.sensor-value 18
               div.sensor-value-unit
-                span #{item.unit}
-            div.sensor-type.icon.#{item.sCode}
+                span Hrs/
+                span Day
+            div(class="sensor-type icon")
+              | <i aria-hidden="true" data-icon="&#x28"></i>
+              div.screen-reader-text Light Sensor
             div.message Check
-            div.settings.icon Settings
+            div(class="settings icon")
+              | <i aria-hidden="true" data-icon="&#x2e"></i>
+              div.screen-reader-text Settings
 
     div#visualizer.content-module.middle
       div#phases-graph.circle.centered
     
     div#controls.content-module.side
       h2.main-heading Controls
-      each item in controls
-        div(class="control #{item.className}", data-control-key="#{item.name}") #{item.name}
-      //-div.control Pump
-      //-div.control Fan
-      //-div.control Light
+      - if (typeof(controls) != 'undefined')
+        each item in controls
+          div(class="control #{item.className}", data-control-key="#{item.name}") #{item.name}
+      - else
+          div(class="sub-heading notification")
+            | No active controls
+            //a(href="/", class="") Settings
     div#reminders.content-module.side
       h2.main-heading Reminders
-      //-div.data-module Hey!
-      //-div.data-module Yo?
   
   section#footer
     div#date.content-module.side
@@ -65,6 +92,14 @@ block content
 
 
 block footer-scripts
+
+  - if (typeof(sensors) == 'undefined')
+    sensors = '[]'
+  - if (typeof(controls) == 'undefined')
+    controls = '[]'
+  - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
+    currentGrowPlanInstancePhases = '[]'
+
   script
     Bitponics.user = {
       currentGrowPlanInstance : {
@@ -75,7 +110,7 @@ block footer-scripts
          */
         sensors : !{JSON.stringify(sensors)},
         controls : !{JSON.stringify(controls)},
-        phases : !{JSON.stringify(currentGrowPlanInstancePhases)},
+        phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
       }
     }
   script(src='/assets/js/libs/d3.v2.js')

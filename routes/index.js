@@ -47,6 +47,7 @@ module.exports = function(app){
 		passport.authenticate('local', function(err, user, info) {
 		    if (err) { return next(err); }
 		    if (!user) {
+		    	console.log(info)
 		      req.flash('error', info.message);
 		      return res.redirect('/login')
 		    }

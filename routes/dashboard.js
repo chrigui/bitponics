@@ -60,14 +60,19 @@ module.exports = function(app){
 	          	//set first GP default to show in dashboard, will match on id if present below
 	          	currentGrowPlanInstance = growPlanInstances[0];
 
-			      	// Now, get the active phase & populate the active phase's Actions & IdealRanges
-			      	var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+	          	if (currentGrowPlanInstance) {
+				      	// Now, get the active phase & populate the active phase's Actions & IdealRanges
+				      	var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
 
-							PhaseModel
-							.findById(activeGrowPlanInstancePhase.phase)		
-							.populate('actions')
-							.populate('idealRanges')
-							.exec(callback);
+								PhaseModel
+								.findById(activeGrowPlanInstancePhase.phase)		
+								.populate('actions')
+								.populate('idealRanges')
+								.exec(callback);
+
+							} else {
+								res.render('dashboard', undefined);
+							}
 						}
 					);
 				},
@@ -151,12 +156,12 @@ module.exports = function(app){
 					sensorsLog.logs.forEach(function(log){
 						// HACK : we shouldn't need to check for existence of this sensor code in the hash
 						// once validation's setup in /api/devices/id/sensor_logs, remove the if(...) check
-						if (locals.sensors[log.sCode]){
+						//if (locals.sensors[log.sCode]){
 							locals.sensors[log.sCode].logs.push({
 								timestamp : sensorsLog.timestamp,
 								value : log.value
 							});	
-						}
+						//}
 					});
 				});
 				

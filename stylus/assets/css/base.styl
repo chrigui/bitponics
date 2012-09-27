@@ -1,5 +1,6 @@
 @import "./libs/resets"
 @import "./global/utils"
+@import "./global/icons"
 @import "helpers"
 
 color-logo-green=#23b500
@@ -9,6 +10,7 @@ color-global-background=#fff
 color-sensor-light=#D2E000
 color-sensor-air=#24d321
 color-sensor-water=#00CBCB
+color-sensor-empty=#999
 color-carrot-green=rgba(67, 240, 32, .5)
 
 body
@@ -70,13 +72,12 @@ abbr[title]
 		font-weight bold
 	}
 	.message {
-		bottom .25em
+		bottom .5em
 		right .75em
 	}
 	.settings {
-		top .75em
-		right .75em
-		font-size: .75em
+		top .15em
+		right .5em
 	}
 	.message, .sensor-value-unit {
 		font-size .55em //~10px
@@ -110,8 +111,8 @@ abbr[title]
 		
 	}
 	.sensor-type {
-		bottom: .75em;
-		left: .75em;
+		bottom: .25em;
+		left: .5em;
 	}
 
 	&.closed { //TODO: work on closed state
@@ -247,6 +248,8 @@ abbr[title]
 #lux,#ir,#full,#vis
 	background-color color-sensor-light
 
+.empty
+	background-color color-sensor-empty
 
 /*
  * Phase Visualizer
