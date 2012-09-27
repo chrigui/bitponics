@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
 	crypto = require('crypto'),
 	bcrypt = require('bcrypt'),
 	winston = require('winston'),
+	timezone = require('timezone/loaded'),	
 	verificationEmailDomain = 'bitponics.com';
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
@@ -35,7 +36,11 @@ UserSchema = new Schema({
   },
   salt: { type: String, required: true },
   hash: { type: String, required: true },
-  locale: String,
+  locale: { 
+  	lang: { type: String, default : 'en' },
+  	territory : { type : String, default: 'US'}
+  },
+  timezone: { type : String, default : 'America/New_York' }, // TODO : make this an enum to restrict the values? 
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
@@ -82,6 +87,18 @@ UserSchema.virtual('name.full')
 		this.set('name.last', lastName);
 	});
 
+UserSchema.virtual('locale.full')
+	.get(function () {
+		return this.locale.language + this.locale.territory ? '_' + this.locale.territory : '';
+	})
+	.set(function (fullLocale) {
+	  	var split = fullLocale.split('_')
+	  		, language = split[0]
+	    	, territory = split[1];
+
+		this.set('locale.language', language);
+		this.set('locale.territory', territory || '');
+	});
 
 /************************** STATIC METHODS  ***************************/
 
@@ -109,10 +126,10 @@ UserSchema.static('createUserWithPassword', function(userProperties, password, n
 UserSchema.static('authenticate', function(email, password, next) {
   this.findOne({ email: email }, function(err, user) {
       if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No user found with that email'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return next(err); }
-        if (!passwordCorrect) { return next(null, false); }
+        if (!passwordCorrect) { return next(new Error('Incorrect password'), false); }
         return next(null, user);
       });
     });
@@ -125,7 +142,7 @@ UserSchema.static('authenticate', function(email, password, next) {
 UserSchema.static('getByPublicDeviceKey', function(key, next) {
   User.findOne({ 'deviceKey.public': key }, function(err, user) {
 	  if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No such device key'), false); }
 
       return next(null, user, user.deviceKey.private);
   });
@@ -134,7 +151,7 @@ UserSchema.static('getByPublicDeviceKey', function(key, next) {
 UserSchema.static('getByPublicApiKey', function(key, next) {
   User.findOne({ 'apiKey.public': key }, function(err, user) {
       if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No such API key'), false); }
 
       return next(null, user, user.apiKey.private);
   });

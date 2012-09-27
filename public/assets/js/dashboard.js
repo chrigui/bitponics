@@ -150,10 +150,64 @@ Bitponics.pages.dashboard = {
             e.preventDefault();
 
             var $this = $(this),
+                tooltipContent = $this.data('tooltipContent'),
                 controlKey = $this.data('controlKey'),
                 controlData = Bitponics.user.currentGrowPlanInstance.controls[controlKey];
             
-            console.log(controlKey, controlData);
+            if (!tooltipContent){
+                // Get the immediately-triggerable actions for this control
+                $.getJSON('/api/actions', 
+                    {control : controlData.id, repeat : false },
+                    function(data){
+                        var model = {
+                            name : controlKey,
+                            actions : data
+                        },
+                        template = $('#templates #control-tooltip-template').val(),
+                        $content = $(Mustache.render(template, model));
+
+                        $content.on('click', '.action-trigger-link', function(e){
+                            var $this = $(this),
+                                actionId = $this.data('actionId');
+                                $this.append('<div class="loader"></div>');
+                                
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/api/grow_plan_instances/' + Bitponics.user.currentGrowPlanInstance.id + '/action_logs',
+                                    data: { actionId: actionId },
+                                    success: function(data){
+                                        $this.find('.loader').remove();
+                                        alert('triggered ');
+                                    },
+                                    error: function(jqXHR, textStatus, error){
+                                        console.log('error', jqXHR, textStatus, error);
+                                        // TODO retry a certain number of times
+                                    }
+                                });
+                                
+                        });
+
+                        $this.data('tooltipContent', $content);
+                        
+                        $this.qtip({
+                            content: {
+                                text: $content
+                            },
+                            show: {
+                                event: 'click'
+                            },
+                            hide : {
+                                event : 'click'
+                            },
+                            position: {
+                                viewport: $(window)
+                            }
+                        })
+                        .qtip('toggle', true); 
+                    }
+                );    
+            }
+            
         });
     }
 };

@@ -139,3 +139,4 @@ abbr[title]{border:none}
 #phases-graph svg{display:inline-block;vertical-align:top}
 section#footer{clear:both;}
 section#footer .content-module{background-color:#fff}
+.loader{height:24px;width:24px;background:url("/img/loader.gif") no-repeat 0 0}
