@@ -12,11 +12,16 @@ module.exports = [
 					{
 						controlValue: undefined,
 						durationType: 'untilPhaseEnd',
-						duration: undefined,
+						duration: undefined
+					},
+					{
+						controlValue: undefined,
+						durationType: 'minutes',
+						duration: '15',
 						message: "Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient."
-					}
+					},
 				],
-				repeat: true
+				repeat: false
 			}
 		}, // end flush Action
 		{
