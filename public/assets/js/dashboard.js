@@ -144,12 +144,24 @@ Bitponics.pages.dashboard = {
                 .attr('stroke-width', 1)
                 .attr('fill', Bitponics.pages.dashboard.getControlFillColor);
         });
+    },
+    initEventHandlers : function(){
+        $('#controls').on('click', '.control', function(e){
+            e.preventDefault();
+
+            var $this = $(this),
+                controlKey = $this.data('controlKey'),
+                controlData = Bitponics.user.currentGrowPlanInstance.controls[controlKey];
+            
+            console.log(controlKey, controlData);
+        });
     }
 };
 
 $(function () {
     Bitponics.pages.dashboard.drawPhaseGraphs();
     Bitponics.pages.dashboard.drawControlGraphs();
+    Bitponics.pages.dashboard.initEventHandlers();
 });
 
 

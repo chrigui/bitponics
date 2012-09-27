@@ -10,8 +10,16 @@ module.exports = function(app) {
 
    //List actions
   app.get('/api/actions', function (req, res, next){
-    winston.info("in actions callback");
-    return ActionModel.find(function (err, actions) {
+    var query = ActionModel.find();
+
+    if (req.query['control']){
+      query = query.where('control').equals(req.query['control']);
+    }
+    if (req.query['repeat']){
+      query = query.where('cycle.repeat').equals(req.query['repeat'].toLowerCase() == 'true' ? true : false);
+    }
+
+    return query.exec(function (err, actions) {
       winston.info("in ActionModel callback");
       if (err) { return next(err); }
 
