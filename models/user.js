@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
 	crypto = require('crypto'),
 	bcrypt = require('bcrypt'),
 	winston = require('winston'),
+	timezone = require('timezone/loaded'),	
 	verificationEmailDomain = 'bitponics.com';
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
@@ -35,8 +36,11 @@ UserSchema = new Schema({
   },
   salt: { type: String, required: true },
   hash: { type: String, required: true },
-  locale: String,
-  timezone: String, // TODO : make this an enum to restrict the values? 
+  locale: { 
+  	lang: { type: String, default : 'en' },
+  	territory : { type : String, default; 'US'}
+  },
+  timezone: { type : String, default : 'America/New_York' }, // TODO : make this an enum to restrict the values? 
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
@@ -83,6 +87,18 @@ UserSchema.virtual('name.full')
 		this.set('name.last', lastName);
 	});
 
+UserSchema.virtual('locale.full')
+	.get(function () {
+		return this.locale.language + this.locale.territory ? '_' + this.locale.territory : '';
+	})
+	.set(function (fullLocale) {
+	  	var split = fullLocale.split('_')
+	  		, language = split[0]
+	    	, territory = split[1];
+
+		this.set('locale.language', language);
+		this.set('locale.territory', territory || '');
+	});
 
 /************************** STATIC METHODS  ***************************/
 
