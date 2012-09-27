@@ -114,6 +114,7 @@ module.exports = function(app){
 					locals.controls[control.name] = {
 						name: control.name,
 						className : control.name.replace(/\s/g,'').toLowerCase(),
+						id : control._id, // TODO : decide whether to make this a friendly id
 						action : {
 							description : controlAction.description,
 							cycle : controlAction.cycle,
