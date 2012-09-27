@@ -38,7 +38,7 @@ UserSchema = new Schema({
   hash: { type: String, required: true },
   locale: { 
   	lang: { type: String, default : 'en' },
-  	territory : { type : String, default; 'US'}
+  	territory : { type : String, default: 'US'}
   },
   timezone: { type : String, default : 'America/New_York' }, // TODO : make this an enum to restrict the values? 
   active : { type : Boolean, default : false },
