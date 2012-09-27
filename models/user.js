@@ -36,6 +36,7 @@ UserSchema = new Schema({
   salt: { type: String, required: true },
   hash: { type: String, required: true },
   locale: String,
+  timezone: String, // TODO : make this an enum to restrict the values? 
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
@@ -109,10 +110,10 @@ UserSchema.static('createUserWithPassword', function(userProperties, password, n
 UserSchema.static('authenticate', function(email, password, next) {
   this.findOne({ email: email }, function(err, user) {
       if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No user found with that email'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return next(err); }
-        if (!passwordCorrect) { return next(null, false); }
+        if (!passwordCorrect) { return next(new Error('Incorrect password'), false); }
         return next(null, user);
       });
     });
@@ -125,7 +126,7 @@ UserSchema.static('authenticate', function(email, password, next) {
 UserSchema.static('getByPublicDeviceKey', function(key, next) {
   User.findOne({ 'deviceKey.public': key }, function(err, user) {
 	  if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No such device key'), false); }
 
       return next(null, user, user.deviceKey.private);
   });
@@ -134,7 +135,7 @@ UserSchema.static('getByPublicDeviceKey', function(key, next) {
 UserSchema.static('getByPublicApiKey', function(key, next) {
   User.findOne({ 'apiKey.public': key }, function(err, user) {
       if (err) { return next(err); }
-      if (!user) { return next(null, false); }
+      if (!user) { return next(new Error('No such API key'), false); }
 
       return next(null, user, user.apiKey.private);
   });

@@ -16,5 +16,8 @@ module.exports = [
 		},
 		{
 			name: "Light"
+		},
+		{
+			name: "Other"
 		}
 	];
