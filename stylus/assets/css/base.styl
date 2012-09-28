@@ -2,16 +2,8 @@
 @import "./global/utils"
 @import "./global/icons"
 @import "helpers"
+@import "./global/colors"
 
-color-logo-green=#23b500
-color-medium-green=#24d321
-color-light-green=#46f121
-color-global-background=#fff
-color-sensor-light=#D2E000
-color-sensor-air=#24d321
-color-sensor-water=#00CBCB
-color-sensor-empty=#999
-color-carrot-green=rgba(67, 240, 32, .5)
 
 body
 	margin: 0;
@@ -31,6 +23,11 @@ h1,h2,h3,h4,h5,h6
 abbr[title]
 	border none
 
+div, p, span, a, a:visited, a:hover, a:active
+	color color-medium-green
+
+
+
 /*
  * Modules
  */
@@ -45,9 +42,7 @@ abbr[title]
 	&.large
 		width 100%
 	&.middle
-		position relative
-		padding 100% 0 0 0 //must match container width
-		height 0
+		width 100%
 
 .data-module {
 	color white
@@ -58,6 +53,10 @@ abbr[title]
 	height 11.5em
 	text-transform uppercase
 	margin 0.125em 0
+
+	div, p, span, a, a:visited, a:hover, a:active {
+		color white
+	}
 
 	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
 		position absolute
@@ -183,7 +182,7 @@ abbr[title]
 		width 100%
 		
 	.sub-heading
-		cursor pointer
+		//cursor pointer
 		position relative
 		/*
 		&:after
@@ -231,10 +230,19 @@ abbr[title]
 	color color-medium-green
 	font-weight bold
 
+	&:before
+		position: absolute;
+		padding-top: 3.35em;
+		width: 100%;
+		top: 0;
+		left: 0;
+		font-size: 1.5em;
+
 	svg
 		position absolute
 		top 2em
 		left 0
+
 
 /*
  * sensors
@@ -275,8 +283,27 @@ section#footer
 	//background-color color-sensor-light
 
 
-
 .loader 
 	height 24px
 	width 24px
 	background url(/img/loader.gif) no-repeat 0 0
+
+
+
+/*
+ * Dashboard
+ */
+.dashboard
+	.content-module
+		&.middle
+			position relative
+			padding 100% 0 0 0 //must match container width
+			height 0
+
+/*
+ * Profile
+ */
+.profile
+	.content-module
+		&.middle
+			//
