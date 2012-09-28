@@ -1,26 +1,20 @@
 extends layout
 
 block content
-  .stackContent 
-    h1.h1 Login
 
-  - if ('undefined' !== typeof errors && errors.length)
-    .stackContent 
-      ul#errors
-        - each error in errors
-          li.error= error
+  section#header
+      header#logo(role="banner") 
+        img(src="/img/leaf-new-green.png", width="15%")
+      div#setup.select-block
+        h2.main-heading #{title}
 
-  .stackContent
-    form(id='login-form', action=formAction, method='POST')
-      
-      #login.stack2of3
-        .stackContent
-          label(for="email") Email
-          input(type='text', name="email")
-      #password.stack2of3
-        .stackContent
-          label(for="password") Password
-          input(type='password', name="password")
-      #submit
-        .stackContent
-          input(type='submit', value='Login')
+  section#main(role="main")
+    div#home.content-module.middle
+      form(id='login-form', action=formAction, method='POST')
+        label(for="email") Email
+        input(type='text', name="email")
+        label(for="password") Password
+        input(type='password', name="password")
+        input(type='submit', value='Login')
+
+  section#footer

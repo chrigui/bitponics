@@ -37,9 +37,13 @@
 .content-box:after,.user-page nav ul li a:after{content:"";display:block;height:0;clear:both;visibility:hidden}
 .text-normalize,.user-page nav ul li,.user-page section header h1,.user-page section header h2,.user-page section ul li{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
 .hide-text,.user-page nav ul li.logo{text-indent:-100%;white-space:nowrap;overflow:hidden}
+.screen-reader-text{position:absolute;top:-9999px;left:-9999px}
 .ellipsis,.user-page nav ul li,.user-page section ul li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .circle{text-align:center;border-radius:50em;}
 .circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;font-weight:bold;}
+.select-block select:focus{outline:none;border:none}
 @font-face{font-family:"DIN";src:url("./fonts/din_medium.eot");src:local("~!#$"),url('./fonts/din_medium.eot?iefix') format(embedded-opentype),url('./fonts/din_medium.woff') format(woff),url('./fonts/din_medium.ttf') format(truetype),url('./fonts/din_medium.svg#webfont') format(svg);font-weight:"normal";font-style:"normal"}
 @font-face{font-family:"DIN";src:url("./fonts/din_bold.eot");src:local("@#$%"),url('./fonts/din_bold.eot?iefix') format(embedded-opentype),url('./fonts/din_bold.woff') format(woff),url('./fonts/din_bold.ttf') format(truetype),url('./fonts/din_bold.svg#webfont') format(svg);font-weight:'bold';font-style:'bold'}
 body,.din-text,.user-page nav ul li a,.user-page section header .date,.user-page section header .time,.user-page section ul li h2,.user-page section ul li span{font-family:Helvetica,Arial,sans-serif;letter-spacing:normal}

@@ -50,7 +50,24 @@ input:valid,textarea:valid,input:invalid,textarea:invalid{background-color:#f0dd
 table{border-collapse:collapse;border-spacing:0}
 td{vertical-align:top}
 @font-face{font-family:'Bitponics-Glyphs';src:url("../../../../assets/fonts/Bitponics-Glyphs.eot");src:url("../../../../assets/fonts/Bitponics-Glyphs.eot?#iefix") format('embedded-opentype'),url("../../../../assets/fonts/Bitponics-Glyphs.svg#Bitponics-Glyphs") format('svg'),url("../../../../assets/fonts/Bitponics-Glyphs.woff") format('woff'),url("../../../../assets/fonts/Bitponics-Glyphs.ttf") format('truetype');font-weight:normal;font-style:normal}
-[data-icon]:before{font-family:'Bitponics-Glyphs';content:attr(data-icon);speak:none;font-weight:normal;-webkit-font-smoothing:antialiased}
+[class^="icon-glyph"]:before,[class*=" icon-glyph"]:before{font-family:'Bitponics-Glyphs';font-style:normal;speak:none;font-weight:normal;-webkit-font-smoothing:antialiased}
+.icon-reservior1:before{content:"\2f"}
+.icon-seedling:before{content:"\25"}
+.icon-vegetative:before{content:"\24"}
+.icon-flowering:before{content:"\23"}
+.icon-version:before{content:"\22"}
+.icon-waterlevel2:before{content:"\26"}
+.icon-ectds:before{content:"\27"}
+.icon-light:before,.icon-lux:before,.icon-ir:before,.icon-full:before,.icon-vis:before{content:"\28"}
+.icon-fan:before{content:"\29"}
+.icon-water:before,.icon-sal:before,.icon-tds:before,.icon-ec:before,.icon-ph:before,.icon-waterpump:before{content:"\2a"}
+.icon-air:before,.icon-co2:before,.icon-hum:before{content:"\2b"}
+.icon-systemtype:before{content:"\2c"}
+.icon-logo:before{content:"\2d"}
+.icon-settings:before{content:"\2e"}
+.icon-reservior2:before{content:"\2f"}
+.icon-reservior3:before{content:"\30"}
+.icon-reservior4:before{content:"\31"}
 .full-width{width:100%}
 .full-height{height:100%}
 .position-f{position:fixed}
@@ -101,12 +118,14 @@ body{margin:0;color:#333;font:112.5%/1.5 Helvetica,Arial,sans-serif;margin:0 aut
 *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 h1,h2,h3,h4,h5,h6{font-weight:normal}
 abbr[title]{border:none}
+div,p,span,a,a:visited,a:hover,a:active{color:#24d321}
 .content-module{min-width:9em;margin:0 0 2.25em;border-top:4px solid #46f121;}
 .content-module.small{width:25%}
 .content-module.medium{width:50%}
 .content-module.large{width:100%}
-.content-module.middle{position:relative;padding:100% 0 0 0;height:0}
+.content-module.middle{width:100%}
 .data-module{color:#fff;text-align:center;position:relative;background-color:#24d321;height:11.5em;text-transform:uppercase;margin:.125em 0;}
+.data-module div,.data-module p,.data-module span,.data-module a,.data-module a:visited,.data-module a:hover,.data-module a:active{color:#fff}
 .data-module .main-heading,.data-module .message,.data-module .settings,.data-module .sensor-value-unit,.data-module .sensor-type{position:absolute}
 .data-module .main-heading{color:#fff;font-size:.75em;margin:0;top:.5em;left:.75em;font-weight:bold}
 .data-module .message{bottom:.5em;right:.75em}
@@ -127,10 +146,11 @@ abbr[title]{border:none}
 .sub-heading{color:#24d321;margin:.65em 0;font-weight:bold}
 .select-block{line-height:1.66em;padding:0 .83em;}
 .select-block .main-heading,.select-block .sub-heading{margin:0;font-size:1.5em;width:100%}
-.select-block .sub-heading{cursor:pointer;position:relative;}
+.select-block .sub-heading{position:relative;}
 .icon{display:inline-block;}
 #visualizer div.circle{position:absolute;top:.75em;left:.75em;bottom:.75em;right:.75em}
 .control{width:8em;height:10em;position:relative;text-align:center;color:#24d321;font-weight:bold;}
+.control:before{position:absolute;padding-top:3.35em;width:100%;top:0;left:0;font-size:1.5em}
 .control svg{position:absolute;top:2em;left:0}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
 #air,#hum,#co2{background-color:#24d321}
@@ -140,3 +160,4 @@ abbr[title]{border:none}
 section#footer{clear:both;}
 section#footer .content-module{background-color:#fff}
 .loader{height:24px;width:24px;background:url("/img/loader.gif") no-repeat 0 0}
+.dashboard .content-module.middle{position:relative;padding:100% 0 0 0;height:0}

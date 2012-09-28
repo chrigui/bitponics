@@ -22,10 +22,11 @@ block content
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
-        if user.name.full != ''
-         | #{user.name.full}
-        else
-         | #{user.email}
+        a(href="/profile")
+          if user.name.full != ''
+           | #{user.name.full}
+          else
+           | #{user.email}
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
@@ -41,14 +42,14 @@ block content
                 div.sensor-value-unit
                   span #{item.unit}
               div(class="sensor-type icon #{item.sCode}")
-                | <i aria-hidden="true" data-icon="&#x28"></i>
+                | <i class="icon-glyph icon-#{item.sCode}" aria-hidden="true"></i>
                 div.screen-reader-text #{item.sCode}
               div.message Check
               div(class="settings icon")
-                | <i aria-hidden="true" data-icon="&#x2e"></i>
+                | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
                 div.screen-reader-text Settings
       - else //show empty sensor or callout to setup sensors?
-        div(class="sub-heading notification")
+        //div(class="sub-heading notification")
             //- | No active sensors
         div(class="sensor data-module")
             h3.main-heading
@@ -59,11 +60,11 @@ block content
                 span Hrs/
                 span Day
             div(class="sensor-type icon")
-              | <i aria-hidden="true" data-icon="&#x28"></i>
+              | <i class="icon-glyph icon-light" aria-hidden="true"></i>
               div.screen-reader-text Light Sensor
             div.message Check
             div(class="settings icon")
-              | <i aria-hidden="true" data-icon="&#x2e"></i>
+              | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
               div.screen-reader-text Settings
 
     div#visualizer.content-module.middle
@@ -73,7 +74,7 @@ block content
       h2.main-heading Controls
       - if (typeof(controls) != 'undefined')
         each item in controls
-          div(class="control #{item.className}", data-control-key="#{item.name}") #{item.name}
+          div(class="control #{item.className} icon-glyph icon-#{item.className}", data-control-key="#{item.name}") #{item.name}
       - else
           div(class="sub-heading notification")
             | No active controls
@@ -108,7 +109,9 @@ block footer-scripts
     controls = '[]'
   - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
     currentGrowPlanInstancePhases = '[]'
-
+  - if (typeof(currentGrowPlanInstance) == 'undefined')
+    currentGrowPlanInstance = '{}'
+    
   script
     Bitponics.user = {
       currentGrowPlanInstance : {

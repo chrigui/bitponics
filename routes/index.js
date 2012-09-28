@@ -178,6 +178,7 @@ module.exports = function(app){
 	require('./demo')(app);
 	require('./setup')(app);
 	require('./styleguide')(app);
+	require('./profile')(app);
 
 	// The call to app.use(app.router); is to position the route handler in the middleware chain.
 	// Everything afterward is assumed to have not matched a route.

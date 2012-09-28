@@ -173,6 +173,7 @@ module.exports = function(app){
 				});
 
 				locals.title = 'Bitponics - Dashboard';
+				locals.className = 'dashboard';
 				locals.user = req.user;
 				locals.activeGrowPlanInstances = growPlanInstances;
 				locals.currentGrowPlanInstance = currentGrowPlanInstance

@@ -46,7 +46,6 @@
 .select-block select:focus{outline:none;border:none}
 .content-module{float:left;}
 .content-module.side{width:100%;margin:2em 0 0 0}
-.content-module.middle{width:100%;padding:100% 0 0 0;border:0 none;clear:both}
 .data-module{width:50%;margin:.125em -2px}
 section#header,section#main,section#footer{padding:1em}
 section#main{padding:6em 1em 1em;}
@@ -55,9 +54,9 @@ section#main #controls,section#main #reminders{float:right}
 #logo,#setup,#user{float:left;width:25%}
 #setup{width:35%;margin-right:10%}
 #user{padding:0}
+.dashboard .content-module.middle{width:100%;padding:100% 0 0 0;border:0 none;clear:both}
 @media screen and (min-width: 60em){.content-module{float:left;}
 .content-module.side{width:20%}
-.content-module.middle{width:60%;padding:60% 0 0 0;clear:none}
 .data-module{width:100%;margin:.125em 0}
 section#footer{width:100%;}
 section#footer .content-module{margin:0}
@@ -65,4 +64,5 @@ section#footer #date{float:left}
 section#footer #notifications{float:right;text-align:right}
 #logo,#setup,#user{width:20%}
 #setup{width:30%;margin-right:30%}
+.dashboard .content-module.middle{width:60%;padding:60% 0 0 0;clear:none}
 }
