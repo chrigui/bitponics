@@ -172,29 +172,37 @@ var actionUtils = {
 	 *                Otherwise it's just written straight to the template.
 	 */
 	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
-		var result = cycleTemplate,
+		var //result = cycleTemplate,
 			states = actionCycleStates,
 			convertDurationToMilliseconds = actionUtils.convertDurationToMilliseconds,
-			offset = offset || 0;
+			offset = offset || 0,
+			result = {
+				cycleString : '',
+				offset : 0,
+				value1 : 0,
+				duration1 : 0,
+				value2 : 0,
+				duration2 : 0
+			};
 
 		switch(states.length){
 			case 1:
 				var infiniteStateControlValue = states[0].controlValue;
-				result = result.replace(/{offset}/, offset);
-				result = result.replace(/{value1}/, infiniteStateControlValue);
-				result = result.replace(/{value2}/, infiniteStateControlValue);
-				result = result.replace(/{duration1}/, 1);
-				result = result.replace(/{duration2}/, 1);
+				result.offset = offset;
+				result.value1 = infiniteStateControlValue;
+				result.duration1 = 1;
+				result.value2 = infiniteStateControlValue;
+				result.duration2 = 1;
 				break;
 			case 2:
 				var state0 = states[0],
 					state1 = states[1];
 				
-				result = result.replace(/{offset}/, offset);
-				result = result.replace(/{value1}/, state0.controlValue);
-				result = result.replace(/{duration1}/, convertDurationToMilliseconds(state0.durationType, state0.duration));
-				result = result.replace(/{value2}/, state1.controlValue);
-				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
+				result.offset = offset;
+				result.value1 = state0.controlValue;
+				result.duration1 = convertDurationToMilliseconds(state0.durationType, state0.duration);
+				result.value2 = state1.controlValue;
+				result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
 				break;
 			case 3:
 				// If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
@@ -207,22 +215,31 @@ var actionUtils = {
 					totalFirstDuration = firstDuration + thirdDuration;
 				
 				// for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
-				// and if we got an offset, add that on
-				result = result.replace(/{offset}/, offset + thirdDuration);
-				result = result.replace(/{value1}/, state0.controlValue);
-				result = result.replace(/{duration1}/, totalFirstDuration);
-				result = result.replace(/{value2}/, state1.controlValue);
-				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
+				// and if we got an offset, add that os.getNetworkInterfaces();
+				result.offset = offset + thirdDuration;
+				result.value1 = state0.controlValue;
+				result.duration1 = totalFirstDuration;
+				result.value2 = state1.controlValue;
+				result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
 				break;
 			default: 
 				winston.info('Serializing a blank actionCycleState');
-				result = result.replace(/{offset}/, offset);
-				result = result.replace(/{value1}/, '0');
-				result = result.replace(/{duration1}/, '0');
-				result = result.replace(/{value2}/, '0');
-				result = result.replace(/{duration2}/, '0');
+				result.offset = 0;
+				result.value1 = 0;
+				result.duration1 = 0;
+				result.value2 = 0;
+				result.duration2 = 0;
 				break;
 		}
+
+		var resultCycleString = cycleTemplate;
+		resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
+		resultCycleString = resultCycleString.replace(/{value1}/, result.value1);
+		resultCycleString = resultCycleString.replace(/{duration1}/, result.duration1);
+		resultCycleString = resultCycleString.replace(/{value2}/, result.value2);
+		resultCycleString = resultCycleString.replace(/{duration2}/, result.duration2);
+		result.cycleString = resultCycleString;
+
 		return result;
 	}
 };
