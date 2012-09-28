@@ -116,6 +116,21 @@ var GrowPlanInstanceSchema = new Schema({
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
+
+
+/**
+ * TODO : 
+ * Returns number of milliseconds since the localized 00:00:00 of the phase start date
+ * Used in cycle offset calculations. 
+ 
+GrowPlanInstanceSchema.virtual('timeSinceActivePhaseStartDate')
+	.get(function(){
+		var now = new Date(),
+			
+	});
+*/
+
+
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
 
 
