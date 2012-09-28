@@ -126,6 +126,7 @@ div,p,span,a,a:visited,a:hover,a:active{color:#24d321}
 .content-module.middle{width:100%}
 .data-module{color:#fff;text-align:center;position:relative;background-color:#24d321;height:11.5em;text-transform:uppercase;margin:.125em 0;}
 .data-module div,.data-module p,.data-module span,.data-module a,.data-module a:visited,.data-module a:hover,.data-module a:active{color:#fff}
+.data-module.warning{background-color:color-warning}
 .data-module .main-heading,.data-module .message,.data-module .settings,.data-module .sensor-value-unit,.data-module .sensor-type{position:absolute}
 .data-module .main-heading{color:#fff;font-size:.75em;margin:0;top:.5em;left:.75em;font-weight:bold}
 .data-module .message{bottom:.5em;right:.75em}

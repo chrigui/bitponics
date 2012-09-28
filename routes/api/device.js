@@ -10,10 +10,10 @@ var mongoose = require('mongoose'),
     ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
     SensorLogModel = require('../../models/sensorLog').model,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
+    ModelUtils = require('../../models/utils'),
     winston = require('winston'),
-    async = require('async');
+    async = require('async'),
+    timezone = require('timezone/loaded');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -163,8 +163,8 @@ module.exports = function(app) {
         device,
         growPlanInstance;
 
-    winston.info('req.body', req.body);
-    winston.info('info', req.body);
+    winston.info('sensor_logs req.body');
+    winston.info(JSON.stringify(req.body));
 
     // For now, only accept requests that use the device content-type
     if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
@@ -172,76 +172,46 @@ module.exports = function(app) {
     }
 
     if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
-      winston.info('req.rawBody', req.rawBody);
       pendingDeviceLogs = JSON.parse(req.rawBody);
-      winston.info('JSON.parse req.rawBody ', pendingDeviceLogs);
     }
 
-    async.waterfall([
-      function wf1(wf1Callback){
-        // In parallel, get the Device and all Sensors
-        async.parallel([
-            function parallel1(callback){
-              SensorModel.find().exec(callback);
-            },
-            function parallel2(callback){
-              DeviceModel.findOne({ deviceId: deviceId }, callback);
-            }
-          ],
-          // When those parallel ops are done, create the sensorLog entry and also retrieve 
-          // the active GrowPlanInstance
-          function parallelFinal(err, results){
-            if (err) { return callback(err);}
-            winston.info('wf1 final step');
+    
+    // In parallel, get the Device and all Sensors
+    async.parallel(
+      [
+        function parallel1(callback){
+          SensorModel.find().exec(callback);
+        },
+        function parallel2(callback){
+          DeviceModel
+          .findOne({ deviceId: deviceId })
+          .populate('activeGrowPlanInstance')
+          .exec(callback);
+        }
+      ],
+      // When those parallel ops are done, create the sensorLog entry and also retrieve 
+      // the active GrowPlanInstance
+      function parallelFinal(err, results){
+        if (err) { return callback(err);}
+      
+        sensors = results[0];
+        device = results[1];
+        if (!device){ 
+          wf1Callback(new Error('Attempted to log to a nonexistent device'));
+        }
 
-            sensors = results[0];
-            device = results[1];
-            if (!device){ 
-              wf1Callback(new Error('Attempted to log to a nonexistent device'));
-            }
+        Object.keys(pendingDeviceLogs).forEach(function(key){
+          pendingSensorLog.logs.push({
+            sCode : key,
+            value : pendingDeviceLogs[key]
+          });
+        });
+        
+        winston.info('pendingSensorLog');
+        winston.info(JSON.stringify(pendingSensorLog));
 
-
-            Object.keys(pendingDeviceLogs).forEach(function(key){
-              pendingSensorLog.logs.push({
-                sCode : key,
-                value : pendingDeviceLogs[key]
-              });
-            });
-            
-            // TODO : also use this opportunity to check if any IdealRanges have been exceeded.
-            // if so, trigger the corresponding action...somehow. 
-            // On the gpi: add to actionLogs
-            // On the device: expire activeActions and activeActionOverrides. Maybe refresh their deviceMessages at this point?
-            
-
-            winston.info('pendingSensorLog');
-            winston.info(JSON.stringify(pendingSensorLog));
-
-            GrowPlanInstanceModel.findOne({ device: device._id, active: true },  wf1Callback);        
-          }
-        );
-      },
-      function wf2(growPlanInstance, wf2Callback){
-        // Now. In parallel, we can persist the pendingSensorLog to 
-        // the device & the growPlanInstance
-        pendingSensorLog.gpid = growPlanInstance.id;
-
-        async.parallel([
-            function parallel1(callback){
-              device.recentSensorLogs.push(pendingSensorLog);
-              device.save(callback);
-            },
-            function parallel2(callback){
-              growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
-              growPlanInstance.save(callback);
-            },
-            function parallel3(callback){
-              var sensorLog = new SensorLogModel(pendingSensorLog);
-              sensorLog.save(callback);
-            }
-          ], 
-          function parallelFinal(err, result){
-            if (err) { return next(err); }
+        ModelUtils.logSensorLog(pendingSensorLog, device.activeGrowPlanInstance, device, function(err){
+          if (err) { return next(err); }
             var responseBody = 'success';
             res.status(200);
             res.header('X-Bpn-ResourceName', 'sensor_logs');
@@ -249,12 +219,7 @@ module.exports = function(app) {
             // To end response for the firmware, send the Bell character
             responseBody += String.fromCharCode(7);
             res.send(responseBody);              
-          }
-        );
-
-      }],
-      function(err, result){
-        if (err) { return next(err); }
+        });
       }
     );
   });
@@ -290,45 +255,43 @@ module.exports = function(app) {
 
     async.waterfall([
       function (callback){
-        winston.info('in callback 1');
-        DeviceModel.findOne({ deviceId: deviceId }, callback);  
+        DeviceModel.findOne({ deviceId: deviceId }).populate('activeGrowPlanInstance').exec(callback);  
       },
       function (deviceResult, callback){
-        winston.info('in callback 2');
         if (!deviceResult){ 
           return callback(new Error('No device found for id ' + req.params.id));
         }
         device = deviceResult;
-        GrowPlanInstanceModel.findOne({ device : deviceResult._id, active : true }).exec(callback);
-      },
-      function (growPlanInstanceResult, callback) {
-        winston.info('in callback 3');
-        if (!growPlanInstanceResult){ 
+
+        growPlanInstance = device.activeGrowPlanInstance;
+
+        if (!growPlanInstance){ 
           return callback(new Error('No active grow plan instance found for device'));
         }
-        growPlanInstance = growPlanInstanceResult;
+        
         growPlanInstancePhase = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
         
         if (!growPlanInstancePhase){
           return callback(new Error('No active phase found for this grow plan instance.'));
         }
+
         PhaseModel.findById(growPlanInstancePhase.phase).populate('actions').exec(callback);
       },
       function (phaseResult, callback){
-        winston.info('in callback 4');
         var allCyclesString = '';
 
         phase = phaseResult;
-        // get the actions that have a control reference & a cycle definition
+        // get the actions that have a control reference & a cycle definition & are repeating
         actions = phase.actions || [];
-        actions = actions.filter(function(action){ return !!action.control && !!action.cycle; });
+        actions = actions.filter(function(action){ return !!action.control && !!action.cycle && !!action.cycle.repeat; });
    
         // get the device's controlMap. Use this as the outer
         // loop to get the actions the device can handle
         device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
+                offset;
             
             winston.info('controlAction');
             winston.info(controlAction);
@@ -343,10 +306,21 @@ module.exports = function(app) {
               thisCycleString = thisCycleString.replace('{value2}','0');    
               thisCycleString = thisCycleString.replace('{duration2}','0');     
             } else {
-              // TODO : account for cycle.repeat
               thisCycleString = thisCycleString.replace('{override}','1');
               // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
-              thisCycleString = thisCycleString.replace('{offset}','0');
+              offset = 0;
+              // 2 scenarios for offset: 1's simple: 2 states, just assume it starts at midnight. 2: 3 states which means it has an overnight state. 
+              // get the user's timezone offset from UTC. that's the offset we pass in.
+              var userTimezone = req.user.timezone,
+                  now = new Date(),
+                  userTimezoneOffsetString = timezone(now, userTimezone, '%z'),
+                  userTimezoneOffsetDirection = userTimezoneOffsetString[0],
+                  userTimezoneOffsetHours = parseInt(userTimezoneOffsetString.substr(1,2), 10),
+                  userTimezoneOffsetMinutes = parseInt(userTimezoneOffsetString.substr(3,2), 10),
+                  userTimezoneOffset = (userTimezoneOffsetDirection == '-' ? -1 : 1) * (userTimezoneOffsetHours * 60 * 60 * 1000) + (userTimezoneOffsetMinutes * 60 * 1000);
+
+              winston.info('userTimezoneOffset from UTC = ' + userTimezoneOffset);
+              thisCycleString = thisCycleString.replace('{offset}', offset.toString());
               thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
             }
             allCyclesString += thisCycleString;
@@ -451,6 +425,7 @@ module.exports = function(app) {
                   thisCycleString = thisCycleString.replace('{duration2}','0');     
                 } else {
                   thisCycleString = thisCycleString.replace('{override}','1');
+                  // overrides are assumed to be immediate actions, so offset will always be 0
                   thisCycleString = thisCycleString.replace('{offset}','0');
                   thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
                 }
