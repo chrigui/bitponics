@@ -144,7 +144,7 @@ module.exports = [
 				"savedObjectIds['users']['jack@bitponics.com']"
 			],
 			owner : "savedObjectIds['users']['jack@bitponics.com']",
-			growPlan : "savedObjectIds['growPlans']['Tomato']",
+			growPlan : "savedObjectIds['growPlans']['Mixed Greens']",
 			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012

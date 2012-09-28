@@ -262,7 +262,8 @@ async.series([
 				name: _data.name,
 				abbrev: _data.abbrev,
 				unit: _data.unit,
-				code: _data.code
+				code: _data.code,
+				visible : _data.visible
 			});
 			
 			dataObj.save(function (err, doc) {
@@ -428,7 +429,8 @@ async.series([
 					users : _data.users,
 					sensorMap : _data.sensorMap,
 					controlMap : _data.controlMap,
-					recentSensorLogs: _data.recentSensorLogs
+					recentSensorLogs: _data.recentSensorLogs,
+					activeGrowPlanInstance : eval(_data.activeGrowPlanInstance)
 				});
 
 			    console.dir(_data)
@@ -448,11 +450,7 @@ async.series([
 			      	 callback(null, null);
 			      }
 			      dataCount--;
-
-			      
-			      
 			    });
-			    
 			});
 		});
     },
@@ -532,7 +530,7 @@ async.series([
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-console.log(_data.description)
+		console.log(_data.description)
 			var dataObj = new models.action({
 				description: _data.description,
 				control: eval(_data.control),
@@ -741,12 +739,24 @@ console.log(_data.description)
 		        console.log(err);
 		      }
 		      savedObjectIds[dataType][_data.gpid] = doc.id;
-		      if (dataCount === 1) {
-		      	 callback(null, null);
+
+		      if (dataObj.active){
+		      	console.log('pairing grow plan instance with device');
+				models.utils.activateGrowPlanInstance(doc, function(err){
+					if (err) { console.log(err); }
+					if (dataCount === 1) {
+				      	 callback(null, null);
+				      }
+				      dataCount--;		
+				});		      
+		      } else {
+		      	if (dataCount === 1) {
+			      	 callback(null, null);
+			      }
+			      dataCount--;		
 		      }
-		      dataCount--;
 		      
-		    });
+			});
 		});
     },
     function(callback){

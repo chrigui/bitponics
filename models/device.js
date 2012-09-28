@@ -39,8 +39,8 @@ var DeviceSchema = new Schema({
 			value: { type: Number }
 		}]
 	}],
-	activeGrowPlanInstance : {type: ObjectId, ref: 'GrowPlanInstance', required:false},
-	activePhase : {type: ObjectId, ref: 'GrowPlanInstance', required:false },
+	activeGrowPlanInstance : { type: ObjectId, ref: 'GrowPlanInstance', required: false},
+	activePhase : { type: ObjectId, ref: 'Phase', required: false },
 	
 	/**
 	 *  Cache of the active phase actions for this device. Right now it's

@@ -10,8 +10,7 @@ var mongoose = require('mongoose'),
     ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
     SensorLogModel = require('../../models/sensorLog').model,
-    Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId,
+    ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async');
     
@@ -177,71 +176,44 @@ module.exports = function(app) {
       winston.info('JSON.parse req.rawBody ', pendingDeviceLogs);
     }
 
-    async.waterfall([
-      function wf1(wf1Callback){
-        // In parallel, get the Device and all Sensors
-        async.parallel([
-            function parallel1(callback){
-              SensorModel.find().exec(callback);
-            },
-            function parallel2(callback){
-              DeviceModel.findOne({ deviceId: deviceId }, callback);
-            }
-          ],
-          // When those parallel ops are done, create the sensorLog entry and also retrieve 
-          // the active GrowPlanInstance
-          function parallelFinal(err, results){
-            if (err) { return callback(err);}
-            winston.info('wf1 final step');
+    
+    // In parallel, get the Device and all Sensors
+    async.parallel(
+      [
+        function parallel1(callback){
+          SensorModel.find().exec(callback);
+        },
+        function parallel2(callback){
+          DeviceModel
+          .findOne({ deviceId: deviceId })
+          .populate('activeGrowPlanInstance')
+          .exec(callback);
+        }
+      ],
+      // When those parallel ops are done, create the sensorLog entry and also retrieve 
+      // the active GrowPlanInstance
+      function parallelFinal(err, results){
+        if (err) { return callback(err);}
+        winston.info('wf1 final step');
 
-            sensors = results[0];
-            device = results[1];
-            if (!device){ 
-              wf1Callback(new Error('Attempted to log to a nonexistent device'));
-            }
+        sensors = results[0];
+        device = results[1];
+        if (!device){ 
+          wf1Callback(new Error('Attempted to log to a nonexistent device'));
+        }
 
+        Object.keys(pendingDeviceLogs).forEach(function(key){
+          pendingSensorLog.logs.push({
+            sCode : key,
+            value : pendingDeviceLogs[key]
+          });
+        });
+        
+        winston.info('pendingSensorLog');
+        winston.info(JSON.stringify(pendingSensorLog));
 
-            Object.keys(pendingDeviceLogs).forEach(function(key){
-              pendingSensorLog.logs.push({
-                sCode : key,
-                value : pendingDeviceLogs[key]
-              });
-            });
-            
-            // TODO : also use this opportunity to check if any IdealRanges have been exceeded.
-            // if so, trigger the corresponding action...somehow. 
-            // On the gpi: add to actionLogs
-            // On the device: expire activeActions and activeActionOverrides. Maybe refresh their deviceMessages at this point?
-            
-
-            winston.info('pendingSensorLog');
-            winston.info(JSON.stringify(pendingSensorLog));
-
-            GrowPlanInstanceModel.findOne({ device: device._id, active: true },  wf1Callback);        
-          }
-        );
-      },
-      function wf2(growPlanInstance, wf2Callback){
-        // Now. In parallel, we can persist the pendingSensorLog to 
-        // the device & the growPlanInstance
-        pendingSensorLog.gpid = growPlanInstance.id;
-
-        async.parallel([
-            function parallel1(callback){
-              device.recentSensorLogs.push(pendingSensorLog);
-              device.save(callback);
-            },
-            function parallel2(callback){
-              growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
-              growPlanInstance.save(callback);
-            },
-            function parallel3(callback){
-              var sensorLog = new SensorLogModel(pendingSensorLog);
-              sensorLog.save(callback);
-            }
-          ], 
-          function parallelFinal(err, result){
-            if (err) { return next(err); }
+        ModelUtils.logSensorLog(pendingSensorLog, device.activeGrowPlanInstance, device, function(err){
+          if (err) { return next(err); }
             var responseBody = 'success';
             res.status(200);
             res.header('X-Bpn-ResourceName', 'sensor_logs');
@@ -249,12 +221,7 @@ module.exports = function(app) {
             // To end response for the firmware, send the Bell character
             responseBody += String.fromCharCode(7);
             res.send(responseBody);              
-          }
-        );
-
-      }],
-      function(err, result){
-        if (err) { return next(err); }
+        });
       }
     );
   });
