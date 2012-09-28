@@ -4,7 +4,6 @@
 @import "helpers"
 @import "./global/colors"
 
-
 body
 	margin: 0;
 	color: #333
@@ -57,6 +56,11 @@ div, p, span, a, a:visited, a:hover, a:active
 	div, p, span, a, a:visited, a:hover, a:active {
 		color white
 	}
+
+	&.warning {
+		background-color color-warning
+	}
+
 
 	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
 		position absolute

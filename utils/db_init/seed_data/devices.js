@@ -23,6 +23,7 @@ module.exports = [
 			    outputId : "2"
 			  }
 			],
+			activeGrowPlanInstance: "savedObjectIds['growPlanInstances']['1']",
 			recentSensorLogs : [
 				{
 					timestamp: 1347364818821,
@@ -57,6 +58,7 @@ module.exports = [
 			    outputId : "2"
 			  }
 			],
+			activeGrowPlanInstance: "savedObjectIds['growPlanInstances']['2']",
 			recentSensorLogs : [
 				{
 					timestamp: 1347364818821,

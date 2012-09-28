@@ -7,8 +7,8 @@ block css
 block content
   section#header
     header#logo(role="banner") 
-      img(src="/img/leaf-new-green.png", width="15%")
-
+      img(src="/img/b-133w.png", width="15%")
+      
     div#setup.select-block
       h2.main-heading Grow Plans
       h3.sub-heading
@@ -30,26 +30,28 @@ block content
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
-      - var sensorStyle = ''
       - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)
-        each item, key in sensors
-          div(class="sensor data-module #{sensorStyle} #{key}")
-              - sensorStyle = 'closed'
-              h3.main-heading
-                | #{item.abbrev}
-              div.sensor-data
-                div.sensor-value #{item.logs[0].value}
-                div.sensor-value-unit
-                  span #{item.unit}
-              div(class="sensor-type icon #{item.sCode}")
-                | <i class="icon-glyph icon-#{item.sCode}" aria-hidden="true"></i>
-                div.screen-reader-text #{item.sCode}
-              div.message Check
-              div(class="settings icon")
-                | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
-                div.screen-reader-text Settings
+        - var sensorStyle = ''
+        each sensorCode in sensorDisplayOrder
+          - var sensor = sensors[sensorCode]
+          - if (sensor)
+            div(class="sensor data-module #{sensorStyle} #{sensorCode} #{sensor.logs[0] ? '' : 'warning'}")
+                - sensorStyle = 'closed'
+                h3.main-heading
+                  | #{sensor.abbrev}
+                div.sensor-data
+                  div.sensor-value #{sensor.logs[0] ? sensor.logs[0].value : '----'}
+                  div.sensor-value-unit
+                    span #{sensor.unit}
+                div(class="sensor-type icon #{sensor.code}")
+                  | <i class="icon-glyph icon-#{sensor.code}" aria-hidden="true"></i>
+                  div.screen-reader-text #{sensor.code}
+                div.message Check
+                div(class="settings icon")
+                  | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
+                  div.screen-reader-text Settings
       - else //show empty sensor or callout to setup sensors?
-        //div(class="sub-heading notification")
+        div(class="sub-heading notification")
             //- | No active sensors
         div(class="sensor data-module")
             h3.main-heading
@@ -60,11 +62,11 @@ block content
                 span Hrs/
                 span Day
             div(class="sensor-type icon")
-              | <i class="icon-glyph icon-light" aria-hidden="true"></i>
+              | <i aria-hidden="true" data-icon="&#x28"></i>
               div.screen-reader-text Light Sensor
             div.message Check
             div(class="settings icon")
-              | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
+              | <i aria-hidden="true" data-icon="&#x2e"></i>
               div.screen-reader-text Settings
 
     div#visualizer.content-module.middle
@@ -109,9 +111,7 @@ block footer-scripts
     controls = '[]'
   - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
     currentGrowPlanInstancePhases = '[]'
-  - if (typeof(currentGrowPlanInstance) == 'undefined')
-    currentGrowPlanInstance = '{}'
-    
+
   script
     Bitponics.user = {
       currentGrowPlanInstance : {

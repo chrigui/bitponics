@@ -33,7 +33,7 @@ module.exports = function(app){
 					async.parallel(
 						[
 							function parallel1(innerCallback){
-								SensorModel.find().exec(innerCallback);
+								SensorModel.find({visible : true}).exec(innerCallback);
 							},
 							function parallel2(innerCallback){
 								ControlModel.find().exec(innerCallback);
@@ -104,7 +104,8 @@ module.exports = function(app){
 					activeGrowPlanInstances : growPlanInstances,
 					currentGrowPlanInstancePhases: currentGrowPlanInstance.phases,
 					sensors: {},
-					controls: {}
+					controls: {},
+					sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis']
 				};
 
 
@@ -135,14 +136,17 @@ module.exports = function(app){
 				});
 
 				activeIdealRanges.forEach(function(idealRange){
-					var ir = {
-						valueRange : idealRange.valueRange
-					};
-					if (idealRange.applicableTimeSpan){
-						// TODO : parse. And use this to determine whether
-						// the sensor is in range. 
+					if (locals.sensors[idealRange.sCode]){
+						var ir = {
+							valueRange : idealRange.valueRange
+						};
+						if (idealRange.applicableTimeSpan){
+							// TODO : parse. And use this to determine whether
+							// the sensor is in range, then add some sort of property
+							// to the sensor to indicate it 
+						}
+						locals.sensors[idealRange.sCode].idealRange = ir;	
 					}
-					locals.sensors[idealRange.sCode].idealRange = ir;
 				});
 
 				// Sort the sensor logs in descending timestamp order. 
@@ -157,20 +161,17 @@ module.exports = function(app){
 					sensorsLog.logs.forEach(function(log){
 						// HACK : we shouldn't need to check for existence of this sensor code in the hash
 						// once validation's setup in /api/devices/id/sensor_logs, remove the if(...) check
-						//if (locals.sensors[log.sCode]){
+						if (locals.sensors[log.sCode]){
 							locals.sensors[log.sCode].logs.push({
 								timestamp : sensorsLog.timestamp,
 								value : log.value
 							});	
-						//}
+						}
 					});
 				});
 				
-				Object.keys(locals.sensors).forEach(function(key){
-					if (locals.sensors[key].logs.length === 0){
-						delete locals.sensors[key];
-					}
-				});
+				
+				
 
 				locals.title = 'Bitponics - Dashboard';
 				locals.className = 'dashboard';

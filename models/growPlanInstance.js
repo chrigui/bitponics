@@ -35,6 +35,10 @@ var GrowPlanInstanceSchema = new Schema({
 		active: { type: Boolean }
 	}],
 
+	settings : {
+		visibleSensors : []
+	},
+	
 	/**
 	 * Sensor logs for the past 24 hours.
 	 */
@@ -113,6 +117,7 @@ var GrowPlanInstanceSchema = new Schema({
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
+
 
 
 /**
