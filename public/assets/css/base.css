@@ -107,6 +107,7 @@ abbr[title]{border:none}
 .content-module.large{width:100%}
 .content-module.middle{position:relative;padding:100% 0 0 0;height:0}
 .data-module{color:#fff;text-align:center;position:relative;background-color:#24d321;height:11.5em;text-transform:uppercase;margin:.125em 0;}
+.data-module.warning{background-color:#d2e000}
 .data-module .main-heading,.data-module .message,.data-module .settings,.data-module .sensor-value-unit,.data-module .sensor-type{position:absolute}
 .data-module .main-heading{color:#fff;font-size:.75em;margin:0;top:.5em;left:.75em;font-weight:bold}
 .data-module .message{bottom:.5em;right:.75em}

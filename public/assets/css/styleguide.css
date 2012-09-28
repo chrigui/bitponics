@@ -160,6 +160,8 @@ textarea{overflow:auto;vertical-align:top;resize:vertical}
 input:valid,textarea:valid,input:invalid,textarea:invalid{background-color:#f0dddd}
 table{border-collapse:collapse;border-spacing:0}
 td{vertical-align:top}
+@font-face{font-family:'Bitponics-Glyphs';src:url("../../../../assets/fonts/Bitponics-Glyphs.eot");src:url("../../../../assets/fonts/Bitponics-Glyphs.eot?#iefix") format('embedded-opentype'),url("../../../../assets/fonts/Bitponics-Glyphs.svg#Bitponics-Glyphs") format('svg'),url("../../../../assets/fonts/Bitponics-Glyphs.woff") format('woff'),url("../../../../assets/fonts/Bitponics-Glyphs.ttf") format('truetype');font-weight:normal;font-style:normal}
+[data-icon]:before{font-family:'Bitponics-Glyphs';content:attr(data-icon);speak:none;font-weight:normal;-webkit-font-smoothing:antialiased}
 .full-width{width:100%}
 .full-height{height:100%}
 .position-f{position:fixed}
@@ -218,14 +220,14 @@ abbr[title]{border:none}
 .data-module{color:#fff;text-align:center;position:relative;background-color:#24d321;height:11.5em;text-transform:uppercase;margin:.125em 0;}
 .data-module .main-heading,.data-module .message,.data-module .settings,.data-module .sensor-value-unit,.data-module .sensor-type{position:absolute}
 .data-module .main-heading{color:#fff;font-size:.75em;margin:0;top:.5em;left:.75em;font-weight:bold}
-.data-module .message{bottom:.25em;right:.75em}
-.data-module .settings{top:.75em;right:.75em;font-size:.75em}
+.data-module .message{bottom:.5em;right:.75em}
+.data-module .settings{top:.15em;right:.5em}
 .data-module .message,.data-module .sensor-value-unit{font-size:.55em;font-weight:bold}
 .data-module .sensor-value-unit{top:1em;right:1.85em;line-height:1em;text-align:left;}
 .data-module .sensor-value-unit span{display:block}
 .data-module .sensor-data{display:inline-block;vertical-align:middle;position:absolute;top:1.85em;left:0;width:100%;border-top:1px solid #fff}
 .data-module .sensor-value{font-size:10em;letter-spacing:-.1em;line-height:1.25em;margin:-.15em 0 0 -.15em;text-align:center}
-.data-module .sensor-type{bottom:.75em;left:.75em}
+.data-module .sensor-type{bottom:.25em;left:.5em}
 .data-module.closed{min-height:2em;height:auto;}
 .data-module.closed .main-heading{position:static;display:inline-block;vertical-align:middle;width:63%;text-align:left;text-indent:.45em}
 .data-module.closed .sensor-value-unit,.data-module.closed .message,.data-module.closed .settings,.data-module.closed .sensor-type{display:none}
@@ -244,6 +246,8 @@ abbr[title]{border:none}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
 #air,#hum,#co2{background-color:#24d321}
 #lux,#ir,#full,#vis{background-color:#d2e000}
+.empty{background-color:#999}
 #phases-graph svg{display:inline-block;vertical-align:top}
 section#footer{clear:both;}
 section#footer .content-module{background-color:#fff}
+.loader{height:24px;width:24px;background:url("/img/loader.gif") no-repeat 0 0}

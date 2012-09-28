@@ -7,6 +7,7 @@ color-logo-green=#23b500
 color-medium-green=#24d321
 color-light-green=#46f121
 color-global-background=#fff
+color-warning=#D2E000
 color-sensor-light=#D2E000
 color-sensor-air=#24d321
 color-sensor-water=#00CBCB
@@ -58,6 +59,11 @@ abbr[title]
 	height 11.5em
 	text-transform uppercase
 	margin 0.125em 0
+
+	&.warning {
+		background-color color-warning
+	}
+
 
 	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
 		position absolute

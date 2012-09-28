@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
  * SensorLog
  */
 var SensorLogSchema = new Schema({
-	gpi : { type : ObjectId, ref: 'GrowPlanInstance'},
+	gpi : { type : ObjectId, ref: 'GrowPlanInstance', required: true},
 	timestamp: { type: Date, required: true, default: Date.now },
 	logs : [{
 		/**

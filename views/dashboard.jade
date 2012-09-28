@@ -29,24 +29,26 @@ block content
   section#main(role="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
-      - var sensorStyle = ''
       - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)
-        each item, key in sensors
-          div(class="sensor data-module #{sensorStyle} #{key}")
-              - sensorStyle = 'closed'
-              h3.main-heading
-                | #{item.abbrev}
-              div.sensor-data
-                div.sensor-value #{item.logs[0].value}
-                div.sensor-value-unit
-                  span #{item.unit}
-              div(class="sensor-type icon #{item.sCode}")
-                | <i aria-hidden="true" data-icon="&#x28"></i>
-                div.screen-reader-text #{item.sCode}
-              div.message Check
-              div(class="settings icon")
-                | <i aria-hidden="true" data-icon="&#x2e"></i>
-                div.screen-reader-text Settings
+        - var sensorStyle = ''
+        each sensorCode in sensorDisplayOrder
+          - var sensor = sensors[sensorCode]
+          - if (sensor)
+            div(class="sensor data-module #{sensorStyle} #{sensorCode} #{sensor.logs[0] ? '' : 'warning'}")
+                - sensorStyle = 'closed'
+                h3.main-heading
+                  | #{sensor.abbrev}
+                div.sensor-data
+                  div.sensor-value #{sensor.logs[0] ? sensor.logs[0].value : '----'}
+                  div.sensor-value-unit
+                    span #{sensor.unit}
+                div(class="sensor-type icon #{sensor.code}")
+                  | <i aria-hidden="true" data-icon="&#x28"></i>
+                  div.screen-reader-text #{sensor.code}
+                div.message Check
+                div(class="settings icon")
+                  | <i aria-hidden="true" data-icon="&#x2e"></i>
+                  div.screen-reader-text Settings
       - else //show empty sensor or callout to setup sensors?
         div(class="sub-heading notification")
             //- | No active sensors

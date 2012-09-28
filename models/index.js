@@ -12,5 +12,6 @@ module.exports = {
 	phase: require('./phase').model,
 	sensor: require('./sensor').model,
 	sensorLog: require('./sensorLog').model,
-	user: require('./user').model
+	user: require('./user').model,
+	utils : require('./utils')
 };
