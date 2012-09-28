@@ -34,8 +34,11 @@ block content
         - var sensorStyle = ''
         each sensorCode in sensorDisplayOrder
           - var sensor = sensors[sensorCode]
+          - var warning = false
           - if (sensor)
-            div(class="sensor data-module #{sensorStyle} #{sensorCode} #{sensor.logs[0] ? '' : 'warning'}")
+            -if (!sensor.logs[0])
+              warning = true
+            div(class="sensor data-module #{sensorStyle} #{sensorCode} #{warning ? 'warning' : ''}")
                 - sensorStyle = 'closed'
                 h3.main-heading
                   | #{sensor.abbrev}
@@ -46,7 +49,7 @@ block content
                 div(class="sensor-type icon #{sensor.code}")
                   | <i class="icon-glyph icon-#{sensor.code}" aria-hidden="true"></i>
                   div.screen-reader-text #{sensor.code}
-                div.message Check
+                div.message #{warning ? 'Check' : 'OK'}
                 div(class="settings icon")
                   | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
                   div.screen-reader-text Settings
@@ -64,7 +67,7 @@ block content
             div(class="sensor-type icon")
               | <i aria-hidden="true" data-icon="&#x28"></i>
               div.screen-reader-text Light Sensor
-            div.message Check
+            div.message OK
             div(class="settings icon")
               | <i aria-hidden="true" data-icon="&#x2e"></i>
               div.screen-reader-text Settings
