@@ -137,8 +137,8 @@ var actionUtils = {
 	},
 
 	/**
-	 * Takes a string with the tokens '{value1},{duration1},{value2},{duration2}'
-	 * and replaces the {valueX} and {durationX} fields with the proper values 
+	 * Takes a string with the tokens {offset},{value1},{duration1},{value2},{duration2}
+	 * and replaces each field with the proper values 
 	 * 
 	 * Assumes it's passed an action with states with controlValues.
 	 */
@@ -150,6 +150,7 @@ var actionUtils = {
 		switch(states.length){
 			case 1:
 				var infiniteStateControlValue = states[0].controlValue;
+				result = result.replace(/{offset}/, 0);
 				result = result.replace(/{value1}/, infiniteStateControlValue);
 				result = result.replace(/{value2}/, infiniteStateControlValue);
 				result = result.replace(/{duration1}/, 1);
@@ -159,13 +160,14 @@ var actionUtils = {
 				var state0 = states[0],
 					state1 = states[1];
 				
+				result = result.replace(/{offset}/, 0);
 				result = result.replace(/{value1}/, state0.controlValue);
 				result = result.replace(/{duration1}/, convertDurationToMilliseconds(state0.durationType, state0.duration));
 				result = result.replace(/{value2}/, state1.controlValue);
 				result = result.replace(/{duration2}/, convertDurationToMilliseconds(state1.durationType, state1.duration));
 				break;
 			case 3:
-				// If a 3-state cycle, the 1st and 3rd must be contiguous (have the same controlValue)
+				// If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
 
 				var state0 = states[0],
 					state1 = states[1],
@@ -174,6 +176,8 @@ var actionUtils = {
 					thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
 					totalFirstDuration = firstDuration + thirdDuration;
 				
+				// for a 3-state cycle, offset should effectibely subtract 3rd state from the totalFirstDuration
+				result = result.replace(/{offset}/, thirdDuration);
 				result = result.replace(/{value1}/, state0.controlValue);
 				result = result.replace(/{duration1}/, totalFirstDuration);
 				result = result.replace(/{value2}/, state1.controlValue);
@@ -181,6 +185,7 @@ var actionUtils = {
 				break;
 			default: 
 				winston.info('Serializing a blank actionCycleState');
+				result = result.replace(/{offset}/, 0);
 				result = result.replace(/{value1}/, '0');
 				result = result.replace(/{duration1}/, '0');
 				result = result.replace(/{value2}/, '0');

@@ -136,14 +136,17 @@ module.exports = function(app){
 				});
 
 				activeIdealRanges.forEach(function(idealRange){
-					var ir = {
-						valueRange : idealRange.valueRange
-					};
-					if (idealRange.applicableTimeSpan){
-						// TODO : parse. And use this to determine whether
-						// the sensor is in range. 
+					if (locals.sensors[idealRange.sCode]){
+						var ir = {
+							valueRange : idealRange.valueRange
+						};
+						if (idealRange.applicableTimeSpan){
+							// TODO : parse. And use this to determine whether
+							// the sensor is in range, then add some sort of property
+							// to the sensor to indicate it 
+						}
+						locals.sensors[idealRange.sCode].idealRange = ir;	
 					}
-					locals.sensors[idealRange.sCode].idealRange = ir;
 				});
 
 				// Sort the sensor logs in descending timestamp order. 
