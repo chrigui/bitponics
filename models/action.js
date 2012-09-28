@@ -56,6 +56,31 @@ ActionSchema = new Schema({
 
 ActionSchema.plugin(useTimestamps);
 
+ActionSchema.virtual('overallCycleTimespan')
+	.get(function () {
+		// default to a 1 year max duration
+		var total = 1000 * 60 * 60 * 24 * 365,
+			cycle = this.cycle,
+			states;
+
+		if (!cycle || !cycle.states.length){ return total; }
+
+		states = cycle.states;
+		switch(states.length){
+			case 1:
+				break;
+			case 2:
+			case 3:
+				total = 0;
+				states.forEach(function(state){
+					total += actionUtils.convertDurationToMilliseconds(state.durationType, state.duration);
+				});
+				break;
+				// no default; we've enforced that we have one of these values already
+		}
+		return total;
+	});
+
 
 /**
  * Now that schema is defined, add indices
@@ -90,6 +115,7 @@ ActionSchema.pre('save', function(next){
 	switch(states.length){
 		case 1:
 			// if a cycle has 1 state, it's considered a discrete action and must have a "repeat" of false
+			// TODO : should this throw an error or just set the correct value silently?
 			if (cycle.repeat){
 				return next(new Error('Actions with single-state cycles are considered discrete actions and must have "repeat" set to false'))
 			}
@@ -141,16 +167,20 @@ var actionUtils = {
 	 * and replaces each field with the proper values 
 	 * 
 	 * Assumes it's passed an action with states with controlValues.
+	 *
+	 * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
+	 *                Otherwise it's just written straight to the template.
 	 */
-	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates){
+	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
 		var result = cycleTemplate,
 			states = actionCycleStates,
-			convertDurationToMilliseconds = actionUtils.convertDurationToMilliseconds;
+			convertDurationToMilliseconds = actionUtils.convertDurationToMilliseconds,
+			offset = offset || 0;
 
 		switch(states.length){
 			case 1:
 				var infiniteStateControlValue = states[0].controlValue;
-				result = result.replace(/{offset}/, 0);
+				result = result.replace(/{offset}/, offset);
 				result = result.replace(/{value1}/, infiniteStateControlValue);
 				result = result.replace(/{value2}/, infiniteStateControlValue);
 				result = result.replace(/{duration1}/, 1);
@@ -160,7 +190,7 @@ var actionUtils = {
 				var state0 = states[0],
 					state1 = states[1];
 				
-				result = result.replace(/{offset}/, 0);
+				result = result.replace(/{offset}/, offset);
 				result = result.replace(/{value1}/, state0.controlValue);
 				result = result.replace(/{duration1}/, convertDurationToMilliseconds(state0.durationType, state0.duration));
 				result = result.replace(/{value2}/, state1.controlValue);
@@ -176,8 +206,9 @@ var actionUtils = {
 					thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
 					totalFirstDuration = firstDuration + thirdDuration;
 				
-				// for a 3-state cycle, offset should effectibely subtract 3rd state from the totalFirstDuration
-				result = result.replace(/{offset}/, thirdDuration);
+				// for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
+				// and if we got an offset, add that on
+				result = result.replace(/{offset}/, offset + thirdDuration);
 				result = result.replace(/{value1}/, state0.controlValue);
 				result = result.replace(/{duration1}/, totalFirstDuration);
 				result = result.replace(/{value2}/, state1.controlValue);
@@ -185,7 +216,7 @@ var actionUtils = {
 				break;
 			default: 
 				winston.info('Serializing a blank actionCycleState');
-				result = result.replace(/{offset}/, 0);
+				result = result.replace(/{offset}/, offset);
 				result = result.replace(/{value1}/, '0');
 				result = result.replace(/{duration1}/, '0');
 				result = result.replace(/{value2}/, '0');

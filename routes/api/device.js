@@ -290,8 +290,7 @@ module.exports = function(app) {
         device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
-                offset;
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
             
             winston.info('controlAction');
             winston.info(controlAction);
@@ -307,21 +306,22 @@ module.exports = function(app) {
               thisCycleString = thisCycleString.replace('{duration2}','0');     
             } else {
               thisCycleString = thisCycleString.replace('{override}','1');
-              // TODO: offset should be made relative to the phase start datetime (which, in turn, should have been started according to the user's locale)
-              offset = 0;
-              // 2 scenarios for offset: 1's simple: 2 states, just assume it starts at midnight. 2: 3 states which means it has an overnight state. 
-              // get the user's timezone offset from UTC. that's the offset we pass in.
-              var userTimezone = req.user.timezone,
-                  now = new Date(),
-                  userTimezoneOffsetString = timezone(now, userTimezone, '%z'),
-                  userTimezoneOffsetDirection = userTimezoneOffsetString[0],
-                  userTimezoneOffsetHours = parseInt(userTimezoneOffsetString.substr(1,2), 10),
-                  userTimezoneOffsetMinutes = parseInt(userTimezoneOffsetString.substr(3,2), 10),
-                  userTimezoneOffset = (userTimezoneOffsetDirection == '-' ? -1 : 1) * (userTimezoneOffsetHours * 60 * 60 * 1000) + (userTimezoneOffsetMinutes * 60 * 1000);
+              
+              // http://en.wikipedia.org/wiki/Date_%28Unix%29
+              // get the overall timespan of the cycle. 
+              // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
+              // get time elapsed from localized phase start
+              // divide time elapsed by overall timespan. remainder is a component of the offset
+              var now = new Date(),
+                  phaseStartDateParts = timezone(growPlanInstancePhase.startDate, req.user.timezone, '%T').split(':'),
+                  // get the midnight of the start date
+                  phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+                  overallCycleTimespan = controlAction.overallCycleTimespan,
+                  phaseTimeElapsed = now - phaseStartDate,
+                  cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
 
-              winston.info('userTimezoneOffset from UTC = ' + userTimezoneOffset);
-              thisCycleString = thisCycleString.replace('{offset}', offset.toString());
-              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+              //thisCycleString = thisCycleString.replace('{offset}', cycleRemainder.toString());
+              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder);  
             }
             allCyclesString += thisCycleString;
           }
@@ -346,6 +346,9 @@ module.exports = function(app) {
       };
       // Expires at the expected end of the current phase.
       // now + (total expected phase time - elapsed phase time)
+      // TODO : or...since phase transitions have to be manually approved,
+      // should this just expire like 1 year into the future and get refreshed
+      // on phase transitions?
       if (phase.expectedNumberOfDays){
         device.activeActions.expires = 
           now + 
