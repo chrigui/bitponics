@@ -320,8 +320,7 @@ module.exports = function(app) {
                   phaseTimeElapsed = now - phaseStartDate,
                   cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
 
-              //thisCycleString = thisCycleString.replace('{offset}', cycleRemainder.toString());
-              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder);  
+              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;  
             }
             allCyclesString += thisCycleString;
           }
@@ -430,7 +429,7 @@ module.exports = function(app) {
                   thisCycleString = thisCycleString.replace('{override}','1');
                   // overrides are assumed to be immediate actions, so offset will always be 0
                   thisCycleString = thisCycleString.replace('{offset}','0');
-                  thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states);  
+                  thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;  
                 }
                 allCyclesString += thisCycleString;  
               }
