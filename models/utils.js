@@ -31,7 +31,7 @@ module.exports = {
 		// TODO : also use this opportunity to check if any IdealRanges have been exceeded.
         // if so, trigger the corresponding action 
         // On the gpi: add to actionLogs
-        // On the device: expire activeActions and activeActionOverrides. Maybe refresh their deviceMessages at this point?
+        // On the device: expire activeActions and activeActionsOverride. Maybe refresh their deviceMessages at this point?
 
 	 	async.parallel(
  		[

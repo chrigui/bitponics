@@ -63,36 +63,9 @@ var GrowPlanInstanceSchema = new Schema({
 	}],
 	*/
 
-
+	// TODO : remove all references to this
 	actionLogs: [{
-		/**
-		 * The time that this action was first requested, either through a sensor trigger or a manual trigger
-		 */
-		timeRequested: { type: Date, required: true, default: Date.now },
 		
-		/**
-		 * The time this action was actually sent, either to the device or user
-		 */
-		timeSent: { type: Date },
-		
-		/**
-		 * Reference to the action
-		 */
-		action : {type: ObjectId, ref: 'Action', required: true},
-		
-		/**
-		 * Boolean indicating whether this action has been sent. This will be
-		 * what queries are run against in order to pick up pending actions.
-		 * Might be redundant given timeSent...could just check that for null
-		 */
-		sent: {type: Boolean, default : false},
-		
-		/**
-		 * "Done" status of the action. Device actions are automatically marked as done.
-		 * Actions that require user action might require the user to mark it as done...but
-		 * that's not implemented. For now we'll just mark this as true whenever an action is _sent_.
-		 */
-		done: {type : Boolean, default : false}
 	}],
 
 	photoLogs: [{
@@ -115,6 +88,21 @@ var GrowPlanInstanceSchema = new Schema({
 { strict: true });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
+
+
+/**
+ * TODO : 
+ * Returns number of milliseconds since the localized 00:00:00 of the phase start date
+ * Used in cycle offset calculations. 
+ 
+GrowPlanInstanceSchema.virtual('timeSinceActivePhaseStartDate')
+	.get(function(){
+		var now = new Date(),
+			
+	});
+*/
+
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
 
