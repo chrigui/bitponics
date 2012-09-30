@@ -307,19 +307,7 @@ module.exports = function(app) {
             } else {
               thisCycleString = thisCycleString.replace('{override}','1');
               
-              // http://en.wikipedia.org/wiki/Date_%28Unix%29
-              // get the overall timespan of the cycle. 
-              // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
-              // get time elapsed from localized phase start
-              // divide time elapsed by overall timespan. remainder is a component of the offset
-              var now = new Date(),
-                  phaseStartDateParts = timezone(growPlanInstancePhase.startDate, req.user.timezone, '%T').split(':'),
-                  // get the midnight of the start date
-                  phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
-                  overallCycleTimespan = controlAction.overallCycleTimespan,
-                  phaseTimeElapsed = now - phaseStartDate,
-                  cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
-
+              var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, controlAction, req.user.timezone);
               thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;  
             }
             allCyclesString += thisCycleString;
@@ -385,7 +373,7 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        activeActionOverridesActions,
+        activeActionsOverrideActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate,
@@ -397,7 +385,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ deviceId: deviceId }).populate('activeActionOverrides.actions').exec(callback);  
+          DeviceModel.findOne({ deviceId: deviceId }).populate('activeActionsOverride.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 
@@ -406,56 +394,20 @@ module.exports = function(app) {
           device = deviceResult;
 
           // Set whether we need to ask the device to refresh its cycles
-          responseBody = responseBody.replace('{refresh}', device.activeActions.deviceRefreshRequired ? '1' : '0');
+          responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
 
-          if (device.activeActionOverrides.expires > Date.now()){
-            allCyclesString = device.activeActionOverrides.deviceMessage;
+          if (device.activeActionsOverride.expires > Date.now()){
+            return callback();
           } else {
-            device.controlMap.forEach(
-              function(controlOutputPair){
-                var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                    controlAction = device.activeActionOverrides.actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
-                  
-                // Need an entry for every control, even if there's no associated cycle
-                if (!controlAction){ 
-                  // if no action, just 0 everything out
-                  thisCycleString = thisCycleString.replace('{override}','0');
-                  thisCycleString = thisCycleString.replace('{offset}','0');
-                  thisCycleString = thisCycleString.replace('{value1}','0');    
-                  thisCycleString = thisCycleString.replace('{duration1}','0');    
-                  thisCycleString = thisCycleString.replace('{value2}','0');    
-                  thisCycleString = thisCycleString.replace('{duration2}','0');     
-                } else {
-                  thisCycleString = thisCycleString.replace('{override}','1');
-                  // overrides are assumed to be immediate actions, so offset will always be 0
-                  thisCycleString = thisCycleString.replace('{offset}','0');
-                  thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;  
-                }
-                allCyclesString += thisCycleString;  
-              }
-            );  
-            
+            device.refreshActiveActionsOverride(callback);
           }
-          responseBody = responseBody.replace('{overrides}', allCyclesString);
-          return callback();  
-          
         }
       ],
       function(err){
         if (err) { return next(err);}
         
-        var now = Date.now();
-        // TODO : populate this correctly. actions should be...something
-        device.activeActionOverrides = {
-          actions: [],
-          deviceMessage : allCyclesString,
-          lastSent : now,
-          expires : now + (365*24*60*60*1000) // just make it expire in a year
-        };
+        responseBody = responseBody.replace(/{overrides}/, device.activeActionsOverride.deviceMessage);
         
-        // We don't need to make the response wait for this particular save. 
-        device.save();
-
         res.status(200);
         res.header('X-Bpn-ResourceName', 'refresh_status');
         res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
