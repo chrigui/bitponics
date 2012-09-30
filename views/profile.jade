@@ -30,8 +30,15 @@ block content
         label(for="lastname") Last Name
         input(id="lastname", name="lastname", type="text", value="#{user.name.last}")
 
-        label(for="locale") Locale
-        input(id="locale", name="locale", type="text", value="#{user.locale.lang}_#{user.locale.territory}")
+        label(for="locale_timezone", class="display-i") Locale
+        button(id="detect", class="display-i") Detect
+        include misc/timezone_select_html
+        include misc/timezone_country_select_html
+
+        div.overflow
+          | <img id="timezone-image" src="img/timezone_map_gray-400.png" width="400" height="200" usemap="#timezone-map" />
+          | <img class="timezone-pin" src="img/pin.png" /> 
+          include misc/timezone_data_400x200
 
         label(for="phone") Phone
         input(id="phone", name="phone", type="text", value="#{user.phone}")
@@ -57,3 +64,13 @@ block content
     div#notifications.content-module.side
       div.sub-heading.notification Notification #1
       div.sub-heading.notification Notification #2
+
+
+block footer-scripts
+  script
+    Bitponics.user = !{JSON.stringify(user)}
+
+  script(src='/assets/js/libs/jquery/jquery.maphilight.min.js')
+  script(src='/assets/js/libs/jquery/jquery.timezone-picker.js')
+  //script(src='/assets/js/libs/jquery/jquery.timezone-picker.min.js')
+  script(src='/assets/js/profile.js')
