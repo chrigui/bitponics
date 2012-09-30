@@ -173,7 +173,7 @@ Bitponics.pages.dashboard = {
                                 
                                 $.ajax({
                                     type: 'POST',
-                                    url: '/api/grow_plan_instances/' + Bitponics.user.currentGrowPlanInstance.id + '/action_logs',
+                                    url: '/api/grow_plan_instances/' + Bitponics.user.currentGrowPlanInstance.id + '/action_override_logs',
                                     data: { actionId: actionId },
                                     success: function(data){
                                         $this.find('.loader').remove();

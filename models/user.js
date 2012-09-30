@@ -101,6 +101,21 @@ UserSchema.virtual('locale.full')
 		this.set('locale.territory', territory || '');
 	});
 
+/**
+ *  Get the current timezone offset from UTC time. This can't be a static
+ *  value since offsets change with daylight savings and stuff. 
+ */
+UserSchema.virtual('timezoneOffset')
+	.get(function(){
+		var now = new Date(),
+			timezoneOffsetString = timezone(now, this.timezone, '%z'),
+			timezoneOffsetDirection = timezoneOffsetString[0],
+			timezoneOffsetHours = parseInt(timezoneOffsetString.substr(1,2), 10),
+			timezoneOffsetMinutes = parseInt(timezoneOffsetString.substr(3,2), 10),
+			timezoneOffset = (timezoneOffsetDirection == '-' ? -1 : 1) * (timezoneOffsetHours * 60 * 60 * 1000) + (timezoneOffsetMinutes * 60 * 1000);
+		return timezoneoffset;
+	});
+
 /************************** STATIC METHODS  ***************************/
 
 UserSchema.static('createUserWithPassword', function(userProperties, password, next){
