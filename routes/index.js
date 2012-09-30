@@ -1,6 +1,7 @@
 var User = require('../models/user').model,
 	winston = require('winston'),
-	passport = require('passport');
+	passport = require('passport'),
+	verificationEmailDomain = 'bitponics.com';
 
 module.exports = function(app){
 
@@ -64,6 +65,8 @@ module.exports = function(app){
 		});
 	});
 
+	
+
 	app.post('/signup', function (req, res, next){
 		User.createUserWithPassword({
 			email: req.param('email')
@@ -92,29 +95,34 @@ module.exports = function(app){
 	app.get('/register', function (req, res, next) {
 	  var UserModel = require('../models/user').model;
 	  if(req.query.verify){ //user coming back to verify account
-	    return UserModel.findOne({ activation_token: req.query.verify }, 
+	    return UserModel.findOne({ activationToken: req.query.verify }, 
 	    	function (err, user) {
 		    	if (err) { return next(err); }
-				if (user && activation_token !== '') {
-					user.active = true;
-					user.save();
-					// TODO : move the render to be a callback to use.save
-					res.render('register', {
-						title: 'Register Success - Active user.',
-						newUser: user
-					});
-				} else {
-					res.render('register', {
-					title: 'Register Failed - No matching token.'
-					});
-				}
+					if (user && user.activationToken !== '') {
+						user.active = true;
+						user.sentEmail = true; //if we get here, this should be true
+						user.save( function(err, user){
+							if (err) { return next(err); }
+							res.render('register', {
+								title: 'Welcome to Bitponics!',
+								message: 'Your registration was successfull.',
+								user: user
+							});
+						});
+					} else {
+						res.render('register', {
+							title: 'Welcome to Bitponics!',
+							message: "There was an error validating your account. Please sign up again."
+						});
+					}
 	    	}
     	);
 	  } else { //user just signed up
 	    winston.info('req.user:');
 	    winston.info(req.user);
 	    res.render('register', {
-	      title: 'Thanks for signing up. Check your email.'
+	      title: 'Register',
+	      message: 'Thanks for signing up. Check your email.'
 	    });
 	  }
 	});
@@ -131,6 +139,8 @@ module.exports = function(app){
 	require('./setup')(app);
 	require('./styleguide')(app);
 	require('./profile')(app);
+	require('./growplans')(app);
+	require('./reset')(app);
 
 	// The call to app.use(app.router); is to position the route handler in the middleware chain.
 	// Everything afterward is assumed to have not matched a route.

@@ -1,0 +1,44 @@
+extends layout
+
+block content
+
+  section#header
+    header#logo(role="banner") 
+      img(src="/img/leaf-new-green.png", width="15%")
+
+    div#setup.select-block
+      h2.main-heading #{title}
+      //h3.sub-heading
+    div#user.select-block
+      h2.main-heading User
+      h3.sub-heading
+          if user.name.full != 'undefined undefined' && user.name.full != ''
+           | #{user.name.full}
+          else
+           | #{user.email}
+
+  section#main(role="main")
+    div.content-module.middle
+      
+      if typeof(message) != 'undefined'
+        h3.main-heading
+          #{message}
+
+      h4.sub-heading
+        a(href="./newgrowplan") Create a new grow plan
+      
+      h4.sub-heading Or choose from existing grow plans.
+        ul
+          li
+            h5 Grow Plan 1
+            p description
+          li 
+            h5 Grow Plan 2
+          li 
+            h5 Grow Plan 3
+          li 
+            h5 Grow Plan 4
+
+
+  section#footer
+    

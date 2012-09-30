@@ -1,18 +1,33 @@
 extends layout
 
 block content
-  .stackContent
-    h1(class="h1") Register your account by verifying your email address.
+  
+  section#header
+      header#logo(role="banner") 
+        img(src="/img/leaf-new-green.png", width="15%")
 
-  - if ('undefined' !== typeof errors && errors.length)
-    .stackContent
-      ul#errors
-        - each error in errors
-          li.error= error
+      div#setup.select-block
+        h2.main-heading #{title}
+        //h3.sub-heading
+      div#user.select-block
+        - if (!user || !user.id)
+          //- h2.main-heading Welcome
+          //- h3.sub-heading
+          //-   a(href="/signup") Sign up
+          //-   <br>
+          //-   a(href="/login") Log in
+        - else
+          h2.main-heading Hi, 
+            //- if user.name.full && user.name.full != ''
+            //-  | #{user.name.full}
+            //- else
+            | #{user.email}
+          //- h3.sub-heading
+          //-     a(href='/logout') Logout
 
-  - else
-    h2 #{'undefined' !== typeof newUser}
-    - if ('undefined' !== typeof newUser)
-      h2 #{newUser.id} - #{title}
-    - else
-      h2 Error - #{title}
+  section#main(role="main")
+    div.content-module.middle
+      h3.sub-heading #{message}
+
+
+  section#footer
