@@ -12,7 +12,7 @@ block content
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
-          if user.name.full != ''
+          if user.name.full != 'undefined undefined' && user.name.full != ''
            | #{user.name.full}
           else
            | #{user.email}

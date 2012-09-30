@@ -38,13 +38,15 @@ module.exports = function(app){
 		  	sms: req.body.notifications_sms
 		  };
 
+		  var locals = {
+		  	title : 'Profile - Updated',
+				className : 'profile',
+				user: user
+		  }
+
 	    user.save(function (err) {
 	      if (err) { return next(err); }
-      	res.render('profile', {
-					title : 'Profile - Updated',
-					className : 'profile',
-					user: user
-				});
+      	res.render('profile', locals);
 	    });
 	  });
 	});
