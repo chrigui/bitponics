@@ -4,7 +4,12 @@ var mongoose = require('mongoose'),
   	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId,
-  	DeviceTypeModel = require('./deviceType').model;
+  	DeviceTypeModel = require('./deviceType').model,
+  	ActionOverrideLogModel = require('./actionOverrideLog').model,
+  	ActionUtils = require('./action').utils;
+
+
+/***************** SCHEMA **********************/
 
 var DeviceSchema = new Schema({
 	deviceId: { type: String, required: true, unique: true }, //mac address
@@ -46,7 +51,6 @@ var DeviceSchema = new Schema({
 	 *  Cache of the active phase actions for this device. Right now it's
 	 *  refreshed inside of /api/device/:id/cycles
 	 *  
-
 	 */
 	activeActions : {
 		actions : [{type: ObjectId, ref: 'Action'}],
@@ -55,15 +59,16 @@ var DeviceSchema = new Schema({
 		expires : Date,
 		deviceRefreshRequired : { type: Boolean, default: true }
 	},
+
 	/**
-	 * activeActionOverrides are any automatically or manually triggered actions. 
+	 * activeActionsOverride are any automatically or manually triggered actions. 
 	 * They override the phase cycles until they expire.
 	 * 
-	 *  If expired, it's refreshed inside refresh_status
+	 * If expired, it's refreshed inside refresh_status
 	 */
-	activeActionOverrides : {
-		actions: [{type: ObjectId, ref: 'Action'}],
-		deviceMessage : String,
+	activeActionsOverride : {
+		actionOverrideLogs: [{ type: ObjectId, ref: 'ActionOverrideLog'}],
+		deviceMessage : { type : String },
 		lastSent: Date,
 		expires : Date
 	}
@@ -71,12 +76,118 @@ var DeviceSchema = new Schema({
 
 DeviceSchema.plugin(useTimestamps);
 
+/***************** END SCHEMA PROPERTIES **********************/
+
+
 /**
- * Add indexes. Probably wise to do it here after all the fields have been added
+ * Add indexes. Do it here after all the fields have been added
  *
  */
 
 
+
+/************** INSTANCE METHODS ************************/
+
+/**
+ * Remove expired actions & update deviceMessage & expires times. 
+ * Saves the model at the end.
+ */
+DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
+	var device = this,
+		now = new Date();
+  	  	
+  	ActionOverrideLogModel
+  	.find({ gpi : device.activeGrowPlanInstance })
+  	.where('expires').gt(now)
+  	.sort('-timeRequested')
+  	.populate('action')
+  	.exec(function(err, actionOverrideLogResults){
+  		if (err) { return callback(err);}
+
+  		var conflictingActionOverrideIds = [],
+  			conflictingActionOverrideIndices = [],
+  			existingActionOverrideControls = {},
+  			soonestActionOverrideExpiration = now + (365 * 24 * 60 * 60 * 1000),
+  			deviceMessage = '',
+  			cycleTemplate = DeviceUtils.cycleTemplate;
+
+  		// first, ensure that the results are clean. results are sorted by 
+  		// descending timeRequested, so the last ones in take precedence. 
+  		// eliminate conflicts by expiring them.
+  		actionOverrideLogResults.forEach(function(actionOverrideLog, index){
+  			if (existingActionOverrideControls[actionOverrideLog.action.control]){
+  				conflictingActionOverrideIds.push(actionOverrideLog._id);
+  				conflictingActionOverrideIndices.push(index);
+  				return;
+  			}
+  			
+  			existingActionOverrideControls[actionOverrideLog.action.control] = true;
+  			
+  			if (actionOverrideLog.expires < soonestActionOverrideExpiration) { 
+  				soonestActionOverrideExpiration = actionOverrideLog.expires;
+  			}
+  		});
+
+  		if (conflictingActionOverrideIds.length > 0){
+  			ActionOverrideLogModel.update({_id : {$in: conflictingActionOverrideIds}}, { expires : now - 1000 }).exec();	
+
+  			conflictingActionOverrideIndices.forEach(function(indexToRemove, index){
+			  	// since we're removing elements from the target array as we go,
+			  	// the indexToRemove will be off by however many we've removed so far
+			  	indexToRemove -= index;
+		  		actionOverrideLogResults.splice(indexToRemove, 1);
+		  	});
+  		}
+
+		// ok, now we're clean.
+		// replace device.activeActionsOverride.actionOverrideLogs with the result set
+  		device.activeActionsOverride.actionOverrideLogs = actionOverrideLogResults;//.map(function(actionOverrideLog){return actionOverrideLog._id;});
+
+  		// generate new device message. compare with current deviceMessage.
+  		device.controlMap.forEach(
+          function(controlOutputPair){
+            var thisCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
+                controlActionOverrideLog = actionOverrideLogResults.filter(function(actionOverrideLog){ return actionOverrideLog.action.control.equals(controlOutputPair.control);})[0],
+                controlAction;
+              
+            // Need an entry for every control, even if there's no associated cycle
+            if (!controlActionOverrideLog){ 
+              // if no action, just 0 everything out
+              thisCycleString = thisCycleString.replace(/{override}/, '0');
+              thisCycleString = thisCycleString.replace(/{offset}/, '0');
+              thisCycleString = thisCycleString.replace(/{value1}/, '0');    
+              thisCycleString = thisCycleString.replace(/{duration1}/, '0');    
+              thisCycleString = thisCycleString.replace(/{value2}/, '0');    
+              thisCycleString = thisCycleString.replace(/{duration2}/, '0');     
+            } else {
+    		  controlAction = controlActionOverrideLog.action;
+              thisCycleString = thisCycleString.replace(/{override}/, '1');
+              // overrides are assumed to be immediate actions, so offset will always be 0
+              thisCycleString = thisCycleString.replace(/{offset}/, '0');
+              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;  
+            }
+            deviceMessage += thisCycleString;  
+          }
+        );  
+  		
+  		if (device.activeActionsOverride.deviceMessage == deviceMessage){
+  			return callback();
+  		}
+
+		device.activeActionsOverride.deviceMessage = deviceMessage;
+		device.activeActionsOverride.lastSent = null;
+		device.activeActionsOverride.expires = soonestActionOverrideExpiration;
+		device.activeActions.deviceRefreshRequired = true;
+
+		device.save(callback);
+  		
+  	});
+});
+/**************** END INSTANCE METHODS ****************************/
+
+
+
+/***************** MIDDLEWARE **********************/
 
 /**
  *  HACK : if DeviceType is unassigned, assign it the 'Bitponics Beta Device 1' DeviceType
@@ -142,10 +253,16 @@ DeviceSchema.pre('save', function(next){
 	next();
 });
 
-var deviceUtils = {
+/***************** END MIDDLEWARE **********************/
+
+
+
+/***************** UTILS **********************/
+var DeviceUtils = {
 	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
 };
+/***************** END UTILS **********************/
 
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);
-exports.utils = deviceUtils;
+exports.utils = DeviceUtils;

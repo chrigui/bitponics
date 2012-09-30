@@ -1,7 +1,10 @@
 var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
-    winston = require('winston');
+    ActionOverrideLogModel = require('../../models/actionOverrideLog').model,
+    ActionUtils = require('../../models/action').utils,
+    winston = require('winston'),
+    async = require('async');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -158,7 +161,7 @@ module.exports = function(app) {
       actionId
    }
 
-   jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/action_logs", 
+   jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/action_override_logs", 
     { 
       actionId: "505d551372b1680000000059"
     }, 
@@ -166,7 +169,7 @@ module.exports = function(app) {
       console.log("Post resposne:"); console.dir(data); console.log(textStatus);                                        
     });
    */
-  app.post('/api/grow_plan_instances/:id/action_logs', function (req, res, next){
+  app.post('/api/grow_plan_instances/:id/action_override_logs', function (req, res, next){
     return GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
@@ -178,23 +181,67 @@ module.exports = function(app) {
         if (err) { return next(err);}
         if (!action) { return next(new Error('Invalid action id'));}
 
-        // Create a new actionLog subdoc
-        // Persist it to the GPI
-        // If it's an action that has a control that the device has:
-        //   - expire the Device's activeActions
-        //   - Do something with Device.activeActionOverrides. 
-        var actionLog = {
-          timeRequested : (req.body.timeRequested ? new Date(req.body.timeRequested) : Date.now()),
-          action : action
-        };
+        // calculate when the actionOverride should expire.
         
-        growPlanInstance.actionLogs.push(actionLog);
+        var now = new Date(),
+            expires = now + (365 * 24 * 60 * 60 * 1000);
+    
+
+        async.series([
+            function(callback){
+              if (!action.control){ return callback(); }
+
+              // get any other actions that exist for the same control.
+              var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
+              
+              var activeActions = ActionModel.findOne()
+                .where('_id')
+                .in(growPlanInstance.device.activeActions.actions)
+                .where('control')
+                .equals(action.control)
+                .exec(function(err, actionResult){
+                  if (err) { return callback(err);}
+                  if (!actionResult){ return callback(); }
+                  var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, req.user.timezone);      
+                  expires = now.valueOf() + cycleRemainder;
+                  return callback();  
+                });
+            }
+          ],
+          function(err, result){
+            if (err) { return next(err); }
+            var actionLog = new ActionOverrideLogModel({
+              gpi : growPlanInstance._id,
+              timeRequested : (req.body.timeRequested ? new Date(req.body.timeRequested) : Date.now()),
+              action : action,
+              expires : expires
+            });
+            
+            // push the log to ActionOverrideLogModel
+            actionLog.save(function(err){
+              if (err){ return next(err); }
+              if (growPlanInstance.device){
+                growPlanInstance.device.refreshActiveActionsOverride(function(err){
+                  if (err) { return next(err); }
+                  return res.send('success');
+                });
+              }
+            });
+          });
+        
+        
+        
+
+        /*
+        //growPlanInstance.actionLogs.push(actionLog);
         growPlanInstance.save(function(err){
           if (err) { return next(err);}
 
           // HACK : instead of figuring out how to properly remove
           // actions from the override list, 
           growPlanInstance.device.activeActionOverrides.actions = [action];
+          // rules for removing actions from override list:
+          // 1. remove if its control value conflicts with the most recently pushed action
           
           // HACK: Another hack. We should actually set the expires to a future date,
           // whenever the next overrideAction should expire.
@@ -206,6 +253,8 @@ module.exports = function(app) {
             return res.send('success');
           });
         });
+
+        */
       });
     });
   });
