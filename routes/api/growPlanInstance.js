@@ -189,7 +189,7 @@ module.exports = function(app) {
 
         async.series([
             function(callback){
-              if (!action.control){ return callback(); }
+              if (!action.control || !growPlanInstance.device){ return callback(); }
 
               // get any other actions that exist for the same control.
               var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
@@ -227,34 +227,8 @@ module.exports = function(app) {
                 });
               }
             });
-          });
-        
-        
-        
-
-        /*
-        //growPlanInstance.actionLogs.push(actionLog);
-        growPlanInstance.save(function(err){
-          if (err) { return next(err);}
-
-          // HACK : instead of figuring out how to properly remove
-          // actions from the override list, 
-          growPlanInstance.device.activeActionOverrides.actions = [action];
-          // rules for removing actions from override list:
-          // 1. remove if its control value conflicts with the most recently pushed action
-          
-          // HACK: Another hack. We should actually set the expires to a future date,
-          // whenever the next overrideAction should expire.
-          // But instead we're going to take advantage of /device/id/cycles refresh_status
-          // logic of regenerating .deviceMessage string if expires is expired
-          growPlanInstance.device.activeActionOverrides.expires = Date.now() - 1000;
-          growPlanInstance.device.save(function(err){
-            if (err) { return next(err);}
-            return res.send('success');
-          });
-        });
-
-        */
+          }
+        );
       });
     });
   });
