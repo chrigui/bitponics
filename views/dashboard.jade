@@ -114,6 +114,8 @@ block footer-scripts
     controls = '[]'
   - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
     currentGrowPlanInstancePhases = '[]'
+  - if (typeof(currentGrowPlanInstance) == 'undefined')
+    currentGrowPlanInstance = { "_id": null }
 
   script
     Bitponics.user = {

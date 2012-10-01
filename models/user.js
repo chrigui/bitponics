@@ -44,6 +44,7 @@ UserSchema = new Schema({
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
+  resetToken : { type : String, default : '' },
   sentEmail : { type: Boolean, default: false },
   notificationPreferences: {
   	email: { type: Boolean, default: true },
@@ -121,15 +122,15 @@ UserSchema.static('createUserWithPassword', function(userProperties, password, n
 	var newUser = new User(userProperties);
 
 	bcrypt.genSalt(10, function(err, salt) {
-    	if (err) { return next(err); }
-    	newUser.salt = salt;
-    	
-    	bcrypt.hash(password, salt, function(err, hash) {
-    		if (err) { return next(err); }
+  	if (err) { return next(err); }
+  	newUser.salt = salt;
+  	
+  	bcrypt.hash(password, salt, function(err, hash) {
+  		if (err) { return next(err); }
 
-      		newUser.hash = hash;
+    		newUser.hash = hash;
 
-      		newUser.save(function(err) {
+    		newUser.save(function(err) {
 		      if (err) { return next(err); }
 		      next(null, newUser);
 		    });
@@ -267,18 +268,18 @@ UserSchema.pre('save', function(next, done){
 		var smtpTransport = nodemailer.createTransport("SMTP",{
 		    service: "Gmail",
 		    auth: {
-		        user: "jack@bitponics.com",
-		        pass: "voonhyvenvlyfonq" //app specific password on jack's account
+		        user: "accounts@bitponics.com",
+		        pass: "8bitpass"
 		    }
 		});
 
 		// setup e-mail data with unicode symbols
 		var mailOptions = {
-		    from: "Bitponics ✔ <jack@bitponics.com>", // sender address
+		    from: "Bitponics <accounts@bitponics.com>", // sender address
 		    to: user.email, // can be list of receivers
-		    subject: "Hello ✔", // Subject line
-		    text: "Hello world ✔", // plaintext body
-		    html: '<b>Hello world ✔</b><p><a href="' + verifyUrl + '">Verify</a></p>' // html body
+		    subject: "Bitponics Accounts", // Subject line
+		    text: "Welcome to Bitponics!", // plaintext body
+		    html: '<b>Welcome to the Bitponics Beta!</b><p><a href="' + verifyUrl + '">Verify your account.</a></p>' // html body
 		}
 
 		// send mail with defined transport object
@@ -288,11 +289,14 @@ UserSchema.pre('save', function(next, done){
 	        // if you don't want to use this transport object anymore, uncomment following line
 		    smtpTransport.close(); // shut down the connection pool, no more messages
 
-	        user.sentEmail = true;
-		    user.save(function(err){
-		    	if (err) { return done(err); }
-		    	return done();
-		    });
+	      user.sentEmail = true;
+	      console.log('user in sendMail callback: ');
+	      console.log(user);
+		    done();
+		    // user.save(function(err){
+		    // 	if (err) { return done(err); }
+		    // 	return done();
+		    // });
 		});
 	});
 });

@@ -71,7 +71,9 @@ module.exports = function(app){
 								.exec(callback);
 
 							} else {
-								res.render('dashboard', undefined);
+								//res.render('dashboard', undefined);
+								req.flash("info", "It looks like you haven't set up any grow plans yet.");
+								res.redirect('/growplans');
 							}
 						}
 					);

@@ -9,7 +9,8 @@ var connect    = require('connect'),
 	mongoose   = require('mongoose'),
 	passport   = require('passport'),
 	csv        = require('express-csv'),
-	winston    = require('winston');
+	winston    = require('winston'),
+	flash      = require('connect-flash');
 
 module.exports = function(app){
 	
@@ -74,6 +75,9 @@ module.exports = function(app){
 	  app.use(express.cookieParser()); 
 	  app.use(express.session({ secret: 'somethingrandom'}));
 	  
+	  //flash messages are separate as of express 3
+	  app.use(flash());
+
 	  mongoose.connect(app.config.mongoUrl);
 	  app.use(passport.initialize());
  	  app.use(passport.session());

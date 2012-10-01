@@ -29,6 +29,6 @@
     	, "express-csv" : ">=0.4.1"
     	, "winston" : ">= 0.6.2"
     	, "winston-loggly" : ">= 0.6"
-    	
+    	, "connect-flash" : ">= 0.1.0"
 	}
 }
