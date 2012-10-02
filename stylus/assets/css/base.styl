@@ -5,10 +5,9 @@
 @import "./global/colors"
 
 body
-	margin: 0;
+	margin: .5em;
 	color: #333
 	font 112.5%/1.5 Helvetica, Arial, sans-serif
-	margin 0 auto
 	background color-global-background
 
 * 
@@ -168,6 +167,14 @@ div, p, span, a, a:visited, a:hover, a:active
 /*
  * headings
  */
+#logo
+	position absolute
+	top 0
+	left 0
+	img
+		width 5em
+		padding .5em
+
 .main-heading
 	color color-light-green
 	margin .5em 0
@@ -178,7 +185,11 @@ div, p, span, a, a:visited, a:hover, a:active
 	font-weight bold
 .select-block
 	line-height 1.66em
-	padding 0 .83em
+	padding 0
+	margin 1em 0
+	text-align right
+
+	
 	.main-heading, .sub-heading
 		@extends .ellipsis
 		margin 0
@@ -207,6 +218,33 @@ div, p, span, a, a:visited, a:hover, a:active
 	div
 		//
 	
+
+.btn
+	@extends .display-ib
+	padding 1em
+	margin 1em
+	background color-medium-green
+	color white
+	cursor pointer
+
+	&:hover
+		background color-medium-green
+		color white
+	&:active
+		background lighten(color-medium-green, 10%)
+		color white
+
+	& *
+		@extends .display-ib
+		margin 0
+
+	&.sub
+		background color-light-green
+
+	&.clear
+		display block
+		clear both
+		margin 0
 
 /*
  * Visualizer
@@ -295,7 +333,7 @@ section#footer
 
 
 /*
- * Dashboard
+ * Dashboard Page
  */
 .dashboard
 	.content-module
@@ -303,11 +341,34 @@ section#footer
 			position relative
 			padding 100% 0 0 0 //must match container width
 			height 0
+	select
+		margin 0
+
 
 /*
- * Profile
+ * Profile Page
  */
 .profile
 	.content-module
 		&.middle
 			//
+
+
+/*
+ * Grow Plans Page
+ */
+.growplans
+	.sub-heading
+		.btn
+			margin-left 0
+	#main
+		ul
+			list-style none
+			padding 0
+
+			li
+				margin 1em 0
+
+				.btn
+					margin 0
+

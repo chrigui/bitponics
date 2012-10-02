@@ -6,7 +6,7 @@
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,.data-module{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,body,margin 0,.data-module{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -39,6 +39,7 @@
 .hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
 .screen-reader-text{position:absolute;top:-9999px;left:-9999px}
 .ellipsis{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.overflow{overflow:auto}
 .circle{text-align:center;border-radius:50em;}
 .circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
 .select-block{overflow:hidden;}
@@ -46,15 +47,20 @@
 .select-block select:focus{outline:none;border:none}
 .content-module{float:left;}
 .content-module.side{width:100%;margin:2em 0 0 0}
-.data-module{width:50%;margin:.125em -2px}
+body,margin 0,.data-module{width:50%;margin:.125em -2px}
+.select-block{padding:0 .83em;text-align:left}
 section#header,section#main,section#footer{padding:1em}
-section#main{padding:6em 1em 1em;}
-section#main #visualizer div.circle{top:1.5em;left:1.5em;bottom:1.5em;right:1.5em}
-section#main #controls,section#main #reminders{float:right}
 #logo,#setup,#user{float:left;width:25%}
 #setup{width:35%;margin-right:10%}
 #user{padding:0}
+#logo{position:static}
 .dashboard .content-module.middle{width:100%;padding:100% 0 0 0;border:0 none;clear:both}
+.dashboard section#main{padding:6em 1em 1em;}
+.dashboard section#main #visualizer div.circle{top:1.5em;left:1.5em;bottom:1.5em;right:1.5em}
+.dashboard section#main #controls,.dashboard section#main #reminders{float:right}
+.growplans #main ul{list-style:none;padding:0;}
+.growplans #main ul li{float:left;width:24%;margin:1em 5% 1em 0;}
+.growplans #main ul li .btn{margin:0}
 @media screen and (min-width: 60em){.content-module{float:left;}
 .content-module.side{width:20%}
 .data-module{width:100%;margin:.125em 0}

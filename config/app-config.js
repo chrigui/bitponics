@@ -20,8 +20,6 @@ module.exports = function(app){
 	 * & guaranteeing that their middleware executes after this is all set up
 	 */
 	app.configure(function(){
-	  
-	  
 
 	  app.use(stylus.middleware({
 		    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
@@ -122,6 +120,20 @@ module.exports = function(app){
 					return connect.basicAuth('bitponics', '8bitpass')(req, res, next);	
 	    		}
 	    	});
+
+	    	//we probably want to do something like this on heroku:
+	    	//redirect to https
+				// app.use(function(req, res, next) {
+				// 		//this is only present on heroku
+				//     var schema = req.headers["x-forwarded-proto"];
+				 		
+				//     if (schema === "https")
+				//         return next();
+				 		
+				//     res.redirect("https://" + req.headers.host + req.url);
+				// });
+
+
 	      	break;
 	}
 
