@@ -16,31 +16,22 @@
 		margin 2em 0 0 0
 	&.middle
 		//
-
+body
+ margin 0
+ 
 .data-module
 	@extends .display-ib
 	width 50%
 	margin 0.125em -2px //TODO: might need to be more flexible
 
+.select-block
+	padding 0 .83em
+	text-align left
 
 section#header,
 section#main,
 section#footer
 	padding 1em
-
-section#main
-	padding 6em 1em 1em
-
-	#visualizer
-		div.circle
-			top 1.5em
-			left 1.5em
-			bottom 1.5em
-			right 1.5em
-			
-
-	#controls, #reminders
-		float right
 			
 
 #logo,
@@ -54,6 +45,13 @@ section#main
 #user
 	padding 0
 
+#logo
+	position static
+	
+
+/*
+ * Dashboard Page
+ */
 .dashboard
 	.content-module
 		&.middle
@@ -61,6 +59,38 @@ section#main
 			padding 100% 0 0 0 //must match container width
 			border 0 none
 			clear: both
+	section#main
+		padding 6em 1em 1em
+
+		#visualizer
+			div.circle
+				top 1.5em
+				left 1.5em
+				bottom 1.5em
+				right 1.5em
+				
+
+		#controls, #reminders
+			float right
+
+/*
+ * Grow Plans Page
+ */
+.growplans
+	#main
+		ul
+			list-style none
+			padding 0
+
+			li
+				float left
+				width 24%
+				margin 1em 5% 1em 0
+
+				.btn
+					margin 0
+
+
 
 @media screen and (min-width: 60em)
 	/*body

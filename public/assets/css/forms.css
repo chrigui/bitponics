@@ -4,4 +4,4 @@ input{margin-top:0;background:#fff;border:1px solid #24d321;padding:.5em}
 input:valid,textarea:valid,input:invalid,textarea:invalid{background:#fff}
 input[type=submit]{background:#24d321;color:#fff;border:none}
 button{background:#fff;color:#24d321}
-select{display:block;margin:.5em}
+select{display:block;margin:.5em 0 0;max-width:14em}

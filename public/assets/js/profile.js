@@ -4,10 +4,13 @@ Bitponics.pages.profile = {
 
     init: function() {
         $('#timezone-image').timezonePicker({
-          target: 'locale_timezone',
-          countryTarget: 'country_timezone'
+          target: '#country_timezone',
+          countryTarget: '#locale_timezone'
         });
         this.initEventHandlers();
+
+        $('#country_timezone').val(Bitponics.user.timezone);
+        $('#locale_timezone').val(Bitponics.user.locale.territory);
     },
 
     initEventHandlers: function() {

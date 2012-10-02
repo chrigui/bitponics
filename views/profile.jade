@@ -31,7 +31,8 @@ block content
         input(id="lastname", name="lastname", type="text", value="#{user.name.last}")
 
         label(for="locale_timezone", class="display-i") Locale
-        button(id="detect", class="display-i") Detect
+        //not working
+        //button(id="detect", class="display-i") Detect
         include misc/timezone_select_html
         include misc/timezone_country_select_html
 
@@ -56,14 +57,6 @@ block content
         label(class="display-i", for="notifications_sms") SMS
 
         input(type="submit", value="Save Profile")
-
-  section#footer
-    div#date.content-module.side
-      div.date.main-heading October 17, 2012
-      div.time.sub-heading 3:23 PM
-    div#notifications.content-module.side
-      div.sub-heading.notification Notification #1
-      div.sub-heading.notification Notification #2
 
 
 block footer-scripts

@@ -71,7 +71,7 @@ module.exports = function(app){
 								.exec(callback);
 
 							} else {
-								//res.render('dashboard', undefined);
+								//TODO: flash is now a separate lib as of express 3 so get connect-flash working
 								req.flash("info", "It looks like you haven't set up any grow plans yet.");
 								res.redirect('/growplans');
 							}

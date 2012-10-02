@@ -23,7 +23,8 @@ module.exports = function(app){
 	    	'first' : req.body.firstname,
 	    	'last' : req.body.lastname
 	    };
-	    user.locale = req.body.locale;
+	    user.locale.territory = req.body.locale_timezone;
+	    user.timezone = req.body.country_timezone;
 	    user.phone = req.body.phone;
 	    // user.address = {
 	    // 	line1 : req.body.addressline1,
@@ -39,7 +40,7 @@ module.exports = function(app){
 		  };
 
 		  var locals = {
-		  	title : 'Profile - Updated',
+		  	title : 'Profile',
 				className : 'profile',
 				user: user
 		  }
