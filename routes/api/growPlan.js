@@ -36,9 +36,6 @@ module.exports = function(app) {
    *    "description": "Herbs on a raft.",
    *    "plants": ["basil", "rosemary", "dill", "swiss chard"],
    *    "expertiseLevel": "expert",
-   *    "growSystem": "",
-   *    "growMedium": "",
-   *    "nutrients": "",
    *    "sensors": "",
    *    "controls": "",
    *    "phases": ""
@@ -57,9 +54,6 @@ module.exports = function(app) {
       description: req.body.description,
       plants: req.body.plants,
       expertiseLevel: req.body.expertiseLevel,
-      growSystem: req.body.growSystem,
-      growMedium: req.body.growMedium,
-      nutrients: req.body.nutrients,
       sensors: req.body.sensors,
       controls: req.body.controls,
       phases: req.body.phases
