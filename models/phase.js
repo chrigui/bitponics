@@ -16,6 +16,10 @@ var PhaseSchema = new Schema({
 	
 	light: { type: ObjectId, ref: 'Light', required: false },
 	
+	growSystem: { type: ObjectId, ref: 'GrowSystem' },
+	
+	growMedium: { type: String },
+
 	actions: [{ type: ObjectId, ref: 'Action', required: true }],
 	
 	idealRanges: [{ type: ObjectId, ref: 'IdealRange', required: false }],

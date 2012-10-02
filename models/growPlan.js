@@ -17,8 +17,11 @@ var GrowPlanSchema = new Schema({
 		'intermediate',
 		'expert'
 	]},
-	growSystem: { type: ObjectId, ref: 'GrowSystem' },
-	growMedium: { type: String },
+	
+	/**
+	 * Nutrients would just be a de-normalized view of the nutrients across the 
+	 * phases. TODO:  decide if we need it as a property here
+	 */
 	nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
 	sensors: [{ type: ObjectId, ref: 'Sensor' }],
 	controls: [{ type: ObjectId, ref: 'Control'}],

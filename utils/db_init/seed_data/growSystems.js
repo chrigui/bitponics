@@ -3,7 +3,7 @@ module.exports = [
 			name: "Drip",
 			description: "Drip system.",
 			type: "deep water culture (DWC)",
-			reservoirSize: 5, //gallons?
+			reservoirSize: 5, //gallons
 			numberOfPlants: 6
 		},
 		{
@@ -26,5 +26,12 @@ module.exports = [
 			type: "deep water culture (DWC)",
 			reservoirSize: 5,
 			numberOfPlants: 6
+		},
+		{
+			name: "Egg-carton seed starter",
+			description: "Seed-starting system made with a plastic egg carton. For full directions on how to make one, go here: http://bitponics.com/guides/water-culture-system",
+			type: "deep water culture (DWC)",
+			reservoirSize: .1,
+			numberOfPlants: 12
 		}
 	];
