@@ -83,18 +83,20 @@ module.exports = function(app){
 					activeIdealRanges = activePhase.idealRanges;
 					activeActions = activePhase.actions;
 
-					// get the actions that have a corresponding control in the associated device
-					activeActions.forEach(function(activeAction){
-						if (!activeAction.control){ return; }
-						var controlMapEntry = currentGrowPlanInstance.device.controlMap.filter(
-							function(controlMapEntry){
-								return (controlMapEntry.control.equals(activeAction.control));
-							});
-						controlMapEntry = (controlMapEntry.length > 0 ? controlMapEntry[0] : undefined);
-						if (controlMapEntry){
-							activeControlActions.push(activeAction);
-						}
-					});
+					if (currentGrowPlanInstance.device){
+						// get the actions that have a corresponding control in the associated device
+						activeActions.forEach(function(activeAction){
+							if (!activeAction.control){ return; }
+							var controlMapEntry = currentGrowPlanInstance.device.controlMap.filter(
+								function(controlMapEntry){
+									return (controlMapEntry.control.equals(activeAction.control));
+								});
+							controlMapEntry = (controlMapEntry.length > 0 ? controlMapEntry[0] : undefined);
+							if (controlMapEntry){
+								activeControlActions.push(activeAction);
+							}
+						});
+					}
 					callback();
 				}
 			],
@@ -111,20 +113,22 @@ module.exports = function(app){
 				};
 
 
-				activeControlActions.forEach(function(controlAction){
-					var control = controls.filter(function(item){return item._id.equals(controlAction.control);})[0];
-					// HACK : pretending there cannot be more than one controlAction per control. probably a good assumption but it's not yet enforced anywhere
-					locals.controls[control.name] = {
-						name: control.name,
-						className : control.name.replace(/\s/g,'').toLowerCase(),
-						id : control._id, // TODO : decide whether to make this a friendly id
-						action : {
-							description : controlAction.description,
-							cycle : controlAction.cycle,
-							cycleString : ActionUtils.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states).cycleString
-						}
-					};
-				});
+				if (currentGrowPlanInstance.device){
+					activeControlActions.forEach(function(controlAction){
+						var control = controls.filter(function(item){return item._id.equals(controlAction.control);})[0];
+						// HACK : pretending there cannot be more than one controlAction per control. probably a good assumption but it's not yet enforced anywhere
+						locals.controls[control.name] = {
+							name: control.name,
+							className : control.name.replace(/\s/g,'').toLowerCase(),
+							id : control._id, // TODO : decide whether to make this a friendly id
+							action : {
+								description : controlAction.description,
+								cycle : controlAction.cycle,
+								cycleString : ActionUtils.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states).cycleString
+							}
+						};
+					});
+				}
 
 				sensors.forEach(function(sensor){
 					locals.sensors[sensor.code] = {
@@ -171,8 +175,6 @@ module.exports = function(app){
 						}
 					});
 				});
-				
-				
 				
 
 				locals.title = 'Bitponics - Dashboard';

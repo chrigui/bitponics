@@ -617,6 +617,9 @@ async.series([
 				name: _data.name,
 				expectedNumberOfDays: _data.expectedNumberOfDays,
 				light: eval(_data.light),
+				growSystem: eval(_data.growSystem),
+				growMedium: _data.growMedium,
+				nutrients: _data.nutrients.map(function(item){ return eval(item) }),
 				actions: actions,
 				idealRanges: idealRanges
 			});
@@ -657,9 +660,6 @@ async.series([
 				description: _data.description,
 				plants: _data.plants,
 				expertiseLevel: _data.expertiseLevel,
-				growSystem: eval(_data.growSystem),
-				growMedium: _data.growMedium,
-				nutrients: _data.nutrients.map(function(item){ return eval(item) }),
 				sensors: _data.sensors.map(function(item){ return eval(item) }),
 				controls: _data.controls.map(function(item){ return eval(item) }),
 				phases: _data.phases.map(function(item){ return eval(item) })

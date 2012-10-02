@@ -38,6 +38,9 @@ module.exports = function(app) {
       name: req.body.type,
       expectedNumberOfDays: req.body.expectedNumberOfDays,
       light: req.body.light,
+      growSystem: req.body.growSystem,
+      growMedium: req.body.growMedium,
+      nutrients: req.body.nutrients,
       actions: req.body.actions,
       idealRanges: req.body.idealRanges,
     });
