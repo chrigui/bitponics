@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
  */
 var SensorLogSchema = new Schema({
 	gpi : { type : ObjectId, ref: 'GrowPlanInstance', required: true},
-	timestamp: { type: Date, required: true, default: Date.now },
+	ts: { type: Date, required: true, default: Date.now },
 	logs : [{
 		/**
 		 * sCode references to Sensor.code
@@ -18,7 +18,7 @@ var SensorLogSchema = new Schema({
 	}]
 });
 
-SensorLogSchema.index({ 'gpi timestamp': -1 });
+SensorLogSchema.index({ 'gpi ts': -1 });
 SensorLogSchema.index({ 'logs.sCode': 1 });
 
 

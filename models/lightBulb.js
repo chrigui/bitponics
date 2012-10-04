@@ -5,23 +5,23 @@ var mongoose = require('mongoose'),
 	useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId;
 
-var LightSchema = new Schema({
-	type: { type: String, required: true },
-	watts: { type: Number },
+var LightBulbSchema = new Schema({
+	type: { type : String, required : true },
+	watts: { type : Number },
 	brand : { type : String },
 	name : { type : String }
 });
 
-LightSchema.plugin(useTimestamps);
+LightBulbSchema.plugin(useTimestamps);
 
-LightSchema.suggestions = {
+LightBulbSchema.suggestions = {
 	type: [
 		'fluorescent',
 		'metal halide',
 		'high pressure sodium (HPS)',
 		'LED'
 	]
-}
+};
 
-exports.schema = LightSchema;
-exports.model = mongoose.model('Light', LightSchema);
+exports.schema = LightBulbSchema;
+exports.model = mongoose.model('LightBulb', LightBulbSchema);

@@ -1,7 +1,7 @@
 module.exports = [
 {
 	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364818821,
+	ts: 1347364818821,
 	logs : [
 	{
 		sCode: "ph",
@@ -19,7 +19,7 @@ module.exports = [
 },
 {
 	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364828821,
+	ts: 1347364828821,
 	logs : [
 	{
 		sCode: "ph",
@@ -37,7 +37,7 @@ module.exports = [
 },
 {
 	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364838821,
+	ts: 1347364838821,
 	logs : [
 	{
 		sCode: "ph",
@@ -55,7 +55,7 @@ module.exports = [
 },
 {
 	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364818821,
+	ts: 1347364818821,
 	logs : [
 	{
 		sCode: "ph",
@@ -73,7 +73,7 @@ module.exports = [
 },
 {
 	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364828821,
+	ts: 1347364828821,
 	logs : [
 	{
 		sCode: "ph",
@@ -91,7 +91,7 @@ module.exports = [
 },
 {
 	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364838821,
+	ts: 1347364838821,
 	logs : [
 	{
 		sCode: "ph",

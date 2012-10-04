@@ -40,7 +40,8 @@ var mongoose   = require('mongoose'),
 		nutrients: {},
 		deviceTypes: {},
 		devices: {},
-		lights: {},
+		lightBulbs: {},
+		lightFixtures: {},
 		growSystems: {},
 		controls: {},
 		actions: {},
@@ -126,10 +127,19 @@ async.series([
 					});
 				},
 				function(innerCallback){
-					if (!mongoose.connection.collections['lights']){ return innerCallback();}
-					mongoose.connection.collections['lights'].drop( function(err) {
+					if (!mongoose.connection.collections['lightbulbs']){ return innerCallback();}
+					mongoose.connection.collections['lightbulbs'].drop( function(err) {
 					    if (err){ return innerCallback(err);}
-					    console.log('lights collection dropped');
+					    console.log('lightbulbs collection dropped');
+					    innerCallback();
+					});
+
+				},
+				function(innerCallback){
+					if (!mongoose.connection.collections['lightfixtures']){ return innerCallback();}
+					mongoose.connection.collections['lightfixtures'].drop( function(err) {
+					    if (err){ return innerCallback(err);}
+					    console.log('lightfixtures collection dropped');
 					    innerCallback();
 					});
 
@@ -413,14 +423,6 @@ async.series([
 					c.control = eval(c.control);
 				});
 
-				/*
-				_data.recentSensorLogs.forEach(function(rsl){
-					rsl.logs.forEach(function(sl){
-						sl.sensor = eval(sl.sensor);
-					});
-				});
-				*/
-
 			    var dataObj = new models.device({
 					deviceId: _data.deviceId,
 					deviceType: eval(_data.deviceType),
@@ -456,15 +458,15 @@ async.series([
     },
     function(callback){
         /**
-		 * Lights
+		 * LightBulbs
 		 */
-		var dataType = 'lights',
+		var dataType = 'lightBulbs',
 			dataCount = data[dataType].length;
 
 		console.log('####### ' + dataType + ' #######');
 
 		data[dataType].forEach(function(_data){
-		    var dataObj = new models.light({
+		    var dataObj = new models.lightBulb({
 				type: _data.type,
 				watts: _data.watts,
 				brand: _data.brand,
@@ -478,7 +480,40 @@ async.series([
 		      dataCount--;
 		      
 		      if (!err) {
-		        console.log("created light");
+		        console.log("created lightBulb");
+		      } else {
+		        console.log(err);
+		      }
+
+		    });
+		});
+    },
+    function(callback){
+        /**
+		 * LightFixtures
+		 */
+		var dataType = 'lightFixtures',
+			dataCount = data[dataType].length;
+
+		console.log('####### ' + dataType + ' #######');
+
+		data[dataType].forEach(function(_data){
+		    var dataObj = new models.lightFixture({
+				type: _data.type,
+				watts: _data.watts,
+				brand: _data.brand,
+				name: _data.name,
+				bulbCapacity: _data.bulbCapacity
+			});
+			dataObj.save(function (err, doc) {
+		      savedObjectIds[dataType][_data.name] = doc.id;
+		      if (dataCount === 1) {
+		      	 callback(null, null);
+		      }
+		      dataCount--;
+		      
+		      if (!err) {
+		        console.log("created lightFixture");
 		      } else {
 		        console.log(err);
 		      }
@@ -501,7 +536,7 @@ async.series([
 				description: _data.description,
 				type: _data.type,
 				reservoirSize: _data.reservoirSize,
-				numberOfPlants: _data.numberOfPlants
+				plantCapacity: _data.plantCapacity
 			});
 			dataObj.save(function (err, doc) {
 		      savedObjectIds[dataType][_data.name] = doc.id;
@@ -616,7 +651,11 @@ async.series([
 		    var dataObj = new models.phase({
 				name: _data.name,
 				expectedNumberOfDays: _data.expectedNumberOfDays,
-				light: eval(_data.light),
+				light: {
+					fixture: eval(_data.light.fixture),
+					fixtureQuantity : _data.light.fixtureQuantity,
+					bulb: eval(_data.light.bulb),
+				},
 				growSystem: eval(_data.growSystem),
 				growMedium: _data.growMedium,
 				nutrients: _data.nutrients.map(function(item){ return eval(item) }),
@@ -705,12 +744,6 @@ async.series([
 				});
 				
 			});
-			_data.controlLogs.forEach(function(item){
-				item.logs.forEach(function(log){
-					log.control = eval(log.control);	
-				});
-			});
-
 			//console.log(savedObjectIds);
 			console.log('device ' + _data.device + ' ' + eval(_data.device));
 
@@ -725,9 +758,8 @@ async.series([
 			    active: _data.active,
 				phases: _data.phases,
 				recentSensorLogs: _data.recentSensorLogs,
-				controlLogs: _data.controlLogs,
-				photoLogs: _data.photLogs,
-				genericLogs: _data.genericLogs
+				recentPhotoLogs: _data.recentPhotLogs,
+				recentTagLogs: _data.recentTagLogs
 			});
 
 		    console.log(dataObj);
@@ -773,7 +805,7 @@ async.series([
 			
 		    var dataObj = new models.sensorLog({
 		    	gpi: eval(_data.gpi),
-				timestamp : _data.timestamp,
+				ts : _data.ts,
 				logs : _data.logs
 			});
 

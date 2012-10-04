@@ -38,7 +38,7 @@ module.exports = [
 			],
 			recentSensorLogs: [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "ph",
@@ -55,7 +55,7 @@ module.exports = [
 					]
 				},
 				{
-					timestamp: 1347364828821,
+					ts: 1347364828821,
 					logs : [
 						{
 							sCode: "ph",
@@ -72,7 +72,7 @@ module.exports = [
 					]
 				},
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							sCode: "ph",
@@ -89,28 +89,9 @@ module.exports = [
 					]
 				}
 			],
-			controlLogs: [
+			recentPhotoLogs: [
 				{
-					timestamp: 1347364838821,
-					logs : [
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 1
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						}	
-					]
-				}
-			],
-			photoLogs: [
-				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
@@ -123,9 +104,9 @@ module.exports = [
 					]
 				}
 			],
-			genericLogs: [
+			recentTagLogs: [
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							entry: "Tomatoes are awesome.",
@@ -171,7 +152,7 @@ module.exports = [
 			],
 			recentSensorLogs: [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "ph",
@@ -188,7 +169,7 @@ module.exports = [
 					]
 				},
 				{
-					timestamp: 1347364828821,
+					ts: 1347364828821,
 					logs : [
 						{
 							sCode: "ph",
@@ -205,7 +186,7 @@ module.exports = [
 					]
 				},
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							sCode: "ph",
@@ -222,28 +203,9 @@ module.exports = [
 					]
 				}
 			],
-			controlLogs: [
+			recentPhotoLogs: [
 				{
-					timestamp: 1347364838821,
-					logs : [
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 1
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						}	
-					]
-				}
-			],
-			photoLogs: [
-				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
@@ -256,9 +218,9 @@ module.exports = [
 					]
 				}
 			],
-			genericLogs: [
+			recentTagLogs: [
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							entry: "Tomatoes are awesome.",

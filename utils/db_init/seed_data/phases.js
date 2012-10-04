@@ -3,7 +3,11 @@ module.exports = [
 			name : 'Seedling',
 			description: 'Seedling phase, from planting seeds until first true leaves appear.',
 			expectedNumberOfDays: 10,
-			lightingType: "savedObjectIds['lights']['cfl']",
+			light: {
+				fixture: "savedObjectIds['lightFixtures']['cfl fixture']",
+				fixtureQuantity : 1,
+				bulb : "savedObjectIds['lightBulbs']['cfl']"
+			},
 			growSystem: "savedObjectIds['growSystems']['Egg-carton seed starter']",
 			growMedium: "rockwool",
 			nutrients: [],
@@ -22,7 +26,11 @@ module.exports = [
 			name : 'Vegetative',
 			description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 			expectedNumberOfDays: 28,
-			light: "savedObjectIds['lights']['metal halide']",
+			light: {
+				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixtureQuantity: 1,
+				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+			},
 			growSystem: "savedObjectIds['growSystems']['Drip']",
 			growMedium: "hydroton",
 			nutrients: [
@@ -45,7 +53,11 @@ module.exports = [
 			name : "Blooming",
 			description: "Open-ended blooming phase. After about 7 days, you should begin to see blossoms.",
 			expectedNumberOfDays: 7,
-			light: "savedObjectIds['lights']['metal halide']",
+			light: {
+				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixtureQuantity: 1,
+				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+			},
 			growSystem: "savedObjectIds['growSystems']['Drip']",
 			growMedium: "hydroton",
 			nutrients: [
@@ -68,7 +80,11 @@ module.exports = [
 			name : "Fruiting",
 			description: "Fruiting phase. Continue to pollinate blossoms and harvest fruit when fully ripened (red).",
 			expectedNumberOfDays: 21,
-			light: "savedObjectIds['lights']['compact fluorescent']",
+			light: {
+				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixtureQuantity: 1,
+				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+			},
 			growSystem: "savedObjectIds['growSystems']['Drip']",
 			growMedium: "hydroton",
 			nutrients: [
