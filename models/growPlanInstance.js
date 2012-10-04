@@ -35,6 +35,7 @@ var GrowPlanInstanceSchema = new Schema({
 		active: { type: Boolean }
 	}],
 
+	// not in use yet, but this will be how a user configures the view on their Dashboard
 	settings : {
 		visibleSensors : []
 	},
@@ -43,7 +44,7 @@ var GrowPlanInstanceSchema = new Schema({
 	 * Sensor logs for the past 24 hours.
 	 */
 	recentSensorLogs: [{
-		timestamp: { type: Date, required: true, default: Date.now },
+		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
 			/**
 			 * sCode references to Sensor.code
@@ -53,39 +54,29 @@ var GrowPlanInstanceSchema = new Schema({
 		}]
 	}],
 	
-	/*
-	controlLogs: [{
-		timestamp: { type: Date, required: true, default: Date.now },
-		logs : [{
-			control: { type: ObjectId, ref: 'Control', required: true },
-			value: { type: Number }
-		}]
-	}],
-	*/
-
-	// TODO : remove all references to this
-	actionLogs: [{
-		
-	}],
-
-	photoLogs: [{
-		timestamp: { type: Date, required: true, default: Date.now },
+	/**
+	 * Photo logs for the past 24 hours
+	 */
+	recentPhotoLogs: [{
+		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
 			url: { type : mongoose.SchemaTypes.Url, required: true},
 			tags: { type : [String]}
 		}]
 	}],
 	
-	genericLogs: [{
-		timestamp: { type: Date, required: true, default: Date.now },
+	/**
+	 * Tag Logs for the past 24 hours
+	 */
+	recentTagLogs: [{
+		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
 			entry: { type: String, required: true },
-			tags: { type : [String]},
-			logType: { type: String }
+			tags: { type : [String]}
 		}]
-	}]
-},
-{ strict: true });
+	}],
+	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
+});
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
@@ -117,7 +108,7 @@ GrowPlanInstanceSchema.pre('save', function(next){
 		logsToRemove = [];
 	
 	this.recentSensorLogs.forEach(function(log){
-		if (log.timestamp < cutoff) { logsToRemove.push(log); }
+		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
 
 	logsToRemove.forEach(function(log){

@@ -19,7 +19,7 @@ var DeviceSchema = new Schema({
 	users : [ { type: ObjectId, ref: 'User', required: true }],
 	userAssignments : [
 		{
-			timestamp : { type : Date, default: Date.now, required : true},
+			ts : { type : Date, default: Date.now, required : true},
 			user : { type : ObjectId, ref: 'User', required: true },
 			assignmentType: { type : String, enum : ['owner', 'member']}
 		}
@@ -37,7 +37,7 @@ var DeviceSchema = new Schema({
 	  }
 	],
 	recentSensorLogs : [{
-		timestamp: { type: Date, required: true, default: Date.now },
+		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
 			// sCode references Sensor.code
 			sCode: { type: String, ref: 'Sensor', required: true },
@@ -243,7 +243,7 @@ DeviceSchema.pre('save', function(next){
 		logsToRemove = [];
 	
 	device.recentSensorLogs.forEach(function(log){
-		if (log.timestamp < cutoff) { logsToRemove.push(log); }
+		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
 
 	logsToRemove.forEach(function(log){

@@ -26,7 +26,7 @@ module.exports = [
 			activeGrowPlanInstance: "savedObjectIds['growPlanInstances']['1']",
 			recentSensorLogs : [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "vis",
@@ -61,7 +61,7 @@ module.exports = [
 			activeGrowPlanInstance: "savedObjectIds['growPlanInstances']['2']",
 			recentSensorLogs : [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "vis",
@@ -101,7 +101,7 @@ module.exports = [
 			],
 			recentSensorLogs : [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "vis",

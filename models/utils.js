@@ -28,6 +28,7 @@ module.exports = {
 	 logSensorLog: function(pendingSensorLog, growPlanInstance, device, callback){
 
 	 	pendingSensorLog.gpi = growPlanInstance._id;
+		
 		// TODO : also use this opportunity to check if any IdealRanges have been exceeded.
         // if so, trigger the corresponding action 
         // On the gpi: add to actionLogs
