@@ -1,36 +1,39 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 		{
+			_id : '506de2fe8eebf7524342cb38',
 			gpid: "1",
 			users : [
-				"savedObjectIds['users']['jack@bitponics.com']",
-				"savedObjectIds['users']['chris@bitponics.com']",
-				"savedObjectIds['users']['amit@bitponics.com']",
-				"savedObjectIds['users']['michael@bitponics.com']",
-				"savedObjectIds['users']['ac@collectiveassembly.com']",
-				"savedObjectIds['users']['md@collectiveassembly.com']",
-				"savedObjectIds['users']['vs@collectiveassembly.com']"
+				"506de3098eebf7524342cb66",
+				"506de3098eebf7524342cb67",
+				"506de30a8eebf7524342cb6c",
+				"506de3098eebf7524342cb68",
+				"506de30a8eebf7524342cb69",
+				"506de30a8eebf7524342cb6a",
+				"506de30a8eebf7524342cb6b"
 			],
-			owner : "savedObjectIds['users']['jack@bitponics.com']",
-			growPlan : "savedObjectIds['growPlans']['Tomato']",
-			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
+			owner : "506de3098eebf7524342cb66",
+			growPlan : "506de2ff8eebf7524342cb3a",
+			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012
 		    active: true,
 			phases: [
 				{
-					phase: "savedObjectIds['phases']['Vegetative']",
+					phase: "506de3048eebf7524342cb4f",
 					startDate: 1347364818821, // 09/11/2012
 					endDate: 1351742400000, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "savedObjectIds['phases']['Blooming']",
+					phase: "506de3048eebf7524342cb50",
 					startDate: 1351828800000, // 11/02/2012
 					endDate: 1357016400000, // 01/01/2013
 					active: false
 				},
 				{
-					phase: "savedObjectIds['phases']['Fruiting']",
+					phase: "506de3048eebf7524342cb51",
 					startDate: 1357102800000, // 01/02/2013
 					endDate: 1362200400000, // 03/01/2013
 					active: false
@@ -120,31 +123,32 @@ module.exports = [
 
 
 		{
+			_id : '506de2ff8eebf7524342cb39',
 			gpid: "2",
 			users : [
-				"savedObjectIds['users']['jack@bitponics.com']"
+				"506de3098eebf7524342cb66"
 			],
-			owner : "savedObjectIds['users']['jack@bitponics.com']",
-			growPlan : "savedObjectIds['growPlans']['Mixed Greens']",
-			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
+			owner : "506de3098eebf7524342cb66",
+			growPlan : "506de2ff8eebf7524342cb3b",
+			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012
 		    active: false,
 			phases: [
 				{
-					phase: "savedObjectIds['phases']['Vegetative']",
+					phase: "506de3048eebf7524342cb4f",
 					startDate: 1347364818821, // 09/11/2012
 					endDate: 1351742400000, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "savedObjectIds['phases']['Blooming']",
+					phase: "506de3048eebf7524342cb50",
 					startDate: 1351828800000, // 11/02/2012
 					endDate: 1357016400000, // 01/01/2013
 					active: false
 				},
 				{
-					phase: "savedObjectIds['phases']['Fruiting']",
+					phase: "506de3048eebf7524342cb51",
 					startDate: 1357102800000, // 01/02/2013
 					endDate: 1362200400000, // 03/01/2013
 					active: false

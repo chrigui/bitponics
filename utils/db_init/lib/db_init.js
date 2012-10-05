@@ -231,6 +231,7 @@ async.series([
 		data[dataType].forEach(function(_data){
 
      		models.user.createUserWithPassword({
+				_id : _data._id,
 				email : _data.email,
 			  	name : _data.name,
 			  	locale: _data.locale,
@@ -269,6 +270,7 @@ async.series([
 		
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.sensor({
+				_id : _data._id,
 				name: _data.name,
 				abbrev: _data.abbrev,
 				unit: _data.unit,
@@ -304,6 +306,7 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.control({
+				_id : _data._id,
 				name: _data.name
 			});
 			dataObj.save(function (err, doc) {
@@ -333,6 +336,7 @@ async.series([
 		
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.nutrient({
+				_id : _data._id,
 				name: _data.name,
 				brand: _data.brand
 			});
@@ -365,13 +369,14 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 		
-			_data.sensorMap.forEach(function(s){
-				s.sensor = eval(s.sensor);
-			});
+			//_data.sensorMap.forEach(function(s){
+		//		s.sensor = eval(s.sensor);
+		//	});
 
 			console.dir(_data.sensorMap);
 
 		    var dataObj = new models.deviceType({
+				_id : _data._id,
 				name: _data.name,
 				firmwareVersion: _data.firmwareVersion,
 				microprocessor: _data.microprocessor,
@@ -409,30 +414,31 @@ async.series([
 			//first, for each type of sensor in sensorMap, get ObjectId
 			models.sensor.find(function (err, sensors) {
 
-				_data.users.forEach(function(u,index){
-					_data.users[index] = eval(u);
-				});
+				//_data.users.forEach(function(u,index){
+			//		_data.users[index] = eval(u);
+			//	});
 
-				if(_data.sensorMap){
-					_data.sensorMap.forEach(function(s){
-						s.sensor = eval(s.sensor);
-					});
-				}
+			//	if(_data.sensorMap){
+			//		_data.sensorMap.forEach(function(s){
+			//			s.sensor = eval(s.sensor);
+			//		});
+			//	}
 
-				_data.controlMap.forEach(function(c){
-					c.control = eval(c.control);
-				});
+			//	_data.controlMap.forEach(function(c){
+			//		c.control = eval(c.control);
+			//	});
 
 			    var dataObj = new models.device({
+					_id : _data._id,
 					deviceId: _data.deviceId,
-					deviceType: eval(_data.deviceType),
+					deviceType: _data.deviceType,
 					name : _data.name,
-					owner: eval(_data.owner),
+					owner: _data.owner,
 					users : _data.users,
 					sensorMap : _data.sensorMap,
 					controlMap : _data.controlMap,
 					recentSensorLogs: _data.recentSensorLogs,
-					activeGrowPlanInstance : eval(_data.activeGrowPlanInstance)
+					activeGrowPlanInstance : _data.activeGrowPlanInstance
 				});
 
 			    console.dir(_data)
@@ -467,6 +473,7 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.lightBulb({
+				_id : _data._id,
 				type: _data.type,
 				watts: _data.watts,
 				brand: _data.brand,
@@ -499,6 +506,7 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.lightFixture({
+				_id : _data._id,
 				type: _data.type,
 				watts: _data.watts,
 				brand: _data.brand,
@@ -532,6 +540,7 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 		    var dataObj = new models.growSystem({
+				_id : _data._id,
 				name: _data.name,
 				description: _data.description,
 				type: _data.type,
@@ -567,8 +576,9 @@ async.series([
 		data[dataType].forEach(function(_data){
 		console.log(_data.description)
 			var dataObj = new models.action({
+				_id : _data._id,
 				description: _data.description,
-				control: eval(_data.control),
+				control: _data.control,
 				cycle: _data.cycle
 			});
 			dataObj.save(function (err, doc) {
@@ -603,12 +613,13 @@ async.series([
 		data[dataType].forEach(function(_data){
 
 		    var dataObj = new models.idealRange({
+				_id : _data._id,
 				name: _data.name,
 				sCode: _data.sCode,
 				valueRange: _data.valueRange,
 				applicableTimeSpan: _data.applicableTimeSpan,
-				actionBelowMin : eval(_data.actionBelowMin),
-				actionAboveMax : eval(_data.actionAboveMax)
+				actionBelowMin : _data.actionBelowMin,
+				actionAboveMax : _data.actionAboveMax
 			});
 
 			dataObj.save(function (err, doc) {
@@ -641,26 +652,29 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 			var actions = [], idealRanges = [];
+
+			/*
 			_data.actions.forEach(function(action){
 				actions.push(eval(action));
 			})
 			_data.idealRanges.forEach(function(idealRange){
 				idealRanges.push(eval(idealRange));
 			})
-
+*/
 		    var dataObj = new models.phase({
+				_id : _data._id,
 				name: _data.name,
 				expectedNumberOfDays: _data.expectedNumberOfDays,
 				light: {
-					fixture: eval(_data.light.fixture),
+					fixture: _data.light.fixture,
 					fixtureQuantity : _data.light.fixtureQuantity,
-					bulb: eval(_data.light.bulb),
+					bulb: _data.light.bulb,
 				},
-				growSystem: eval(_data.growSystem),
+				growSystem: _data.growSystem,
 				growMedium: _data.growMedium,
-				nutrients: _data.nutrients.map(function(item){ return eval(item) }),
-				actions: actions,
-				idealRanges: idealRanges
+				nutrients: _data.nutrients,
+				actions: _data.actions,
+				idealRanges: _data.idealRanges
 			});
 
 			dataObj.save(function (err, doc) {
@@ -694,14 +708,15 @@ async.series([
 		data[dataType].forEach(function(_data){
 
 		    var dataObj = new models.growPlan({
-				createdBy: eval(_data.createdBy),
+				_id : _data._id,
+				createdBy: _data.createdBy,
 				name: _data.name,
 				description: _data.description,
 				plants: _data.plants,
 				expertiseLevel: _data.expertiseLevel,
-				sensors: _data.sensors.map(function(item){ return eval(item) }),
-				controls: _data.controls.map(function(item){ return eval(item) }),
-				phases: _data.phases.map(function(item){ return eval(item) })
+				sensors: _data.sensors,
+				controls: _data.controls,
+				phases: _data.phases
 			});
 
 		    console.log(dataObj);
@@ -735,6 +750,7 @@ async.series([
 
 		data[dataType].forEach(function(_data){
 
+			/*
 			_data.phases.forEach(function(item){
 				item.phase = eval(item.phase);
 			});
@@ -746,13 +762,15 @@ async.series([
 			});
 			//console.log(savedObjectIds);
 			console.log('device ' + _data.device + ' ' + eval(_data.device));
+			*/
 
 		    var dataObj = new models.growPlanInstance({
+		    	_id : _data._id,
 		    	gpid: _data.gpid,
-				users: _data.users.map(function(item){ return eval(item) }),
-				owner : eval(_data.owner),
-				growPlan: eval(_data.growPlan),
-				device: eval(_data.device),
+				users: _data.users,
+				owner : _data.owner,
+				growPlan: _data.growPlan,
+				device: _data.device,
 				startDate: _data.startDate,
 				endDate: _data.endDate,
 			    active: _data.active,
@@ -804,7 +822,8 @@ async.series([
 		data[dataType].forEach(function(_data){
 			
 		    var dataObj = new models.sensorLog({
-		    	gpi: eval(_data.gpi),
+		    	_id : _data._id,
+		    	gpi: _data.gpi,
 				ts : _data.ts,
 				logs : _data.logs
 			});

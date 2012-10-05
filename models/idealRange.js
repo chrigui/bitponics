@@ -6,8 +6,6 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var IdealRangeSchema = new Schema({
-	name: { type: String },
-
 	/**
 	 * sCode references Sensor.code
 	 */

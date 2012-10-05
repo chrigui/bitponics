@@ -1,5 +1,8 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [ //default pw is "8bitpass" for all init users
 		{
+			_id : '506de3098eebf7524342cb65',
 			email : "jack.bishop1@gmail.com",
 		  	name : {
 		  		first : "Jack",
@@ -12,6 +15,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : false
 		},
 		{
+			_id : '506de3098eebf7524342cb66',
 			email : "jack@bitponics.com",
 		  	name : {
 		  		first : "Jack",
@@ -24,6 +28,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			_id : '506de3098eebf7524342cb67',
 			email : "chris@bitponics.com",
 		  	name : {
 		  		first : "Chris",
@@ -40,6 +45,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	}
 		},
 		{
+			_id : '506de3098eebf7524342cb68',
 			email : "michael@bitponics.com",
 		  	name : {
 		  		first : "Michael",
@@ -52,6 +58,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			_id : '506de30a8eebf7524342cb69',
 			email : "ac@collectiveassembly.com",
 		  	name : {
 		  		first : "Andrew",
@@ -64,6 +71,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			_id : '506de30a8eebf7524342cb6a',
 			email : "md@collectiveassembly.com",
 		  	name : {
 		  		first : "Manuel",
@@ -76,6 +84,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			_id : '506de30a8eebf7524342cb6b',
 			email : "vs@collectiveassembly.com",
 		  	name : {
 		  		first : "Virgilio",
@@ -88,6 +97,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true
 		},
 		{
+			_id : '506de30a8eebf7524342cb6c',
 			email : "amit@bitponics.com",
 		  	name: {
 		  		first: "Amit",
