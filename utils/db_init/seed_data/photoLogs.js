@@ -1,6 +1,9 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 	{
-		gpi: "savedObjectIds['growPlanInstances']['1']",
+		_id : '506de3048eebf7524342cb52',
+		gpi: "506de2fe8eebf7524342cb38",
 		ts: 1347364838821,
 		logs : [
 			{

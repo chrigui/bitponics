@@ -1,105 +1,111 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 		{
+			_id : '506de3038eebf7524342cb4e',
 			name : 'Seedling',
 			description: 'Seedling phase, from planting seeds until first true leaves appear.',
 			expectedNumberOfDays: 10,
 			light: {
-				fixture: "savedObjectIds['lightFixtures']['cfl fixture']",
+				fixture: "506de3028eebf7524342cb47",
 				fixtureQuantity : 1,
-				bulb : "savedObjectIds['lightBulbs']['cfl']"
+				bulb : "506de3018eebf7524342cb42"
 			},
-			growSystem: "savedObjectIds['growSystems']['Egg-carton seed starter']",
+			growSystem: "506de3008eebf7524342cb40",
 			growMedium: "rockwool",
 			nutrients: [],
 			actions: [
-				"savedObjectIds['actions']['Transplant seedlings into the grow bed']",
-				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
-				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
+				"506de2ec8eebf7524342cb24",
+				"506de2ef8eebf7524342cb25",
+				"506de2f08eebf7524342cb26",
+				"506de2f18eebf7524342cb27"
 			],
 			idealRanges: [
-				"savedObjectIds['idealRanges']['Ideal Light - Vegetative']",
-				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+				"506de30b8eebf7524342cb6d",
+				"506de30b8eebf7524342cb6f"
 			]
 		},
 		{
+			_id : '506de3048eebf7524342cb4f',
 			name : 'Vegetative',
 			description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 			expectedNumberOfDays: 28,
 			light: {
-				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixture: "506de3028eebf7524342cb48",
 				fixtureQuantity: 1,
-				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+				bulb: "506de3018eebf7524342cb43",
 			},
-			growSystem: "savedObjectIds['growSystems']['Drip']",
+			growSystem: "506de2ff8eebf7524342cb3c",
 			growMedium: "hydroton",
 			nutrients: [
-				"savedObjectIds['nutrients']['Grow']",
-				"savedObjectIds['nutrients']['Bloom']",
-				"savedObjectIds['nutrients']['Micro']"
+				"506de3038eebf7524342cb4b",
+				"506de3038eebf7524342cb4c",
+				"506de3038eebf7524342cb4d"
 			],
 			actions: [
-				"savedObjectIds['actions']['Transplant seedlings into the grow bed']",
-				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
-				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
+				"506de2ec8eebf7524342cb24",
+				"506de2ef8eebf7524342cb25",
+				"506de2f08eebf7524342cb26",
+				"506de2f18eebf7524342cb27"
 			],
 			idealRanges: [
-				"savedObjectIds['idealRanges']['Ideal Light - Vegetative']",
-				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+				"506de30b8eebf7524342cb6d",
+				"506de30b8eebf7524342cb6f"
 			]
 		},
 		{
+			_id : '506de3048eebf7524342cb50',
 			name : "Blooming",
 			description: "Open-ended blooming phase. After about 7 days, you should begin to see blossoms.",
 			expectedNumberOfDays: 7,
 			light: {
-				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixture: "506de3028eebf7524342cb48",
 				fixtureQuantity: 1,
-				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+				bulb: "506de3018eebf7524342cb43",
 			},
-			growSystem: "savedObjectIds['growSystems']['Drip']",
+			growSystem: "506de2ff8eebf7524342cb3c",
 			growMedium: "hydroton",
 			nutrients: [
-				"savedObjectIds['nutrients']['Grow']",
-				"savedObjectIds['nutrients']['Bloom']",
-				"savedObjectIds['nutrients']['Micro']"
+				"506de3038eebf7524342cb4b",
+				"506de3038eebf7524342cb4c",
+				"506de3038eebf7524342cb4d"
 			],
 			actions: [
-				"savedObjectIds['actions']['Pollinate any new blossoms using a watercolor brush to distribute']",
-				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
-				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
+				"506de2fc8eebf7524342cb2c",
+				"506de2ef8eebf7524342cb25",
+				"506de2f08eebf7524342cb26",
+				"506de2f18eebf7524342cb27"
 			],
 			idealRanges: [
-				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
-				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+				"506de30b8eebf7524342cb6e",
+				"506de30b8eebf7524342cb6f"
 			]
 		},
 		{
+			_id : '506de3048eebf7524342cb51',
 			name : "Fruiting",
 			description: "Fruiting phase. Continue to pollinate blossoms and harvest fruit when fully ripened (red).",
 			expectedNumberOfDays: 21,
 			light: {
-				fixture: "savedObjectIds['lightFixtures']['metal halide']",
+				fixture: "506de3028eebf7524342cb48",
 				fixtureQuantity: 1,
-				bulb: "savedObjectIds['lightBulbs']['metal halide']",
+				bulb: "506de3018eebf7524342cb43",
 			},
-			growSystem: "savedObjectIds['growSystems']['Drip']",
+			growSystem: "506de2ff8eebf7524342cb3c",
 			growMedium: "hydroton",
 			nutrients: [
-				"savedObjectIds['nutrients']['Grow']",
-				"savedObjectIds['nutrients']['Bloom']",
-				"savedObjectIds['nutrients']['Micro']"
+				"506de3038eebf7524342cb4b",
+				"506de3038eebf7524342cb4c",
+				"506de3038eebf7524342cb4d"
 			],
 			actions: [
-				"savedObjectIds['actions']['Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.']",
-				"savedObjectIds['actions']['Water pump cycle']",
-				"savedObjectIds['actions']['Light cycle, with lights on between 6am and 10pm.']"
+				"506de2ef8eebf7524342cb25",
+				"506de2f08eebf7524342cb26",
+				"506de2f18eebf7524342cb27"
 			],
 			idealRanges: [
-				"savedObjectIds['idealRanges']['Ideal Light - Bloom']",
-				"savedObjectIds['idealRanges']['Ideal Air Temp']"
+				"506de30b8eebf7524342cb6e",
+				"506de30b8eebf7524342cb6f"
 			]
 		}
 	];

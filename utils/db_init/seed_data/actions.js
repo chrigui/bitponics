@@ -1,10 +1,14 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 		{
+			_id : '506de2ec8eebf7524342cb24',
 			description: "Transplant seedlings into the grow bed",
 			control: undefined,
 			cycle: undefined
 		},
 		{
+			_id : '506de2ef8eebf7524342cb25',
 			description: "Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.",
 			control: undefined,
 			cycle: {
@@ -25,8 +29,9 @@ module.exports = [
 			}
 		}, // end flush Action
 		{
+			_id : '506de2f08eebf7524342cb26',
 			description: "Water pump cycle",
-			control: "savedObjectIds['controls']['Water Pump']", // reference to Pump control
+			control: "506de2fc8eebf7524342cb2d", // reference to Pump control
 			cycle: {
 				states: [
 					{
@@ -46,8 +51,9 @@ module.exports = [
 			}
 		}, // end "Water pump cycle" action	
 		{
+			_id : '506de2f18eebf7524342cb27',
 			description: "Light cycle, with lights on between 6am and 10pm.",
-			control: "savedObjectIds['controls']['Light']",
+			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
 					// start the day with 6 hours off
@@ -75,8 +81,9 @@ module.exports = [
 			}
 		},
 		{
+			_id : '506de2fb8eebf7524342cb28',
 			description: "Turn on supplemental lighting.",
-			control: "savedObjectIds['controls']['Light']",
+			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
 					{
@@ -88,8 +95,9 @@ module.exports = [
 			}
 		},
 		{
+			_id : '506de2fb8eebf7524342cb29',
 			description: "Turn off any supplemental lights.",
-			control: "savedObjectIds['controls']['Light']",
+			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
 					{
@@ -101,8 +109,9 @@ module.exports = [
 			}
 		},
 		{
+			_id : '506de2fb8eebf7524342cb2a',
 			description: "Turn on air conditioner.",
-			control: "savedObjectIds['controls']['Air Conditioner']",
+			control: "506de2fd8eebf7524342cb31",
 			cycle: {
 				states: [
 					{
@@ -114,8 +123,9 @@ module.exports = [
 			}
 		},
 		{
+			_id : '506de2fc8eebf7524342cb2b',
 			description: "Turn on heater.",
-			control: "savedObjectIds['controls']['Heater']",
+			control: "506de2fc8eebf7524342cb2f",
 			cycle: {
 				states: [
 					{
@@ -127,6 +137,7 @@ module.exports = [
 			}
 		},
 		{
+			_id : '506de2fc8eebf7524342cb2c',
 			description: "Pollinate any new blossoms using a watercolor brush to distribute",
 			control: undefined,
 			cycle: undefined

@@ -32,6 +32,8 @@ var PhaseSchema = new Schema({
 	actions: [{ type: ObjectId, ref: 'Action', required: true }],
 	
 	idealRanges: [{ type: ObjectId, ref: 'IdealRange', required: false }],
+
+	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],
 });
 
 PhaseSchema.plugin(useTimestamps);
