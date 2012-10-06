@@ -50,7 +50,7 @@ var GrowPlanInstanceSchema = new Schema({
 			 * sCode references to Sensor.code
 			 */
 			sCode: { type: String, ref: 'Sensor', required: true },
-			value: { type: Number }
+			val: { type: Number }
 		}]
 	}],
 	
@@ -71,7 +71,7 @@ var GrowPlanInstanceSchema = new Schema({
 	recentTagLogs: [{
 		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
-			entry: { type: String, required: true },
+			val: { type: String, required: true },
 			tags: { type : [String]}
 		}]
 	}],

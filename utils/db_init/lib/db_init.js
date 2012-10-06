@@ -2,21 +2,23 @@
 
 /*
  * db_init
- * https://github.com/amitkumar/bitponics
+ * https://github.com/Bitponics/bitponics
  *
  * Copyright (c) 2012 Jack Bishop
  * Licensed under the MIT license.
  *
  *
+ * Setup:
+ *   1. $ cd bitponics/utils/db_init
+ *   2. $ npm link
+ *
  * Usage:
- *   1. cd bitponics/utils/db_init
- *   2. npm link
- *   3. db_init [local|dev|staging|mongodb://whatever-db-you-need] [clear]
+ *   1. $ db_init [local|dev|staging|mongodb://whatever-db-you-need] [clear]
  *   
  *   example: 
- *		db_init local
+ *		$ db_init local
  *   example with clear:
- *		db_init dev clear
+ *		$ db_init dev clear
  *  
  *	 This script optionally removes all collections, then adds data from /bitponics/utils/db_init/seed_data/.
  *

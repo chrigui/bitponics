@@ -41,7 +41,7 @@ var DeviceSchema = new Schema({
 		logs : [{
 			// sCode references Sensor.code
 			sCode: { type: String, ref: 'Sensor', required: true },
-			value: { type: Number }
+			val: { type: Number }
 		}]
 	}],
 	activeGrowPlanInstance : { type: ObjectId, ref: 'GrowPlanInstance', required: false},
@@ -179,8 +179,8 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
 		device.activeActionsOverride.expires = soonestActionOverrideExpiration;
 		device.activeActions.deviceRefreshRequired = true;
 
+		winston.info('refreshActiveActionsOverride for device ' + device._id + ' ' + JSON.stringify(device.activeActionsOverride));
 		device.save(callback);
-  		
   	});
 });
 /**************** END INSTANCE METHODS ****************************/

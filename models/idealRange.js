@@ -38,5 +38,16 @@ var IdealRangeSchema = new Schema({
 
 IdealRangeSchema.plugin(useTimestamps);
 
+
+IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
+	var applicableTimeSpan = this.applicableTimeSpan;
+	if (applicableTimeSpan){ return true; }
+	
+	var dateParts = timezone(dateParts, userTimezone, '%T').split(':'),
+        millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);
+
+    return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) && (millisecondsIntoDay <= applicableTimeSpan.endTime) );
+});
+
 exports.schema = IdealRangeSchema;
 exports.model = mongoose.model('IdealRange', IdealRangeSchema);
