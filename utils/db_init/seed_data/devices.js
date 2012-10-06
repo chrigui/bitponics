@@ -33,11 +33,11 @@ module.exports = [
 					logs : [
 						{
 							sCode: "vis",
-							value: 12121
+							val: 12121
 						},
 						{
 							sCode: "vis",
-							value: 122222112
+							val: 122222112
 						}
 					]
 				}
@@ -69,11 +69,11 @@ module.exports = [
 					logs : [
 						{
 							sCode: "vis",
-							value: 12121
+							val: 12121
 						},
 						{
 							sCode: "vis",
-							value: 122222112
+							val: 122222112
 						}
 					]
 				}
@@ -110,11 +110,11 @@ module.exports = [
 					logs : [
 						{
 							sCode: "vis",
-							value: 12121
+							val: 12121
 						},
 						{
 							sCode: "vis",
-							value: 122222112
+							val: 122222112
 						}
 					]
 				}

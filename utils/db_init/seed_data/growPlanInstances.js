@@ -45,15 +45,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.25
+							val: 6.25
 						},
 						{
 							sCode: "air",
-							value: 30
+							val: 30
 						},
 						{
 							sCode: "water",
-							value: 35
+							val: 35
 						}
 					]
 				},
@@ -62,15 +62,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 7.25
+							val: 7.25
 						},
 						{
 							sCode: "air",
-							value: 33
+							val: 33
 						},
 						{
 							sCode: "water",
-							value: 34
+							val: 34
 						}
 					]
 				},
@@ -79,15 +79,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.5
+							val: 6.5
 						},
 						{
 							sCode: "air",
-							value: 34
+							val: 34
 						},
 						{
 							sCode: "water",
-							value: 33
+							val: 33
 						}
 					]
 				}
@@ -112,7 +112,7 @@ module.exports = [
 					ts: 1347364838821,
 					logs : [
 						{
-							entry: "Tomatoes are awesome.",
+							val: "Tomatoes are awesome.",
 							tags: ["awesome"],
 							logType: ""
 						}
@@ -160,15 +160,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.25
+							val: 6.25
 						},
 						{
 							sCode: "air",
-							value: 30
+							val: 30
 						},
 						{
 							sCode: "water",
-							value: 35
+							val: 35
 						}
 					]
 				},
@@ -177,15 +177,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 7.25
+							val: 7.25
 						},
 						{
 							sCode: "air",
-							value: 33
+							val: 33
 						},
 						{
 							sCode: "water",
-							value: 34
+							val: 34
 						}
 					]
 				},
@@ -194,15 +194,15 @@ module.exports = [
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.5
+							val: 6.5
 						},
 						{
 							sCode: "air",
-							value: 34
+							val: 34
 						},
 						{
 							sCode: "water",
-							value: 33
+							val: 33
 						}
 					]
 				}
@@ -227,7 +227,7 @@ module.exports = [
 					ts: 1347364838821,
 					logs : [
 						{
-							entry: "Tomatoes are awesome.",
+							val: "Tomatoes are awesome.",
 							tags: ["awesome"],
 							logType: ""
 						}

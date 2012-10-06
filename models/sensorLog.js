@@ -14,7 +14,7 @@ var SensorLogSchema = new Schema({
 		 * sCode references to Sensor.code
 		 */
 		sCode: { type: String, ref: 'Sensor', required: true },
-		value: { type: Number }
+		val: { type: Number }
 	}]
 });
 

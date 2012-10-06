@@ -157,7 +157,7 @@ module.exports = function(app) {
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
     var deviceId = req.params.id.replace(/:/g,''),
-        pendingSensorLog = {timestamp : Date.now(), logs : []},
+        pendingSensorLog = { ts : Date.now(), logs : []},
         pendingDeviceLogs,
         sensors,
         device,
@@ -189,8 +189,6 @@ module.exports = function(app) {
           .exec(callback);
         }
       ],
-      // When those parallel ops are done, create the sensorLog entry and also retrieve 
-      // the active GrowPlanInstance
       function parallelFinal(err, results){
         if (err) { return callback(err);}
       
@@ -203,22 +201,22 @@ module.exports = function(app) {
         Object.keys(pendingDeviceLogs).forEach(function(key){
           pendingSensorLog.logs.push({
             sCode : key,
-            value : pendingDeviceLogs[key]
+            val : pendingDeviceLogs[key]
           });
         });
         
         winston.info('pendingSensorLog');
         winston.info(JSON.stringify(pendingSensorLog));
 
-        ModelUtils.logSensorLog(pendingSensorLog, device.activeGrowPlanInstance, device, function(err){
+        ModelUtils.logSensorLog(pendingSensorLog, device.activeGrowPlanInstance, device, req.user.timezone, function(err){
           if (err) { return next(err); }
-            var responseBody = 'success';
-            res.status(200);
-            res.header('X-Bpn-ResourceName', 'sensor_logs');
-            res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-            // To end response for the firmware, send the Bell character
-            responseBody += String.fromCharCode(7);
-            res.send(responseBody);              
+          var responseBody = 'success';
+          res.status(200);
+          res.header('X-Bpn-ResourceName', 'sensor_logs');
+          res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+          // To end response for the firmware, send the Bell character
+          responseBody += String.fromCharCode(7);
+          res.send(responseBody);              
         });
       }
     );
