@@ -168,7 +168,26 @@ function triggerActionOverride(options, callback){
           if (!action.control){ return innerCallback(); }
 
           if (!device){
-            return innerCallback();            
+            PhaseModel.findById(growPlanInstance.phases.filter(function(phase){return phase.active;})[0])
+            .populate('actions')
+            .exec(function(err, phaseResult){
+                if (err) { return innerCallback(err);}
+                ActionModel.findOne()
+                .where('_id')
+                .in(phaseResult.actions)
+                .where('control')
+                .equals(action.control)
+                .exec(function(err, actionResult){
+                  if (err) { return innerCallback(err);}
+                  if (!actionResult){ return innerCallback(); }
+                  var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);      
+                  expires = now.valueOf() + cycleRemainder;
+                  return innerCallback();  
+                });
+                
+              }
+            );
+            
           } else {
             // get any other actions that exist for the same control.
             var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
@@ -211,8 +230,7 @@ function triggerActionOverride(options, callback){
               ts : now,
               timeSent : now,
               msg : actionOverrideMessage,
-              type : 'actionNeeded',
-              viewed : false
+              type : 'actionNeeded'
             });
             winston.info('Creating notification : ' + notification.toString());
             notification.save(function(err){
