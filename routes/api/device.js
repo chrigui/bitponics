@@ -208,16 +208,24 @@ module.exports = function(app) {
         winston.info('pendingSensorLog');
         winston.info(JSON.stringify(pendingSensorLog));
 
-        ModelUtils.logSensorLog(pendingSensorLog, device.activeGrowPlanInstance, device, req.user.timezone, function(err){
-          if (err) { return next(err); }
-          var responseBody = 'success';
-          res.status(200);
-          res.header('X-Bpn-ResourceName', 'sensor_logs');
-          res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-          // To end response for the firmware, send the Bell character
-          responseBody += String.fromCharCode(7);
-          res.send(responseBody);              
-        });
+        ModelUtils.logSensorLog(
+          {
+            pendingSensorLog : pendingSensorLog, 
+            growPlanInstance : device.activeGrowPlanInstance, 
+            device : device, 
+            user : req.user 
+          },
+          function(err){
+            if (err) { return next(err); }
+            var responseBody = 'success';
+            res.status(200);
+            res.header('X-Bpn-ResourceName', 'sensor_logs');
+            res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+            // To end response for the firmware, send the Bell character
+            responseBody += String.fromCharCode(7);
+            res.send(responseBody);              
+          }
+        );
       }
     );
   });

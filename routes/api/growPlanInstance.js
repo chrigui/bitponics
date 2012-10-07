@@ -181,11 +181,13 @@ module.exports = function(app) {
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
     
       ModelUtils.triggerActionOverride(
-        growPlanInstance, 
-        growPlanInstance.device, 
-        req.body.actionId, 
-        req.body.message,
-        req.user.timezone,
+        {
+          growPlanInstance : growPlanInstance, 
+          device : growPlanInstance.device, 
+          actionId : req.body.actionId, 
+          actionOverrideMessage : req.body.message,
+          user : req.user
+        },
         function(err){
           if (err) { return next(err); }
           return res.send('success');

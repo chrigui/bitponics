@@ -9,6 +9,7 @@ module.exports = {
 	idealRange: require('./idealRange').model,
 	lightBulb: require('./lightBulb').model,
 	lightFixture: require('./lightFixture').model,
+	notification: require('./notification').model,
 	nutrient: require('./nutrient').model,
 	phase: require('./phase').model,
 	sensor: require('./sensor').model,
