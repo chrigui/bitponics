@@ -8,6 +8,7 @@ var Device = require('./device'),
     ActionModel = Action.model,
     ActionUtils = Action.utils,
     ActionOverrideLogModel = require('./actionOverrideLog').model,
+    NotificationModel = require('./notification').model,
     SensorModel = require('./sensor').model,
     SensorLogModel = require('./sensorLog').model,
     winston = require('winston'),
@@ -24,8 +25,14 @@ var Device = require('./device'),
  * @param growPlanInstance : GrowPlanInstance model instance on which to log this to recentSensorLogs
  * @param device : optional. Device Model instance on which to log this to recentSensorLogs
  */
-function logSensorLog(pendingSensorLog, growPlanInstance, device, userTimezone, callback){
-  var activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
+function logSensorLog(options, callback){
+  var pendingSensorLog = options.pendingSensorLog,
+      growPlanInstance = options.growPlanInstance,
+      device = options.device,
+      user = options.user,
+      timezone = user.timezone,
+      activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
+  
   pendingSensorLog.gpi = growPlanInstance._id;
   
   async.parallel(
@@ -61,30 +68,34 @@ function logSensorLog(pendingSensorLog, growPlanInstance, device, userTimezone, 
             if (!idealRange){ return iteratorCallback(); }
             valueRange = idealRange.valueRange;
             if (log.val < valueRange.min) {
-              if (!idealRange.checkIfWithinTimespan(userTimezone, pendingSensorLog.ts)){ return iteratorCallback(); }
+              if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
               triggerActionOverride(
-                growPlanInstance, 
-                device, 
-                idealRange.actionBelowMin, 
-                message, 
-                userTimezone,
+                {
+                  growPlanInstance : growPlanInstance, 
+                  device : device, 
+                  actionId : idealRange.actionBelowMin, 
+                  actionOverrideMessage : message, 
+                  user : user 
+                },
                 function(err){
                   if (err) { return iteratorCallback(err); }
                   iteratorCallback();
                 }
               );
             } else if (log.val > valueRange.max){
-              if (!idealRange.checkIfWithinTimespan(userTimezone, pendingSensorLog.ts)){ return iteratorCallback(); }
+              if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
               triggerActionOverride(
-                growPlanInstance, 
-                device, 
-                idealRange.actionBelowMin, 
-                message, 
-                userTimezone,
+                {
+                  growPlanInstance : growPlanInstance, 
+                  device : device, 
+                  actionId : idealRange.actionBelowMin, 
+                  actionOverrideMessage : message, 
+                  user : user 
+                },
                 function(err){
                   if (err) { return iteratorCallback(err); }
                   iteratorCallback();
@@ -135,7 +146,13 @@ function activateGrowPlanInstance(growPlanInstance, callback){
 };
 
 
-function triggerActionOverride(growPlanInstance, device, actionId, actionOverrideMessage, timezone, callback){
+function triggerActionOverride(options, callback){
+  var growPlanInstance = options.growPlanInstance,
+      device = options.device, 
+      actionId = options.actionId,
+      actionOverrideMessage = options.actionOverrideMessage,
+      user = options.user,
+      timezone = user.timezone;
   ActionModel.findById(actionId, function(err, action){
     if (err) { return next(err);}
     if (!action) { return next(new Error('Invalid action id'));}
@@ -143,29 +160,33 @@ function triggerActionOverride(growPlanInstance, device, actionId, actionOverrid
     // calculate when the actionOverride should expire.
     var now = new Date(),
         expires = now + (365 * 24 * 60 * 60 * 1000),
-        actionHasDeviceControl = false,
-        timeRequested = now;
+        actionHasDeviceControl = false;
 
-    async.series([
-      function(innerCallback){
-        if (!action.control || !device){ return innerCallback(); }
+    async.series(
+      [
+        function(innerCallback){
+          if (!action.control){ return innerCallback(); }
 
-          // get any other actions that exist for the same control.
-          var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
-          
-          ActionModel.findOne()
-          .where('_id')
-          .in(device.activeActions.actions)
-          .where('control')
-          .equals(action.control)
-          .exec(function(err, actionResult){
-            if (err) { return innerCallback(err);}
-            if (!actionResult){ return innerCallback(); }
-            var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);      
-            expires = now.valueOf() + cycleRemainder;
-            actionHasDeviceControl = true;
-            return innerCallback();  
-          });
+          if (!device){
+            return innerCallback();            
+          } else {
+            // get any other actions that exist for the same control.
+            var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
+            
+            ActionModel.findOne()
+            .where('_id')
+            .in(device.activeActions.actions)
+            .where('control')
+            .equals(action.control)
+            .exec(function(err, actionResult){
+              if (err) { return innerCallback(err);}
+              if (!actionResult){ return innerCallback(); }
+              var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);      
+              expires = now.valueOf() + cycleRemainder;
+              actionHasDeviceControl = true;
+              return innerCallback();  
+            });
+          }
         }
         ],
         function(err, result){
@@ -173,7 +194,7 @@ function triggerActionOverride(growPlanInstance, device, actionId, actionOverrid
           var actionLog = new ActionOverrideLogModel({
             gpi : growPlanInstance._id,
             msg : actionOverrideMessage,
-            timeRequested : timeRequested,
+            timeRequested : now,
             action : action,
             // TODO : handle expires for the no-device case 
             expires : expires
@@ -183,11 +204,28 @@ function triggerActionOverride(growPlanInstance, device, actionId, actionOverrid
         actionLog.save(function(err){
           if (err){ return callback(err); }
           winston.info('Logged actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
-          if (!actionHasDeviceControl){ return callback(); }
-          device.refreshActiveActionsOverride(function(err){
-            if (err) { return callback(err); }
-            return callback();
-          });
+          if (!actionHasDeviceControl){ 
+            var notification = new NotificationModel({
+              users : [user],
+              gpi : growPlanInstance,
+              ts : now,
+              timeSent : now,
+              msg : actionOverrideMessage,
+              type : 'actionNeeded',
+              viewed : false
+            });
+            winston.info('Creating notification : ' + notification.toString());
+            notification.save(function(err){
+              if (err) { return callback(err); }
+              return callback();
+            });
+          } else {
+            device.refreshActiveActionsOverride(function(err){
+              if (err) { return callback(err); }
+              return callback();
+            });  
+          }
+          
         });
       }
     );
