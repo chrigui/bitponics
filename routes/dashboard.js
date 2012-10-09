@@ -160,7 +160,7 @@ module.exports = function(app){
 				// on sensorLogs.timestamp so maybe it's already in some sort 
 				// of order
 				var sortedSensorLogs = currentGrowPlanInstance.recentSensorLogs.sort(function(logA, logB){
-					return ( (logA.timestamp > logB) ? -1 : 1);
+					return ( (logA.ts > logB) ? -1 : 1);
 				});
 
 				sortedSensorLogs.forEach(function(sensorsLog){
@@ -169,8 +169,8 @@ module.exports = function(app){
 						// once validation's setup in /api/devices/id/sensor_logs, remove the if(...) check
 						if (locals.sensors[log.sCode]){
 							locals.sensors[log.sCode].logs.push({
-								timestamp : sensorsLog.timestamp,
-								value : log.value
+								timestamp : sensorsLog.ts,
+								value : log.val
 							});	
 						}
 					});

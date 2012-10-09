@@ -1,109 +1,117 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 {
-	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364818821,
+	_id : '506de3048eebf7524342cb53',
+	gpi : "506de2fe8eebf7524342cb38",
+	ts: 1347364818821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 6.25
+		val: 6.25
 	},
 	{
 		sCode: "air",
-		value: 30
+		val: 30
 	},
 	{
 		sCode: "water",
-		value: 35
+		val: 35
 	}
 	]
 },
 {
-	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364828821,
+	_id : '506de3058eebf7524342cb54',
+	gpi : "506de2fe8eebf7524342cb38",
+	ts: 1347364828821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 7.25
+		val: 7.25
 	},
 	{
 		sCode: "air",
-		value: 33
+		val: 33
 	},
 	{
 		sCode: "water",
-		value: 34
+		val: 34
 	}
 	]
 },
 {
-	gpi : "savedObjectIds['growPlanInstances']['1']",
-	timestamp: 1347364838821,
+	_id : '506de3058eebf7524342cb55',
+	gpi : "506de2fe8eebf7524342cb38",
+	ts: 1347364838821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 6.5
+		val: 6.5
 	},
 	{
 		sCode: "air",
-		value: 34
+		val: 34
 	},
 	{
 		sCode: "water",
-		value: 33
+		val: 33
 	}
 	]
 },
 {
-	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364818821,
+	_id : '506de3058eebf7524342cb56',
+	gpi : "506de2ff8eebf7524342cb39",
+	ts: 1347364818821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 6.25
+		val: 6.25
 	},
 	{
 		sCode: "air",
-		value: 30
+		val: 30
 	},
 	{
 		sCode: "water",
-		value: 35
+		val: 35
 	}
 	]
 },
 {
-	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364828821,
+	_id : '506de3058eebf7524342cb57',
+	gpi : "506de2ff8eebf7524342cb39",
+	ts: 1347364828821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 7.25
+		val: 7.25
 	},
 	{
 		sCode: "air",
-		value: 33
+		val: 33
 	},
 	{
 		sCode: "water",
-		value: 34
+		val: 34
 	}
 	]
 },
 {
-	gpi : "savedObjectIds['growPlanInstances']['2']",
-	timestamp: 1347364838821,
+	_id : '506de3068eebf7524342cb58',
+	gpi : "506de2ff8eebf7524342cb39",
+	ts: 1347364838821,
 	logs : [
 	{
 		sCode: "ph",
-		value: 6.5
+		val: 6.5
 	},
 	{
 		sCode: "air",
-		value: 34
+		val: 34
 	},
 	{
 		sCode: "water",
-		value: 33
+		val: 33
 	}
 	]
 }

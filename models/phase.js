@@ -9,13 +9,22 @@ var PhaseSchema = new Schema({
 	
 	name: { type: String, required: true },
 	
+	description: { type: String },
+
 	/**
 	 * expectedNumberOfDays. undefined means infinite.
 	 */
 	expectedNumberOfDays: { type: Number, required: false },
 	
-	light: { type: ObjectId, ref: 'Light', required: false },
-	
+	/**
+	 * Light definition. Optional. Defines fixtures, bulbs, and quantities.
+	 */
+	light: {
+		fixture: { type: ObjectId, ref: 'LightFixture'},
+		fixtureQuantity: { type : Number },
+		bulb: { type : ObjectId, ref: 'LightBulb'}
+	},
+
 	growSystem: { type: ObjectId, ref: 'GrowSystem' },
 	
 	growMedium: { type: String },
@@ -23,6 +32,8 @@ var PhaseSchema = new Schema({
 	actions: [{ type: ObjectId, ref: 'Action', required: true }],
 	
 	idealRanges: [{ type: ObjectId, ref: 'IdealRange', required: false }],
+
+	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],
 });
 
 PhaseSchema.plugin(useTimestamps);

@@ -3,6 +3,7 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     DeviceModel = require('../../models/device').model,
     ActionOverrideLogModel = require('../../models/actionOverrideLog').model,
     ActionUtils = require('../../models/action').utils,
+    ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async');
 
@@ -158,78 +159,40 @@ module.exports = function(app) {
    * params:
    * data: {
       timeRequested (optional)
-      actionId
+      actionId,
+      message (optional)
    }
 
    jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/action_override_logs", 
     { 
-      actionId: "505d551372b1680000000059"
+      actionId: "505d551372b1680000000059",
+      message: "Manually triggered from web dashboard"
     }, 
     function (data, textStatus, jqXHR) {
-      console.log("Post resposne:"); console.dir(data); console.log(textStatus);                                        
+      console.log("Post response:"); console.dir(data); console.log(textStatus);                                        
     });
    */
   app.post('/api/grow_plan_instances/:id/action_override_logs', function (req, res, next){
-    return GrowPlanInstanceModel
+    GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
     .exec(function (err, growPlanInstance) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
-      
-      ActionModel.findById(req.body.actionId, function(err, action){
-        if (err) { return next(err);}
-        if (!action) { return next(new Error('Invalid action id'));}
-
-        // calculate when the actionOverride should expire.
-        
-        var now = new Date(),
-            expires = now + (365 * 24 * 60 * 60 * 1000);
     
-
-        async.series([
-            function(callback){
-              if (!action.control || !growPlanInstance.device){ return callback(); }
-
-              // get any other actions that exist for the same control.
-              var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
-              
-              var activeActions = ActionModel.findOne()
-                .where('_id')
-                .in(growPlanInstance.device.activeActions.actions)
-                .where('control')
-                .equals(action.control)
-                .exec(function(err, actionResult){
-                  if (err) { return callback(err);}
-                  if (!actionResult){ return callback(); }
-                  var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, req.user.timezone);      
-                  expires = now.valueOf() + cycleRemainder;
-                  return callback();  
-                });
-            }
-          ],
-          function(err, result){
-            if (err) { return next(err); }
-            var actionLog = new ActionOverrideLogModel({
-              gpi : growPlanInstance._id,
-              timeRequested : (req.body.timeRequested ? new Date(req.body.timeRequested) : Date.now()),
-              action : action,
-              expires : expires
-            });
-            
-            // push the log to ActionOverrideLogModel
-            actionLog.save(function(err){
-              if (err){ return next(err); }
-              if (growPlanInstance.device){
-                growPlanInstance.device.refreshActiveActionsOverride(function(err){
-                  if (err) { return next(err); }
-                  return res.send('success');
-                });
-              }
-            });
-          }
-        );
-      });
+      ModelUtils.triggerActionOverride(
+        {
+          growPlanInstance : growPlanInstance, 
+          device : growPlanInstance.device, 
+          actionId : req.body.actionId, 
+          actionOverrideMessage : req.body.message,
+          user : req.user
+        },
+        function(err){
+          if (err) { return next(err); }
+          return res.send('success');
+        }
+      );
     });
   });
 };

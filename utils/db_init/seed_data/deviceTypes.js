@@ -1,65 +1,56 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 		{
+			_id : '506de2fe8eebf7524342cb37',
 			name: "Bitponics Beta Device 1",
 			firmwareVersion: "0.1",
 			microprocessor: "blah",
 			sensorMap: [
 				{ 
 					inputId: "ph",
-					sensor: "savedObjectIds['sensors']['ph']" // ref to pH Sensor instance"s ObjectId
+					sensor: "506de3068eebf7524342cb59" // ref to pH Sensor instance"s ObjectId
 				},
 				{	inputId: "ec",
-					sensor:	"savedObjectIds['sensors']['ec']"
-				},
-				{
-					inputId: "tds",
-					sensor: "savedObjectIds['sensors']['tds']"
-				},
-				{
-					inputId: "sal",
-					sensor: "savedObjectIds['sensors']['sal']"
+					sensor:	"506de3068eebf7524342cb5a"
 				},
 				{
 					inputId: "air",
-					sensor: "savedObjectIds['sensors']['air']"
+					sensor: "506de3078eebf7524342cb5d"
 				},
 				{
 					inputId: "water",
-					sensor: "savedObjectIds['sensors']['water']"
+					sensor: "506de3078eebf7524342cb5e"
 				},
 				{
 					inputId: "hum",
-					sensor: "savedObjectIds['sensors']['hum']"
-				},
-				{
-					inputId: "co2",
-					sensor: "savedObjectIds['sensors']['co2']"
+					sensor: "506de3078eebf7524342cb5f"
 				},
 				{
 					inputId: "lux",
-					sensor: "savedObjectIds['sensors']['lux']"
+					sensor: "506de3088eebf7524342cb61"
 				},
 				{
 					inputId: "ir",
-					sensor: "savedObjectIds['sensors']['ir']"
+					sensor: "506de3088eebf7524342cb62"
 				},
 				{	
 					inputId: "full",
-					sensor: "savedObjectIds['sensors']['full']"
+					sensor: "506de3088eebf7524342cb63"
 				},
 				{
 					inputId: "vis",
-					sensor: "savedObjectIds['sensors']['vis']"
+					sensor: "506de3098eebf7524342cb64"
 				}
 			],
 			controlMap : [
 				{
 					outputId: "1",
-					sensor: "savedObjectIds['controls']['Light']"
+					sensor: "506de2fd8eebf7524342cb32"
 				},
 				{
 					outputId: "2",
-					sensor: "savedObjectIds['controls']['Water Pump']"
+					sensor: "506de2fc8eebf7524342cb2d"
 				}
 			]
 		},

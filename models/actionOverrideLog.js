@@ -14,6 +14,13 @@ var ActionOverrideLogSchema = new Schema({
 	 */
 	gpi : { type: ObjectId, ref: 'GrowPlanInstance', required: true },
 
+	
+	/**
+	 * Message is a chance to explain what triggered this action,
+	 * for example when actions are triggered by an IdealRange violation
+	 */
+	msg : { type : String, required: false },
+
 	/**
 	 * The time that this action was first requested, either through a sensor trigger or a manual trigger
 	 */
