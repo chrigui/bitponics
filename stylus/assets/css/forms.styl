@@ -1,4 +1,7 @@
+@import "nib"
+@import "./helpers"
 @import "./global/colors"
+
 
 
 /*
@@ -40,3 +43,66 @@ select
 	display block
 	margin .5em 0 0
 	max-width 14em
+
+
+.steps
+	
+	.step
+		position relative
+		padding-bottom 5em
+	label
+		font-size 4em
+		line-height 1em
+
+	.grid
+		margin-left 0
+		padding-left 0
+		li
+			@extends .display-ib
+			text-align center
+			vertical-align middle
+			margin .15em 0
+			padding 0
+		&.sortlist li
+			margin .15em
+		label
+			@extends .display-ib
+			padding 1.5em 1em 0
+			height 4em
+			color white
+			background color-medium-green
+			font-size 1em
+			margin 0
+			vertical-align bottom
+			opacity .6
+			transition opacity 300ms linear
+		
+			//&.selected
+			//	opacity 1
+		.info
+			display none
+			position absolute
+			bottom 0
+			left 0
+			height 5em
+			width 50%
+			text-align left
+
+
+	input[type=radio], input[type=checkbox]
+		//display none
+		opacity 0
+		height 0
+		width 0
+		margin 0
+
+	input[type='radio']:checked + label,
+	input[type='checkbox']:checked + label
+		opacity 1
+
+	input[type='radio']:checked ~ .info,
+	input[type='checkbox']:checked ~ .info
+		display block
+
+
+

@@ -1,13 +1,16 @@
+@import "nib"
 @import "./libs/resets"
 @import "./global/utils"
 @import "./global/icons"
-@import "helpers"
-
-color-logo-green=#23b500
-color-medium-green=#24d321
-color-light-green=#46f121
-color-global-background=#fff
-color-sensor-light=#c8c300
+@import "./helpers"
+@import "./global/colors"
+@import "./typography"
+@import "./base"
+@import "./forms"
+@media screen and (min-width: 40em)
+	@import "./tablet"
+@media screen and (min-width: 65em)
+	@import "./desktop"
 
 /*
  * styleguide specific
@@ -37,6 +40,8 @@ color-sensor-light=#c8c300
 	section.wrapper
 		background-color color-global-background
 		padding 1em
+	.content-module
+		float none
 	li
 		padding 1em
 	.default-background
@@ -53,5 +58,4 @@ color-sensor-light=#c8c300
 		height 1em
 		@extends .circle
 
-@import "base"
-
+// /.styleguide

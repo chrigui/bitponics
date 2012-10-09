@@ -58,9 +58,6 @@ section#header,section#main,section#footer{padding:1em}
 .dashboard section#main{padding:6em 1em 1em;}
 .dashboard section#main #visualizer div.circle{top:1.5em;left:1.5em;bottom:1.5em;right:1.5em}
 .dashboard section#main #controls,.dashboard section#main #reminders{float:right}
-.growplans #main ul{list-style:none;padding:0;}
-.growplans #main ul li{float:left;width:24%;margin:1em 5% 1em 0;}
-.growplans #main ul li .btn{margin:0}
 @media screen and (min-width: 60em){.content-module{float:left;}
 .content-module.side{width:20%}
 .data-module{width:100%;margin:.125em 0}

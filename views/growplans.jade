@@ -1,5 +1,8 @@
 extends layout
 
+block css
+  link(rel='stylesheet', href='/assets/css/libs/steps.css')
+
 block content
 
   section#header
@@ -19,26 +22,83 @@ block content
 
   section#main(role="main")
     div.content-module.middle
+      h3.main-heading Grow Plan Selection
+      form(id="growplans", class='steps', action='', method='post')                  
+        
+        section(id="system_selection", class="step", data-required="1")
+          systemtypes = ['Ebb & Flow','Nutrient Film Technique (NFT)','Deep Water Culture (DWC)','Aquaponics', 'Other']
+          label What type of system do you have?
+          ul(class="grid photos")
+            each system, i in systemtypes
+              li
+                input(id="sys_#{system}", type='radio', name="system", value="#{system}")
+                label(for="sys_#{system}") #{system}
+
+        section(id="plant_selection", class="step")
+          //plants = ['Arugula','Basil','Chervil','Chives','Coriander','Dill','Lemon','Balm','Mache','Majoram','Oregano','Rosemary','Sorrel','Spearmint','Peppermint','Sage','Tarragon','Thyme','Artichokes','Asparagus','Beans','Beets','Broccoli','Brussel','Sprouts','Cabbages','Carrots','Cauliflowers','Celery','Cucumber','Eggplants','Leeks','Lettuce','Onions','Parsnips','Peas','Potatoes','Radishes','Rhubarb','Squash','Tomatoes','Yams', 'Other']
+          label What would you like to grow?
+
+          input(class="search no-validate")
+          //span(class="sort", data-sort="plant") Sort by Plant Name
+
+          ul(class="grid sortlist")
+            each plant, i in plants
+              li
+                input(id="#{plant}", type='checkbox', name="plants", value="#{plant}")
+                label(for="#{plant}", class="plant") #{plant}
+
+        section(id="growplan_results", class="step update-panel", data-required="1")
+          label We've found some grow plans for you
+          ul(class="grid sortlist photos")
+            each growPlan, i in growPlans
+              li(id="gplist_#{growPlan.id}")
+                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}")
+                label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
+                div.info
+                  div.gplist_description #{growPlan.description}
+                  div.gplist_plants #{growPlan.plants}
+                  //TODO: get all phase's systems populated here so we can filter on it
+                  div.gplist_system #{growPlan.phases}
+
+        section(id="growplan_edit", class="step hide")
+          h4 Grow Plan Activation
+
+          //set as default grow plan, will change dynamically based on previous step selection
+          input(type="hidden", name="parentGrowPlan", value="#{growPlanDefault.id}") 
+
+          label #{growPlanDefault.name}
+          input(id="gpedit_name", type='text', name="gpedit_name", value="#{growPlanDefault.name}")
+          
+          label #{growPlanDefault.description}
+          input(id="gpedit_description", type='text', name="gpedit_description", value="#{growPlanDefault.description}")
+
+          label #{growPlanDefault.plants}
+          input(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+
+          label #{growPlanDefault.expertiseLevel}
+          input(id="gpedit_expertiseLevel", type='text', name="gpedit_expertiseLevel", value="#{growPlanDefault.expertiseLevel}")
+
+          label #{growPlanDefault.nutrients}
+          input(id="gpedit_nutrients", type='text', name="gpedit_nutrients", value="#{growPlanDefault.nutrients}")
+
+          label #{growPlanDefault.sensors}
+          input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
+
+          label #{growPlanDefault.controls}
+          input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
+
+          label #{growPlanDefault.phases}
+          input(id="gpedit_phases", type='text', name="gpedit_phases", value="#{growPlanDefault.phases}")
+
+        input(id="growplans_activate", type="submit", value="Activate Grow Plan")
+
+block footer-scripts
+
+  script
+    Bitponics.user = {
       
-      //- if typeof(message) != 'undefined' && message.length
-      //-   h3.main-heading
-      //-     #{message}
-
-      h4.sub-heading
-        a(href="./newgrowplan", class="btn") Create a new grow plan
-      
-      h4.sub-heading Or choose from existing grow plans. 
-      form(id="growplans", action="", method="post")
-        ul
-          each growPlan, i in growPlans
-            li
-              label(for="gp_#{i}", class="btn sub")
-                h5 #{growPlan.name}
-                input(id="gp_#{i}", type="checkbox", name="growplan", value="#{growPlan.id}")
-
-              p #{growPlan.description}
-        input(type="submit", class="btn clear", value="Save grow plans")
-
-
-  section#footer
-    
+    }
+  script(src='/assets/js/libs/Steps.js')
+  script(src='/assets/js/libs/list/src/list.js')
+  //- script(src='/assets/js/libs/list/list.min.js')
+  script(src='/assets/js/growplans.js')
