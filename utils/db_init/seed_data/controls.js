@@ -28,5 +28,9 @@ module.exports = [
 		{
 			_id : '506de2fd8eebf7524342cb33',
 			name: "Other"
+		},
+		{
+			_id : '506de30d8eebf7524342cb74',
+			name : 'Seedling Heat Mat'
 		}
 	];
