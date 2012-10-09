@@ -18,7 +18,9 @@ var GrowSystemSchema = new Schema({
 	 */
 	reservoirSize: { type: Number },
 	
-	numberOfPlants: { type: Number, required: true }
+	numberOfPlants: { type: Number, required: true },
+
+	photos: [{ type: mongoose.SchemaTypes.Url }]
 });
 
 GrowSystemSchema.plugin(useTimestamps);

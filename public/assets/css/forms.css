@@ -1,3 +1,50 @@
+.full-width{width:100%}
+.full-height{height:100%}
+.position-f{position:fixed}
+.position-r{position:relative}
+.position-a{position:absolute}
+.display-b{display:block}
+.display-n{display:none}
+.display-i{display:inline}
+.display-ib,.steps .grid li,.steps .grid label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-t{display:table}
+.clear-b{clear:both}
+.clear-l{clear:left}
+.clear-r{clear:right}
+.clearfix{zoom:1}
+.clearfix:before,.clearfix:after{content:"";display:table}
+.clearfix:after{clear:both}
+.float-l{float:left}
+.float-r{float:right}
+.float-n{float:none}
+.top-0{top:0}
+.bottom-0{bottom:0}
+.left-0{left:0}
+.right-0{right:0}
+.uppercase{text-transform:uppercase}
+.lowercase{text-transform:lowercase}
+.text-align-c{text-align:center}
+.text-align-r{text-align:right}
+.text-align-l{text-align:left}
+.text-align-j{text-align:justify}
+.padding-20{padding:20px}
+.centered{margin-left:auto;margin-right:auto}
+.default-border-b{border-bottom:1px solid #333}
+.default-border-t{border-top:1px solid #333}
+.default-border-r{border-right:1px solid #333}
+.default-border-l{border-left:1px solid #333}
+.content-box{display:block;letter-spacing:normal;word-spacing:normal;text-align:left;}
+.content-box:after{content:"";display:block;height:0;clear:both;visibility:hidden}
+.text-normalize{font-family:'Courier New',monospace;letter-spacing:-.63em;text-align:center;vertical-align:top;font-size:16px}
+.hide-text{text-indent:-100%;white-space:nowrap;overflow:hidden}
+.screen-reader-text{position:absolute;top:-9999px;left:-9999px}
+.ellipsis{overflow:hidden;-o-text-overflow:ellipsis;text-overflow:ellipsis;white-space:nowrap}
+.overflow{overflow:auto}
+.circle{text-align:center;-webkit-border-radius:50em;border-radius:50em;}
+.circle:before{content:'';display:inline-block;height:100%;vertical-align:middle;margin-right:-.25em}
+.select-block{overflow:hidden;}
+.select-block select{cursor:pointer;-moz-appearance:none;-webkit-appearance:none;color:inherit;border:0 none;width:120%;font-weight:bold;}
+.select-block select:focus{outline:none;border:none}
 label,input{display:block;margin:1em 0}
 label{font-weight:bold;margin-bottom:0}
 input{margin-top:0;background:#fff;border:1px solid #24d321;padding:.5em}
@@ -5,3 +52,13 @@ input:valid,textarea:valid,input:invalid,textarea:invalid{background:#fff}
 input[type=submit]{background:#24d321;color:#fff;border:none}
 button{background:#fff;color:#24d321}
 select{display:block;margin:.5em 0 0;max-width:14em}
+.steps .step{position:relative;padding-bottom:5em}
+.steps label{font-size:4em;line-height:1em}
+.steps .grid{margin-left:0;padding-left:0;}
+.steps .grid li{text-align:center;vertical-align:middle;margin:.15em 0;padding:0}
+.steps .grid.sortlist li{margin:.15em}
+.steps .grid label{padding:1.5em 1em 0;height:4em;color:#fff;background:#24d321;font-size:1em;margin:0;vertical-align:bottom;opacity:.6;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=60);filter:alpha(opacity=60);-webkit-transition:opacity 300ms linear;-moz-transition:opacity 300ms linear;-o-transition:opacity 300ms linear;-ms-transition:opacity 300ms linear;transition:opacity 300ms linear}
+.steps .grid .info{display:none;position:absolute;bottom:0;left:0;height:5em;width:50%;text-align:left}
+.steps input[type=radio],.steps input[type=checkbox]{opacity:0;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);filter:alpha(opacity=0);height:0;width:0;margin:0}
+.steps input[type='radio']:checked + label,.steps input[type='checkbox']:checked + label{opacity:1;-ms-filter:none;filter:none}
+.steps input[type='radio']:checked ~ .info,.steps input[type='checkbox']:checked ~ .info{display:block}

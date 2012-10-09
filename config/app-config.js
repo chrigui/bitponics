@@ -122,6 +122,7 @@ module.exports = function(app){
 	    	});
 
 	    	//we probably want to do something like this on heroku:
+	    	//BUT IS IT SECURE?
 	    	//redirect to https
 				// app.use(function(req, res, next) {
 				// 		//this is only present on heroku

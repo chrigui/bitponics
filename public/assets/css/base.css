@@ -159,7 +159,7 @@ div,p,span,a,a:visited,a:hover,a:active{color:#24d321}
 .btn.sub{background:#46f121}
 .btn.clear{display:block;clear:both;margin:0}
 #visualizer div.circle{position:absolute;top:.75em;left:.75em;bottom:.75em;right:.75em}
-.control{width:8em;height:10em;position:relative;text-align:center;color:#24d321;font-weight:bold;}
+.control{width:8em;height:10em;position:relative;text-align:center;color:#24d321;font-weight:bold;margin:0 0 1em;}
 .control:before{position:absolute;padding-top:3.35em;width:100%;top:0;left:0;font-size:1.5em}
 .control svg{position:absolute;top:2em;left:0}
 #ph,#ec,#tds,#sal,#water{background-color:#00cbcb}
@@ -172,7 +172,3 @@ section#footer .content-module{background-color:#fff}
 .loader{height:24px;width:24px;background:url("/img/loader.gif") no-repeat 0 0}
 .dashboard .content-module.middle{position:relative;padding:100% 0 0 0;height:0}
 .dashboard select{margin:0}
-.growplans .sub-heading .btn{margin-left:0}
-.growplans #main ul{list-style:none;padding:0;}
-.growplans #main ul li{margin:1em 0;}
-.growplans #main ul li .btn{margin:0}
