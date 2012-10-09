@@ -6,6 +6,7 @@ module.exports = {
 	growPlan: require('./growPlan').model,
 	growPlanInstance: require('./growPlanInstance').model,
 	growSystem: require('./growSystem').model,
+	plant: require('./plant').model,
 	idealRange: require('./idealRange').model,
 	lightBulb: require('./lightBulb').model,
 	lightFixture: require('./lightFixture').model,

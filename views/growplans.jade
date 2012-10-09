@@ -26,16 +26,14 @@ block content
       form(id="growplans", class='steps', action='', method='post')                  
         
         section(id="system_selection", class="step", data-required="1")
-          systemtypes = ['Ebb & Flow','Nutrient Film Technique (NFT)','Deep Water Culture (DWC)','Aquaponics', 'Other']
           label What type of system do you have?
           ul(class="grid photos")
-            each system, i in systemtypes
+            each system, i in growSystems
               li
-                input(id="sys_#{system}", type='radio', name="system", value="#{system}")
-                label(for="sys_#{system}") #{system}
+                input(id="sys_#{system.name}", type='radio', name="system.name", value="#{system.name}")
+                label(for="sys_#{system.name}") #{system.name}
 
         section(id="plant_selection", class="step")
-          //plants = ['Arugula','Basil','Chervil','Chives','Coriander','Dill','Lemon','Balm','Mache','Majoram','Oregano','Rosemary','Sorrel','Spearmint','Peppermint','Sage','Tarragon','Thyme','Artichokes','Asparagus','Beans','Beets','Broccoli','Brussel','Sprouts','Cabbages','Carrots','Cauliflowers','Celery','Cucumber','Eggplants','Leeks','Lettuce','Onions','Parsnips','Peas','Potatoes','Radishes','Rhubarb','Squash','Tomatoes','Yams', 'Other']
           label What would you like to grow?
 
           input(class="search no-validate")
@@ -44,21 +42,22 @@ block content
           ul(class="grid sortlist")
             each plant, i in plants
               li
-                input(id="#{plant}", type='checkbox', name="plants", value="#{plant}")
-                label(for="#{plant}", class="plant") #{plant}
+                input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
+                label(for="#{plant.name}", class="plant") #{plant.name}
 
         section(id="growplan_results", class="step update-panel", data-required="1")
           label We've found some grow plans for you
           ul(class="grid sortlist photos")
+            dummy_systems = ["Drip","aquaponics","ebb & flow","Egg-carton seed starter","deep water culture (DWC)", "Bitponics Water Culture System"]
             each growPlan, i in growPlans
               li(id="gplist_#{growPlan.id}")
                 input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}")
                 label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
                 div.info
-                  div.gplist_description #{growPlan.description}
-                  div.gplist_plants #{growPlan.plants}
-                  //TODO: get all phase's systems populated here so we can filter on it
-                  div.gplist_system #{growPlan.phases}
+                  div(class="gplist_description") #{growPlan.description}
+                  div(class="gplist_plants") #{growPlan.plants}
+                  //TODO get all phase's systems populated here so we can filter on it
+                  div(class="gplist_system #{dummy_systems[i]}") #{dummy_systems[i]}
 
         section(id="growplan_edit", class="step hide")
           h4 Grow Plan Activation
