@@ -1,36 +1,39 @@
+var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+
 module.exports = [
 		{
+			_id : '506de2fe8eebf7524342cb38',
 			gpid: "1",
 			users : [
-				"savedObjectIds['users']['jack@bitponics.com']",
-				"savedObjectIds['users']['chris@bitponics.com']",
-				"savedObjectIds['users']['amit@bitponics.com']",
-				"savedObjectIds['users']['michael@bitponics.com']",
-				"savedObjectIds['users']['ac@collectiveassembly.com']",
-				"savedObjectIds['users']['md@collectiveassembly.com']",
-				"savedObjectIds['users']['vs@collectiveassembly.com']"
+				"506de3098eebf7524342cb66",
+				"506de3098eebf7524342cb67",
+				"506de30a8eebf7524342cb6c",
+				"506de3098eebf7524342cb68",
+				"506de30a8eebf7524342cb69",
+				"506de30a8eebf7524342cb6a",
+				"506de30a8eebf7524342cb6b"
 			],
-			owner : "savedObjectIds['users']['jack@bitponics.com']",
-			growPlan : "savedObjectIds['growPlans']['Tomato']",
-			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
+			owner : "506de3098eebf7524342cb66",
+			growPlan : "506de2ff8eebf7524342cb3a",
+			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012
 		    active: true,
 			phases: [
 				{
-					phase: "savedObjectIds['phases']['Vegetative']",
+					phase: "506de3048eebf7524342cb4f",
 					startDate: 1347364818821, // 09/11/2012
 					endDate: 1351742400000, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "savedObjectIds['phases']['Blooming']",
+					phase: "506de3048eebf7524342cb50",
 					startDate: 1351828800000, // 11/02/2012
 					endDate: 1357016400000, // 01/01/2013
 					active: false
 				},
 				{
-					phase: "savedObjectIds['phases']['Fruiting']",
+					phase: "506de3048eebf7524342cb51",
 					startDate: 1357102800000, // 01/02/2013
 					endDate: 1362200400000, // 03/01/2013
 					active: false
@@ -38,79 +41,60 @@ module.exports = [
 			],
 			recentSensorLogs: [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.25
+							val: 6.25
 						},
 						{
 							sCode: "air",
-							value: 30
+							val: 30
 						},
 						{
 							sCode: "water",
-							value: 35
+							val: 35
 						}
 					]
 				},
 				{
-					timestamp: 1347364828821,
+					ts: 1347364828821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 7.25
+							val: 7.25
 						},
 						{
 							sCode: "air",
-							value: 33
+							val: 33
 						},
 						{
 							sCode: "water",
-							value: 34
+							val: 34
 						}
 					]
 				},
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.5
+							val: 6.5
 						},
 						{
 							sCode: "air",
-							value: 34
+							val: 34
 						},
 						{
 							sCode: "water",
-							value: 33
+							val: 33
 						}
 					]
 				}
 			],
-			controlLogs: [
+			recentPhotoLogs: [
 				{
-					timestamp: 1347364838821,
-					logs : [
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 1
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						}	
-					]
-				}
-			],
-			photoLogs: [
-				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
@@ -123,12 +107,12 @@ module.exports = [
 					]
 				}
 			],
-			genericLogs: [
+			recentTagLogs: [
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
-							entry: "Tomatoes are awesome.",
+							val: "Tomatoes are awesome.",
 							tags: ["awesome"],
 							logType: ""
 						}
@@ -139,31 +123,32 @@ module.exports = [
 
 
 		{
+			_id : '506de2ff8eebf7524342cb39',
 			gpid: "2",
 			users : [
-				"savedObjectIds['users']['jack@bitponics.com']"
+				"506de3098eebf7524342cb66"
 			],
-			owner : "savedObjectIds['users']['jack@bitponics.com']",
-			growPlan : "savedObjectIds['growPlans']['Mixed Greens']",
-			device : "savedObjectIds['devices']['0006667211cf']", //TODO: bitponics device
+			owner : "506de3098eebf7524342cb66",
+			growPlan : "506de2ff8eebf7524342cb3b",
+			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
 			endDate: 1351742400000, // 11/01/2012
 		    active: false,
 			phases: [
 				{
-					phase: "savedObjectIds['phases']['Vegetative']",
+					phase: "506de3048eebf7524342cb4f",
 					startDate: 1347364818821, // 09/11/2012
 					endDate: 1351742400000, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "savedObjectIds['phases']['Blooming']",
+					phase: "506de3048eebf7524342cb50",
 					startDate: 1351828800000, // 11/02/2012
 					endDate: 1357016400000, // 01/01/2013
 					active: false
 				},
 				{
-					phase: "savedObjectIds['phases']['Fruiting']",
+					phase: "506de3048eebf7524342cb51",
 					startDate: 1357102800000, // 01/02/2013
 					endDate: 1362200400000, // 03/01/2013
 					active: false
@@ -171,79 +156,60 @@ module.exports = [
 			],
 			recentSensorLogs: [
 				{
-					timestamp: 1347364818821,
+					ts: 1347364818821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.25
+							val: 6.25
 						},
 						{
 							sCode: "air",
-							value: 30
+							val: 30
 						},
 						{
 							sCode: "water",
-							value: 35
+							val: 35
 						}
 					]
 				},
 				{
-					timestamp: 1347364828821,
+					ts: 1347364828821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 7.25
+							val: 7.25
 						},
 						{
 							sCode: "air",
-							value: 33
+							val: 33
 						},
 						{
 							sCode: "water",
-							value: 34
+							val: 34
 						}
 					]
 				},
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							sCode: "ph",
-							value: 6.5
+							val: 6.5
 						},
 						{
 							sCode: "air",
-							value: 34
+							val: 34
 						},
 						{
 							sCode: "water",
-							value: 33
+							val: 33
 						}
 					]
 				}
 			],
-			controlLogs: [
+			recentPhotoLogs: [
 				{
-					timestamp: 1347364838821,
-					logs : [
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 1
-						},
-						{
-							control: "savedObjectIds['controls']['Fan']",
-							value: 0
-						}	
-					]
-				}
-			],
-			photoLogs: [
-				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
 							url: "http://cityexile.files.wordpress.com/2009/04/tomato_seedling1.jpg",
@@ -256,12 +222,12 @@ module.exports = [
 					]
 				}
 			],
-			genericLogs: [
+			recentTagLogs: [
 				{
-					timestamp: 1347364838821,
+					ts: 1347364838821,
 					logs : [
 						{
-							entry: "Tomatoes are awesome.",
+							val: "Tomatoes are awesome.",
 							tags: ["awesome"],
 							logType: ""
 						}

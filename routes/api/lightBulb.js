@@ -1,4 +1,4 @@
-var LightModel = require('../../models/light').model,
+var LightBulbModel = require('../../models/lightBulb').model, 
     winston = require('winston');
 
 /**
@@ -9,8 +9,8 @@ var LightModel = require('../../models/light').model,
 module.exports = function(app) {
 
    //List lights
-  app.get('/api/lights', function (req, res, next){
-    return LightModel.find(function (err, lights) {
+  app.get('/api/light_bulbs', function (req, res, next){
+    return LightBulbModel.find(function (err, lights) {
       if (err) { return next(err); }
       return res.send(lights);
       });
@@ -20,7 +20,7 @@ module.exports = function(app) {
    * Create single light
    *
    *  Test with:
-   *  jQuery.post("/api/lights", {
+   *  jQuery.post("/api/light_bulbs", {
    *    "type": "light type",
    *    "watts": "60",
    *    "brand" : "light brand",
@@ -30,11 +30,11 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/lights', function (req, res, next){
+  app.post('/api/light_bulbs', function (req, res, next){
     var light;
     winston.info("POST: ");
     winston.info(req.body);
-    light = new LightModel({
+    light = new LightBulbModel({
       type: req.body.type,
       watts: req.body.watts,
       brand : req.body.brand,
@@ -50,15 +50,15 @@ module.exports = function(app) {
    * Read an light
    *
    * To test:
-   * jQuery.get("/api/lights/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/light_bulbs/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/lights/:id', function (req, res, next){
-    return LightModel.findById(req.params.id, function (err, light) {
+  app.get('/api/light_bulbs/:id', function (req, res, next){
+    return LightBulbModel.findById(req.params.id, function (err, light) {
       if (err) { return next(err); }
       return res.send(light);
     });
@@ -69,10 +69,9 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/lights/${id}",
+   *     url: "/api/light_bulbs/${id}",
    *     type: "PUT",
    *     data: {
-   *       "actionBelowMin": "actionid"
    *     },
    *     success: function (data, textStatus, jqXHR) {
    *         console.log("Post response:");
@@ -82,10 +81,9 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/lights/:id', function (req, res, next){
-    return LightModel.findById(req.params.id, function (err, light) {
+  app.put('/api/light_bulbs/:id', function (req, res, next){
+    return LightBulbModel.findById(req.params.id, function (err, light) {
       if (err) { return next(err); }
-      light.actionBelowMin = req.body.actionBelowMin;
       return light.save(function (err) {
         if (err) { return next(err); }
         return res.send(light);
@@ -98,7 +96,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/lights/${id}", 
+   *     url: "/api/light_bulbs/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -108,8 +106,8 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/lights/:id', function (req, res, next){
-    return LightModel.findById(req.params.id, function (err, light) {
+  app.delete('/api/light_bulbs/:id', function (req, res, next){
+    return LightBulbModel.findById(req.params.id, function (err, light) {
       if (err) { return next(err); }
       return light.remove(function (err) {
         if (err) { return next(err); }

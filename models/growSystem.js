@@ -10,6 +10,8 @@ var GrowSystemSchema = new Schema({
 	name: { type: String, required: true },
 	
 	description: { type: String, required: false },
+
+	createdBy: { type: ObjectId, ref: 'User'},
 	
 	type: { type: String, required: true },
 	
@@ -18,9 +20,15 @@ var GrowSystemSchema = new Schema({
 	 */
 	reservoirSize: { type: Number },
 	
-	numberOfPlants: { type: Number, required: true },
+	plantCapacity: { type: Number, required: true },
 
-	photos: [{ type: mongoose.SchemaTypes.Url }]
+	overallSize: {
+		w: { type: Number },
+		h: { type: Number },
+		d: { type: Number }
+	},
+
+	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
 });
 
 GrowSystemSchema.plugin(useTimestamps);
