@@ -25,7 +25,6 @@
  */
 
 //TODO: separate device script
-//TODO: user, phase, growPlan and growPlanInstance seed data
 
 var mongoose   = require('mongoose'),
 async = require('async'),
@@ -45,6 +44,7 @@ mongoUrls = require('../../../config/mongo-config').urls,
 		lightBulbs: {},
 		lightFixtures: {},
 		growSystems: {},
+		plants: {},
 		controls: {},
 		actions: {},
 		idealRanges: {},
@@ -74,7 +74,7 @@ mongoUrls = require('../../../config/mongo-config').urls,
 
 	console.log(db_url);
 	console.log(clear);
-//console.log(data);
+	// console.log(data);
 
 mongoose.connect(db_url);
 
@@ -584,6 +584,42 @@ function(callback){
 		 				if (err) { console.log(err); return callback(err);}
 		 				savedObjectIds[dataType][_data.name] = doc.id;
 		 				console.log("created grow system");
+		 				decrementData();
+		 			});
+		 		}
+		 	});
+		 });
+		},
+
+		function(callback){
+   	/**
+		 * Plants
+		 */
+		 var dataType = 'plants',
+		 dataCount = data[dataType].length,
+		 decrementData = function(){
+		 	dataCount--;
+		 	if (dataCount === 0){
+		 		callback();
+		 	}
+		 };
+
+		 console.log('####### ' + dataType + ' #######');
+
+		 data[dataType].forEach(function(_data){
+		 	models.plant.findById(_data._id, function(err, result){
+		 		if (err) { console.log(err); return callback(err);}
+		 		if (result){
+		 			decrementData();
+		 		} else {
+		 			var dataObj = new models.plant({
+		 				_id : _data._id,
+		 				name: _data.name
+		 			});
+		 			dataObj.save(function (err, doc) {
+		 				if (err) { console.log(err); return callback(err);}
+		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				console.log("created plant");
 		 				decrementData();
 		 			});
 		 		}

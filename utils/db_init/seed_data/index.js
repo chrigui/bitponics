@@ -8,6 +8,7 @@ var data = {
 	lightFixtures: require('./lightFixtures'),
 	lightBulbs: require('./lightBulbs'),
 	growSystems: require('./growSystems'),
+	plants: require('./plants'),
 	actions: require('./actions'),
 	idealRanges: require('./idealRanges'),
 	phases: require('./phases'),

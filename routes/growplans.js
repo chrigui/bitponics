@@ -2,6 +2,7 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   GrowPlanModel = require('../models/growPlan').model,
   UserModel = require('../models/user').model,
   PlantModel = require('../models/plant').model,
+  GrowSystemModel = require('../models/growSystem').model,
 	winston = require('winston'),
 	passport = require('passport');
 
@@ -22,23 +23,28 @@ module.exports = function(app){
 		}
 
 		//get all plants
-		PlantModel.find({}, function(err, plants) {
-			locals.plants = plants
+		GrowSystemModel.find({}, function(err, growSystems) {
+			locals.growSystems = growSystems;
 
-			//get all grow plans
-			GrowPlanModel.find({}, function(err, gps) {
-				locals.growPlansLength = gps.length;
-				locals.growPlans = gps;
+			//get all plants
+			PlantModel.find({}, function(err, plants) {
+				locals.plants = plants;
 
-				gps.forEach(function (item) {
-					if(item.name === 'All-Purpose'){
-						locals.growPlanDefault = item;
-					}
+				//get all grow plans
+				GrowPlanModel.find({}, function(err, gps) {
+					locals.growPlansLength = gps.length;
+					locals.growPlans = gps;
+
+					gps.forEach(function (item) {
+						if(item.name === 'All-Purpose'){
+							locals.growPlanDefault = item;
+						}
+					});
+
+					res.render('growplans', locals);
 				});
 
-				res.render('growplans', locals);
 			});
-
 		});
 	});
 
