@@ -96,13 +96,13 @@ module.exports = [
 		},
 		{
 			_id : '506de2fb8eebf7524342cb29',
-			description: "Turn off any supplemental lights.",
+			description: "Turn off supplemental lights.",
 			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
 					{
 						controlValue: 0,
-						message: "Turn off any supplemental lights."
+						message: "Turn off supplemental lights."
 					}
 				],
 				repeat : false
@@ -141,6 +141,33 @@ module.exports = [
 			description: "Pollinate any new blossoms using a watercolor brush to distribute",
 			control: undefined,
 			cycle: undefined
+		},
+		{
+			_id : '506de30c8eebf7524342cb73',
+			description: "Increase heat under seedlings, either by using a seedling heat mat or moving seedling tray to a warmer area, such as on top of a refrigerator.",
+			control: "506de30d8eebf7524342cb74", // seedling heat mat
+			cycle: {
+				states: [
+					{
+						controlValue: 255,
+						message: "Turn on seedling heat mat."
+					}
+				],
+				repeat: false
+			}
+		},
+		{
+			_id : '506de30d8eebf7524342cb75',
+			description: "Decrease heat under seedlings, either by turning off seedling heat mat or moving seedling tray to a cooler area.",
+			control: "506de30d8eebf7524342cb74", // seedling heat mat
+			cycle: {
+				states: [
+					{
+						controlValue: 0,
+						message: "Turn off seedling heat mat."
+					}
+				],
+				repeat: false
+			}
 		}
-
 	]

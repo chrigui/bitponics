@@ -34,9 +34,17 @@ module.exports = [
 			plantCapacity: 6
 		},
 		{
+			_id : '506de30d8eebf7524342cb77',
+			name: "Bitponics Water Culture System",
+			description: "The system provided to our Kickstarter backers.",
+			type: "deep water culture (DWC)",
+			reservoirSize: 4.5,
+			plantCapacity: 6	
+		},
+		{
 			_id : '506de3008eebf7524342cb40',
 			name: "Egg-carton seed starter",
-			description: "Seed-starting system made with a plastic egg carton. For full directions on how to make one, go here: http://bitponics.com/guides/water-culture-system",
+			description: "Seed-starting system made with a plastic egg carton. For full directions on how to make one, go here: http://bitponics.com/guides/water-culture-system. And this system doesn't have room for pH and EC sensors, but you won't need them anyway since in the seed-starting phase you just use plain tap water. So just put the caps on those sensors, unplug them and store them aside until you get to the next phase.",
 			type: "deep water culture (DWC)",
 			reservoirSize: .1,
 			plantCapacity: 12
