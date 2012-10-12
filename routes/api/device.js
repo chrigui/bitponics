@@ -2,9 +2,8 @@ var mongoose = require('mongoose'),
     Device = require('../../models/device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
+    GrowPlanModel = require('../../models/growPlan').growPlan.model,
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
-    GrowPlanModel = require('../../models/growPlan').model,
-    PhaseModel = require('../../models/phase').model,
     Action = require('../../models/action'),
     ActionModel = Action.model,
     ActionUtils = Action.utils,
@@ -281,12 +280,14 @@ module.exports = function(app) {
           return callback(new Error('No active phase found for this grow plan instance.'));
         }
 
-        PhaseModel.findById(growPlanInstancePhase.phase).populate('actions').exec(callback);
+        GrowPlanModel.findById(growPlanInstance.growPlan)
+        .populate('phases.actions')
+        .exec(callback);
       },
-      function (phaseResult, callback){
+      function (growPlanResult, callback){
         var allCyclesString = '';
 
-        phase = phaseResult;
+        phase = growPlanResult.phases.filter(function(item){return item._id.equals(growPlanInstancePhase.phase);})[0];
         // get the actions that have a control reference & a cycle definition & are repeating
         actions = phase.actions || [];
         actions = actions.filter(function(action){ return !!action.control && !!action.cycle && !!action.cycle.repeat; });
@@ -330,7 +331,6 @@ module.exports = function(app) {
       responseBody = responseBody.replace('{cycles}', allCyclesString);
 
       device.activeGrowPlanInstance = growPlanInstance;
-      device.activePhase = phase;
       device.activeActions = {
         actions: actions,
         deviceMessage : responseBody,

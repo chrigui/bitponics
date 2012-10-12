@@ -6,7 +6,8 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId,
   	DeviceTypeModel = require('./deviceType').model,
   	ActionOverrideLogModel = require('./actionOverrideLog').model,
-  	ActionUtils = require('./action').utils;
+  	ActionUtils = require('./action').utils,
+  	winston = require('winston');
 
 
 /***************** SCHEMA **********************/
@@ -45,7 +46,6 @@ var DeviceSchema = new Schema({
 		}]
 	}],
 	activeGrowPlanInstance : { type: ObjectId, ref: 'GrowPlanInstance', required: false},
-	activePhase : { type: ObjectId, ref: 'Phase', required: false },
 	
 	/**
 	 *  Cache of the active phase actions for this device. Right now it's

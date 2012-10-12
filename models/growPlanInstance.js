@@ -29,7 +29,7 @@ var GrowPlanInstanceSchema = new Schema({
     active: { type: Boolean, required: true },
 
 	phases: [{
-		phase: { type: ObjectId, ref: 'Phase' },
+		phase: Schema.Types.ObjectId, // ObjectId of GrowPlan.Phase
 		startDate: { type: Date },
 		endDate: { type: Date },
 		active: { type: Boolean }

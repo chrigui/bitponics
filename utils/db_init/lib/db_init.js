@@ -47,8 +47,6 @@ mongoUrls = require('../../../config/mongo-config').urls,
 		plants: {},
 		controls: {},
 		actions: {},
-		idealRanges: {},
-		phases: {},
 		growPlans: {},
 		growPlanInstances: {},
 		users: {},
@@ -168,22 +166,6 @@ mongoose.connect(db_url);
 		 			mongoose.connection.collections['actions'].drop( function(err) {
 		 				if (err){ return innerCallback(err);}
 		 				console.log('actions collection dropped');
-		 				innerCallback();
-		 			});
-		 		},
-		 		function(innerCallback){
-		 			if (!mongoose.connection.collections['idealranges']){ return innerCallback();}
-		 			mongoose.connection.collections['idealranges'].drop( function(err) {
-		 				if (err){ return innerCallback(err);}
-		 				console.log('idealranges collection dropped');
-		 				innerCallback();
-		 			});
-		 		},
-		 		function(innerCallback){
-		 			if (!mongoose.connection.collections['phases']){ return innerCallback();}
-		 			mongoose.connection.collections['phases'].drop( function(err) {
-		 				if (err){ return innerCallback(err);}
-		 				console.log('phases collection dropped');
 		 				innerCallback();
 		 			});
 		 		},
@@ -665,98 +647,8 @@ function(callback){
 		 });
 		},
 
-		function(callback){
-        /**
-		 * idealRanges
-		 */
-
-		 var dataType = 'idealRanges',
-		 dataCount = data[dataType].length,
-		 decrementData = function(){
-		 	dataCount--;
-		 	if (dataCount === 0){
-		 		callback();
-		 	}
-		 };
-
-		 console.log('####### ' + dataType + ' #######');
-
-		 data[dataType].forEach(function(_data){
-		 	models.idealRange.findById(_data._id, function(err, result){
-		 		if (err) { console.log(err); return callback(err);}
-		 		if (result){
-		 			decrementData();
-		 		} else {
-		 			var dataObj = new models.idealRange({
-		 				_id : _data._id,
-		 				name: _data.name,
-		 				sCode: _data.sCode,
-		 				valueRange: _data.valueRange,
-		 				applicableTimeSpan: _data.applicableTimeSpan,
-		 				actionBelowMin : _data.actionBelowMin,
-		 				actionAboveMax : _data.actionAboveMax
-		 			});
-
-		 			dataObj.save(function (err, doc) {
-		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
-		 				console.log("created idealRange");
-		 				decrementData();
-		 			});
-		 		}
-		 	});
-		 	
-		 });
-		},
-
-		function(callback){
-        /**
-		 * Phases
-		 */
-
-		 var dataType = 'phases',
-		 dataCount = data[dataType].length,
-		 decrementData = function(){
-		 	dataCount--;
-		 	if (dataCount === 0){
-		 		callback();
-		 	}
-		 };
-
-		 console.log('####### ' + dataType + ' #######');
-
-		 data[dataType].forEach(function(_data){
-		 	models.phase.findById(_data._id, function(err, result){
-		 		if (err) { console.log(err); return callback(err);}
-		 		if (result){
-		 			decrementData();
-		 		} else {
-		 			var dataObj = new models.phase({
-		 				_id : _data._id,
-		 				name: _data.name,
-		 				expectedNumberOfDays: _data.expectedNumberOfDays,
-		 				light: {
-		 					fixture: _data.light.fixture,
-		 					fixtureQuantity : _data.light.fixtureQuantity,
-		 					bulb: _data.light.bulb,
-		 				},
-		 				growSystem: _data.growSystem,
-		 				growMedium: _data.growMedium,
-		 				nutrients: _data.nutrients,
-		 				actions: _data.actions,
-		 				idealRanges: _data.idealRanges
-		 			});
-
-		 			dataObj.save(function (err, doc) {
-		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
-		 				console.log("created phase");
-		 				decrementData();
-		 			});
-		 		}
-		 	});
-		 });
-		},
+		
+		
 
 		function(callback){
         /**

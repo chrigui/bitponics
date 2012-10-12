@@ -17,25 +17,24 @@ module.exports = [
 			growPlan : "506de2ff8eebf7524342cb3a",
 			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
-			endDate: 1351742400000, // 11/01/2012
-		    active: true,
+			active: true,
 			phases: [
 				{
-					phase: "506de3048eebf7524342cb4f",
+					phase: "506de3038eebf7524342cb4e",
 					startDate: 1347364818821, // 09/11/2012
-					endDate: 1351742400000, // 11/01/2012
+					endDate: null, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "506de3048eebf7524342cb50",
-					startDate: 1351828800000, // 11/02/2012
-					endDate: 1357016400000, // 01/01/2013
+					phase: "506de3048eebf7524342cb4f",
 					active: false
 				},
 				{
-					phase: "506de3048eebf7524342cb51",
-					startDate: 1357102800000, // 01/02/2013
-					endDate: 1362200400000, // 03/01/2013
+					phase: "506de3048eebf7524342cb50",
+					active: false
+				},
+				{
+					phase : "506de3048eebf7524342cb51",
 					active: false
 				}
 			],
@@ -132,25 +131,15 @@ module.exports = [
 			growPlan : "506de2ff8eebf7524342cb3b",
 			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			startDate: 1347364818821, // 09/11/2012
-			endDate: 1351742400000, // 11/01/2012
-		    active: false,
+			active: false,
 			phases: [
 				{
-					phase: "506de3048eebf7524342cb4f",
+					phase: "506de30e8eebf7524342cb79",
 					startDate: 1347364818821, // 09/11/2012
-					endDate: 1351742400000, // 11/01/2012
 					active: true
 				},
 				{
-					phase: "506de3048eebf7524342cb50",
-					startDate: 1351828800000, // 11/02/2012
-					endDate: 1357016400000, // 01/01/2013
-					active: false
-				},
-				{
-					phase: "506de3048eebf7524342cb51",
-					startDate: 1357102800000, // 01/02/2013
-					endDate: 1362200400000, // 03/01/2013
+					phase: "506de30e8eebf7524342cb7a",
 					active: false
 				}
 			],

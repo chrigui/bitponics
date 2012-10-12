@@ -1,4 +1,4 @@
-var GrowPlanModel = require('../../models/growPlan').model,
+var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     winston = require('winston');
 
 /**

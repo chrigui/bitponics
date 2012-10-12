@@ -2,8 +2,7 @@ var Device = require('./device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
     GrowPlanInstanceModel = require('./growPlanInstance').model,
-    GrowPlanModel = require('./growPlan').model,
-    PhaseModel = require('./phase').model,
+    GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
     ActionUtils = Action.utils,
@@ -51,11 +50,13 @@ function logSensorLog(options, callback){
       sensorLog.save(innerCallback);
     },
     function parallel4(innerCallback){
-      PhaseModel
-      .findById(activeGrowPlanInstancePhase.phase)
-      .populate('idealRanges')
-      .exec(function(err, phase){
+      GrowPlanModel
+      .findById(growPlanInstance.growPlan)
+      .exec(function(err, growPlan){
         if (err){ return innerCallback(err); }
+        if (!growPlan){ return new Error('GrowPlanInstance.growPlan not found'); }
+        
+        var phase = growPlan.phases.filter(function(item){ return item._id.equals(activeGrowPlanInstancePhase.phase); })[0];
         if (!phase){ return new Error('Active phase not found for this grow plan instance'); }
         if (!phase.idealRanges){ return innerCallback();}
         
@@ -168,13 +169,15 @@ function triggerActionOverride(options, callback){
           if (!action.control){ return innerCallback(); }
 
           if (!device){
-            PhaseModel.findById(growPlanInstance.phases.filter(function(phase){return phase.active;})[0])
-            .populate('actions')
+            GrowPlanModel.findById(growPlanInstance.growPlan)
+            .populate('phases.actions')
             .exec(function(err, phaseResult){
                 if (err) { return innerCallback(err);}
+                var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase){return phase.active;})[0];
+                var phase = growPlan.phases.filter(function(phase){return phase._id.equals(growPlanInstancePhase.phase);})[0];
                 ActionModel.findOne()
                 .where('_id')
-                .in(phaseResult.actions)
+                .in(phase.actions)
                 .where('control')
                 .equals(action.control)
                 .exec(function(err, actionResult){

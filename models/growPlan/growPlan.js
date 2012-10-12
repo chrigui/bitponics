@@ -1,10 +1,10 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-	mongoosePlugins = require('../lib/mongoose-plugins'),
+	mongoosePlugins = require('../../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
-  	GrowSystemSchema = require('./growSystem').schema;
+  	PhaseSchema = require('./phase').schema;
 
 var GrowPlanSchema = new Schema({
 	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
@@ -25,10 +25,9 @@ var GrowPlanSchema = new Schema({
 	//nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
 	sensors: [{ type: ObjectId, ref: 'Sensor' }],
 	controls: [{ type: ObjectId, ref: 'Control'}],
-	phases: [{ type: ObjectId, ref: 'Phase' }],
+	phases: [PhaseSchema],
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
-},
-{ strict: true });
+});
 
 GrowPlanSchema.plugin(useTimestamps);
 
@@ -43,4 +42,5 @@ GrowPlanSchema.suggestions = {
 	]
 };
 
+exports.schema = GrowPlanSchema;
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

@@ -1,4 +1,4 @@
-var IdealRangeModel = require('../../models/idealRange').model,
+var //IdealRangeModel = require('../../../models/growPlan').idealRange.model,
     winston = require('winston');
 
 /**
@@ -9,11 +9,13 @@ var IdealRangeModel = require('../../models/idealRange').model,
 module.exports = function(app) {
 
    //List ideal_ranges
-  app.get('/api/ideal_ranges', function (req, res, next){
+  app.get('/api/grow_plans/:growPlanId/ideal_ranges', function (req, res, next){
+    /*
     return IdealRangeModel.find(function (err, idealRanges) {
       if (err){ next(err); }
       return res.send(idealRanges);
     });
+*/
   });
 
   /*
@@ -34,7 +36,8 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/ideal_ranges', function (req, res, next){
+  app.post('/api/grow_plans/:growPlanId/ideal_ranges', function (req, res, next){
+  /*
     var idealRange;
     winston.info("POST: ");
     winston.info(req.body);
@@ -50,6 +53,7 @@ module.exports = function(app) {
       if (err) { return next(err); }
       return res.send(idealRange);
     });
+*/
   });
 
   /*
@@ -63,11 +67,13 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/ideal_ranges/:id', function (req, res, next){
+  app.get('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+    /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
       return res.send(idealRange);
     });
+*/
   });
 
   /*
@@ -88,7 +94,8 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/ideal_ranges/:id', function (req, res, next){
+  app.put('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+    /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
       idealRange.actionBelowMin = req.body.actionBelowMin;
@@ -97,6 +104,7 @@ module.exports = function(app) {
         return res.send(idealRange);
       });
     });
+*/
   });
 
   /*
@@ -114,7 +122,8 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/ideal_ranges/:id', function (req, res, next){
+  app.delete('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+    /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
       return idealRange.remove(function (err) {
@@ -122,5 +131,6 @@ module.exports = function(app) {
         return res.send('');
       });
     });
+*/
   });
 };
