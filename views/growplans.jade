@@ -1,0 +1,103 @@
+extends layout
+
+block css
+  link(rel='stylesheet', href='/assets/css/libs/steps.css')
+
+block content
+
+  section#header
+    header#logo(role="banner") 
+      img(src="/img/leaf-new-green.png", width="15%")
+
+    div#setup.select-block
+      h2.main-heading #{title}
+      //h3.sub-heading
+    div#user.select-block
+      h2.main-heading User
+      h3.sub-heading
+          if user.name.full != 'undefined undefined' && user.name.full != ''
+           | #{user.name.full}
+          else
+           | #{user.email}
+
+  section#main(role="main")
+    div.content-module.middle
+      h3.main-heading Grow Plan Selection
+      form(id="growplans", class='steps', action='', method='post')                  
+        
+        section(id="system_selection", class="step", data-required="1")
+          label What type of system do you have?
+          ul(class="grid photos")
+            each system, i in growSystems
+              li
+                input(id="sys_#{system.name}", type='radio', name="system.name", value="#{system.name}")
+                label(for="sys_#{system.name}") #{system.name}
+
+        section(id="plant_selection", class="step")
+          label What would you like to grow?
+
+          input(class="search no-validate")
+          //span(class="sort", data-sort="plant") Sort by Plant Name
+
+          ul(class="grid sortlist")
+            each plant, i in plants
+              li
+                input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
+                label(for="#{plant.name}", class="plant") #{plant.name}
+
+        section(id="growplan_results", class="step update-panel", data-required="1")
+          label We've found some grow plans for you
+          ul(class="grid sortlist photos")
+            dummy_systems = ["Drip","aquaponics","ebb & flow","Egg-carton seed starter","deep water culture (DWC)", "Bitponics Water Culture System"]
+            each growPlan, i in growPlans
+              li(id="gplist_#{growPlan.id}")
+                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}")
+                label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
+                div.info
+                  div(class="gplist_description") #{growPlan.description}
+                  div(class="gplist_plants") #{growPlan.plants}
+                  //TODO get all phase's systems populated here so we can filter on it
+                  div(class="gplist_system #{dummy_systems[i]}") #{dummy_systems[i]}
+
+        section(id="growplan_edit", class="step hide")
+          h4 Grow Plan Activation
+
+          //set as default grow plan, will change dynamically based on previous step selection
+          input(type="hidden", name="parentGrowPlan", value="#{growPlanDefault.id}") 
+
+          label #{growPlanDefault.name}
+          input(id="gpedit_name", type='text', name="gpedit_name", value="#{growPlanDefault.name}")
+          
+          label #{growPlanDefault.description}
+          input(id="gpedit_description", type='text', name="gpedit_description", value="#{growPlanDefault.description}")
+
+          label #{growPlanDefault.plants}
+          input(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+
+          label #{growPlanDefault.expertiseLevel}
+          input(id="gpedit_expertiseLevel", type='text', name="gpedit_expertiseLevel", value="#{growPlanDefault.expertiseLevel}")
+
+          label #{growPlanDefault.nutrients}
+          input(id="gpedit_nutrients", type='text', name="gpedit_nutrients", value="#{growPlanDefault.nutrients}")
+
+          label #{growPlanDefault.sensors}
+          input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
+
+          label #{growPlanDefault.controls}
+          input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
+
+          label #{growPlanDefault.phases}
+          input(id="gpedit_phases", type='text', name="gpedit_phases", value="#{growPlanDefault.phases}")
+
+        input(id="growplans_activate", type="submit", value="Activate Grow Plan")
+
+block footer-scripts
+
+  script
+    Bitponics.user = {
+      
+    }
+  script(src='/assets/js/libs/Steps.js')
+  script(src='/assets/js/libs/list/src/list.js')
+  //- script(src='/assets/js/libs/list/list.min.js')
+  script(src='/assets/js/growplans.js')

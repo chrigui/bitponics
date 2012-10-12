@@ -1,35 +1,33 @@
 extends layout
 
 block content
-  - if (!user || !user.id)
-    .stackContent
-      header.default-border-b
-           h1.stack1of1 
-            span.stackContent Not Authenticated
 
-      section.stack1of1 
-         div.padding-20
-          #signup
-            a(href='/signup', style='text-decoration:underline;color:#333') Sign up
-          #password-login
-            a(href='/login', style='text-decoration:underline;color:#333') Login
-          
-      // section.stack1of1 
-        div.stackContent.padding-20
-          h2 Or login using one of the following services:
-          div
-            #fb-login(style='float: left; margin-left: 5px')
-              a(href='/auth/facebook', style='border: 0px')
-                img(style='border: 0px', src='http://github.com/intridea/authbuttons/raw/master/png/facebook_64.png')
-            #google-login(style='float: left; margin-left: 5px')
-              a(href='/auth/google', style='border: 0px')
-                img(style='border: 0px', src='http://github.com/intridea/authbuttons/raw/master/png/google_64.png')
-            
-  - else
-    .stackContent
-      .stack1of1
-        h2 Authenticated
-        #user-id 
-          | Logged in with `user.id` #{user.id}, 'user.email' #{user.email}
-        h3
-          a(href='/logout', style='text-decoration:underline;color:#333') Logout
+  section#header
+      header#logo(role="banner") 
+        img(src="/img/leaf-new-green.png", width="15%")
+
+      div#setup.select-block
+        h2.main-heading #{title}
+        //h3.sub-heading
+      div#user.select-block
+        - if (!user || !user.id)
+          h2.main-heading Welcome
+          h3.sub-heading
+            a(href="/signup") Sign up
+            <br>
+            a(href="/login") Log in
+        - else
+          h2.main-heading Hi, 
+            if user.name.full != ''
+             | #{user.name.full}
+            else
+             | #{user.email}
+          h3.sub-heading
+              a(href='/logout') Logout
+
+  section#main(role="main")
+    div#home.content-module.middle
+
+
+  section#footer
+

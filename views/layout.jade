@@ -1,5 +1,5 @@
 !!! 5
-html(class=className)
+html(class=className+" no-js")
   head
     title= title
     meta(charset="UTF-8")
@@ -12,9 +12,8 @@ html(class=className)
     
     include includes/footer/main
 
-    script(src='//code.jquery.com/jquery-1.7.1.min.js')
-    script(src='/socket.io/socket.io.js')
-    //script(src='/assets/js/plugins/jquery.flot.js')
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js')
+    //script(src='/socket.io/socket.io.js')
 
     script(src='/assets/js/libs/rickshaw/vendor/d3.min.js')
     script(src='/assets/js/libs/rickshaw/vendor/d3.layout.min.js')

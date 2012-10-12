@@ -1,21 +1,13 @@
-// ===== ./libs/resets
-@import "./libs/resets"
-
 @import "nib"
-
-// if lt IE 8
-// ===== ./helpers
+@import "./libs/resets"
+@import "./global/utils"
+@import "./global/icons"
 @import "./helpers"
-// ===== ./typography
+@import "./global/colors"
 @import "./typography"
-// ===== ./base
 @import "./base"
-// ===== ./mobile
-@media screen and (max-width: 639px)
-	@import "./mobile"
-// ===== ./tablet
-@media screen and (min-width: 640px)
+@import "./forms"
+@media screen and (min-width: 40em)
 	@import "./tablet"
-// ===== ./desktop
-@media screen and (min-width: 1024px)
+@media screen and (min-width: 65em)
 	@import "./desktop"

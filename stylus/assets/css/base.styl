@@ -1,16 +1,360 @@
+@import "./libs/resets"
 @import "./global/utils"
-@import "nib"
+@import "./global/icons"
+@import "helpers"
+@import "./global/colors"
 
 body
-  background-color med-white
-  font-size base-font-size
+	margin: .5em;
+	color: #333
+	font 112.5%/1.5 Helvetica, Arial, sans-serif
+	background color-global-background
 
-ul {
-  list-style none
-  li {
-  	list-style-type none
-  }
+* 
+	-webkit-box-sizing border-box
+	-moz-box-sizing border-box
+	box-sizing border-box
+
+h1,h2,h3,h4,h5,h6
+	font-weight normal
+
+abbr[title]
+	border none
+
+div, p, span, a, a:visited, a:hover, a:active
+	color color-medium-green
+
+
+
+/*
+ * Modules
+ */
+.content-module
+	min-width 9em
+	margin 0 0 2.25em
+	border-top 4px solid color-light-green
+	&.small
+		width 25%
+	&.medium
+		width 50%
+	&.large
+		width 100%
+	&.middle
+		width 100%
+
+.data-module {
+	color white
+	text-align center
+	position relative
+	background-color color-medium-green
+	//width 100%
+	height 11.5em
+	text-transform uppercase
+	margin 0.125em 0
+
+	div, p, span, a, a:visited, a:hover, a:active {
+		color white
+	}
+
+	&.warning {
+		background-color color-warning
+	}
+
+
+	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
+		position absolute
+	}
+
+	.main-heading {
+		color white
+		font-size .75em
+		margin 0
+		top .5em
+		left .75em
+		font-weight bold
+	}
+	.message {
+		bottom .5em
+		right .75em
+	}
+	.settings {
+		top .15em
+		right .5em
+	}
+	.message, .sensor-value-unit {
+		font-size .55em //~10px
+		font-weight bold
+	}
+	.sensor-value-unit {
+		top 1em
+		right 1.85em
+		line-height 1em
+		text-align left
+
+		span {
+			display block
+		}
+	}
+	.sensor-data {
+		display inline-block
+		vertical-align middle
+		position: absolute;
+		top 1.85em
+		left 0
+		width 100%
+		border-top 1px solid white
+	}
+	.sensor-value {
+		font-size 10em
+		letter-spacing -.1em
+		line-height 1.25em
+		margin -.15em 0 0 -.15em
+		text-align center
+		
+	}
+	.sensor-type {
+		bottom: .25em;
+		left: .5em;
+	}
+
+	&.closed { //TODO: work on closed state
+		min-height 2em
+		height auto
+
+		.main-heading {
+			position static
+			display inline-block
+			vertical-align middle
+			width 63%
+			text-align left
+			text-indent .45em
+		}
+		.sensor-value-unit, .message, .settings, .sensor-type {
+			display none
+		}
+		.sensor-data {
+			width 30%
+			text-align right
+			position relative
+			right .25em
+			top 0
+			border none 0
+			
+		}
+		.sensor-value {
+			font-size .75em
+			position static
+			letter-spacing normal
+			margin 0
+			position relative
+			right 0.15em
+			text-align right
+			font-weight bold	
+		}
+
+
+	}
+
+	&:before {
+	    content ''
+	    display inline-block
+	    height 100%
+	    vertical-align middle
+	    margin-right -0.25em
+	}
 }
 
-*
-  box-sizing border-box
+/*
+ * headings
+ */
+#logo
+	position absolute
+	top 0
+	left 0
+	img
+		width 5em
+		padding .5em
+
+.main-heading
+	color color-light-green
+	margin .5em 0
+	font-weight bold
+.sub-heading
+	color color-medium-green
+	margin .65em 0
+	font-weight bold
+.select-block
+	line-height 1.66em
+	padding 0
+	margin 1em 0
+	text-align right
+
+	
+	.main-heading, .sub-heading
+		@extends .ellipsis
+		margin 0
+		font-size  1.5em
+		width 100%
+		
+	.sub-heading
+		//cursor pointer
+		position relative
+		/*
+		&:after
+			position absolute
+			content ''
+			right 0
+			top .35em
+			width 1px
+			height 1px
+			create-triangle('down', 10px, color-carrot-green)
+		*/
+
+/*
+ * Icons
+ */
+.icon
+	display inline-block
+	div
+		//
+	
+
+.btn
+	@extends .display-ib
+	padding 1em
+	margin 1em
+	background color-medium-green
+	color white
+	cursor pointer
+
+	&:hover
+		background color-medium-green
+		color white
+	&:active
+		background lighten(color-medium-green, 10%)
+		color white
+
+	& *
+		@extends .display-ib
+		margin 0
+
+	&.sub
+		background color-light-green
+
+	&.clear
+		display block
+		clear both
+		margin 0
+
+/*
+ * Visualizer
+ */
+#visualizer
+	div.circle
+		//background-color color-medium-green
+		position: absolute;
+		top .75em
+		left .75em
+		bottom .75em
+		right .75em
+
+/*
+ * controls
+ */
+.control
+	@extends .display-ib
+	width 8em
+	height 10em
+	position relative
+	text-align center
+	color color-medium-green
+	font-weight bold
+	margin: 0 0 1em;
+
+	&:before
+		position: absolute;
+		padding-top: 3.35em;
+		width: 100%;
+		top: 0;
+		left: 0;
+		font-size: 1.5em;
+
+	svg
+		position absolute
+		top 2em
+		left 0
+
+
+/*
+ * sensors
+ */
+#ph,#ec,#tds,#sal,#water
+	background-color color-sensor-water
+
+#air,#hum,#co2
+	background-color color-sensor-air
+
+#lux,#ir,#full,#vis
+	background-color color-sensor-light
+
+.empty
+	background-color color-sensor-empty
+
+/*
+ * Phase Visualizer
+ */
+#phases-graph
+	svg
+		display: inline-block;
+		vertical-align: top;
+
+section#footer
+	clear both
+
+	.content-module
+		background-color color-global-background
+
+
+/*
+ * Notifications
+ */
+#notifications
+	//
+.notification.sub-heading
+	//background-color color-sensor-light
+
+
+.loader 
+	height 24px
+	width 24px
+	background url(/img/loader.gif) no-repeat 0 0
+
+
+
+/*
+ * Dashboard Page
+ */
+.dashboard
+	.content-module
+		&.middle
+			position relative
+			padding 100% 0 0 0 //must match container width
+			height 0
+	select
+		margin 0
+
+
+/*
+ * Profile Page
+ */
+.profile
+	.content-module
+		&.middle
+			//
+
+
+/*
+ * Grow Plans Page
+ */
+.growplans
+	//

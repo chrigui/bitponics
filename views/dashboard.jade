@@ -1,93 +1,137 @@
 extends layout
 
 
-block css 
-  link(rel='stylesheet', href='/assets/css/pages/dashboard/nav.css')
-
+block css
+  link(rel='stylesheet', href='/assets/css/libs/jquery.qtip.css')
 
 block content
-  div#dashboard.user-page
-    nav
-      ul
-        li.first.logo
-          a(href="#") bitponics
-        li.growing-plan
-          a(href="#") Tomatoes
-            span.triangle-down
-        li.user
-          a(href="#") Amit Kumar
-            span.icon
-        li.language
-          a(href="#") English
-            span.icon
-        li.last.settings
-          a(href="#") Settings
-            span.icon
-    section
-      header.default-border-b
-        h1.date
-          span Friday, November 18, 2011
-        h2.time
-          span.text-align-r 8:32 AM
-    section
-      div#phases-graph
-      nav#graph-nav
-        .photo-stream
-          ul
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-            li 
-              img(src="img/placeholders/hydro7.jpg")  
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-            li 
-              img(src="img/placeholders/hydro1.jpg")
-            li 
-              img(src="img/placeholders/hydro2.jpg")
-            li 
-              img(src="img/placeholders/hydro3.jpg")
-            li 
-              img(src="img/placeholders/hydro4.jpg")
-            li 
-              img(src="img/placeholders/hydro5.jpg")
-            li 
-              img(src="img/placeholders/hydro6.jpg")
-          .add-photo
-            img(src="img/icons/camera.gif")
+  section#header
+    header#logo(role="banner") 
+      img(src="/img/b-133w.png", width="15%")
+      
+    div#setup.select-block
+      h2.main-heading Grow Plans
+      h3.sub-heading
+        - if (typeof(activeGrowPlanInstances) != 'undefined')
+          select
+            each item in activeGrowPlanInstances
+              option= item.growPlan.name
+            option Create New Grow Plan
+        - else
+          option Create New Grow Plan
+    div#user.select-block
+      h2.main-heading User
+      h3.sub-heading
+        a(href="/profile")
+          if user.name.full != ''
+           | #{user.name.full}
+          else
+           | #{user.email}
+  section#main(role="main")
+    div#sensors.content-module.side
+      h2.main-heading Sensors
+      - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)
+        - var sensorStyle = ''
+        each sensorCode in sensorDisplayOrder
+          - var sensor = sensors[sensorCode]
+          - var warning = false
+          - if (sensor)
+            -if (!sensor.logs[0])
+              warning = true
+            div(class="sensor data-module #{sensorStyle} #{sensorCode} #{warning ? 'warning' : ''}")
+                - sensorStyle = 'closed'
+                h3.main-heading
+                  | #{sensor.abbrev}
+                div.sensor-data
+                  div.sensor-value #{sensor.logs[0] ? sensor.logs[0].value : '----'}
+                  div.sensor-value-unit
+                    span #{sensor.unit}
+                div(class="sensor-type icon #{sensor.code}")
+                  | <i class="icon-glyph icon-#{sensor.code}" aria-hidden="true"></i>
+                  div.screen-reader-text #{sensor.code}
+                div.message #{warning ? 'Check' : 'OK'}
+                div(class="settings icon")
+                  | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
+                  div.screen-reader-text Settings
+      - else //show empty sensor or callout to setup sensors?
+        div(class="sub-heading notification")
+            //- | No active sensors
+        div(class="sensor data-module")
+            h3.main-heading
+              | Example Sensor
+            div.sensor-data
+              div.sensor-value 18
+              div.sensor-value-unit
+                span Hrs/
+                span Day
+            div(class="sensor-type icon")
+              | <i aria-hidden="true" data-icon="&#x28"></i>
+              div.screen-reader-text Light Sensor
+            div.message OK
+            div(class="settings icon")
+              | <i aria-hidden="true" data-icon="&#x2e"></i>
+              div.screen-reader-text Settings
 
-        .notifications
+    div#visualizer.content-module.middle
+      div#phases-graph.circle.centered
+    
+    div#controls.content-module.side
+      h2.main-heading Controls
+      - if (typeof(controls) != 'undefined')
+        each item in controls
+          div(class="control #{item.className} icon-glyph icon-#{item.className}", data-control-key="#{item.name}") #{item.name}
+      - else
+          div(class="sub-heading notification")
+            | No active controls
+            //a(href="/", class="") Settings
+    div#reminders.content-module.side
+      h2.main-heading Reminders
+  
+  section#footer
+    div#date.content-module.side
+      div.date.main-heading October 17, 2012
+      div.time.sub-heading 3:23 PM
+    div#notifications.content-module.side
+      div.sub-heading.notification Notification #1
+      div.sub-heading.notification Notification #2
 
-          .arrow-left
-            img(src="img/icons/arrow-left.gif")
-          .arrow-right
-            img(src="img/icons/arrow-right.gif")
-          .notification
-            .calendar
-              img(src="img/icons/calendar.gif")
-            .text Flush reservior and refill. Mix 1/4 cup "Grow" nutrient, then 1/4 cup "Micro" nutrient, then 1/2 cup "Bloom" nutrient.
-          .add-log 
-            img(src="img/icons/notepad.gif")
+  section#templates(style="display:none")
+    textarea#control-tooltip-template
+      |  <div class="control-tooltip">
+      |    <h3>Available actions to trigger on your {{name}}:</h3>
+      |    {{#actions}}
+      |      <div>
+      |        <a class="action-trigger-link" data-action-id="{{_id}}">{{description}}</a>
+      |      </div>
+      |    {{/actions}}
+      |  </div>
 
 block footer-scripts
+
+  - if (typeof(sensors) == 'undefined')
+    sensors = '[]'
+  - if (typeof(controls) == 'undefined')
+    controls = '[]'
+  - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
+    currentGrowPlanInstancePhases = '[]'
+  - if (typeof(currentGrowPlanInstance) == 'undefined')
+    currentGrowPlanInstance = { "_id": null }
+
+  script
+    Bitponics.user = {
+      currentGrowPlanInstance : {
+        /**
+         *  Mashup of Sensor objects GPI's current Phase's IdealRanges.
+         *  abbrev, unit of measurement, code, name, idealRange.
+         *  Hash keyed by Sensor.code.
+         */
+        id : !{JSON.stringify(currentGrowPlanInstance._id)},
+        sensors : !{JSON.stringify(sensors)},
+        controls : !{JSON.stringify(controls)},
+        phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
+      }
+    }
   script(src='/assets/js/libs/d3.v2.js')
-  script(src='/assets/js/dashboard.js')
+  script(src='/assets/js/libs/jquery/jquery.qtip.min.js')
+  script(src='/assets/js/libs/mustache.js')
+  script(src='/assets/js/dashboard.js') 
