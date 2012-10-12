@@ -10,8 +10,6 @@ var data = {
 	growSystems: require('./growSystems'),
 	plants: require('./plants'),
 	actions: require('./actions'),
-	idealRanges: require('./idealRanges'),
-	phases: require('./phases'),
 	growPlans: require('./growPlans'),
 	growPlanInstances: require('./growPlanInstances'),
 	sensorLogs: require('./sensorLogs'),

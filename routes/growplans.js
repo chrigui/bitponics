@@ -1,5 +1,5 @@
 var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
-  GrowPlanModel = require('../models/growPlan').model,
+  GrowPlanModel = require('../models/growPlan').growPlan.model,
   UserModel = require('../models/user').model,
   PlantModel = require('../models/plant').model,
   GrowSystemModel = require('../models/growSystem').model,

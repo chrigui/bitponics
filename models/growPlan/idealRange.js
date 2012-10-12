@@ -1,8 +1,6 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	mongoosePlugins = require('../lib/mongoose-plugins'),
-	useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId;
 
 var IdealRangeSchema = new Schema({
@@ -36,9 +34,6 @@ var IdealRangeSchema = new Schema({
 	}
 });
 
-IdealRangeSchema.plugin(useTimestamps);
-
-
 IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 	var applicableTimeSpan = this.applicableTimeSpan;
 	if (applicableTimeSpan){ return true; }
@@ -50,4 +45,3 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 });
 
 exports.schema = IdealRangeSchema;
-exports.model = mongoose.model('IdealRange', IdealRangeSchema);

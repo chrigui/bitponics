@@ -1,9 +1,8 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	mongoosePlugins = require('../lib/mongoose-plugins'),
-	useTimestamps = mongoosePlugins.useTimestamps,
-  	ObjectId = Schema.ObjectId;
+  	ObjectId = Schema.ObjectId,
+  	IdealRangeSchema = require('./idealRange').schema;
 
 var PhaseSchema = new Schema({
 	
@@ -31,18 +30,9 @@ var PhaseSchema = new Schema({
 
 	actions: [{ type: ObjectId, ref: 'Action', required: true }],
 	
-	idealRanges: [{ type: ObjectId, ref: 'IdealRange', required: false }],
+	idealRanges: [IdealRangeSchema],
 
 	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],
 });
 
-PhaseSchema.plugin(useTimestamps);
-
-/**
- * suggestions for auto-complete
- */
-PhaseSchema.suggestions = {
-}
-
 exports.schema = PhaseSchema;
-exports.model = mongoose.model('Phase', PhaseSchema);

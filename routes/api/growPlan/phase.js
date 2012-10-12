@@ -1,4 +1,4 @@
-var PhaseModel = require('../../models/phase').model,
+var //PhaseModel = require('../../../models/growPlan').phase.model,
     winston = require('winston');
 
 /**
@@ -9,11 +9,13 @@ var PhaseModel = require('../../models/phase').model,
 module.exports = function(app) {
 
    //List phases
-  app.get('/api/phases', function (req, res, next){
+  app.get('/api/grow_plans/:growPlanId/phases', function (req, res, next){
+    /*
     return PhaseModel.find(function (err, phases) {
       if (err) { return next(err); }
       return res.send(phases);
     });
+*/
   });
 
   /*
@@ -30,7 +32,8 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/phases', function (req, res, next){
+  app.post('/api/grow_plans/:growPlanId/phases', function (req, res, next){
+    /*
     var phase;
     winston.info("POST: ");
     winston.info(req.body);
@@ -48,6 +51,7 @@ module.exports = function(app) {
       if (err) { return next(err); }
       return res.send(phase);
     });
+*/
   });
 
   /*
@@ -61,11 +65,13 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/phases/:id', function (req, res, next){
+  app.get('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+    /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }
       return res.send(phase);
     });
+*/
   });
 
   /*
@@ -86,7 +92,8 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/phases/:id', function (req, res, next){
+  app.put('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+    /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }
       phase.actionBelowMin = req.body.actionBelowMin;
@@ -95,6 +102,7 @@ module.exports = function(app) {
         return res.send(phase);
       });
     });
+*/
   });
 
   /*
@@ -112,7 +120,8 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/phases/:id', function (req, res, next){
+  app.delete('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+    /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }
       return phase.remove(function (err) {
@@ -120,5 +129,7 @@ module.exports = function(app) {
         return res.send('');
       });
     });
+*/
   });
+
 };

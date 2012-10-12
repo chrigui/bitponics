@@ -1,12 +1,10 @@
 var ControlModel = require('../models/control').model,
+GrowPlanModel = require('../models/growPlan').growPlan.model,
 GrowPlanInstanceModel = require('../models/growPlanInstance').model,
-GrowPlanModel = require('../models/growPlan').model,
 SensorModel = require('../models/sensor').model,
-PhaseModel = require('../models/phase').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
 ActionUtils = Action.utils,
-IdealRangeModel = require('../models/idealRange').model,
 winston = require('winston'),
 async = require('async'); 
 
@@ -19,6 +17,7 @@ module.exports = function(app){
 		var sensors,
 		growPlanInstances,
 		currentGrowPlanInstance,
+		currentGrowPlan,
 		phases,
 		activePhase,
 		activeIdealRanges,
@@ -41,33 +40,26 @@ module.exports = function(app){
 							function parallel3(innerCallback){
 								GrowPlanInstanceModel
 								.find({ 'users': req.user })
-								.populate('growPlan')
 								.populate('device')
-								.populate('phases.phase')
 								.sort('-startDate')
 								.exec(innerCallback);
 							}
 						],
-	          // When those parallel ops are done, create the sensorLog entry and also retrieve 
-	          // the active GrowPlanInstance
-	          function parallelFinal(err, results){
-	          	if (err) { return next(err);}
+						function parallelFinal(err, results){
+				          	if (err) { return next(err);}
 
-	          	sensors = results[0];
-	          	controls = results[1];
-	          	growPlanInstances = results[2];
+				          	sensors = results[0];
+				          	controls = results[1];
+				          	growPlanInstances = results[2];
 
-	          	//set first GP default to show in dashboard, will match on id if present below
-	          	currentGrowPlanInstance = growPlanInstances[0];
+				          	//set first GP default to show in dashboard, 
+				          	// TODO : filter based on active or something will match on id if present below
+				          	currentGrowPlanInstance = growPlanInstances[0];
 
-	          	if (currentGrowPlanInstance) {
-				      	// Now, get the active phase & populate the active phase's Actions & IdealRanges
-				      	var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
-
-								PhaseModel
-								.findById(activeGrowPlanInstancePhase.phase)		
-								.populate('actions')
-								.populate('idealRanges')
+				          	if (currentGrowPlanInstance) {
+						      	GrowPlanModel
+								.findById(currentGrowPlanInstance.growPlan)		
+								.populate('phases.actions')
 								.exec(callback);
 
 							} else {
@@ -75,11 +67,15 @@ module.exports = function(app){
 								req.flash("info", "It looks like you haven't set up any grow plans yet.");
 								res.redirect('/growplans');
 							}
-						}
+						}	
 					);
 				},
-				function wf2(phaseResult, callback){
-					activePhase = phaseResult;
+				function wf2(growPlanResult, callback){
+					if (!growPlanResult){ return callback(new Error('GrowPlanInstance.growPlan not found'));}
+					currentGrowPlan = growPlanResult;
+					// Now, get the active phase & populate the active phase's Actions & IdealRanges
+			      	var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+					activePhase = currentGrowPlan.phases.filter(function(item){ return item._id.equals(activeGrowPlanInstancePhase.phase); })[0];
 					activeIdealRanges = activePhase.idealRanges;
 					activeActions = activePhase.actions;
 
@@ -106,7 +102,12 @@ module.exports = function(app){
 				// Now get the models ready for client-side
 				var locals = {
 					activeGrowPlanInstances : growPlanInstances,
-					currentGrowPlanInstancePhases: currentGrowPlanInstance.phases,
+					currentGrowPlanInstancePhases: currentGrowPlanInstance.phases.map(
+						function(phase) { 
+							result = phase.toObject();
+							result.phase = currentGrowPlan.phases.filter(function(item){return item._id.equals(phase.phase);})[0];
+							return result;
+						}),
 					sensors: {},
 					controls: {},
 					sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis']
@@ -181,7 +182,7 @@ module.exports = function(app){
 				locals.className = 'dashboard';
 				locals.user = req.user;
 				locals.activeGrowPlanInstances = growPlanInstances;
-				locals.currentGrowPlanInstance = currentGrowPlanInstance
+				locals.currentGrowPlanInstance = currentGrowPlanInstance;
 
 				res.render('dashboard', locals);
 			}
