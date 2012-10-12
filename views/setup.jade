@@ -37,15 +37,26 @@ block content
               ul 
                 li
                   label(for='wifi-ssid') SSID
-                    input#wifi-ssid(name='wifi-ssid')
+                    select#wifi-ssid(name='wifi-ssid')
                 li
                   label(for='wifi-pass') PASS
                     input#wifi-pass(name='wifi-pass')
                 li
-                  label(for='wifi-mode') MODE
-                    input#wifi-mode(name='wifi-mode')
-                li
                   button#submit-wifi-form(type='submit') Go
+        li#wifi-data-submitted
+          p Great! The Bitponics device is now connecting to the&nbsp; 
+            span.selectedNetworkSsid
+            | network. 
+          p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to&nbsp;  
+            span.selectedNetworkSsid
+            |.
+          p After you're back on the&nbsp; 
+            span.selectedNetworkSsid
+            | network,
+            a(id="submit-device-info", href="javascript:void(0);", style="color:blue;") click here so that we can pair your device to your Bitponics account.
+        li#pairing-complete
+          p Great, your device is now connected to your account. Let's take a look at the data we're getting:
+
              
 
 block footer-scripts
@@ -53,8 +64,8 @@ block footer-scripts
     script
       Bitponics.currentUser = {
         email: '!{user.email}',
-        publicKey: '!{user.apiPublicKey}',
-        privateKey: '!{user.apiPrivateKey}'
+        publicDeviceKey: '!{user.deviceKey.public}',
+        privateDeviceKey: '!{user.deviceKey.private}'
       };
 
   script(src='/assets/js/setup.js')

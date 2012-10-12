@@ -1,22 +1,61 @@
+@import "nib"
+@import "./libs/resets"
 @import "./global/utils"
-@import "helpers"
-@import "typography"
-@import "./pages/dashboard/nav"
+@import "./global/icons"
+@import "./helpers"
+@import "./global/colors"
+@import "./typography"
+@import "./base"
+@import "./forms"
+@media screen and (min-width: 40em)
+	@import "./tablet"
+@media screen and (min-width: 65em)
+	@import "./desktop"
 
-color-primary-component=#99d264 //(ie. timeline entries)
-color-secondary-dark=#000000 //(ie. timeline ruler)
-color-logo-green=#7da451
-color-secondary-dark=#333333
-color-global-background=#f5f5f5
+/*
+ * styleguide specific
+ */
+.styleguide
+	
+	background rgba(70, 241, 33, 0.45)
+	
+	ul {
+	  margin: 1em 0;
+	  padding: 0;
+	  list-style none
+	  & li {
+	    list-style-type none
+	  }
+	}
+	.colors
+		.main-heading
+			background-color color-main-heading
+		.sub-heading
+			background-color color-sub-heading
+	.heading
+		//
+	section.colors
+		//
+	//section.layout
+	section.wrapper
+		background-color color-global-background
+		padding 1em
+	.content-module
+		float none
+	li
+		padding 1em
+	.default-background
+		background-color color-global-background
+	.logo
+		background-color color-logo-green
+	.bitponics-light-green
+		background-color color-light-green
+	.bitponics-medium-green
+		background-color color-medium-green
+	.color
+		padding 1em
+		width 1em
+		height 1em
+		@extends .circle
 
-body
-  background-color color-global-background
-  font-family "DIN", Helvetica, Arial, sans-serif
-  letter-spacing:normal;
-
-ul {
-  list-style none
-  & li {
-    list-style-type none
-  }
-}
+// /.styleguide

@@ -1,2 +1,126 @@
-.mobile
-	display none 
+@import "helpers"
+
+.content-module
+	float left
+	&.side
+		width 100%
+		margin 2em 0 0 0
+	&.middle
+		//
+body
+ margin 0
+ 
+.data-module
+	@extends .display-ib
+	width 50%
+	margin 0.125em -2px //TODO: might need to be more flexible
+
+.select-block
+	padding 0 .83em
+	text-align left
+
+section#header,
+section#main,
+section#footer
+	padding 1em
+			
+
+#logo,
+#setup,
+#user
+	float left
+	width 25%
+#setup
+	width 35%
+	margin-right 10%
+#user
+	padding 0
+
+#logo
+	position static
+	
+
+/*
+ * Dashboard Page
+ */
+.dashboard
+	.content-module
+		&.middle
+			width 100%
+			padding 100% 0 0 0 //must match container width
+			border 0 none
+			clear: both
+	section#main
+		padding 6em 1em 1em
+
+		#visualizer
+			div.circle
+				top 1.5em
+				left 1.5em
+				bottom 1.5em
+				right 1.5em
+				
+
+		#controls, #reminders
+			float right
+
+/*
+ * Grow Plans Page
+ */
+.growplans
+	//
+
+
+
+@media screen and (min-width: 60em)
+	/*body
+		&:after
+			content 'large-tablet-layout'*/
+
+	.content-module
+		float left
+		&.side
+			width 20%
+		&.middle
+			//
+
+	.data-module
+		width 100%
+		margin 0.125em 0
+
+
+	/*
+	 * Footer
+	 */
+	section#footer
+		//position fixed
+		//bottom 0
+		width 100%
+		
+
+		.content-module
+			margin 0
+
+		#date
+			float left
+
+		#notifications
+			float right
+			text-align right
+
+
+	#logo,
+	#setup,
+	#user
+		width 20%
+	#setup
+		width 30%
+		margin-right 30%
+
+	.dashboard
+		.content-module
+			&.middle
+				width 60%
+				padding 60% 0 0 0 //must match container width
+				clear none
+

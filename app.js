@@ -4,7 +4,8 @@
  */
 
 var express    = require('express'),
-    app        = module.exports = express();
+    app        = module.exports = express(),
+    winston    = require('winston');
 
 // Configure the app instance
 require('./config')(app);
@@ -12,14 +13,34 @@ require('./config')(app);
 // Add Routes to the app
 require('./routes')(app);
 
+/** 
+ *  Error handling 
+ *  Should be done last after all routes & middleware
+ *  References:
+ *  http://expressjs.com/guide.html
+ */
+require('./config/error-config')(app);
+
+
 // Finally, start up the server
 var server = app.listen(process.env.PORT || 80, function(){
   //var address = server.address();
   //app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
   
-  console.log('Express server running at ' + JSON.stringify(server.address()));
-  console.log('app.config.appUrl = ' + app.config.appUrl);
+  winston.info('Express server running at ' + JSON.stringify(server.address()));
+  winston.info('app.config.appUrl = ' + app.config.appUrl);
 });
+
+if (app.settings.env === 'local'){
+  winston.info('starting up https server');
+  var fs = require('fs'),
+      https = require('https');
+  var options = {
+    key: fs.readFileSync('config/ssl/local/server.key'),
+    cert: fs.readFileSync('config/ssl/local/server.crt')
+  };
+  https.createServer(options, app).listen(443);
+}
 
 
 

@@ -5,24 +5,172 @@ block content
     li
       section.colors
         h2 Colors
-          ul
-            li.brand Brand
-              h3 Logo
-              div.logo.color #7da451
-            li.brand Components
-              h3 Default Background
-              div.defualt-background.color #f5f5f4
-    li
-      section.layout
-        h2 Layouts
-          ul
-            li.blah Blah
-              h3 User Timeline
-              div.user-timeline.layout Some layout...
+        ul
+          li
+            h3 Logo: #23b500
+            div.logo.color
+          li
+            h3 Default Background #fff
+            div.default-background.color
+          li
+            h3 Bitponics Light Green #46f121
+            h3.bitponics-light-green.color
+          li
+            h3 Bitponics Medium Green #24d321
+            h3.bitponics-medium-green.color 
+          li
+            h3 Light Sensor: #c8c300
+            h3.sensor-light.color
+
+
     li
       section.typography
         h2 Typography
-          ul
-            li.blah Blah
-              h3 Headings
-              div.headings.typography Some typography stuff...
+        ul
+          li
+            h3 Main Heading
+            section.wrapper
+              h3.heading.main-heading Example Main Heading
+          li
+            h3 Sub Heading
+            section.wrapper
+              h3.heading.sub-heading Example Sub Heading
+
+
+    li
+      section.layout
+        examplePhaseGraphSVG = '<svg width="491" height="491"><g class="phase0" transform="translate(245.5,245.5)"><path d="M1.503204299316968e-14,-245.5A245.5,245.5 0 0,1 54.6288892862752,-239.3448024406377L40.9716669647064,-179.50860183047828A184.125,184.125 0 0,0 1.127403224487726e-14,-184.125Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M54.6288892862752,-239.3448024406377A245.5,245.5 0 0,1 106.51845795336054,-221.1878570700439L79.8888434650204,-165.89089280253293A184.125,184.125 0 0,0 40.9716669647064,-179.50860183047828Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M106.51845795336054,-221.1878570700439A245.5,245.5 0 0,1 153.0667463563191,-191.93962894590132L114.80005976723932,-143.954721709426A184.125,184.125 0 0,0 79.8888434650204,-165.89089280253293Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M153.0667463563191,-191.93962894590132A245.5,245.5 0 0,1 191.93962894590132,-153.06674635631907L143.954721709426,-114.8000597672393A184.125,184.125 0 0,0 114.80005976723932,-143.954721709426Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M191.93962894590132,-153.06674635631907A245.5,245.5 0 0,1 221.1878570700439,-106.51845795336052L165.89089280253293,-79.88884346502039A184.125,184.125 0 0,0 143.954721709426,-114.8000597672393Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M221.1878570700439,-106.51845795336052A245.5,245.5 0 0,1 239.3448024406377,-54.62888928627518L179.50860183047828,-40.97166696470639A184.125,184.125 0 0,0 165.89089280253293,-79.88884346502039Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M239.3448024406377,-54.62888928627518A245.5,245.5 0 0,1 245.5,0L184.125,0A184.125,184.125 0 0,0 179.50860183047828,-40.97166696470639Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M245.5,0A245.5,245.5 0 0,1 239.3448024406377,54.62888928627518L179.50860183047828,40.97166696470639A184.125,184.125 0 0,0 184.125,0Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M239.3448024406377,54.62888928627518A245.5,245.5 0 0,1 221.1878570700439,106.51845795336052L165.89089280253293,79.88884346502039A184.125,184.125 0 0,0 179.50860183047828,40.97166696470639Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M221.1878570700439,106.51845795336052A245.5,245.5 0 0,1 191.93962894590132,153.06674635631907L143.954721709426,114.8000597672393A184.125,184.125 0 0,0 165.89089280253293,79.88884346502039Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M191.93962894590132,153.06674635631907A245.5,245.5 0 0,1 153.0667463563191,191.93962894590132L114.80005976723932,143.954721709426A184.125,184.125 0 0,0 143.954721709426,114.8000597672393Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M153.0667463563191,191.93962894590132A245.5,245.5 0 0,1 106.51845795336054,221.1878570700439L79.8888434650204,165.89089280253293A184.125,184.125 0 0,0 114.80005976723932,143.954721709426Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M106.51845795336054,221.1878570700439A245.5,245.5 0 0,1 54.6288892862752,239.3448024406377L40.9716669647064,179.50860183047828A184.125,184.125 0 0,0 79.8888434650204,165.89089280253293Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M54.6288892862752,239.3448024406377A245.5,245.5 0 0,1 1.503204299316968e-14,245.5L1.127403224487726e-14,184.125A184.125,184.125 0 0,0 40.9716669647064,179.50860183047828Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M1.503204299316968e-14,245.5A245.5,245.5 0 0,1 -54.62888928627517,239.3448024406377L-40.97166696470638,179.50860183047828A184.125,184.125 0 0,0 1.127403224487726e-14,184.125Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-54.62888928627517,239.3448024406377A245.5,245.5 0 0,1 -106.51845795336051,221.1878570700439L-79.88884346502037,165.89089280253293A184.125,184.125 0 0,0 -40.97166696470638,179.50860183047828Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-106.51845795336051,221.1878570700439A245.5,245.5 0 0,1 -153.06674635631907,191.93962894590135L-114.8000597672393,143.954721709426A184.125,184.125 0 0,0 -79.88884346502037,165.89089280253293Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-153.06674635631907,191.93962894590135A245.5,245.5 0 0,1 -191.93962894590132,153.0667463563191L-143.954721709426,114.80005976723932A184.125,184.125 0 0,0 -114.8000597672393,143.954721709426Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-191.93962894590132,153.0667463563191A245.5,245.5 0 0,1 -221.18785707004386,106.51845795336055L-165.8908928025329,79.88884346502041A184.125,184.125 0 0,0 -143.954721709426,114.80005976723932Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-221.18785707004386,106.51845795336055A245.5,245.5 0 0,1 -239.3448024406377,54.62888928627521L-179.50860183047828,40.97166696470641A184.125,184.125 0 0,0 -165.8908928025329,79.88884346502041Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-239.3448024406377,54.62888928627521A245.5,245.5 0 0,1 -245.5,3.006408598633936e-14L-184.125,2.254806448975452e-14A184.125,184.125 0 0,0 -179.50860183047828,40.97166696470641Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-245.5,3.006408598633936e-14A245.5,245.5 0 0,1 -239.3448024406377,-54.628889286275154L-179.50860183047828,-40.971666964706365A184.125,184.125 0 0,0 -184.125,2.254806448975452e-14Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-239.3448024406377,-54.628889286275154A245.5,245.5 0 0,1 -221.1878570700439,-106.5184579533605L-165.89089280253293,-79.88884346502037A184.125,184.125 0 0,0 -179.50860183047828,-40.971666964706365Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-221.1878570700439,-106.5184579533605A245.5,245.5 0 0,1 -191.93962894590135,-153.06674635631904L-143.954721709426,-114.80005976723928A184.125,184.125 0 0,0 -165.89089280253293,-79.88884346502037Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-191.93962894590135,-153.06674635631904A245.5,245.5 0 0,1 -153.06674635631913,-191.9396289459013L-114.80005976723935,-143.95472170942597A184.125,184.125 0 0,0 -143.954721709426,-114.80005976723928Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-153.06674635631913,-191.9396289459013A245.5,245.5 0 0,1 -106.51845795336055,-221.18785707004386L-79.88884346502041,-165.8908928025329A184.125,184.125 0 0,0 -114.80005976723935,-143.95472170942597Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-106.51845795336055,-221.18785707004386A245.5,245.5 0 0,1 -54.62888928627523,-239.3448024406377L-40.97166696470642,-179.50860183047828A184.125,184.125 0 0,0 -79.88884346502041,-165.8908928025329Z" stroke="#fff" stroke-width="1" fill="#46f121"></path><path d="M-54.62888928627523,-239.3448024406377A245.5,245.5 0 0,1 -4.509612897950904e-14,-245.5L-3.382209673463178e-14,-184.125A184.125,184.125 0 0,0 -40.97166696470642,-179.50860183047828Z" stroke="#fff" stroke-width="1" fill="#46f121"></path></g><g class="phase1" transform="translate(245.5,245.5)"><path d="M1.127403224487726e-14,-184.125A184.125,184.125 0 0,1 143.954721709426,-114.8000597672393L95.96981447295066,-76.53337317815954A122.75,122.75 0 0,0 7.51602149658484e-15,-122.75Z" stroke="#fff" stroke-width="1" fill="#D2E000"></path><path d="M143.954721709426,-114.8000597672393A184.125,184.125 0 0,1 179.50860183047828,40.97166696470639L119.67240122031885,27.31444464313759A122.75,122.75 0 0,0 95.96981447295066,-76.53337317815954Z" stroke="#fff" stroke-width="1" fill="#D2E000"></path><path d="M179.50860183047828,40.97166696470639A184.125,184.125 0 0,1 79.8888434650204,165.89089280253293L53.25922897668027,110.59392853502194A122.75,122.75 0 0,0 119.67240122031885,27.31444464313759Z" stroke="#fff" stroke-width="1" fill="#D2E000"></path><path d="M79.8888434650204,165.89089280253293A184.125,184.125 0 0,1 -79.88884346502037,165.89089280253293L-53.259228976680255,110.59392853502194A122.75,122.75 0 0,0 53.25922897668027,110.59392853502194Z" stroke="#fff" stroke-width="1" fill="#D2E000"></path><path d="M-79.88884346502037,165.89089280253293A184.125,184.125 0 0,1 -179.50860183047828,40.97166696470641L-119.67240122031885,27.314444643137605A122.75,122.75 0 0,0 -53.259228976680255,110.59392853502194Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-179.50860183047828,40.97166696470641A184.125,184.125 0 0,1 -143.954721709426,-114.80005976723928L-95.96981447295067,-76.53337317815952A122.75,122.75 0 0,0 -119.67240122031885,27.314444643137605Z" stroke="#fff" stroke-width="1" fill="#D2E000"></path><path d="M-143.954721709426,-114.80005976723928A184.125,184.125 0 0,1 -3.382209673463178e-14,-184.125L-2.254806448975452e-14,-122.75A122.75,122.75 0 0,0 -95.96981447295067,-76.53337317815952Z" stroke="#fff" stroke-width="1" fill="#24d321"></path></g><g class="phase2" transform="translate(245.5,245.5)"><path d="M7.51602149658484e-15,-122.75A122.75,122.75 0 0,1 36.18119765893851,-117.29656191024877L18.090598829469254,-58.648280955124385A61.375,61.375 0 0,0 3.75801074829242e-15,-61.375Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M36.18119765893851,-117.29656191024877A122.75,122.75 0 0,1 69.1475371273096,-101.42080954728836L34.5737685636548,-50.71040477364418A61.375,61.375 0 0,0 18.090598829469254,-58.648280955124385Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M69.1475371273096,-101.42080954728836A122.75,122.75 0 0,1 95.96981447295066,-76.53337317815954L47.98490723647533,-38.26668658907977A61.375,61.375 0 0,0 34.5737685636548,-50.71040477364418Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M95.96981447295066,-76.53337317815954A122.75,122.75 0 0,1 114.26475264607608,-44.845610740974976L57.13237632303804,-22.422805370487488A61.375,61.375 0 0,0 47.98490723647533,-38.26668658907977Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M114.26475264607608,-44.845610740974976A122.75,122.75 0 0,1 122.40676610398987,-9.173118987733558L61.20338305199493,-4.586559493866779A61.375,61.375 0 0,0 57.13237632303804,-22.422805370487488Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M122.40676610398987,-9.173118987733558A122.75,122.75 0 0,1 119.67240122031883,27.31444464313762L59.836200610159416,13.65722232156881A61.375,61.375 0 0,0 61.20338305199493,-4.586559493866779Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M119.67240122031883,27.31444464313762A122.75,122.75 0 0,1 106.30461831453982,61.37500000000003L53.15230915726991,30.687500000000014A61.375,61.375 0 0,0 59.836200610159416,13.65722232156881Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M106.30461831453982,61.37500000000003A122.75,122.75 0 0,1 83.49120356138035,89.98211726711119L41.74560178069017,44.991058633555596A61.375,61.375 0 0,0 53.15230915726991,30.687500000000014Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M83.49120356138035,89.98211726711119A122.75,122.75 0 0,1 53.25922897668027,110.59392853502194L26.629614488340135,55.29696426751097A61.375,61.375 0 0,0 41.74560178069017,44.991058633555596Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M53.25922897668027,110.59392853502194A122.75,122.75 0 0,1 18.294938173125438,121.37898391913453L9.147469086562719,60.68949195956726A61.375,61.375 0 0,0 26.629614488340135,55.29696426751097Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M18.294938173125438,121.37898391913453A122.75,122.75 0 0,1 -18.29493817312537,121.37898391913454L-9.147469086562685,60.68949195956727A61.375,61.375 0 0,0 9.147469086562719,60.68949195956726Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-18.29493817312537,121.37898391913454A122.75,122.75 0 0,1 -53.259228976680205,110.59392853502197L-26.629614488340103,55.29696426751099A61.375,61.375 0 0,0 -9.147469086562685,60.68949195956727Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-53.259228976680205,110.59392853502197A122.75,122.75 0 0,1 -83.4912035613803,89.98211726711124L-41.74560178069015,44.99105863355562A61.375,61.375 0 0,0 -26.629614488340103,55.29696426751099Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-83.4912035613803,89.98211726711124A122.75,122.75 0 0,1 -106.30461831453982,61.37500000000004L-53.15230915726991,30.68750000000002A61.375,61.375 0 0,0 -41.74560178069015,44.99105863355562Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-106.30461831453982,61.37500000000004A122.75,122.75 0 0,1 -119.67240122031885,27.314444643137605L-59.83620061015942,13.657222321568803A61.375,61.375 0 0,0 -53.15230915726991,30.68750000000002Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-119.67240122031885,27.314444643137605A122.75,122.75 0 0,1 -122.40676610398987,-9.173118987733597L-61.20338305199493,-4.586559493866798A61.375,61.375 0 0,0 -59.83620061015942,13.657222321568803Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-122.40676610398987,-9.173118987733597A122.75,122.75 0 0,1 -114.26475264607606,-44.84561074097504L-57.13237632303803,-22.42280537048752A61.375,61.375 0 0,0 -61.20338305199493,-4.586559493866798Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-114.26475264607606,-44.84561074097504A122.75,122.75 0 0,1 -95.9698144729506,-76.53337317815962L-47.9849072364753,-38.26668658907981A61.375,61.375 0 0,0 -57.13237632303803,-22.42280537048752Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-95.9698144729506,-76.53337317815962A122.75,122.75 0 0,1 -69.1475371273095,-101.42080954728844L-34.57376856365475,-50.71040477364422A61.375,61.375 0 0,0 -47.9849072364753,-38.26668658907981Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-69.1475371273095,-101.42080954728844A122.75,122.75 0 0,1 -36.181197658938345,-117.29656191024883L-18.090598829469172,-58.64828095512441A61.375,61.375 0 0,0 -34.57376856365475,-50.71040477364422Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M-36.181197658938345,-117.29656191024883A122.75,122.75 0 0,1 1.9549973754662622e-13,-122.75L9.774986877331311e-14,-61.375A61.375,61.375 0 0,0 -18.090598829469172,-58.64828095512441Z" stroke="#fff" stroke-width="1" fill="#24d321"></path></g></svg>'
+        exampleControlSVG = '<svg width="144" height="144"><g class="control-light" transform="translate(72,72)"><path d="M4.408582873760558e-15,-72A72,72 0 0,1 62.353829072479584,35.999999999999986L31.176914536239792,17.999999999999993A36,36 0 0,0 2.204291436880279e-15,-36Z" stroke="#fff" stroke-width="1" fill="#24d321"></path><path d="M62.353829072479584,35.999999999999986A72,72 0 1,1 -1.3225748621281674e-14,-72L-6.612874310640837e-15,-36A36,36 0 1,0 31.176914536239792,17.999999999999993Z" stroke="#fff" stroke-width="1" fill="#46f121"></path></g></svg>'
+        h2 Layouts
+        ul
+          li
+            h3 Content Module Full Width
+            section.wrapper
+              section.content-module
+                h3.main-heading Controls
+                div(class="control light icon-glyph icon-light", data-control-key="light") Light
+                  != exampleControlSVG
+                div(class="control waterpump icon-glyph icon-waterpump", data-control-key="waterpump") Waterpump
+                  != exampleControlSVG
+                div(class="control fan icon-glyph icon-fan", data-control-key="fan") Fan
+                  != exampleControlSVG
+          li
+            h3 Content Module Medium
+            section.wrapper
+              section.content-module.medium
+                h3.main-heading Controls
+                div(class="control light icon-glyph icon-light", data-control-key="light") Light
+                  != exampleControlSVG
+                div(class="control waterpump icon-glyph icon-waterpump", data-control-key="waterpump") Waterpump
+                  != exampleControlSVG
+                div(class="control fan icon-glyph icon-fan", data-control-key="fan") Fan
+                  != exampleControlSVG
+          li
+            h3 Content Module Small
+            section.wrapper
+              section.content-module.small
+                h3.main-heading Controls
+                div(class="control light icon-glyph icon-light", data-control-key="light") Light
+                  != exampleControlSVG
+                div(class="control waterpump icon-glyph icon-waterpump", data-control-key="waterpump") Waterpump
+                  != exampleControlSVG
+                div(class="control fan icon-glyph icon-fan", data-control-key="fan") Fan
+                  != exampleControlSVG
+          li
+            h3 Data Module Collapsed
+            section.data-module.light.closed
+              h3.main-heading Light
+              div.sensor-data
+                div.sensor-value 18
+                div.sensor-value-unit Hrs/Day
+              div.message Check
+              div.settings Settings
+          li
+            h3 Data Module Open
+            section#full.data-module
+              h3.main-heading
+                | Light
+              div.sensor-data
+                div.sensor-value 18
+                div.sensor-value-unit
+                  span Hrs/
+                  span Day
+              div(class="sensor-type icon ph")
+                  | <i class="icon-glyph icon-ph" aria-hidden="true"></i>
+                  div.screen-reader-text pH
+              div.message Check
+              div(class="settings icon")
+                  | <i class="icon-glyph icon-settings" aria-hidden="true"></i>
+                  div.screen-reader-text Settings
+          li
+            h3 Example Phase Graph
+            section.wrapper
+              div.content-module
+                div#phases-graph.circle.centered
+                  != examplePhaseGraphSVG
+
+          li
+            h3 Default Form Style
+            section.wrapper
+              div.content-module
+                h3.main-heading User Profile
+                form(id="profile-form", method="POST", action="/profile")
+                  input(type="hidden", name="_method", value="PUT")
+                  label(for="email") Email
+                  input(id="email", name="email", type="email", value="#{user.email}")
+
+                  label(for="firstname") First Name
+                  input(id="firstname", name="firstname", type="text", value="#{user.name.first}")
+
+                  label(for="lastname") Last Name
+                  input(id="lastname", name="lastname", type="text", value="#{user.name.last}")
+
+                  label(for="locale_timezone", class="display-i") Locale
+                  //not working
+                  //button(id="detect", class="display-i") Detect
+                  include misc/timezone_select_html
+                  include misc/timezone_country_select_html
+
+                  div.overflow
+                    | <img id="timezone-image" src="img/timezone_map_gray-400.png" width="400" height="200" usemap="#timezone-map" />
+                    | <img class="timezone-pin" src="img/pin.png" /> 
+                    include misc/timezone_data_400x200
+
+                  label(for="phone") Phone
+                  input(id="phone", name="phone", type="text", value="#{user.phone}")
+
+                  //- label Address
+                  //- input(id="addressline1", name="addressline1", type="number")
+                  //- input(id="addressline2", name="addressline2", type="number")
+                  
+                  label Preferred Notification Methods 
+                  input(class="display-i", id="notifications_email", name="notifications_email", 
+                    type="checkbox", checked=user.notificationPreferences.email)
+                  label(class="display-i", for="notifications_email") Email
+                  input(class="display-i", id="notifications_sms", name="notifications_sms", 
+                    type="checkbox", checked=user.notificationPreferences.sms)
+                  label(class="display-i", for="notifications_sms") SMS
+                  input(type="submit", value="Save Profile")
+
+          li
+            h3 Conversation Step By Step Form Style
+            section.wrapper
+              div.content-module
+                h3.main-heading Grow Plan Selection
+                form(class='steps', action='', method='get')                  
+                  section(class="step")
+                    plants = ['Arugula','Basil','Chervil','Chives','Coriander','Dill','Lemon','Balm','Mache','Majoram','Oregano','Rosemary','Sorrel','Spearmint','Peppermint','Sage','Tarragon','Thyme','Artichokes','Asparagus','Beans','Beets','Broccoli','Brussel','Sprouts','Cabbages','Carrots','Cauliflowers','Celery','Cucumber','Eggplants','Leeks','Lettuce','Onions','Parsnips','Peas','Potatoes','Radishes','Rhubarb','Squash','Tomatoes','Yams', 'Other']
+                    label What would you like to grow?
+                    ul.grid
+                      each plant, i in plants
+                        li
+                          label(for="#{plant}") #{plant}
+                          input(id="#{plant}", type='checkbox', name="plants", value="#{plant}")
+                  section(class="step")
+                    systemtypes = ['Ebb & Flow','Nutrient Film Technique (NFT)','Deep Water Culture (DWC)','Aquaponics', 'Other']
+                    label What type of system do you have?
+                    ul(class="grid photos")
+                      each system, i in systemtypes
+                        li
+                          label(for="#{system}") #{system}
+                          input(id="#{system}", type='radio', name="system", value="#{system}")

@@ -1,4 +1,5 @@
-var SensorModel = require('../../models/sensor').model;
+var SensorModel = require('../../models/sensor').model,
+    winston = require('winston');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -8,13 +9,10 @@ var SensorModel = require('../../models/sensor').model;
 module.exports = function(app) {
 
    //List sensors
-  app.get('/api/sensor', function (req, res){
+  app.get('/api/sensors', function (req, res, next){
     return SensorModel.find(function (err, sensors) {
-      if (!err) {
-        return res.send(sensors);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(sensors);
     });
   });
 
@@ -22,7 +20,7 @@ module.exports = function(app) {
    * Create single sensor
    *
    *  Test with:
-   *  jQuery.post("/api/sensor", {
+   *  jQuery.post("/api/sensors", {
    *    "name": "humidity",
    *    "abbrev": "hum",
    *    "unitOfMeasurement": "unit"
@@ -30,52 +28,46 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/sensor', function (req, res){
+  app.post('/api/sensors', function (req, res, next){
     var sensor;
-    console.log("POST: ");
-    console.log(req.body);
+    winston.log("POST: ");
+    winston.log(req.body);
     sensor = new SensorModel({
       name: req.body.name,
       abbrev: req.body.abbrev,
-      unitOfMeasurement: req.body.unitOfMeasurement
+      unit: req.body.unit
     });
     sensor.save(function (err) {
-      if (!err) {
-        return console.log("created sensor");
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      winston.log("created sensor");
+      return res.send(sensor);
     });
-    return res.send(sensor);
   });
 
   /*
-   * Read an sensor
+   * Read a sensor
    *
    * To test:
-   * jQuery.get("/api/sensor/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/sensors/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/sensor/:id', function (req, res){
+  app.get('/api/sensors/:id', function (req, res, next){
     return SensorModel.findById(req.params.id, function (err, sensor) {
-      if (!err) {
-        return res.send(sensor);
-      } else {
-        return console.log(err);
-      }
+      if (err) { return next(err); }
+      return res.send(sensor);
     });
   });
 
   /*
-   * Update an sensor
+   * Update a sensor
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/sensor/${id}",
+   *     url: "/api/sensors/${id}",
    *     type: "PUT",
    *     data: {
    *       "actionBelowMin": "actionid"
@@ -88,26 +80,24 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/sensor/:id', function (req, res){
+  app.put('/api/sensors/:id', function (req, res, next){
     return SensorModel.findById(req.params.id, function (err, sensor) {
+      if (err) { return next(err); }
       sensor.actionBelowMin = req.body.actionBelowMin;
       return sensor.save(function (err) {
-        if (!err) {
-          console.log("updated sensor");
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        winston.log("updated sensor");
         return res.send(sensor);
       });
     });
   });
 
   /*
-   * Delete an sensor
+   * Delete a sensor
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/sensor/${id}", 
+   *     url: "/api/sensors/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -117,15 +107,13 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/sensor/:id', function (req, res){
+  app.delete('/api/sensors/:id', function (req, res, next){
     return SensorModel.findById(req.params.id, function (err, sensor) {
+      if (err) { return next(err); }
       return sensor.remove(function (err) {
-        if (!err) {
-          console.log("removed");
-          return res.send('');
-        } else {
-          console.log(err);
-        }
+        if (err) { return next(err); }
+        winston.log("removed sensor");
+        return res.send('');
       });
     });
   });

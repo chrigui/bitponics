@@ -7,7 +7,8 @@
 	    "npm":  "1.0.x"
 	  }
 	, "dependencies": {
-		"bcrypt": ">= 0.5.0"
+		  "async" : "=0.1.22"
+		, "bcrypt": ">= 0.5.0"
 		, "connect"	  : "=2.4.3"
 		, "express"   : "3.0.0rc3"
 		, "jade"      : ">= 0.27.2"
@@ -22,12 +23,12 @@
     	, "nodeunit" : ">=0.7.4"
     	, "passport": ">= 0.1.1"
     	, "passport-local": ">= 0.1.6"
+    	, "timezone" : "=0.0.15"
     	, "zombie"   : ">=1.1.1"
     	, "nodemailer" : ">=0.3"
     	, "express-csv" : ">=0.4.1"
     	, "winston" : ">= 0.6.2"
     	, "winston-loggly" : ">= 0.6"
-    	, "cron" : "1.0.1"
-		, "time" : "=0.8.3"
+    	, "connect-flash" : ">= 0.1.0"
 	}
 }

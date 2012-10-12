@@ -9,7 +9,8 @@ var connect    = require('connect'),
 	mongoose   = require('mongoose'),
 	passport   = require('passport'),
 	csv        = require('express-csv'),
-	winston    = require('winston');
+	winston    = require('winston'),
+	flash      = require('connect-flash');
 
 module.exports = function(app){
 	
@@ -19,39 +20,45 @@ module.exports = function(app){
 	 * & guaranteeing that their middleware executes after this is all set up
 	 */
 	app.configure(function(){
-	  var stylusMiddleware = stylus.middleware({
-	    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
-	    dest: __dirname + '/../public/', // .styl resources are compiled `/stylesheets/*.css`
-	    debug: true,
-	    compile: function(str, path) { // optional, but recommended
-	      return stylus(str)
-	        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
-	        .set('filename', path)
-	        .set('warn', true)
-	        .set('compress', true)
-	        .use(nib());
-	      }
-	  });
-	  app.use(stylusMiddleware);  
+
+	  app.use(stylus.middleware({
+		    src: __dirname + '/../stylus/', // .styl files are located in `/stylus`
+		    dest: __dirname + '/../public/', // .styl resources are compiled `/stylesheets/*.css`
+		    debug: true,
+		    compile: function(str, path) { // optional, but recommended
+		      return stylus(str)
+		        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
+		        .set('filename', path)
+		        .set('warn', true)
+		        .set('compress', true)
+		        .use(nib());
+		      }
+		  })
+	  );  
 	  
 	  app.set('view engine', 'jade');
 	  
 	  app.use(express.logger(':method :url :status'));
 
+	  // If we've got a device request or an HMAC-authed request, need the raw body
 	  app.use (function(req, res, next) {
-		if(req.headers['content-type'] == 'text/csv' || 
-			(req.headers['authorization'] && req.headers['authorization'].indexOf('HMAC') === 0)){
+	  	var contentType = req.headers['content-type'] || '',
+	  		authHeader = req.headers['authorization'] || '';
+		
+		if( (contentType.indexOf('application/vnd.bitponics') >= 0) || 
+			(authHeader.indexOf('BPN_DEVICE') >= 0) ||
+			(authHeader.indexOf('BPN_API') >= 0) 
+			){
 		    var data='';
 		    req.setEncoding('utf8');
 		    req.on('data', function(chunk) { 
-		       data += chunk;
+		    	data += chunk;
 		    });
-
 		    req.on('end', function() {
 		        req.rawBody = data;
 		        next();
 		    });
-		}else{
+		} else{
 			next();
 		}
 	  });
@@ -59,26 +66,24 @@ module.exports = function(app){
 	  app.use(express.bodyParser());
 	  app.use(express.methodOverride());
 	  
+	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
 	  app.use(express.static(__dirname + '/../public'));
 	  
 	  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
 	  app.use(express.cookieParser()); 
 	  app.use(express.session({ secret: 'somethingrandom'}));
 	  
+	  //flash messages are separate as of express 3
+	  app.use(flash());
+
 	  mongoose.connect(app.config.mongoUrl);
 	  app.use(passport.initialize());
  	  app.use(passport.session());
 
-	  winston.add(require('winston-loggly').Loggly, {
-	    subdomain : app.config.loggly.subdomain,
-	    inputToken : app.config.loggly.tokens[app.settings.env],
-	    level : 'error'
-	  });  
-
-	  // must add the router after mongoose-auth has added its middleware (https://github.com/bnoguchi/mongoose-auth)
-	  // per mongoose-auth readme, don't need this since express handles it
-	  //app.use(app.router); 
-
+ 	  // custom "verbose errors" setting
+	  // which we can use in the templates
+	  // via settings['verbose errors']
+	  app.enable('verbose errors');
 	});
 
 	switch(app.settings.env){
@@ -90,23 +95,46 @@ module.exports = function(app){
 			// make the response markup pretty-printed
 			app.locals({pretty: true });
 	    case 'production':
+	    	app.disable('verbose errors');
 	    	// Ensure that this is an authenticated request.
 	    	// If it doesn't already have a req.user, 
 	    	// check whether it's attempting HMAC auth,
 	    	// and finally fallback to checking Basic auth
 	    	app.use(function(req, res, next){
-	    		var authorization = req.headers.authorization;
+	    		var authorization = req.headers.authorization,
+	    			scheme;
 
 	    		if (req.user){ 
-	    			next();
+	    			return next();
 	    		} else {
-	    			if (authorization && authorization.split(' ')[0] == 'HMAC'){
-	    				passport.authenticate('hmac', {session: false})(req, res, next);
-	    			} else {
-	    				connect.basicAuth('bitponics', '8bitpass')(req, res, next);
+	    			if (authorization){
+	    				scheme = authorization.split(' ')[0];
+		    			switch(scheme){
+		    				case 'BPN_DEVICE':
+		    					return passport.authenticate('device', {session: false})(req, res, next);
+		    				case 'BPN_API':
+		    					return passport.authenticate('api', {session: false})(req, res, next);
+	    					// no default. just let it flow down to the connect.basicAuth
+	    				}
 	    			}
-				} 
+					return connect.basicAuth('bitponics', '8bitpass')(req, res, next);	
+	    		}
 	    	});
+
+	    	//we probably want to do something like this on heroku:
+	    	//BUT IS IT SECURE?
+	    	//redirect to https
+				// app.use(function(req, res, next) {
+				// 		//this is only present on heroku
+				//     var schema = req.headers["x-forwarded-proto"];
+				 		
+				//     if (schema === "https")
+				//         return next();
+				 		
+				//     res.redirect("https://" + req.headers.host + req.url);
+				// });
+
+
 	      	break;
 	}
 
@@ -122,4 +150,7 @@ module.exports = function(app){
 	app.configure('production', function(){
 	  app.use(express.errorHandler()); 
 	});
+
+
+	
 };
