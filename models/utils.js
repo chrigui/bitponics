@@ -10,6 +10,8 @@ var Device = require('./device'),
     NotificationModel = require('./notification').model,
     SensorModel = require('./sensor').model,
     SensorLogModel = require('./sensorLog').model,
+    EmailConfig = require('../config/email-config'),
+    nodemailer = require('nodemailer'),
     winston = require('winston'),
     async = require('async');
 
@@ -412,9 +414,110 @@ function triggerActionOverride(options, callback){
 };
 
 
+
+function scanForPhaseChanges(GrowPlanInstanceModel, callback){
+  var now = new Date(),
+      tomorrow = new Date(now + (24 * 60 * 60 * 1000));
+
+    GrowPlanInstanceModel
+    .find()
+    .where('active')
+    .equals(true)
+    .where('phases.expectedEndDate')
+    .gt(now).lt(tomorrow)
+    .populate('growPlan')
+    .select('_id users growPlan phases')
+    .exec(function(err, growPlanInstanceResults){
+      // TODO : log to winston/loggly
+      if (err) { console.log( err ); return; }
+      if (!growPlanInstanceResults.length) { return; }
+
+      growPlanInstanceResults.forEach(function(growPlanInstance){
+        var currentGrowPlanInstancePhase,
+          currentGrowPlanInstancePhaseIndex, 
+          nextGrowPlanInstancePhase,
+          nextPhase,
+          notificationType = 'info',
+          notificationMessage = '',
+          notification;
+
+        growPlanInstance.phases.some(
+          function(item, index){ 
+            if (item.active === true){
+              currentGrowPlanInstancePhase = item;
+              currentGrowPlanInstancePhaseIndex = index;
+              return true;
+            }
+          }
+      );
+      
+      nextGrowPlanInstancePhase = growPlanInstance.phases[currentGrowPlanInstancePhaseIndex + 1];
+
+      if (!nextGrowPlanInstancePhase) { return; }
+      
+      growPlanInstance.growPlan.phases.some(function(item){
+        if (item._id.equals(nextGrowPlanInstancePhase.phase)){
+          nextPhase = item;
+          return true;
+        }
+      });
+
+      notificationMessage = "It's almost time for the " + nextPhase.name + " phase.";
+      notification = new NotificationModel({
+        gpi : growPlanInstance._id,
+        users : growPlanInstance.users,
+        ts : now,
+        type : notificationType,
+        msg : notificationMessage
+      });
+      notification.save();  
+      });
+    });
+}
+
+
+function clearPendingNotifications (NotificationModel, callback){
+  var now = new Date();
+  NotificationModel
+  .find()
+  .where('timeSent')
+  .equals(null)
+  .populate('users', 'email')
+  .exec(function(err, notificationResults){
+    if (err) { return callback(err); }
+    if (!notificationResults.length){ return callback(); }
+    var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
+    
+    async.forEach(
+      notificationResults, 
+      function (notification, iteratorCallback){
+        var mailOptions = {
+            from: "notifications@bitponics.com", // sender address
+            to: users.map(function(user) { return user.email; }).join(', '), 
+            subject: "Bitponics Notification", // Subject line
+            text: notification.msg,
+            html: notification.msg
+        };
+        emailTransport.sendMail(mailOptions, function(err, response){
+          if(err){ return iteratorCallback(err); }
+          notification.timeSent = now;
+          notification.viewed = true;
+          notification.save(iteratorCallback);
+        });
+      },
+      function (err){
+        if (err) { return callback(err);}
+      }
+    );
+  });
+}
+
+
 module.exports = {
   logSensorLog : logSensorLog,
   activateGrowPlanInstance : activateGrowPlanInstance,
   activatePhase : activatePhase,
-  triggerActionOverride : triggerActionOverride
+  triggerActionOverride : triggerActionOverride,
+  scanForPhaseChanges : scanForPhaseChanges,
+  clearPendingNotifications : clearPendingNotifications
 };

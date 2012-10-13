@@ -12,8 +12,6 @@ var mongoose = require('mongoose'),
  */
 var GrowPlanInstanceSchema = new Schema({
 
-	gpid: { type: Number },
-
 	users : [{ type: ObjectId, ref: 'User' }],
 	
 	owner : { type: ObjectId, ref: 'User', required: true },
@@ -101,6 +99,7 @@ GrowPlanInstanceSchema.virtual('timeSinceActivePhaseStartDate')
 
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
+GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
 
 
 
