@@ -3,7 +3,6 @@ var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
 module.exports = [
 		{
 			_id : '506de2fe8eebf7524342cb38',
-			gpid: "1",
 			users : [
 				"506de3098eebf7524342cb66",
 				"506de3098eebf7524342cb67",
@@ -123,7 +122,6 @@ module.exports = [
 
 		{
 			_id : '506de2ff8eebf7524342cb39',
-			gpid: "2",
 			users : [
 				"506de3098eebf7524342cb66"
 			],

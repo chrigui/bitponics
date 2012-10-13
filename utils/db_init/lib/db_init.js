@@ -719,7 +719,6 @@ function(callback){
 		 		} else {
 		 			var dataObj = new models.growPlanInstance({
 		 				_id : _data._id,
-		 				gpid: _data.gpid,
 		 				users: _data.users,
 		 				owner : _data.owner,
 		 				growPlan: _data.growPlan,
@@ -735,7 +734,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.gpid] = doc.id;
+		 				savedObjectIds[dataType][_data._id] = doc.id;
 		 				console.log("created grow plan instance");
 
 		 				if (dataObj.active){
