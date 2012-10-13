@@ -11,7 +11,8 @@ var mongoose = require('mongoose'),
 	bcrypt = require('bcrypt'),
 	winston = require('winston'),
 	timezone = require('timezone/loaded'),	
-	verificationEmailDomain = 'bitponics.com';
+	verificationEmailDomain = 'bitponics.com',
+	EmailConfig = require('../config/email-config');
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -264,18 +265,11 @@ UserSchema.pre('save', function(next, done){
 	  	//send activation email if not activated user
 		if(user.active && user.sentEmail){ return done(); }
 			
-		// create reusable transport method (opens pool of SMTP connections)
-		var smtpTransport = nodemailer.createTransport("SMTP",{
-		    service: "Gmail",
-		    auth: {
-		        user: "accounts@bitponics.com",
-		        pass: "8bitpass"
-		    }
-		});
+		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
 
 		// setup e-mail data with unicode symbols
 		var mailOptions = {
-		    from: "Bitponics <accounts@bitponics.com>", // sender address
+		    from: "accounts@bitponics.com", // sender address
 		    to: user.email, // can be list of receivers
 		    subject: "Bitponics Accounts", // Subject line
 		    text: "Welcome to Bitponics!", // plaintext body
@@ -283,20 +277,15 @@ UserSchema.pre('save', function(next, done){
 		}
 
 		// send mail with defined transport object
-		smtpTransport.sendMail(mailOptions, function(err, response){
+		emailTransport.sendMail(mailOptions, function(err, response){
 		    if(err){ return done(err); }
 		    winston.info("Message sent: " + response.message);
-	        // if you don't want to use this transport object anymore, uncomment following line
-		    smtpTransport.close(); // shut down the connection pool, no more messages
+		    emailTransport.close(); // this is probably not necessary when sending through amazonSES API but whatever
 
-	      user.sentEmail = true;
-	      console.log('user in sendMail callback: ');
-	      console.log(user);
+			user.sentEmail = true;
+			console.log('user in sendMail callback: ');
+			console.log(user);
 		    done();
-		    // user.save(function(err){
-		    // 	if (err) { return done(err); }
-		    // 	return done();
-		    // });
 		});
 	});
 });
