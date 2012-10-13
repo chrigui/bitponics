@@ -91,6 +91,7 @@ DeviceSchema.plugin(useTimestamps);
 /**
  * Remove expired actions & update deviceMessage & expires times. 
  * Saves the model at the end.
+ * Originally written to be called after adding an entry to ActionOverrideLog collection.
  */
 DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
 	var device = this,
