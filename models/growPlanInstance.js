@@ -30,8 +30,13 @@ var GrowPlanInstanceSchema = new Schema({
 
 	phases: [{
 		phase: Schema.Types.ObjectId, // ObjectId of GrowPlan.Phase
-		startDate: { type: Date },
-		endDate: { type: Date },
+		startDate: { type: Date }, // actual date the phase was started. null/undefined if not yet started
+		endDate: { type: Date }, // actual date the phase was ended. null/undefined if not yet ended
+		/**
+		 * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
+		 * used by the worker process to query & notify of impending phase advancement
+		 */
+		expectedEndDate : { type : Date }, 
 		active: { type: Boolean }
 	}],
 

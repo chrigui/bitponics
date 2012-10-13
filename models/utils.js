@@ -120,7 +120,7 @@ function logSensorLog(options, callback){
 
 
 /**
- * Activate a grow plan. If there's a device, update the device's activeGrowPlanInstance property
+ * Activate an existing grow plan instance. If there's a device, update the device's activeGrowPlanInstance property
  * and remove the device from any other GPI's that are using it. 
  */
 function activateGrowPlanInstance(growPlanInstance, callback){
@@ -147,17 +147,149 @@ function activateGrowPlanInstance(growPlanInstance, callback){
 };
 
 
+/**
+ * Activate a phase on a grow plan instance. 
+ * @param device : if growPlanInstance has a device, should be the Device model instance. this is just to save us another query here
+ */
+function activatePhase(growPlanInstance, growPlan, phaseId, device, callback){
+  var now = new Date(),
+      growPlanPhase = growPlan.phases.filter(function(item){ return item._id.equals(phaseId);})[0],
+      deviceControlsWithAction = [];
+  
+  growPlanInstance.phases.forEach(function(phase){
+    if (phase.phase.equals(phaseId)){
+      phase.active = true;
+      phase.startDate = now; 
+      phase.expectedEndDate = now + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000);
+    } else {
+      if (phase.active == true){
+        phase.endDate = now;
+      }
+      phase.active = false;
+    }
+  });
+  
+  if (device){
+    deviceControlsWithAction = growPlanPhase.actions.filter(
+      function(item){ 
+        return (item.control && device.controlMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
+      }
+    );;
+  }
+
+  async.parallel([
+      // save the new phase settings to the growPlanInstance
+      function(innerCallback){
+        return growPlanInstance.save(innerCallback);
+      },
+      // Get all actions for this phase, notify user about them
+      function(innerCallback){
+        ActionModel
+        .find()
+        .where('_id')
+        .in(growPlanPhase.actions)
+        .populate('control')
+        .exec(function(err, actionResults){
+          if (err) { return innerCallback(err); }
+          if (!actionResults.length) { return innerCallback(); }
+          
+          async.forEach(
+            actionResults, 
+            function(action, iteratorCallback){
+              var notificationMessage = growPlanPhase.name + ' phase started. Time to trigger the action "' + action.description + '".',
+                notificationType = 'actionNeeded';
+
+                // Check if this has a device control
+                if (action.control) {
+                  if (deviceControlsWithAction.some(function(deviceControlId){
+                      return action.control._id.equals(deviceControlId);
+                    })){
+                      notificationType = 'info';
+                      notificationMessage += ' Since you have a ' + action.control.name + ' connected, we\'ve done this automatically.';
+                    }  
+                }
+                
+                var notification = new NotificationModel({
+                  users : growPlanInstance.users,
+                  gpi : growPlanInstance,
+                  type : notificationType,
+                  msg : notificationMessage
+                });
+                notification.save(iteratorCallback);
+              },
+              function(err){
+                if (err) { return innerCallback(err); }
+                innerCallback();
+              }
+          );
+        });
+      },
+      // Force the device to refresh itself by expiring actions & overrides
+      function(innerCallback){
+        if (!device){ return innerCallback; }
+          
+        device.activeActions.expires = now - 1000;
+        device.activeActionsOverride.expires = now - 1000;
+
+        ActionOverrideLogModel
+        .find()
+        .where('gpi')
+        .equals(growPlanInstance._id)
+        .where(expires)
+        .gt(now)
+        .populate('action')
+        .exec(function(err, actionOverrideLogResults){
+          if (err) { return innerCallback(err);}
+          if (!actionOverrideLogResults.length){ return innerCallback(); }
+          var actionOverrideLogsToExpire = [];
+          actionOverrideLogResults.forEach(function(actionOverrideLog){
+            if (!actionOverrideLog.action.control) { return; } 
+            if (deviceControlsWithAction.some(function(deviceControlId){
+              return actionOverrideLog.action.control.equals(deviceControlId);
+            })){
+              actionOverrideLogsToExpire.push(actionOverrideLog);
+            } 
+          });
+
+          async.forEach(actionOverrideLogsToExpire, 
+            function(actionOverrideLog, iteratorCallback){
+              actionOverrideLog.expires = now - 1000;
+              actionOverrideLog.save(iteratorCallback);
+            }, 
+            function(err){
+              if (err) { return innerCallback(err);}
+              return innerCallback();
+            }
+          );
+        });
+      }
+    ],
+    function(err, results){
+      if (err) { return callback(err);}
+      return callback();
+    });
+}
+
+
+/**
+ * Trigger an action override. Can be called because of an IdealRange violation or manually.
+ *
+ * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control. 
+ */
 function triggerActionOverride(options, callback){
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
       actionId = options.actionId,
       actionOverrideMessage = options.actionOverrideMessage,
       user = options.user,
-      timezone = user.timezone;
-  ActionModel.findById(actionId, function(err, action){
-    if (err) { return next(err);}
-    if (!action) { return next(new Error('Invalid action id'));}
+      timezone = user.timezone,
+      action;
 
+  ActionModel.findById(actionId, function(err, actionResult){
+    if (err) { return next(err);}
+    if (!actionResult) { return next(new Error('Invalid action id'));}
+
+    action = actionResult;
     // calculate when the actionOverride should expire.
     var now = new Date(),
         expires = now + (365 * 24 * 60 * 60 * 1000),
@@ -210,44 +342,70 @@ function triggerActionOverride(options, callback){
             });
           }
         }
-        ],
-        function(err, result){
-          if (err) { return callback(err); }
-          var actionLog = new ActionOverrideLogModel({
-            gpi : growPlanInstance._id,
-            msg : actionOverrideMessage,
-            timeRequested : now,
-            action : action,
-            // TODO : handle expires for the no-device case 
-            expires : expires
-          });
+      ],
+      function(err, result){
+        if (err) { return callback(err); }
+        
+        var notificationType,
+            notificationMessage = actionOverrideMessage + '.';
 
-        // push the log to ActionOverrideLogModel
-        actionLog.save(function(err){
-          if (err){ return callback(err); }
-          winston.info('Logged actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
-          if (!actionHasDeviceControl){ 
-            var notification = new NotificationModel({
-              users : [user],
-              gpi : growPlanInstance,
-              ts : now,
-              timeSent : now,
-              msg : actionOverrideMessage,
-              type : 'actionNeeded'
-            });
-            winston.info('Creating notification : ' + notification.toString());
-            notification.save(function(err){
-              if (err) { return callback(err); }
-              return callback();
-            });
-          } else {
-            device.refreshActiveActionsOverride(function(err){
-              if (err) { return callback(err); }
-              return callback();
-            });  
+        winston.info('Logging actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
+        
+        if (!actionHasDeviceControl){ 
+          notificationType = 'actionNeeded';
+          notificationMessage += action.description;
+        } else {
+          notificationType = 'info';
+          notificationMessage += ' Device has automatically triggered the following action : "' + action.description + '".';
+        }
+
+        // In parallel: 
+        // log to ActionOverrideLog
+        // log a Notification, and 
+        // if device has a relevant control, refresh its commands
+        async.parallel(
+          [
+            function(innerCallback){
+              var actionLog = new ActionOverrideLogModel({
+                  gpi : growPlanInstance._id,
+                  msg : actionOverrideMessage,
+                  timeRequested : now,
+                  action : action,
+                  // TODO : handle expires for the no-device case 
+                  expires : expires
+                });
+
+              // push the log to ActionOverrideLogModel
+              actionLog.save(innerCallback);
+            },
+            function(innerCallback){
+              var notification = new NotificationModel({
+                  users : [user],
+                  gpi : growPlanInstance,
+                  ts : now,
+                  timeSent : now,
+                  msg : notificationMessage,
+                  type : notificationType
+              });
+              winston.info('Creating notification : ' + notification.toString());
+              notification.save(function(err){
+                if (err) { return innerCallback(err); }
+                return innerCallback();
+              });
+            },
+            function(innerCallback){
+              if (actionHasDeviceControl){ 
+                winston.info('Calling refreshActiveActionsOverride for device : ' + device._id.toString());
+                return device.refreshActiveActionsOverride(innerCallback);
+              } 
+              return innerCallback();
+            }
+          ],
+          function(err){
+            if (err) { return callback(err); }
+            return callback();
           }
-          
-        });
+        );
       }
     );
   });
@@ -257,5 +415,6 @@ function triggerActionOverride(options, callback){
 module.exports = {
   logSensorLog : logSensorLog,
   activateGrowPlanInstance : activateGrowPlanInstance,
+  activatePhase : activatePhase,
   triggerActionOverride : triggerActionOverride
 };
