@@ -23,9 +23,8 @@ var NotificationSchema = new Schema({
 
 
 	/**
-	 * time that we actually sent the email/SMS, if applicable. If
-	 * this was a dashboard-only notification, this is set to the same time
-	 * as ts. 
+	 * time that we actually sent the email/SMS (If this was a dashboard-only notification, 
+	 * this is set to the same time as ts) 
 	 * If we go with a db-worker approach, the worker
 	 * would query this for "null" to find notifications
 	 * that still need to be sent. 
