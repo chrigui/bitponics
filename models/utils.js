@@ -493,7 +493,7 @@ function clearPendingNotifications (NotificationModel, callback){
       function (notification, iteratorCallback){
         var mailOptions = {
             from: "notifications@bitponics.com", // sender address
-            to: users.map(function(user) { return user.email; }).join(', '), 
+            to: notification.users.map(function(user) { return user.email; }).join(', '), 
             subject: "Bitponics Notification", // Subject line
             text: notification.msg,
             html: notification.msg
