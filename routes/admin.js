@@ -1,4 +1,5 @@
-var winston = require('winston');
+var winston = require('winston'),
+	ModelUtils = require('../models/utils');
 
 module.exports = function(app){
 	/*
@@ -6,8 +7,6 @@ module.exports = function(app){
 	 * Require authenticated user with property admin=true
 	 */
 	app.all('/admin*', function (req, res, next) {
-	  winston.dir(req.user);
-	  winston.dir(req.loggedIn);
 	  if (req.user.admin) {
 	    next();
 	  } else {
@@ -23,4 +22,20 @@ module.exports = function(app){
 	    title: 'Bitponics Admin'
 	  })
 	});
+
+	
+	app.get('/admin/trigger_clearPendingNotifications', function (req, res) {
+	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err){
+	  	if (err) { 
+	  		winston.error(err); 
+	  		res.status(500);
+	        res.send('error');
+	        return;
+	  	}
+	  	res.status(200);
+	  	res.send('success');
+	  	return;
+	  });
+	});	
+
 };
