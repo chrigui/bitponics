@@ -347,7 +347,7 @@ function triggerActionOverride(options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationMessage = actionOverrideMessage + '.';
+            notificationMessage = actionOverrideMessage + '. ';
 
         winston.info('Logging actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
         
@@ -356,7 +356,7 @@ function triggerActionOverride(options, callback){
           notificationMessage += action.description;
         } else {
           notificationType = 'info';
-          notificationMessage += ' Device has automatically triggered the following action : "' + action.description + '".';
+          notificationMessage += 'Device has automatically triggered the following action : "' + action.description + '".';
         }
 
         // In parallel: 
@@ -383,7 +383,6 @@ function triggerActionOverride(options, callback){
                   users : [user],
                   gpi : growPlanInstance,
                   ts : now,
-                  timeSent : now,
                   msg : notificationMessage,
                   type : notificationType
               });
