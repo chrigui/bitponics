@@ -74,3 +74,7 @@ new cronJob('0 0 0 * * *', function(){
 }, null, true, "America/New_York");
 
  console.log('Started worker');
+
+ setInterval(function(){
+ 	var x = 'break here';
+ }, 1000);
