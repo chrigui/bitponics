@@ -15,12 +15,12 @@ module.exports = [
 			owner : "506de3098eebf7524342cb66",
 			growPlan : "506de2ff8eebf7524342cb3a",
 			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
-			startDate: 1347364818821, // 09/11/2012
+			startDate: '2012 09 11 00:00:00 GMT-0400 (EDT)', // 09/11/2012
 			active: true,
 			phases: [
 				{
 					phase: "506de3038eebf7524342cb4e",
-					startDate: 1347364818821, // 09/11/2012
+					startDate: '2012 09 11 00:00:00 GMT-0400 (EDT)', // 09/11/2012
 					endDate: null, // 11/01/2012
 					active: true
 				},

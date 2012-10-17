@@ -10,14 +10,14 @@ module.exports = function(app){
 	  if (req.user.admin) {
 	    next();
 	  } else {
-	    res.redirect('/login');
+	    res.redirect('/login?redirect=' + req.url);
 	  }
 	});
 
 	/* 
 	 * Admin landing
 	 */
-	app.get('/admin/', function (req, res) {
+	app.get('/admin', function (req, res) {
 	  res.render('admin', {
 	    title: 'Bitponics Admin'
 	  })
@@ -38,4 +38,17 @@ module.exports = function(app){
 	  });
 	});	
 
+	app.get('/admin/trigger_scanForPhaseChanges', function (req, res) {
+	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
+	  	if (err) { 
+	  		winston.error(err); 
+	  		res.status(500);
+	        res.send('error');
+	        return;
+	  	}
+	  	res.status(200);
+	  	res.send('success');
+	  	return;
+	  });
+	});	
 };
