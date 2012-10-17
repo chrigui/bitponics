@@ -13,7 +13,8 @@ var Device = require('./device'),
     EmailConfig = require('../config/email-config'),
     nodemailer = require('nodemailer'),
     winston = require('winston'),
-    async = require('async');
+    async = require('async'),
+    tz = require('timezone/loaded');
 
 
 /**
@@ -119,158 +120,6 @@ function logSensorLog(options, callback){
     }
   );
 };
-
-
-/**
- * Activate an existing grow plan instance. If there's a device, update the device's activeGrowPlanInstance property
- * and remove the device from any other GPI's that are using it. 
- */
-function activateGrowPlanInstance(growPlanInstance, callback){
-  growPlanInstance.active = true;
-
-  if (!growPlanInstance.device){
-    return growPlanInstance.save(callback);
-  }
-  else {
-    DeviceModel.findById(growPlanInstance.device, function(err, deviceResult){
-      if (err) { return callback(err); }
-      if (!deviceResult){ return callback(new Error('No device found for specified id')); }
-
-      deviceResult.activeGrowPlanInstance = growPlanInstance;
-
-      deviceResult.save(function(err){
-        if (err) { return callback(err); }
-        return growPlanInstance.save(callback);     
-      });
-    });
-
-    // TODO : check for other Devices that have activeGrowPlanInstance set to this. do something....
-  }
-};
-
-
-/**
- * Activate a phase on a grow plan instance. 
- * @param device : if growPlanInstance has a device, should be the Device model instance. this is just to save us another query here
- */
-function activatePhase(growPlanInstance, growPlan, phaseId, device, callback){
-  var now = new Date(),
-      growPlanPhase = growPlan.phases.filter(function(item){ return item._id.equals(phaseId);})[0],
-      deviceControlsWithAction = [];
-  
-  growPlanInstance.phases.forEach(function(phase){
-    if (phase.phase.equals(phaseId)){
-      phase.active = true;
-      phase.startDate = now; 
-      phase.expectedEndDate = now + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000);
-    } else {
-      if (phase.active == true){
-        phase.endDate = now;
-      }
-      phase.active = false;
-    }
-  });
-  
-  if (device){
-    deviceControlsWithAction = growPlanPhase.actions.filter(
-      function(item){ 
-        return (item.control && device.controlMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
-      }
-    );;
-  }
-
-  async.parallel([
-      // save the new phase settings to the growPlanInstance
-      function(innerCallback){
-        return growPlanInstance.save(innerCallback);
-      },
-      // Get all actions for this phase, notify user about them
-      function(innerCallback){
-        ActionModel
-        .find()
-        .where('_id')
-        .in(growPlanPhase.actions)
-        .populate('control')
-        .exec(function(err, actionResults){
-          if (err) { return innerCallback(err); }
-          if (!actionResults.length) { return innerCallback(); }
-          
-          async.forEach(
-            actionResults, 
-            function(action, iteratorCallback){
-              var notificationMessage = growPlanPhase.name + ' phase started. Time to trigger the action "' + action.description + '".',
-                notificationType = 'actionNeeded';
-
-                // Check if this has a device control
-                if (action.control) {
-                  if (deviceControlsWithAction.some(function(deviceControlId){
-                      return action.control._id.equals(deviceControlId);
-                    })){
-                      notificationType = 'info';
-                      notificationMessage += ' Since you have a ' + action.control.name + ' connected, we\'ve done this automatically.';
-                    }  
-                }
-                
-                var notification = new NotificationModel({
-                  users : growPlanInstance.users,
-                  gpi : growPlanInstance,
-                  type : notificationType,
-                  msg : notificationMessage
-                });
-                notification.save(iteratorCallback);
-              },
-              function(err){
-                if (err) { return innerCallback(err); }
-                innerCallback();
-              }
-          );
-        });
-      },
-      // Force the device to refresh itself by expiring actions & overrides
-      function(innerCallback){
-        if (!device){ return innerCallback; }
-          
-        device.activeActions.expires = now - 1000;
-        device.activeActionsOverride.expires = now - 1000;
-
-        ActionOverrideLogModel
-        .find()
-        .where('gpi')
-        .equals(growPlanInstance._id)
-        .where(expires)
-        .gt(now)
-        .populate('action')
-        .exec(function(err, actionOverrideLogResults){
-          if (err) { return innerCallback(err);}
-          if (!actionOverrideLogResults.length){ return innerCallback(); }
-          var actionOverrideLogsToExpire = [];
-          actionOverrideLogResults.forEach(function(actionOverrideLog){
-            if (!actionOverrideLog.action.control) { return; } 
-            if (deviceControlsWithAction.some(function(deviceControlId){
-              return actionOverrideLog.action.control.equals(deviceControlId);
-            })){
-              actionOverrideLogsToExpire.push(actionOverrideLog);
-            } 
-          });
-
-          async.forEach(actionOverrideLogsToExpire, 
-            function(actionOverrideLog, iteratorCallback){
-              actionOverrideLog.expires = now - 1000;
-              actionOverrideLog.save(iteratorCallback);
-            }, 
-            function(err){
-              if (err) { return innerCallback(err);}
-              return innerCallback();
-            }
-          );
-        });
-      }
-    ],
-    function(err, results){
-      if (err) { return callback(err);}
-      return callback();
-    });
-}
 
 
 /**
@@ -384,7 +233,7 @@ function triggerActionOverride(options, callback){
               var notification = new NotificationModel({
                   users : [user],
                   gpi : growPlanInstance,
-                  ts : now,
+                  timeToSend : now,
                   msg : notificationMessage,
                   type : notificationType
               });
@@ -461,12 +310,12 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
         }
       });
 
-      notificationMessage = "It's almost time for the " + nextPhase.name + " phase.";
+      notificationMessage = "It's almost time for the " + nextPhase.name + " phase. Log into your dashboard to advance your grow plan to the next phase.";
       notification = new NotificationModel({
         gpi : growPlanInstance._id,
         users : growPlanInstance.users,
-        ts : now,
         type : notificationType,
+        timeToSend : now,
         msg : notificationMessage
       });
       notification.save();  
@@ -474,13 +323,16 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
     });
 }
 
-
+/** 
+ * Called from the worker process across each environment, which is why we
+ * need the model to be passed in
+ */
 function clearPendingNotifications (NotificationModel, callback){
   var now = new Date();
   NotificationModel
   .find()
-  .where('timeSent')
-  .equals(null)
+  .where('timeToSend')
+  .lte(now)
   .populate('users', 'email')
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
@@ -490,17 +342,28 @@ function clearPendingNotifications (NotificationModel, callback){
     async.forEach(
       notificationResults, 
       function (notification, iteratorCallback){
+        var subject = "Bitponics Notification";
+        if (notification.type === 'actionNeeded'){ subject += ': Action Needed'; }
+        
         var mailOptions = {
             from: "notifications@bitponics.com", // sender address
             to: notification.users.map(function(user) { return user.email; }).join(', '), 
-            subject: "Bitponics Notification", // Subject line
+            subject: subject, // Subject line
             text: notification.msg,
             html: notification.msg
         };
+        
         emailTransport.sendMail(mailOptions, function(err, response){
           if(err){ return iteratorCallback(err); }
-          notification.timeSent = now;
-          notification.viewed = true;
+          
+          notification.sentLogs.push({ts: now});
+          
+          if (notification.repeat && notification.repeat.duration){
+            notification.timeToSend = tz(notification.timeToSend, notification.tz, notification.repeat.tz, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
+          } else {
+            notification.timeToSend = null;
+          }
+          
           notification.save(iteratorCallback);
         });
       },
@@ -514,8 +377,6 @@ function clearPendingNotifications (NotificationModel, callback){
 
 module.exports = {
   logSensorLog : logSensorLog,
-  activateGrowPlanInstance : activateGrowPlanInstance,
-  activatePhase : activatePhase,
   triggerActionOverride : triggerActionOverride,
   scanForPhaseChanges : scanForPhaseChanges,
   clearPendingNotifications : clearPendingNotifications

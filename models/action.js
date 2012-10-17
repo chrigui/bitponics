@@ -35,7 +35,6 @@ ActionSchema = new Schema({
 				controlValue: { type: String },
 
 				durationType: { type: String, enum: [
-					'milliseconds',
 					'seconds',
 					'minutes',
 					'hours',
@@ -89,6 +88,7 @@ ActionSchema.virtual('overallCycleTimespan')
  // Want a sparse index on control (since it's an optional field)
 ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
+
 /**
  *  Validate cycle states
  *
@@ -118,16 +118,32 @@ ActionSchema.pre('save', function(next){
 			// if a cycle has 1 state, it's considered a discrete action and must have a "repeat" of false
 			// TODO : should this throw an error or just set the correct value silently?
 			if (cycle.repeat){
-				return next(new Error('Actions with single-state cycles are considered discrete actions and must have "repeat" set to false'))
+				return next(new Error('Actions with single-state cycles are considered discrete actions and cannot have "repeat" set to true'));
 			}
 			break;
 		case 2:
+			// if 2 states, at least one must have a duration defined
+			if ( !(states[0].durationType && states[0].duration) &&
+				 !(states[1].durationType && states[1].duration)){
+				return next(new Error('In a 2-state cycle, at least one state must have a duration defined'));
+			}
 			break;
 		case 3:
 			// if a cycle has 3 states, the 1st and 3rd must have the same control value
 			if (states[0].controlValue !== states[2].controlValue){
-				return next(new Error('First and last control values must be equal'))
+				return next(new Error('First and last control values must be equal'));
 			}
+			// and either the (1st & 3rd) or 2nd states must have durations defined
+			if (!(
+					(
+						(states[0].durationType && states[0].duration) &&
+				  	(states[2].durationType && states[2].duration)
+			  	) 
+				  ||
+				  (states[1].durationType && states[1].duration)
+			   )){
+				return next(new Error('In a 3-state cycle, either the (1st and 3rd) or the 2nd state must have a duration defined'));
+			}	
 			break;
 		// no default; we've enforced that we have one of these values already
 	}
@@ -147,7 +163,7 @@ var ActionUtils = {
 				return duration * 1000;
 			case 'minutes':
 				return duration * 1000 * 60;
-			case'hours':
+			case 'hours':
 				return duration * 1000 * 60 * 60;
 			case 'days':
 				return duration * 1000 * 60 * 60 * 24;
