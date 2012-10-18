@@ -21,15 +21,15 @@ var GrowPlanInstanceSchema = new Schema({
 	
 	owner : { type: ObjectId, ref: 'User', required: true },
 
-	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
+	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true },
 	
 	device : { type : ObjectId, ref : 'Device', required: false }, //the bitponics device
 	
-	startDate: { type: Date, required: true },
+	startDate: { type: Date },
 
 	endDate: { type: Date },
 
-  active: { type: Boolean, required: true },
+  active: { type: Boolean },
 
 	phases: [{
 		phase: Schema.Types.ObjectId, // ObjectId of GrowPlan.Phase
@@ -148,7 +148,7 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
       gpi.save(function(err){
         if (!options.active){
-          return callback(null, gpi);
+          return callback(err, gpi);
         }
          
         return gpi.activate({ 
@@ -302,9 +302,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
               return (item.control && device.controlMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
             }
           );
-          console.log('growPlanPhase.actions', growPlanPhase.actions);
-          console.log('actionsWithDeviceControl');
-          console.log(actionsWithDeviceControl);
+          
           innerCallback();
         });
       },
