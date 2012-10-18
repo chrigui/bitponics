@@ -3,29 +3,42 @@ var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
 module.exports = [
 		{
 			_id : '506de2ec8eebf7524342cb24',
-			description: "Transplant seedlings into the grow bed",
-			control: undefined,
-			cycle: undefined
+			description : "Transplant seedlings into the grow bed"
+		},
+		{
+			_id : '506de3128eebf7524342cb87',
+			description : "Water level check",
+			cycle : {
+				states : [
+					{
+						durationType: 'hours',
+						duration: 8
+					},
+					{
+						message: "Check water level in seed tray. Make sure there's a thin layer at the bottom of the tray to last the seedlings through the day."
+					},
+					{ 
+						durationType : 'hours',
+						duration: 16
+					}
+				],
+				repeat : true
+			}
 		},
 		{
 			_id : '506de2ef8eebf7524342cb25',
-			description: "Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient.",
-			control: undefined,
+			description: "Reservior refill cycle",
 			cycle: {
 				states: [
 					{
-						controlValue: undefined,
-						durationType: 'untilPhaseEnd',
-						duration: undefined
-					},
-					{
-						controlValue: undefined,
-						durationType: 'minutes',
-						duration: '15',
 						message: "Flush and refill reservoir. Discard any solution in the reservoir, rinse the entire system with water. Then refill the reservoir to capacity with water. Mix in ¼ cup Grow nutrient, then ¼ cup Bloom nutrient, then ¼ cup Micro nutrient."
 					},
+					{
+						durationType: 'weeks',
+						duration: 3
+					}
 				],
-				repeat: false
+				repeat: true
 			}
 		}, // end flush Action
 		{
@@ -37,13 +50,13 @@ module.exports = [
 					{
 						controlValue: 1,
 						durationType: 'minutes',
-						duration: 15, // 15 min in milliseconds
+						duration: 15, 
 						message: "Turn pump on for 15 minutes"
 					},
 					{
 						controlValue: 0,
 						durationType: 'minutes',
-						duration: 15, // 15 min in millisecond
+						duration: 15, 
 						message: "Turn pump off for 15 minutes"
 					}
 				],

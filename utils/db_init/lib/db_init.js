@@ -192,6 +192,22 @@ mongoose.connect(db_url);
 		 				console.log('sensorlogs collection dropped');
 		 				innerCallback();
 		 			});
+		 		},
+		 		function(innerCallback){
+		 			if (!mongoose.connection.collections['notifications']){ return innerCallback();}
+		 			mongoose.connection.collections['notifications'].drop( function(err) {
+		 				if (err){ return innerCallback(err);}
+		 				console.log('notifications collection dropped');
+		 				innerCallback();
+		 			});
+		 		},
+		 		function(innerCallback){
+		 			if (!mongoose.connection.collections['actionoverridelogs']){ return innerCallback();}
+		 			mongoose.connection.collections['actionoverridelogs'].drop( function(err) {
+		 				if (err){ return innerCallback(err);}
+		 				console.log('actionoverridelogs collection dropped');
+		 				innerCallback();
+		 			});
 		 		}
 		 		],
 		 		function(err, results){
@@ -717,6 +733,22 @@ function(callback){
 		 		if (result){
 		 			decrementData();
 		 		} else {
+		 			models.growPlanInstance.create({
+		 				_id : _data._id,
+		 				users: _data.users,
+		 				owner : _data.owner,
+		 				growPlan: _data.growPlan,
+		 				device: _data.device,
+		 				active : _data.active
+		 			},
+		 			function(err, doc){
+		 				if (err) { console.log(err); return callback(err);}
+		 				savedObjectIds[dataType][_data._id] = doc._id;
+		 				console.log("created grow plan instance");
+		 				decrementData();
+		 			}
+		 			);
+		 			/*
 		 			var dataObj = new models.growPlanInstance({
 		 				_id : _data._id,
 		 				users: _data.users,
@@ -748,6 +780,8 @@ function(callback){
 		 				}
 
 		 			});
+*/
+
 		 		}
 		 	});
 		});
