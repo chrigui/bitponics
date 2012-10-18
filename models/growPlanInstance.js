@@ -246,7 +246,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       now = new Date(),
       phaseDay = options.phaseDay || 0,
       growPlanPhase, 
-      actionsWithDeviceControl = [];
+      actionsWithDeviceControl = [],
+      prevPhase;
   
   // First, populate growPlan, owner, device
   // then, set the phase properties & save the gpi
@@ -265,6 +266,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           innerCallback();
         });
       },
+
       function (innerCallback){
         GrowPlanModel
         .findById(growPlanInstance.growPlan)
@@ -282,6 +284,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
               phase.expectedEndDate = now + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
             } else {
               if (phase.active == true){
+                prevPhase = phase;
                 phase.endDate = now;
               }
               phase.active = false;
@@ -291,6 +294,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           innerCallback();
         });
       },
+
       function (innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
         DeviceModel.findById(growPlanInstance.device, function (err, deviceResult){
@@ -306,6 +310,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           innerCallback();
         });
       },
+
       function (innerCallback){
         // At this point, the growPlanInstance is done being edited.
         if (options.save) {
@@ -314,6 +319,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           return innerCallback();
         }
       },
+
       function (innerCallback){
 
         async.parallel([
@@ -394,6 +400,40 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
         }
         );
       },
+
+      // Send notifications for the just-ended phase 
+      function (innerCallback){
+        if (!(prevPhase && prevPhase.phaseEndActions)){ return innerCallback(); }
+
+        ActionModel
+        .find()
+        .where('_id')
+        .in(prevPhase.phaseEndActions)
+        .populate('control')
+        .exec(function (err, actionResults){
+          if (err) { return innerCallback(err); }
+          if (!actionResults.length) { return innerCallback(); }
+
+          async.forEach(
+            actionResults, 
+            function(action, iteratorCallback){
+              var actionNotification = new NotificationModel({
+                    users : growPlanInstance.users,
+                    gpi : growPlanInstance,
+                    timeToSend : now,
+                    msg : prevPhase.name + ' phase ended. Time to trigger the action "' + action.description + '".'
+                  });
+
+              actionNotification.save(iteratorCallback);
+            },
+            function (err){
+              return innerCallback(err);
+            }
+          );
+        });
+      },
+
+      // Send notifications for the newly activated phase
       function (innerCallback){
         ActionModel
         .find()
