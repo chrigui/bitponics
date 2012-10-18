@@ -30,6 +30,10 @@ var PhaseSchema = new Schema({
 
 	actions: [{ type: ObjectId, ref: 'Action', required: true }],
 	
+	phaseEndActions : [{ type: ObjectId, ref: 'Action', required: true }],
+
+	phaseEndDescription : { type : String },
+
 	idealRanges: [IdealRangeSchema],
 
 	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],

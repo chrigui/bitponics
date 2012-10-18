@@ -23,7 +23,7 @@ module.exports = [
 			phases: [
 				{
 					_id : '506de30c8eebf7524342cb72',
-					name : 'All-Purpose Seedling',
+					name : 'Seedling',
 					description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway. This phase is for the "All-Purpose" grow plan so its sensor ranges aren\'t optimal for any specific plant, but instead describe a range that should be adequate for most plants.',
 					expectedNumberOfDays: 7,
 					light: {
@@ -35,11 +35,12 @@ module.exports = [
 					growMedium: "rockwool",
 					nutrients: [],
 					actions: [
-						"506de2ec8eebf7524342cb24",
-						"506de2ef8eebf7524342cb25",
-						"506de2f08eebf7524342cb26",
+						"506de3128eebf7524342cb87",
 						"506de2f18eebf7524342cb27"
 					],
+					phaseEndActions : [
+					],
+					phaseEndDescription: "This phase is over once the seedlings start growing their first true leaves.",
 					idealRanges: [
 						{
 							_id : '506de30c8eebf7524342cb71',
@@ -79,7 +80,7 @@ module.exports = [
 				},
 				{
 					_id : '506de30e8eebf7524342cb78',
-					name : 'All-Purpose Vegetative',
+					name : 'Vegetative',
 					description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 					light: {
 						fixture: "506de3028eebf7524342cb48",
