@@ -8,12 +8,12 @@ machine:
   hosts:
     bitponics.com: 127.0.0.1
 
-    node:
-      version:
-        0.6.18
+  node:
+    version:
+      0.6.18
 
-    environment:
-      NODE_ENV: test
+  environment:
+    NODE_ENV: test
 
 deployment:
   production:
