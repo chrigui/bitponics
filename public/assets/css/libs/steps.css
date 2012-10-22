@@ -1,2 +1,2 @@
 .steps .step.dim{opacity:.3}
-.steps .step.hide{display:none}
+.steps .step.hide{visibility:hidden}

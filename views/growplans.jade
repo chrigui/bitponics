@@ -1,7 +1,16 @@
 extends layout
 
+block head
+  script
+    $(document).bind("mobileinit", function(){
+      //$.mobile.autoInitializePage = false;
+      $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search";
+    });
+  script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
+  //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
+  link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
 block content
 
@@ -11,6 +20,7 @@ block content
 
     div#setup.select-block
       h2.main-heading #{title}
+      h3.sub-heading Selection
       //h3.sub-heading
     div#user.select-block
       h2.main-heading User
@@ -22,11 +32,10 @@ block content
 
   section#main(role="main")
     div.content-module.middle
-      h3.main-heading Grow Plan Selection
       form(id="growplans", class='steps', action='', method='post')                  
         
         section(id="system_selection", class="step", data-required="1")
-          label What type of system do you have?
+          h4 What type of system do you have?
           ul(class="grid photos")
             each system, i in growSystems
               li
@@ -34,7 +43,7 @@ block content
                 label(for="sys_#{system.name}") #{system.name}
 
         section(id="plant_selection", class="step")
-          label What would you like to grow?
+          h4 What would you like to grow?
 
           input(class="search no-validate")
           //span(class="sort", data-sort="plant") Sort by Plant Name
@@ -45,49 +54,181 @@ block content
                 input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
                 label(for="#{plant.name}", class="plant") #{plant.name}
 
-        section(id="growplan_results", class="step update-panel", data-required="1")
-          label We've found some grow plans for you
+        section(id="growplan_results", class="step update-panel hide", data-required="1")
+          h4 We've found grow plans for you
           ul(class="grid sortlist photos")
-            dummy_systems = ["Drip","aquaponics","ebb & flow","Egg-carton seed starter","deep water culture (DWC)", "Bitponics Water Culture System"]
+            //dummy_systems = ["Drip","aquaponics","ebb & flow","Egg-carton seed starter","deep water culture (DWC)", "Bitponics Water Culture System"]
             each growPlan, i in growPlans
               li(id="gplist_#{growPlan.id}")
                 input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}")
                 label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
+                  div.info
+                    div(class="gplist_description") #{growPlan.description}
+                    div(class="gplist_plants " + growPlan.plants.join(' ')) #{growPlan.plants}
+                    ul(class="gplist_system")
+                      each phase in growPlan.phases
+                        li #{phase.growSystem.name}
+
+          //Default grow plans not filtered
+          ul(class="grid sortlist photos default")
+            li(id="gplist_#{growPlanDefault.id}")
+              input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}")
+              label(for="gplist_input_#{growPlanDefault.id}") #{growPlanDefault.name}
                 div.info
-                  div(class="gplist_description") #{growPlan.description}
-                  div(class="gplist_plants") #{growPlan.plants}
-                  //TODO get all phase's systems populated here so we can filter on it
-                  div(class="gplist_system #{dummy_systems[i]}") #{dummy_systems[i]}
+                  div(class="gplist_description") #{growPlanDefault.description}
+                  ul(class="gplist_system")
+                      each phase in growPlanDefault.phases
+                        li #{phase.growSystem.name}
 
         section(id="growplan_edit", class="step hide")
-          h4 Grow Plan Activation
+          h4 Tailor this grow plan to your needs
 
           //set as default grow plan, will change dynamically based on previous step selection
-          input(type="hidden", name="parentGrowPlan", value="#{growPlanDefault.id}") 
+          input(id="gpedit__id", type="hidden", name="parentGrowPlan", value="#{growPlanDefault.id}") 
 
-          label #{growPlanDefault.name}
+          label Name
           input(id="gpedit_name", type='text', name="gpedit_name", value="#{growPlanDefault.name}")
           
-          label #{growPlanDefault.description}
-          input(id="gpedit_description", type='text', name="gpedit_description", value="#{growPlanDefault.description}")
+          label Description
+          textarea(id="gpedit_description", name="gpedit_description") #{growPlanDefault.description}
 
-          label #{growPlanDefault.plants}
-          input(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+          label Plants
+          ul(class="grid plantlist")
+            //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+            each plant in growPlanDefault.plants
+              li
+                input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
+                label(for="#{plant.name}", class="plant") #{plant.name}
 
-          label #{growPlanDefault.expertiseLevel}
-          input(id="gpedit_expertiseLevel", type='text', name="gpedit_expertiseLevel", value="#{growPlanDefault.expertiseLevel}")
+          label Expertise Level
+          ul.grid
+            li
+              input(id="gpedit_expertiseLevel_beginner", type='radio', name="gpedit_expertiseLevel", value="beginner", checked='beginner' == growPlanDefault.expertiseLevel)
+              label(for="gpedit_expertiseLevel_beginner") Beginner
+            li
+              input(id="gpedit_expertiseLevel_intermediate", type='radio', name="gpedit_expertiseLevel", value="intermediate", checked='intermediate' == growPlanDefault.expertiseLevel)
+              label(for="gpedit_expertiseLevel_intermediate") Intermediate
+            li
+              input(id="gpedit_expertiseLevel_expert", type='radio', name="gpedit_expertiseLevel", value="expert", checked='expert' == growPlanDefault.expertiseLevel)
+              label(for="gpedit_expertiseLevel_expert") Expert
+          
+          //- label Sensors
+          //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
 
-          label #{growPlanDefault.nutrients}
-          input(id="gpedit_nutrients", type='text', name="gpedit_nutrients", value="#{growPlanDefault.nutrients}")
+          //- label Controls
+          //- input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
 
-          label #{growPlanDefault.sensors}
-          input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
+          label Phases
+          div.phaseRangeSlider
+            div.phase-current-indicator
+              span(for="phase_slider_current") I am on day  
+              input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182") 
+              span of this grow plan.
 
-          label #{growPlanDefault.controls}
-          input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
+            div.phase-sliders
+              - var allPhases = ['Seedling', 'Vegetative', 'Blooming', 'Fruiting'];
+              each phaseName, i in allPhases
+                div(class="phase-slider #{phaseName.toLowerCase()} inactive", data-phase="#{phaseName.toLowerCase()}")
+                  div(class="phase-slider-info")
+                    div.toggle
+                      span.add +
+                      span.remove x
+                    label(for="phase_slider_#{i}") #{phaseName}
+                    span(class="date-range") date-x
+                    span - 
+                    span(class="date-duration") duration-x 
+                  input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="phase-slider-input", value="#{(i+1)/4 * 182}", min="0", max="182", data-phase="#{phaseName.toLowerCase()}")
+                  span days
 
-          label #{growPlanDefault.phases}
-          input(id="gpedit_phases", type='text', name="gpedit_phases", value="#{growPlanDefault.phases}")
+                  - var hasPhase = 0;
+                  - var currentPhaseData = undefined;
+                  each phase, i in growPlanDefault.phases
+                    - if (phase.name == phaseName) {
+                      - hasPhase++;
+                      - currentPhaseData = phase;
+                    - }
+
+                  if (hasPhase > 0)
+                      div.growMedium
+                        label Grow Medium
+                        input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="#{currentPhaseData.growMedium}")
+                      
+                      div.nutrients
+                        label Nutrients
+                        ul.grid
+                          each nutrient in currentPhaseData.nutrients
+                            li
+                              input(id="gpedit_#{phaseName}_nutrients", type='checkbox', name="gpedit_#{phaseName}_nutrients", value="#{nutrient.id}", checked=true)
+                              label(for="gpedit_#{phaseName}_nutrients") #{nutrient.name} - #{nutrient.brand}
+
+                      div.actions
+                        label Actions
+                        ul.grid
+                          each action, i in currentPhaseData.actions
+                            li
+                              input(id="gpedit_#{i}_#{phaseName}_action", type="checkbox", name="gpedit_#{i}_#{phaseName}_action", value="#{action.id}", checked=true)
+                              label(for="gpedit_#{i}_#{phaseName}_action") #{action.description}
+                          //- each phaseEndActions in currentPhaseData.actions
+                          //-   li
+                          //-     //TODO: this is hack w/ i*99
+                          //-     input(id="gpedit_#{i*99}_#{phaseName}_action", type="checkbox", name="gpedit_#{i}_#{phaseName}_action", value="#{phaseEndActions.id}, checked=true")
+                          //-     label(for="gpedit_#{i*99}_#{phaseName}_action") #{phaseEndActions.description}
+
+                      div.idealRanges
+                        label Ideal Ranges
+                        ul.grid
+                          each idealRange, i in currentPhaseData.idealRanges
+                            li
+                              input(id="gpedit_#{i}_#{phaseName}_idealrange", type="checkbox", name="gpedit_#{i}_#{phaseName}_idealrange", value="#{idealRange.id}", checked=true)
+                              label(for="gpedit_#{i}_#{phaseName}_idealrange") #{idealRange.sCode}
+                      
+                      div.phaseEndDescription
+                        label Phase End Description
+                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription") #{currentPhaseData.phaseEndDescription}
+                    
+                  else 
+                      //this grow plan doesnt have this data, but populate the html anyway for possible customization
+
+                      div.growMedium
+                        label Grow Medium
+                        input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="")
+                      
+                      div.nutrients
+                        label Nutrients
+                        ul.grid
+                            label Add +
+                            input(id="gpedit_#{phaseName}_nutrients", type='text', name="gpedit_#{phaseName}_nutrients", value="")
+                            
+
+                      div.actions
+                        label Actions
+                        ul.grid
+                            li
+                              input(type="checkbox", name="gpedit_#{phaseName}_action", value="")
+                              label Add +
+
+                      div.idealRanges
+                        label Ideal Ranges
+                        ul.grid
+                            li
+                              input(type="checkbox", name="gpedit_#{phaseName}_idealrange", value="")
+                              label Add +
+                      
+                      div.phaseEndDescription
+                        label Phase End Description
+                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription") Write a phase end description... 
+                  
+                  //span Days (Default: #{(i+1)/4 * 182} )
+          
+
+
+
+                //- each phase, i in growPlanDefault.phases
+                //-   div(class="phase-slider #{phase.name.toLowerCase()}")
+                //-     - var sliderValue = phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 100
+                //-     label(for="first_phase_slider") #{phase.name}
+                //-     input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="no-disable", value="#{sliderValue}", min="0", max="100", data-phase="#{phase.name}")
+                //-     span Days (Default: #{phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 'indeterminate'} ) 
 
         input(id="growplans_activate", type="submit", value="Activate Grow Plan")
 
@@ -97,7 +238,11 @@ block footer-scripts
     Bitponics.user = {
       
     }
+    Bitponics.growPlans = !{JSON.stringify(growPlans)};
+    Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
+  
   script(src='/assets/js/libs/Steps.js')
   script(src='/assets/js/libs/list/src/list.js')
+  script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')
   //- script(src='/assets/js/libs/list/list.min.js')
   script(src='/assets/js/growplans.js')

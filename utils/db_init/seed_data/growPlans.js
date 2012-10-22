@@ -82,6 +82,7 @@ module.exports = [
 					_id : '506de30e8eebf7524342cb78',
 					name : 'Vegetative',
 					description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
+					expectedNumberOfDays: 28,
 					light: {
 						fixture: "506de3028eebf7524342cb48",
 						fixtureQuantity: 1,

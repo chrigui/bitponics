@@ -18,14 +18,6 @@ module.exports = [
 		name: "Chives"
 	},
 	{
-		_id: "5074983aab364e2a9fffd4f3",
-		name: "Tarragon"
-	},
-	{
-		_id: "5074983bab364e2a9fffd4f4",
-		name: "Tarragon"
-	},
-	{
 		_id: "507492f3fe420e210be58a85",
 		name: "Tarragon"
 	},

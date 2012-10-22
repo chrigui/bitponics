@@ -11,6 +11,8 @@ window.Steps = (function( window, document, undefined ) {
     UPDATE_PANEL_CLASS = '.update-panel',
 
     initialStepIndex = 0,
+
+    doScroll = true,
     
     Steps = {};
 
@@ -34,19 +36,20 @@ window.Steps = (function( window, document, undefined ) {
       Steps.currentStep.find(':input').removeAttr('disabled');
       Steps.steps.filter(':gt(' + Steps.currentStepIndex + ')')
         .addClass('dim')
-        .find(':input')
+        .find(':input:not(.no-disable)')
         .attr('disabled', true);
     }
 
     function validate(e) {
-      var activeStep = $(e.target).closest('.step');
+      var activeStep = $(e.target).closest('.step'),
+        nextStep = activeStep.next(STEP_CLASS);
       
       if (!Steps.stepsInteractedWith[activeStep.index()]) {
         //add to list of steps user has interacted with and scroll to next
         Steps.stepsInteractedWith[activeStep.index()] = activeStep;
-        $('html, body').animate({
-          scrollTop: activeStep.next().offset().top
-        }, 1000);
+        if (doScroll && nextStep.length) {
+          scrollToNextSection(nextStep.offset().top);
+        }
       }
 
       //loop through all interacted with steps and validate them
@@ -54,7 +57,9 @@ window.Steps = (function( window, document, undefined ) {
       for(var step in steps) {
         if (isValidStep(steps[step])) {
           steps[step].addClass('complete');
-          steps[step].next().removeClass('dim hide').find(':input').removeAttr('disabled');
+          if (nextStep.length) {
+            steps[step].next(STEP_CLASS).removeClass('dim hide').find(':input').removeAttr('disabled');
+          }
           delete Steps.stepsInvalid[steps[step]]; //remove from invalid
         } else {
           steps[step].addClass('error');
@@ -114,6 +119,15 @@ window.Steps = (function( window, document, undefined ) {
 
     function findByName( name ) {
       return Steps.form.find('[name="' + name + '"]');
+    }
+
+    function scrollToNextSection( top ) {
+      var delay = 0;
+      setTimeout(function(){
+        $('html, body').animate({
+          scrollTop: top
+        }, 1000);
+      }, delay)
     }
 
     Steps._version = version;

@@ -1,0 +1,35 @@
+## Customize the test machine
+machine:
+
+  timezone:
+    America/New_York # Set the timezeone
+
+  # Override /etc/hosts
+  hosts:
+    bitponics.com: 127.0.0.1
+
+  node:
+    version:
+      0.6.18
+
+  environment:
+    NODE_ENV: test
+
+deployment:
+  production:
+    branch: master
+    heroku:
+      appname: bitponics-prod
+  staging:
+    branch: staging
+    heroku:
+      appname: bitponics-staging
+  dev:
+    branch: dev
+    heroku:
+      appname: bitponics-dev
+  worker:
+    branch: worker
+    heroku:
+      appname: bitponics-worker
+  
