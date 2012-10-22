@@ -8,16 +8,17 @@ html(class=className+" no-js")
     block head
 
   body
-    block content
-    
-    include includes/footer/main
+    div(data-role="page")
+        div(data-role="content")
+            block content
+            
+            include includes/footer/main
 
-    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js')
-    //script(src='/socket.io/socket.io.js')
+            //script(src='/socket.io/socket.io.js')
 
-    script(src='/assets/js/libs/rickshaw/vendor/d3.min.js')
-    script(src='/assets/js/libs/rickshaw/vendor/d3.layout.min.js')
-    script(src='/assets/js/libs/rickshaw/rickshaw.min.js')
-    
-    block footer-scripts
-    
+            script(src='/assets/js/libs/rickshaw/vendor/d3.min.js')
+            script(src='/assets/js/libs/rickshaw/vendor/d3.layout.min.js')
+            script(src='/assets/js/libs/rickshaw/rickshaw.min.js')
+            
+            block footer-scripts
+        

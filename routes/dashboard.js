@@ -46,18 +46,18 @@ module.exports = function(app){
 							}
 						],
 						function parallelFinal(err, results){
-				          	if (err) { return next(err);}
+	          	if (err) { return next(err);}
 
-				          	sensors = results[0];
-				          	controls = results[1];
-				          	growPlanInstances = results[2];
+	          	sensors = results[0];
+	          	controls = results[1];
+	          	growPlanInstances = results[2];
 
-				          	//set first GP default to show in dashboard, 
-				          	// TODO : filter based on active or something will match on id if present below
-				          	currentGrowPlanInstance = growPlanInstances[0];
+	          	//set first GP default to show in dashboard, 
+	          	// TODO : filter based on active or something will match on id if present below
+	          	currentGrowPlanInstance = growPlanInstances[0];
 
-				          	if (currentGrowPlanInstance) {
-						      	GrowPlanModel
+	          	if (currentGrowPlanInstance) {
+			      	GrowPlanModel
 								.findById(currentGrowPlanInstance.growPlan)		
 								.populate('phases.actions')
 								.exec(callback);
@@ -65,7 +65,7 @@ module.exports = function(app){
 							} else {
 								//TODO: flash is now a separate lib as of express 3 so get connect-flash working
 								req.flash("info", "It looks like you haven't set up any grow plans yet.");
-								res.redirect('/growplans');
+								return res.redirect('/growplans?noactivegrowplans');
 							}
 						}	
 					);
@@ -74,7 +74,12 @@ module.exports = function(app){
 					if (!growPlanResult){ return callback(new Error('GrowPlanInstance.growPlan not found'));}
 					currentGrowPlan = growPlanResult;
 					// Now, get the active phase & populate the active phase's Actions & IdealRanges
-			      	var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+			    var activeGrowPlanInstancePhase = currentGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+
+			    if (!activeGrowPlanInstancePhase) {
+			    	return res.redirect('/growplans?noactivegrowplans');
+			    }
+
 					activePhase = currentGrowPlan.phases.filter(function(item){ return item._id.equals(activeGrowPlanInstancePhase.phase); })[0];
 					activeIdealRanges = activePhase.idealRanges;
 					activeActions = activePhase.actions;

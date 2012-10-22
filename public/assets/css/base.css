@@ -172,3 +172,24 @@ section#footer .content-module{background-color:#fff}
 .loader{height:24px;width:24px;background:url("/img/loader.gif") no-repeat 0 0}
 .dashboard .content-module.middle{position:relative;padding:100% 0 0 0;height:0}
 .dashboard select{margin:0}
+.growplans .grid .info{display:none;text-align:left}
+.growplans .grid .large-label .info *{color:#fff}
+.phaseRangeSlider{position:relative;padding-top:3em;}
+.phaseRangeSlider div.ui-slider{position:absolute;left:0;margin:1em 0;background:transparent;height:1em;top:0;border-radius:0;border:1px solid #23b500;width:100%}
+.phaseRangeSlider div.ui-slider:last-child{position:absolute;left:0}
+.phaseRangeSlider .slide-back{position:absolute;height:1em;top:1em;text-align:center}
+.phaseRangeSlider .phase-slider{color:#fff;padding:.5em;overflow:hidden;}
+.phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span{color:#fff}
+.phaseRangeSlider .phase-slider .toggle{padding:.5em;cursor:pointer;text-align:right;position:absolute;top:-1em;right:-.5em;width:2em;height:2em;font-size:2em;}
+.phaseRangeSlider .phase-slider .toggle .add{display:none}
+.phaseRangeSlider .phase-slider .toggle .remove{display:block}
+.phaseRangeSlider .phase-slider.inactive{opacity:.45;height:2em;}
+.phaseRangeSlider .phase-slider.inactive .toggle .add{display:block}
+.phaseRangeSlider .phase-slider.inactive .toggle .remove{display:none}
+.phaseRangeSlider .phase-slider.inactive .slide-back{display:none}
+.phaseRangeSlider .phase-slider .phase-slider-info{position:relative}
+.phaseRangeSlider .seedling{background-color:#30f700}
+.phaseRangeSlider .vegetative{background-color:#29d600}
+.phaseRangeSlider .blooming{background-color:#1c9100}
+.phaseRangeSlider .fruiting{background-color:#0e4800}
+.phaseRangeSlider .phase-current-indicator .ui-slider-handle .ui-btn-inner{background-color:#333;border-color:#333}

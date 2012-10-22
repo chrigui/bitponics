@@ -357,4 +357,137 @@ section#footer
  * Grow Plans Page
  */
 .growplans
-	//
+	#growplan_results
+		//padding-bottom 10em
+		.grid
+			// li
+			// 	width 33%
+			// 	height 10em
+	.grid
+		.info
+			display none
+			// position absolute
+			// bottom auto
+			// left 0
+			// height 5em
+			// width 50%
+			text-align left
+		.large-label
+			.info *
+				color white
+
+.phaseRangeSlider{
+    position: relative;
+    padding-top: 3em;
+    // height: 30px;
+    // margin-top: 60px;
+               /* moves label field */
+		#phase_slider_0{
+		    // top: -40px;
+		    // position: absolute;
+		    // left: 100px;
+		}       /* moves first input field */ 
+		#phase_slider_1{
+		    // top: -40px;
+		    // position: absolute;
+		    // left: 170px;
+		}      /* move second input field */ 
+		div.ui-slider{
+		    position: absolute;
+		    left: 0;
+				margin: 1em 0;
+				background: transparent;
+				height: 1em;
+				top: 0;
+				border-radius: 0;
+				border: 1px solid color-logo-green;
+				width: 100%;
+		}                   /* move both sliders - adressing 1st slider with CSS is hard */ 
+		div.ui-slider:last-child{
+		    position: absolute;
+		    left: 0px;
+		}
+		.slide-back {
+		    position:absolute;
+		    height: 1em;
+		    top: 1em;
+		    text-align: center;
+		}
+		.phase-slider {
+			//display: inline-block;
+			color: white;
+			padding: .5em;
+			overflow: hidden;
+
+			label, span {
+				color: white
+			}
+
+			.toggle {
+				padding: .5em;
+				cursor: pointer;
+				text-align: right;
+				position: absolute;
+				top: -1em;
+				right: -0.5em;
+				width: 2em;
+				height: 2em;
+				font-size: 2em;
+
+				.add {
+					display: none;
+				}
+
+				.remove {
+					display: block;
+				}
+			}
+
+			&.inactive {
+				opacity: .45;
+				height: 2em;
+
+				.toggle {
+					.add { display: block; }
+					.remove { display: none; }
+				}
+
+				.slide-back {
+					display: none;
+				}
+			}
+
+			.phase-slider-info {
+				position: relative;
+			}
+
+			
+
+		}
+
+		.seedling {
+			background-color color-phase-seedling
+		}
+		.vegetative {
+			background-color color-phase-vegetative
+		}
+		.blooming {
+			background-color color-phase-blooming
+		}
+		.fruiting {
+			background-color color-phase-fruiting
+		}
+
+		.phase-current-indicator {
+			.ui-slider-handle .ui-btn-inner{
+				background-color: #333;
+				border-color: #333;
+			}
+		}
+
+		.phase-slider-input {
+			//display: none;
+		}
+
+
+}

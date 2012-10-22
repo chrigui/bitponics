@@ -6,7 +6,7 @@
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,.steps .grid li,.steps .grid label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,.steps .grid li,.steps .grid label,.steps .grid input[type=radio],.steps .grid input[type=checkbox]{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -47,18 +47,18 @@
 .select-block select:focus{outline:none;border:none}
 label,input{display:block;margin:1em 0}
 label{font-weight:bold;margin-bottom:0}
-input{margin-top:0;background:#fff;border:1px solid #24d321;padding:.5em}
+input,textarea{margin-top:0;background:#fff;border:1px solid #24d321;padding:.5em}
 input:valid,textarea:valid,input:invalid,textarea:invalid{background:#fff}
-input[type=submit]{background:#24d321;color:#fff;border:none}
+input[type=submit]{background:#24d321;color:#fff;border:none;font-size:1.5em}
 button{background:#fff;color:#24d321}
 select{display:block;margin:.5em 0 0;max-width:14em}
+textarea{width:100%;min-height:4em;padding:.25em .5em}
 .steps .step{position:relative;padding-bottom:5em}
-.steps label{font-size:4em;line-height:1em}
+.steps h4{font-weight:bold;margin:0;font-size:4em;line-height:1em}
 .steps .grid{margin-left:0;padding-left:0;}
 .steps .grid li{text-align:center;vertical-align:middle;margin:.15em 0;padding:0}
 .steps .grid.sortlist li{margin:.15em}
-.steps .grid label{padding:1.5em 1em 0;height:4em;color:#fff;background:#24d321;font-size:1em;margin:0;vertical-align:bottom;opacity:.6;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=60);filter:alpha(opacity=60);-webkit-transition:opacity 300ms linear;-moz-transition:opacity 300ms linear;-o-transition:opacity 300ms linear;-ms-transition:opacity 300ms linear;transition:opacity 300ms linear}
-.steps .grid .info{display:none;position:absolute;bottom:0;left:0;height:5em;width:50%;text-align:left}
+.steps .grid label{padding:1.5em 1em 0;height:4em;line-height:1em;color:#fff;background:#24d321;font-size:1em;margin:0;vertical-align:bottom;opacity:.6;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=60);filter:alpha(opacity=60);-webkit-transition:opacity 300ms linear;-moz-transition:opacity 300ms linear;-o-transition:opacity 300ms linear;-ms-transition:opacity 300ms linear;transition:opacity 300ms linear;border:1px solid #fff}
 .steps input[type=radio],.steps input[type=checkbox]{opacity:0;-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=0);filter:alpha(opacity=0);height:0;width:0;margin:0}
 .steps input[type='radio']:checked + label,.steps input[type='checkbox']:checked + label{opacity:1;-ms-filter:none;filter:none}
 .steps input[type='radio']:checked ~ .info,.steps input[type='checkbox']:checked ~ .info{display:block}
