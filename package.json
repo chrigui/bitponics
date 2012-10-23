@@ -21,16 +21,22 @@
 		, "socket.io" : "0.8"
 		, "stylus"    : ">= 0.0.1"
     	, "bootstrap-stylus": ">= 0.0.1"
-    	, "nodeunit" : ">=0.7.4"
     	, "passport": ">= 0.1.1"
     	, "passport-local": ">= 0.1.6"
     	, "time"     : "=0.8.3"
     	, "timezone" : "=0.0.15"
-    	, "zombie"   : ">=1.1.1"
     	, "nodemailer" : ">=0.3"
     	, "express-csv" : ">=0.4.1"
     	, "winston" : ">= 0.6.2"
     	, "winston-loggly" : ">= 0.6"
     	, "connect-flash" : ">= 0.1.0"
+	}
+	, "devDependencies": {
+		  "mocha" : "=1.6.0"
+		, "zombie"   : ">=1.1.1"
+		, "should" : "=1.2.0"
+	}
+	, "scripts": {
+	    "test": "./node_modules/.bin/mocha --reporter dot --recursive"
 	}
 }

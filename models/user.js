@@ -119,35 +119,34 @@ UserSchema.virtual('timezoneOffset')
 
 /************************** STATIC METHODS  ***************************/
 
-UserSchema.static('createUserWithPassword', function(userProperties, password, next){
+UserSchema.static('createUserWithPassword', function(userProperties, password, done){
 	var newUser = new User(userProperties);
 
 	bcrypt.genSalt(10, function(err, salt) {
-  	if (err) { return next(err); }
+  	if (err) { return done(err); }
   	newUser.salt = salt;
   	
   	bcrypt.hash(password, salt, function(err, hash) {
-  		if (err) { return next(err); }
+  		if (err) { return done(err); }
 
     		newUser.hash = hash;
 
     		newUser.save(function(err) {
-		      if (err) { return next(err); }
-		      next(null, newUser);
+    		return done(err, newUser);
 		    });
 		});
 	});
 });
 
 
-UserSchema.static('authenticate', function(email, password, next) {
+UserSchema.static('authenticate', function(email, password, done) {
   this.findOne({ email: email }, function(err, user) {
-      if (err) { return next(err); }
-      if (!user) { return next(new Error('No user found with that email'), false); }
+      if (err) { return done(err); }
+      if (!user) { return done(new Error('No user found with that email'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
-        if (err) { return next(err); }
-        if (!passwordCorrect) { return next(new Error('Incorrect password'), false); }
-        return next(null, user);
+        if (err) { return done(err); }
+        if (!passwordCorrect) { return done(new Error('Incorrect password'), false); }
+        return done(null, user);
       });
     });
 });
@@ -156,21 +155,21 @@ UserSchema.static('authenticate', function(email, password, next) {
 /**
  * Used by Passport BPN_DEVICE strategy
  */
-UserSchema.static('getByPublicDeviceKey', function(key, next) {
+UserSchema.static('getByPublicDeviceKey', function(key, done) {
   User.findOne({ 'deviceKey.public': key }, function(err, user) {
-	  if (err) { return next(err); }
-      if (!user) { return next(new Error('No such device key'), false); }
+	  if (err) { return done(err); }
+      if (!user) { return done(new Error('No such device key'), false); }
 
-      return next(null, user, user.deviceKey.private);
+      return done(null, user, user.deviceKey.private);
   });
 });
 
-UserSchema.static('getByPublicApiKey', function(key, next) {
+UserSchema.static('getByPublicApiKey', function(key, done) {
   User.findOne({ 'apiKey.public': key }, function(err, user) {
-      if (err) { return next(err); }
-      if (!user) { return next(new Error('No such API key'), false); }
+      if (err) { return done(err); }
+      if (!user) { return done(new Error('No such API key'), false); }
 
-      return next(null, user, user.apiKey.private);
+      return done(null, user, user.apiKey.private);
   });
 });
 /************************** END STATIC METHODS  ***************************/
@@ -218,7 +217,7 @@ UserSchema.pre('save', true, function(next, done){
  *  Give user API keys if needed. Can be done in parallel with other pre save hooks. 
  *  http://mongoosejs.com/docs/middleware.html
  */
-UserSchema.pre('save', function(next, done){
+UserSchema.pre('save', true, function(next, done){
 	var user = this;
 	
 	next();
@@ -242,15 +241,15 @@ UserSchema.pre('save', function(next, done){
 /**
  *  Give user activation token if needed. This also can be done in parallel.
  */
-UserSchema.pre('save', function(next, done){
+UserSchema.pre('save', true, function(next, done){
 	var user = this,
 		token = "",
 		verifyUrl = "";
 
 	next();
 
-	winston.info('user.active:'+user.active)
-	winston.info('user.sentEmail:'+user.sentEmail)
+	//winston.info('user.active:'+user.active)
+	//winston.info('user.sentEmail:'+user.sentEmail)
 
 	if(user.activationToken && user.active) { return done(); }
 	
