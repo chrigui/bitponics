@@ -10,7 +10,7 @@ machine:
 
   node:
     version:
-      0.6.18
+      0.8.12
 
   environment:
     NODE_ENV: ci
