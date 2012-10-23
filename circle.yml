@@ -21,7 +21,7 @@ checkout:
 
 dependencies:
   pre:
-    - npm link ../db_init
+    - npm link ./db_init
 
 test:
   override:
