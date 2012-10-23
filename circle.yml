@@ -13,7 +13,19 @@ machine:
       0.6.18
 
   environment:
-    NODE_ENV: test
+    NODE_ENV: ci
+
+checkout:
+  post:
+    - git submodule update --init
+
+dependencies:
+  pre:
+    - npm link ../db_init
+
+test:
+  override:
+    - ./node_modules/.bin/mocha --reporter tap
 
 deployment:
   production:
@@ -32,4 +44,3 @@ deployment:
     branch: worker
     heroku:
       appname: bitponics-worker
-  
