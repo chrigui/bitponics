@@ -20,7 +20,7 @@ checkout:
     - git submodule update --init
 
 dependencies:
-  pre:
+  post:
     - npm link ./utils/db_init
 
 test:
