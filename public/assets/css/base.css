@@ -68,6 +68,9 @@ td{vertical-align:top}
 .icon-reservior2:before{content:"\2f"}
 .icon-reservior3:before{content:"\30"}
 .icon-reservior4:before{content:"\31"}
+.icon-logo-new:before{content:"\32"}
+.icon-plus:before{content:"\33"}
+.icon-x:before{content:"\34"}
 .full-width{width:100%}
 .full-height{height:100%}
 .position-f{position:fixed}
@@ -178,18 +181,26 @@ section#footer .content-module{background-color:#fff}
 .phaseRangeSlider div.ui-slider{position:absolute;left:0;margin:1em 0;background:transparent;height:1em;top:0;border-radius:0;border:1px solid #23b500;width:100%}
 .phaseRangeSlider div.ui-slider:last-child{position:absolute;left:0}
 .phaseRangeSlider .slide-back{position:absolute;height:1em;top:1em;text-align:center}
+.phaseRangeSlider .phase-tabs{list-style:none;margin:0;padding:0;}
+.phaseRangeSlider .phase-tabs li{position:relative;width:25%;float:left;padding:1em 0;color:#fff;background:#008000}
 .phaseRangeSlider .phase-slider{color:#fff;padding:.5em;overflow:hidden;}
-.phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span{color:#fff}
-.phaseRangeSlider .phase-slider .toggle{padding:.5em;cursor:pointer;text-align:right;position:absolute;top:-1em;right:-.5em;width:2em;height:2em;font-size:2em;}
-.phaseRangeSlider .phase-slider .toggle .add{display:none}
-.phaseRangeSlider .phase-slider .toggle .remove{display:block}
-.phaseRangeSlider .phase-slider.inactive{opacity:.45;height:2em;}
-.phaseRangeSlider .phase-slider.inactive .toggle .add{display:block}
-.phaseRangeSlider .phase-slider.inactive .toggle .remove{display:none}
+.phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span,.phaseRangeSlider .phase-slider div{color:#fff}
+.phaseRangeSlider .phase-slider.focused{border:1px solid #f00;height:auto}
+.phaseRangeSlider .phase-slider.active{float:left;height:3em}
+.phaseRangeSlider .phase-slider.inactive{opacity:.45;height:3em;}
 .phaseRangeSlider .phase-slider.inactive .slide-back{display:none}
-.phaseRangeSlider .phase-slider .phase-slider-info{position:relative}
-.phaseRangeSlider .seedling{background-color:#30f700}
-.phaseRangeSlider .vegetative{background-color:#29d600}
-.phaseRangeSlider .blooming{background-color:#1c9100}
-.phaseRangeSlider .fruiting{background-color:#0e4800}
+.phaseRangeSlider .phase-slider .phase-slider-info{position:relative;}
+.phaseRangeSlider .phase-slider .phase-slider-info label{font-size:1.5em}
 .phaseRangeSlider .phase-current-indicator .ui-slider-handle .ui-btn-inner{background-color:#333;border-color:#333}
+.toggle{position:absolute;top:0;right:0;font-size:1.25em;}
+.toggle .add{display:none}
+.toggle .remove{display:block}
+.focused{border:1px solid #f00;height:auto}
+.active{float:left;height:3em}
+.inactive{opacity:.45;height:3em;}
+.inactive .toggle .add{display:block}
+.inactive .toggle .remove{display:none}
+.seedling{background-color:#30f700}
+.vegetative{background-color:#29d600}
+.blooming{background-color:#1c9100}
+.fruiting{background-color:#0e4800}

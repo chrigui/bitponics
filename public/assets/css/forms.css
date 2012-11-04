@@ -54,7 +54,7 @@ button{background:#fff;color:#24d321}
 select{display:block;margin:.5em 0 0;max-width:14em}
 textarea{width:100%;min-height:4em;padding:.25em .5em}
 .steps .step{position:relative;padding-bottom:5em}
-.steps h4{font-weight:bold;margin:0;font-size:4em;line-height:1em}
+.steps h4{font-weight:bold;margin:1em 0 0;font-size:4em;line-height:1em}
 .steps .grid{margin-left:0;padding-left:0;}
 .steps .grid li{text-align:center;vertical-align:middle;margin:.15em 0;padding:0}
 .steps .grid.sortlist li{margin:.15em}

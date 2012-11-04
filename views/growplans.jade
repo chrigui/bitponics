@@ -127,18 +127,29 @@ block content
 
             div.phase-sliders
               - var allPhases = ['Seedling', 'Vegetative', 'Blooming', 'Fruiting'];
+              ul(class="phase-tabs")
+                each phaseName, i in allPhases
+                  li(class="#{phaseName.toLowerCase()}", data-phase="#{phaseName.toLowerCase()}") #{phaseName}
+                    div.toggle
+                      div(class="add icon")
+                        | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+                      div(class="remove icon")
+                        | <i class="icon-glyph icon-x" aria-hidden="true"></i>
               each phaseName, i in allPhases
                 div(class="phase-slider #{phaseName.toLowerCase()} inactive", data-phase="#{phaseName.toLowerCase()}")
                   div(class="phase-slider-info")
-                    div.toggle
-                      span.add +
-                      span.remove x
+                    //- div.toggle
+                    //-   div(class="add icon")
+                    //-     | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+                    //-   div(class="remove icon")
+                    //-     | <i class="icon-glyph icon-x" aria-hidden="true"></i>
                     label(for="phase_slider_#{i}") #{phaseName}
                     span(class="date-range") date-x
                     span - 
                     span(class="date-duration") duration-x 
-                  input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="phase-slider-input", value="#{(i+1)/4 * 182}", min="0", max="182", data-phase="#{phaseName.toLowerCase()}")
-                  span days
+                  div(class="phase-slider-slider")
+                    input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="phase-slider-input", value="#{(i+1)/4 * 182}", min="0", max="182", data-phase="#{phaseName.toLowerCase()}")
+                    span days
 
                   - var hasPhase = 0;
                   - var currentPhaseData = undefined;
@@ -149,6 +160,7 @@ block content
                     - }
 
                   if (hasPhase > 0)
+                    section
                       div.growMedium
                         label Grow Medium
                         input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="#{currentPhaseData.growMedium}")
@@ -188,7 +200,7 @@ block content
                     
                   else 
                       //this grow plan doesnt have this data, but populate the html anyway for possible customization
-
+                    section
                       div.growMedium
                         label Grow Medium
                         input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="")
