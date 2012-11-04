@@ -42,10 +42,10 @@ Bitponics.pages.growplans = {
         self.formContainer.on('change', '#system_selection :input:not(.search), #plant_selection :input:not(.search)', $.proxy(self.handleInputAnswered, self));
         self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self))
         self.formContainer.on('keypress', '#plant_selection input.search', $.proxy(self.handleListFilter, self));
-        self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self))
-        self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self))
-        self.formContainer.on('click', '#growplan_edit .phase-slider .toggle', $.proxy(self.updatePhaseUI, self))
-
+        self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self));
+        self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
+        self.formContainer.on('click', '#growplan_edit .phase-tabs .toggle', $.proxy(self.updatePhaseUI, self));
+        self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(self.updatePhaseUI().focusPhase, self));
 
         //TODO: make more concise with $('.phase-slider-input') selector
         $('#phase_slider_0').change(function() {
@@ -258,11 +258,18 @@ Bitponics.pages.growplans = {
             }
         });
     },
-
+    
     handlePhaseSlider: function(e, ui) {
-        var self = this;
-        $('.phaseRangeSlider .phase-sliders .slide-back').remove();
-        $($('.phaseRangeSlider .phase-sliders a').get().reverse()).each(function(i) {
+        var self = this,
+            currentSliderInteractedWith = $(e.target).parents('.phase-slider'),
+            phaseSliders = $('.phaseRangeSlider .phase-sliders');
+        
+        phaseSliders.find('.phase-slider').removeClass('focused') //remove focus class from all sliders
+            .end().siblings('.slide-back').remove(); //remove slider backgrounds, regenerate below
+        currentSliderInteractedWith.addClass('focused'); //focus the current phase being interacted with
+
+        //loop through the sliders and set the background colors appropriately
+        $(phaseSliders.find('a').get().reverse()).each(function(i) {
             var numPhases = $('input[data-phase]').length,
                 phaseName = $('#phase_slider_' + (numPhases - 1 - i)).attr('data-phase'),
                 phaseDays = $('input[data-phase='+phaseName+']').val(),
@@ -270,14 +277,15 @@ Bitponics.pages.growplans = {
                 phaseDateDurationEl = $('.phase-slider[data-phase='+phaseName+']').find('date-duration');
 
             if(!$(this).parents('.phase-slider').hasClass('inactive')){
-                $('.phaseRangeSlider .phase-sliders').append($('<div></div>')
+                $('.phaseRangeSlider').append($('<div></div>')
                     .addClass('slide-back '+phaseName)
                     .css({
                         'width': $(this).position().left - 5
                     }));
+
                 //TODO: update phaseDateRangeEl for each phase
-                console.log(phaseDays);
-                console.log(self.updatePhaseUI().getDateFromDays(phaseDays))
+                // console.log(phaseDays);
+                // console.log(self.updatePhaseUI().getDateFromDays(phaseDays));
             }
         });
     },
@@ -286,14 +294,17 @@ Bitponics.pages.growplans = {
     updatePhaseUI: function(e, phases) {
         var maxSliderVal = 182,
             phaseSliders = $('.phase-slider'),
+            phaseTabs = $('.phase-tabs li'),
             phaseSliderDiv,
             phaseName,
             phaseInput,
             phaseIndex,
-            phaseVal = 0;
+            phaseVal = 0,
+            numActivePhases = 0;
 
-        if (!e && phases) { //activate default phases
-            phaseSliders.addClass('inactive'); //reset
+        if (!e && phases) { //activate default phases and set initial styles
+            phaseSliders.addClass('inactive'); //reset phase sections
+            phaseTabs.addClass('inactive'); //reset tabs
             phases.forEach(function(phase){
                 phaseVal = phaseVal + phase.expectedNumberOfDays;
                 phaseSliders.each(function(i, slider){
@@ -305,8 +316,15 @@ Bitponics.pages.growplans = {
 
                     if (!phaseVal) phaseVal = maxSliderVal;
 
-                    if($(this).hasClass(phase.name.toLowerCase())){
-                        activatePhase();
+                    if ($(this).hasClass(phase.name.toLowerCase())) {
+                        activatePhase(phaseSliderDiv);
+                        numActivePhases++;
+                        if (numActivePhases == 1) {
+                            var p = phaseSliderDiv;
+                            setTimeout(function(){
+                                focusPhase(p);
+                            }, 1000);
+                        }
                     }
                 });
                 phaseSliders.filter('.inactive')
@@ -314,9 +332,11 @@ Bitponics.pages.growplans = {
                     .val(maxSliderVal)
                     .slider('refresh');
             });
-        } else if (e) { //user customized phases
-            phaseSliderDiv = $(e.target).parents('.phase-slider'),
-            phaseName = phaseSliderDiv.attr('data-phase'),
+        } else if (e && e.target) { //user customized phases
+            //phaseSliderDiv = $(e.target).parents('.phase-slider'),
+            phaseName = $(e.target).parents('[data-phase]').attr('data-phase');
+            phaseSliderDiv = $('.phase-slider[data-phase='+phaseName+']');
+            //phaseName = phaseSliderDiv.attr('data-phase'),
             phaseInput = $('input[data-phase="'+phaseName+'"]'),
             phaseIndex = $('.phase-slider-input').index(phaseInput),
             phaseVal = $('.phase-slider-input:eq('+(phaseIndex+1)+')').val();
@@ -325,23 +345,30 @@ Bitponics.pages.growplans = {
 
             if (phaseSliderDiv.hasClass('inactive')) {
                 activatePhase(phaseSliderDiv);
+                focusPhase(phaseSliderDiv);
             } else {
                 deactivatePhase(phaseSliderDiv);
             }
 
-        } 
+        }
 
 
 
-        function activatePhase() {
-            phaseSliderDiv.add('.phase-slider:lt('+phaseIndex+').inactive')
+        function activatePhase(phase) {
+            //activate all phases before this one and set values for this phase
+            phase.add('.phase-slider:lt('+phaseIndex+').inactive')
                 .removeClass('inactive')
+                .addClass('active')
                 .find('.phase-slider-input')
                 .slider('enable')
                 .removeClass('ui-disabled mobile-textinput-disabled')
                 .val(phaseVal)
                 .slider('refresh');
 
+            //set tab state to match
+            $('.phase-tabs li:lt('+(phaseIndex+1)+')').removeClass('inactive').addClass('active');
+
+            //set values for all phases before this one
             $('.phase-slider-input:lt('+phaseIndex+')').each(function(i){
                 var val = $(this).val();
                 if (val == phaseVal) {
@@ -351,17 +378,34 @@ Bitponics.pages.growplans = {
             })
         }
 
-        function deactivatePhase() {
-            phaseSliderDiv.add('.phase-slider:gt('+phaseIndex+')')
+        function deactivatePhase(phase) {
+            //deactive this phase and all phases after this one, set value for this phase to max value
+            phase.add('.phase-slider:gt('+phaseIndex+')')
+                .removeClass('active')
                 .addClass('inactive')
                 .find('.phase-slider-input')
                 .val(maxSliderVal)
                 .slider('disable')
                 .slider('refresh');
 
+            //set tab state to match
+            $('.phase-tabs li:gt('+(phaseIndex-1)+')').removeClass('inactive').addClass('active');
+
             $('.phase-slider-input:eq('+(phaseIndex-1)+')')
                 .val(maxSliderVal)
                 .slider('refresh');
+        }
+
+        function focusPhase(p) {
+            var phase;
+            if (p && p.target) { //click event
+                phase = $(p.target).attr('data-phase');
+                //$(p.target).siblings().removeClass('focused').end().addClass('focused');
+            } else { //phase div
+                phase = p.attr('data-phase');
+            }
+            console.log('focus phase: '+phase);
+            $('[data-phase]').removeClass('focused').filter('[data-phase='+phase+']').addClass('focused');
         }
 
         function getDateFromDays(days) {
@@ -371,7 +415,8 @@ Bitponics.pages.growplans = {
         }
 
         return {
-            getDateFromDays: getDateFromDays
+            getDateFromDays: getDateFromDays,
+            focusPhase: focusPhase
         }
     }
 };

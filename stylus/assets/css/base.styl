@@ -413,44 +413,44 @@ section#footer
 		    top: 1em;
 		    text-align: center;
 		}
+		.phase-tabs {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+
+			li {
+				position: relative;
+				width: 25%;
+				float: left;
+				padding: 1em 0;
+				color: white;
+				background: green;
+			}
+		}
 		.phase-slider {
 			//display: inline-block;
 			color: white;
 			padding: .5em;
 			overflow: hidden;
 
-			label, span {
+			label, span, div {
 				color: white
 			}
+			
 
-			.toggle {
-				padding: .5em;
-				cursor: pointer;
-				text-align: right;
-				position: absolute;
-				top: -1em;
-				right: -0.5em;
-				width: 2em;
-				height: 2em;
-				font-size: 2em;
+			&.focused {
+				border: 1px solid red;
+				height: auto;
+			}
 
-				.add {
-					display: none;
-				}
-
-				.remove {
-					display: block;
-				}
+			&.active {
+				float: left;
+				height: 3em;
 			}
 
 			&.inactive {
 				opacity: .45;
-				height: 2em;
-
-				.toggle {
-					.add { display: block; }
-					.remove { display: none; }
-				}
+				height: 3em;
 
 				.slide-back {
 					display: none;
@@ -459,24 +459,17 @@ section#footer
 
 			.phase-slider-info {
 				position: relative;
+
+				label {
+					font-size: 1.5em;
+				}
 			}
 
 			
 
 		}
 
-		.seedling {
-			background-color color-phase-seedling
-		}
-		.vegetative {
-			background-color color-phase-vegetative
-		}
-		.blooming {
-			background-color color-phase-blooming
-		}
-		.fruiting {
-			background-color color-phase-fruiting
-		}
+		
 
 		.phase-current-indicator {
 			.ui-slider-handle .ui-btn-inner{
@@ -490,4 +483,52 @@ section#footer
 		}
 
 
+}
+
+.toggle {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 1.25em;
+
+	.add {
+		display: none;
+	}
+
+	.remove {
+		display: block;
+	}
+}
+
+.focused {
+	border: 1px solid red;
+	height: auto;
+}
+
+.active {
+	float: left;
+	height: 3em;
+}
+
+.inactive {
+	opacity: .45;
+	height: 3em;
+
+	.toggle {
+		.add { display: block; }
+		.remove { display: none; }
+	}
+}
+
+.seedling {
+	background-color color-phase-seedling
+}
+.vegetative {
+	background-color color-phase-vegetative
+}
+.blooming {
+	background-color color-phase-blooming
+}
+.fruiting {
+	background-color color-phase-fruiting
 }
