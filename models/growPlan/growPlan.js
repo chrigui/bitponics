@@ -31,16 +31,23 @@ var GrowPlanSchema = new Schema({
 
 GrowPlanSchema.plugin(useTimestamps);
 
-GrowPlanSchema.suggestions = {
-	growMedium : [
-		'hydroton',
-		'cocoa chips',
-		'cocoa coir',
-		'perlite',
-		'soil',
-		'rockwool'
-	]
-};
+/**
+ *  Validate 
+ *
+ */
+GrowPlanSchema.pre('save', function(next){
+	var phases = this.phases;
+	// Ensure unique names across phases
+	for (var i = 0, length = phases.length; i < length; i++){
+		var phaseName = phases[i].name;
+		for (var j = i+1; j < length; j++){
+			if (phaseName === phases[j].name){
+				return next(new Error("Duplicate phase name. Phases in a grow plan must have unique names."));
+			}
+		}
+	}
+	return next();
+});
 
 exports.schema = GrowPlanSchema;
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);
