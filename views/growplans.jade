@@ -100,18 +100,6 @@ block content
                 input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
                 label(for="#{plant.name}", class="plant") #{plant.name}
 
-          label Expertise Level
-          ul.grid
-            li
-              input(id="gpedit_expertiseLevel_beginner", type='radio', name="gpedit_expertiseLevel", value="beginner", checked='beginner' == growPlanDefault.expertiseLevel)
-              label(for="gpedit_expertiseLevel_beginner") Beginner
-            li
-              input(id="gpedit_expertiseLevel_intermediate", type='radio', name="gpedit_expertiseLevel", value="intermediate", checked='intermediate' == growPlanDefault.expertiseLevel)
-              label(for="gpedit_expertiseLevel_intermediate") Intermediate
-            li
-              input(id="gpedit_expertiseLevel_expert", type='radio', name="gpedit_expertiseLevel", value="expert", checked='expert' == growPlanDefault.expertiseLevel)
-              label(for="gpedit_expertiseLevel_expert") Expert
-          
           //- label Sensors
           //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
 
@@ -161,6 +149,10 @@ block content
 
                   if (hasPhase > 0)
                     section
+                      div.growSystem
+                        label Grow System
+                        input(id="gpedit_#{phaseName}_growsystem", type='text', name="gpedit_#{phaseName}_growsystem", value="#{currentPhaseData.growSystem._id}")
+
                       div.growMedium
                         label Grow Medium
                         input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="#{currentPhaseData.growMedium}")
@@ -178,8 +170,8 @@ block content
                         ul.grid
                           each action, i in currentPhaseData.actions
                             li
-                              input(id="gpedit_#{i}_#{phaseName}_action", type="checkbox", name="gpedit_#{i}_#{phaseName}_action", value="#{action.id}", checked=true)
-                              label(for="gpedit_#{i}_#{phaseName}_action") #{action.description}
+                              input(id="gpedit_#{phaseName}_action_#{i}", type="checkbox", name="gpedit_#{phaseName}_actions", value="#{action.id}", checked=true)
+                              label(for="gpedit_#{phaseName}_action_#{i}") #{action.description}
                           //- each phaseEndActions in currentPhaseData.actions
                           //-   li
                           //-     //TODO: this is hack w/ i*99
@@ -191,12 +183,12 @@ block content
                         ul.grid
                           each idealRange, i in currentPhaseData.idealRanges
                             li
-                              input(id="gpedit_#{i}_#{phaseName}_idealrange", type="checkbox", name="gpedit_#{i}_#{phaseName}_idealrange", value="#{idealRange.id}", checked=true)
-                              label(for="gpedit_#{i}_#{phaseName}_idealrange") #{idealRange.sCode}
+                              input(id="gpedit_#{phaseName}_idealrange_#{i}", type="checkbox", name="gpedit_#{phaseName}_idealranges", value="#{idealRange.id}", checked=true)
+                              label(for="gpedit_#{phaseName}_idealrange_#{i}") #{idealRange.sCode}
                       
                       div.phaseEndDescription
                         label Phase End Description
-                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription") #{currentPhaseData.phaseEndDescription}
+                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...") #{currentPhaseData.phaseEndDescription}
                     
                   else 
                       //this grow plan doesnt have this data, but populate the html anyway for possible customization
@@ -216,19 +208,19 @@ block content
                         label Actions
                         ul.grid
                             li
-                              input(type="checkbox", name="gpedit_#{phaseName}_action", value="")
+                              input(type="checkbox", name="gpedit_#{phaseName}_actions", value="")
                               label Add +
 
                       div.idealRanges
                         label Ideal Ranges
                         ul.grid
                             li
-                              input(type="checkbox", name="gpedit_#{phaseName}_idealrange", value="")
+                              input(type="checkbox", name="gpedit_#{phaseName}_idealranges", value="")
                               label Add +
                       
                       div.phaseEndDescription
                         label Phase End Description
-                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription") Write a phase end description... 
+                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...")
                   
                   //span Days (Default: #{(i+1)/4 * 182} )
           
