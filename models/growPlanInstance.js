@@ -104,7 +104,7 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
  * 
  * @param options.growPlan (required)
  * @param options.owner (required)
- * @param options.users (required) 
+ * @param options.users (optional). Members of the GPI. If undefined, we'll just use options.owner
  * @param options.active (required) Boolean indicating whether to immediately activate the grow plan instance
  * @param options.device (optional) If present, sets the device property on the grow plan instance
  * @param options.activePhaseId (optional) The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance
@@ -112,11 +112,15 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
  */
 
 GrowPlanInstanceSchema.static('create', function(options, callback) {
-  var gpi = new GrowPlanInstanceModel({
-    _id : options._id,
+  var gpiInitData = {
     owner : options.owner,
     users : options.users || [options.owner]
-  });
+  };
+  if (options._id){
+    gpiInitData._id = options._id;
+  };
+
+  var gpi = new GrowPlanInstanceModel(gpiInitData);
  
   async.parallel([
       function (innerCallback){
@@ -133,7 +137,7 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
         });
       },
       function (innerCallback){
-        if (!options.device) { innerCallback(); }
+        if (!options.device) { return innerCallback(); }
 
         DeviceModel.findById(options.device, function(err, device){
           if (err) { return innerCallback(err); }
@@ -147,6 +151,7 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
       if (err) { return callback(err); }
 
       gpi.save(function(err){
+        winston.info('Created new gpi for user ' + options.owner + ' gpi id ' + gpi._id);
         if (!options.active){
           return callback(err, gpi);
         }

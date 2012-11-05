@@ -49,5 +49,44 @@ GrowPlanSchema.pre('save', function(next){
 	return next();
 });
 
+
+
+/*
+ * Given a number of days into the GrowPlan, find
+ * the target phase & number of days into the phase.
+ * If numberOfDays exceeds total span of GrowPlan,
+ * returns last day of last phase
+ * 
+ * @param numberOfDays
+ *
+ * @return { phaseId : phaseId, day : numberOfDaysIntoPhase } 
+ *
+ */
+GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
+	var phases = this.phases,
+		i = 0,
+		length = phases.length,
+		remainder = numberOfDays,
+		phaseDays;
+
+	for (; i < length; i++){
+		phaseDays = phases[i].expectedNumberOfDays;
+		if (remainder < phaseDays){
+			return {
+				phaseId : phases[i]._id,
+				day : remainder
+			};
+		} else {
+			remainder -= phaseDays;
+		}
+	}
+
+	return {
+		phaseId : phases[length - 1]._id,
+		day : phases[length - 1].expectedNumberOfDays
+	};
+});
+
+
 exports.schema = GrowPlanSchema;
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

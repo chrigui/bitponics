@@ -234,6 +234,14 @@ block content
                 //-     input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="no-disable", value="#{sliderValue}", min="0", max="100", data-phase="#{phase.name}")
                 //-     span Days (Default: #{phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 'indeterminate'} ) 
 
+          if (userOwnedDevices.length > 0)
+            label Device
+            ul(class="grid devicelist")
+              each device in userOwnedDevices
+                li
+                  input(id="device_#{device._id}", type='radio', name="device", value="#{device._id}")
+                  label(for="device_#{device._id}", class="device") #{device.name}
+
         input(id="growplans_activate", type="submit", value="Activate Grow Plan")
 
 block footer-scripts
