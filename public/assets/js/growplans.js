@@ -41,7 +41,7 @@ Bitponics.pages.growplans = {
     initEventHandlers: function() {
         var self = this;
         self.formContainer.on('change', '#system_selection :input:not(.search), #plant_selection :input:not(.search)', $.proxy(self.handleInputAnswered, self));
-        self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self))
+        self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self));
         self.formContainer.on('keypress', '#plant_selection input.search', $.proxy(self.handleListFilter, self));
         self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self));
         self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
@@ -166,7 +166,23 @@ Bitponics.pages.growplans = {
 
     handleFormSubmit: function(e) {
         e.preventDefault();
-        console.log('activate grow plan')
+        var form = e.target,
+            $form = $(form);
+        
+        $.ajax({
+            type: 'POST',
+            url: form.action,
+            data: $form.serialize()
+        })
+        .done(function(data){
+            console.log('Form submit succeeded.');
+            console.log(data);
+        })
+        .fail(function(data){
+            console.log('Form submit failed.');
+            console.log(data);
+        });
+        return false;
     },
 
     filterGrowPlanList: function(input) {
