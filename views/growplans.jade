@@ -121,7 +121,10 @@ block content
           label Phases
           div.phaseRangeSlider
             div.phase-current-indicator
-              span(for="phase_slider_current") I am on day  
+              span This grow plan lasts  
+              input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182") 
+              span days.
+              span I am on day  
               input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182") 
               span of this grow plan.
 
@@ -131,9 +134,9 @@ block content
                 each phaseName, i in allPhases
                   li(class="#{phaseName.toLowerCase()}", data-phase="#{phaseName.toLowerCase()}") #{phaseName}
                     div.toggle
-                      div(class="add icon")
+                      div(class="add icon btn")
                         | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
-                      div(class="remove icon")
+                      div(class="remove icon btn")
                         | <i class="icon-glyph icon-x" aria-hidden="true"></i>
               each phaseName, i in allPhases
                 div(class="phase-slider #{phaseName.toLowerCase()} inactive", data-phase="#{phaseName.toLowerCase()}")
