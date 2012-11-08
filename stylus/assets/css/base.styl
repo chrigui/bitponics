@@ -422,9 +422,14 @@ section#footer
 				position: relative;
 				width: 25%;
 				float: left;
-				padding: 1em 0;
+				padding: 1em;
 				color: white;
 				background: green;
+
+				&.inactive {
+					opacity: 1;
+					background-color: rgba(0, 255, 0, .5);
+				}
 			}
 		}
 		.phase-slider {
@@ -432,6 +437,7 @@ section#footer
 			color: white;
 			padding: .5em;
 			overflow: hidden;
+			width: 100%;
 
 			label, span, div {
 				color: white
@@ -476,6 +482,11 @@ section#footer
 				background-color: #333;
 				border-color: #333;
 			}
+			#phase_slider_duration {
+				@extends .display-ib
+				width: 50px;
+				padding: .4em;
+			}
 		}
 
 		.phase-slider-input {
@@ -490,6 +501,12 @@ section#footer
 	top: 0;
 	right: 0;
 	font-size: 1.25em;
+	
+	.add, .remove {
+		padding: 0 .25em;
+		margin: 0;
+		background: none;
+	}
 
 	.add {
 		display: none;

@@ -79,7 +79,7 @@ td{vertical-align:top}
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,.btn,.btn *,.control{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,.btn,.btn *,.control,.phaseRangeSlider .phase-current-indicator #phase_slider_duration{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -182,8 +182,9 @@ section#footer .content-module{background-color:#fff}
 .phaseRangeSlider div.ui-slider:last-child{position:absolute;left:0}
 .phaseRangeSlider .slide-back{position:absolute;height:1em;top:1em;text-align:center}
 .phaseRangeSlider .phase-tabs{list-style:none;margin:0;padding:0;}
-.phaseRangeSlider .phase-tabs li{position:relative;width:25%;float:left;padding:1em 0;color:#fff;background:#008000}
-.phaseRangeSlider .phase-slider{color:#fff;padding:.5em;overflow:hidden;}
+.phaseRangeSlider .phase-tabs li{position:relative;width:25%;float:left;padding:1em;color:#fff;background:#008000;}
+.phaseRangeSlider .phase-tabs li.inactive{opacity:1;background-color:rgba(0,255,0,0.5)}
+.phaseRangeSlider .phase-slider{color:#fff;padding:.5em;overflow:hidden;width:100%;}
 .phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span,.phaseRangeSlider .phase-slider div{color:#fff}
 .phaseRangeSlider .phase-slider.focused{border:1px solid #f00;height:auto}
 .phaseRangeSlider .phase-slider.active{float:left;height:3em}
@@ -192,7 +193,9 @@ section#footer .content-module{background-color:#fff}
 .phaseRangeSlider .phase-slider .phase-slider-info{position:relative;}
 .phaseRangeSlider .phase-slider .phase-slider-info label{font-size:1.5em}
 .phaseRangeSlider .phase-current-indicator .ui-slider-handle .ui-btn-inner{background-color:#333;border-color:#333}
+.phaseRangeSlider .phase-current-indicator #phase_slider_duration{width:50px;padding:.4em}
 .toggle{position:absolute;top:0;right:0;font-size:1.25em;}
+.toggle .add,.toggle .remove{padding:0 .25em;margin:0;background:none}
 .toggle .add{display:none}
 .toggle .remove{display:block}
 .focused{border:1px solid #f00;height:auto}

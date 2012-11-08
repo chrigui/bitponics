@@ -7,6 +7,7 @@ Bitponics.pages.growplans = {
     SYSTEM_SECTION_SELECTOR: '#system_selection',
     PLANT_SECTION_SELECTOR: '#plant_selection',
 
+    DEFAULT_GROW_PLAN_DURATION: 182,
 
     init: function() {
         var self = this;
@@ -46,6 +47,7 @@ Bitponics.pages.growplans = {
         self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs .toggle', $.proxy(self.updatePhaseUI, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(self.updatePhaseUI().focusPhase, self));
+        self.formContainer.on('change', '#growplan_edit #phase_slider_duration', $.proxy(self.updatePhaseUI().refreshAllSliders, self));
 
         //TODO: make more concise with $('.phase-slider-input') selector
         $('#phase_slider_0').change(function() {
@@ -292,7 +294,8 @@ Bitponics.pages.growplans = {
 
 
     updatePhaseUI: function(e, phases) {
-        var maxSliderVal = 182,
+        var self = this,
+            maxSliderVal = self.DEFAULT_GROW_PLAN_DURATION,
             phaseSliders = $('.phase-slider'),
             phaseTabs = $('.phase-tabs li'),
             phaseSliderDiv,
@@ -389,7 +392,7 @@ Bitponics.pages.growplans = {
                 .slider('refresh');
 
             //set tab state to match
-            $('.phase-tabs li:gt('+(phaseIndex-1)+')').removeClass('inactive').addClass('active');
+            $('.phase-tabs li:gt('+(phaseIndex-1)+')').removeClass('active').addClass('inactive');
 
             $('.phase-slider-input:eq('+(phaseIndex-1)+')')
                 .val(maxSliderVal)
@@ -414,9 +417,14 @@ Bitponics.pages.growplans = {
             return newDate.getMonth()+1 +'/'+ newDate.getDate() +'/'+ newDate.getFullYear()
         }
 
+        function refreshAllSliders(){
+            phaseSliders.find('input').change();
+        }
+
         return {
             getDateFromDays: getDateFromDays,
-            focusPhase: focusPhase
+            focusPhase: focusPhase,
+            refreshAllSliders: refreshAllSliders
         }
     }
 };
