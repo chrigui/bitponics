@@ -144,6 +144,10 @@ block content
 
                   if (hasPhase > 0)
                     section
+                      div.phaseDescription
+                        label Phase Description
+                        textarea(id="gpedit_#{phaseName}_description", name="gpedit_#{phaseName}_description", placeholder="Write a phase description...") #{currentPhaseData.phaseDescription}
+
                       div.growSystem
                         label Grow System
                         input(id="gpedit_#{phaseName}_growsystem", type='text', name="gpedit_#{phaseName}_growsystem", value="#{currentPhaseData.growSystem._id}")
@@ -184,10 +188,17 @@ block content
                       div.phaseEndDescription
                         label Phase End Description
                         textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...") #{currentPhaseData.phaseEndDescription}
-                    
                   else 
-                      //this grow plan doesnt have this data, but populate the html anyway for possible customization
+                    //this grow plan doesnt have this data, but populate the html anyway for possible customization
                     section
+                      div.phaseDescription
+                        label Phase Description
+                        textarea(id="gpedit_#{phaseName}_description", name="gpedit_#{phaseName}_description", placeholder="Write a phase description...")
+
+                      div.growSystem
+                        label Grow System
+                        input(id="gpedit_#{phaseName}_growsystem", type='text', name="gpedit_#{phaseName}_growsystem", value="")
+
                       div.growMedium
                         label Grow Medium
                         input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="")
@@ -217,7 +228,6 @@ block content
                         label Phase End Description
                         textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...")
                   
-                  //span Days (Default: #{(i+1)/4 * 182} )
           
 
 
@@ -242,9 +252,7 @@ block content
 block footer-scripts
 
   script
-    Bitponics.user = {
-      
-    }
+    Bitponics.user = !{JSON.stringify(user)};
     Bitponics.growPlans = !{JSON.stringify(growPlans)};
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
@@ -253,3 +261,4 @@ block footer-scripts
   script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')
   //- script(src='/assets/js/libs/list/list.min.js')
   script(src='/assets/js/growplans.js')
+  script(src='/assets/js/utils.js')

@@ -170,14 +170,156 @@ Bitponics.pages.growplans = {
     },
 
     handleFormSubmit: function(e) {
+
+// {
+//     createdAt: "2012-11-05T02:38:38.101Z",
+//     updatedAt: "2012-11-05T02:38:38.101Z",
+//     _id: "506de30c8eebf7524342cb70",
+//     createdBy: "506de30a8eebf7524342cb6c",
+//     name: "All-Purpose",
+//     description: "A generic grow plan suitable for running a garden with a wide variety of plants. It won't get you optimum yields for everything, but it's a good starting point while you learn about the specific needs of your plants.",
+//     expertiseLevel: "beginner",
+//     __v: 0,
+//     visibility: "public",
+//     phases: [{
+//         _id: "506de30c8eebf7524342cb72",
+//         name: "Seedling",
+//         description: "Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn't necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway. This phase is for the "
+//         All - Purpose " grow plan so its sensor ranges aren't optimal for any specific plant, but instead describe a range that should be adequate for most plants.",
+//         expectedNumberOfDays: 7,
+//         growSystem: "506de3008eebf7524342cb40",
+//         growMedium: "rockwool",
+//         phaseEndDescription: "This phase is over once the seedlings start growing their first true leaves.",
+//         nutrients: [],
+//         idealRanges: [{
+//             _id: "506de30c8eebf7524342cb71",
+//             sCode: "water",
+//             actionBelowMin: "506de30c8eebf7524342cb73",
+//             actionAboveMax: "506de30d8eebf7524342cb75",
+//             valueRange: {
+//                 min: 18.33,
+//                 max: 21.11
+//             }
+//         }, {
+//             _id: "506de30d8eebf7524342cb76",
+//             sCode: "air",
+//             actionBelowMin: "506de2fc8eebf7524342cb2b",
+//             actionAboveMax: "506de2fb8eebf7524342cb2a",
+//             valueRange: {
+//                 min: 12.77,
+//                 max: 21.11
+//             }
+//         }, {
+//             _id: "506de30b8eebf7524342cb6e",
+//             sCode: "full",
+//             actionBelowMin: "506de2fb8eebf7524342cb28",
+//             actionAboveMax: "506de2fb8eebf7524342cb29",
+//             applicableTimeSpan: {
+//                 startTime: 28800000,
+//                 endTime: 72000000
+//             },
+//             valueRange: {
+//                 min: 2000,
+//                 max: 10000
+//             }
+//         }],
+//         phaseEndActions: [],
+//         actions: [
+//             "506de3128eebf7524342cb87",
+//             "506de2f18eebf7524342cb27"],
+//         light: {
+//             fixture: "506de3028eebf7524342cb47",
+//             fixtureQuantity: 1,
+//             bulb: "506de3018eebf7524342cb42"
+//         }
+    // }],
+    //     controls: [
+    //         "506de2fd8eebf7524342cb32",
+    //         "506de2fc8eebf7524342cb2d"
+    //     ],
+    //     sensors: [
+    //         "506de3068eebf7524342cb59",
+    //         "506de3068eebf7524342cb5a",
+    //         "506de3078eebf7524342cb5d",
+    //         "506de3078eebf7524342cb5e",
+    //         "506de3078eebf7524342cb5f",
+    //         "506de3088eebf7524342cb63"
+    //     ],
+    //     plants: [ ]
+
+
         e.preventDefault();
         var form = e.target,
-            $form = $(form);
-        
+            data = {
+                createdBy: Bitponics.user._id,
+                name: $('#gpedit_name').val(),
+                description: $('#gpedit_description').val(),
+                //expertiseLevel: $('#gpedit_expertiseLevel').val(),
+                visibility: 'public',
+                phases: [],
+                controls: [],
+                sensors: [],
+                plants: []
+            };
+
+        //phases
+        $('.phaseRangeSlider .phase-slider.active').each(function() {
+
+            var phaseName = Bitponics.Utils.toTitleCase($(this).attr('data-phase')),
+                phase = { 
+                    actions: [],
+                    description: $('#gpedit_'+phaseName+'_description').val(),
+                    expectedNumberOfDays: $(this).find('input.date-duration').val(),
+                    growMedium: $('#gpedit_'+phaseName+'_growmedium').val(),
+                    growSystem: {},
+                    idealRanges: [],
+                    light: {},
+                    name: phaseName,
+                    nutrients: [],
+                    phaseEndActions: []
+                    phaseEndDescription: $('#gpedit_'+phaseName+'_enddescription').val()
+                };
+
+            //phase actions
+            $('[name=gpedit_'+phaseName+'_actions]:checked').each(function() {
+                var action = {
+                    description: '',
+                    cycle: {
+                        repeat: true,
+                        states: [{
+                            durationType: '',
+                            duration: 8,
+                        }, {
+                            message: '',
+                        }, {
+                            durationType: '',
+                            duration: 16
+                        }]
+                    }
+                };
+
+                //now fill in data from form for this action?
+
+                phase.actions.push(action);
+            });
+
+            // $(this).find(':input').each(function() {
+            //     console.log('name: ' + $(this).attr('name') + ' | value: ' + $(this).val())
+            // });
+        });
+
+
+        //controls
+
+        //sensors
+
+        //plants
+
+
         $.ajax({
             type: 'POST',
             url: form.action,
-            data: $form.serialize()
+            data: data
         })
         .done(function(data){
             console.log('Form submit succeeded.');
@@ -345,7 +487,7 @@ Bitponics.pages.growplans = {
 
                     if (!phaseVal) phaseVal = maxSliderVal;
 
-                    if ($(this).hasClass(phase.name.toLowerCase())) {
+                    if ($(this).attr('data-phase') == phase.name.toLowerCase()) {
                         activatePhase(phaseSliderDiv);
                         numActivePhases++;
                         if (numActivePhases == 1) {
