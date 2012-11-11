@@ -255,7 +255,7 @@ Bitponics.pages.growplans = {
                 //add plants selected in filter step to current grow plan plants
                 //TODO: do we want this?
                 self.formContainer.find('#plant_selection input[name=plants]:checked').each(function(){
-                    selectedPlants.push($(this).val());
+                    selectedPlants.push({ name : $(this).val()});
                 });
                 fullPlantList = selectedPlants.concat(growPlan.plants);
                 
@@ -264,12 +264,13 @@ Bitponics.pages.growplans = {
 
                 //populate plant list
                 for(var i = 0; i < fullPlantList.length; i++){
-                    var newLI = '<li>' + templ.replace(replaceToken, fullPlantList[i]) + '</li>'
+                    var newLI = '<li>' + templ.replace(replaceToken, fullPlantList[i].name) + '</li>'
                     newLI = $(newLI);
-                    newLI.find('input:first').attr('id', fullPlantList[i] + '_edit')
+                    newLI.find('input:first').attr('id', fullPlantList[i].name + '_edit')
                         .attr('checked', true)
-                        .end().find('label:first').attr('for', fullPlantList[i] + '_edit');
-                    $('#growplan_edit ul.plantlist').append(newLI)
+                        .end().find('label:first').attr('for', fullPlantList[i].name + '_edit');
+                    newLI.data('plant') = fullPlantList[i];
+                    $('#growplan_edit ul.plantlist').append(newLI);
                 }
 
                 $('#gpedit_expertiseLevel').val(growPlan.expertiseLevel);

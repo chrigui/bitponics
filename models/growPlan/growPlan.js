@@ -11,7 +11,7 @@ var GrowPlanSchema = new Schema({
 	createdBy: { type: ObjectId, ref: 'User' },
 	name: { type: String, required: true },
 	description: { type: String, required: true },
-	plants: [String],
+	plants: [{ type: ObjectId, ref: 'Plant' }],
 	expertiseLevel: { type: String, enum: [
 		'beginner',
 		'intermediate',
@@ -111,10 +111,9 @@ GrowPlanSchema.method('equals', function(otherGrowPlan){
 
 	if (this.description !== otherGrowPlan.description) { return false; }
 
-	//if (this.plants.length !== otherGrowPlan.plants.length) { return false; }
+	if (this.plants.length !== otherGrowPlan.plants.length) { return false; }
 	
 	// TODO : this loop can probably be optimized
-	/*
 	var allPlantsFound = true;
 	for (var i = 0, length = this.plants.length; i < length; i++){
 		var plantName = this.plants[i].name,
@@ -133,7 +132,6 @@ GrowPlanSchema.method('equals', function(otherGrowPlan){
 	if (!allPlantsFound){
 		return false;
 	}
-	*/
 	
 	return true;
 });
