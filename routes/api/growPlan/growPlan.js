@@ -34,8 +34,7 @@ module.exports = function(app) {
    *    "createdBy": "userid",
    *    "name": "Jack's Grow Plan",
    *    "description": "Herbs on a raft.",
-   *    "plants": ["basil", "rosemary", "dill", "swiss chard"],
-   *    "expertiseLevel": "expert",
+   *    "plants": [{ name : "basil"}, { name : "rosemary"}, { name : "dill"}, { name : "swiss chard"} ],
    *    "sensors": "",
    *    "controls": "",
    *    "phases": ""
