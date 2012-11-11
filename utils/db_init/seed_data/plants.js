@@ -11,7 +11,7 @@ module.exports = [
 	},
 	{
 		_id: "5074983aab364e2a9fffd4f1",
-		name: "Coriander"
+		name: "Cilantro"
 	},
 	{
 		_id: "5074983aab364e2a9fffd4f2",
@@ -75,11 +75,11 @@ module.exports = [
 	},
 	{
 		_id: "50749126fe420e210be58a6c",
-		name: "Yams"
+		name: "Yam"
 	},
 	{
 		_id: "50749126fe420e210be58a6d",
-		name: "Tomatoes"
+		name: "Tomato"
 	},
 	{
 		_id: "50749127fe420e210be58a6e",
@@ -91,19 +91,19 @@ module.exports = [
 	},
 	{
 		_id: "50749127fe420e210be58a70",
-		name: "Radishes"
+		name: "Radish"
 	},
 	{
 		_id: "50749128fe420e210be58a71",
-		name: "Potatoes"
+		name: "Potato"
 	},
 	{
 		_id: "50749128fe420e210be58a72",
-		name: "Peas"
+		name: "Pea"
 	},
 	{
 		_id: "50749129fe420e210be58a74",
-		name: "Artichokes"
+		name: "Artichoke"
 	},
 	{
 		_id: "50749129fe420e210be58a75",
@@ -111,11 +111,11 @@ module.exports = [
 	},
 	{
 		_id: "50749129fe420e210be58a76",
-		name: "Beans"
+		name: "Bean"
 	},
 	{
 		_id: "5074912afe420e210be58a77",
-		name: "Beets"
+		name: "Beet"
 	},
 	{
 		_id: "5074912afe420e210be58a78",
@@ -123,7 +123,7 @@ module.exports = [
 	},
 	{
 		_id: "5074912afe420e210be58a79",
-		name: "Brussel"
+		name: "Brussels Sprout"
 	},
 	{
 		_id: "5074912afe420e210be58a7a",
@@ -131,15 +131,15 @@ module.exports = [
 	},
 	{
 		_id: "5074912bfe420e210be58a7b",
-		name: "Cabbages"
+		name: "Cabbage"
 	},
 	{
 		_id: "5074912bfe420e210be58a7c",
-		name: "Carrots"
+		name: "Carrot"
 	},
 	{
 		_id: "5074912bfe420e210be58a7d",
-		name: "Cauliflowers"
+		name: "Cauliflower"
 	},
 	{
 		_id: "5074912cfe420e210be58a7e",
@@ -151,11 +151,11 @@ module.exports = [
 	},
 	{
 		_id: "5074912cfe420e210be58a80",
-		name: "Eggplants"
+		name: "Eggplant"
 	},
 	{
 		_id: "5074912dfe420e210be58a81",
-		name: "Leeks"
+		name: "Leek"
 	},
 	{
 		_id: "5074912dfe420e210be58a82",
@@ -163,10 +163,14 @@ module.exports = [
 	},
 	{
 		_id: "5074912dfe420e210be58a83",
-		name: "Onions"
+		name: "Onion"
 	},
 	{
 		_id: "5074912efe420e210be58a84",
-		name: "Parsnips"
+		name: "Parsnip"
+	},
+	{
+		_id : "50a016f8eb1164c6b88e3038",
+		name : "Swiss Chard"
 	}
 ];

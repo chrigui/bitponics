@@ -97,8 +97,8 @@ block content
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
             each plant in growPlanDefault.plants
               li
-                input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
-                label(for="#{plant.name}", class="plant") #{plant.name}
+                input(id="#{plant._id}", type='checkbox', name="plants", value="#{plant._id}")
+                label(for="#{plant._id}", class="plant") #{plant.name}
 
           //- label Sensors
           //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
