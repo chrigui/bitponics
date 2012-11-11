@@ -453,16 +453,16 @@ Bitponics.pages.growplans = {
                 startDay = phase.prev('.phase-slider').find('.phase-slider-input').val()
             }
 
-            console.log(
-                {
-                    index: phaseIndex,
-                    startDay: parseInt(startDay),
-                    endDay: parseInt(endDay),
-                    startDate: getDateFromDays(parseInt(startDay)),
-                    endDate: getDateFromDays(parseInt(endDay)),
-                    range: parseInt(endDay - startDay)
-                }
-            )
+            // console.log(
+            //     {
+            //         index: phaseIndex,
+            //         startDay: parseInt(startDay),
+            //         endDay: parseInt(endDay),
+            //         startDate: getDateFromDays(parseInt(startDay)),
+            //         endDate: getDateFromDays(parseInt(endDay)),
+            //         range: parseInt(endDay - startDay)
+            //     }
+            // )
             return {
                 startDay: parseInt(startDay),
                 endDay: parseInt(endDay),
