@@ -11,7 +11,7 @@ var GrowPlanSchema = new Schema({
 	createdBy: { type: ObjectId, ref: 'User' },
 	name: { type: String, required: true },
 	description: { type: String, required: true },
-	plants: [String],
+	plants: [{ type: ObjectId, ref: 'Plant' }],
 	expertiseLevel: { type: String, enum: [
 		'beginner',
 		'intermediate',
@@ -31,6 +31,9 @@ var GrowPlanSchema = new Schema({
 
 GrowPlanSchema.plugin(useTimestamps);
 
+
+/************************** STATIC METHODS  ***************************/
+
 /**
  *  Validate 
  *
@@ -49,7 +52,10 @@ GrowPlanSchema.pre('save', function(next){
 	return next();
 });
 
+/************************** END STATIC METHODS  ***************************/
 
+
+/************************** INSTANCE METHODS  ***************************/
 
 /*
  * Given a number of days into the GrowPlan, find
@@ -87,6 +93,50 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
 	};
 });
 
+
+/*
+ * Given another GrowPlan object, determine whether
+ * they're equivalent enough to say they're "equal".
+ * Comparing only salient properties; ignoring properties 
+ * like createdAt/updatedAt
+ * 
+ * @param otherGrowPlan. GrowPlan model object
+ *
+ * @return boolean. True if GrowPlans are equivalent, false if not
+ *
+ */
+GrowPlanSchema.method('equals', function(otherGrowPlan){
+	
+	if (this.name !== otherGrowPlan.name) { return false; }
+
+	if (this.description !== otherGrowPlan.description) { return false; }
+
+	if (this.plants.length !== otherGrowPlan.plants.length) { return false; }
+	
+	// TODO : this loop can probably be optimized
+	var allPlantsFound = true;
+	for (var i = 0, length = this.plants.length; i < length; i++){
+		var plantName = this.plants[i].name,
+			plantFound = false;
+		for (var j = 0; j < length; j++){
+			if (plantName === otherGrowPlan.plants[j].name){
+				plantFound = true;
+				break;
+			}
+		}
+		if (!plantFound) { 
+			allPlantsFound = false;
+			break;
+		}
+	}
+	if (!allPlantsFound){
+		return false;
+	}
+	
+	return true;
+});
+
+/************************** END INSTANCE METHODS  ***************************/
 
 exports.schema = GrowPlanSchema;
 exports.model = mongoose.model('GrowPlan', GrowPlanSchema);

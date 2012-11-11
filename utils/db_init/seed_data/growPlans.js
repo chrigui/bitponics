@@ -135,7 +135,7 @@ module.exports = [
 			createdBy: "506de3098eebf7524342cb66",
 			name: "Tomato",
 			description: "Growing indeterminate organic tomatoes (Redfield Beauty OG) for year round fruiting. Growing in a 3’x3’ grow bed filled with 4\" of hydroton.",
-			plants: ["tomatoes"],
+			plants: ["50749126fe420e210be58a6d"],
 			expertiseLevel: "intermediate",
 			sensors: [
 				"506de3068eebf7524342cb59",
@@ -351,7 +351,7 @@ module.exports = [
 			createdBy: "506de3098eebf7524342cb66",
 			name: "Mixed Greens",
 			description: "A grow plan suited for growing any variety of herbs and leafy greens you want. Basil, cilantro, lettuce, swiss chard, throw it all in!",
-			plants: ["basil", "swiss chard", "cilantro", "lettuce"],
+			plants: ["50749120fe420e210be58a69", "50a016f8eb1164c6b88e3038", "5074983aab364e2a9fffd4f1", "5074912dfe420e210be58a82"],
 			expertiseLevel: "intermediate",
 			sensors: [
 				"506de3068eebf7524342cb59",
