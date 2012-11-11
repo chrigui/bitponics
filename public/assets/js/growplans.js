@@ -6,8 +6,10 @@ Bitponics.pages.growplans = {
     SELECTED_CLASS: 'selected',
     SYSTEM_SECTION_SELECTOR: '#system_selection',
     PLANT_SECTION_SELECTOR: '#plant_selection',
+    GROWPLAN_DURATION_SELECTOR: '#phase_slider_duration',
 
-    DEFAULT_GROW_PLAN_DURATION: 182,
+    defaultGrowPlanDuration: 182,
+    maxPhases: 4,
 
     init: function() {
         var self = this;
@@ -48,6 +50,9 @@ Bitponics.pages.growplans = {
         self.formContainer.on('click', '#growplan_edit .phase-tabs .toggle', $.proxy(self.updatePhaseUI, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(self.updatePhaseUI().focusPhase, self));
         self.formContainer.on('change', '#growplan_edit #phase_slider_duration', $.proxy(self.updatePhaseUI().refreshAllSliders, self));
+        //self.formContainer.on('mouseup touchend', '#growplan_edit .active .ui-slider-handle:last', $.proxy(self.updatePhaseUI().refreshAllSliders, self));
+        self.formContainer.on('keypress', '#growplan_edit #phase_slider_duration', $.proxy(self.updatePhaseUI().handleDurationKeypress, self));
+        self.formContainer.on('change', '#growplan_edit .date-duration', $.proxy(self.updatePhaseUI().setPhaseDays, self));
 
         //TODO: make more concise with $('.phase-slider-input') selector
         $('#phase_slider_0').change(function() {
@@ -280,11 +285,13 @@ Bitponics.pages.growplans = {
     handlePhaseSlider: function(e, ui) {
         var self = this,
             currentSliderInteractedWith = $(e.target).parents('.phase-slider'),
-            phaseSliders = $('.phaseRangeSlider .phase-sliders');
+            currentPhaseDays = currentSliderInteractedWith.find('input[data-phase]').val(),
+            phaseSliders = $('.phaseRangeSlider .phase-sliders'),
+            date;
         
-        phaseSliders.find('.phase-slider').removeClass('focused') //remove focus class from all sliders
-            .end().siblings('.slide-back').remove(); //remove slider backgrounds, regenerate below
-        currentSliderInteractedWith.addClass('focused'); //focus the current phase being interacted with
+        phaseSliders.siblings('.slide-back').remove(); //remove slider backgrounds, regenerate below
+        
+        self.updatePhaseUI().focusPhase(currentSliderInteractedWith) //focus the current phase being interacted with
 
         //loop through the sliders and set the background colors appropriately
         $(phaseSliders.find('a').get().reverse()).each(function(i) {
@@ -300,18 +307,21 @@ Bitponics.pages.growplans = {
                     .css({
                         'width': $(this).position().left - 5
                     }));
-
-                //TODO: update phaseDateRangeEl for each phase
-                // console.log(phaseDays);
-                // console.log(self.updatePhaseUI().getDateFromDays(phaseDays));
             }
         });
+
+        //set date range and total days for this phase
+        setTimeout(function () {
+            date = self.updatePhaseUI().getPhaseDateRange(currentSliderInteractedWith);
+            currentSliderInteractedWith.find('.date-range').html(date.startDate + ' - ' + date.endDate)
+                .end().find('.date-duration').val(date.range);
+        }, 100);
     },
 
 
     updatePhaseUI: function(e, phases) {
         var self = this,
-            maxSliderVal = self.DEFAULT_GROW_PLAN_DURATION,
+            maxSliderVal = self.defaultGrowPlanDuration,
             phaseSliders = $('.phase-slider'),
             phaseTabs = $('.phase-tabs li'),
             phaseSliderDiv,
@@ -417,30 +427,89 @@ Bitponics.pages.growplans = {
 
         function focusPhase(p) {
             var phase;
-            if (p && p.target) { //click event
+            if (p && p.target) { //is click event
                 phase = $(p.target).attr('data-phase');
-                //$(p.target).siblings().removeClass('focused').end().addClass('focused');
-            } else { //phase div
+            } else { //is phase div passed in
                 phase = p.attr('data-phase');
             }
-            console.log('focus phase: '+phase);
-            $('[data-phase]').removeClass('focused').filter('[data-phase='+phase+']').addClass('focused');
+            
+            if( $('div[data-phase='+phase+'], li[data-phase='+phase+']').hasClass('active') ) { //only focus phase if it is active in phase slider
+                $('div[data-phase], li[data-phase]').removeClass('focused').filter('[data-phase='+phase+']').addClass('focused');
+            }
         }
 
         function getDateFromDays(days) {
             var now = new Date();
-            var newDate = new Date( now.getTime() + days*24*60*60*1000 );
+            var newDate = new Date( now.getTime() + parseInt(days)*24*60*60*1000 );
             return newDate.getMonth()+1 +'/'+ newDate.getDate() +'/'+ newDate.getFullYear()
         }
 
-        function refreshAllSliders(){
-            phaseSliders.find('input').change();
+        function getPhaseDateRange(phase) {
+            var phaseIndex = $('.phase-slider').index(phase),
+                startDay = 0,
+                endDay = phase.find('.phase-slider-input').val();
+            
+            if (!!phase.prev('.phase-slider').length) {
+                startDay = phase.prev('.phase-slider').find('.phase-slider-input').val()
+            }
+
+            console.log(
+                {
+                    index: phaseIndex,
+                    startDay: parseInt(startDay),
+                    endDay: parseInt(endDay),
+                    startDate: getDateFromDays(parseInt(startDay)),
+                    endDate: getDateFromDays(parseInt(endDay)),
+                    range: parseInt(endDay - startDay)
+                }
+            )
+            return {
+                startDay: parseInt(startDay),
+                endDay: parseInt(endDay),
+                startDate: getDateFromDays(parseInt(startDay)),
+                endDate: getDateFromDays(parseInt(endDay)),
+                range: parseInt(endDay - startDay)
+            }
+        }
+
+        function refreshAllSliders(e) {
+            var durationInput = $(self.GROWPLAN_DURATION_SELECTOR),
+                days = durationInput.val();
+
+            self.defaultGrowPlanDuration = days;
+            phaseSliders.find('input[data-phase]').attr('max', days).change()
+
+            //TODO: when making grow plan duration longer, need to set inactive phase sliders to max, but they are disabled so cant set them
+                // .end()
+                // .filter('.inactive')
+                // .find('.phase-slider-input')
+                // .removeAttr('disabled')
+                // .val(days)
+                // .attr('disabled', 'disabled');
+        
+        }
+
+        function handleDurationKeypress(e) {
+            if (e.which == 13) {
+                refreshAllSliders();
+                e.preventDefault();
+            }
+        }
+
+        function setPhaseDays(e) {
+            var phase = $(e.target).parents('.phase-slider'),
+                startDay = getPhaseDateRange(phase).startDay;
+                totalDays = 1*$(e.target).val() + startDay;
+            phase.find('.phase-slider-input').val(totalDays).change();
         }
 
         return {
             getDateFromDays: getDateFromDays,
+            getPhaseDateRange: getPhaseDateRange,
             focusPhase: focusPhase,
-            refreshAllSliders: refreshAllSliders
+            refreshAllSliders: refreshAllSliders,
+            handleDurationKeypress: handleDurationKeypress,
+            setPhaseDays: setPhaseDays
         }
     }
 };
