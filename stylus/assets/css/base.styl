@@ -424,39 +424,50 @@ section#footer
 				float: left;
 				padding: 1em;
 				color: white;
-				background: green;
+				//background: green;
+				cursor: pointer;
+				height: auto;
+
+				&.focused {
+					text-decoration: underline;
+				}
 
 				&.inactive {
+					display: block;
 					opacity: 1;
-					background-color: rgba(0, 255, 0, .5);
+					background-color: rgba(36, 211, 33, .6);
+				}
+
+				.toggle {
+					text-decoration: none;
 				}
 			}
 		}
 		.phase-slider {
 			//display: inline-block;
 			color: white;
-			padding: .5em;
 			overflow: hidden;
 			width: 100%;
+			//text-decoration: none;
+			height: 0;
+			padding: 0;
 
 			label, span, div {
 				color: white
 			}
-			
 
 			&.focused {
-				border: 1px solid red;
+				//text-decoration: underline;
 				height: auto;
+				padding: .5em;
+				float: left;
 			}
 
 			&.active {
-				float: left;
-				height: 3em;
+
 			}
 
 			&.inactive {
-				opacity: .45;
-				height: 3em;
 
 				.slide-back {
 					display: none;
@@ -466,8 +477,13 @@ section#footer
 			.phase-slider-info {
 				position: relative;
 
-				label {
-					font-size: 1.5em;
+				.date-duration {
+					@extends .display-ib
+					width: 4em;
+					padding: .4em;
+					background: none;
+					border: 0 none;
+					color: white;
 				}
 			}
 
@@ -478,19 +494,27 @@ section#footer
 		
 
 		.phase-current-indicator {
-			.ui-slider-handle .ui-btn-inner{
-				background-color: #333;
-				border-color: #333;
+			.ui-slider-handle {
+				z-index: 2; //bump up above phase handles
+			 	.ui-btn-inner{
+					background-color: #333;
+					border-color: #333;
+				}
 			}
+			
+			input {
+				margin-right: .25em;
+			}
+
 			#phase_slider_duration {
 				@extends .display-ib
-				width: 50px;
+				width: 4em;
 				padding: .4em;
 			}
 		}
 
 		.phase-slider-input {
-			//display: none;
+			display: none;
 		}
 
 
@@ -517,14 +541,14 @@ section#footer
 	}
 }
 
-.focused {
-	border: 1px solid red;
-	height: auto;
-}
-
 .active {
 	float: left;
 	height: 3em;
+}
+
+.focused {
+	//border: 1px solid red;
+	height: auto;
 }
 
 .inactive {
@@ -537,15 +561,20 @@ section#footer
 	}
 }
 
-.seedling {
+
+.seedling, .seedling .ui-slider-handle {
 	background-color color-phase-seedling
+	background-image none
 }
-.vegetative {
+.vegetative, .vegetative .ui-slider-handle {
 	background-color color-phase-vegetative
+	background-image none
 }
-.blooming {
+.blooming, .blooming .ui-slider-handle {
 	background-color color-phase-blooming
+	background-image none
 }
-.fruiting {
+.fruiting, .fruiting .ui-slider-handle {
 	background-color color-phase-fruiting
+	background-image none
 }
