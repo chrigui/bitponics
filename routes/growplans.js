@@ -181,17 +181,45 @@ module.exports = function(app){
 				return res.json(result);
 			}
 
-			var submittedGrowPlanData = {
-				
-			},
+			var submittedGrowPlan = new GrowPlanModel({
+				parentGrowPlanId: undefined,
+				createdBy: req.user,
+				name: req.body.gpedit_name,
+				description: req.body.gpedit_description,
+				plants: req.body.plants,
+				sensors: [],
+				controls: [],
+				phases: [],
+				visibility: undefined
+			}),
 			isNewGrowPlan = false;
 
 			// compare the submitted data to the growPlan
+			isNewGrowPlan = !growPlanResult.equals(submittedGrowPlan);
 
-			//if (!isNewGrowPlan){
-				var startingPhaseData = growPlanResult.getPhaseAndDayFromStartDay(parseInt(req.phase_slider_current, 10));
+			async.series([
+				function branchingCheck(callback){
+					if (!isNewGrowPlan){ return callback(null, growPlanResult); }
+
+					// branch the growPlanResult
+					submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
+					submittedGrowPlan.save(function (err){
+						return callback(err, submittedGrowPlan);
+					});
+				}
+			],
+			function (err, results){
+				if (err) { 
+					result.status = 'error';
+					result.errors = [err.message];
+					return res.json(result);
+				}
+
+				var growPlanToUse = results[0],
+					startingPhaseData = growPlanToUse.getPhaseAndDayFromStartDay(parseInt(req.phase_slider_current, 10));
+				
 				GrowPlanInstanceModel.create({
-					growPlan : growPlanResult._id,
+					growPlan : growPlanToUse._id,
 					owner : req.user._id,
 					active : true,
 					activePhaseId : startingPhaseData.phaseId,
@@ -209,9 +237,8 @@ module.exports = function(app){
 					}
 					return res.json(result);
 				});			
-			//} else {
-				// branch the growPlanResult
-			//}
+			}	
+			);			
 		});
 	});
 
