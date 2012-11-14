@@ -64,7 +64,9 @@ block content
                 label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
                   div.info
                     div(class="gplist_description") #{growPlan.description}
-                    div(class="gplist_plants " + growPlan.plants.join(' ')) #{growPlan.plants}
+                    div(class="gplist_plants")
+                      each plant in growPlan.plants
+                        | #{plant.name} 
                     ul(class="gplist_system")
                       each phase in growPlan.phases
                         li #{phase.growSystem.name}
@@ -166,25 +168,40 @@ block content
 
                       div.actions
                         label Actions
-                        ul.grid
+                        ul
                           each action, i in currentPhaseData.actions
                             li
                               input(id="gpedit_#{phaseName}_action_#{i}", type="checkbox", name="gpedit_#{phaseName}_actions", value="#{action.id}", checked=true)
                               label(for="gpedit_#{phaseName}_action_#{i}") #{action.description}
-                          //- each phaseEndActions in currentPhaseData.actions
-                          //-   li
-                          //-     //TODO: this is hack w/ i*99
-                          //-     input(id="gpedit_#{i*99}_#{phaseName}_action", type="checkbox", name="gpedit_#{i}_#{phaseName}_action", value="#{phaseEndActions.id}, checked=true")
-                          //-     label(for="gpedit_#{i*99}_#{phaseName}_action") #{phaseEndActions.description}
+                              if action.control
+                                div #{controls[action.control].name}
+         
+                      //- div.controls
+                      //-     label Controls
+                      //-     ul
+                      //-       each control, i in controls
+                      //-         li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
 
                       div.idealRanges
                         label Ideal Ranges
-                        ul.grid
+                        ul
                           each idealRange, i in currentPhaseData.idealRanges
                             li
+                              label(for="gpedit_#{phaseName}_idealrange_#{i}") #{sensors[idealRange.sCode].name}
                               input(id="gpedit_#{phaseName}_idealrange_#{i}", type="checkbox", name="gpedit_#{phaseName}_idealranges", value="#{idealRange.id}", checked=true)
-                              label(for="gpedit_#{phaseName}_idealrange_#{i}") #{idealRange.sCode}
-                      
+                              
+                              div Action Control: #{controls[actions[idealRange.actionAboveMax].control].name}
+
+                              label(for="gpedit_#{phaseName}_idealrange_#{i}_min") Minimum Value (#{sensors[idealRange.sCode].unit})
+                              input(id="gpedit_#{phaseName}_idealrange_#{i}_min", class="no-disable", type="number", name="gpedit_#{phaseName}_idealranges_min", value="#{idealRange.valueRange.min}")
+                              textarea(id="gpedit_#{phaseName}_idealrange_#{i}_min_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionBelowMin].description}
+                              
+                              label(for="gpedit_#{phaseName}_idealrange_#{i}_max") Maximum Value (#{sensors[idealRange.sCode].unit})
+                              input(id="gpedit_#{phaseName}_idealrange_#{i}_max", class="no-disable", type="number", name="gpedit_#{phaseName}_idealranges_max", value="#{idealRange.valueRange.max}")
+                              textarea(id="gpedit_#{phaseName}_idealrange_#{i}_max_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionAboveMax].description}
+                              
+
+
                       div.phaseEndDescription
                         label Phase End Description
                         textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...") #{currentPhaseData.phaseEndDescription}
@@ -216,6 +233,12 @@ block content
                             li
                               input(type="checkbox", name="gpedit_#{phaseName}_actions", value="")
                               label Add +
+
+                      div.controls
+                          label Controls
+                          ul
+                            each control, i in controls
+                              li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
 
                       div.idealRanges
                         label Ideal Ranges
@@ -254,6 +277,9 @@ block footer-scripts
   script
     Bitponics.user = !{JSON.stringify(user)};
     Bitponics.growPlans = !{JSON.stringify(growPlans)};
+    Bitponics.actions = !{JSON.stringify(actions)};
+    Bitponics.controls = !{JSON.stringify(controls)};
+    Bitponics.sensors = !{JSON.stringify(sensors)};
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
   script(src='/assets/js/libs/Steps.js')
