@@ -276,7 +276,7 @@ Bitponics.pages.growplans = {
                     light: {},
                     name: phaseName,
                     nutrients: [],
-                    phaseEndActions: []
+                    phaseEndActions: [],
                     phaseEndDescription: $('#gpedit_'+phaseName+'_enddescription').val()
                 };
 
@@ -284,18 +284,7 @@ Bitponics.pages.growplans = {
             $('[name=gpedit_'+phaseName+'_actions]:checked').each(function() {
                 var action = {
                     description: '',
-                    cycle: {
-                        repeat: true,
-                        states: [{
-                            durationType: '',
-                            duration: 8,
-                        }, {
-                            message: '',
-                        }, {
-                            durationType: '',
-                            duration: 16
-                        }]
-                    }
+                    cycle: {}
                 };
 
                 //now fill in data from form for this action?
@@ -308,7 +297,7 @@ Bitponics.pages.growplans = {
             // });
         });
 
-
+        console.log(phase.actions);
         //controls
 
         //sensors
@@ -316,19 +305,19 @@ Bitponics.pages.growplans = {
         //plants
 
 
-        $.ajax({
-            type: 'POST',
-            url: form.action,
-            data: data
-        })
-        .done(function(data){
-            console.log('Form submit succeeded.');
-            console.log(data);
-        })
-        .fail(function(data){
-            console.log('Form submit failed.');
-            console.log(data);
-        });
+        // $.ajax({
+        //     type: 'POST',
+        //     url: form.action,
+        //     data: data
+        // })
+        // .done(function(data){
+        //     console.log('Form submit succeeded.');
+        //     console.log(data);
+        // })
+        // .fail(function(data){
+        //     console.log('Form submit failed.');
+        //     console.log(data);
+        // });
         return false;
     },
 
@@ -397,7 +386,7 @@ Bitponics.pages.growplans = {
                 //add plants selected in filter step to current grow plan plants
                 //TODO: do we want this?
                 self.formContainer.find('#plant_selection input[name=plants]:checked').each(function(){
-                    selectedPlants.push({ name : $(this).val()});
+                    selectedPlants.push($(this).val());
                 });
                 fullPlantList = selectedPlants.concat(growPlan.plants);
                 
@@ -406,13 +395,12 @@ Bitponics.pages.growplans = {
 
                 //populate plant list
                 for(var i = 0; i < fullPlantList.length; i++){
-                    var newLI = '<li>' + templ.replace(replaceToken, fullPlantList[i].name) + '</li>'
+                    var newLI = '<li>' + templ.replace(replaceToken, fullPlantList[i]) + '</li>'
                     newLI = $(newLI);
-                    newLI.find('input:first').attr('id', fullPlantList[i].name + '_edit')
+                    newLI.find('input:first').attr('id', fullPlantList[i] + '_edit')
                         .attr('checked', true)
-                        .end().find('label:first').attr('for', fullPlantList[i].name + '_edit');
-                    newLI.data('plant') = fullPlantList[i];
-                    $('#growplan_edit ul.plantlist').append(newLI);
+                        .end().find('label:first').attr('for', fullPlantList[i] + '_edit');
+                    $('#growplan_edit ul.plantlist').append(newLI)
                 }
 
                 $('#gpedit_expertiseLevel').val(growPlan.expertiseLevel);
@@ -620,7 +608,7 @@ Bitponics.pages.growplans = {
                 days = durationInput.val();
 
             self.defaultGrowPlanDuration = days;
-            phaseSliders.find('input[data-phase]').attr('max', days).change()
+            phaseSliders.find('input[data-phase]').add('#phase_slider_current').attr('max', days).change()
 
             //TODO: when making grow plan duration longer, need to set inactive phase sliders to max, but they are disabled so cant set them
                 // .end()

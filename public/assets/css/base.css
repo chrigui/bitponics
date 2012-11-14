@@ -79,7 +79,7 @@ td{vertical-align:top}
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,.btn,.btn *,.control,.phaseRangeSlider .phase-slider .phase-slider-info .date-duration,.phaseRangeSlider .phase-current-indicator #phase_slider_duration{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,.btn,.btn *,.control,.phaseRangeSlider .phase-slider .phase-slider-info .date-duration,.phaseRangeSlider .phase-current-indicator #phase_slider_duration,.phaseRangeSlider .idealRanges input[type=number],.phaseRangeSlider .idealRanges label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -197,6 +197,11 @@ section#footer .content-module{background-color:#fff}
 .phaseRangeSlider .phase-current-indicator input{margin-right:.25em}
 .phaseRangeSlider .phase-current-indicator #phase_slider_duration{width:4em;padding:.4em}
 .phaseRangeSlider .phase-slider-input{display:none}
+.phaseRangeSlider .idealRanges{position:relative;}
+.phaseRangeSlider .idealRanges ul{list-style:none;margin:0;padding:0}
+.phaseRangeSlider .idealRanges li{background:rgba(0,0,0,0.25);padding:.5em;margin:0 0 1em}
+.phaseRangeSlider .idealRanges input[type=checkbox]{opacity:1;height:auto;width:auto;margin:auto}
+.phaseRangeSlider .idealRanges input[type=number]{width:5em;margin:1em 0 0}
 .toggle{position:absolute;top:0;right:0;font-size:1.25em;}
 .toggle .add,.toggle .remove{padding:0 .25em;margin:0;background:none}
 .toggle .add{display:none}

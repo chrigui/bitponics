@@ -3,11 +3,14 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   UserModel = require('../models/user').model,
   DeviceModel = require('../models/device').model,
   PlantModel = require('../models/plant').model,
+  ControlModel = require('../models/control').model,
+  SensorModel = require('../models/sensor').model,
+  IdealRangesModel = require('../models/growPlan/idealRange').model,
   GrowSystemModel = require('../models/growSystem').model,
   ActionModel = require('../models/action').model,
 	winston = require('winston'),
 	passport = require('passport'),
-	async = require('async'); 
+	async = require('async');
 
 module.exports = function(app){
 	
@@ -25,7 +28,11 @@ module.exports = function(app){
 			//message : req.flash('info') //TODO: this isn't coming thru
 			growSystems: {},
 			plants: {},
+			controls: {},
 			growPlans: {},
+			idealRanges: [],
+			actions: {},
+			sensors: {},
 			growPlanDefault: {}
 		}
 		// locals.growPlanDefault.estimatedDuration = 0;
@@ -41,6 +48,10 @@ module.exports = function(app){
 					PlantModel.find({}, callback);
 				},
 				function parallel3(callback){
+					//get all controls
+					ControlModel.find({}, callback);
+				},
+				function parallel4(callback){
 					//get all grow plans and populate
 					async.series(
 						[
@@ -59,23 +70,24 @@ module.exports = function(app){
 								});
 							},
 							function (innerCallback) {
+								var actionIds = [];
 								locals.growPlans.forEach(function(growPlan) {
 									growPlan.phases.forEach(function(phase) {
-										phase.idealRanges.forEach(function(idealRange) {
-											// ActionModel.findById(idealRange.actionAboveMax, function (err, action) {
-											// 	if (err) { next(err); }
-											// 	console.log('actionAboveMax');
-											// 	console.log(action);
-											// });
-											// ActionModel.findById(idealRange.actionBelowMin, function (err, action) {
-											// 	if (err) { next(err); }
-											// 	console.log('actionBelowMin');
-											// 	console.log(action);
-											// });
+										phase.idealRanges.forEach(function(idealRange, i) {
+											actionIds.push(idealRange.actionAboveMax);
+											actionIds.push(idealRange.actionBelowMin);
 										});
 									});
 								});
-								innerCallback(null);
+								ActionModel.find({})
+									.where('_id').in(actionIds)
+									.exec(function (err, actions) {
+										if (err) { next(err); }
+										actions.forEach(function(item, index) {
+											locals.actions[item.id] = item;
+										});
+										innerCallback();
+									});
 							}
 						],
 						function (err, result) {
@@ -83,30 +95,42 @@ module.exports = function(app){
 						}
 					)
 				},
-				function parallel4(callback){
+				function parallel5(callback){
 					// Get the devices that the user owns
 					DeviceModel.find({owner : req.user._id}, callback);
+				},
+				function parallel6(callback){
+					// Get all sensors
+					SensorModel.find({}, callback);
 				}
 			],
 			function parallelFinal(err, result){
 				if (err) { return next(err); }
-				
-				locals.growSystems = result[0];
-				locals.plants = result[1];
-				// locals.growPlans = result[2];
-				locals.userOwnedDevices = result[3];
+				var growSystems = result[0],
+						plants = result[1],
+						controls = result[2],
+						userOwnedDevices = result[4],
+						sensors = result[5];
+
+				locals.growSystems = growSystems;
+				locals.plants = plants;
+				locals.userOwnedDevices = userOwnedDevices;
+
+				//convert controls into obj with id as keys
+				controls.forEach(function (item, index) {
+					locals.controls[item.id] = item;
+				});
+
+				//convert sensors into obj with id as keys
+				sensors.forEach(function (item, index) {
+					locals.sensors[item.code] = item;
+				});
 
 				//single out the default grow plan
 				locals.growPlans.forEach(function (item, index) {
 					if(item.name === 'All-Purpose'){
 						locals.growPlanDefault = item;
 						locals.growPlans.splice(index, 1); //remove default from general list of grow plans
-
-						// item.phases.forEach(function (phase, index) {
-						// 	var days = phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 28; //use 28 as default phase length?
-						// 	locals.growPlanDefault.estimatedDuration += days;
-						// });
-						// console.log('locals.growPlanDefault.estimatedDuration: '+locals.growPlanDefault.estimatedDuration);
 					}
 				});
 
