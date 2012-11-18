@@ -221,7 +221,7 @@ module.exports = function(app){
 			isNewGrowPlan = false;
 
 			// compare the submitted data to the growPlan
-			isNewGrowPlan = !growPlanResult.equals(submittedGrowPlan);
+			isNewGrowPlan = !growPlanResult.isEquivalentTo(submittedGrowPlan);
 
 			async.series([
 				function branchingCheck(callback){

@@ -105,7 +105,7 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
  * @return boolean. True if GrowPlans are equivalent, false if not
  *
  */
-GrowPlanSchema.method('equals', function(otherGrowPlan){
+GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan){
 	
 	if (this.name !== otherGrowPlan.name) { return false; }
 
