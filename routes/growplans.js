@@ -216,21 +216,24 @@ module.exports = function(app){
 				sensors: [],
 				controls: [],
 				phases: [],
-				visibility: undefined
-			}),
-			isNewGrowPlan = false;
-
-			// compare the submitted data to the growPlan
-			isNewGrowPlan = !growPlanResult.isEquivalentTo(submittedGrowPlan);
+				visibility: 'public'
+			});
 
 			async.series([
 				function branchingCheck(callback){
-					if (!isNewGrowPlan){ return callback(null, growPlanResult); }
-
-					// branch the growPlanResult
-					submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
-					submittedGrowPlan.save(function (err){
-						return callback(err, submittedGrowPlan);
+					growPlanResult.isEquivalentTo(submittedGrowPlan, function(err, isEquivalent){
+						if (err) { 
+							return callback(err); 
+						}
+						if (isEquivalent) { 
+							return callback(null, growPlanResult); 
+						} else {
+							// branch the growPlanResult
+							submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
+							submittedGrowPlan.save(function (err){
+								return callback(err, submittedGrowPlan);
+							});		
+						}
 					});
 				}
 			],

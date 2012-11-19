@@ -101,18 +101,23 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
  * like createdAt/updatedAt
  * 
  * @param otherGrowPlan. GrowPlan model object
- *
- * @return boolean. True if GrowPlans are equivalent, false if not
+ * @param callback. function(err, result) to be called with result. result is a boolean,
+ * 					true if the objects are equivalent, false if not
  *
  */
-GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan){
-	
-	if (this.name !== otherGrowPlan.name) { return false; }
+GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
+	var growPlan = this;
 
-	if (this.description !== otherGrowPlan.description) { return false; }
+	// compare name
+	if (this.name !== otherGrowPlan.name) { return callback(null, false); }
 
-	if (this.plants.length !== otherGrowPlan.plants.length) { return false; }
-	
+
+	// compare description
+	if (this.description !== otherGrowPlan.description) { return callback(null, false); }
+
+
+	// compare plants
+	if (this.plants.length !== otherGrowPlan.plants.length) { return callback(null, false); }
 	// TODO : this loop can probably be optimized
 	var allPlantsFound = true;
 	for (var i = 0, length = this.plants.length; i < length; i++){
@@ -130,10 +135,45 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan){
 		}
 	}
 	if (!allPlantsFound){
-		return false;
+		return callback(null, false);
 	}
 	
-	return true;
+	
+	// compare phases, shallow
+	if (this.phases.length !== otherGrowPlan.phases.length) { return callback(null, false); }
+	
+	
+	// Now that we've passed all of the shallow comparisons, 
+	// we need to do all of the async comparisons
+	var allAsyncEquivalenceChecksPassed = true;
+	async.parallel(
+		[
+			function phasesComparison(innerCallback){
+				var allPhasesAreEquivalent = true;
+				async.forEach(this.phases, 
+					function phaseIterator(phase, phaseCallback){
+						var otherPhase = otherGrowPlan.phases[growPlan.indexOf(phase)];
+						return phase.isEquivalentTo(otherPhase, function(err, isEquivalent){
+							if (!isEquivalent){
+								allPhasesAreEquivalent = false;
+								// TODO : short-circuit the async loop by calling callback with an error?
+							}
+							return innerCallback();
+						});
+					},
+					function phaseLoopEnd(err){
+						if (!allPhasesAreEquivalent){
+							allAsyncEquivalenceChecksPassed = false;
+						}
+						return innerCallback(err, allPhasesAreEquivalent);
+					}
+				);
+			}
+		],
+		function parallelComparisonEnd(err, results){
+			return callback(err, allAsyncEquivalenceChecksPassed)
+		}
+	);
 });
 
 /************************** END INSTANCE METHODS  ***************************/
