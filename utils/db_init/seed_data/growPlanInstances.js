@@ -13,7 +13,7 @@ module.exports = [
 				//"506de30a8eebf7524342cb6b"
 			],
 			owner : "506de30a8eebf7524342cb6c",
-			growPlan : "506de30c8eebf7524342cb70",
+			growPlan : "506de2ff8eebf7524342cb3a",
 			device : "506de2fe8eebf7524342cb34", 
 			active: true,
 		},

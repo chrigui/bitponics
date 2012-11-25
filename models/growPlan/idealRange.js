@@ -34,6 +34,61 @@ var IdealRangeSchema = new Schema({
 	}
 });
 
+
+/************************** INSTANCE METHODS  ***************************/
+/*
+ * Given another IdealRange object, determine whether
+ * they're equivalent.
+ *
+ * Synchronous, unlike parent "isEquivalentTo" functions
+ * 
+ * @param other. IdealRange model object
+ * @return boolean. Function to be called with result. Passed a boolean argument,
+ * 					true if the objects are equivalent, false if not
+ *
+ */
+IdealRangeSchema.method('isEquivalentTo', function(other){
+	if (this.sCode !== other.sCode) { return false;}
+	if (this.valueRange.min !== other.valueRange.min) { return false;}
+	if (this.valueRange.max !== other.valueRange.max) { return false;}
+	
+	if (!((this.actionBelowMin && other.actionBelowMin) || (!this.actionBelowMin && !other.actionBelowMin))) {
+		return false;
+	}
+	if (this.actionBelowMin){
+		// TODO : investigate if there's a better way to do this "is ObjectID or Model" check.
+		// One option: Modify ObjectID's prototype to add an "_id" method that returns self. then we can just always do myModel.otherModel._id
+		var thisActionBelowMinId = this.actionBelowMin.constructor.name.toLowerCase() === 'objectid' ? this.actionBelowMin : this.actionBelowMin._id;
+		var otherActionBelowMinId = other.actionBelowMin.constructor.name.toLowerCase() === 'objectid' ? other.actionBelowMin : other.actionBelowMin._id;
+		if (!thisActionBelowMinId.equals(otherActionBelowMinId)) { return false;}
+	}
+
+	if (!((this.actionAboveMax && other.actionAboveMax) || (!this.actionAboveMax && !other.actionAboveMax))) {
+		return false;
+	}
+	if (this.actionAboveMax){
+		var thisActionAboveMaxId = this.actionAboveMax.constructor.name.toLowerCase() === 'objectid' ? this.actionAboveMax : this.actionAboveMax._id;
+		var otherActionAboveMaxId = other.actionAboveMax.constructor.name.toLowerCase() === 'objectid' ? other.actionAboveMax : other.actionAboveMax._id;
+		if (!thisActionAboveMaxId.equals(otherActionAboveMaxId)) { return false;}
+	}
+
+	if (!((this.applicableTimeSpan && other.applicableTimeSpan) || (!this.applicableTimeSpan && !other.applicableTimeSpan))) {
+		return false;
+	}
+	if (this.applicableTimeSpan){
+		if (!
+			(this.applicableTimeSpan.startTime == other.applicableTimeSpan.startTime)
+			&&
+			(this.applicableTimeSpan.endTime == other.applicableTimeSpan.endTime)
+			){
+			return false;
+		}
+	}
+
+	return true;
+});
+
+
 IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 	var applicableTimeSpan = this.applicableTimeSpan;
 	if (applicableTimeSpan){ return true; }
@@ -43,5 +98,7 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 
     return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) && (millisecondsIntoDay <= applicableTimeSpan.endTime) );
 });
+
+/************************** END INSTANCE METHODS  ***************************/
 
 exports.schema = IdealRangeSchema;

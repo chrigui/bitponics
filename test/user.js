@@ -1,11 +1,7 @@
 var mongoose = require('mongoose'),
 User = require('../models/user').model,
-exec = require('child_process').exec,
-should = require('should'),
-mongoUrl = 'mongodb://localhost/bitponics_test';
+should = require('should');
 
-// Connecting to a local test database or creating it on the fly
-mongoose.connect(mongoUrl);
 
 /*
  * Mocha Test
@@ -18,33 +14,8 @@ mongoose.connect(mongoUrl);
  * your code should be done executing so Mocha runs to test properly.
  */
  describe('User', function(){
+
  	var currentUser = null;
-
-  /*
-   * before Method
-   *
-   * The before method will execute every time Mocha is run. This
-   * code will not run every time an individual test is run.
-   */
-   before(function(done){
-   	exec('db_init ' + mongoUrl + ' clear', 
-   		function (error, stdout, stderr){
-   			if (error) { return done(new Error(error));}
-   			if (stderr) { return done(new Error(stderr));}
-   			return done();
-   		});
-   });
-
-  /*
-   * after Method
-   *
-   * Just like the before, after is run after Mocha has completed
-   * running it's queue.
-   */
-   after(function(done){
-   	done();
-   });
-
 
  	/*
    * beforeEach Method

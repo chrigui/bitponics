@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
-  	IdealRangeSchema = require('./idealRange').schema;
+  	IdealRangeSchema = require('./idealRange').schema,
+  	async = require('async');
 
 var PhaseSchema = new Schema({
 	
@@ -43,7 +44,7 @@ var PhaseSchema = new Schema({
 /************************** INSTANCE METHODS  ***************************/
 /*
  * Given another Phase object, determine whether
- * they're equivalent..
+ * they're equivalent.
  * Comparing only salient properties; ignoring properties 
  * like createdAt/updatedAt
  * 
@@ -67,14 +68,38 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 	// compare growMedium
 	if (this.growMedium !== other.growMedium) { return callback(null, false); }	
 
+
+	// compare growSystem
+	if ( !(
+			(this.growSystem && other.growSystem)
+			||
+			(!this.growSystem && !other.growSystem)
+		  )
+		)
+	{ 
+		return callback(null, false); 
+	}
+	if (this.growSystem){
+		var thisGrowSystemId = phase.growSystem.constructor.name.toLowerCase() === 'objectid' ? phase.growSystem : phase.growSystem._id,
+			otherGrowSystemId = other.growSystem.constructor.name.toLowerCase() === 'objectid' ? other.growSystem : other.growSystem._id;
+		if (!thisGrowSystemId.equals(otherGrowSystemId)){
+			return callback(null, false);
+		}
+	} 
+
 	// compare phaseEndDescription
 	if (this.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
 
 
 	// compare light, shallow
-	if ( this.light && !other.light){ return callback(null, false); }
-	if ( !this.light && other.light){ return callback(null, false); }
-	if ( this.light && other.light){
+	if (!(
+		(this.light && other.light)
+		||
+		(!this.light && !other.light)
+		)){ 
+		return callback(null, false); 
+	}
+	if (this.light){
 		if ( !(
 			(this.light.fixture && other.light.fixture) ||
 			(!this.light.fixture && !other.light.fixture)
@@ -155,7 +180,9 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				if (!phase.light){ return innerCallback(null, true); }
 
 				if (phase.light.fixture){
-					if (!phase.light.fixture._id.equals(other.light.fixture._id)){
+					var thisLightFixtureId = phase.light.fixture.constructor.name.toLowerCase() === 'objectid' ? phase.light.fixture : phase.light.fixture._id;
+					var otherLightFixtureId = other.light.fixture.constructor.name.toLowerCase() === 'objectid' ? other.light.fixture : other.light.fixture._id;
+					if (!thisLightFixtureId.equals(otherLightFixtureId)){
 						return innerCallback(null, false);
 					}
 				}
@@ -163,22 +190,25 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 					return innerCallback(null, false);
 				}
 				if (phase.light.bulb){
-					if (!phase.light.bulb._id.equals(other.light.bulb._id)){
+					var thisLightBulbId = phase.light.bulb.constructor.name.toLowerCase() === 'objectid' ? phase.light.bulb : phase.light.bulb._id;
+					var otherLightBulbId = other.light.bulb.constructor.name.toLowerCase() === 'objectid' ? other.light.bulb : other.light.bulb._id;
+					if (!thisLightBulbId.equals(otherLightBulbId)){
 						return innerCallback(null, false);
 					}
 				}
 				return innerCallback(null, true);
 			},
 			function actionsComparison(innerCallback){
-				if (!phase.actions.length) { return callback(null, true); }
+				if (!phase.actions || !phase.actions.length) { return callback(null, true); }
 
 				var allActionsFound = true;
 				for (var i = 0, length = phase.actions.length; i < length; i++){
 					// TODO : figure out how to handle actions that haven't been "populated" (they're still just an ObjectID)
-					var actionId = phase.actions[i]._id,
+					var thisActionId = (phase.actions[i].constructor.name.toLowerCase() === 'objectid' ? phase.actions[i] : phase.actions[i]._id),
 						actionFound = false;
 					for (var j = 0; j < length; j++){
-						if (actionId.equals(other.actions[j]._id)){
+						var otherActionId =  (other.actions[j].constructor.name.toLowerCase() === 'objectid' ? other.actions[j] : other.actions[j]._id);
+						if (thisActionId.equals(otherActionId)){
 							actionFound = true;
 							break;
 						}
@@ -194,15 +224,16 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return callback(null, true);
 			},
 			function phaseEndActionsComparison(innerCallback){
-				if (!phase.phaseEndActions.length) { return callback(null, true); }
+				if (!phase.phaseEndActions || !phase.phaseEndActions.length) { return callback(null, true); }
 
 				var allActionsFound = true;
 				for (var i = 0, length = phase.phaseEndActions.length; i < length; i++){
 					// TODO : figure out how to handle actions that haven't been "populated" (they're still just an ObjectID)
-					var actionId = phase.phaseEndActions[i]._id,
+					var actionId = (phase.phaseEndActions[i].constructor.name.toLowerCase() === 'objectid' ? phase.phaseEndActions[i] : phase.phaseEndActions[i]._id),
 						actionFound = false;
 					for (var j = 0; j < length; j++){
-						if (actionId.equals(other.phaseEndActions[j]._id)){
+						var otherActionId = (other.phaseEndActions[j].constructor.name.toLowerCase() === 'objectid' ? other.phaseEndActions[j] : other.phaseEndActions[j]._id);
+						if (actionId.equals(otherActionId)){
 							actionFound = true;
 							break;
 						}
@@ -218,15 +249,13 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return callback(null, true);	
 			},
 			function idealRangesComparison(innerCallback){
-				if (!phase.idealRanges.length) { return callback(null, true); }
+				if (!phase.idealRanges || !phase.idealRanges.length) { return callback(null, true); }
 
 				var allIdealRangesFound = true;
 				for (var i = 0, length = phase.idealRanges.length; i < length; i++){
-					// TODO : figure out how to handle those that haven't been "populated" (they're still just an ObjectID)
-					var idealRangeId = phase.idealRanges[i]._id,
-						idealRangeFound = false;
+					var idealRangeFound = false;
 					for (var j = 0; j < length; j++){
-						if (idealRangeId.equals(other.idealRanges[j]._id)){
+						if (phase.idealRanges[i].isEquivalentTo(other.idealRanges[j])){
 							idealRangeFound = true;
 							break;
 						}
@@ -242,15 +271,16 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return callback(null, true);
 			},
 			function nutrientsComparison(innerCallback){
-				if (!phase.nutrients.length) { return callback(null, true); }
+				if (!phase.nutrients || !phase.nutrients.length) { return callback(null, true); }
 
 				var allNutrientsFound = true;
 				for (var i = 0, length = phase.nutrients.length; i < length; i++){
 					// TODO : figure out how to handle those that haven't been "populated" (they're still just an ObjectID)
-					var nutrientId = phase.nutrients[i]._id,
+					var nutrientId = (phase.nutrients[i].constructor.name.toLowerCase() === 'objectid' ? phase.nutrients[i] : phase.nutrients[i]._id),
 						nutrientFound = false;
 					for (var j = 0; j < length; j++){
-						if (nutrientId.equals(other.nutrients[j]._id)){
+						var otherNutrientId = (other.nutrients[j].constructor.name.toLowerCase() === 'objectid' ? other.nutrients[j] : other.nutrients[j]._id);
+						if (nutrientId.equals(otherNutrientId)){
 							nutrientFound = true;
 							break;
 						}
