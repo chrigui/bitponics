@@ -11,3 +11,6 @@ To run:
   - Update host file to have "127.0.0.1 bitponics.com"
   - > mongod
   - > sudo node-dev app.js
+
+To run tests:
+> ./node_modules/.bin/mocha --reporter dot --recursive

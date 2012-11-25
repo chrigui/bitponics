@@ -1,4 +1,4 @@
-var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+var ObjectId = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{

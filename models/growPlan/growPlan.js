@@ -4,7 +4,8 @@ var mongoose = require('mongoose'),
 	useTimestamps = mongoosePlugins.useTimestamps,
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
-  	PhaseSchema = require('./phase').schema;
+  	PhaseSchema = require('./phase').schema,
+	async = require('async');
 
 var GrowPlanSchema = new Schema({
 	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
@@ -150,9 +151,9 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 		[
 			function phasesComparison(innerCallback){
 				var allPhasesAreEquivalent = true;
-				async.forEach(this.phases, 
+				async.forEach(growPlan.phases, 
 					function phaseIterator(phase, phaseCallback){
-						var otherPhase = otherGrowPlan.phases[growPlan.indexOf(phase)];
+						var otherPhase = otherGrowPlan.phases[growPlan.phases.indexOf(phase)];
 						return phase.isEquivalentTo(otherPhase, function(err, isEquivalent){
 							if (!isEquivalent){
 								allPhasesAreEquivalent = false;
