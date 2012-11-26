@@ -48,6 +48,8 @@ var IdealRangeSchema = new Schema({
  *
  */
 IdealRangeSchema.method('isEquivalentTo', function(other){
+	var getObjectId = require('../utils').getObjectId;
+
 	if (this.sCode !== other.sCode) { return false;}
 	if (this.valueRange.min !== other.valueRange.min) { return false;}
 	if (this.valueRange.max !== other.valueRange.max) { return false;}
@@ -56,10 +58,8 @@ IdealRangeSchema.method('isEquivalentTo', function(other){
 		return false;
 	}
 	if (this.actionBelowMin){
-		// TODO : investigate if there's a better way to do this "is ObjectID or Model" check.
-		// One option: Modify ObjectID's prototype to add an "_id" method that returns self. then we can just always do myModel.otherModel._id
-		var thisActionBelowMinId = this.actionBelowMin.constructor.name.toLowerCase() === 'objectid' ? this.actionBelowMin : this.actionBelowMin._id;
-		var otherActionBelowMinId = other.actionBelowMin.constructor.name.toLowerCase() === 'objectid' ? other.actionBelowMin : other.actionBelowMin._id;
+		var thisActionBelowMinId = getObjectId(this.actionBelowMin),
+			otherActionBelowMinId = getObjectId(other.actionBelowMin);
 		if (!thisActionBelowMinId.equals(otherActionBelowMinId)) { return false;}
 	}
 
@@ -67,8 +67,8 @@ IdealRangeSchema.method('isEquivalentTo', function(other){
 		return false;
 	}
 	if (this.actionAboveMax){
-		var thisActionAboveMaxId = this.actionAboveMax.constructor.name.toLowerCase() === 'objectid' ? this.actionAboveMax : this.actionAboveMax._id;
-		var otherActionAboveMaxId = other.actionAboveMax.constructor.name.toLowerCase() === 'objectid' ? other.actionAboveMax : other.actionAboveMax._id;
+		var thisActionAboveMaxId = getObjectId(this.actionAboveMax),
+			otherActionAboveMaxId = getObjectId(other.actionAboveMax);
 		if (!thisActionAboveMaxId.equals(otherActionAboveMaxId)) { return false;}
 	}
 
