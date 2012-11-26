@@ -107,7 +107,8 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
  *
  */
 GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
-	var growPlan = this;
+	var growPlan = this,
+		getObjectId = require('../utils').getObjectId;
 
 	// compare name
 	if (this.name !== otherGrowPlan.name) { return callback(null, false); }
@@ -118,14 +119,15 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 
 
 	// compare plants
+
 	if (this.plants.length !== otherGrowPlan.plants.length) { return callback(null, false); }
 	// TODO : this loop can probably be optimized
 	var allPlantsFound = true;
 	for (var i = 0, length = this.plants.length; i < length; i++){
-		var plantName = this.plants[i].name,
+		var plantId = getObjectId(this.plants[i]),
 			plantFound = false;
 		for (var j = 0; j < length; j++){
-			if (plantName === otherGrowPlan.plants[j].name){
+			if (plantId.equals(getObjectId(otherGrowPlan.plants[j]))) {
 				plantFound = true;
 				break;
 			}
@@ -146,7 +148,6 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 	
 	// Now that we've passed all of the shallow comparisons, 
 	// we need to do all of the async comparisons
-	var allAsyncEquivalenceChecksPassed = true;
 	async.parallel(
 		[
 			function phasesComparison(innerCallback){
@@ -159,19 +160,17 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 								allPhasesAreEquivalent = false;
 								// TODO : short-circuit the async loop by calling callback with an error?
 							}
-							return innerCallback();
+							return phaseCallback();
 						});
 					},
 					function phaseLoopEnd(err){
-						if (!allPhasesAreEquivalent){
-							allAsyncEquivalenceChecksPassed = false;
-						}
 						return innerCallback(err, allPhasesAreEquivalent);
 					}
 				);
 			}
 		],
 		function parallelComparisonEnd(err, results){
+			var allAsyncEquivalenceChecksPassed = results.every(function(result){ return result; });
 			return callback(err, allAsyncEquivalenceChecksPassed)
 		}
 	);

@@ -374,10 +374,21 @@ function clearPendingNotifications (NotificationModel, callback){
   });
 }
 
+/**
+ * Returns the ObjectId of the object, taking into account
+ * whether the object is a populated Model or an ObjectId
+ *
+ * @param object
+ * @return ObjectId
+ */
+function getObjectId (object){
+  return (object.constructor.name.toLowerCase() === 'objectid' ? object : object._id);
+}
 
 module.exports = {
   logSensorLog : logSensorLog,
   triggerActionOverride : triggerActionOverride,
   scanForPhaseChanges : scanForPhaseChanges,
-  clearPendingNotifications : clearPendingNotifications
+  clearPendingNotifications : clearPendingNotifications,
+  getObjectId : getObjectId
 };
