@@ -1,4 +1,5 @@
 @import "helpers"
+@import "nib"
 
 .content-module
 	float left
@@ -124,3 +125,28 @@ section#footer
 				padding 60% 0 0 0 //must match container width
 				clear none
 
+
+/*
+ * Grow Plans Page
+ */
+.phaseRangeSlider {
+
+}
+.idealRanges {
+	li {
+		clearfix()
+	}
+	.hi, .lo {
+		width: 50%;
+		float: left;
+
+		label {
+			@extends .display-ib
+		}
+
+	}
+
+	.lo {
+		float: right;
+	}
+}

@@ -379,19 +379,7 @@ section#footer
 .phaseRangeSlider{
     position: relative;
     padding-top: 3em;
-    // height: 30px;
-    // margin-top: 60px;
-               /* moves label field */
-		#phase_slider_0{
-		    // top: -40px;
-		    // position: absolute;
-		    // left: 100px;
-		}       /* moves first input field */ 
-		#phase_slider_1{
-		    // top: -40px;
-		    // position: absolute;
-		    // left: 170px;
-		}      /* move second input field */ 
+
 		div.ui-slider{
 		    position: absolute;
 		    left: 0;
@@ -427,6 +415,8 @@ section#footer
 				//background: green;
 				cursor: pointer;
 				height: auto;
+				//text-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+				font-weight: bold;
 
 				&.focused {
 					text-decoration: underline;
@@ -453,7 +443,9 @@ section#footer
 			padding: 0;
 
 			label, span, div {
-				color: white
+				color: white;
+	    	//text-shadow: 1px 1px 1px rgba(0, 0, 0, .25);
+				font-weight: bold;
 			}
 
 			&.focused {
@@ -476,22 +468,30 @@ section#footer
 
 			.phase-slider-info {
 				position: relative;
-
-				.date-duration {
-					@extends .display-ib
-					width: 4em;
-					padding: .4em;
-					background: none;
-					border: 0 none;
-					color: white;
-				}
 			}
 
 			
 
 		}
 
-		
+		.date-range {
+			display: block;
+		}
+
+		input[type=number] {
+			@extends .display-ib
+			width: 2.75em;
+			padding: .4em;
+			background: none;
+			border: 1px dotted white;
+			box-shadow: none;
+			border-radius: 0;
+			box-sizing: content-box;
+			color: white;
+			border-color: white;
+			font-weight: bold;
+			font-size: 1.5em;
+		}
 
 		.phase-current-indicator {
 			.ui-slider-handle {
@@ -502,24 +502,28 @@ section#footer
 				}
 			}
 			
-			input {
+			input[type=number] {
+				color: color-medium-green;
+				border: 1px dotted color-medium-green;
 				margin-right: .25em;
 			}
 
-			#phase_slider_duration {
-				@extends .display-ib
-				width: 4em;
-				padding: .4em;
-			}
+			
 		}
 
 		.phase-slider-input {
-			display: none;
+			display: none!important;
 		}
+
+		// .phaseDescription, .growSystem, .growMedium, .nutrients, .actions {
+		// 	width: 50%;
+		// 	float: left;
+		// }
 
 		.idealRanges {
 			position: relative;
-			
+			clearfix()
+
 			ul {
 				list-style: none;
 				margin: 0;
@@ -540,13 +544,31 @@ section#footer
 			}
 
 			input[type=number] {
-				@extends .display-ib
-				width: 5em;
-				margin: 1em 0 0;
+				width: 3.75em;
+			}
+
+			input[type=checkbox] {
+				display: inline;
+			}
+
+			textarea {
+				max-width: 300px
 			}
 
 			label {
 				@extends .display-ib
+			}
+
+			.hi, .lo {
+
+				label, textarea {
+					display: block;
+					width: 100%;
+				}
+
+				label {
+					font-size: 2em;
+				}
 			}
 
 		}
@@ -581,7 +603,6 @@ section#footer
 }
 
 .focused {
-	//border: 1px solid red;
 	height: auto;
 }
 
