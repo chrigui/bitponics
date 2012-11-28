@@ -6,7 +6,7 @@
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,body,margin 0,.data-module{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,body,margin 0,.data-module,.idealRanges .hi label,.idealRanges .lo label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -68,4 +68,8 @@ section#footer #notifications{float:right;text-align:right}
 #logo,#setup,#user{width:20%}
 #setup{width:30%;margin-right:30%}
 .dashboard .content-module.middle{width:60%;padding:60% 0 0 0;clear:none}
-}
+}.idealRanges li{zoom:1}
+.idealRanges li:before,.idealRanges li:after{content:"";display:table}
+.idealRanges li:after{clear:both}
+.idealRanges .hi,.idealRanges .lo{width:50%;float:left;}
+.idealRanges .lo{float:right}

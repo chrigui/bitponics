@@ -113,10 +113,9 @@ block content
             div.phase-current-indicator
               span This grow plan lasts  
               input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182") 
-              span days. I am on day  
-              input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182") 
-              span of this grow plan.
-
+              span days and I am on day  
+              input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182")
+              
             div.phase-sliders
               - var allPhases = ['Seedling', 'Vegetative', 'Blooming', 'Fruiting'];
               ul(class="phase-tabs")
@@ -185,20 +184,30 @@ block content
                       div.idealRanges
                         label Ideal Ranges
                         ul
+                          li.add
+                            label(data-form-control="add") Add +
                           each idealRange, i in currentPhaseData.idealRanges
-                            li
+                            li.closed
+                              div(class="sensor-type icon #{idealRange.sCode}")
+                                | <i class="icon-glyph icon-#{idealRange.sCode}" aria-hidden="true"></i>
+                                div.screen-reader-text #{idealRange.sCode}
                               label(for="gpedit_#{phaseName}_idealrange_#{i}") #{sensors[idealRange.sCode].name}
                               input(id="gpedit_#{phaseName}_idealrange_#{i}", type="checkbox", name="gpedit_#{phaseName}_idealranges", value="#{idealRange.id}", checked=true)
                               
                               div Action Control: #{controls[actions[idealRange.actionAboveMax].control].name}
-
-                              label(for="gpedit_#{phaseName}_idealrange_#{i}_min") Minimum Value (#{sensors[idealRange.sCode].unit})
-                              input(id="gpedit_#{phaseName}_idealrange_#{i}_min", class="no-disable", type="number", name="gpedit_#{phaseName}_idealranges_min", value="#{idealRange.valueRange.min}")
-                              textarea(id="gpedit_#{phaseName}_idealrange_#{i}_min_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionBelowMin].description}
+                              //- div(class="control #{controls[actions[idealRange.actionAboveMax].control].name.replace(/\s/g,'').toLowerCase()} icon-glyph icon-#{controls[actions[idealRange.actionAboveMax].control].name.replace(/\s/g,'').toLowerCase()}", 
+                              //-   data-control-key="#{controls[actions[idealRange.actionAboveMax].control].name}") #{controls[actions[idealRange.actionAboveMax].control].name}
                               
-                              label(for="gpedit_#{phaseName}_idealrange_#{i}_max") Maximum Value (#{sensors[idealRange.sCode].unit})
-                              input(id="gpedit_#{phaseName}_idealrange_#{i}_max", class="no-disable", type="number", name="gpedit_#{phaseName}_idealranges_max", value="#{idealRange.valueRange.max}")
-                              textarea(id="gpedit_#{phaseName}_idealrange_#{i}_max_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionAboveMax].description}
+                              div.hi
+                                label(for="gpedit_#{phaseName}_idealrange_#{i}_min") High
+                                input(id="gpedit_#{phaseName}_idealrange_#{i}_min", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_min", value="#{idealRange.valueRange.min}")
+                                span #{sensors[idealRange.sCode].unit}
+                                textarea(id="gpedit_#{phaseName}_idealrange_#{i}_min_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionBelowMin].description}
+                              div.lo
+                                label(for="gpedit_#{phaseName}_idealrange_#{i}_max") Low
+                                input(id="gpedit_#{phaseName}_idealrange_#{i}_max", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_max", value="#{idealRange.valueRange.max}")
+                                span #{sensors[idealRange.sCode].unit}
+                                textarea(id="gpedit_#{phaseName}_idealrange_#{i}_max_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionAboveMax].description}
                               
 
 
@@ -229,10 +238,10 @@ block content
 
                       div.actions
                         label Actions
-                        ul.grid
+                        ul(class="grid", data-item-template="idealrange")
                             li
-                              input(type="checkbox", name="gpedit_#{phaseName}_actions", value="")
-                              label Add +
+                              labellabel(data-form-control="add") Add +
+                            //input(type="checkbox", name="gpedit_#{phaseName}_actions", value="")
 
                       div.controls
                           label Controls
@@ -242,10 +251,10 @@ block content
 
                       div.idealRanges
                         label Ideal Ranges
-                        ul.grid
+                        ul(class="grid", data-item-template="idealrange")
                             li
-                              input(type="checkbox", name="gpedit_#{phaseName}_idealranges", value="")
-                              label Add +
+                              label(data-form-control="add") Add +
+                            //input(type="checkbox", name="gpedit_#{phaseName}_idealranges", value="")
                       
                       div.phaseEndDescription
                         label Phase End Description

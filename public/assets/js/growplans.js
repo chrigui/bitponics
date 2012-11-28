@@ -526,7 +526,7 @@ Bitponics.pages.growplans = {
                 .slider('refresh');
 
             //set tab state to match
-            $('.phase-tabs li:lt('+(phaseIndex+1)+')').removeClass('inactive').addClass('active');
+            $('.phase-tabs li').eq(phaseIndex).add('.phase-tabs li:lt('+phaseIndex+')').removeClass('inactive').addClass('active');
 
             //set values for all phases before this one
             $('.phase-slider-input:lt('+phaseIndex+')').each(function(i){
@@ -546,10 +546,12 @@ Bitponics.pages.growplans = {
                 .find('.phase-slider-input')
                 .val(maxSliderVal)
                 .slider('disable')
-                .slider('refresh');
+                .slider('refresh')
+                .end()
+                .removeClass('focused');
 
             //set tab state to match
-            $('.phase-tabs li:gt('+(phaseIndex-1)+')').removeClass('active').addClass('inactive');
+            $('.phase-tabs li').eq(phaseIndex).add('.phase-tabs li:gt('+phaseIndex+')').removeClass('active focused').addClass('inactive');
 
             $('.phase-slider-input:eq('+(phaseIndex-1)+')')
                 .val(maxSliderVal)

@@ -79,7 +79,7 @@ td{vertical-align:top}
 .display-b{display:block}
 .display-n{display:none}
 .display-i{display:inline}
-.display-ib,.btn,.btn *,.control,.phaseRangeSlider .phase-slider .phase-slider-info .date-duration,.phaseRangeSlider .phase-current-indicator #phase_slider_duration,.phaseRangeSlider .idealRanges input[type=number],.phaseRangeSlider .idealRanges label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
+.display-ib,.btn,.btn *,.control,.phaseRangeSlider input[type=number],.phaseRangeSlider .idealRanges label{display:-moz-inline-stack;zoom:1;*display:inline;display:inline-block}
 .display-t{display:table}
 .clear-b{clear:both}
 .clear-l{clear:left}
@@ -182,26 +182,30 @@ section#footer .content-module{background-color:#fff}
 .phaseRangeSlider div.ui-slider:last-child{position:absolute;left:0}
 .phaseRangeSlider .slide-back{position:absolute;height:1em;top:1em;text-align:center}
 .phaseRangeSlider .phase-tabs{list-style:none;margin:0;padding:0;}
-.phaseRangeSlider .phase-tabs li{position:relative;width:25%;float:left;padding:1em;color:#fff;cursor:pointer;height:auto;}
+.phaseRangeSlider .phase-tabs li{position:relative;width:25%;float:left;padding:1em;color:#fff;cursor:pointer;height:auto;font-weight:bold;}
 .phaseRangeSlider .phase-tabs li.focused{text-decoration:underline}
 .phaseRangeSlider .phase-tabs li.inactive{display:block;opacity:1;background-color:rgba(36,211,33,0.6)}
 .phaseRangeSlider .phase-tabs li .toggle{text-decoration:none}
 .phaseRangeSlider .phase-slider{color:#fff;overflow:hidden;width:100%;height:0;padding:0;}
-.phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span,.phaseRangeSlider .phase-slider div{color:#fff}
+.phaseRangeSlider .phase-slider label,.phaseRangeSlider .phase-slider span,.phaseRangeSlider .phase-slider div{color:#fff;font-weight:bold}
 .phaseRangeSlider .phase-slider.focused{height:auto;padding:.5em;float:left}
 .phaseRangeSlider .phase-slider.inactive .slide-back{display:none}
-.phaseRangeSlider .phase-slider .phase-slider-info{position:relative;}
-.phaseRangeSlider .phase-slider .phase-slider-info .date-duration{width:4em;padding:.4em;background:none;border:0 none;color:#fff}
+.phaseRangeSlider .phase-slider .phase-slider-info{position:relative}
+.phaseRangeSlider .date-range{display:block}
+.phaseRangeSlider input[type=number]{width:2.75em;padding:.4em;background:none;border:1px dotted #fff;box-shadow:none;border-radius:0;box-sizing:content-box;color:#fff;border-color:#fff;font-weight:bold;font-size:1.5em}
 .phaseRangeSlider .phase-current-indicator .ui-slider-handle{z-index:2;}
 .phaseRangeSlider .phase-current-indicator .ui-slider-handle .ui-btn-inner{background-color:#333;border-color:#333}
-.phaseRangeSlider .phase-current-indicator input{margin-right:.25em}
-.phaseRangeSlider .phase-current-indicator #phase_slider_duration{width:4em;padding:.4em}
-.phaseRangeSlider .phase-slider-input{display:none}
+.phaseRangeSlider .phase-current-indicator input[type=number]{color:#24d321;border:1px dotted #24d321;margin-right:.25em}
+.phaseRangeSlider .phase-slider-input{display:none !important}
 .phaseRangeSlider .idealRanges{position:relative;}
 .phaseRangeSlider .idealRanges ul{list-style:none;margin:0;padding:0}
 .phaseRangeSlider .idealRanges li{background:rgba(0,0,0,0.25);padding:.5em;margin:0 0 1em}
 .phaseRangeSlider .idealRanges input[type=checkbox]{opacity:1;height:auto;width:auto;margin:auto}
-.phaseRangeSlider .idealRanges input[type=number]{width:5em;margin:1em 0 0}
+.phaseRangeSlider .idealRanges input[type=number]{width:3.75em}
+.phaseRangeSlider .idealRanges input[type=checkbox]{display:inline}
+.phaseRangeSlider .idealRanges textarea{max-width:300px}
+.phaseRangeSlider .idealRanges .hi label,.phaseRangeSlider .idealRanges .lo label,.phaseRangeSlider .idealRanges .hi textarea,.phaseRangeSlider .idealRanges .lo textarea{display:block;width:100%}
+.phaseRangeSlider .idealRanges .hi label,.phaseRangeSlider .idealRanges .lo label{font-size:2em}
 .toggle{position:absolute;top:0;right:0;font-size:1.25em;}
 .toggle .add,.toggle .remove{padding:0 .25em;margin:0;background:none}
 .toggle .add{display:none}
