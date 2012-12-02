@@ -2,6 +2,7 @@ var mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
 GrowPlanInstance = require('../models/growPlanInstance').model,
 GrowPlan = require('../models/growPlan').growPlan.model,
+Device = require('../models/device').model,
 should = require('should'),
 sampleGrowPlanInstances = require('../utils/db_init/seed_data/growPlanInstances'),
 async = require('async');
@@ -53,6 +54,7 @@ async = require('async');
         });
       });
 
+
       it('returns an error if options.owner is not specified', function(done){
         GrowPlanInstance.create({
           growPlan : '506de2ff8eebf7524342cb3a',
@@ -63,6 +65,7 @@ async = require('async');
           return done();
         });
       });
+
 
       it('returns an error if an invalid options.growPlan is specified', function(done){
         GrowPlanInstance.create({
@@ -75,6 +78,7 @@ async = require('async');
           return done();
         });
       });
+
 
       it('returns a GrowPlanInstance if valid options are specified', function(done){
         GrowPlanInstance.create({
@@ -167,8 +171,6 @@ async = require('async');
 
 
       it('activates specified phase and day if options.activePhaseId options.activePhaseDay are defined', function(done){
-        
-
         GrowPlanInstance.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
@@ -203,6 +205,44 @@ async = require('async');
             }
           });
           foundActivePhase.should.be.true;
+          return done();
+        });
+      });
+
+
+      it('activates specified device if options.device is defined', function(done){
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a',
+          owner : '506de30a8eebf7524342cb6c',
+          device : '506de2fe8eebf7524342cb35',
+          active : true
+        },
+        function(err, gpi){
+          should.not.exist(err);
+          should.exist(gpi);
+          gpi.should.be.an.instanceof(GrowPlanInstance);
+          should.exist(gpi.active);
+          should.exist(gpi.device);
+
+          Device.findById(gpi.device, function(err, device){
+            should.not.exist(err);
+            should.exist(device);
+            device.activeGrowPlanInstance.equals(gpi._id).should.be.true;
+            return done();
+          });
+        });
+      });
+
+
+      it('returns an error if GPI owner does not own the specified device', function(done){
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a',
+          owner : '506de30a8eebf7524342cb6c',
+          device : '506de2fe8eebf7524342cb36',
+          active : true
+        },
+        function(err, gpi){
+          should.exist(err);
           return done();
         });
       });      

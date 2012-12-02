@@ -14,7 +14,8 @@ var Device = require('./device'),
     nodemailer = require('nodemailer'),
     winston = require('winston'),
     async = require('async'),
-    tz = require('timezone/loaded');
+    tz = require('timezone/loaded'),
+    ObjectID = require('mongodb').ObjectID;
 
 
 /**
@@ -382,7 +383,10 @@ function clearPendingNotifications (NotificationModel, callback){
  * @return ObjectId
  */
 function getObjectId (object){
-  return (object.constructor.name.toLowerCase() === 'objectid' ? object : object._id);
+  var constructor = object.constructor.name.toLowerCase();
+  if (constructor === 'objectid'){ return object; }
+  if (constructor === 'string'){ return new ObjectID(object); } 
+  return object._id;
 }
 
 module.exports = {
