@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   	ActionModel,
   	ActionSchema,
   	async = require('async'),
-  	timezone = require('timezone/loaded');
+  	timezone = require('timezone/loaded'),
+  	ControlModel = require('./control').model;
 
 ActionSchema = new Schema({
 	

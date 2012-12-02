@@ -102,13 +102,15 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
 /**
  * Create a new GrowPlanInstance from the specified GrowPlan
  * 
- * @param options.growPlan (required)
- * @param options.owner (required)
+ * @param options.growPlan (required) GrowPlan model, ObjectID instance, or objectId string
+ * @param options.owner (required) User model, ObjectID instance, or objectId string
  * @param options.users (optional). Members of the GPI. If undefined, we'll just use options.owner
  * @param options.active (required) Boolean indicating whether to immediately activate the grow plan instance
  * @param options.device (optional) If present, sets the device property on the grow plan instance
  * @param options.activePhaseId (optional) The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance
  * @param options.activePhaseDay (optional) Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
+ *
+ * @param callback. Function called with (err, growPlanInstance)
  */
 
 GrowPlanInstanceSchema.static('create', function(options, callback) {
@@ -151,6 +153,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
       if (err) { return callback(err); }
 
       gpi.save(function(err){
+        if (err) { return callback(err); }
+
         winston.info('Created new gpi for user ' + options.owner + ' gpi id ' + gpi._id);
         if (!options.active){
           return callback(err, gpi);
@@ -286,7 +290,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             if (phase.phase.equals(phaseId)){
               phase.active = true;
               phase.startDate = now; 
-              phase.expectedEndDate = now + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
+              phase.expectedEndDate = now.valueOf() + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
             } else {
               if (phase.active == true){
                 prevPhase = phase;
@@ -296,7 +300,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             }
           });
           
-          innerCallback();
+          return innerCallback();
         });
       },
 

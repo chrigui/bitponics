@@ -38,6 +38,11 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
     });
 
 
+    describe('#getPhaseAndDayFromStartDay(numberOfDays)', function(){
+      // TODO : this
+    });
+    
+
     describe('#isEquivalentTo(other, callback)', function(){
       beforeEach(function(){
         var other = sampleGrowPlans[0];
