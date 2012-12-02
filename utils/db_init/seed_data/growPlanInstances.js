@@ -24,7 +24,6 @@ module.exports = [
 			],
 			owner : "506de3098eebf7524342cb66",
 			growPlan : "506de2ff8eebf7524342cb3b",
-			device : "506de2fe8eebf7524342cb34", //TODO: bitponics device
 			active: false,
 		}
 	];

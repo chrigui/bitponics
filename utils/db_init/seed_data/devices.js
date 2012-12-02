@@ -15,7 +15,7 @@ module.exports = [
 				"506de30a8eebf7524342cb6a",
 				"506de30a8eebf7524342cb6b"
 			 ],
-			owner: "506de3098eebf7524342cb66",
+			owner: "506de30a8eebf7524342cb6c",
 			controlMap : [ 
 			  {
 			    control : "506de2fd8eebf7524342cb32",
