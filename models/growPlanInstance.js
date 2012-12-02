@@ -10,7 +10,8 @@ var mongoose = require('mongoose'),
   async = require('async'),
   winston = require('winston'),
   tz = require('timezone/loaded'),
-  DeviceModel = require('./device').model;
+  DeviceModel = require('./device').model,
+  getObjectId = require('./utils').getObjectId;
 
 /**
  * GrowPlanInstance 
@@ -122,6 +123,9 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     gpiInitData._id = options._id;
   };
 
+  if (!options.owner) { return callback(new Error('options.owner must be defined')); }
+  if (!options.growPlan) { return callback(new Error('options.growPlan must be defined')); }
+
   var gpi = new GrowPlanInstanceModel(gpiInitData);
  
   async.parallel([
@@ -135,7 +139,7 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           growPlan.phases.forEach(function(phase){
             gpi.phases.push({ phase : phase._id});
           });
-          innerCallback();
+          return innerCallback();
         });
       },
       function (innerCallback){
@@ -144,8 +148,9 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
         DeviceModel.findById(options.device, function(err, device){
           if (err) { return innerCallback(err); }
           if (!device) { return innerCallback(new Error('Invalid device id')); }
+          if (!device.owner.equals(getObjectId(options.owner))){return innerCallback(new Error('Only device owner can assign device to grow plan')); }
           gpi.device = device;
-          innerCallback();
+          return innerCallback();
         });
       }
     ],
@@ -213,7 +218,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           DeviceModel.findById(gpi.device, function(err, deviceResult){
             if (err) { return innerCallback(err); }
             if (!deviceResult){ return innerCallback(new Error('No device found for specified id')); }
-
+            if (!deviceResult.owner.equals(getObjectId(gpi.owner))){return innerCallback(new Error('Only device owner can assign device to grow plan')); }
             deviceResult.activeGrowPlanInstance = gpi;
 
             deviceResult.save(function(err){
@@ -226,7 +231,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
         }
       ],
       function(err, results){
-        callback(err, gpi);
+        return callback(err, gpi);
       }
     );
   });

@@ -22,8 +22,8 @@
   mongoose.connect(mongoUrl);
  	exec('db_init ' + mongoUrl + ' clear', 
  		function (error, stdout, stderr){
- 			if (error) { return done(new Error(error));}
- 			if (stderr) { return done(new Error(stderr));}
+ 			if (error) { console.log(error); return done(new Error(error));}
+ 			if (stderr) { console.log(stderr); return done(new Error(stderr));}
  			return done();
  		});
  });

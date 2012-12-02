@@ -158,7 +158,7 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 						return phase.isEquivalentTo(otherPhase, function(err, isEquivalent){
 							if (!isEquivalent){
 								allPhasesAreEquivalent = false;
-								// TODO : short-circuit the async loop by calling callback with an error?
+								// TODO : short-circuit the async loop by calling callback with an error? or is that too dirty
 							}
 							return phaseCallback();
 						});
