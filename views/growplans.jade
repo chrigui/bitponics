@@ -30,7 +30,7 @@ block content
           else
            | #{user.email}
 
-  section#main(role="main")
+  section#main(role="main", ng-app)
     div.content-module.middle
       form(id="growplans", class='steps', action='', method='post')                  
         
@@ -181,11 +181,17 @@ block content
                       //-       each control, i in controls
                       //-         li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
 
-                      div.idealRanges
+                      div.idealRanges(ng-controller="Bitponics.pages.growplans.IdealRangeController")
                         label Ideal Ranges
                         ul
                           li.add
                             label(data-form-control="add") Add +
+                            form#add-new-ideal-range-form
+                              label(for="") Action Control: 
+                              select(ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
+                                option(value="") None
+                              
+                              
                           each idealRange, i in currentPhaseData.idealRanges
                             li.closed
                               div(class="sensor-type icon #{idealRange.sCode}")
@@ -291,6 +297,7 @@ block footer-scripts
     Bitponics.sensors = !{JSON.stringify(sensors)};
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
   script(src='/assets/js/libs/Steps.js')
   script(src='/assets/js/libs/list/src/list.js')
   script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')

@@ -41,18 +41,21 @@ Bitponics.pages.growplans = {
     },
     
     initEventHandlers: function() {
-        var self = this;
+        var self = this,
+            updatedPhaseUI = self.updatePhaseUI();
         self.formContainer.on('change', '#system_selection :input:not(.search), #plant_selection :input:not(.search)', $.proxy(self.handleInputAnswered, self));
         self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self));
         self.formContainer.on('keypress', '#plant_selection input.search', $.proxy(self.handleListFilter, self));
         self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self));
         self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs .toggle', $.proxy(self.updatePhaseUI, self));
-        self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(self.updatePhaseUI().focusPhase, self));
-        self.formContainer.on('change', '#growplan_edit #phase_slider_duration', $.proxy(self.updatePhaseUI().refreshAllSliders, self));
+        self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(updatedPhaseUI.focusPhase, self));
+        //self.formContainer.on('click', '#growplan_edit .idealRanges .add', $.proxy(updatedPhaseUI.addIdealRange, self));
+        self.formContainer.on('change', '#growplan_edit #phase_slider_duration', $.proxy(updatedPhaseUI.refreshAllSliders, self));
         //self.formContainer.on('mouseup touchend', '#growplan_edit .active .ui-slider-handle:last', $.proxy(self.updatePhaseUI().refreshAllSliders, self));
-        self.formContainer.on('keypress', '#growplan_edit #phase_slider_duration', $.proxy(self.updatePhaseUI().handleDurationKeypress, self));
-        self.formContainer.on('change', '#growplan_edit .date-duration', $.proxy(self.updatePhaseUI().setPhaseDays, self));
+        self.formContainer.on('keypress', '#growplan_edit #phase_slider_duration', $.proxy(updatedPhaseUI.handleDurationKeypress, self));
+        self.formContainer.on('change', '#growplan_edit .date-duration', $.proxy(updatedPhaseUI.setPhaseDays, self));
+
 
         //TODO: make more concise with $('.phase-slider-input') selector
         $('#phase_slider_0').change(function() {
@@ -644,6 +647,11 @@ Bitponics.pages.growplans = {
             handleDurationKeypress: handleDurationKeypress,
             setPhaseDays: setPhaseDays
         }
+    },
+
+    IdealRangeController : function($scope){
+        $scope.controls = Bitponics.controls;
+        $scope.selectedControl = undefined;
     }
 };
 
