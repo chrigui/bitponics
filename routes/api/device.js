@@ -189,12 +189,12 @@ module.exports = function(app) {
         }
       ],
       function parallelFinal(err, results){
-        if (err) { return callback(err);}
+        if (err) { return next(err);}
       
         sensors = results[0];
         device = results[1];
         if (!device){ 
-          wf1Callback(new Error('Attempted to log to a nonexistent device'));
+          return next(new Error('Attempted to log to a nonexistent device'));
         }
 
         Object.keys(pendingDeviceLogs).forEach(function(key){
