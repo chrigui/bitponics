@@ -25,9 +25,59 @@ module.exports = function(app){
 	});
 
 	app.get('/', function (req, res){
-	  res.render('index', {
-	    title: "Bitponics"
-	  });
+	  var locals = {
+    	title: "Bitponics",
+    	className: "home"
+    };
+	  res.render('index', locals);
+	});
+
+	app.get('/about', function (req, res){
+	  var locals = {
+    	title: "About",
+    	className: "about"
+    };
+	  res.render('about', locals);
+	});
+
+	app.get('/howitworks', function (req, res){
+	  var locals = {
+    	title: "How It Works",
+    	className: "howitworks"
+    };
+	  res.render('howitworks', locals);
+	});
+
+	app.get('/gallery', function (req, res){
+	  var locals = {
+    	title: "Gallery",
+    	className: "gallery"
+    };
+	  res.render('gallery', locals);
+	});
+
+	app.get('/press', function (req, res){
+	  var locals = {
+    	title: "Press",
+    	className: "press"
+    };
+	  res.render('press', locals);
+	});
+
+	app.get('/contact', function (req, res){
+	  var locals = {
+    	title: "Contact",
+    	className: "contact"
+    };
+	  res.render('contact', locals);
+	});
+
+	app.get('/buy', function (req, res){
+	  var locals = {
+    	title: "Buy",
+    	className: "buy"
+    };
+	  res.render('buy', locals);
 	});
 
 	app.get('/login', function (req, res){

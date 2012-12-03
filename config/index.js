@@ -77,5 +77,6 @@ module.exports = function(app) {
 
   require('./auth-config')(app);
   require('./app-config')(app);
+  
 };
 
