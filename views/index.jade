@@ -3,31 +3,88 @@ extends layout
 block content
 
   section#header
-      header#logo(role="banner") 
-        img(src="/img/leaf-new-green.png", width="15%")
+      header
+        nav(role="nav")
+          ul
+            li.nav-section
+              h1(class="logo icon", role="banner")
+                div 
+                  | Bitponics
+                  span &trade;
+                | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
 
-      div#setup.select-block
-        h2.main-heading #{title}
-        //h3.sub-heading
-      div#user.select-block
-        - if (!user || !user.id)
-          h2.main-heading Welcome
-          h3.sub-heading
-            a(href="/signup") Sign up
-            <br>
-            a(href="/login") Log in
-        - else
-          h2.main-heading Hi, 
-            if user.name.full != ''
-             | #{user.name.full}
-            else
-             | #{user.email}
-          h3.sub-heading
-              a(href='/logout') Logout
+            li.nav-section
+              ul
+                li 
+                  a(href="/about") About
+                li 
+                  a(href="/howitworks") How It Works
+
+            li.nav-section
+              ul
+                li 
+                  a(href="/gallery") Gallery
+                li 
+                  a(href="/press") Press
+
+            li.nav-section
+              ul
+                li 
+                  a(href="/contact") Contact
+
+            li(class="nav-section last")
+              ul
+                li 
+                  a(href="/buy") Buy
+
+      //- div#setup.select-block
+      //-   h2.main-heading #{title}
+      //-   //h3.sub-heading
+      //- div#user.select-block
+      //-   - if (!user || !user.id)
+      //-     h2.main-heading Welcome
+      //-     h3.sub-heading
+      //-       a(href="/signup") Sign up
+      //-       <br>
+      //-       a(href="/login") Log in
+      //-   - else
+      //-     h2.main-heading Hi, 
+      //-       if user.name.full != ''
+      //-        | #{user.name.full}
+      //-       else
+      //-        | #{user.email}
+      //-     h3.sub-heading
+      //-         a(href='/logout') logout
 
   section#main(role="main")
     div#home.content-module.middle
+      
+    //- div#about.content-module.middle
+    //-   h2 About
+    //- div#howitworks.content-module.middle
+    //-   h2 How It Works
+    //- div#gallery.content-module.middle
+    //-   h2 Gallery
+    //- div#press.content-module.middle
+    //-   h2 Press
+    //- div#contact.content-module.middle
+    //-   h2 Contact
+    //- div#buy.content-module.middle
+    //-   h2 Buy
 
 
   section#footer
+
+block footer-scripts
+
+  script(src='/assets/js/utils.js')
+  script
+    Bitponics.user = !{JSON.stringify(user)};
+    Bitponics.Utils.setupPages($('nav ul > li a'));
+
+  script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
+  script(src='/assets/js/libs/jquery/jquery.localScroll.min.js')
+
+  script
+    $('nav a').localScroll({ lazy: true });
 

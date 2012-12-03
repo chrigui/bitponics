@@ -10,7 +10,9 @@ var connect    = require('connect'),
 	passport   = require('passport'),
 	csv        = require('express-csv'),
 	winston    = require('winston'),
-	flash      = require('connect-flash');
+	flash      = require('connect-flash'),
+	semver  = require('semver'),
+  path    = require('path');
 
 module.exports = function(app){
 	
@@ -30,7 +32,7 @@ module.exports = function(app){
 		        //.define('url', stylus.url({ paths: [__dirname + '/public'] }))
 		        .set('filename', path)
 		        .set('warn', true)
-		        .set('compress', true)
+		        .set('compress', false)
 		        .use(nib());
 		      }
 		  })
@@ -67,8 +69,35 @@ module.exports = function(app){
 	  app.use(express.methodOverride());
 	  
 	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
-	  app.use(express.static(__dirname + '/../public'));
+	  app.use(express.static(path.join(__dirname, '/../public')));
 	  
+	  // Set the CDN options
+	  app.enable('view cache');
+	  var options = {
+	      publicDir  : path.join(__dirname, '/../public')
+	    , viewsDir   : path.join(__dirname, '/../views')
+	    , domain     : 'cdn.bitponics.com'
+	    , bucket     : 'bitponics'
+	    , endpoint   : 'http://bitponics.s3.amazonaws.com/'
+	    , key        : 'AKIAIU5OC3NSS5DGS4RQ'
+	    , secret     : '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'
+	    , hostname   : 'localhost'
+	    , port       : 80
+	    , ssl        : false
+	    , production : false //false means we use local assets
+	    , logger     : winston.info
+	  };
+
+	  // Initialize the CDN magic
+	  var CDN = require('express-cdn')(app, options);
+
+	  // Add the view helper
+	  // if (semver.lt(express.version, '3.0.0')) {
+	    app.locals({ CDN: CDN() });
+	  // } else {
+	  //   app.dynamicHelpers({ CDN: CDN });
+	  // }
+
 	  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
 	  app.use(express.cookieParser()); 
 	  app.use(express.session({ secret: 'somethingrandom'}));

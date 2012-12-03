@@ -1,0 +1,52 @@
+extends layout
+
+block content
+
+  section#header
+      header
+        nav(role="nav")
+          ul
+            li.nav-section
+              h1#logo(role="banner", class="icon")
+                div 
+                  | Bitponics
+                  span &trade;
+                | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
+
+            li.nav-section
+              ul
+                li 
+                  a(href="/about") About
+                li 
+                  a(href="/howitworks") How It Works
+
+            li.nav-section
+              ul
+                li 
+                  a(href="/gallery") Gallery
+                li 
+                  a(href="/press") Press
+
+            li.nav-section
+              ul
+                li 
+                  a(href="/contact") Contact
+
+            li(class="nav-section last")
+              ul
+                li 
+                  a(href="/buy") Buy
+
+  section#main(role="main")
+    h2 Contact
+
+  section#footer
+
+block footer-scripts
+
+  //- script
+  //-   Bitponics.user = !{JSON.stringify(user)};
+  //-   $('nav ul > li a')
+
+  //- script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
+

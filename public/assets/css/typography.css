@@ -1,5 +1,7 @@
-@font-face{font-family:"DIN";src:url("./fonts/din_medium.eot");src:local("~!#$"),url('./fonts/din_medium.eot?iefix') format(embedded-opentype),url('./fonts/din_medium.woff') format(woff),url('./fonts/din_medium.ttf') format(truetype),url('./fonts/din_medium.svg#webfont') format(svg);font-weight:"normal";font-style:"normal"}
-@font-face{font-family:"DIN";src:url("./fonts/din_bold.eot");src:local("@#$%"),url('./fonts/din_bold.eot?iefix') format(embedded-opentype),url('./fonts/din_bold.woff') format(woff),url('./fonts/din_bold.ttf') format(truetype),url('./fonts/din_bold.svg#webfont') format(svg);font-weight:'bold';font-style:'bold'}
-body,.din-text{font-family:Helvetica,Arial,sans-serif;letter-spacing:normal}
-a{color:#333;text-decoration:none;}
-a:hover{text-decoration:underline}
+a {
+  color: #333;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
