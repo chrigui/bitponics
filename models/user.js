@@ -70,9 +70,25 @@ UserSchema = new Schema({
   	 * Private API key is a 32-char random hex string
   	 */
   	private: String
-  }
-},
-{ strict: true });
+  },
+  plans : [
+  	{
+  		type : { type: String, enum: [
+			'free',
+			'serious',
+			'industrial'
+		]},
+		device : { type: ObjectId, ref : 'Device'},
+		createdAt : { type : Date, default : Date.now },
+		payments : [
+			{
+				ts : { type : Date },
+				amount : { type : Number }
+			}
+		]
+  	}
+  ]
+});
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
@@ -180,6 +196,26 @@ UserSchema.static('getByPublicApiKey', function(key, done) {
 
 UserSchema.method('verifyPassword', function(password, next) {
   bcrypt.compare(password, this.hash, next);
+});
+
+UserSchema.method('toPublicJSON', function() {
+  return {
+  	_id : this._id,
+  	name : this.name,
+  	email : this.email,
+  	phone : this.phone,
+  	address : this.country,
+  	locale: this.locale,
+  	timezone: this.timezone,
+  	active : this.active,
+  	notificationPreferences: this.notificationPreferences,
+  	deviceKey : {
+  		public : this.deviceKey.public
+  	},
+  	apiKey : {
+  		public: this.apiKey.public
+  	}
+  };
 });
 
 /************** END INSTANCE METHODS ********************/
