@@ -32,35 +32,33 @@ block content
 
   section#main(role="main", ng-app)
     div.content-module.middle
-      form(id="growplans", class='steps', action='', method='post')                  
-        
+      form(id="growplans", class='steps', action='', method='post', ng-controller="Bitponics.pages.growplans.GrowPlanController")
+        h4 Let's find you a grow plan.         
         section(id="system_selection", class="step", data-required="1")
           h4 What type of system do you have?
           ul(class="grid photos")
-            each system, i in growSystems
-              li
-                input(id="sys_#{system.name}", type='radio', name="system.name", value="#{system.name}")
-                label(for="sys_#{system.name}") #{system.name}
+            li(ng-repeat="system in growSystems | orderBy:name")
+              input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="growSystemSelections[system._id]", ng-change="updateSelectedGrowSystem(this)")
+              label(for="{{system._id}}") {{system.name}}
 
         section(id="plant_selection", class="step")
           h4 What would you like to grow?
 
-          input(class="search no-validate")
-          //span(class="sort", data-sort="plant") Sort by Plant Name
-
+          input(class="search no-validate", ng-model="plantQuery", ng-change="filterPlantList()")
+          div(ng-hide="filteredPlantList.length") 
+            button(class="add", ng-click="addPlant()") Add
+          
           ul(class="grid sortlist")
-            each plant, i in plants
-              li
-                input(id="#{plant.name}", type='checkbox', name="plants", value="#{plant.name}")
-                label(for="#{plant.name}", class="plant") #{plant.name}
+            li(ng-repeat="plant in filteredPlantList | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="plantSelections[plant._id]", ng-change="updateSelectedPlants()")
+              label(for="{{plant._id}}", class="plant") {{plant.name}}
 
         section(id="growplan_results", class="step update-panel hide", data-required="1")
           h4 We've found grow plans for you
           ul(class="grid sortlist photos")
-            //dummy_systems = ["Drip","aquaponics","ebb & flow","Egg-carton seed starter","deep water culture (DWC)", "Bitponics Water Culture System"]
             each growPlan, i in growPlans
               li(id="gplist_#{growPlan.id}")
-                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}")
+                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
                 label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
                   div.info
                     div(class="gplist_description") #{growPlan.description}
@@ -74,7 +72,7 @@ block content
           //Default grow plans not filtered
           ul(class="grid sortlist photos default")
             li(id="gplist_#{growPlanDefault.id}")
-              input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}")
+              input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
               label(for="gplist_input_#{growPlanDefault.id}") #{growPlanDefault.name}
                 div.info
                   div(class="gplist_description") #{growPlanDefault.description}
@@ -86,26 +84,25 @@ block content
           h4 Tailor this grow plan to your needs
 
           //set as default grow plan, will change dynamically based on previous step selection
-          input(id="gpedit__id", type="hidden", name="parentGrowPlan", value="#{growPlanDefault.id}") 
+          input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="selectedGrowPlan._id") 
 
           label Name
-          input(id="gpedit_name", type='text', name="gpedit_name", value="#{growPlanDefault.name}")
+          input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
           
           label Description
-          textarea(id="gpedit_description", name="gpedit_description") #{growPlanDefault.description}
+          textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description")
 
           label Plants
           ul(class="grid plantlist")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-            each plant in growPlanDefault.plants
-              li
-                input(id="#{plant._id}", type='checkbox', name="plants", value="#{plant._id}")
-                label(for="#{plant._id}", class="plant") #{plant.name}
+            li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="plant._id")
+              label(for="{{plant._id}}", class="plant") {{plant.name}}
 
-          //- label Sensors
+          //- label Suggested Sensors
           //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
 
-          //- label Controls
+          //- label Suggested Accessories *Aggregated from the accessories(controls) across phases.actions, phases.phaseEndActions, and phases.idealRanges
           //- input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
 
           label Phases
@@ -181,15 +178,28 @@ block content
                       //-       each control, i in controls
                       //-         li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
 
-                      div.idealRanges(ng-controller="Bitponics.pages.growplans.IdealRangeController")
+                      div.idealRanges
                         label Ideal Ranges
                         ul
                           li.add
                             label(data-form-control="add") Add +
                             form#add-new-ideal-range-form
-                              label(for="") Action Control: 
-                              select(ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
-                                option(value="") None
+                              div
+                                label(for="") Sensor
+                                select(class="no-disable", ng-model="selectedSensor", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors")
+                              div
+                                label(for="") Action Control: 
+                                select(class="no-disable", ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
+                                  option(value="") None
+                              div.hi
+                                label(for="gpedit_#{phaseName}_idealrange_new_min") High
+                                input(id="gpedit_#{phaseName}_idealrange_new_min", class="no-disable", type="number", step="any", value="0")
+                                textarea(id="gpedit_#{phaseName}_idealrange_new_min_action", placeholder="Describe the triggered action.")
+                              div.lo
+                                label(for="gpedit_#{phaseName}_idealrange_new_max") Low
+                                input(id="gpedit_#{phaseName}_idealrange_new_max", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_max", value="1")
+                                textarea(id="gpedit_#{phaseName}_idealrange_new_max_action", placeholder="Describe the triggered action.") 
+
                               
                               
                           each idealRange, i in currentPhaseData.idealRanges
@@ -290,14 +300,17 @@ block content
 block footer-scripts
 
   script
-    Bitponics.user = !{JSON.stringify(user)};
+    Bitponics.user = !{JSON.stringify(user.toPublicJSON())};
     Bitponics.growPlans = !{JSON.stringify(growPlans)};
+    Bitponics.growSystems = !{JSON.stringify(growSystems)};
     Bitponics.actions = !{JSON.stringify(actions)};
     Bitponics.controls = !{JSON.stringify(controls)};
     Bitponics.sensors = !{JSON.stringify(sensors)};
+    Bitponics.plants = !{JSON.stringify(plants)};
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  script(src='/assets/js/libs/es5-shim.min.js')
   script(src='/assets/js/libs/Steps.js')
   script(src='/assets/js/libs/list/src/list.js')
   script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')

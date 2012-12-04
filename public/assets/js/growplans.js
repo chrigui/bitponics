@@ -17,19 +17,6 @@ Bitponics.pages.growplans = {
         self.formContainer = $(self.GROWPLAN_FORM_SELECTOR);
         self.initEventHandlers();
         
-        //setup plant list for filtering using Listjs: https://github.com/javve/list/blob/master/README.md
-        self.plantList = new List('plant_selection', {
-            valueNames: [ 'plant' ],
-            listClass: 'grid',
-            plugins: [
-                [ 'fuzzySearch' ]
-            ]
-        });
-
-        //create template from LI markup in order to let users add new plants on the fly
-        self.plantListItemTemplate = $(self.plantList.list).find('li:first');
-        self.plantListItemReplaceToken = self.plantListItemTemplate.find('input').val();
-
         self.growPlanList = new List('growplan_results', {
             valueNames: [ 'gplist_description', 'gplist_plants', 'gplist_system' ],
             listClass: 'grid'
@@ -45,9 +32,9 @@ Bitponics.pages.growplans = {
             updatedPhaseUI = self.updatePhaseUI();
         self.formContainer.on('change', '#system_selection :input:not(.search), #plant_selection :input:not(.search)', $.proxy(self.handleInputAnswered, self));
         self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self));
-        self.formContainer.on('keypress', '#plant_selection input.search', $.proxy(self.handleListFilter, self));
-        self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self));
-        self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
+        //self.formContainer.on('keypress', '#plant_selection input.search', $.proxy(self.handleListFilter, self));
+        //self.formContainer.on('click', '#plant_selection button.add', $.proxy(self.handlePlantAdd, self));
+        //self.formContainer.on('click', '#growplan_results label', $.proxy(self.handleGrowPlanSelect, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs .toggle', $.proxy(self.updatePhaseUI, self));
         self.formContainer.on('click', '#growplan_edit .phase-tabs li', $.proxy(updatedPhaseUI.focusPhase, self));
         //self.formContainer.on('click', '#growplan_edit .idealRanges .add', $.proxy(updatedPhaseUI.addIdealRange, self));
@@ -649,10 +636,65 @@ Bitponics.pages.growplans = {
         }
     },
 
-    IdealRangeController : function($scope){
+    GrowPlanController : ['$scope', '$filter', function($scope, $filter){
+        $scope.plants = Bitponics.plants;
+        $scope.filteredPlantList = angular.copy($scope.plants);
         $scope.controls = Bitponics.controls;
-        $scope.selectedControl = undefined;
-    }
+        $scope.sensors = Bitponics.sensors;
+        $scope.plantSelections = {};
+        $scope.selectedPlants = [];
+        $scope.plantQuery = '';
+        $scope.growSystems = Bitponics.growSystems;
+        $scope.growSystemSelections = {};
+
+        $scope.setSelectedGrowPlan = function() {
+            var growPlans = Bitponics.growPlans;
+            for (var i = growPlans.length; i--;){
+                if (growPlans[i]._id == $scope.selectedGrowPlanId){
+                    $scope.selectedGrowPlan = growPlans[i];
+                    break;
+                }
+            }
+            if (!$scope.selectedGrowPlan) { $scope.selectedGrowPlan = Bitponics.growPlanDefault; }
+            $scope.selectedPlants.forEach(function(plant, index){
+                if (!$scope.selectedGrowPlan.plants.some(function(gpPlant){ gpPlant.name === plant.name })){
+                    $scope.selectedGrowPlan.plants.push(plant);
+                }
+            });
+            $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
+        };
+
+        $scope.filteredSensors = function() {
+            var list = [];
+            angular.forEach($scope.sensors, function(sensor) {
+              list.push(sensor);
+            });
+            return list;
+        };
+
+        $scope.updateSelectedGrowSystem = function(el){
+            var growSystemSelections = $scope.growSystemSelections;
+            $scope.selectedGrowSystem = $scope.growSystems.filter(function(system, index){ return growSystemSelections[system._id]; })
+        };
+
+        $scope.filterPlantList = function(){
+            var filteredPlantList = $filter('filter')($scope.plants, { name : $scope.plantQuery });
+            $scope.filteredPlantList = filteredPlantList;
+        };
+
+        $scope.addPlant = function(){
+            var newPlant = {name : $scope.plantQuery };
+            $scope.filteredPlantList.push(newPlant);
+            $scope.selectedPlants.push(newPlant);
+        };
+
+        $scope.updateSelectedPlants = function(){
+            var plantSelections = $scope.plantSelections;
+            $scope.selectedPlants = $scope.plants.filter(function(plant, index){ return plantSelections[plant._id]; })
+        };
+
+        
+    }]
 };
 
 $(function () {

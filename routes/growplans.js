@@ -45,7 +45,7 @@ module.exports = function(app){
 				},
 				function parallel2(callback){
 					//get all plants
-					PlantModel.find({}, callback);
+					PlantModel.find({}, '_id name', callback);
 				},
 				function parallel3(callback){
 					//get all controls
