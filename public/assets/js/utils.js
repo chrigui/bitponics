@@ -46,6 +46,28 @@ Bitponics.Utils = {
      	  	}
 	    });
 
+	},
+
+	sectionHeightAlign: function(minHeight, sectionSelector) {
+		var screenHeight = $(window).height() > minHeight ? $(window).height() : minHeight;
+    
+    $(sectionSelector).each(function(i) {
+    	var section = $(this),
+    			sectionHeight = section.height();
+    	
+    	if (i == 0) {
+    		section.height(screenHeight);
+    	} else {
+    		setTimeout(function() {
+    			sectionHeight = section.height();
+    			if(sectionHeight < minHeight) {
+    				section.height(screenHeight);
+    			}
+    		}, 1000);
+    	}
+
+    });
+    	
 	}
 
 }
