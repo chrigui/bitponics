@@ -6,7 +6,7 @@ block content
       header
         nav(role="nav")
           ul
-            li.nav-section
+            li(class="nav-section first")
               h1(class="logo icon", role="banner")
                 div 
                   | Bitponics
@@ -74,6 +74,7 @@ block content
 
 
   section#footer
+    div Footer
 
 block footer-scripts
 
@@ -81,6 +82,7 @@ block footer-scripts
   script
     Bitponics.user = !{JSON.stringify(user)};
     Bitponics.Utils.setupPages($('nav ul > li a'));
+    Bitponics.Utils.sectionHeightAlign(600, '#main > .content-module');
 
   script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
   script(src='/assets/js/libs/jquery/jquery.localScroll.min.js')
