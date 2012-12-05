@@ -552,6 +552,14 @@ a:hover,
 a:active {
   color: #24d321;
 }
+a {
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
 /*
  * Modules
  */
@@ -855,6 +863,9 @@ section#footer .content-module {
   width: 24px;
   background: url("/img/loader.gif") no-repeat 0 0;
 }
+.page-content em {
+  display: block;
+}
 /*
  * Home Page
  */
@@ -894,6 +905,10 @@ section#footer .content-module {
 }
 .home nav ul li {
   display: block;
+  margin: 1em 0;
+}
+.home nav ul li .first {
+  margin: 0;
 }
 .home .logo {
   font-size: 1.17em;
@@ -924,6 +939,34 @@ section#footer .content-module {
 .home #buy {
   background-color: #fff;
   color: #00fa8b;
+}
+.home #howitworks div,
+.home #press div,
+.home #buy div,
+.home #howitworks p,
+.home #press p,
+.home #buy p,
+.home #howitworks span,
+.home #press span,
+.home #buy span,
+.home #howitworks a,
+.home #press a,
+.home #buy a,
+.home #howitworks a:visited,
+.home #press a:visited,
+.home #buy a:visited,
+.home #howitworks a:hover,
+.home #press a:hover,
+.home #buy a:hover,
+.home #howitworks a:active,
+.home #press a:active,
+.home #buy a:active {
+  color: #00fa8b;
+}
+.home #howitworks .nav-section,
+.home #press .nav-section,
+.home #buy .nav-section {
+  border-top: 1px solid #00fa8b;
 }
 /*
  * Dashboard Page
