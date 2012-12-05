@@ -82,6 +82,19 @@ ActionSchema.virtual('overallCycleTimespan')
 		return total;
 	});
 
+ActionSchema.virtual('isSingleState')
+	.get(function () {
+		return this.cycle.states.length === 1;
+	});
+
+ActionSchema.virtual('singleStateValue')
+	.get(function () {
+		if (this.isSingleState){
+			return this.cycle.states[0].controlValue;
+		} else {
+			return null;
+		}
+	});
 
 /**
  * Now that schema is defined, add indices

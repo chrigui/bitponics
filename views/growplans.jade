@@ -109,184 +109,113 @@ block content
           div.phaseRangeSlider
             div.phase-current-indicator
               span This grow plan lasts  
-              input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182") 
+              input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182", ng-model="expectedGrowPlanDuration", ng-change="updatePhaseDurations()") 
               span days and I am on day  
-              input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182")
+              input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
               
             div.phase-sliders
-              - var allPhases = ['Seedling', 'Vegetative', 'Blooming', 'Fruiting'];
               ul(class="phase-tabs")
-                each phaseName, i in allPhases
-                  li(class="#{phaseName.toLowerCase()}", data-phase="#{phaseName.toLowerCase()}") #{phaseName}
-                    div.toggle
-                      div(class="add icon btn")
-                        | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
-                      div(class="remove icon btn")
-                        | <i class="icon-glyph icon-x" aria-hidden="true"></i>
-              each phaseName, i in allPhases
-                div(class="phase-slider #{phaseName.toLowerCase()} inactive", data-phase="#{phaseName.toLowerCase()}")
+                li(ng-repeat="phase in selectedGrowPlan.phases") {{phase.name}}
+                  div(class="remove icon btn")
+                    | <i class="icon-glyph icon-x" aria-hidden="true"></i>
+                li() Add New Phase
+                  div(class="add icon btn")
+                    | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+
+                div(ng-repeat="phase in selectedGrowPlan.phases", class="phase-slider")
                   div(class="phase-slider-info")
                     span(class="date-range") x
-                    input(class="date-duration no-disable", name="date-duration", value="0", type="number") 
+                    input(class="date-duration no-disable", name="date-duration", value="0", type="number", ng-model="phase.expectedNumberOfDays") 
                     span  days
                   div(class="phase-slider-slider")
-                    input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="phase-slider-input", value="#{(i+1)/4 * 182}", min="0", max="182", data-phase="#{phaseName.toLowerCase()}")
+                    input(type="range", name="phase_slider_{{$index}}", id="phase_slider_{{$index}}", class="phase-slider-input", value="0", min="0", max="{{expectedGrowPlanDuration}}", ng-model="phase.expectedNumberOfDays")
 
-                  - var hasPhase = 0;
-                  - var currentPhaseData = undefined;
-                  each phase, i in growPlanDefault.phases
-                    - if (phase.name == phaseName) {
-                      - hasPhase++;
-                      - currentPhaseData = phase;
-                    - }
+                  section
+                    div.phaseName
+                      label Phase Name
+                      input(type="text", placeholder="Give this phase a name...", ng-model="phase.name")
 
-                  if (hasPhase > 0)
-                    section
-                      div.phaseDescription
-                        label Phase Description
-                        textarea(id="gpedit_#{phaseName}_description", name="gpedit_#{phaseName}_description", placeholder="Write a phase description...") #{currentPhaseData.phaseDescription}
+                    div.phaseDescription
+                      label Phase Description
+                      textarea(placeholder="Write a phase description...", ng-model="phase.description")
 
-                      div.growSystem
-                        label Grow System
-                        input(id="gpedit_#{phaseName}_growsystem", type='text', name="gpedit_#{phaseName}_growsystem", value="#{currentPhaseData.growSystem._id}")
+                    div.growSystem
+                      label Grow System
+                      input(type='text', ng-model="phase.growSystem")
 
-                      div.growMedium
-                        label Grow Medium
-                        input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="#{currentPhaseData.growMedium}")
-                      
-                      div.nutrients
-                        label Nutrients
-                        ul.grid
-                          each nutrient in currentPhaseData.nutrients
-                            li
-                              input(id="gpedit_#{phaseName}_nutrients", type='checkbox', name="gpedit_#{phaseName}_nutrients", value="#{nutrient.id}", checked=true)
-                              label(for="gpedit_#{phaseName}_nutrients") #{nutrient.name} - #{nutrient.brand}
+                    div.growMedium
+                      label Grow Medium
+                      input(type='text', ng-model="phase.growMedium")
+                    
+                    div.nutrients
+                      label Nutrients
+                      ul.grid
+                        li(ng-repeat="nutrient in phase.nutrients")
+                          input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient.id}}", checked=true)
+                          label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
 
-                      div.actions
-                        label Actions
-                        ul
-                          each action, i in currentPhaseData.actions
-                            li
-                              input(id="gpedit_#{phaseName}_action_#{i}", type="checkbox", name="gpedit_#{phaseName}_actions", value="#{action.id}", checked=true)
-                              label(for="gpedit_#{phaseName}_action_#{i}") #{action.description}
-                              if action.control
-                                div #{controls[action.control].name}
-         
-                      //- div.controls
-                      //-     label Controls
-                      //-     ul
-                      //-       each control, i in controls
-                      //-         li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
-
-                      div.idealRanges
-                        label Ideal Ranges
-                        ul
-                          li.add
-                            label(data-form-control="add") Add +
-                            form#add-new-ideal-range-form
-                              div
-                                label(for="") Sensor
-                                select(class="no-disable", ng-model="selectedSensor", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors")
-                              div
-                                label(for="") Action Control: 
-                                select(class="no-disable", ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
-                                  option(value="") None
-                              div.hi
-                                label(for="gpedit_#{phaseName}_idealrange_new_min") High
-                                input(id="gpedit_#{phaseName}_idealrange_new_min", class="no-disable", type="number", step="any", value="0")
-                                textarea(id="gpedit_#{phaseName}_idealrange_new_min_action", placeholder="Describe the triggered action.")
-                              div.lo
-                                label(for="gpedit_#{phaseName}_idealrange_new_max") Low
-                                input(id="gpedit_#{phaseName}_idealrange_new_max", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_max", value="1")
-                                textarea(id="gpedit_#{phaseName}_idealrange_new_max_action", placeholder="Describe the triggered action.") 
-
-                              
-                              
-                          each idealRange, i in currentPhaseData.idealRanges
-                            li.closed
-                              div(class="sensor-type icon #{idealRange.sCode}")
-                                | <i class="icon-glyph icon-#{idealRange.sCode}" aria-hidden="true"></i>
-                                div.screen-reader-text #{idealRange.sCode}
-                              label(for="gpedit_#{phaseName}_idealrange_#{i}") #{sensors[idealRange.sCode].name}
-                              input(id="gpedit_#{phaseName}_idealrange_#{i}", type="checkbox", name="gpedit_#{phaseName}_idealranges", value="#{idealRange.id}", checked=true)
-                              
-                              div Action Control: #{controls[actions[idealRange.actionAboveMax].control].name}
-                              //- div(class="control #{controls[actions[idealRange.actionAboveMax].control].name.replace(/\s/g,'').toLowerCase()} icon-glyph icon-#{controls[actions[idealRange.actionAboveMax].control].name.replace(/\s/g,'').toLowerCase()}", 
-                              //-   data-control-key="#{controls[actions[idealRange.actionAboveMax].control].name}") #{controls[actions[idealRange.actionAboveMax].control].name}
-                              
-                              div.hi
-                                label(for="gpedit_#{phaseName}_idealrange_#{i}_min") High
-                                input(id="gpedit_#{phaseName}_idealrange_#{i}_min", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_min", value="#{idealRange.valueRange.min}")
-                                span #{sensors[idealRange.sCode].unit}
-                                textarea(id="gpedit_#{phaseName}_idealrange_#{i}_min_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionBelowMin].description}
-                              div.lo
-                                label(for="gpedit_#{phaseName}_idealrange_#{i}_max") Low
-                                input(id="gpedit_#{phaseName}_idealrange_#{i}_max", class="no-disable", type="number", step="any", name="gpedit_#{phaseName}_idealranges_max", value="#{idealRange.valueRange.max}")
-                                span #{sensors[idealRange.sCode].unit}
-                                textarea(id="gpedit_#{phaseName}_idealrange_#{i}_max_action", placeholder="Describe the triggered action.") #{actions[idealRange.actionAboveMax].description}
-                              
-
-
-                      div.phaseEndDescription
-                        label Phase End Description
-                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...") #{currentPhaseData.phaseEndDescription}
-                  else 
-                    //this grow plan doesnt have this data, but populate the html anyway for possible customization
-                    section
-                      div.phaseDescription
-                        label Phase Description
-                        textarea(id="gpedit_#{phaseName}_description", name="gpedit_#{phaseName}_description", placeholder="Write a phase description...")
-
-                      div.growSystem
-                        label Grow System
-                        input(id="gpedit_#{phaseName}_growsystem", type='text', name="gpedit_#{phaseName}_growsystem", value="")
-
-                      div.growMedium
-                        label Grow Medium
-                        input(id="gpedit_#{phaseName}_growmedium", type='text', name="gpedit_#{phaseName}_growmedium", value="")
-                      
-                      div.nutrients
-                        label Nutrients
-                        ul.grid
-                            label Add +
-                            input(id="gpedit_#{phaseName}_nutrients", type='text', name="gpedit_#{phaseName}_nutrients", value="")
+                    div.actions
+                      label Actions
+                      ul
+                        li(ng-repeat="action in phase.actions")
+                          input(id="gpedit_{{phase._id}}_action_{{action._id}}", type="checkbox", name="gpedit_{{phase._id}}_action_{{action._id}}", value="{{action.id}}", checked=true)
+                          label(for="gpedit_{{phase._id}}_action_{{action._id}}") {{action.description}}
+                          div(ng-show="action.control") {{controls[action.control].name}}
+       
+                    div.idealRanges
+                      label Ideal Ranges
+                      ul
+                        li.add
+                          label(data-form-control="add") Add +
+                          form#add-new-ideal-range-form
+                            div
+                              label(for="") Sensor
+                              select(class="no-disable", ng-model="selectedSensor", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors")
+                            div
+                              label(for="") Trigger Accessory: 
+                              select(class="no-disable", ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
+                                option(value="") None
+                            div.lo
+                              label(for="gpedit_{{phase._id}}_idealrange_new_min") Low
+                              input(id="gpedit_{{phase._id}}_idealrange_new_min", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealranges_min", value="1")
+                              textarea(id="gpedit_{{phase._id}}_idealrange_new_min_action", placeholder="Describe the triggered action.") 
+                            div.hi
+                              label(for="gpedit_{{phase._id}}_idealrange_new_max") High
+                              input(id="gpedit_{{phase._id}}_idealrange_new_max", class="no-disable", type="number", step="any", value="0")
+                              textarea(id="gpedit_{{phase._id}}_idealrange_new_max_action", placeholder="Describe the triggered action.")
                             
 
-                      div.actions
-                        label Actions
-                        ul(class="grid", data-item-template="idealrange")
-                            li
-                              labellabel(data-form-control="add") Add +
-                            //input(type="checkbox", name="gpedit_#{phaseName}_actions", value="")
+                            
+                        li.closed(ng-repeat="idealRange in phase.idealRanges")
+                          div(class="sensor-type icon {{idealRange.sCode}}")
+                            | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
+                            div.screen-reader-text {{idealRange.sCode}}
+                          label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}") {{sensors[idealRange.sCode].name}}
+                          input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}", type="checkbox", name="gpedit_{{phase._id}}_idealranges", value="{{idealRange.id}}", checked=true)
+                          
+                          
+                          div Trigger Accessory: {{controls[idealRange.actionAboveMax.control].name}}
+                          
+                          div.lo
+                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min") Low
+                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min", ng-model="idealRange.valueRange.min")
+                            span {{sensors[idealRange.sCode].unit}}
+                            textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionBelowMin.control")Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
 
-                      div.controls
-                          label Controls
-                          ul
-                            each control, i in controls
-                              li(id="gpedit_#{phaseName}_control_#{control._id}") #{control.name}
+                          div.hi
+                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max") High
+                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max", ng-model="idealRange.valueRange.max")
+                            span {{sensors[idealRange.sCode].unit}}
+                            textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionAboveMax.control")Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
+                          
 
-                      div.idealRanges
-                        label Ideal Ranges
-                        ul(class="grid", data-item-template="idealrange")
-                            li
-                              label(data-form-control="add") Add +
-                            //input(type="checkbox", name="gpedit_#{phaseName}_idealranges", value="")
-                      
+
                       div.phaseEndDescription
                         label Phase End Description
-                        textarea(id="gpedit_#{phaseName}_enddescription", name="gpedit_#{phaseName}_enddescription", placeholder="Write a phase end description...")
+                        textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="Write a phase end description...", ng-model="phase.phaseEndDescription")
                   
-          
-
-
-
-                //- each phase, i in growPlanDefault.phases
-                //-   div(class="phase-slider #{phase.name.toLowerCase()}")
-                //-     - var sliderValue = phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 100
-                //-     label(for="first_phase_slider") #{phase.name}
-                //-     input(type="range", name="phase_slider_#{i}", id="phase_slider_#{i}", class="no-disable", value="#{sliderValue}", min="0", max="100", data-phase="#{phase.name}")
-                //-     span Days (Default: #{phase.expectedNumberOfDays ? phase.expectedNumberOfDays : 'indeterminate'} ) 
-
           if (userOwnedDevices.length > 0)
             label Device
             ul(class="grid devicelist")
