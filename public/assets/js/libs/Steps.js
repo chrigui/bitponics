@@ -34,10 +34,12 @@ window.Steps = (function( window, document, undefined ) {
 
     function setInitialStepStyles() {
       Steps.currentStep.find(':input').removeAttr('disabled');
+      /*
       Steps.steps.filter(':gt(' + Steps.currentStepIndex + ')')
         .addClass('dim')
         .find(':input:not(.no-disable)')
         .attr('disabled', true);
+        */
     }
 
     function validate(e) {

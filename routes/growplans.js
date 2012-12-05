@@ -245,7 +245,7 @@ module.exports = function(app){
 				}
 
 				var growPlanToUse = results[0],
-					startingPhaseData = growPlanToUse.getPhaseAndDayFromStartDay(parseInt(req.phase_slider_current, 10));
+					startingPhaseData = growPlanToUse.getPhaseAndDayFromStartDay(parseInt(req.growPlan.currentGrowPlanDay, 10));
 				
 				GrowPlanInstanceModel.create({
 					growPlan : growPlanToUse._id,
