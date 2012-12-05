@@ -6,8 +6,8 @@ block content
       header
         nav(role="nav")
           ul
-            li.nav-section
-              h1#logo(role="banner", class="icon")
+            li(class="nav-section first")
+              h1(class="logo icon", role="banner")
                 div 
                   | Bitponics
                   span &trade;
@@ -38,7 +38,32 @@ block content
                   a(href="/buy") Buy
 
   section#main(role="main")
-    h2 Contact
+    h2(class="logo icon nav-section", role="banner")
+      div 
+        | Bitponics
+        span &trade;
+      | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
+    h3(class="page-heading nav-section") Contact
+    div.page-content
+
+      h4 We'd love to hear from you!
+      | <div id="wufoo-m7x4a3">
+      | <a href="http://greatsoles.wufoo.com/forms/m7x4a3">Send us an email.</a>.
+      | </div>
+      | <script type="text/javascript">var m7x4a3;(function(d, t) {
+      | var s = d.createElement(t), options = {
+      | 'userName':'greatsoles', 
+      | 'formHash':'m7x4a3', 
+      | 'autoResize':true,
+      | 'height':'514',
+      | 'async':true,
+      | 'header':'show'};
+      | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
+      | s.onload = s.onreadystatechange = function() {
+      | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
+      | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
+      | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
+      | })(document, 'script');</script>
 
   section#footer
 
