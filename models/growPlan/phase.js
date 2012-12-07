@@ -42,6 +42,14 @@ var PhaseSchema = new Schema({
 });
 
 /************************** INSTANCE METHODS  ***************************/
+
+
+// TODO : Add validation on save. 
+// Validation rules:
+// Max 1 idealRange per sensor. 
+
+
+
 /*
  * Given another Phase object, determine whether
  * they're equivalent.
