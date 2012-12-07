@@ -145,8 +145,8 @@ block content
 
                     div.growSystem
                       label Grow System
-                      input(type='text', ng-model="phase.growSystem")
-
+                      select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
+                      
                     div.growMedium
                       label Grow Medium
                       input(type='text', ng-model="phase.growMedium")
