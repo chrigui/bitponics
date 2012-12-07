@@ -163,6 +163,16 @@ Bitponics.pages.growplans = {
             
             $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
         };
+
+
+        $scope.addIdealRange = function(e){
+            var phase = e.phase,
+                newIdealRange = {
+                    _id : ''
+                };
+            phase.idealRanges.unshift(newIdealRange);
+        };
+
     }]
 };
 

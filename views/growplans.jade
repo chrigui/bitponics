@@ -12,6 +12,10 @@ block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
   link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
+  //- TEMP hacks
+  style
+    .phase-slider { height: auto !important; background: gray;}
+
 block content
 
   section#header
@@ -163,38 +167,21 @@ block content
                           div(ng-show="action.control") {{controls[action.control].name}}
        
                     div.idealRanges
-                      label Ideal Ranges
+                      label Ideal Sensor Ranges
                       ul
                         li.add
-                          label(data-form-control="add") Add +
-                          form#add-new-ideal-range-form
-                            div
-                              label(for="") Sensor
-                              select(class="no-disable", ng-model="selectedSensor", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors")
-                            div
-                              label(for="") Trigger Accessory: 
-                              select(class="no-disable", ng-model="selectedControl", ng-options="control._id as control.name for (controlKey,control) in controls")
-                                option(value="") None
-                            div.lo
-                              label(for="gpedit_{{phase._id}}_idealrange_new_min") Low
-                              input(id="gpedit_{{phase._id}}_idealrange_new_min", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealranges_min", value="1")
-                              textarea(id="gpedit_{{phase._id}}_idealrange_new_min_action", placeholder="Describe the triggered action.") 
-                            div.hi
-                              label(for="gpedit_{{phase._id}}_idealrange_new_max") High
-                              input(id="gpedit_{{phase._id}}_idealrange_new_max", class="no-disable", type="number", step="any", value="0")
-                              textarea(id="gpedit_{{phase._id}}_idealrange_new_max_action", placeholder="Describe the triggered action.")
-                            
-
+                          div(class="add icon btn", ng-click="addIdealRange(this)")
+                            | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
                             
                         li.closed(ng-repeat="idealRange in phase.idealRanges")
                           div(class="sensor-type icon {{idealRange.sCode}}")
                             | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
                             div.screen-reader-text {{idealRange.sCode}}
                           label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}") {{sensors[idealRange.sCode].name}}
-                          input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}", type="checkbox", name="gpedit_{{phase._id}}_idealranges", value="{{idealRange.id}}", checked=true)
+                            select(class="no-disable", ng-model="sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors")
                           
-                          
-                          div Trigger Accessory: {{controls[idealRange.actionAboveMax.control].name}}
+                          div Trigger Accessory: {{actionBelowMin.control}}
+                            select(class="no-disable", ng-model="actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
                           
                           div.lo
                             label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min") Low
@@ -239,6 +226,7 @@ block footer-scripts
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  //script(src='/assets/js/libs/jquery/jquery-mobile-angular-adapter-1.1.1.js')
   script(src='/assets/js/libs/es5-shim.min.js')
   script(src='/assets/js/libs/Steps.js')
   script(src='/assets/js/libs/list/src/list.js')
