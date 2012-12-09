@@ -158,14 +158,7 @@ block content
                           input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient.id}}", checked=true)
                           label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
 
-                    div.actions
-                      label Actions
-                      ul
-                        li(ng-repeat="action in phase.actions")
-                          input(id="gpedit_{{phase._id}}_action_{{action._id}}", type="checkbox", name="gpedit_{{phase._id}}_action_{{action._id}}", value="{{action.id}}", checked=true)
-                          label(for="gpedit_{{phase._id}}_action_{{action._id}}") {{action.description}}
-                          div(ng-show="action.control") {{controls[action.control].name}}
-       
+                    
                     div.idealRanges
                       label Ideal Sensor Ranges
                       ul
@@ -196,8 +189,22 @@ block content
                             span {{sensors[idealRange.sCode].unit}}
                             textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
                             div(ng-show="idealRange.actionAboveMax.control")Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
-                          
 
+
+                    div.actions
+                      label Actions
+                      ul
+                        li.add
+                          div(class="add icon btn", ng-click="addAction(this)")
+                            | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+                        li(ng-repeat="action in phase.actions") | Action
+                          
+                          label(for="gpedit_{{phase._id}}_action_{{action._id}}") Description
+                          input(id="gpedit_{{phase._id}}_action_{{action._id}}_min", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min", ng-model="idealRange.valueRange.min")
+                          textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                          div(ng-show="action.control") {{controls[action.control].name}}
+       
+                    
 
                       div.phaseEndDescription
                         label Phase End Description

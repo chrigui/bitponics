@@ -168,11 +168,25 @@ Bitponics.pages.growplans = {
         $scope.addIdealRange = function(e){
             var phase = e.phase,
                 newIdealRange = {
-                    _id : ''
+                    _id : phase.idealRanges.length.toString(), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
+                    valueRange = {
+                        min : 0,
+                        max : 1
+                    }
                 };
+            // Unshift to make it show up first
             phase.idealRanges.unshift(newIdealRange);
         };
 
+
+        $scope.addAction = function(e){
+            var phase = e.phase,
+                newAction = {
+                    _id : phase.actions.length.toString() // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
+                };
+            // Unshift to make it show up first
+            phase.actions.unshift(newAction);
+        };        
     }]
 };
 
