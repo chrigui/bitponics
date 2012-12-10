@@ -8,7 +8,7 @@ window.Steps = (function( window, document, undefined ) {
 
     CURRENT_STEP_CLASS = '',
 
-    UPDATE_PANEL_CLASS = '.update-panel',
+    //UPDATE_PANEL_CLASS = '.update-panel',
 
     initialStepIndex = 0,
 
@@ -21,7 +21,7 @@ window.Steps = (function( window, document, undefined ) {
       Steps.steps = Steps.form.find(STEP_CLASS);
       Steps.currentStepIndex = initialStepIndex;
       Steps.currentStep = Steps.steps.eq(Steps.currentStepIndex);
-      Steps.updatePanel = Steps.steps.find(UPDATE_PANEL_CLASS);
+      //Steps.updatePanel = Steps.steps.find(UPDATE_PANEL_CLASS);
       Steps.stepsInteractedWith = {};
       Steps.stepsInvalid = {};
       initEventHandlers();

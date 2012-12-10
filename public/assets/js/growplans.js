@@ -1,75 +1,10 @@
 Bitponics.pages.growplans = {
-
-    HEADER_SELECTOR: '#header',
-    CONTAINER_SELECTOR: '#main', 
-    GROWPLAN_FORM_SELECTOR: 'form#growplans',
-    SELECTED_CLASS: 'selected',
-    SYSTEM_SECTION_SELECTOR: '#system_selection',
-    PLANT_SECTION_SELECTOR: '#plant_selection',
-    GROWPLAN_DURATION_SELECTOR: '#phase_slider_duration',
-
-    defaultGrowPlanDuration: 182,
-    maxPhases: 4,
-
     init: function() {
-        var self = this;
-        self.container = $(self.CONTAINER_SELECTOR);
-        self.formContainer = $(self.GROWPLAN_FORM_SELECTOR);
-        self.initEventHandlers();
-    },
-    
-    initEventHandlers: function() {
-        var self = this;
-        //self.formContainer.on('change', '#system_selection :input:not(.search), #plant_selection :input:not(.search)', $.proxy(self.handleInputAnswered, self));
-        self.formContainer.on('submit', $.proxy(self.handleFormSubmit, self));
-
     },
 
+    app: angular.module( "GrowPlanModule", [ "ngResource" ] ),
 
-    filterGrowPlanList: function(input) {
-        var self = this,
-            inArray = $.inArray(input.val(), self.growPlanList.currentFilters);
-
-        //if answer is not in array and it is selected, then add to filter list
-        if (inArray === -1 && input.is(':checked')) {
-            self.growPlanList.currentFilters.push(input.val().toLowerCase());
-
-        //else if answer is in array and is not checked, remove it
-        } else if(!input.is(':checked')) {
-            self.growPlanList.currentFilters.splice(inArray, 1);
-        }
-
-        //remove any unselected radio values
-        if (input.attr('type') == 'radio') {
-            $(input).parent().siblings().find('[type=radio]:not(:checked)').each(function (index, radioInput) {
-                self.growPlanList.currentFilters = $.grep(self.growPlanList.currentFilters, function(value) {
-                    return value != $(radioInput).val().toLowerCase();
-                });
-            });
-        }
-
-        // filter on all answers
-        self.growPlanList.filter(function(item) {
-            var match = false;
-            $.each(self.growPlanList.currentFilters, function(index1, filterValue) {
-                var re = new RegExp(filterValue, "ig");
-                $.each(item.values(), function(index2, itemValue) {
-                    if (itemValue.search(re) != -1) {
-                        match = true;
-                    }
-                });
-            });
-            return match;
-        });
-
-        $.each(self.growPlanList.items, function(index, item) {
-            $(item.elm).find(':input').attr('disabled', false);
-        });
-
-    },
-
-
-    GrowPlanController : ['$scope', '$filter', function($scope, $filter){
+    GrowPlanController : ['$scope', '$filter', '$resource', function($scope, $filter, $resource){
         $scope.plants = Bitponics.plants;
         $scope.filteredPlantList = angular.copy($scope.plants);
         $scope.controls = Bitponics.controls;
@@ -80,10 +15,18 @@ Bitponics.pages.growplans = {
         $scope.growSystems = Bitponics.growSystems;
         $scope.growSystemSelections = {};
         $scope.currentGrowPlanDay = 0;
-
+        $scope.growPlans = Bitponics.growPlans;
+        $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
+        var GrowPlanModel = $resource(
+            '/api/grow_plans/',
+            {},
+            {
+                'query':  { method: 'GET', isArray: true }
+            }
+        );
 
         $scope.setSelectedGrowPlan = function() {
-            var growPlans = Bitponics.growPlans;
+            var growPlans = $scope.growPlans;
             for (var i = growPlans.length; i--;){
                 if (growPlans[i]._id == $scope.selectedGrowPlanId){
                     $scope.selectedGrowPlan = growPlans[i];
@@ -129,13 +72,29 @@ Bitponics.pages.growplans = {
             var newPlant = {name : $scope.plantQuery };
             $scope.filteredPlantList.push(newPlant);
             $scope.selectedPlants.push(newPlant);
-        };
+        };  
 
         $scope.updateSelectedPlants = function(){
             var plantSelections = $scope.plantSelections;
-            $scope.selectedPlants = $scope.plants.filter(function(plant, index){ return plantSelections[plant._id]; })
+            $scope.selectedPlants = $scope.plants.filter(function(plant, index){ return plantSelections[plant._id]; });
+            $scope.updateSelectedGrowPlans();
         };
 
+        $scope.updateSelectedGrowPlans = function(){
+            var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id });
+            // $scope.filteredGrowPlanList = $scope.growPlans.filter(function(growPlan, index){
+            //     var match = false;
+            //     growPlan.plants.forEach(function(plant){
+            //         if(selectedPlantIds.indexOf(plant._id) !== -1){
+            //             match = true;
+            //         }
+            //     });
+            //     return match;
+            // });
+            $scope.filteredGrowPlanList = GrowPlanModel.query({plants: [], system: ''}, function(){
+                console.log('GrowPlanModel: '+$scope.filteredGrowPlanList);
+            });
+        };
         
         $scope.updatePhaseDurations = function(){
             var currentExpectedPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;}),
@@ -169,7 +128,7 @@ Bitponics.pages.growplans = {
             var phase = e.phase,
                 newIdealRange = {
                     _id : phase.idealRanges.length.toString(), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
-                    valueRange = {
+                    valueRange: {
                         min : 0,
                         max : 1
                     }

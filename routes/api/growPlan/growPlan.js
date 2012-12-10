@@ -19,9 +19,11 @@ module.exports = function(app) {
 
    //List grow plans
   app.get('/api/grow_plans', function (req, res, next){
+    var query = req.params;
+    console.log(query);
     return GrowPlanModel.find(function (err, grow_plans) {
-      console.log(grow_plans)
-      console.log(err)
+      // console.log(grow_plans)
+      // console.log(err)
       if (err) { return next(err); }
       return res.send(grow_plans);
     });
@@ -137,5 +139,26 @@ module.exports = function(app) {
         return res.send('');
       });
     });
+  });
+
+  /*
+   * Create single grow plan
+   *
+   *  Test with:
+   *    "/api/grow_plans?plants=x&system=x"
+   *
+   */
+  app.get('/api/grow_plans/query', function (req, res, next){
+    var grow_plan;
+    winston.info("QUERY: ");
+    winston.info(req.params);
+    
+    return GrowPlanModel.find(function (err, grow_plans) {
+      console.log(grow_plans)
+      console.log(err)
+      if (err) { return next(err); }
+      return res.send(grow_plans);
+    });
+
   });
 };
