@@ -82,16 +82,10 @@ Bitponics.pages.growplans = {
 
         $scope.updateSelectedGrowPlans = function(){
             var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id });
-            // $scope.filteredGrowPlanList = $scope.growPlans.filter(function(growPlan, index){
-            //     var match = false;
-            //     growPlan.plants.forEach(function(plant){
-            //         if(selectedPlantIds.indexOf(plant._id) !== -1){
-            //             match = true;
-            //         }
-            //     });
-            //     return match;
-            // });
-            $scope.filteredGrowPlanList = GrowPlanModel.query({plants: [], system: ''}, function(){
+            $scope.filteredGrowPlanList = GrowPlanModel.query({
+                plants: selectedPlantIds, 
+                growSystem: $scope.selectedGrowSystem[0]._id
+            }, function(){
                 console.log('GrowPlanModel: '+$scope.filteredGrowPlanList);
             });
         };

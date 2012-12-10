@@ -19,14 +19,27 @@ module.exports = function(app) {
 
    //List grow plans
   app.get('/api/grow_plans', function (req, res, next){
-    var query = req.params;
-    console.log(query);
-    return GrowPlanModel.find(function (err, grow_plans) {
-      // console.log(grow_plans)
-      // console.log(err)
-      if (err) { return next(err); }
-      return res.send(grow_plans);
-    });
+    var plants = req.query.plants,
+        growSystem = req.query.growSystem;
+    
+    if(!plants.length) {
+      return GrowPlanModel.find(function (err, grow_plans) {
+        // console.log(grow_plans)
+        // console.log(err)
+        if (err) { return next(err); }
+        return res.send(grow_plans);
+      });
+    } else {
+      //console.log(plants.split(','));
+      return GrowPlanModel
+        .find()
+        .where('plants').in(plants.split(','))
+        .select('name description')
+        .exec(function (err, grow_plans) {
+          if (err) { return next(err); }
+          return res.send(grow_plans);
+        });
+    }
   });
 
   /*
@@ -141,24 +154,4 @@ module.exports = function(app) {
     });
   });
 
-  /*
-   * Create single grow plan
-   *
-   *  Test with:
-   *    "/api/grow_plans?plants=x&system=x"
-   *
-   */
-  app.get('/api/grow_plans/query', function (req, res, next){
-    var grow_plan;
-    winston.info("QUERY: ");
-    winston.info(req.params);
-    
-    return GrowPlanModel.find(function (err, grow_plans) {
-      console.log(grow_plans)
-      console.log(err)
-      if (err) { return next(err); }
-      return res.send(grow_plans);
-    });
-
-  });
 };
