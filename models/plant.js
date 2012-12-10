@@ -11,8 +11,7 @@ var PlantSchema = new Schema({
 
 PlantSchema.plugin(useTimestamps);
 
-PlantSchema.suggestions = {
-};
+PlantSchema.path('name').index({ unique: true });
 
 exports.schema = PlantSchema;
 exports.model = mongoose.model('Plant', PlantSchema);
