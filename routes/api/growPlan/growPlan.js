@@ -19,12 +19,27 @@ module.exports = function(app) {
 
    //List grow plans
   app.get('/api/grow_plans', function (req, res, next){
-    return GrowPlanModel.find(function (err, grow_plans) {
-      console.log(grow_plans)
-      console.log(err)
-      if (err) { return next(err); }
-      return res.send(grow_plans);
-    });
+    var plants = req.query.plants,
+        growSystem = req.query.growSystem;
+    
+    if(!plants.length) {
+      return GrowPlanModel.find(function (err, grow_plans) {
+        // console.log(grow_plans)
+        // console.log(err)
+        if (err) { return next(err); }
+        return res.send(grow_plans);
+      });
+    } else {
+      //console.log(plants.split(','));
+      return GrowPlanModel
+        .find()
+        .where('plants').in(plants.split(','))
+        .select('name description')
+        .exec(function (err, grow_plans) {
+          if (err) { return next(err); }
+          return res.send(grow_plans);
+        });
+    }
   });
 
   /*
@@ -138,4 +153,5 @@ module.exports = function(app) {
       });
     });
   });
+
 };
