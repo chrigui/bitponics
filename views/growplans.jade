@@ -34,7 +34,7 @@ block content
           else
            | #{user.email}
 
-  section#main(role="main", ng-app)
+  section#main(role="main", ng-app="GrowPlanModule")
     div.content-module.middle
       form(id="growplans", class='steps', action='', method='post', ng-controller="Bitponics.pages.growplans.GrowPlanController")
         h4 Let's find you a grow plan.         
@@ -60,18 +60,17 @@ block content
         section(id="growplan_results", class="step update-panel hide", data-required="1")
           h4 We've found grow plans for you
           ul(class="grid sortlist photos")
-            each growPlan, i in growPlans
-              li(id="gplist_#{growPlan.id}")
-                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
-                label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
+            //- each growPlan, i in growPlans
+            //-   li(id="gplist_#{growPlan.id}")
+            li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:name")
+                input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
+                label(for="gplist_input_{{growPlan._id}}") {{growPlan.name}}
                   div.info
-                    div(class="gplist_description") #{growPlan.description}
-                    div(class="gplist_plants")
-                      each plant in growPlan.plants
-                        | #{plant.name} 
-                    ul(class="gplist_system")
-                      each phase in growPlan.phases
-                        li #{phase.growSystem.name}
+                    div(class="gplist_description") {{growPlan.description}}
+                    div(class="gplist_plants", ng-repeat="plant in growPlan.plants")
+                        | {{plant.name}}
+                    ul(class="gplist_system", ng-repeat="phase in growPlan.phases")
+                        li {{phase.growSystem.name}}
 
           //Default grow plans not filtered
           ul(class="grid sortlist photos default")
@@ -262,6 +261,7 @@ block footer-scripts
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
   //script(src='/assets/js/libs/jquery/jquery-mobile-angular-adapter-1.1.1.js')
   script(src='/assets/js/libs/es5-shim.min.js')
   script(src='/assets/js/libs/Steps.js')
