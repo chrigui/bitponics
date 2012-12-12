@@ -60,17 +60,18 @@ block content
         section(id="growplan_results", class="step update-panel hide", data-required="1")
           h4 We've found grow plans for you
           ul(class="grid sortlist photos")
-            //- each growPlan, i in growPlans
-            //-   li(id="gplist_#{growPlan.id}")
-            li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:name")
-                input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
-                label(for="gplist_input_{{growPlan._id}}") {{growPlan.name}}
+            each growPlan, i in growPlans
+              li(id="gplist_#{growPlan.id}")
+                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
+                label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
                   div.info
-                    div(class="gplist_description") {{growPlan.description}}
-                    div(class="gplist_plants", ng-repeat="plant in growPlan.plants")
-                        | {{plant.name}}
-                    ul(class="gplist_system", ng-repeat="phase in growPlan.phases")
-                        li {{phase.growSystem.name}}
+                    div(class="gplist_description") #{growPlan.description}
+                    div(class="gplist_plants")
+                      each plant in growPlan.plants
+                        | #{plant.name} 
+                    ul(class="gplist_system")
+                      each phase in growPlan.phases
+                        li #{phase.growSystem.name}
 
           //Default grow plans not filtered
           ul(class="grid sortlist photos default")
@@ -162,7 +163,8 @@ block content
                       //- Assuming Phases would be h5
                       h6 Ideal Sensor Ranges
                       p Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
-                        | we'll send you an alert. And you can also specify an accessory to trigger on or off.
+                        | we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
+                        | that the ideal range should apply.
                       ul
                         li.add
                           div(class="add icon btn", ng-click="addIdealRange(this)")
@@ -192,6 +194,17 @@ block content
                             textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
                             div(ng-show="idealRange.actionAboveMax.control")Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
 
+                          div
+                            | What time of day should the ideal range apply?
+                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan") All Day
+                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", class="no-disable", type="checkbox", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
+
+                            div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
+                              div.idealRangeStartTime Start Time
+                              select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                              div.idealRangeEndTime End Time
+                              select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
                     div.actions
                       h6 Actions
@@ -216,23 +229,26 @@ block content
                             input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType")Once at the end of the phase
                             input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType")Repeat throughout the phase
 
-                          div(ng-show="action.scheduleType === 'repeat'")
+                          div(ng-show="action.scheduleType == 'repeat'")
                             
                             ul
-                              li(ng-repeat="durationType in ['seconds','minutes','hours','days','weeks','months'")
+                              li(ng-repeat="durationType in ['seconds','minutes','hours','days','weeks','months']")
                                 input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_durationType", value="{{durationType}}", ng-model="action.durationType")
 
-                            
-                            // Do Y for Z duration
-                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_durationType")Duration Type
 
-                            // And do A for B duration
+                            // Do A for B duration
+                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_durationType")Duration Type
+                            select(ng-model="actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+
+                            // And do C for D duration
+
+
                             // Starting at timeOfDay
 
                             
                             //- 
 
-                          div(ng-show="action.scheduleType !== 'repeat'")
+                          div(ng-show="action.scheduleType != 'repeat'")
 
                       div.phaseEndDescription
                         label Phase End Description
