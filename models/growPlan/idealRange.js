@@ -91,7 +91,7 @@ IdealRangeSchema.method('isEquivalentTo', function(other){
 
 IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 	var applicableTimeSpan = this.applicableTimeSpan;
-	if (applicableTimeSpan){ return true; }
+	if (!applicableTimeSpan){ return true; }
 	
 	var dateParts = timezone(dateParts, userTimezone, '%T').split(':'),
         millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);

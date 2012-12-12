@@ -17,6 +17,8 @@ Bitponics.pages.growplans = {
         $scope.currentGrowPlanDay = 0;
         $scope.growPlans = Bitponics.growPlans;
         $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
+        $scope.timesOfDayList = Bitponics.Utils.generateTimesOfDayArray();
+
         var GrowPlanModel = $resource(
             '/api/grow_plans/',
             {},
@@ -24,6 +26,21 @@ Bitponics.pages.growplans = {
                 'query':  { method: 'GET', isArray: true }
             }
         );
+    
+        // Adds/calculates properties necessary for UI presentation
+        function reformatServerSideGrowPlan(growPlan){
+            growPlan.phases.forEach(function(phase, index){
+                phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
+                    if (!idealRange.applicableTimespan){
+                        idealRange.noApplicableTimespan = true;
+                    }
+                });
+            });
+        };
+        // On init, process the default grow plans
+        $scope.growPlans.forEach(function(growPlan){
+            reformatServerSideGrowPlan(growPlan);
+        });
 
         $scope.setSelectedGrowPlan = function() {
             var growPlans = $scope.growPlans;
@@ -35,17 +52,13 @@ Bitponics.pages.growplans = {
             }
             if (!$scope.selectedGrowPlan) { $scope.selectedGrowPlan = Bitponics.growPlanDefault; }
             
-            // Update grow plan plants
+            // Update grow plan plants.
             $scope.selectedPlants.forEach(function(plant, index){
                 if (!$scope.selectedGrowPlan.plants.some(function(gpPlant){ gpPlant.name === plant.name })){
                     $scope.selectedGrowPlan.plants.push(plant);
                 }
             });
             $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-
-            // Update grow plan phases
-            var allPhases = ['Seedling', 'Vegetative', 'Blooming', 'Fruiting'];
-            //if (!$scope.selectedGrowPlan.phases           
 
             $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
         };
