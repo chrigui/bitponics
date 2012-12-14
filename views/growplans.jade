@@ -15,6 +15,7 @@ block css
   //- TEMP hacks
   style
     .phase-slider { height: auto !important; background: gray;}
+    input[type=radio].ng-binding { opacity : 1; height: auto; width: auto; }
 
 block content
 
@@ -200,11 +201,13 @@ block content
                             input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", class="no-disable", type="checkbox", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
 
                             div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
+                              // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
                               div.idealRangeStartTime Start Time
                               select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
                               div.idealRangeEndTime End Time
                               select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+
 
                     div.actions
                       h6 Actions
@@ -215,30 +218,47 @@ block content
                         li.add
                           div(class="add icon btn", ng-click="addAction(this)")
                             | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
-                        li(ng-repeat="action in phase.actions") | Action
+                        li(ng-repeat="action in phase.actionsViewModel") | Action
                           
                           label(for="gpedit_{{phase._id}}_action_{{action._id}}_description") Description
                           textarea(id="gpedit_{{phase._id}}_action_{{action._id}}_description", placeholder="Describe the action.", ng-model="action.description")
 
                           div Trigger the following accessory (optional):
-                            select(class="no-disable", ng-model="actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            select(class="no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
 
                           div
                             | Scheduling. Trigger this action:
-                            input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")Once at the start of the phase
-                            input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType")Once at the end of the phase
-                            input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType")Repeat throughout the phase
+                            
+                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType") 
+                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart") Once at the start of the phase
+
+                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseEnd", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
+                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseEnd") Once at the end of the phase
+
+                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_repeat", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
+                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_repeat") Repeat throughout the phase
+
+                          div(ng-show="action.scheduleType != 'repeat'")
 
                           div(ng-show="action.scheduleType == 'repeat'")
-                            
-                            ul
-                              li(ng-repeat="durationType in ['seconds','minutes','hours','days','weeks','months']")
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_durationType", value="{{durationType}}", ng-model="action.durationType")
+                            div Repeating actions have a "cycle", or 2 states which alternate with each other.
 
+                            div State 1
+                              div Should last for:
+                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_duration", type="number", ng-model="action.cycle.states[0].duration", value="1")
+                                select(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_durationType", ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                              
+                              label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_message") State Description
+                              input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_message", type="text", ng-model="action.cycle.states[0].message")
 
-                            // Do A for B duration
-                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_durationType")Duration Type
-                            select(ng-model="actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                              div(ng-show="action.control") Turn {{action.control.name}}:
+                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOn", type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
+                                label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOn") On
+
+                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOff", type="radio", value="0", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", ng-model="action.cycle.states[0].controlValue")
+                                label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOff") Off
+                                
+
 
                             // And do C for D duration
 
@@ -248,7 +268,7 @@ block content
                             
                             //- 
 
-                          div(ng-show="action.scheduleType != 'repeat'")
+                          
 
                       div.phaseEndDescription
                         label Phase End Description

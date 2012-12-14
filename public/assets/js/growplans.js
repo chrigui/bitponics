@@ -18,6 +18,7 @@ Bitponics.pages.growplans = {
         $scope.growPlans = Bitponics.growPlans;
         $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
         $scope.timesOfDayList = Bitponics.Utils.generateTimesOfDayArray();
+        $scope.actionDurationTypeOptions = ['seconds','minutes','hours','days','weeks','months'];
 
         var GrowPlanModel = $resource(
             '/api/grow_plans/',
@@ -28,19 +29,36 @@ Bitponics.pages.growplans = {
         );
     
         // Adds/calculates properties necessary for UI presentation
-        function reformatServerSideGrowPlan(growPlan){
+        function initGrowPlanViewModel(growPlan){
             growPlan.phases.forEach(function(phase, index){
                 phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
                     if (!idealRange.applicableTimespan){
                         idealRange.noApplicableTimespan = true;
                     }
                 });
+
+                phase.actionsViewModel = [];
+                phase.actions.forEach(function(action){
+                    if (action.cycle.repeat){
+                        action.scheduleType = 'repeat';
+                    } 
+                    else {
+                        action.scheduleType = 'phaseStart';
+                    }
+                    phase.actionsViewModel.push(action);
+                });
+                phase.phaseEndActions.forEach(function(action){
+                    action.scheduleType = 'phaseEnd';
+                    phase.actionsViewModel.push(action);
+                });
             });
         };
-        // On init, process the default grow plans
-        $scope.growPlans.forEach(function(growPlan){
-            reformatServerSideGrowPlan(growPlan);
-        });
+        /*
+         * 
+         */
+        function compileGrowPlanViewModel(growPlan){
+            // TODO. 
+        };
 
         $scope.setSelectedGrowPlan = function() {
             var growPlans = $scope.growPlans;
@@ -59,7 +77,7 @@ Bitponics.pages.growplans = {
                 }
             });
             $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-
+            initGrowPlanViewModel($scope.selectedGrowPlan);
             $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
         };
 
@@ -148,7 +166,7 @@ Bitponics.pages.growplans = {
         $scope.addAction = function(e){
             var phase = e.phase,
                 newAction = {
-                    _id : phase.actions.length.toString() + '-' + (Date.now().toString()) // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
+                    _id : phase.actions.length.toString() + '-' + (Date.now().toString()) // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
                 };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
