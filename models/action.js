@@ -88,73 +88,8 @@ ActionSchema.virtual('overallCycleTimespan')
 	});
 
 
-ActionSchema.virtual('isSingleState')
-	.get(function () {
-		return this.cycle.states.length === 1;
-	});
-
-
-ActionSchema.virtual('singleStateValue')
-	.get(function () {
-		if (this.isSingleState){
-			return this.cycle.states[0].controlValue;
-		} else {
-			return null;
-		}
-	});
-
-
-
 /************************** INSTANCE METHODS ***************************/
 
-/**
- * getFrontEndFormat
- *
- * Creates a view on this Action that corresponds to its representation 
- * in the front-end interface. Simplifies the scheduling/repeating information.
- *
- * @param actionSource. 'phaseStart' || 'phaseEnd' || 'idealRange'. Optional. Used to set scheduleType
- * @return object. In the format of 
- *	{ 
- *		_id : ObjectID, 
- *		description: String, 
- *		scheduleType : 'phaseStart'||'phaseEnd'||'idealRange'||'repeat',
- *	}
- */
-ActionSchema.method('getFrontEndFormat', function(actionSource){
-	var result = {
-		_id : this._id,
-		description : this.description,
-		control : this.control
-	};
-	
-	result.states = [];
-	result.states.push(this.cycle.states[0]);
-
-	if (actionSource === 'phaseEnd' || actionSource === 'idealRange'){
-		result.scheduleType = actionSource;
-
-	} else {
-		if (this.isSingleState){ 
-			result.scheduleType = 'phaseStart';
-		} else {
-			result.scheduleType = 'repeat';
-			if (this.cycle.states.length === 3){
-				
-				// In a 3-state cycle, 1st and 3rd have the same value. 
-				// Simplifying view to be 2 states with an offset
-				result.states[0].duration += this.cycle.states[2].duration;
-				result.states[1] = this.cycle.states[1];
-				result.offset = {
-					durationType : this.cycle.states[2].durationType,
-					duration : this.cycle.states[2].duration
-				};
-			}
-		}
-	}
-	
-
-});
 
 /************************** END INSTANCE METHODS ***************************/
 
@@ -162,10 +97,6 @@ ActionSchema.method('getFrontEndFormat', function(actionSource){
 
 
 /************************** STATIC METHODS ***************************/
-
-ActionSchema.static('createFromFrontEndFormat', function(frontEndAction){
-
-});
 
 /************************** END STATIC METHODS***************************/
 

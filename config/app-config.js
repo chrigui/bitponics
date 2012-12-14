@@ -72,7 +72,7 @@ module.exports = function(app){
 	  app.use(express.static(path.join(__dirname, '/../public')));
 	  
 	  // Set the CDN options
-	  app.enable('view cache');
+	  
 	  var options = {
 	      publicDir  : path.join(__dirname, '/../public')
 	    , viewsDir   : path.join(__dirname, '/../views')
@@ -125,6 +125,7 @@ module.exports = function(app){
 			app.locals({pretty: true });
 	    case 'production':
 	    	app.disable('verbose errors');
+	    	app.enable('view cache');
 	    	// Ensure that this is an authenticated request.
 	    	// If it doesn't already have a req.user, 
 	    	// check whether it's attempting HMAC auth,
