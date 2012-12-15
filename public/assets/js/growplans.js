@@ -60,7 +60,11 @@ Bitponics.pages.growplans = {
 
         $scope.updateSelectedGrowSystem = function(el){
             var growSystemSelections = $scope.growSystemSelections;
-            $scope.selectedGrowSystem = $scope.growSystems.filter(function(system, index){ return growSystemSelections[system._id]; })
+            $scope.selectedGrowSystem = el.system;
+            console.log($scope.selectedPlants);
+            if($scope.selectedPlants.length){
+                $scope.updateSelectedGrowPlans();
+            }
         };
 
         $scope.filterPlantList = function(){
@@ -84,7 +88,7 @@ Bitponics.pages.growplans = {
             var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id });
             $scope.filteredGrowPlanList = GrowPlanModel.query({
                 plants: selectedPlantIds, 
-                growSystem: $scope.selectedGrowSystem[0]._id
+                growSystem: $scope.selectedGrowSystem._id
             }, function(){
                 console.log('GrowPlanModel: '+$scope.filteredGrowPlanList);
             });
