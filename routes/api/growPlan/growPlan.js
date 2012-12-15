@@ -17,28 +17,65 @@ module.exports = function(app) {
     });
   });
 
-   //List grow plans
+  //List all grow plans (except All-Purpose)
   app.get('/api/grow_plans', function (req, res, next){
-    var plants = req.query.plants,
+    var filter = false,
+        plants = req.query.plants,
         growSystem = req.query.growSystem;
     
-    if(!plants.length) {
+    if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
+      filter = true;
+      plants = plants.split(',');
+      growSystem = growSystem.split(',');
+    }
+
+    if(!filter) { //return all grow plans
+      
       return GrowPlanModel.find(function (err, grow_plans) {
-        // console.log(grow_plans)
-        // console.log(err)
         if (err) { return next(err); }
         return res.send(grow_plans);
       });
-    } else {
-      //console.log(plants.split(','));
+
+    } else { //filter on plants and growsystem
+
       return GrowPlanModel
-        .find()
-        .where('plants').in(plants.split(','))
-        .select('name description')
-        .exec(function (err, grow_plans) {
+        .find(
+          {
+            $or: [
+              { plants: { $in: plants } },
+              { phases: {
+                  $elemMatch: {
+                    growSystem: { $in: growSystem }
+                  }
+                }
+              }
+            ],
+            name: {
+              $ne: 'All-Purpose'
+            }
+          },
+          {
+            name: 1,
+            description: 1
+          }
+        ).exec(function (err, grow_plans) {
           if (err) { return next(err); }
           return res.send(grow_plans);
         });
+
+        //profiling in shell
+        // db.system.profile.find({ts:{$gt:new ISODate("2011-07-12T03:00:00Z"),$lt:new ISODate("2011-07-12T03:40:00Z")}},{user:0}).sort({millis:-1})
+
+        //Not sure how to do same as above using Mongoose helpers...
+
+        // .find()
+        // .where('plants').in(plants)
+        // .select('name description')
+        // .exec(function (err, grow_plans) {
+        //   if (err) { return next(err); }
+        //   return res.send(grow_plans);
+        // });
+
     }
   });
 

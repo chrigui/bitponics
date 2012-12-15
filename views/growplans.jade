@@ -37,7 +37,7 @@ block content
 
   section#main(role="main", ng-app="GrowPlanModule")
     div.content-module.middle
-      form(id="growplans", class='steps', action='', method='post', ng-controller="Bitponics.pages.growplans.GrowPlanController")
+      form(id="growplans", class='steps', action='', method='post', ng-submit="submit()", ng-controller="Bitponics.pages.growplans.GrowPlanController")
         h4 Let's find you a grow plan.         
         section(id="system_selection", class="step", data-required="1")
           h4 What type of system do you have?
