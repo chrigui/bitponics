@@ -177,11 +177,11 @@ block content
                             div.screen-reader-text {{idealRange.sCode}}
                           
                           label {{sensors[idealRange.sCode].name}}
-                            select(class="no-disable", ng-model="idealRange.sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors")
+                            select(ng-model="idealRange.sCode", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name")
                               option(value="") Select Sensor
                           
                           label Trigger the following accessory (optional):
-                            select(class="no-disable", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            select(ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
                               option(value="") None
                           
                           div.lo
