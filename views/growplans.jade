@@ -85,7 +85,7 @@ block content
                       each phase in growPlanDefault.phases
                         li #{phase.growSystem.name}
 
-        section(id="growplan_edit", class="step hide")
+        section(id="growplan_edit", class="hide")
           h4 Tailor this grow plan to your needs
 
           //set as default grow plan, will change dynamically based on previous step selection
@@ -176,40 +176,40 @@ block content
                             | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
                             div.screen-reader-text {{idealRange.sCode}}
                           
-                          label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}") {{sensors[idealRange.sCode].name}}
-                            select(class="no-disable", ng-model="idealRange.sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors", ng-required="true")
+                          label {{sensors[idealRange.sCode].name}}
+                            select(class="no-disable", ng-model="idealRange.sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors")
                               option(value="") Select Sensor
                           
-                          div Trigger the following accessory (optional):
+                          label Trigger the following accessory (optional):
                             select(class="no-disable", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
                               option(value="") None
                           
                           div.lo
-                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min") Low
-                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min", ng-model="idealRange.valueRange.min")
+                            label Low
+                              input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
                             span {{sensors[idealRange.sCode].unit}}
-                            textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                            div(ng-show="idealRange.actionBelowMin.control")Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
+                            textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
 
                           div.hi
-                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max") High
-                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max", class="no-disable", type="number", step="any", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_max", ng-model="idealRange.valueRange.max")
+                            label High
+                              input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
                             span {{sensors[idealRange.sCode].unit}}
-                            textarea(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min_action", placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                            div(ng-show="idealRange.actionAboveMax.control")Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
+                            textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
 
                           div
                             | What time of day should the ideal range apply?
-                            label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan") All Day
-                            input(id="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", class="no-disable", type="checkbox", name="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_hasApplicableTimeSpan", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
+                            label All Day
+                              input(class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
 
                             div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
                               // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
-                              div.idealRangeStartTime Start Time
-                              select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              label.idealRangeStartTime Start Time
+                                select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                              div.idealRangeEndTime End Time
-                              select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              label.idealRangeEndTime End Time
+                                select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
 
                     div.actions
@@ -217,30 +217,33 @@ block content
                       p Here's where you set schedules for actions to take throughout the phase. You can create on/off cycles for accessories and also schedule notifications
                         | for yourself. If you specify an accessory and have it connected to your Bitponics device, we'll simply trigger its cycles automatically. If there's an accessory
                         | specified that you don't have connected to your device, we'll instead send you a notification whenever an action should take place.
+                      
                       ul
                         li.add
                           div(class="add icon btn", ng-click="addAction(this)")
                             | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
-                        li(ng-repeat="action in phase.actionsViewModel") | Action
+                        
+                        li(ng-repeat="action in phase.actionsViewModel") Action
                           
-                          label(for="gpedit_{{phase._id}}_action_{{action._id}}_description") Description
-                          textarea(id="gpedit_{{phase._id}}_action_{{action._id}}_description", placeholder="Describe the action.", ng-model="action.description")
+                          label Description
+                            textarea(placeholder="Describe the action.", ng-model="action.description")
 
-                          div Trigger the following accessory (optional):
+                          label Trigger the following accessory (optional):
                             select(class="no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
                               option(value="") None
 
-                          div
-                            | Scheduling. Trigger this action:
-                            
-                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
-                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart") Once at the start of the phase
+                          div Scheduling. Trigger this action:
+                            label 
+                              input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
+                              | Once at the start of the phase
 
-                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseEnd", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
-                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseEnd") Once at the end of the phase
+                            label
+                              input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
+                              | Once at the end of the phase
 
-                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_repeat", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
-                            label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_repeat") Repeat throughout the phase
+                            label 
+                              input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
+                              | Repeat throughout the phase
 
                           div(ng-show="action.scheduleType != 'repeat'")
 
@@ -249,23 +252,38 @@ block content
 
                             div State 1
                               div Should last for:
-                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_duration", type="number", ng-model="action.cycle.states[0].duration", value="1")
-                                select(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_durationType", ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                input(type="number", ng-model="action.cycle.states[0].duration", value="1")
+                                select(ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
                               
-                              label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_message") State Description
-                              input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_message", type="text", ng-model="action.cycle.states[0].message")
+                              label State Description
+                                input(type="text", ng-model="action.cycle.states[0].message")
 
                               div(ng-show="action.control") Turn {{action.control.name}}:
-                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOn", type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
-                                label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOn") On
+                                label 
+                                  input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
+                                  | On
 
-                                input(id="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOff", type="radio", value="0", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", ng-model="action.cycle.states[0].controlValue")
-                                label(for="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValueOff") Off
+                                label
+                                  input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
+                                  | Off
                                 
 
+                            div State 2
+                              div Should last for:
+                                input(type="number", ng-model="action.cycle.states[1].duration", value="1")
+                                select(ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                              
+                              label State Description
+                                input(type="text", ng-model="action.cycle.states[1].message")
 
-                            // And do C for D duration
+                              div(ng-show="action.control") Turn {{action.control.name}}:
+                                label 
+                                  input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
+                                  | On
 
+                                label
+                                  input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
+                                  | Off
 
                             // Starting at timeOfDay
 
