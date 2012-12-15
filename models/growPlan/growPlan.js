@@ -33,7 +33,7 @@ var GrowPlanSchema = new Schema({
 GrowPlanSchema.plugin(useTimestamps);
 
 
-/************************** STATIC METHODS  ***************************/
+/************************** MIDDLEWARE  ***************************/
 
 /**
  *  Validate 
@@ -53,7 +53,8 @@ GrowPlanSchema.pre('save', function(next){
 	return next();
 });
 
-/************************** END STATIC METHODS  ***************************/
+/************************** END MIDDLEWARE ***************************/
+
 
 
 /************************** INSTANCE METHODS  ***************************/

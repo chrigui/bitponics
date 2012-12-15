@@ -41,8 +41,7 @@ ActionSchema = new Schema({
 					'hours',
 					'days',
 					'weeks',
-					'months',
-					'untilPhaseEnd'
+					'months'
 				]},
 				
 				duration: { type: Number },
@@ -57,6 +56,11 @@ ActionSchema = new Schema({
 
 ActionSchema.plugin(useTimestamps);
 
+
+/**
+ * Used by the notification engine to set when actions should expire in 
+ * order to recalculate current actions. 
+ */
 ActionSchema.virtual('overallCycleTimespan')
 	.get(function () {
 		// default to a 1 year max duration
@@ -69,6 +73,7 @@ ActionSchema.virtual('overallCycleTimespan')
 		states = cycle.states;
 		switch(states.length){
 			case 1:
+				// Single-state cycle. Infinite (aka, 1-year expiration)
 				break;
 			case 2:
 			case 3:
@@ -82,26 +87,21 @@ ActionSchema.virtual('overallCycleTimespan')
 		return total;
 	});
 
-ActionSchema.virtual('isSingleState')
-	.get(function () {
-		return this.cycle.states.length === 1;
-	});
 
-ActionSchema.virtual('singleStateValue')
-	.get(function () {
-		if (this.isSingleState){
-			return this.cycle.states[0].controlValue;
-		} else {
-			return null;
-		}
-	});
+/************************** INSTANCE METHODS ***************************/
 
-/**
- * Now that schema is defined, add indices
- */
- // Want a sparse index on control (since it's an optional field)
-ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
+/************************** END INSTANCE METHODS ***************************/
+
+
+
+
+/************************** STATIC METHODS ***************************/
+
+/************************** END STATIC METHODS***************************/
+
+
+/************************** MIDDLEWARE ***************************/
 
 /**
  *  Validate cycle states
@@ -165,9 +165,25 @@ ActionSchema.pre('save', function(next){
   	next();
 });
 
+/************************** END MIDDLEWARE ***************************/
+
+
+/**
+ * Now that schema is defined, add indices
+ */
+ // Want a sparse index on control (since it's an optional field)
+ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
+
+
 ActionModel = mongoose.model('Action', ActionSchema);
 
 
+
+
+/**
+ * Utilities
+ *
+ */
 var ActionUtils = {
 	convertDurationToMilliseconds : function(durationType, duration){
 		switch(durationType){
@@ -211,22 +227,19 @@ var ActionUtils = {
       	return cycleRemainder;
 	},
 
+	
+
 	/**
-	 * Takes a string with the tokens {offset},{value1},{duration1},{value2},{duration2}
-	 * and replaces each field with the proper values 
+	 * Parses cycles and returns simplified 1 or 2 state object, with an offset if necessary.
 	 * 
-	 * Assumes it's passed an action with states with controlValues.
-	 *
 	 * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
 	 *                Otherwise it's just written straight to the template.
 	 */
-	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
-		var //result = cycleTemplate,
-			states = actionCycleStates,
+	getSimplifiedCycleFormat : function(actionCycleStates, offset){
+		var states = actionCycleStates,
 			convertDurationToMilliseconds = ActionUtils.convertDurationToMilliseconds,
 			offset = offset || 0,
 			result = {
-				cycleString : '',
 				offset : 0,
 				value1 : 0,
 				duration1 : 0,
@@ -264,7 +277,7 @@ var ActionUtils = {
 					totalFirstDuration = firstDuration + thirdDuration;
 				
 				// for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
-				// and if we got an offset, add that os.getNetworkInterfaces();
+				// and if we got an offset passed in, add that 
 				result.offset = offset + thirdDuration;
 				result.value1 = state0.controlValue;
 				result.duration1 = totalFirstDuration;
@@ -280,8 +293,24 @@ var ActionUtils = {
 				result.duration2 = 0;
 				break;
 		}
+		return result;
+	},
 
-		var resultCycleString = cycleTemplate;
+
+	/**
+	 * Takes a string with the tokens {offset},{value1},{duration1},{value2},{duration2}
+	 * and replaces each field with the proper values. Offset is returned in milliseconds.
+	 * 
+	 * Assumes it's passed an action with states with controlValues.
+	 *
+	 * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
+	 *                Otherwise it's just written straight to the template.
+	 * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
+	 */
+	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
+		var result = ActionUtils.getSimplfiedCycleFormat(actionCycleStates, offset),
+			resultCycleString = cycleTemplate;
+
 		resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
 		resultCycleString = resultCycleString.replace(/{value1}/, result.value1);
 		resultCycleString = resultCycleString.replace(/{duration1}/, result.duration1);

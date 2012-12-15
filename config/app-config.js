@@ -12,7 +12,7 @@ var connect    = require('connect'),
 	winston    = require('winston'),
 	flash      = require('connect-flash'),
 	semver  = require('semver'),
-  path    = require('path');
+  	path    = require('path');
 
 module.exports = function(app){
 	
@@ -72,7 +72,7 @@ module.exports = function(app){
 	  app.use(express.static(path.join(__dirname, '/../public')));
 	  
 	  // Set the CDN options
-	  app.enable('view cache');
+	  
 	  var options = {
 	      publicDir  : path.join(__dirname, '/../public')
 	    , viewsDir   : path.join(__dirname, '/../views')
@@ -115,6 +115,7 @@ module.exports = function(app){
 	  app.enable('verbose errors');
 	});
 
+	// Configure options that most environments should have
 	switch(app.settings.env){
 	    case 'local':
 	    case 'development':
@@ -151,7 +152,6 @@ module.exports = function(app){
 	    	});
 
 	    	//we probably want to do something like this on heroku:
-	    	//BUT IS IT SECURE?
 	    	//redirect to https
 				// app.use(function(req, res, next) {
 				// 		//this is only present on heroku
@@ -178,8 +178,6 @@ module.exports = function(app){
 	
 	app.configure('production', function(){
 	  app.use(express.errorHandler()); 
+	  app.enable('view cache');
 	});
-
-
-	
 };
