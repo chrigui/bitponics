@@ -28,7 +28,10 @@ Bitponics.pages.growplans = {
             }
         );
     
-        // Adds/calculates properties necessary for UI presentation
+        
+        /**
+         * Adds/calculates properties necessary for UI presentation
+         */
         function initGrowPlanViewModel(growPlan){
             growPlan.phases.forEach(function(phase, index){
                 phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
@@ -52,13 +55,39 @@ Bitponics.pages.growplans = {
                     phase.actionsViewModel.push(action);
                 });
             });
+            return growPlan;
         };
-        /*
-         * 
+        
+
+        /**
+         * Convert Action ViewModel back to server model
          */
-        function compileGrowPlanViewModel(growPlan){
-            // TODO. 
+        function compileGrowPlanViewModelToServerModel(growPlan){
+            growPlan.phases.forEach(function(phase, index){
+                phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
+                    if (idealRange.noApplicableTimespan){
+                        idealRange.applicableTimespan = undefined;   
+                    }
+                });
+
+                phase.actions = [];
+                phase.phaseEndActions = [];
+
+                phase.actionsViewModel.forEach(function(actionViewModel){
+                    switch(actionViewModel.scheduleType){
+                        case 'phaseStart':
+                        case 'repeat':
+                            phase.actions.push(actionViewModel);
+                            break;
+                        case 'phaseEnd':
+                            phase.phaseEndActions.push(actionViewModel);
+                            break;
+                    }
+                });
+            });
+            return growPlan;             
         };
+
 
         $scope.setSelectedGrowPlan = function() {
             var growPlans = $scope.growPlans;
@@ -70,6 +99,8 @@ Bitponics.pages.growplans = {
             }
             if (!$scope.selectedGrowPlan) { $scope.selectedGrowPlan = Bitponics.growPlanDefault; }
             
+            initGrowPlanViewModel($scope.selectedGrowPlan);
+
             // Update grow plan plants.
             $scope.selectedPlants.forEach(function(plant, index){
                 if (!$scope.selectedGrowPlan.plants.some(function(gpPlant){ gpPlant.name === plant.name })){
@@ -77,7 +108,7 @@ Bitponics.pages.growplans = {
                 }
             });
             $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-            initGrowPlanViewModel($scope.selectedGrowPlan);
+            
             $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
         };
 

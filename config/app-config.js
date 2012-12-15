@@ -12,7 +12,7 @@ var connect    = require('connect'),
 	winston    = require('winston'),
 	flash      = require('connect-flash'),
 	semver  = require('semver'),
-  path    = require('path');
+  	path    = require('path');
 
 module.exports = function(app){
 	
@@ -115,6 +115,7 @@ module.exports = function(app){
 	  app.enable('verbose errors');
 	});
 
+	// Configure options that most environments should have
 	switch(app.settings.env){
 	    case 'local':
 	    case 'development':
@@ -125,7 +126,6 @@ module.exports = function(app){
 			app.locals({pretty: true });
 	    case 'production':
 	    	app.disable('verbose errors');
-	    	app.enable('view cache');
 	    	// Ensure that this is an authenticated request.
 	    	// If it doesn't already have a req.user, 
 	    	// check whether it's attempting HMAC auth,
@@ -152,7 +152,6 @@ module.exports = function(app){
 	    	});
 
 	    	//we probably want to do something like this on heroku:
-	    	//BUT IS IT SECURE?
 	    	//redirect to https
 				// app.use(function(req, res, next) {
 				// 		//this is only present on heroku
@@ -179,8 +178,6 @@ module.exports = function(app){
 	
 	app.configure('production', function(){
 	  app.use(express.errorHandler()); 
+	  app.enable('view cache');
 	});
-
-
-	
 };
