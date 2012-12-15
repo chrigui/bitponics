@@ -4,7 +4,7 @@ block head
   script
     $(document).bind("mobileinit", function(){
       //$.mobile.autoInitializePage = false;
-      $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search";
+      $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
     });
   script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
   //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
@@ -175,11 +175,14 @@ block content
                           div(class="sensor-type icon {{idealRange.sCode}}")
                             | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
                             div.screen-reader-text {{idealRange.sCode}}
+                          
                           label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}") {{sensors[idealRange.sCode].name}}
-                            select(class="no-disable", ng-model="sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors")
+                            select(class="no-disable", ng-model="idealRange.sCode", ng-options="sensor.sCode as sensor.name for (sensorKey,sensor) in sensors", ng-required="true")
+                              option(value="") Select Sensor
                           
                           div Trigger the following accessory (optional):
-                            select(class="no-disable", ng-model="actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            select(class="no-disable", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                              option(value="") None
                           
                           div.lo
                             label(for="gpedit_{{phase._id}}_idealrange_{{idealRange._id}}_min") Low
@@ -225,11 +228,12 @@ block content
 
                           div Trigger the following accessory (optional):
                             select(class="no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                              option(value="") None
 
                           div
                             | Scheduling. Trigger this action:
                             
-                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType") 
+                            input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
                             label(for="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseStart") Once at the start of the phase
 
                             input(type="radio", id="gpedit_{{phase._id}}_action_{{action._id}}_schedule_phaseEnd", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
