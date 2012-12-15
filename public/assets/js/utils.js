@@ -68,6 +68,27 @@ Bitponics.Utils = {
 
     });
     	
-	}
+	},
 
+	/**
+	 * Generate an array with the times of day in :30 minute increments, along with milliseconds since start of day (00:00)
+	 */
+	generateTimesOfDayArray : function(){
+		var result = [], min = 0, hr = 0, minStr, hrStr, hrInc = 0;
+
+		for (; hrInc < 24;){
+			hr = Math.floor(hrInc);
+			hrStr = (hr < 10 ? '0' + hr : hr);
+			hrStr = (hr > 12 ? (hr - 12) : (hr == 0 ? '12' : hr));
+			var suffix = (hr < 12 ? 'am' : 'pm');
+			minStr = min < 10 ? '0' + min : min;
+			result.push({
+				"ms": ((min * 60 * 1000) + (hr * 60 * 60 * 1000)),
+				"str": hrStr + ':' + minStr + suffix
+			});
+			min = (min == 0 ? 30 : 0);
+			hrInc += .5;
+		}
+		return result;
+	}
 }
