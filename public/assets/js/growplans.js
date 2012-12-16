@@ -35,8 +35,8 @@ Bitponics.pages.growplans = {
         function initGrowPlanViewModel(growPlan){
             growPlan.phases.forEach(function(phase, index){
                 phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
-                    if (!idealRange.applicableTimespan){
-                        idealRange.noApplicableTimespan = true;
+                    if (!idealRange.applicableTimeSpan){
+                        idealRange.noApplicableTimeSpan = true;
                     }
                 });
 
@@ -152,7 +152,7 @@ Bitponics.pages.growplans = {
                 plants: selectedPlantIds, 
                 growSystem: $scope.selectedGrowSystem._id
             }, function(){
-                console.log('GrowPlanModel: '+$scope.filteredGrowPlanList);
+                console.log('GrowPlanModel: ',$scope.filteredGrowPlanList);
             });
         };
         
@@ -169,14 +169,12 @@ Bitponics.pages.growplans = {
             } else if (difference < 0){
                 // If it's a negative change, decrement from the final phase first, preserving a min of 1 day duration. Then start
                 // removing days from earlier phases. Preserve at least 1 day in all phases
-                while (difference){
-                    for (i = phases.length; i--;){
-                        phase = phases[i];
-                        while (phase.expectedNumberOfDays > 1 && difference < 0){
-                            phase.expectedNumberOfDays--;
-                            difference++;        
-                        } 
-                    }
+                for (i = phases.length; i--;){
+                    phase = phases[i];
+                    while (phase.expectedNumberOfDays > 1 && difference < 0){
+                        phase.expectedNumberOfDays--;
+                        difference++;        
+                    } 
                 }
             }
             
