@@ -5,6 +5,7 @@ block head
     $(document).bind("mobileinit", function(){
       //$.mobile.autoInitializePage = false;
       $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
+      $.mobile.ajaxLinksEnabled = false;
     });
   script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
   //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
@@ -37,7 +38,7 @@ block content
 
   section#main(role="main", ng-app="GrowPlanModule")
     div.content-module.middle
-      form(id="growplans", class='steps', action='', method='post', ng-submit="submit()", ng-controller="Bitponics.pages.growplans.GrowPlanController")
+      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="Bitponics.pages.growplans.GrowPlanController", novalidate)
         h4 Let's find you a grow plan.         
         section(id="system_selection", class="step", data-required="1")
           h4 What type of system do you have?
