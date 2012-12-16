@@ -205,7 +205,15 @@ Bitponics.pages.growplans = {
                 };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
-        };        
+        };
+
+        $scope.submit = function(){
+            console.log('submit!');
+            if($scope.selectedGrowPlan){
+                console.log(compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan));
+            }
+            return false
+        }
     }]
 };
 
