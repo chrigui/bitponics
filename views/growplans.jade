@@ -248,51 +248,65 @@ block content
 
                             div(ng-show="action.scheduleType != 'repeat'")
 
+
+
                             div(ng-show="action.scheduleType == 'repeat'")
-                              div Repeating actions have a "cycle", or 2 states which alternate with each other.
+                              
 
-                              div State 1
-                                div Should last for:
-                                  input(type="number", ng-model="action.cycle.states[0].duration", value="1")
-                                  select(ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
-                                
-                                label State Description
-                                  input(type="text", ng-model="action.cycle.states[0].message")
+                              div(ng-show="action.control")
+                                label Daily
+                                  input(type="checkbox", ng-model="action.isDailyCycle")
 
-                                div(ng-show="action.control") Turn {{action.control.name}}:
-                                  label 
-                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
-                                    | On
+                                div(ng-show="action.isDailyCycle")
+                                  label Turn {{action.control.name}} on at 
+                                    select(ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                                  label
-                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
-                                    | Off
+                                  label Turn {{action.control.name}} off at 
+                                    select(ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                                div(ng-show="!action.isDailyCycle")
+                                  div Repeating actions have a of alternating on/off states.
                                   
+                                  div First, turn {{action.control.name}}
+                                    label 
+                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
+                                      | On
 
-                              div State 2
-                                div Should last for:
-                                  input(type="number", ng-model="action.cycle.states[1].duration", value="1")
-                                  select(ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
-                                
-                                label State Description
-                                  input(type="text", ng-model="action.cycle.states[1].message")
+                                    label
+                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
+                                      | Off
 
-                                div(ng-show="action.control") Turn {{action.control.name}}:
-                                  label 
-                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
-                                    | On
+                                    div for
+                                      input(type="number", ng-model="action.cycle.states[0].duration", value="1")
+                                      select(ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                    
+                                  div Then turn {{action.control.name}}
+                                    label 
+                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
+                                      | On
 
-                                  label
-                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
-                                    | Off
+                                    label
+                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
+                                      | Off
 
-                              // Starting at timeOfDay
+                                    div for 
+                                      input(type="number", ng-model="action.cycle.states[1].duration", value="1")
+                                      select(ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                    
+
+                              div(ng-show="!action.control")
+                                div Every:
+                                  input(type="number", ng-model="action.overallDuration", value="1")
+                                  select(ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+
+                                div(ng-show="action.overallDurationType == 'days'")
+                                  label At 
+                                  select(ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                                label Send me the following message:
+                                  textarea(ng-model="action.message", placeholder="It's time to...")
 
                               
-                              //- 
-
-                            
-
                         div.phaseEndDescription
                           label Phase End Description
                           textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="Write a phase end description...", ng-model="phase.phaseEndDescription")

@@ -19,6 +19,7 @@ Bitponics.pages.growplans = {
         $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
         $scope.timesOfDayList = Bitponics.Utils.generateTimesOfDayArray();
         $scope.actionDurationTypeOptions = ['seconds','minutes','hours','days','weeks','months'];
+        $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
 
         var GrowPlanModel = $resource(
             '/api/grow_plans/',
@@ -29,76 +30,6 @@ Bitponics.pages.growplans = {
         );
     
         
-        /**
-         * Adds/calculates properties necessary for UI presentation
-         */
-        function initGrowPlanViewModel(growPlan){
-            growPlan.phases.forEach(function(phase, index){
-                phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
-                    if (!idealRange.applicableTimeSpan){
-                        idealRange.noApplicableTimeSpan = true;
-                    }
-                });
-
-                phase.actionsViewModel = [];
-                phase.actions.forEach(function(action){
-                    var overallDuration = 0;
-                    action.isDailyCycle = false;
-                    if (action.cycle.repeat){
-                        action.scheduleType = 'repeat';
-                        
-                        action.cycle.states.forEach(function(state){
-                            overallDuration += moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();
-                        });
-                        
-                        if (moment.duration(overallDuration).asDays() === 1){
-                            action.isDailyCycle = true;
-                        }
-                    } 
-                    else {
-                        action.scheduleType = 'phaseStart';
-                    }
-                    phase.actionsViewModel.push(action);
-                });
-                phase.phaseEndActions.forEach(function(action){
-                    action.scheduleType = 'phaseEnd';
-                    phase.actionsViewModel.push(action);
-                });
-            });
-            return growPlan;
-        };
-        
-
-        /**
-         * Convert Action ViewModel back to server model
-         */
-        function compileGrowPlanViewModelToServerModel(growPlan){
-            growPlan.phases.forEach(function(phase, index){
-                phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
-                    if (idealRange.noApplicableTimespan){
-                        idealRange.applicableTimespan = undefined;   
-                    }
-                });
-
-                phase.actions = [];
-                phase.phaseEndActions = [];
-
-                phase.actionsViewModel.forEach(function(actionViewModel){
-                    switch(actionViewModel.scheduleType){
-                        case 'phaseStart':
-                        case 'repeat':
-                            phase.actions.push(actionViewModel);
-                            break;
-                        case 'phaseEnd':
-                            phase.phaseEndActions.push(actionViewModel);
-                            break;
-                    }
-                });
-            });
-            return growPlan;             
-        };
-
-
         $scope.setSelectedGrowPlan = function() {
             var growPlans = $scope.growPlans;
             for (var i = growPlans.length; i--;){
@@ -109,7 +40,7 @@ Bitponics.pages.growplans = {
             }
             if (!$scope.selectedGrowPlan) { $scope.selectedGrowPlan = Bitponics.growPlanDefault; }
             
-            initGrowPlanViewModel($scope.selectedGrowPlan);
+            Bitponics.pages.growplans.initGrowPlanViewModel($scope.selectedGrowPlan);
 
             // Update grow plan plants.
             $scope.selectedPlants.forEach(function(plant, index){
@@ -222,7 +153,182 @@ Bitponics.pages.growplans = {
             }
             return false
         }
-    }]
+    }],
+
+
+    /**
+     * Adds/calculates properties necessary for UI presentation
+     */
+    initGrowPlanViewModel : function (growPlan){
+        var initActionViewModel = Bitponics.pages.growplans.initActionViewModel;
+
+        growPlan.phases.forEach(function(phase, index){
+            phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
+                if (!idealRange.applicableTimeSpan){
+                    idealRange.noApplicableTimeSpan = true;
+                }
+            });
+            
+            phase.actionsViewModel = [];
+            phase.actions.forEach(function(action){
+                phase.actionsViewModel.push(initActionViewModel(action, 'phaseStart'));
+            });
+            phase.phaseEndActions.forEach(function(action){
+                phase.actionsViewModel.push(initActionViewModel(action, 'phaseEnd'));
+            });
+        });
+        return growPlan;
+    },
+
+    /**
+     * Adds/calculates properties necessary for UI presentation
+     * Properties for control vs no-control presentation,
+     * daily vs non-daily cycles. Makes changes in-plase on the provided Action.
+     * 
+     * Adds the following properties:
+     * action.scheduleType (string) : 'phaseStart' || 'phaseEnd' || 'repeat'
+     * action.isDailyCycle (boolean)
+     * action.dailyOnTime (set if isDailyCycle)
+     * action.dailyOffTime (set if isDailyCycle)
+     * action.message (set if a no-control action)
+     * action.offsetTimeOfDay (set if a no-control, daily action)
+     *
+     * @param action
+     * @param source : 'phaseStart' || 'phaseEnd'
+     * 
+     * @return action. The modified Action object.
+     */
+    initActionViewModel: function(action, source){
+        var overallDuration = 0,
+            asMonths,
+            asWeeks,
+            asDays,
+            asHours,
+            asMinutes,
+            asSeconds;
+        
+        // Set scheduleType
+        if (source === 'phaseStart'){
+            if (action.cycle.repeat){
+                action.scheduleType = 'repeat';
+            } 
+            else {
+                action.scheduleType = 'phaseStart';
+            }
+        } else {
+            action.scheduleType = 'phaseEnd';
+        }
+
+        // Set overallDuration
+        action.isDailyCycle = false;
+        action.cycle.states.forEach(function(state){
+            overallDuration += moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();
+        });
+        overallDuration = moment.duration(overallDuration);
+        
+
+        // Calculate overall duration type, checking from broadest time span down
+        if (Bitponics.Utils.isWholeNumber(asMonths = overallDuration.asMonths())) {
+            action.overallDuration = asMonths;
+            action.overallDurationType = 'months';
+        } else if (Bitponics.Utils.isWholeNumber(asWeeks = overallDuration.asWeeks())){
+            action.overallDuration = asWeeks;
+            action.overallDurationType = 'weeks';
+        } else if (Bitponics.Utils.isWholeNumber(asDays = overallDuration.asDays())){
+            action.overallDuration = asDays;
+            action.overallDurationType = 'days';
+            if (asDays === 1){
+                action.isDailyCycle = true;
+                
+                // If it's an accessory with a daily cycle, we want to show daily 
+                // on/off times
+                if (action.control){
+                    if (action.cycle.states[0].controlValue === '0'){
+                        if (action.cycle.states.length === 3){
+                            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
+                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            // if first state is off, then OFF trigger time is actually later in the day than ON time. 
+                            // Add ON duration to ON trigger time to get OFF trigger time
+                            // ON is state[1]
+                            action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType);
+                        } else {
+                            action.dailyOffTime = 0;
+                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                        }
+                    } else {
+                        // else first state of ON cycle
+                        if (action.cycle.states.length === 3){
+                            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
+                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            // if first state is ON, then ON trigger time is actually later in the day than OFF time. 
+                            // Add OFF duration to OFF trigger time to get ON trigger time
+                            // OFF is state[1]
+                            action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType);;
+                        } else {
+                            action.dailyOnTime = 0;
+                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                        }
+                    }
+                }
+            }
+        } else if (Bitponics.Utils.isWholeNumber(asHours = overallDuration.asHours())){
+            action.overallDuration = asHours;
+            action.overallDurationType = 'hours';   
+        } else if (Bitponics.Utils.isWholeNumber(asMinutes = overallDuration.asMinutes())){
+            action.overallDuration = asMinutes;
+            action.overallDurationType = 'minutes';   
+        } else {
+            action.overallDuration = overallDuration.asSeconds();
+            action.overallDurationType = 'seconds';   
+        }
+
+        if (action.cycle.states.length === 3){
+            action.offsetTimeOfDay = moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();    
+        }
+        
+        // If no control, then this is just a repeating notification. 
+        // Get the message from the state that has a message
+        if (!action.control && action.cycle && action.cycle.states.length){
+            for (var stateIndex = 0, statesLength = action.cycle.states.length; stateIndex < statesLength; stateIndex++){
+                if (action.cycle.states[stateIndex].message){
+                    action.message = action.cycle.states[stateIndex].message;
+                    break;
+                }
+            }
+        }
+        
+        return action;
+    },    
+
+
+    /**
+     * Convert Action ViewModel back to server model
+     */
+    compileGrowPlanViewModelToServerModel: function (growPlan){
+        growPlan.phases.forEach(function(phase, index){
+            phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
+                if (idealRange.noApplicableTimespan){
+                    idealRange.applicableTimespan = undefined;   
+                }
+            });
+
+            phase.actions = [];
+            phase.phaseEndActions = [];
+
+            phase.actionsViewModel.forEach(function(actionViewModel){
+                switch(actionViewModel.scheduleType){
+                    case 'phaseStart':
+                    case 'repeat':
+                        phase.actions.push(actionViewModel);
+                        break;
+                    case 'phaseEnd':
+                        phase.phaseEndActions.push(actionViewModel);
+                        break;
+                }
+            });
+        });
+        return growPlan;             
+    }
 };
 
 $(function () {
