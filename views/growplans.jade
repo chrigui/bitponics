@@ -76,15 +76,15 @@ block content
                         li #{phase.growSystem.name}
 
           //Default grow plans not filtered
-          ul(class="grid sortlist photos default")
-            li(id="gplist_#{growPlanDefault.id}")
-              input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
-              label(for="gplist_input_#{growPlanDefault.id}") #{growPlanDefault.name}
-                div.info
-                  div(class="gplist_description") #{growPlanDefault.description}
-                  ul(class="gplist_system")
-                      each phase in growPlanDefault.phases
-                        li #{phase.growSystem.name}
+          //- ul(class="grid sortlist photos default")
+          //-   li(id="gplist_#{growPlanDefault.id}")
+          //-     input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
+          //-     label(for="gplist_input_#{growPlanDefault.id}") #{growPlanDefault.name}
+          //-       div.info
+          //-         div(class="gplist_description") #{growPlanDefault.description}
+          //-         ul(class="gplist_system")
+          //-             each phase in growPlanDefault.phases
+          //-               li #{phase.growSystem.name}
 
         section(id="growplan_edit", class="hide")
           h4 Tailor this grow plan to your needs
