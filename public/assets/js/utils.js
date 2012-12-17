@@ -90,5 +90,9 @@ Bitponics.Utils = {
 			hrInc += .5;
 		}
 		return result;
+	},
+
+	isWholeNumber: function (n) {
+	   return n % 1 === 0;
 	}
 }
