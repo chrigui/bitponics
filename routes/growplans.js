@@ -128,7 +128,7 @@ module.exports = function(app){
 
 				//single out the default grow plan
 				locals.growPlans.forEach(function (item, index) {
-					if(item.name === 'All-Purpose'){
+					if(item.name === 'All-Purpose'){ //TODO: match _id
 						locals.growPlanDefault = item;
 						locals.growPlans.splice(index, 1); //remove default from general list of grow plans
 					}

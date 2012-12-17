@@ -1,4 +1,5 @@
 var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
+    ActionModel = require('../../../models/action').model,
     winston = require('winston');
 
 /**
@@ -18,8 +19,12 @@ module.exports = function(app) {
   });
 
   //List all grow plans (except All-Purpose)
+  //TODO: only pass full data when passing in _id to match on - so populate etc.
+  // else, send compact
   app.get('/api/grow_plans', function (req, res, next){
     var filter = false,
+        full = false,
+        id = req.query.id,
         plants = req.query.plants,
         growSystem = req.query.growSystem;
     
@@ -27,16 +32,20 @@ module.exports = function(app) {
       filter = true;
       plants = plants.split(',');
       growSystem = growSystem.split(',');
+    }else if(!!id){
+      full = true;
     }
 
-    if(!filter) { //return all grow plans
+
+
+    if(!filter && !full) { //return all grow plans
       
       return GrowPlanModel.find(function (err, grow_plans) {
         if (err) { return next(err); }
         return res.send(grow_plans);
       });
 
-    } else { //filter on plants and growsystem
+    } else if (filter) { //filter on plants and growsystem
 
       return GrowPlanModel
         .find(
@@ -51,7 +60,7 @@ module.exports = function(app) {
               }
             ],
             name: {
-              $ne: 'All-Purpose'
+              $ne: 'All-Purpose' //TODO: should be _id
             }
           },
           {
@@ -63,19 +72,62 @@ module.exports = function(app) {
           return res.send(grow_plans);
         });
 
-        //profiling in shell
-        // db.system.profile.find({ts:{$gt:new ISODate("2011-07-12T03:00:00Z"),$lt:new ISODate("2011-07-12T03:40:00Z")}},{user:0}).sort({millis:-1})
+    } else if (full) { //return single growplan with all data populated
 
-        //Not sure how to do same as above using Mongoose helpers...
+      return GrowPlanModel
+        .findById(id)
+        .populate('controls')
+        .populate('sensors')
+        .populate('plants')
+        .populate('phases.nutrients')
+        .populate('phases.actions')
+        .populate('phases.growSystem')
+        .populate('phases.phaseEndActions')
+        .exec(function(err, grow_plan){
+          if (err) { return next(err); }
 
-        // .find()
-        // .where('plants').in(plants)
-        // .select('name description')
-        // .exec(function (err, grow_plans) {
-        //   if (err) { return next(err); }
-        //   return res.send(grow_plans);
-        // });
+          //Populate idealRange actions
+          // var actionsObj= {};
+          var actionIds = [];
+          grow_plan.phases.forEach(function(phase) {
+            phase.idealRanges.forEach(function(idealRange, i) {
+              actionIds.push(idealRange.actionAboveMax, idealRange.actionBelowMin);
+              // actionsObj[idealRange.actionAboveMax] = { phaseId: phase._id, idealRangeIndex: i, type: 'actionAboveMax' };
+              // actionsObj[idealRange.actionBelowMin] = { phaseId: phase._id, idealRangeIndex: i, type: 'actionBelowMin' };
+            });
+          });
 
+          ActionModel.find({})
+            .where('_id').in(actionIds)
+            .exec(function (err, actions) {
+              if (err) { next(err); }
+              console.log(grow_plan);
+              var growPlan = grow_plan.toObject();
+              console.log(growPlan);
+              actions.forEach(function(action) {
+                growPlan.phases.forEach(function(phase) {
+                  phase.idealRanges.forEach(function(idealRange) {
+                    if (action._id.toString() == idealRange.actionAboveMax) {
+                      console.log('before: ')
+                      console.log(idealRange.actionAboveMax)
+                      idealRange.actionAboveMax = action;
+                      console.log('after: ')
+                      console.log(idealRange.actionAboveMax)
+                    } else if (action._id.toString() == idealRange.actionBelowMin.toString()) {
+                      console.log('min action: ' + action.description);
+                      idealRange.actionBelowMin = action;
+                    }
+
+                  });
+                });
+              });
+
+              return res.send(growPlan);
+                
+            });
+
+
+        });
     }
   });
 
