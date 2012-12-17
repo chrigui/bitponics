@@ -386,6 +386,7 @@ function getObjectId (object){
   var constructor = object.constructor.name.toLowerCase();
   if (constructor === 'objectid'){ return object; }
   if (constructor === 'string'){ return new ObjectID(object); } 
+  // else, assume it's a populated model and return _id property
   return object._id;
 }
 
