@@ -223,7 +223,7 @@ Bitponics.pages.growplans = {
         // Set overallDuration
         action.isDailyCycle = false;
         action.cycle.states.forEach(function(state){
-            overallDuration += moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();
+            overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
         });
         overallDuration = moment.duration(overallDuration);
         
@@ -247,27 +247,27 @@ Bitponics.pages.growplans = {
                     if (action.cycle.states[0].controlValue === '0'){
                         if (action.cycle.states.length === 3){
                             // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
                             // if first state is off, then OFF trigger time is actually later in the day than ON time. 
                             // Add ON duration to ON trigger time to get OFF trigger time
                             // ON is state[1]
-                            action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType);
+                            action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
                         } else {
                             action.dailyOffTime = 0;
-                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
                         }
                     } else {
                         // else first state of ON cycle
                         if (action.cycle.states.length === 3){
                             // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
                             // if first state is ON, then ON trigger time is actually later in the day than OFF time. 
                             // Add OFF duration to OFF trigger time to get ON trigger time
                             // OFF is state[1]
-                            action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType);;
+                            action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
                         } else {
                             action.dailyOnTime = 0;
-                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType);
+                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
                         }
                     }
                 }
