@@ -127,6 +127,14 @@ ActionSchema.pre('save', function(next){
 		return next(new Error('Invalid number of cycle states'));
 	}
 	
+	if (action.control){
+		if (states.some(function(state){
+			return (typeof state.controlValue === 'undefined' || state.controlValue === null);
+		})){
+			return next(new Error('If an action has a control, each cycle state must specify a control value'));
+		}
+	}
+
 	switch(states.length){
 		case 1:
 			// if a cycle has 1 state, it's considered a discrete action and must have a "repeat" of false

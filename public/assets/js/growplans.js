@@ -42,8 +42,18 @@ Bitponics.pages.growplans = {
 
                 phase.actionsViewModel = [];
                 phase.actions.forEach(function(action){
+                    var overallDuration = 0;
+                    action.isDailyCycle = false;
                     if (action.cycle.repeat){
                         action.scheduleType = 'repeat';
+                        
+                        action.cycle.states.forEach(function(state){
+                            overallDuration += moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();
+                        });
+                        
+                        if (moment.duration(overallDuration).asDays() === 1){
+                            action.isDailyCycle = true;
+                        }
                     } 
                     else {
                         action.scheduleType = 'phaseStart';
