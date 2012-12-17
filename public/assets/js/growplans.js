@@ -38,7 +38,9 @@ Bitponics.pages.growplans = {
                     break;
                 }
             }
-            if (!$scope.selectedGrowPlan) { $scope.selectedGrowPlan = Bitponics.growPlanDefault; }
+            if (!$scope.selectedGrowPlan) { 
+                $scope.selectedGrowPlan = Bitponics.growPlanDefault; 
+            }
             
             Bitponics.pages.growplans.initGrowPlanViewModel($scope.selectedGrowPlan);
 
@@ -147,11 +149,10 @@ Bitponics.pages.growplans = {
         };
 
         $scope.submit = function(){
-            console.log('submit!');
             if($scope.selectedGrowPlan){
+                console.log('submit!');
                 console.log(compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan));
             }
-            return false
         }
     }],
 
