@@ -21,6 +21,14 @@ Bitponics.pages.growplans = {
         $scope.actionDurationTypeOptions = ['seconds','minutes','hours','days','weeks','months'];
         $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
 
+        //Wrapping our ng-model vars {}
+        //This is necessary so ng-change always fires, due to: https://github.com/angular/angular.js/issues/1100
+        $scope.selected = {
+            growSystem: undefined,
+            growPlan: undefined,
+            plant: {}
+        };
+
         var GrowPlanModel = $resource(
             '/api/grow_plans/',
             {},
@@ -31,14 +39,9 @@ Bitponics.pages.growplans = {
     
         
         $scope.setSelectedGrowPlan = function() {
-            var growPlans = $scope.growPlans;
-            for (var i = growPlans.length; i--;){
-                if (growPlans[i]._id == $scope.selectedGrowPlanId){
-                    $scope.selectedGrowPlan = growPlans[i];
-                    break;
-                }
-            }
-            if (!$scope.selectedGrowPlan) { 
+            $scope.selectedGrowPlan = $filter('filter')($scope.growPlans, { _id: $scope.selected.growPlan });
+
+            if (!$scope.selectedGrowPlan.length) { 
                 $scope.selectedGrowPlan = Bitponics.growPlanDefault; 
             }
             
@@ -55,7 +58,7 @@ Bitponics.pages.growplans = {
             $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
         };
 
-        $scope.filteredSensors = function() {
+        $scope.selectedSensors = function() {
             var list = [];
             angular.forEach($scope.sensors, function(sensor) {
               list.push(sensor);
@@ -63,12 +66,10 @@ Bitponics.pages.growplans = {
             return list;
         };
 
-        $scope.updateSelectedGrowSystem = function(el){
-            var growSystemSelections = $scope.growSystemSelections;
-            $scope.selectedGrowSystem = el.system;
-            console.log($scope.selectedPlants);
+        $scope.updateSelectedGrowSystem = function(){
+            $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
             if($scope.selectedPlants.length){
-                $scope.updateSelectedGrowPlans();
+                $scope.updatefilteredGrowPlans();
             }
         };
 
@@ -84,17 +85,27 @@ Bitponics.pages.growplans = {
         };  
 
         $scope.updateSelectedPlants = function(){
-            var plantSelections = $scope.plantSelections;
-            $scope.selectedPlants = $scope.plants.filter(function(plant, index){ return plantSelections[plant._id]; });
-            $scope.updateSelectedGrowPlans();
+            for (var i = $scope.plants.length; i--;) {
+                Object.keys($scope.selected.plant).forEach(function(_id) {
+                    if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
+                        $scope.selectedPlants.push($scope.plants[i]);
+                    }
+                });
+            }
+            $scope.updatefilteredGrowPlans();
         };
 
-        $scope.updateSelectedGrowPlans = function(){
-            var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id });
+        $scope.updatefilteredGrowPlans = function(){
+            var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id }),
+                growPlanDefault = new GrowPlanModel(Bitponics.growPlanDefault);
+
+            //hit API with params to filter grow plans
             $scope.filteredGrowPlanList = GrowPlanModel.query({
-                plants: selectedPlantIds, 
+                plants: selectedPlantIds,
                 growSystem: $scope.selectedGrowSystem._id
             }, function(){
+                //add default to end of filtered grow plan array
+                $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
                 console.log('GrowPlanModel: ',$scope.filteredGrowPlanList);
             });
         };

@@ -10,7 +10,8 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   ActionModel = require('../models/action').model,
 	winston = require('winston'),
 	passport = require('passport'),
-	async = require('async');
+	async = require('async'),
+	allPurposeGrowPlanId = '506de30c8eebf7524342cb70';
 
 module.exports = function(app){
 	
@@ -128,7 +129,7 @@ module.exports = function(app){
 
 				//single out the default grow plan
 				locals.growPlans.forEach(function (item, index) {
-					if(item.name === 'All-Purpose'){ //TODO: match _id
+					if(item._id == allPurposeGrowPlanId){
 						locals.growPlanDefault = item;
 						locals.growPlans.splice(index, 1); //remove default from general list of grow plans
 					}
