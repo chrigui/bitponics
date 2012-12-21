@@ -44,7 +44,7 @@ block content
           h4 What type of system do you have?
           ul(class="grid photos")
             li(ng-repeat="system in growSystems | orderBy:name")
-              input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="growSystemSelections[system._id]", ng-change="updateSelectedGrowSystem(this)")
+              input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
               label(for="{{system._id}}") {{system.name}}
 
         section(id="plant_selection", class="step")
@@ -56,35 +56,19 @@ block content
           
           ul(class="grid sortlist")
             li(ng-repeat="plant in filteredPlantList | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="plantSelections[plant._id]", ng-change="updateSelectedPlants()")
+              input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
               label(for="{{plant._id}}", class="plant") {{plant.name}}
 
         section(id="growplan_results", class="step update-panel hide", data-required="1")
           h4 We've found grow plans for you
           ul(class="grid sortlist photos")
-            each growPlan, i in growPlans
-              li(id="gplist_#{growPlan.id}")
-                input(id="gplist_input_#{growPlan.id}", type='radio', name="growplans", value="#{growPlan.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
-                label(for="gplist_input_#{growPlan.id}") #{growPlan.name}
-                  div.info
-                    div(class="gplist_description") #{growPlan.description}
-                    div(class="gplist_plants")
-                      each plant in growPlan.plants
-                        | #{plant.name} 
-                    ul(class="gplist_system")
-                      each phase in growPlan.phases
-                        li #{phase.growSystem.name}
+            //- each growPlan, i in growPlans
+            li(ng-repeat="growPlan in filteredGrowPlanList")
+              input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}", ng-model="selected.growPlan", ng-change="setSelectedGrowPlan()")
+              label(for="gplist_input_{{growPlan._id}}") {{growPlan.name}}
+                div.info
+                  div(class="gplist_description") {{growPlan.description}}
 
-          //Default grow plans not filtered
-          //- ul(class="grid sortlist photos default")
-          //-   li(id="gplist_#{growPlanDefault.id}")
-          //-     input(id="gplist_input_#{growPlanDefault.id}", type='radio', name="growplans", value="#{growPlanDefault.id}", ng-model="selectedGrowPlanId", ng-change="setSelectedGrowPlan()")
-          //-     label(for="gplist_input_#{growPlanDefault.id}") #{growPlanDefault.name}
-          //-       div.info
-          //-         div(class="gplist_description") #{growPlanDefault.description}
-          //-         ul(class="gplist_system")
-          //-             each phase in growPlanDefault.phases
-          //-               li #{phase.growSystem.name}
 
         section(id="growplan_edit", class="hide")
           h4 Tailor this grow plan to your needs

@@ -1,6 +1,7 @@
 var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     ActionModel = require('../../../models/action').model,
-    winston = require('winston');
+    winston = require('winston'),
+    allPurposeGrowPlanId = '506de30c8eebf7524342cb70';
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -18,9 +19,12 @@ module.exports = function(app) {
     });
   });
 
-  //List all grow plans (except All-Purpose)
-  //TODO: only pass full data when passing in _id to match on - so populate etc.
-  // else, send compact
+  /*
+   * List all grow plans
+   *  If no params, list all in db
+   *  If id param, match on grow plan and return compact data
+   *  If plants and growSystem params, filter on all grow plans (except All-Purpose) and return compact data
+   */
   app.get('/api/grow_plans', function (req, res, next){
     var filter = false,
         full = false,
@@ -28,6 +32,8 @@ module.exports = function(app) {
         plants = req.query.plants,
         growSystem = req.query.growSystem;
     
+
+
     if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
       filter = true;
       plants = plants.split(',');
@@ -59,8 +65,8 @@ module.exports = function(app) {
                 }
               }
             ],
-            name: {
-              $ne: 'All-Purpose' //TODO: should be _id
+            _id: {
+              $ne: allPurposeGrowPlanId
             }
           },
           {
@@ -86,35 +92,27 @@ module.exports = function(app) {
         .exec(function(err, grow_plan){
           if (err) { return next(err); }
 
-          //Populate idealRange actions
-          // var actionsObj= {};
+          //Populate idealRange actions ids for querying
           var actionIds = [];
           grow_plan.phases.forEach(function(phase) {
             phase.idealRanges.forEach(function(idealRange, i) {
               actionIds.push(idealRange.actionAboveMax, idealRange.actionBelowMin);
-              // actionsObj[idealRange.actionAboveMax] = { phaseId: phase._id, idealRangeIndex: i, type: 'actionAboveMax' };
-              // actionsObj[idealRange.actionBelowMin] = { phaseId: phase._id, idealRangeIndex: i, type: 'actionBelowMin' };
             });
           });
 
+          //Query on all action ids
           ActionModel.find({})
             .where('_id').in(actionIds)
             .exec(function (err, actions) {
               if (err) { next(err); }
-              console.log(grow_plan);
-              var growPlan = grow_plan.toObject();
-              console.log(growPlan);
+              var growPlan = grow_plan.toObject(); //in order to have properties update as expected
               actions.forEach(function(action) {
                 growPlan.phases.forEach(function(phase) {
                   phase.idealRanges.forEach(function(idealRange) {
+
                     if (action._id.toString() == idealRange.actionAboveMax) {
-                      console.log('before: ')
-                      console.log(idealRange.actionAboveMax)
                       idealRange.actionAboveMax = action;
-                      console.log('after: ')
-                      console.log(idealRange.actionAboveMax)
                     } else if (action._id.toString() == idealRange.actionBelowMin.toString()) {
-                      console.log('min action: ' + action.description);
                       idealRange.actionBelowMin = action;
                     }
 
