@@ -326,7 +326,9 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
 
 /** 
  * Called from the worker process across each environment, which is why we
- * need the model to be passed in
+ * need the model to be passed in.
+ *
+ * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  */
 function clearPendingNotifications (NotificationModel, callback){
   var now = new Date();
@@ -334,7 +336,7 @@ function clearPendingNotifications (NotificationModel, callback){
   .find()
   .where('timeToSend')
   .lte(now)
-  .populate('users', 'email')
+  .populate('users', 'email') // only need the email field for Users
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
     if (!notificationResults.length){ return callback(); }

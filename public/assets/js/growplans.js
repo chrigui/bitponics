@@ -206,7 +206,7 @@ Bitponics.pages.growplans = {
      * action.offsetTimeOfDay (set if a no-control, daily action)
      *
      * @param action
-     * @param source : 'phaseStart' || 'phaseEnd'
+     * @param source (optional): 'phaseStart' || 'phaseEnd'
      * 
      * @return action. The modified Action object.
      */
@@ -314,7 +314,7 @@ Bitponics.pages.growplans = {
 
 
     /**
-     * Convert Action ViewModel back to server model
+     * Convert GrowPlan ViewModel back to server model
      */
     compileGrowPlanViewModelToServerModel: function (growPlan){
         growPlan.phases.forEach(function(phase, index){
@@ -340,6 +340,29 @@ Bitponics.pages.growplans = {
             });
         });
         return growPlan;             
+    },
+
+
+    /**
+     * Convert Action ViewModel back to server model
+     *
+     * Converts the following viewModel properties back to server model format:
+     * action.scheduleType (string) : 'phaseStart' || 'phaseEnd' || 'repeat'
+     * action.isDailyCycle (boolean)
+     * action.dailyOnTime (set if isDailyCycle)
+     * action.dailyOffTime (set if isDailyCycle)
+     * action.message (set if a no-control action)
+     * action.offsetTimeOfDay (set if a no-control, daily action)
+     */
+    compileActionViewModelToServerModel: function (action){
+        if (action.scheduleType === 'repeat'){
+            if (action.isDailyCycle){
+                action.cycles = [];
+                
+            } else {
+
+            }
+        }
     }
 };
 
