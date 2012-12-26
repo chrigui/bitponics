@@ -61,8 +61,8 @@ var NotificationSchema = new Schema({
 
 	type : { type: String, enum: ["info","actionNeeded","error"]}
 	// current triggers for notifications:
-	// IdealRange violation that can be handled by device 
-	// IdealRange violation that can't be handled by device 
+	// IdealRange violation that can be handled by device (type="info")
+	// IdealRange violation that can't be handled by device (type="actionNeeded")
 	// Phase Actions being started (at phase activation)
 	// Actions triggered by IdealRange violations
 	// Action cycles triggering repeating notifications

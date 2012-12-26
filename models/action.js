@@ -90,7 +90,26 @@ ActionSchema.virtual('overallCycleTimespan')
 
 /************************** INSTANCE METHODS ***************************/
 
-
+/**
+ * Get the message for the specified cycle state.
+ * 
+ * Used primarily to generate a message for a control trigger when there
+ * is no explicit message defined.
+ *
+ * @param stateIndex (int) Required.
+ * @param controlName (string, optional). If no explicit message is defined, and there is a control defined, this param
+ * 		  will be interpolated into the message.
+ */
+ActionSchema.method('getStateMessage', function(stateIndex, controlName){
+	var state = this.cycle.states[stateIndex];
+	if (state.message) { 
+		return state.message;
+	}
+	if (state.controlValue){
+		return 'Turn ' + (controlName ? (controlName + ' ') : '') + (state.controlValue == '0' ? 'off' : 'on');
+	}
+	return '';
+});
 /************************** END INSTANCE METHODS ***************************/
 
 
