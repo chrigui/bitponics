@@ -329,7 +329,9 @@ function(callback){
 		 		} else {
 		 			var dataObj = new models.control({
 		 				_id : _data._id,
-		 				name: _data.name
+		 				name: _data.name,
+		 				onAction : _data.onAction,
+		 				offAction : _data.offAction
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
