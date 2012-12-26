@@ -6,7 +6,9 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId;
 
 var ControlSchema = new Schema({
-	name: { type: String, required: true }
+	name: { type: String, required: true },
+	onAction: { type: ObjectId, ref: 'Action', required: false },
+	offAction: { type: ObjectId, ref: 'Action', required: false }
 });
 
 ControlSchema.plugin(useTimestamps);

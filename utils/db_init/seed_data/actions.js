@@ -2,6 +2,158 @@ var ObjectId = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{
+			_id : '506de2fb8eebf7524342cb28',
+			description: "Turn supplemental lights on",
+			control: "506de2fd8eebf7524342cb32",
+			cycle: {
+				states: [
+					{
+						controlValue: 255
+					}
+				]
+			}
+		},
+		{
+			_id : '506de2fb8eebf7524342cb29',
+			description: "Turn supplemental lights off",
+			control: "506de2fd8eebf7524342cb32",
+			cycle: {
+				states: [
+					{
+						controlValue: 0
+					}
+				],
+				repeat : false
+			}
+		},
+		{
+			_id : '506de2fb8eebf7524342cb2a',
+			description: "Turn air conditioner on",
+			control: "506de2fd8eebf7524342cb31",
+			cycle: {
+				states: [
+					{
+						controlValue: 255,
+					}
+				]
+			}
+		},
+		{
+			_id : '50da4cab0a312499fae453e7',
+			description: "Turn air conditioner off",
+			control: "506de2fd8eebf7524342cb31",
+			cycle: {
+				states: [
+					{
+						controlValue: 0,
+					}
+				]
+			}
+		},
+		{
+			_id : '506de2fc8eebf7524342cb2b',
+			description: "Turn heater on",
+			control: "506de2fc8eebf7524342cb2f",
+			cycle: {
+				states: [
+					{
+						controlValue: 255
+					}
+				]
+			}
+		},
+		{
+			_id : '50da4f1e0a312499fae453e9',
+			description: "Turn heater off",
+			control: "506de2fc8eebf7524342cb2f",
+			cycle: {
+				states: [
+					{
+						controlValue: 0
+					}
+				]
+			}
+		},
+
+		{
+			_id : '50da4f650a312499fae453ea',
+			description: "Turn water pump on",
+			control: "506de2fc8eebf7524342cb2d",
+			cycle: {
+				states: [
+					{
+						controlValue: 255
+					}
+				]
+			}
+		},
+		{
+			_id : '50da4f660a312499fae453eb',
+			description: "Turn water pump off",
+			control: "506de2fc8eebf7524342cb2d",
+			cycle: {
+				states: [
+					{
+						controlValue: 0
+					}
+				]
+			}
+		},
+
+
+		{
+			_id : '50da532d0a312499fae453ec',
+			description: "Turn humidifier on",
+			control: "506de2fc8eebf7524342cb2e",
+			cycle: {
+				states: [
+					{
+						controlValue: 255
+					}
+				]
+			}
+		},
+		{
+			_id : '50da532d0a312499fae453ed',
+			description: "Turn humidifier off",
+			control: "506de2fc8eebf7524342cb2e",
+			cycle: {
+				states: [
+					{
+						controlValue: 0
+					}
+				]
+			}
+		},
+
+
+		{
+			_id : '50da53730a312499fae453ee',
+			description: "Turn fan on",
+			control: "506de2fd8eebf7524342cb30",
+			cycle: {
+				states: [
+					{
+						controlValue: 255
+					}
+				]
+			}
+		},
+		{
+			_id : '50da53740a312499fae453ef',
+			description: "Turn fan off",
+			control: "506de2fd8eebf7524342cb30",
+			cycle: {
+				states: [
+					{
+						controlValue: 0
+					}
+				]
+			}
+		},
+
+
+		{
 			_id : '506de2ec8eebf7524342cb24',
 			description : "Transplant seedlings into the grow bed"
 		},
@@ -94,66 +246,8 @@ module.exports = [
 			}
 		},
 		{
-			_id : '506de2fb8eebf7524342cb28',
-			description: "Turn on supplemental lighting.",
-			control: "506de2fd8eebf7524342cb32",
-			cycle: {
-				states: [
-					{
-						controlValue: 255,
-						message: "Turn on supplemental lighting.",
-					}
-				],
-				repeat : false
-			}
-		},
-		{
-			_id : '506de2fb8eebf7524342cb29',
-			description: "Turn off supplemental lights.",
-			control: "506de2fd8eebf7524342cb32",
-			cycle: {
-				states: [
-					{
-						controlValue: 0,
-						message: "Turn off supplemental lights."
-					}
-				],
-				repeat : false
-			}
-		},
-		{
-			_id : '506de2fb8eebf7524342cb2a',
-			description: "Turn on air conditioner.",
-			control: "506de2fd8eebf7524342cb31",
-			cycle: {
-				states: [
-					{
-						controlValue: 255,
-						message: "Turn on air conditioner."
-					}
-				],
-				repeat : false
-			}
-		},
-		{
-			_id : '506de2fc8eebf7524342cb2b',
-			description: "Turn on heater.",
-			control: "506de2fc8eebf7524342cb2f",
-			cycle: {
-				states: [
-					{
-						controlValue: 255,
-						message: "Turn on heater."
-					}
-				],
-				repeat: false
-			}
-		},
-		{
 			_id : '506de2fc8eebf7524342cb2c',
-			description: "Pollinate any new blossoms using a watercolor brush to distribute",
-			control: undefined,
-			cycle: undefined
+			description: "Pollinate any new blossoms using a watercolor brush to distribute"
 		},
 		{
 			_id : '506de30c8eebf7524342cb73',
@@ -162,11 +256,9 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255,
-						message: "Turn on seedling heat mat."
+						controlValue: 255
 					}
-				],
-				repeat: false
+				]
 			}
 		},
 		{
@@ -176,11 +268,9 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0,
-						message: "Turn off seedling heat mat."
+						controlValue: 0
 					}
-				],
-				repeat: false
+				]
 			}
 		}
 	]
