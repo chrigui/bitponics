@@ -8,7 +8,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255
+						controlValue: '1'
 					}
 				]
 			}
@@ -20,10 +20,9 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0
+						controlValue: '0'
 					}
-				],
-				repeat : false
+				]
 			}
 		},
 		{
@@ -33,7 +32,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255,
+						controlValue: '1'
 					}
 				]
 			}
@@ -45,7 +44,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0,
+						controlValue: '0'
 					}
 				]
 			}
@@ -57,7 +56,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255
+						controlValue: '1'
 					}
 				]
 			}
@@ -69,7 +68,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0
+						controlValue: '0'
 					}
 				]
 			}
@@ -82,7 +81,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255
+						controlValue: '1'
 					}
 				]
 			}
@@ -94,7 +93,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0
+						controlValue: '0'
 					}
 				]
 			}
@@ -108,7 +107,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255
+						controlValue: '1'
 					}
 				]
 			}
@@ -120,7 +119,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0
+						controlValue: '0'
 					}
 				]
 			}
@@ -134,7 +133,7 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 255
+						controlValue: '1'
 					}
 				]
 			}
@@ -146,13 +145,35 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 0
+						controlValue: '0'
 					}
 				]
 			}
 		},
-
-
+		{
+			_id : '506de30c8eebf7524342cb73',
+			description: "Increase heat under seedlings, either by using a seedling heat mat or moving seedling tray to a warmer area, such as on top of a refrigerator.",
+			control: "506de30d8eebf7524342cb74", // seedling heat mat
+			cycle: {
+				states: [
+					{
+						controlValue: '1'
+					}
+				]
+			}
+		},
+		{
+			_id : '506de30d8eebf7524342cb75',
+			description: "Decrease heat under seedlings, either by turning off seedling heat mat or moving seedling tray to a cooler area.",
+			control: "506de30d8eebf7524342cb74", // seedling heat mat
+			cycle: {
+				states: [
+					{
+						controlValue: '0'
+					}
+				]
+			}
+		},
 		{
 			_id : '506de2ec8eebf7524342cb24',
 			description : "Transplant seedlings into the grow bed"
@@ -200,13 +221,13 @@ module.exports = [
 			cycle: {
 				states: [
 					{
-						controlValue: 1,
+						controlValue: '1',
 						durationType: 'minutes',
 						duration: 15, 
 						message: "Turn pump on for 15 minutes"
 					},
 					{
-						controlValue: 0,
+						controlValue: '0',
 						durationType: 'minutes',
 						duration: 15, 
 						message: "Turn pump off for 15 minutes"
@@ -223,20 +244,20 @@ module.exports = [
 				states: [
 					// start the day with 6 hours off
 					{
-						controlValue: 1,
+						controlValue: '1',
 						durationType: 'hours',
 						duration: 6,
 						message: "Turn light off."
 					},
 					{
-						controlValue: 0,
+						controlValue: '0',
 						durationType: 'hours',
 						duration: 16,
 						message: "Turn light on."
 					},
 					// finish off the 24 hour day with off
 					{
-						controlValue: 1,
+						controlValue: '1',
 						durationType: 'hours',
 						duration: 2,
 						message: "Turn light off."
@@ -248,29 +269,5 @@ module.exports = [
 		{
 			_id : '506de2fc8eebf7524342cb2c',
 			description: "Pollinate any new blossoms using a watercolor brush to distribute"
-		},
-		{
-			_id : '506de30c8eebf7524342cb73',
-			description: "Increase heat under seedlings, either by using a seedling heat mat or moving seedling tray to a warmer area, such as on top of a refrigerator.",
-			control: "506de30d8eebf7524342cb74", // seedling heat mat
-			cycle: {
-				states: [
-					{
-						controlValue: 255
-					}
-				]
-			}
-		},
-		{
-			_id : '506de30d8eebf7524342cb75',
-			description: "Decrease heat under seedlings, either by turning off seedling heat mat or moving seedling tray to a cooler area.",
-			control: "506de30d8eebf7524342cb74", // seedling heat mat
-			cycle: {
-				states: [
-					{
-						controlValue: 0
-					}
-				]
-			}
 		}
 	]

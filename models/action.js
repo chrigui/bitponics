@@ -335,7 +335,7 @@ var ActionUtils = {
 	 * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
 	 */
 	updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
-		var result = ActionUtils.getSimplfiedCycleFormat(actionCycleStates, offset),
+		var result = ActionUtils.getSimplifiedCycleFormat(actionCycleStates, offset),
 			resultCycleString = cycleTemplate;
 
 		resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
