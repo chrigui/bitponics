@@ -268,6 +268,6 @@ module.exports = [
 		},
 		{
 			_id : '506de2fc8eebf7524342cb2c',
-			description: "Pollinate any new blossoms using a watercolor brush to distribute"
+			description: "Pollinate any new blossoms. Use a small paintbrush or cottom swab brush to distribute pollen between flowers."
 		}
-	]
+	];
