@@ -31,7 +31,7 @@ block content
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
-          if user.name.full != 'undefined undefined' && user.name.full != ''
+          if user.name.full != ''
            | #{user.name.full}
           else
            | #{user.email}
@@ -239,17 +239,17 @@ block content
 
                               div(ng-show="action.control")
                                 label Daily
-                                  input(type="checkbox", ng-model="action.isDailyCycle")
+                                  input(type="checkbox", ng-model="action.isDailyControlCycle")
 
-                                div(ng-show="action.isDailyCycle")
+                                div(ng-show="action.isDailyControlCycle")
                                   label Turn {{action.control.name}} on at 
                                     select(ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
                                   label Turn {{action.control.name}} off at 
                                     select(ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                                div(ng-show="!action.isDailyCycle")
-                                  div Repeating actions have a of alternating on/off states.
+                                div(ng-show="!action.isDailyControlCycle")
+                                  div Repeating actions have alternating on/off states.
                                   
                                   div First, turn {{action.control.name}}
                                     label 
@@ -294,7 +294,7 @@ block content
                               
                         div.phaseEndDescription
                           label Phase End Description
-                          textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="Write a phase end description...", ng-model="phase.phaseEndDescription")
+                          textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="This phase is over when...", ng-model="phase.phaseEndDescription")
                   
           if (userOwnedDevices.length > 0)
             div.device 

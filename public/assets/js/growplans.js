@@ -18,7 +18,7 @@ Bitponics.pages.growplans = {
         $scope.growPlans = Bitponics.growPlans;
         $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
         $scope.timesOfDayList = Bitponics.Utils.generateTimesOfDayArray();
-        $scope.actionDurationTypeOptions = ['seconds','minutes','hours','days','weeks','months'];
+        $scope.actionDurationTypeOptions = Bitponics.Utils.durationTypes,
         $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
 
         //Wrapping our ng-model vars {}
@@ -199,11 +199,13 @@ Bitponics.pages.growplans = {
      * 
      * Adds the following properties:
      * action.scheduleType (string) : 'phaseStart' || 'phaseEnd' || 'repeat'
-     * action.isDailyCycle (boolean)
-     * action.dailyOnTime (set if isDailyCycle)
-     * action.dailyOffTime (set if isDailyCycle)
+     * action.isDailyControlCycle (boolean)
+     * action.dailyOnTime (set if isDailyControlCycle)
+     * action.dailyOffTime (set if isDailyControlCycle)
      * action.message (set if a no-control action)
-     * action.offsetTimeOfDay (set if a no-control, daily action)
+     * action.offsetTimeOfDay (set if a repeating action with an offset)
+     * action.overallDuration
+     * action.overallDurationType (months||weeks||days||hours||minutes||seconds)
      *
      * @param action
      * @param source (optional): 'phaseStart' || 'phaseEnd'
@@ -232,66 +234,47 @@ Bitponics.pages.growplans = {
         }
 
         // Set overallDuration
-        action.isDailyCycle = false;
+        action.isDailyControlCycle = false;
         action.cycle.states.forEach(function(state){
             overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
         });
-        overallDuration = moment.duration(overallDuration);
-        
+        overallDuration = Bitponics.Utils.getLargestWholeNumberDurationObject(overallDuration);
 
-        // Calculate overall duration type, checking from broadest time span down
-        if (Bitponics.Utils.isWholeNumber(asMonths = overallDuration.asMonths())) {
-            action.overallDuration = asMonths;
-            action.overallDurationType = 'months';
-        } else if (Bitponics.Utils.isWholeNumber(asWeeks = overallDuration.asWeeks())){
-            action.overallDuration = asWeeks;
-            action.overallDurationType = 'weeks';
-        } else if (Bitponics.Utils.isWholeNumber(asDays = overallDuration.asDays())){
-            action.overallDuration = asDays;
-            action.overallDurationType = 'days';
-            if (asDays === 1){
-                action.isDailyCycle = true;
-                
-                // If it's an accessory with a daily cycle, we want to show daily 
-                // on/off times
-                if (action.control){
-                    if (action.cycle.states[0].controlValue === '0'){
-                        if (action.cycle.states.length === 3){
-                            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-                            // if first state is off, then OFF trigger time is actually later in the day than ON time. 
-                            // Add ON duration to ON trigger time to get OFF trigger time
-                            // ON is state[1]
-                            action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
-                        } else {
-                            action.dailyOffTime = 0;
-                            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-                        }
+        action.overallDuration = overallDuration.duration;
+        action.overallDurationType = overallDuration.durationType;
+
+        if (action.overallDurationType === 'days' && action.overallDuration === 1){
+            // If it's an accessory with a daily cycle, we want to show daily 
+            // on/off times
+            if (action.control){
+                action.isDailyControlCycle = true;
+                if (action.cycle.states[0].controlValue === '0'){
+                    if (action.cycle.states.length === 3){
+                        // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
+                        action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
+                        // if first state is off, then OFF trigger time is actually later in the day than ON time. 
+                        // Add ON duration to ON trigger time to get OFF trigger time
+                        // ON is state[1]
+                        action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
                     } else {
-                        // else first state of ON cycle
-                        if (action.cycle.states.length === 3){
-                            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-                            // if first state is ON, then ON trigger time is actually later in the day than OFF time. 
-                            // Add OFF duration to OFF trigger time to get ON trigger time
-                            // OFF is state[1]
-                            action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
-                        } else {
-                            action.dailyOnTime = 0;
-                            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-                        }
+                        action.dailyOffTime = 0;
+                        action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
+                    }
+                } else {
+                    // else first state of ON cycle
+                    if (action.cycle.states.length === 3){
+                        // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
+                        action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
+                        // if first state is ON, then ON trigger time is actually later in the day than OFF time. 
+                        // Add OFF duration to OFF trigger time to get ON trigger time
+                        // OFF is state[1]
+                        action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
+                    } else {
+                        action.dailyOnTime = 0;
+                        action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
                     }
                 }
             }
-        } else if (Bitponics.Utils.isWholeNumber(asHours = overallDuration.asHours())){
-            action.overallDuration = asHours;
-            action.overallDurationType = 'hours';   
-        } else if (Bitponics.Utils.isWholeNumber(asMinutes = overallDuration.asMinutes())){
-            action.overallDuration = asMinutes;
-            action.overallDurationType = 'minutes';   
-        } else {
-            action.overallDuration = overallDuration.asSeconds();
-            action.overallDurationType = 'seconds';   
         }
 
         if (action.cycle.states.length === 3){
@@ -331,13 +314,15 @@ Bitponics.pages.growplans = {
                 switch(actionViewModel.scheduleType){
                     case 'phaseStart':
                     case 'repeat':
-                        phase.actions.push(actionViewModel);
+                        phase.actions.push(Bitponics.pages.growplans.compileActionViewModelToServerModel(actionViewModel));
                         break;
                     case 'phaseEnd':
-                        phase.phaseEndActions.push(actionViewModel);
+                        phase.phaseEndActions.push(Bitponics.pages.growplans.compileActionViewModelToServerModel(actionViewModel));
                         break;
                 }
             });
+
+            delete phase.actionsViewModel;
         });
         return growPlan;             
     },
@@ -348,21 +333,105 @@ Bitponics.pages.growplans = {
      *
      * Converts the following viewModel properties back to server model format:
      * action.scheduleType (string) : 'phaseStart' || 'phaseEnd' || 'repeat'
-     * action.isDailyCycle (boolean)
-     * action.dailyOnTime (set if isDailyCycle)
-     * action.dailyOffTime (set if isDailyCycle)
+     * action.isDailyControlCycle (boolean)
+     * action.dailyOnTime (set if isDailyControlCycle)
+     * action.dailyOffTime (set if isDailyControlCycle)
      * action.message (set if a no-control action)
-     * action.offsetTimeOfDay (set if a no-control, daily action)
+     * action.offsetTimeOfDay (set if a repeating action with an offset)
+     * action.overallDuration
+     * action.overallDurationType (months||weeks||days||hours||minutes||seconds)
+     *
+     * 
      */
     compileActionViewModelToServerModel: function (action){
+        var ACCESSORY_ON = Bitponics.Utils.accessoryValues.ON,
+            ACCESSORY_OFF = Bitponics.Utils.accessoryValues.OFF,
+            dailyOnTimeAsMilliseconds,
+            dailyOffTimeAssMilliseconds;
         if (action.scheduleType === 'repeat'){
-            if (action.isDailyCycle){
-                action.cycles = [];
-                
+            action.cycle.repeat = true;
+            if (action.control) {
+                // Non-daily control cycles need no special treatment...the Angular data-binding
+                // sets the correct properties straight-away
+                if (action.isDailyControlCycle) {
+                    action.cycle.states = [];
+                    if (action.dailyOnTime < action.dailyOffTime){
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_OFF,
+                            durationType : 'hours',
+                            duration : moment.duration(action.dailyOnTime).asHours()
+                        });
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_ON,
+                            durationType : 'hours',
+                            duration : moment.duration(action.dailyOffTime - action.dailyOnTime).asHours()
+                        });
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_OFF,
+                            durationType : 'hours',
+                            duration : (24 - moment.duration(action.dailyOffTime).asHours())
+                        });
+                    } else {
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_ON,
+                            durationType : 'hours',
+                            duration : moment.duration(action.dailyOffTime).asHours()
+                        });
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_OFF,
+                            durationType : 'hours',
+                            duration : moment.duration(action.dailyOnTime - action.dailyOffTime).asHours()
+                        });
+                        action.cycle.states.push({
+                            controlValue : ACCESSORY_ON,
+                            durationType : 'hours',
+                            duration : (24 - moment.duration(action.dailyOnTime).asHours())
+                        });
+                    }
+                }
             } else {
+                // action does not have a control
+                action.cycle.states = [];
+                var overallDurationAsMoment = moment.duration(action.overallDuration, action.overallDurationType),
+                    lastStateDurationType = action.overallDurationType,
+                    lastStateDuration = action.overallDuration,
+                    lastStateDurationAsMilliseconds,
+                    lastStateDurationObject;
+                
+                if (action.overallDurationType === 'days' && action.offsetTimeOfDay){
+                    action.cycle.states.push({
+                        durationType : 'hours',
+                        duration: moment.duration(action.offsetTimeOfDay).asHours()
+                    });
 
+                    lastStateDurationAsMilliseconds = (moment.duration(lastStateDuration, lastStateDurationType).asMilliseconds() - moment.duration(action.offsetTimeOfDay).asMilliseconds());
+                    lastStateDurationObject = Bitponics.Utils.getLargestWholeNumberDurationObject(lastStateDurationAsMilliseconds);
+                    lastStateDurationType = lastStateDurationObject.durationType;
+                    lastStateDuration = lastStateDurationObject.duration;
+                }
+
+                action.cycle.states.push({
+                    message: action.message
+                });
+                
+                overallDurationAsMoment
+                action.cycle.states.push({
+                    durationType : lastStateDurationType,
+                    duration : lastStateDuration
+                });
             }
         }
+
+        delete action.scheduleType;
+        delete action.isDailyControlCycle;
+        delete action.dailyOnTime;
+        delete action.dailyOffTime;
+        delete action.message;
+        delete action.offsetTimeOfDay;
+        delete action.overallDuration;
+        delete action.overallDurationType;
+
+        return action;
     }
 };
 

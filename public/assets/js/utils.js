@@ -2,6 +2,8 @@
  * Utils
  */
 
+// depends on moment.js
+
 Bitponics.Utils = {
 	
 	toTitleCase: function(str) {
@@ -94,5 +96,62 @@ Bitponics.Utils = {
 
 	isWholeNumber: function (n) {
 	   return n % 1 === 0;
+	},
+
+	durationTypes : ['seconds','minutes','hours','days','weeks','months'],
+
+
+	/**
+	 * Takes a duration and returns the largest unit of time for which the duration is a whole number.
+	 * Used to simplify presentation of durations in UI (avoiding decimals).
+	 *
+	 * @param duration. Number. If durationType is omitted, it is assumed to be milliseconds.
+	 * @param durationType. String. One of Bitponics.Utils.durationTypes
+	 * @return { 'duration' : number, 'durationType' : string }
+	 */
+	getLargestWholeNumberDurationObject : function(duration, durationType){
+		var duration = moment.duration(duration, durationType || ''),
+			transformedDuration;
+		if (Bitponics.Utils.isWholeNumber(transformedDuration = duration.asMonths())) {
+        	return {
+        		duration : transformedDuration,
+        		durationType : 'months'
+        	}
+    	}
+	    if (Bitponics.Utils.isWholeNumber(transformedDuration = duration.asWeeks())){
+	        return {
+        		duration : transformedDuration,
+        		durationType : 'weeks'
+        	}
+		}
+		if (Bitponics.Utils.isWholeNumber(transformedDuration = duration.asDays())){
+	        return {
+        		duration : transformedDuration,
+        		durationType : 'days'
+        	}
+		}
+		if (Bitponics.Utils.isWholeNumber(transformedDuration = duration.asHours())){
+	        return {
+        		duration : transformedDuration,
+        		durationType : 'hours'
+        	}
+		}
+		if (Bitponics.Utils.isWholeNumber(transformedDuration = duration.asMinutes())){
+	        return {
+        		duration : transformedDuration,
+        		durationType : 'minutes'
+        	}
+		}
+		// if all fail, return as seconds
+		transformedDuration = duration.asSeconds();
+        return {
+    		duration : transformedDuration,
+    		durationType : 'seconds'
+    	}
+	},
+
+	accessoryValues : {
+		ON : '1',
+		OFF : '0'
 	}
 }
