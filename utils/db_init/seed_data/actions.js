@@ -244,20 +244,20 @@ module.exports = [
 				states: [
 					// start the day with 6 hours off
 					{
-						controlValue: '1',
+						controlValue: '0',
 						durationType: 'hours',
 						duration: 6,
 						message: "Turn light off."
 					},
 					{
-						controlValue: '0',
+						controlValue: '1',
 						durationType: 'hours',
 						duration: 16,
 						message: "Turn light on."
 					},
 					// finish off the 24 hour day with off
 					{
-						controlValue: '1',
+						controlValue: '0',
 						durationType: 'hours',
 						duration: 2,
 						message: "Turn light off."

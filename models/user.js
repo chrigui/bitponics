@@ -94,7 +94,10 @@ UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the sche
 
 UserSchema.virtual('name.full')
 	.get(function () {
-		return this.name.first + ' ' + this.name.last;
+		var fullName = '';
+		if (this.name.first) { fullName += this.name.first; }
+		if (this.name.last) { fullName += ' ' + this.name.last; }
+		return fullName;
 	})
 	.set(function (setFullNameTo) {
 	  	var split = setFullNameTo.split(' ')
