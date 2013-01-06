@@ -39,23 +39,29 @@ Bitponics.pages.growplans = {
     
         
         $scope.setSelectedGrowPlan = function() {
-            $scope.selectedGrowPlan = $filter('filter')($scope.growPlans, { _id: $scope.selected.growPlan });
+            $scope.selectedGrowPlan = $filter('filter')($scope.growPlans, { _id: $scope.selected.growPlan })[0];
 
-            if (!$scope.selectedGrowPlan.length) { 
+            if (!$scope.selectedGrowPlan) { 
                 $scope.selectedGrowPlan = Bitponics.growPlanDefault; 
             }
             
-            Bitponics.pages.growplans.initGrowPlanViewModel($scope.selectedGrowPlan);
+            $scope.selectedGrowPlan = GrowPlanModel.get({
+                id: $scope.selectedGrowPlan._id
+            }, function(){
+                Bitponics.pages.growplans.initGrowPlanViewModel($scope.selectedGrowPlan);
 
-            // Update grow plan plants.
-            $scope.selectedPlants.forEach(function(plant, index){
-                if (!$scope.selectedGrowPlan.plants.some(function(gpPlant){ gpPlant.name === plant.name })){
-                    $scope.selectedGrowPlan.plants.push(plant);
-                }
+                // Update grow plan plants.
+                $scope.selectedPlants.forEach(function(plant, index){
+                    if (0 === $.grep($scope.selectedGrowPlan.plants, function(gpPlant){ return gpPlant.name == plant.name; }).length){
+                        //only add if not already in grow plan's plant list
+                        $scope.selectedGrowPlan.plants.push(plant);
+                    }
+                });
+                $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
+                
+                $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
             });
-            $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-            
-            $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
+
         };
 
         $scope.selectedSensors = function() {
@@ -106,7 +112,6 @@ Bitponics.pages.growplans = {
             }, function(){
                 //add default to end of filtered grow plan array
                 $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
-                console.log('GrowPlanModel: ',$scope.filteredGrowPlanList);
             });
         };
         

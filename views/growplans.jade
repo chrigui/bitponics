@@ -64,7 +64,7 @@ block content
           ul(class="grid sortlist photos")
             //- each growPlan, i in growPlans
             li(ng-repeat="growPlan in filteredGrowPlanList")
-              input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}", ng-model="selected.growPlan", ng-change="setSelectedGrowPlan()")
+              input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="selected.growPlan", ng-change="setSelectedGrowPlan()")
               label(for="gplist_input_{{growPlan._id}}") {{growPlan.name}}
                 div.info
                   div(class="gplist_description") {{growPlan.description}}
