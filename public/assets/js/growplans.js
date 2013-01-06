@@ -52,7 +52,8 @@ Bitponics.pages.growplans = {
 
                 // Update grow plan plants.
                 $scope.selectedPlants.forEach(function(plant, index){
-                    if (!$scope.selectedGrowPlan.plants.some(function(gpPlant){ gpPlant.name === plant.name })){
+                    if (0 === $.grep($scope.selectedGrowPlan.plants, function(gpPlant){ return gpPlant.name == plant.name; }).length){
+                        //only add if not already in grow plan's plant list
                         $scope.selectedGrowPlan.plants.push(plant);
                     }
                 });
@@ -111,7 +112,6 @@ Bitponics.pages.growplans = {
             }, function(){
                 //add default to end of filtered grow plan array
                 $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
-                console.log('GrowPlanModel: ',$scope.filteredGrowPlanList);
             });
         };
         
