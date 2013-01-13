@@ -1183,8 +1183,8 @@ section#footer .content-module {
 }
 .inactive {
   opacity: 0.45;
-  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=45);
   filter: alpha(opacity=45);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=45)";
   height: 3em;
 }
 .inactive .toggle .add {
