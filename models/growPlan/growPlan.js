@@ -2,9 +2,9 @@ var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	mongoosePlugins = require('../../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
-  	Schema = mongoose.Schema,
-  	ObjectId = Schema.ObjectId,
-  	PhaseSchema = require('./phase').schema,
+	Schema = mongoose.Schema,
+	ObjectId = Schema.ObjectId,
+	PhaseSchema = require('./phase').schema,
 	async = require('async');
 
 var GrowPlanSchema = new Schema({

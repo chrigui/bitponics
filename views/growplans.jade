@@ -130,9 +130,48 @@ block content
                         textarea(placeholder="Write a phase description...", ng-model="phase.description")
 
                       div.growSystem
-                        label Grow System
-                        select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
-                        
+                        //select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
+                        h6 Grow System
+                        label Name
+                        input(type="text", ng-model="phase.growSystem.name")
+                        label Description
+                        input(type="text", ng-model="phase.growSystem.description")
+                        label Type
+                        input(type="text", ng-model="phase.growSystem.type")
+                        label Reservoir Size
+                        input(type="text", ng-model="phase.growSystem.reservoirSize")
+                        label Plant Capacity
+                        input(type="text", ng-model="phase.growSystem.plantCapacity")
+                        h7 Size
+                        input(type="text", placeholder="W", ng-model="phase.growSystem.overallSize.w")
+                        input(type="text", placeholder="H", ng-model="phase.growSystem.overallSize.h")
+                        input(type="text", placeholder="D", ng-model="phase.growSystem.overallSize.d")
+                      
+                      div.light
+                        h6 Light
+                        h7 Fixture
+                        label Brand
+                        input(type="text", ng-model="phase.light.fixture.brand")
+                        label Name
+                        input(type="text", ng-model="phase.light.fixture.name")
+                        label Type
+                        input(type="text", ng-model="phase.light.fixture.type")
+                        label Watts
+                        input(type="text", ng-model="phase.light.fixture.watts")
+                        label # of bulbs per fixture
+                        input(type="text", ng-model="phase.light.fixture.bulbCapacity")
+                        label # of fixtures
+                        input(type="text", ng-model="phase.light.fixtureQuantity")
+                        h7 Bulbs
+                        label Brand
+                        input(type="text", ng-model="phase.light.bulb.brand")
+                        label Name
+                        input(type="text", ng-model="phase.light.bulb.name")
+                        label Type
+                        input(type="text", ng-model="phase.light.bulb.type")
+                        label Watts
+                        input(type="text", ng-model="phase.light.bulb.watts")
+  
                       div.growMedium
                         label Grow Medium
                         input(type='text', ng-model="phase.growMedium")
