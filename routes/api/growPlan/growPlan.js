@@ -1,7 +1,10 @@
 var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     ActionModel = require('../../../models/action').model,
+    LightFixtureModel = require('../../../models/lightFixture').model,
+    LightBulbModel = require('../../../models/lightBulb').model,
     winston = require('winston'),
-    allPurposeGrowPlanId = '506de30c8eebf7524342cb70';
+    allPurposeGrowPlanId = '506de30c8eebf7524342cb70',
+    async = require('async');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -93,37 +96,64 @@ module.exports = function(app) {
           if (err) { return next(err); }
 
           //Populate idealRange actions ids for querying
-          var actionIds = [];
+          var actionIds = [],
+            fixtureIds = [],
+            bulbIds = [];
+
           grow_plan.phases.forEach(function(phase) {
             phase.idealRanges.forEach(function(idealRange, i) {
               actionIds.push(idealRange.actionAboveMax, idealRange.actionBelowMin);
             });
+            fixtureIds.push(phase.light.fixture);
+            bulbIds.push(phase.light.bulb);
           });
 
-          //Query on all action ids
-          ActionModel.find({})
-            .where('_id').in(actionIds)
-            .exec(function (err, actions) {
-              if (err) { next(err); }
-              var growPlan = grow_plan.toObject(); //in order to have properties update as expected
-              actions.forEach(function(action) {
-                growPlan.phases.forEach(function(phase) {
-                  phase.idealRanges.forEach(function(idealRange) {
+          async.parallel(
+            [
+              function parallel1(callback){
+                //Query on all action ids
+                ActionModel.find({})
+                  .where('_id').in(actionIds)
+                  .exec(callback);
+              },
+              function parallel2(callback){
+                //query on all fixture ids
+                LightFixtureModel.find({})
+                  .where('_id').in(fixtureIds)
+                  .exec(callback);
+              },
+              function parallel3(callback){
+                //query on all bulb ids
+                LightBulbModel.find({})
+                  .where('_id').in(bulbIds)
+                  .exec(callback);
+              }
+            ],
+            function parallelFinal(err, result){
+              if (err) { return next(err); }
+              var actions = result[0],
+                fixtures = result[1],
+                bulbs = result[2],
+                growPlan = grow_plan.toObject(); //in order to have properties update as expected
+              
+              //manually "populate" our nested phase props
+              growPlan.phases.forEach(function(phase) {
+                var light = phase.light;
+                light.fixture = fixtures.filter(function(fixture){ return fixture._id.toString() == phase.light.fixture.toString() })[0];
+                light.bulb = bulbs.filter(function(bulb){ return bulb._id.toString() == phase.light.bulb.toString() })[0];
+                phase.light = light;
 
-                    if (action._id.toString() == idealRange.actionAboveMax) {
-                      idealRange.actionAboveMax = action;
-                    } else if (action._id.toString() == idealRange.actionBelowMin.toString()) {
-                      idealRange.actionBelowMin = action;
-                    }
-
-                  });
+                phase.idealRanges.forEach(function(idealRange) {
+                  idealRange.actionAboveMax = actions.filter(function(action){ return action._id.toString() == idealRange.actionAboveMax })[0];
+                  idealRange.actionBelowMin = actions.filter(function(action){ return action._id.toString() == idealRange.actionBelowMin })[0];
                 });
+
               });
 
               return res.send(growPlan);
-                
-            });
 
+            }
+          );
 
         });
     }

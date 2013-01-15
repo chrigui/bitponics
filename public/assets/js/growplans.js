@@ -167,7 +167,7 @@ Bitponics.pages.growplans = {
         $scope.submit = function(){
             if($scope.selectedGrowPlan){
                 console.log('submit!');
-                console.log(compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan));
+                console.log(Bitponics.pages.growplans.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan));
             }
         }
     }],
