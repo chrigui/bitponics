@@ -1,23 +1,3 @@
-var Device = require('./device'),
-    DeviceModel = Device.model,
-    DeviceUtils = Device.utils,
-    GrowPlanInstanceModel = require('./growPlanInstance').model,
-    GrowPlanModel = require('./growPlan').growPlan.model,
-    Action = require('./action'),
-    ActionModel = Action.model,
-    ActionUtils = Action.utils,
-    ActionOverrideLogModel = require('./actionOverrideLog').model,
-    NotificationModel = require('./notification').model,
-    SensorModel = require('./sensor').model,
-    SensorLogModel = require('./sensorLog').model,
-    EmailConfig = require('../config/email-config'),
-    nodemailer = require('nodemailer'),
-    winston = require('winston'),
-    async = require('async'),
-    tz = require('timezone/loaded'),
-    ObjectID = require('mongodb').ObjectID;
-
-
 /**
  * logSensorLog : Log a sensorLog to the sensorLog collection as well as the
  * device.recentSensorLogs & growPlanInstance.recentSensorLogs. Verify against
@@ -29,6 +9,10 @@ var Device = require('./device'),
  * @param device : optional. Device Model instance on which to log this to recentSensorLogs
  */
 function logSensorLog(options, callback){
+  var GrowPlanModel = require('./growPlan').growPlan.model,
+      async = require('async'),
+      SensorLogModel = require('./sensorLog').model;
+
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
       device = options.device,
@@ -120,7 +104,7 @@ function logSensorLog(options, callback){
       return callback();
     }
   );
-};
+}
 
 
 /**
@@ -129,6 +113,23 @@ function logSensorLog(options, callback){
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control. 
  */
 function triggerActionOverride(options, callback){
+  var Device = require('./device'),
+    DeviceModel = Device.model,
+    DeviceUtils = Device.utils,
+    GrowPlanInstanceModel = require('./growPlanInstance').model,
+    GrowPlanModel = require('./growPlan').growPlan.model,
+    Action = require('./action'),
+    ActionModel = Action.model,
+    ActionUtils = Action.utils,
+    ActionOverrideLogModel = require('./actionOverrideLog').model,
+    NotificationModel = require('./notification').model,
+    SensorLogModel = require('./sensorLog').model,
+    EmailConfig = require('../config/email-config'),
+    nodemailer = require('nodemailer'),
+    winston = require('winston'),
+    async = require('async'),
+    tz = require('timezone/loaded');
+
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
       actionId = options.actionId,
@@ -138,8 +139,8 @@ function triggerActionOverride(options, callback){
       action;
 
   ActionModel.findById(actionId, function(err, actionResult){
-    if (err) { return next(err);}
-    if (!actionResult) { return next(new Error('Invalid action id'));}
+    if (err) { return callback(err);}
+    if (!actionResult) { return callback(new Error('Invalid action id'));}
 
     action = actionResult;
     // calculate when the actionOverride should expire.
@@ -155,7 +156,7 @@ function triggerActionOverride(options, callback){
           if (!device){
             GrowPlanModel.findById(growPlanInstance.growPlan)
             .populate('phases.actions')
-            .exec(function(err, phaseResult){
+            .exec(function(err, growPlan){
                 if (err) { return innerCallback(err);}
                 var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase){return phase.active;})[0];
                 var phase = growPlan.phases.filter(function(phase){return phase._id.equals(growPlanInstancePhase.phase);})[0];
@@ -265,6 +266,10 @@ function triggerActionOverride(options, callback){
 
 
 function scanForPhaseChanges(GrowPlanInstanceModel, callback){
+  var GrowPlanInstanceModel = require('./growPlanInstance').model,
+      NotificationModel = require('./notification').model,
+      winston = require('winston');
+
   var now = new Date(),
       tomorrow = new Date(now + (24 * 60 * 60 * 1000));
 
@@ -331,6 +336,13 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  */
 function clearPendingNotifications (NotificationModel, callback){
+  var NotificationModel = require('./notification').model,
+      EmailConfig = require('../config/email-config'),
+      nodemailer = require('nodemailer'),
+      tz = require('timezone/loaded'),
+      async = require('async'),
+      winston = require('winston');
+
   var now = new Date();
   NotificationModel
   .find()
@@ -385,6 +397,7 @@ function clearPendingNotifications (NotificationModel, callback){
  * @return ObjectId
  */
 function getObjectId (object){
+  var ObjectID = require('mongodb').ObjectID;
   var constructor = object.constructor.name.toLowerCase();
   if (constructor === 'objectid'){ return object; }
   if (constructor === 'string'){ return new ObjectID(object); } 
@@ -392,10 +405,101 @@ function getObjectId (object){
   return object._id;
 }
 
+
+/**
+ * Retrieves a GrowPlan and populates all of its nested objects:
+ * phases.nutrients
+ * phases.growSystem
+ * phases.light.fixture
+ * phases.light.bulb
+ * phases.actions
+ * phases.phaseEndActions
+ * phases.idealRanges.sensor
+ * phases.idealRanges.actionBelowMin
+ * phases.idealRanges.actionAboveMax
+ *
+ * Returns a plain-old-JS-object GrowPlan (not a GrowPlan Mongoose model) 
+ * because of the lack of support for assigning models to ObjectId reference fields
+ * 
+ * Omits GrowPlan.sensors and GrowPlan.controls properties as those will be converted 
+ * into virtuals soon (they'll simply be compiled views of all the sensors & controls used across all phases)
+ * 
+ * @param query {Object} Mongoose query parameters.
+ * @param callback {function} Function with the signature function(err, growPlan){}. "growPlan" param is a POJO GrowPlan.
+ */
+function getFullyPopulatedGrowPlan(query, callback){
+  var GrowPlanModel = require('./growPlan').growPlan.model,
+      async = require('async'),
+      winston = require('winston'),
+      Action = require('./action'),
+      ActionModel = Action.model,
+      ActionUtils = Action.utils,
+      growPlans;
+      
+  async.series(
+    [
+      function (innerCallback) {
+        GrowPlanModel.find(query)
+        .populate('plants')
+        .populate('phases.nutrients')
+        .populate('phases.growSystem')
+        .populate('phases.actions')
+        .populate('phases.phaseEndActions')
+        .exec(function(err, growPlanResults){
+          growPlans = growPlanResults.map(function(growPlanResult){ return growPlanResult.toObject(); });
+          innerCallback();
+        });
+      },
+      function (innerCallback) {
+        var actionIds = [];
+        growPlans.forEach(function(growPlan) {
+          growPlan.phases.forEach(function(phase) {
+            phase.idealRanges.forEach(function(idealRange, i) {
+              actionIds.push(idealRange.actionAboveMax);
+              actionIds.push(idealRange.actionBelowMin);
+            });
+          });
+        });
+        
+        ActionModel.find({})
+        .where('_id').in(actionIds)
+        .exec(function (err, actions) {
+          if (err) { return innerCallback(err); }
+          
+          var actionsById = {};
+          actions.forEach(function(item, index) {
+             actionsById[item._id.toString()] = item;
+          });
+
+          growPlans.forEach(function(growPlan) {
+            growPlan.phases.forEach(function(phase) {
+              phase.idealRanges.forEach(function(idealRange, i) {
+                if (idealRange.actionBelowMin) { 
+                  idealRange.actionBelowMin = actionsById[getObjectId(idealRange.actionBelowMin).toString()];
+                }
+                if (idealRange.actionAboveMax) { 
+                  idealRange.actionAboveMax = actionsById[getObjectId(idealRange.actionAboveMax).toString()];
+                }
+              });
+            });
+          });
+
+          innerCallback();
+        });
+      }
+    ],
+    function (err, result) {
+      //console.log(JSON.stringify(growPlans, null, 2));
+      return callback(err, growPlans);
+    }
+  );
+}
+
 module.exports = {
   logSensorLog : logSensorLog,
   triggerActionOverride : triggerActionOverride,
   scanForPhaseChanges : scanForPhaseChanges,
   clearPendingNotifications : clearPendingNotifications,
-  getObjectId : getObjectId
+  getObjectId : getObjectId,
+  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan
 };

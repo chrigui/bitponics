@@ -36,7 +36,6 @@ module.exports = function(app){
 			sensors: {},
 			growPlanDefault: {}
 		}
-		// locals.growPlanDefault.estimatedDuration = 0;
 		
 		async.parallel(
 			[
@@ -66,6 +65,7 @@ module.exports = function(app){
 								.populate('phases.growSystem')
 								.populate('phases.phaseEndActions')
 								.exec(function(err, gps){
+									if (err) { return innerCallback(err); }
 									locals.growPlans = gps;
 									innerCallback();
 								});
@@ -83,7 +83,7 @@ module.exports = function(app){
 								ActionModel.find({})
 									.where('_id').in(actionIds)
 									.exec(function (err, actions) {
-										if (err) { next(err); }
+										if (err) { return innerCallback(err); }
 										actions.forEach(function(item, index) {
 											locals.actions[item.id] = item;
 										});
@@ -94,7 +94,7 @@ module.exports = function(app){
 						function (err, result) {
 							callback();
 						}
-					)
+					);
 				},
 				function parallel5(callback){
 					// Get the devices that the user owns

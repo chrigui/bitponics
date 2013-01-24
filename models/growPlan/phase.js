@@ -4,7 +4,9 @@ var mongoose = require('mongoose'),
   	Schema = mongoose.Schema,
   	ObjectId = Schema.ObjectId,
   	IdealRangeSchema = require('./idealRange').schema,
-  	async = require('async');
+  	async = require('async'),
+  	Action = require('../action').model,
+  	getObjectId = require('../utils').getObjectId;
 
 var PhaseSchema = new Schema({
 	
@@ -48,82 +50,82 @@ var PhaseSchema = new Schema({
 // Validation rules:
 // Max 1 idealRange per sensor. 
 
+/*********************** END INSTANCE METHODS *************************/
 
 
-/*
- * Given another Phase object, determine whether
- * they're equivalent.
- * Comparing only salient properties; ignoring properties 
- * like createdAt/updatedAt
+
+/*********************** STATIC METHODS ******************************/
+
+/**
+ * Given 2 Phase objects, determine whether they're equivalent.
+ * Comparing only user-defined properties.
  * 
- * @param other. Phase model object
+ * @param source {Phase} Phase model object
+ * @param other {Phase} Phase model object
  * @param callback. Function to be called with result. Passed a boolean argument,
  * 					true if the objects are equivalent, false if not
  *
  */
-PhaseSchema.method('isEquivalentTo', function(other, callback){
-	var phase = this,
-		getObjectId = require('../utils').getObjectId;
-
+PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 	// compare name
-	if (this.name !== other.name) { return callback(null, false); }
+	if (source.name !== other.name) { return callback(null, false); }
 
 	// compare description
-	if (this.description !== other.description) { return callback(null, false); }
+	if (source.description !== other.description) { return callback(null, false); }
 
 	// compare expectedNumberOfDays
-	if (this.expectedNumberOfDays !== other.expectedNumberOfDays) { return callback(null, false); }
+	if (source.expectedNumberOfDays !== other.expectedNumberOfDays) { return callback(null, false); }
 
 	// compare growMedium
-	if (this.growMedium !== other.growMedium) { return callback(null, false); }	
+	if (source.growMedium !== other.growMedium) { return callback(null, false); }	
 
 
 	// compare growSystem
 	if ( !(
-			(this.growSystem && other.growSystem)
+			(source.growSystem && other.growSystem)
 			||
-			(!this.growSystem && !other.growSystem)
+			(!source.growSystem && !other.growSystem)
 		  )
 		)
 	{ 
 		return callback(null, false); 
 	}
-	if (this.growSystem){
-		var thisGrowSystemId = getObjectId(phase.growSystem),
+	if (source.growSystem){
+		var thisGrowSystemId = getObjectId(source.growSystem),
 			otherGrowSystemId = getObjectId(other.growSystem);
 		if (!thisGrowSystemId.equals(otherGrowSystemId)){
 			return callback(null, false);
 		}
-	} 
+	}
 
 	// compare phaseEndDescription
-	if (this.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
+	if (source.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
 
 
 	// compare light, shallow
 	if (!(
-		(this.light && other.light)
+		(source.light && other.light)
 		||
-		(!this.light && !other.light)
+		(!source.light && !other.light)
 		)){ 
 		return callback(null, false); 
 	}
-	if (this.light){
+	if (source.light){
 		if ( !(
-			(this.light.fixture && other.light.fixture) ||
-			(!this.light.fixture && !other.light.fixture)
+			(source.light.fixture && other.light.fixture) ||
+			(!source.light.fixture && !other.light.fixture)
 		 )
 		){ 
 			return callback(null, false); 
 		}
 		if ( !(
-			(this.light.bulb && other.light.bulb) ||
-			(!this.light.bulb && !other.light.bulb)
+			(source.light.bulb && other.light.bulb) ||
+			(!source.light.bulb && !other.light.bulb)
 		 )
 		){ 
 			return callback(null, false); 
 		}
-		if ( this.light.fixtureQuantity !== other.light.fixtureQuantity)
+		if ( source.light.fixtureQuantity !== other.light.fixtureQuantity)
 		{ 
 			return callback(null, false); 
 		}
@@ -132,51 +134,51 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 
 	// compare actions, shallow
 	if ( !(
-			(this.actions && other.actions) ||
-			(!this.actions && !other.actions)
+			(source.actions && other.actions) ||
+			(!source.actions && !other.actions)
 		 )
 		){ 
 		return callback(null, false); 
 	}
-	if (this.actions && other.actions && (this.actions.length !== other.actions.length)){
+	if (source.actions && other.actions && (source.actions.length !== other.actions.length)){
 		return callback(null, false);
 	}
 
 	// compare phaseEndActions, shallow
 	if ( !(
-			(this.phaseEndActions && other.phaseEndActions) ||
-			(!this.phaseEndActions && !other.phaseEndActions)
+			(source.phaseEndActions && other.phaseEndActions) ||
+			(!source.phaseEndActions && !other.phaseEndActions)
 		 )
 		){ 
 		return callback(null, false); 
 	}
-	if (this.phaseEndActions && other.phaseEndActions && (this.phaseEndActions.length !== other.phaseEndActions.length)){
+	if (source.phaseEndActions && other.phaseEndActions && (source.phaseEndActions.length !== other.phaseEndActions.length)){
 		return callback(null, false);
 	}
 
 
 	// compare idealRanges, shallow
 	if ( !(
-			(this.idealRanges && other.idealRanges) ||
-			(!this.idealRanges && !other.idealRanges)
+			(source.idealRanges && other.idealRanges) ||
+			(!source.idealRanges && !other.idealRanges)
 		 )
 		){ 
 		return callback(null, false); 
 	}
-	if (this.idealRanges && other.idealRanges && (this.idealRanges.length !== other.idealRanges.length)){
+	if (source.idealRanges && other.idealRanges && (source.idealRanges.length !== other.idealRanges.length)){
 		return callback(null, false);
 	}
 	
 
 	// compare nutrients, shallow
 	if ( !(
-			(this.nutrients && other.nutrients) ||
-			(!this.nutrients && !other.nutrients)
+			(source.nutrients && other.nutrients) ||
+			(!source.nutrients && !other.nutrients)
 		 )
 		){ 
 		return callback(null, false); 
 	}
-	if (this.nutrients && other.nutrients && (this.nutrients.length !== other.nutrients.length)){
+	if (source.nutrients && other.nutrients && (source.nutrients.length !== other.nutrients.length)){
 		return callback(null, false);
 	}
 	
@@ -184,37 +186,37 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 	async.parallel(
 		[
 			function lightComparison(innerCallback){
-				if (!phase.light){ return innerCallback(null, true); }
+				if (!source.light){ return innerCallback(null, true); }
 
-				if (phase.light.fixture){
-					var thisLightFixtureId = getObjectId(phase.light.fixture),
+				if (source.light.fixture){
+					var sourceLightFixtureId = getObjectId(source.light.fixture),
 						otherLightFixtureId = getObjectId(other.light.fixture);
-					if (!thisLightFixtureId.equals(otherLightFixtureId)){
+					if (!sourceLightFixtureId.equals(otherLightFixtureId)){
 						return innerCallback(null, false);
 					}
 				}
-				if (phase.light.fixtureQuantity !== other.light.fixtureQuantity){
+				if (source.light.fixtureQuantity !== other.light.fixtureQuantity){
 					return innerCallback(null, false);
 				}
-				if (phase.light.bulb){
-					var thisLightBulbId = getObjectId(phase.light.bulb),
+				if (source.light.bulb){
+					var sourceLightBulbId = getObjectId(source.light.bulb),
 						otherLightBulbId = getObjectId(other.light.bulb);
-					if (!thisLightBulbId.equals(otherLightBulbId)){
+					if (!sourceLightBulbId.equals(otherLightBulbId)){
 						return innerCallback(null, false);
 					}
 				}
 				return innerCallback(null, true);
 			},
 			function actionsComparison(innerCallback){
-				if (!phase.actions || !phase.actions.length) { return innerCallback(null, true); }
+				if (!source.actions || !source.actions.length) { return innerCallback(null, true); }
 
 				var allActionsFound = true;
-				for (var i = 0, length = phase.actions.length; i < length; i++){
-					var thisActionId = getObjectId(phase.actions[i]),
+				for (var i = 0, length = source.actions.length; i < length; i++){
+					var action = source.actions[i],
 						actionFound = false;
 					for (var j = 0; j < length; j++){
-						var otherActionId =  getObjectId(other.actions[j]);
-						if (thisActionId.equals(otherActionId)){
+						var otherAction = other.actions[j];
+						if (Action.isEquivalentTo(action, otherAction)) {
 							actionFound = true;
 							break;
 						}
@@ -230,15 +232,15 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return innerCallback(null, true);
 			},
 			function phaseEndActionsComparison(innerCallback){
-				if (!phase.phaseEndActions || !phase.phaseEndActions.length) { return innerCallback(null, true); }
+				if (!source.phaseEndActions || !source.phaseEndActions.length) { return innerCallback(null, true); }
 
 				var allActionsFound = true;
-				for (var i = 0, length = phase.phaseEndActions.length; i < length; i++){
-					var actionId = getObjectId(phase.phaseEndActions[i]),
+				for (var i = 0, length = source.phaseEndActions.length; i < length; i++){
+					var action = source.phaseEndActions[i],
 						actionFound = false;
 					for (var j = 0; j < length; j++){
-						var otherActionId = getObjectId(other.phaseEndActions[j]);
-						if (actionId.equals(otherActionId)){
+						var otherAction = other.phaseEndActions[j];
+						if (Action.isEquivalentTo(action, otherAction)){
 							actionFound = true;
 							break;
 						}
@@ -254,13 +256,13 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return innerCallback(null, true);	
 			},
 			function idealRangesComparison(innerCallback){
-				if (!phase.idealRanges || !phase.idealRanges.length) { return innerCallback(null, true); }
+				if (!source.idealRanges || !source.idealRanges.length) { return innerCallback(null, true); }
 
 				var allIdealRangesFound = true;
-				for (var i = 0, length = phase.idealRanges.length; i < length; i++){
+				for (var i = 0, length = source.idealRanges.length; i < length; i++){
 					var idealRangeFound = false;
 					for (var j = 0; j < length; j++){
-						if (phase.idealRanges[i].isEquivalentTo(other.idealRanges[j])){
+						if (IdealRangeSchema.statics.isEquivalentTo(source.idealRanges[i], other.idealRanges[j])){
 							idealRangeFound = true;
 							break;
 						}
@@ -276,11 +278,11 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 				return innerCallback(null, true);
 			},
 			function nutrientsComparison(innerCallback){
-				if (!phase.nutrients || !phase.nutrients.length) { return innerCallback(null, true); }
+				if (!source.nutrients || !source.nutrients.length) { return innerCallback(null, true); }
 
 				var allNutrientsFound = true;
-				for (var i = 0, length = phase.nutrients.length; i < length; i++){
-					var nutrientId = getObjectId(phase.nutrients[i]),
+				for (var i = 0, length = source.nutrients.length; i < length; i++){
+					var nutrientId = getObjectId(source.nutrients[i]),
 						nutrientFound = false;
 					for (var j = 0; j < length; j++){
 						var otherNutrientId = getObjectId(other.nutrients[j]);
@@ -306,5 +308,7 @@ PhaseSchema.method('isEquivalentTo', function(other, callback){
 		}
 	);
 });
+
+/*********************** END STATIC METHODS **************************/
 
 exports.schema = PhaseSchema;
