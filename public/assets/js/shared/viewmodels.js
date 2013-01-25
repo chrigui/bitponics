@@ -146,7 +146,7 @@ define(['moment', 'utils'], function(moment, utils){
                 switch(actionViewModel.scheduleType){
                     case 'phaseStart':
                     case 'repeat':
-                        phase.actions.push(compileActionViewModelToServerModel(actionViewModel));
+                        phase.actions.push(viewModels.compileActionViewModelToServerModel(actionViewModel));
                         break;
                     case 'phaseEnd':
                         phase.phaseEndActions.push(viewModels.compileActionViewModelToServerModel(actionViewModel));
