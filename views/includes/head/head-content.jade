@@ -18,3 +18,18 @@ script
 		appUrl : '!{appUrl}',
 		pages : {}
 	};
+
+mixin requirejs(datamain)
+	script(src='/assets/js/libs/require.js', data-main=datamain)
+	script
+		require.config({
+			paths: {
+				'viewmodels': '/assets/js/shared/viewmodels', 
+				'es5shim': '/assets/js/libs/es5-shim.min',
+				'steps': '/assets/js/libs/Steps',
+				'moment': '/assets/js/libs/moment.min',
+				'utils': '/assets/js/shared/utils',
+				'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
+				'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
+			}
+		});

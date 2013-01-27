@@ -12,13 +12,8 @@ block head
   
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
-  script(src='/assets/js/libs/require.js', data-main="/assets/js/growplans")
-  script
-    require.config({
-      baseUrl: "/assets/js",
-      shim : {
-      }
-    });
+  mixin requirejs("/assets/js/growplans")
+
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
   link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
