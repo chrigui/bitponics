@@ -1,11 +1,11 @@
 /* Home Page */
 
 define([
-    '/assets/js/libs/jquery/jquery.scrollTo.min.js',
-    '/assets/js/libs/jquery/jquery.localScroll.min.js',
-    '/assets/js/libs/es5-shim.min.js',
-    '/assets/js/shared/utils.js',
-    ], 
+    'scrollto',
+    'localscroll',
+    'es5shim',
+    'utils',
+    ],
 function(){
   Bitponics.pages.home = {
     
@@ -34,8 +34,6 @@ function(){
         $('#main > .content-module').each(function(){
           self.sectionPositions[$(this).attr('id')] = $(this).position().top;
         });
-
-        console.log(self.sectionPositions)
       });
       
     },
@@ -68,18 +66,11 @@ function(){
       setTimeout(function(){
         var lastSection = 'home';
         for(var section in secPos){
-          // console.log('secPos(lastSection): '+secPos[lastSection])
-          // console.log('secPos(section): '+secPos[section])
-          console.log('scrollTop: '+scrollTop)
           if(scrollTop >= secPos[section]){
             console.log('place: '+secPos[section])
             $('.header-fixed li').removeClass('active');
             $('.header-fixed li[data-name='+section+']').addClass('active');
           }
-          // if(secPos[lastSection] <= y && y < secPos[section]){
-          //   $('.header-fixed [data-name='+lastSection+']').addClass('active');
-          //   lastSection = section;
-          // }
         };
       }, 0);
     }

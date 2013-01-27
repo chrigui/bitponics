@@ -1,13 +1,7 @@
 extends layout
 
 block head
-  script(src='/assets/js/libs/require.js', data-main="/assets/js/pages/index")
-  script
-    require.config({
-      baseUrl: "/assets/js/pages",
-      shim : {
-      }
-    });
+  mixin requirejs("/assets/js/pages/index")
 
 block content
 
