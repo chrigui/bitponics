@@ -1,8 +1,17 @@
 extends layout
 
+block head
+  script(src='/assets/js/libs/require.js', data-main="/assets/js/pages/index")
+  script
+    require.config({
+      baseUrl: "/assets/js/pages",
+      shim : {
+      }
+    });
+
 block content
 
-  section#header
+  section.header
       header
         nav(role="nav")
           ul
@@ -15,26 +24,26 @@ block content
 
             li.nav-section
               ul
-                li 
+                li(class="about", data-name="about") 
                   a(href="/about") About
-                li 
+                li(class="howitworks", data-name="howitworks")
                   a(href="/howitworks") How It Works
 
             li.nav-section
               ul
-                li 
+                li(class="gallery", data-name="gallery")
                   a(href="/gallery") Gallery
-                li 
+                li(class="press", data-name="press")
                   a(href="/press") Press
 
             li.nav-section
               ul
-                li 
+                li(class="contact", data-name="contact")
                   a(href="/contact") Contact
 
             li(class="nav-section last")
               ul
-                li 
+                li(class="buy", data-name="buy")
                   a(href="/buy") Buy
 
       //- div#setup.select-block
@@ -78,15 +87,11 @@ block content
 
 block footer-scripts
 
-  script(src='/assets/js/utils.js')
+  //- script(src='/assets/js/shared/utils.js')
   script
     Bitponics.user = !{JSON.stringify(user)};
-    Bitponics.Utils.setupPages($('nav ul > li a'));
-    Bitponics.Utils.sectionHeightAlign(600, '#main > .content-module');
-
-  script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
-  script(src='/assets/js/libs/jquery/jquery.localScroll.min.js')
-
-  script
-    $('nav a').localScroll({ lazy: true });
+    
+  //- script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
+  //- script(src='/assets/js/libs/jquery/jquery.localScroll.min.js')
+  //- script(src="/assets/js/pages/index.js")
 

@@ -1,5 +1,6 @@
 @import "helpers"
 @import "nib"
+@import "./global/colors"
 
 .content-module
 	float left
@@ -20,7 +21,7 @@ body
 	padding 0 .83em
 	text-align left
 
-section#header,
+section.header,
 section#main,
 section#footer
 	padding 1em
@@ -158,16 +159,70 @@ section#footer
  */
 .home
 	
-	// #logo
-	// 	width 18.6% //refactor into global styles
-	#main, #header
-		padding 0 //refactor into global styles
+	#main, .header
+		padding 0
 
-	#header
+	.header
 		position absolute
 		width 100%
 		top 0
 		left 0
+
+	.header-fixed
+		background white
+		color color-text-gray
+		top 800px
+		//margin-top 2em //has to match padding top for .home #main > div, .home header
+
+		&.fixed
+			@extends .fixed
+			top 0
+			z-index 1
+
+		header
+			padding 0 2.6%
+
+		li.first
+			//visibility hidden
+			min-height auto
+			width: 19.3%;
+			margin: 0 0.8% 0 0;
+			padding: 0.45em 0 0 0.15em;
+
+		h1 div, h1 span
+			color #00fa8b
+		a 
+			color color-text-gray
+			line-height: 3em;
+
+			&.active
+				color #00fa8b
+
+		h1 i
+			display none
+
+		.nav-section
+			border-top none
+			width auto
+			margin 0 0 0 0
+			padding 0 0 0 0
+			min-height auto
+			height 3em
+
+			li
+				display inline-block
+				margin 0 3em 0 0
+
+				&.active
+					float none
+					height auto
+					
+					a
+						color #00fa8b
+
+
+
+			
 
 	.nav-section
 		border-top 1px solid white
@@ -180,6 +235,7 @@ section#footer
 		li
 			margin 0
 
+
 	.last
 		margin 0
 
@@ -189,10 +245,9 @@ section#footer
 		float: right;
 
 
-
-
-
-
+	#main
+		#about, #gallery, #contact, #howitworks, #press, #buy
+			padding-top 4em
 
 
 

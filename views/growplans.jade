@@ -9,12 +9,23 @@ block head
     });
   script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
   //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
+  
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
+  script(src='/assets/js/libs/require.js', data-main="/assets/js/growplans")
+  script
+    require.config({
+      baseUrl: "/assets/js",
+      shim : {
+      }
+    });
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
   link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
   //- TEMP hacks
   style
+    [ng-cloak] { display: none; }
     .phase-slider { height: auto !important; background: gray;}
     input[type=radio].ng-binding { opacity : 1; height: auto; width: auto; }
 
@@ -31,12 +42,12 @@ block content
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
-          if user.name.full != 'undefined undefined' && user.name.full != ''
+          if user.name.full != ''
            | #{user.name.full}
           else
            | #{user.email}
 
-  section#main(role="main", ng-app="GrowPlanModule")
+  section(ng-cloak="")#main(role="main")
     div.content-module.middle
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="Bitponics.pages.growplans.GrowPlanController", novalidate)
         h4 Let's find you a grow plan.         
@@ -278,17 +289,17 @@ block content
 
                               div(ng-show="action.control")
                                 label Daily
-                                  input(type="checkbox", ng-model="action.isDailyCycle")
+                                  input(type="checkbox", ng-model="action.isDailyControlCycle")
 
-                                div(ng-show="action.isDailyCycle")
+                                div(ng-show="action.isDailyControlCycle")
                                   label Turn {{action.control.name}} on at 
                                     select(ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
                                   label Turn {{action.control.name}} off at 
                                     select(ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                                div(ng-show="!action.isDailyCycle")
-                                  div Repeating actions have a of alternating on/off states.
+                                div(ng-show="!action.isDailyControlCycle")
+                                  div Repeating actions have alternating on/off states.
                                   
                                   div First, turn {{action.control.name}}
                                     label 
@@ -333,7 +344,7 @@ block content
                               
                         div.phaseEndDescription
                           label Phase End Description
-                          textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="Write a phase end description...", ng-model="phase.phaseEndDescription")
+                          textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="This phase is over when...", ng-model="phase.phaseEndDescription")
                   
           if (userOwnedDevices.length > 0)
             div.device 
@@ -359,14 +370,15 @@ block footer-scripts
     Bitponics.plants = !{JSON.stringify(plants)};
     Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
+  //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
   //script(src='/assets/js/libs/jquery/jquery-mobile-angular-adapter-1.1.1.js')
-  script(src='/assets/js/libs/es5-shim.min.js')
-  script(src='/assets/js/libs/Steps.js')
-  script(src='/assets/js/libs/list/src/list.js')
-  script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')
+  //script(src='/assets/js/libs/es5-shim.min.js')
+  //script(src='/assets/js/libs/Steps.js')
+  //script(src='/assets/js/libs/list/src/list.js')
+  //script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')
   //- script(src='/assets/js/libs/list/list.min.js')
-  script(src='/assets/js/libs/moment.min.js')
-  script(src='/assets/js/growplans.js')
-  script(src='/assets/js/utils.js')
+  //script(src='/assets/js/libs/moment.min.js')
+  //- script(src='/assets/js/growplans.js')
+  //script(src='/assets/js/utils.js')
+

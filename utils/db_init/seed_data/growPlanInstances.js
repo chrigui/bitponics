@@ -24,6 +24,15 @@ module.exports = [
 			],
 			owner : "506de3098eebf7524342cb66",
 			growPlan : "506de2ff8eebf7524342cb3b",
-			active: false,
+			active: false
+		},
+		{
+			_id : '50e48ebe71acd87507edef50',
+			users : [
+				"50e33086a47897af3446e26e"
+			],
+			owner : "50e33086a47897af3446e26e",
+			growPlan : "506de2ff8eebf7524342cb3b",
+			active: true
 		}
 	];

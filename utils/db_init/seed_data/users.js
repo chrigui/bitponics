@@ -15,6 +15,19 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : false
 		},
 		{
+			_id : '50e33086a47897af3446e26e',
+			email : "test@bitponics.com",
+		  	name : {
+		  		first : "Tfirst",
+		  		last : "Tlast"
+	  		},
+		  	locale: "en_US",
+		  	active : true,
+		  	admin :  false,
+		  	activationToken : "12345678900",
+		  	sentEmail : true
+		},
+		{
 			_id : '506de3098eebf7524342cb66',
 			email : "jack@bitponics.com",
 		  	name : {

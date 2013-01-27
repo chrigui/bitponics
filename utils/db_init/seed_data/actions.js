@@ -244,20 +244,20 @@ module.exports = [
 				states: [
 					// start the day with 6 hours off
 					{
-						controlValue: '1',
+						controlValue: '0',
 						durationType: 'hours',
 						duration: 6,
 						message: "Turn light off."
 					},
 					{
-						controlValue: '0',
+						controlValue: '1',
 						durationType: 'hours',
 						duration: 16,
 						message: "Turn light on."
 					},
 					// finish off the 24 hour day with off
 					{
-						controlValue: '1',
+						controlValue: '0',
 						durationType: 'hours',
 						duration: 2,
 						message: "Turn light off."
@@ -268,6 +268,6 @@ module.exports = [
 		},
 		{
 			_id : '506de2fc8eebf7524342cb2c',
-			description: "Pollinate any new blossoms using a watercolor brush to distribute"
+			description: "Pollinate any new blossoms. Use a small paintbrush or cottom swab brush to distribute pollen between flowers."
 		}
-	]
+	];
