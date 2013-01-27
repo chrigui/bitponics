@@ -5,9 +5,13 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,
 	PhaseSchema = require('./phase').schema,
-	async = require('async');
+	Phase = require('./phase').model,
+	async = require('async'),
+	getObjectId = require('../utils').getObjectId;
 
-var GrowPlanSchema = new Schema({
+
+var GrowPlanModel,
+	GrowPlanSchema = new Schema({
 	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
 	createdBy: { type: ObjectId, ref: 'User' },
 	name: { type: String, required: true },
@@ -59,13 +63,13 @@ GrowPlanSchema.pre('save', function(next){
 
 /************************** INSTANCE METHODS  ***************************/
 
-/*
+/**
  * Given a number of days into the GrowPlan, find
  * the target phase & number of days into the phase.
  * If numberOfDays exceeds total span of GrowPlan,
  * returns last day of last phase
  * 
- * @param numberOfDays
+ * @param numberOfDays {Number}
  *
  * @return { phaseId : phaseId, day : numberOfDaysIntoPhase } 
  *
@@ -96,39 +100,41 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
 });
 
 
-/*
- * Given another GrowPlan object, determine whether
- * they're equivalent enough to say they're "equal".
- * Comparing only salient properties; ignoring properties 
- * like createdAt/updatedAt
+
+/************************** END INSTANCE METHODS  ***************************/
+
+
+/************************** STATIC METHODS  ***************************/
+
+/**
+ * Given 2 GrowPlan objects, determine whether they're "equivalent" by comparing 
+ * all user-defined properties (ignoring _id's, createdAt/updatedAt)
  * 
- * @param otherGrowPlan. GrowPlan model object
- * @param callback. function(err, result) to be called with result. result is a boolean,
+ * @param source {GrowPlan}. Fully populated, POJO GrowPlan model object. Retrieved 
+ * @param other {GrowPlan}. Fully populated, POJO GrowPlan model object.
+ * @param callback {function} . function(err, result) to be called with result. result is a boolean,
  * 					true if the objects are equivalent, false if not
  *
  */
-GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
-	var growPlan = this,
-		getObjectId = require('../utils').getObjectId;
-
+GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
 	// compare name
-	if (this.name !== otherGrowPlan.name) { return callback(null, false); }
+	if (source.name !== other.name) { return callback(null, false); }
 
 
 	// compare description
-	if (this.description !== otherGrowPlan.description) { return callback(null, false); }
+	if (source.description !== other.description) { return callback(null, false); }
 
 
 	// compare plants
 
-	if (this.plants.length !== otherGrowPlan.plants.length) { return callback(null, false); }
+	if (source.plants.length !== other.plants.length) { return callback(null, false); }
 	// TODO : this loop can probably be optimized
 	var allPlantsFound = true;
-	for (var i = 0, length = this.plants.length; i < length; i++){
-		var plantId = getObjectId(this.plants[i]),
+	for (var i = 0, length = source.plants.length; i < length; i++){
+		var plantId = getObjectId(source.plants[i]),
 			plantFound = false;
 		for (var j = 0; j < length; j++){
-			if (plantId.equals(getObjectId(otherGrowPlan.plants[j]))) {
+			if (plantId.equals(getObjectId(other.plants[j]))) {
 				plantFound = true;
 				break;
 			}
@@ -144,8 +150,7 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 	
 	
 	// compare phases, shallow
-	if (this.phases.length !== otherGrowPlan.phases.length) { return callback(null, false); }
-	
+	if (source.phases.length !== other.phases.length) { return callback(null, false); }
 	
 	// Now that we've passed all of the shallow comparisons, 
 	// we need to do all of the async comparisons
@@ -153,10 +158,10 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 		[
 			function phasesComparison(innerCallback){
 				var allPhasesAreEquivalent = true;
-				async.forEach(growPlan.phases, 
+				async.forEach(source.phases, 
 					function phaseIterator(phase, phaseCallback){
-						var otherPhase = otherGrowPlan.phases[growPlan.phases.indexOf(phase)];
-						return phase.isEquivalentTo(otherPhase, function(err, isEquivalent){
+						var otherPhase = other.phases[source.phases.indexOf(phase)];
+						return PhaseSchema.statics.isEquivalentTo(phase, otherPhase, function(err, isEquivalent){
 							if (!isEquivalent){
 								allPhasesAreEquivalent = false;
 								// TODO : short-circuit the async loop by calling callback with an error? or is that too dirty
@@ -176,8 +181,8 @@ GrowPlanSchema.method('isEquivalentTo', function(otherGrowPlan, callback){
 		}
 	);
 });
+/************************** END STATIC METHODS  ***************************/
 
-/************************** END INSTANCE METHODS  ***************************/
-
+GrowPlanModel = mongoose.model('GrowPlan', GrowPlanSchema);
 exports.schema = GrowPlanSchema;
-exports.model = mongoose.model('GrowPlan', GrowPlanSchema);
+exports.model = GrowPlanModel;
