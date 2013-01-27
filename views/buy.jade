@@ -2,7 +2,7 @@ extends layout
 
 block content
 
-  section#header
+  section.header
       header
         nav(role="nav")
           ul
@@ -15,35 +15,37 @@ block content
 
             li.nav-section
               ul
-                li 
+                li(class="about", data-name="about") 
                   a(href="/about") About
-                li 
+                li(class="howitworks", data-name="howitworks")
                   a(href="/howitworks") How It Works
 
             li.nav-section
               ul
-                li 
+                li(class="gallery", data-name="gallery")
                   a(href="/gallery") Gallery
-                li 
+                li(class="press", data-name="press")
                   a(href="/press") Press
 
             li.nav-section
               ul
-                li 
+                li(class="contact", data-name="contact")
                   a(href="/contact") Contact
 
             li(class="nav-section last")
               ul
-                li 
+                li(class="buy", data-name="buy")
                   a(href="/buy") Buy
 
   section#main(role="main")
-    h2(class="logo icon nav-section", role="banner")
-      div 
-        | Bitponics
-        span &trade;
+    //- h2(class="logo icon nav-section", role="banner")
+    //-   div 
+    //-     | Bitponics
+    //-     span &trade;
+    //-   | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
+    h3(class="page-heading nav-section") 
+      div Buy
       | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
-    h3(class="page-heading nav-section") Buy
     div.page-content
       p Purchase a bitponics device.
 

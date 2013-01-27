@@ -4,7 +4,8 @@
 .full-height {
   height: 100%;
 }
-.position-f {
+.fixed,
+.home .header-fixed.fixed {
   position: fixed;
 }
 .position-r {
@@ -196,7 +197,7 @@ margin 0,
   padding: 0 0.83em;
   text-align: left;
 }
-section#header,
+section.header,
 section#main,
 section#footer {
   padding: 1em;
@@ -307,14 +308,65 @@ section#footer {
  * Home Page
  */
 .home #main,
-.home #header {
+.home .header {
   padding: 0;
 }
-.home #header {
+.home .header {
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
+}
+.home .header-fixed {
+  background: #fff;
+  color: #999b9a;
+  top: 800px;
+}
+.home .header-fixed.fixed {
+  top: 0;
+  z-index: 1;
+}
+.home .header-fixed header {
+  padding: 0 2.6%;
+}
+.home .header-fixed li.first {
+  min-height: auto;
+  width: 19.3%;
+  margin: 0 0.8% 0 0;
+  padding: 0.45em 0 0 0.15em;
+}
+.home .header-fixed h1 div,
+.home .header-fixed h1 span {
+  color: #00fa8b;
+}
+.home .header-fixed a {
+  color: #999b9a;
+  line-height: 3em;
+}
+.home .header-fixed a.active {
+  color: #00fa8b;
+}
+.home .header-fixed h1 i {
+  display: none;
+}
+.home .header-fixed .nav-section {
+  border-top: none;
+  width: auto;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  min-height: auto;
+  height: 3em;
+}
+.home .header-fixed .nav-section li {
+  display: inline-block;
+  margin: 0 3em 0 0;
+}
+.home .header-fixed .nav-section li.active {
+  float: none;
+  height: auto;
+}
+.home .header-fixed .nav-section li.active a {
+  color: #00fa8b;
 }
 .home .nav-section {
   border-top: 1px solid #fff;
@@ -334,4 +386,12 @@ section#footer {
   clear: both;
   width: 80%;
   float: right;
+}
+.home #main #about,
+.home #main #gallery,
+.home #main #contact,
+.home #main #howitworks,
+.home #main #press,
+.home #main #buy {
+  padding-top: 4em;
 }
