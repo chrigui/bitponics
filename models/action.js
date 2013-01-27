@@ -8,7 +8,8 @@ var mongoose = require('mongoose'),
   	ActionSchema,
   	async = require('async'),
   	timezone = require('timezone/loaded'),
-  	ControlModel = require('./control').model;
+  	ControlModel = require('./control').model,
+  	getObjectId = require('./utils').getObjectId;;
 
 ActionSchema = new Schema({
 	
@@ -110,12 +111,68 @@ ActionSchema.method('getStateMessage', function(stateIndex, controlName){
 	}
 	return '';
 });
+
+
 /************************** END INSTANCE METHODS ***************************/
 
 
 
 
 /************************** STATIC METHODS ***************************/
+
+/**
+ * Given another Action object, determine whether they're equivalent.
+ * Compares most properties, ignoring Action._id and Action.cycle.states._id.
+ *
+ * Synchronous.
+ * 
+ * @param source {Action}. Action model object
+ * @param other {Action}. Action model object
+ * @return {boolean}. true if the objects are equivalent, false if not
+ */
+ActionSchema.static('isEquivalentTo', function(source, other){
+	if (source.description != other.description){
+		return false;
+	}
+	
+	if (!((source.control && other.control) || (!source.control && !other.control))) {
+		return false;
+	}
+	if (source.control){
+		if (!getObjectId(source.control).equals(getObjectId(other.control))){
+			return false;
+		}
+	}
+
+	if (!source.cycle.states.length === other.cycle.states.length){
+		return false;
+	}
+
+	if (!source.cycle.repeat == other.cycle.repeat){ 
+		return false;
+	}
+
+	var allStatesEquivalent = source.cycle.states.every(function(state, index){
+		var otherState = other.cycle.states[index];
+		if (state.controlValue != otherState.controlValue) { 
+			return false;
+		}
+		if (state.durationType != otherState.durationType) { 
+			return false;
+		}
+		if (state.duration != otherState.duration) { 
+			return false;
+		}
+		if (state.message != otherState.message) { 
+			return false;
+		}
+		return true;
+	});
+
+	if (!allStatesEquivalent) { return false; }
+
+	return true;
+});
 
 /************************** END STATIC METHODS***************************/
 

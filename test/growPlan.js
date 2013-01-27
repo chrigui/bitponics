@@ -1,6 +1,8 @@
 var mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-GrowPlan = require('../models/growPlan').growPlan.model,
+Models = require('../models'),
+GrowPlan = Models.growPlan,
+ModelUtils = Models.utils,
 should = require('should'),
 sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
 
@@ -44,39 +46,56 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
     
 
     describe('#isEquivalentTo(other, callback)', function(){
-      beforeEach(function(){
-        var other = sampleGrowPlans[0];
+
+      beforeEach(function(done){
+        var self = this,
+            other = sampleGrowPlans[0];
+        
         other._id = new ObjectID();
-        this.other = new GrowPlan(other);
+        self.other = new GrowPlan(other);
+
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
+            self.otherFullyPopulatedGrowPlan = growPlans[0];
+            done();
+          }
+        );
       });
 
 
       it('returns true when other GrowPlan is equivalent', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+        
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.true;
               done();
-            });     
+            });
           }
         );
       });
 
 
       it('returns false when other GrowPlan has different "name"', function(done){
-        var other = this.other;        
+        var other = this.otherFullyPopulatedGrowPlan;
         other.name = 'should not match';
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+        
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -86,15 +105,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "description"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.description = 'should not match';
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
-            
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+        
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -104,15 +125,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "plants"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.plants.push('50749839ab364e2a9fffd4ef');
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
-            
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+        
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -122,15 +145,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different number of phases', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases.pop();
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -140,15 +165,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.name"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].name = "don't match this";
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -158,15 +185,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.description"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].description = "don't match this";
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -176,15 +205,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.expectedNumberOfDays"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].expectedNumberOfDays = 8093485039;
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -194,15 +225,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.idealRanges"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].idealRanges.pop();
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -212,15 +245,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.idealRanges.valueRange.min"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].idealRanges[0].valueRange.min = 1;
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -230,15 +265,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.idealRanges.valueRange.min"', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].idealRanges[0].valueRange.max = 50;
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -248,15 +285,19 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.idealRanges.actionBelowMin"', function(done){
-        var other = this.other;
-        other.phases[0].idealRanges[0].actionBelowMin = new ObjectID();
-        
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].idealRanges[0].actionBelowMin = new Models.action({
+          description : "don't match this"
+        });
+
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -266,15 +307,19 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.idealRanges.actionAboveMax"', function(done){
-        var other = this.other;
-        other.phases[0].idealRanges[0].actionAboveMax = new ObjectID();
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].idealRanges[0].actionAboveMax = new Models.action({
+          description : "don't match this"
+        });
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -284,15 +329,17 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.actions" length', function(done){
-        var other = this.other;
+        var other = this.otherFullyPopulatedGrowPlan;
         other.phases[0].actions.pop();
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -302,15 +349,19 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.actions"', function(done){
-        var other = this.other;
-        other.phases[0].actions[0] = new ObjectID();
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].actions[0] = new Models.action({
+          description : "don't match this"
+        });
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -320,15 +371,19 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.phaseEndActions" length', function(done){
-        var other = this.other;
-        other.phases[0].phaseEndActions.push(new ObjectID());
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].phaseEndActions.push(new Models.action({
+          description : "don't match this"
+        }));
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -337,16 +392,20 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
         );
       });
 
-      it('returns false when other GrowPlan has different "phases.phaseEndActions"', function(done){
-        var other = this.other;
-        other.phases[0].phaseEndActions[0] = new ObjectID();
+      it('returns false when other GrowPlan has different "phases.phaseEndActions" definitions', function(done){
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].phaseEndActions[0] = new Models.action({
+          description : "don't match this"
+        });
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -356,15 +415,20 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.nutrients"', function(done){
-        var other = this.other;
-        other.phases[0].nutrients.push(new ObjectID());
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].nutrients.push(new Models.nutrient({
+          brand : "don't match this",
+          name : "don't match this"
+        }));
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -374,15 +438,21 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
       });
 
       it('returns false when other GrowPlan has different "phases.growSystem"', function(done){
-        var other = this.other;
-        other.phases[0].growSystem = new ObjectID();
+        var other = this.otherFullyPopulatedGrowPlan;
+        other.phases[0].growSystem = new Models.growSystem({
+          name : "don't match this",
+          type : "don't match this",
+          plantCapacity : 0
+        });  
 
-        GrowPlan.findById('506de30c8eebf7524342cb70',
-          function(err, growPlan){
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : '506de30c8eebf7524342cb70'},
+          function(err, growPlans){
             should.not.exist(err);
+            var growPlan = growPlans[0];
             should.exist(growPlan);
             
-            growPlan.isEquivalentTo(other, function(err, isEquivalent){
+            GrowPlan.isEquivalentTo(growPlan, other, function(err, isEquivalent){
               should.not.exist(err);
               isEquivalent.should.be.false;
               done();
@@ -390,7 +460,6 @@ sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
           }
         );
       });
-
       
     });
     

@@ -25,7 +25,7 @@ should = require('should');
 	 */
 	 beforeEach(function(done){
 	 	User.createUserWithPassword({
-		 		email : 'test@bitponics.com',
+		 		email : 'unittest@bitponics.com',
 			  	name : {
 			  		first : "Testfirstname",
 			  		last : "Testlastname"
@@ -48,16 +48,16 @@ should = require('should');
     * Remove the test user.
     */
     afterEach(function(done){
-    	User.remove({email: 'test@bitponics.com'}, done);
+    	User.remove({email: 'unittest@bitponics.com'}, done);
     });
 
 
     it('creates a new user', function(done){
-    	User.findOne({ email : 'test@bitponics.com'},
+    	User.findOne({ email : 'unittest@bitponics.com'},
     		function(err, user){
     			should.not.exist(err);
 					should.exist(user);
-		  		user.email.should.eql('test@bitponics.com');
+		  		user.email.should.eql('unittest@bitponics.com');
 		  		done();
     		});
 
@@ -65,17 +65,17 @@ should = require('should');
 
 
     it('authenticates a user by email and password', function(done){
-    	User.authenticate('test@bitponics.com', '8bitpass', function(err, user){
+    	User.authenticate('unittest@bitponics.com', '8bitpass', function(err, user){
     		should.not.exist(err);
 				should.exist(user);
-	  		user.email.should.eql('test@bitponics.com');
+	  		user.email.should.eql('unittest@bitponics.com');
 	  		done();
     	})
     });
 
 
 		it('gets a user by public device key', function(done){
-    	User.findOne({email : 'test@bitponics.com'},
+    	User.findOne({email : 'unittest@bitponics.com'},
     		function(err, user){
     			should.not.exist(err);
 					should.exist(user);
@@ -90,7 +90,7 @@ should = require('should');
 
 
 		it('gets a user by public api key', function(done){
-    	User.findOne({email : 'test@bitponics.com'},
+    	User.findOne({email : 'unittest@bitponics.com'},
     		function(err, user){
     			should.not.exist(err);
 					should.exist(user);

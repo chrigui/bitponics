@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
+Models = require('../models'),
 GrowPlanInstance = require('../models/growPlanInstance').model,
 GrowPlan = require('../models/growPlan').growPlan.model,
 Device = require('../models/device').model,

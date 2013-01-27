@@ -1,22 +1,133 @@
 /* qTip2 - Pretty powerful tooltips - v2.0.0 - 2012-09-10
 * http://craigsworks.com/projects/qtip2/
 * Copyright (c) 2012 Craig Michael Thompson; Licensed MIT, GPL */
-#qtip-rcontainer{position:absolute;left:-28000px;top:-28000px;display:block;visibility:hidden}
-#qtip-rcontainer .ui-tooltip{display:block !important;visibility:hidden !important;position:static !important;float:left !important}
-.ui-tooltip,.qtip{position:absolute;left:-28000px;top:-28000px;display:none;max-width:280px;min-width:50px;font-size:10.5px;line-height:12px}
-.ui-tooltip-content{position:relative;padding:5px 9px;overflow:hidden;background:#fff;text-align:left;word-wrap:break-word}
-.ui-tooltip-titlebar{position:relative;min-height:14px;padding:5px 35px 5px 10px;overflow:hidden;border-width:0 0 1px;font-weight:bold}
-.ui-tooltip-titlebar + .ui-tooltip-content{border-top-width:0 !important}
-.ui-tooltip-titlebar .ui-state-default{position:absolute;right:4px;top:50%;margin-top:-9px;cursor:pointer;outline:medium none;border-width:1px;border-style:solid}
-* html .ui-tooltip-titlebar .ui-state-default{top:16px}
-.ui-tooltip-titlebar .ui-icon,.ui-tooltip-icon .ui-icon{display:block;text-indent:-1000em;direction:ltr}
-.ui-tooltip-icon,.ui-tooltip-icon .ui-icon{-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;text-decoration:none}
-.ui-tooltip-icon .ui-icon{width:18px;height:14px;text-align:center;text-indent:0;font:normal bold 10px/13px Tahoma,sans-serif;color:inherit;background:transparent none no-repeat -100em -100em}
-.ui-tooltip-focus,/* Applied on hover of tooltips i.e. added/removed on mouseenter/mouseleave respectively */,.ui-tooltip-hover,/* Default tooltip style */,.ui-tooltip-default{border-width:1px;border-style:solid;border-color:#f1d031;background-color:#ffffa3;color:#555}
-.ui-tooltip-default .ui-tooltip-titlebar{background-color:#ffef93}
-.ui-tooltip-default .ui-tooltip-icon{border-color:#ccc;background:#f1f1f1;color:#777}
-.ui-tooltip-default .ui-tooltip-titlebar .ui-state-hover{border-color:#aaa;color:#111}
-.ui-tooltip .ui-tooltip-tip{margin:0 auto;overflow:hidden;z-index:10}
-.ui-tooltip .ui-tooltip-tip,.ui-tooltip .ui-tooltip-tip .qtip-vml{position:absolute;line-height:.1px !important;font-size:.1px !important;color:#123456;background:transparent;border:0 dashed transparent}
-.ui-tooltip .ui-tooltip-tip canvas{top:0;left:0}
-.ui-tooltip .ui-tooltip-tip .qtip-vml{behavior:url("#default#VML");display:inline-block;visibility:visible}
+/* Fluid class for determining actual width in IE */
+#qtip-rcontainer {
+  position: absolute;
+  left: -28000px;
+  top: -28000px;
+  display: block;
+  visibility: hidden;
+}
+/* Fluid class for determining actual width in IE */
+#qtip-rcontainer .ui-tooltip {
+  display: block !important;
+  visibility: hidden !important;
+  position: static !important;
+  float: left !important;
+}
+/* Core qTip styles */
+.ui-tooltip,
+.qtip {
+  position: absolute;
+  left: -28000px;
+  top: -28000px;
+  display: none;
+  max-width: 280px;
+  min-width: 50px;
+  font-size: 10.5px;
+  line-height: 12px;
+}
+.ui-tooltip-content {
+  position: relative;
+  padding: 5px 9px;
+  overflow: hidden;
+  background: #fff;
+  text-align: left;
+  word-wrap: break-word;
+}
+.ui-tooltip-titlebar {
+  position: relative;
+  min-height: 14px;
+  padding: 5px 35px 5px 10px;
+  overflow: hidden;
+  border-width: 0 0 1px;
+  font-weight: bold;
+}
+.ui-tooltip-titlebar + .ui-tooltip-content {
+  border-top-width: 0 !important;
+}
+/* Default close button class */
+.ui-tooltip-titlebar .ui-state-default {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  margin-top: -9px;
+  cursor: pointer;
+  outline: medium none;
+  border-width: 1px;
+  border-style: solid;
+}
+* html .ui-tooltip-titlebar .ui-state-default {
+  top: 16px;
+}
+/* IE fix */
+.ui-tooltip-titlebar .ui-icon,
+.ui-tooltip-icon .ui-icon {
+  display: block;
+  text-indent: -1000em;
+  direction: ltr;
+}
+.ui-tooltip-icon,
+.ui-tooltip-icon .ui-icon {
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  text-decoration: none;
+}
+.ui-tooltip-icon .ui-icon {
+  width: 18px;
+  height: 14px;
+  text-align: center;
+  text-indent: 0;
+  font: normal bold 10px/13px Tahoma, sans-serif;
+  color: inherit;
+  background: transparent none no-repeat -100em -100em;
+}
+/* Applied to 'focused' tooltips e.g. most recently displayed/interacted with */
+.ui-tooltip-focus,
+/* Applied on hover of tooltips i.e. added/removed on mouseenter/mouseleave respectively */,
+.ui-tooltip-hover,
+/* Default tooltip style */,
+.ui-tooltip-default {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #f1d031;
+  background-color: #ffffa3;
+  color: #555;
+}
+.ui-tooltip-default .ui-tooltip-titlebar {
+  background-color: #ffef93;
+}
+.ui-tooltip-default .ui-tooltip-icon {
+  border-color: #ccc;
+  background: #f1f1f1;
+  color: #777;
+}
+.ui-tooltip-default .ui-tooltip-titlebar .ui-state-hover {
+  border-color: #aaa;
+  color: #111;
+}
+.ui-tooltip .ui-tooltip-tip {
+  margin: 0 auto;
+  overflow: hidden;
+  z-index: 10;
+}
+.ui-tooltip .ui-tooltip-tip,
+.ui-tooltip .ui-tooltip-tip .qtip-vml {
+  position: absolute;
+  line-height: 0.1px !important;
+  font-size: 0.1px !important;
+  color: #123456;
+  background: transparent;
+  border: 0 dashed transparent;
+}
+.ui-tooltip .ui-tooltip-tip canvas {
+  top: 0;
+  left: 0;
+}
+.ui-tooltip .ui-tooltip-tip .qtip-vml {
+  behavior: url("#default#VML");
+  display: inline-block;
+  visibility: visible;
+}

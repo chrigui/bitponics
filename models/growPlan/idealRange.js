@@ -1,7 +1,9 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
-  	ObjectId = Schema.ObjectId;
+  	ObjectId = Schema.ObjectId,
+  	Action = require('../action').model,
+  	getObjectId = require('../utils').getObjectId;
 
 var IdealRangeSchema = new Schema({
 	/**
@@ -36,58 +38,6 @@ var IdealRangeSchema = new Schema({
 
 
 /************************** INSTANCE METHODS  ***************************/
-/*
- * Given another IdealRange object, determine whether
- * they're equivalent.
- *
- * Synchronous, unlike parent "isEquivalentTo" functions
- * 
- * @param other. IdealRange model object
- * @return boolean. Function to be called with result. Passed a boolean argument,
- * 					true if the objects are equivalent, false if not
- *
- */
-IdealRangeSchema.method('isEquivalentTo', function(other){
-	var getObjectId = require('../utils').getObjectId;
-
-	if (this.sCode !== other.sCode) { return false;}
-	if (this.valueRange.min !== other.valueRange.min) { return false;}
-	if (this.valueRange.max !== other.valueRange.max) { return false;}
-	
-	if (!((this.actionBelowMin && other.actionBelowMin) || (!this.actionBelowMin && !other.actionBelowMin))) {
-		return false;
-	}
-	if (this.actionBelowMin){
-		var thisActionBelowMinId = getObjectId(this.actionBelowMin),
-			otherActionBelowMinId = getObjectId(other.actionBelowMin);
-		if (!thisActionBelowMinId.equals(otherActionBelowMinId)) { return false;}
-	}
-
-	if (!((this.actionAboveMax && other.actionAboveMax) || (!this.actionAboveMax && !other.actionAboveMax))) {
-		return false;
-	}
-	if (this.actionAboveMax){
-		var thisActionAboveMaxId = getObjectId(this.actionAboveMax),
-			otherActionAboveMaxId = getObjectId(other.actionAboveMax);
-		if (!thisActionAboveMaxId.equals(otherActionAboveMaxId)) { return false;}
-	}
-
-	if (!((this.applicableTimeSpan && other.applicableTimeSpan) || (!this.applicableTimeSpan && !other.applicableTimeSpan))) {
-		return false;
-	}
-	if (this.applicableTimeSpan){
-		if (!
-			(this.applicableTimeSpan.startTime == other.applicableTimeSpan.startTime)
-			&&
-			(this.applicableTimeSpan.endTime == other.applicableTimeSpan.endTime)
-			){
-			return false;
-		}
-	}
-
-	return true;
-});
-
 
 IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 	var applicableTimeSpan = this.applicableTimeSpan;
@@ -100,5 +50,58 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
 });
 
 /************************** END INSTANCE METHODS  ***************************/
+
+
+/************************** STATIC METHODS  ***************************/
+
+/**
+ * Given two IdealRange objects, determine whether they're equivalent
+ * by comparing user-defined properties.
+ *
+ * Synchronous, unlike parent "isEquivalentTo" functions.
+ *
+ * Assumes that if actionBelowMin and actionAboveMax are defined,
+ * they are populated Action model objects and not simply ObjectIds or strings.
+ * 
+ * @param source {IdealRange}. IdealRange model object. 
+ * @param other {IdealRange}. IdealRange model object. 
+ * @return {boolean}. true if the objects are equivalent, false if not
+ */
+IdealRangeSchema.static('isEquivalentTo', function(source, other){
+	if (source.sCode !== other.sCode) { return false;}
+	if (source.valueRange.min !== other.valueRange.min) { return false;}
+	if (source.valueRange.max !== other.valueRange.max) { return false;}
+	
+	if (!((source.actionBelowMin && other.actionBelowMin) || (!source.actionBelowMin && !other.actionBelowMin))) {
+		return false;
+	}
+	if (source.actionBelowMin){
+		if (!Action.isEquivalentTo(source.actionBelowMin, other.actionBelowMin)) { return false;}
+	}
+
+	if (!((source.actionAboveMax && other.actionAboveMax) || (!source.actionAboveMax && !other.actionAboveMax))) {
+		return false;
+	}
+	if (source.actionAboveMax){
+		if (!Action.isEquivalentTo(source.actionAboveMax, other.actionAboveMax)) { return false;}
+	}
+
+	if (!((source.applicableTimeSpan && other.applicableTimeSpan) || (!source.applicableTimeSpan && !other.applicableTimeSpan))) {
+		return false;
+	}
+	if (source.applicableTimeSpan){
+		if (!
+			(source.applicableTimeSpan.startTime == other.applicableTimeSpan.startTime)
+			&&
+			(source.applicableTimeSpan.endTime == other.applicableTimeSpan.endTime)
+			){
+			return false;
+		}
+	}
+
+	return true;
+});
+
+/************************** END STATIC METHODS  ***************************/
 
 exports.schema = IdealRangeSchema;
