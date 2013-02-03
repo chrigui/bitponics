@@ -12,7 +12,7 @@ var mongoose = require('mongoose'),
   tz = require('timezone/loaded'),
   DeviceModel = require('./device').model,
   getObjectId = require('./utils').getObjectId,
-  SensorLogSchema = require('./sensorlog').schema;
+  SensorLogSchema = require('./sensorLog').schema;
 
 /**
  * GrowPlanInstance 
