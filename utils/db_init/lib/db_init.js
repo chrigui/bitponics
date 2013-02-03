@@ -13,7 +13,7 @@
  *   2. $ npm link
  *
  * Usage:
- *   1. $ db_init [local|dev|staging|mongodb://whatever-db-you-need] [clear]
+ *   1. $ db_init [local|dev|staging|test|mongodb://whatever-db-you-need] [clear]
  *   
  *   example: 
  *		$ db_init local
@@ -66,6 +66,8 @@ mongoUrls = require('../../../config/mongo-config').urls,
 		db_url = mongoUrls.staging;
 		appDomain = appDomains.staging;
 		break;
+		case 'test':
+		db_url = mongoUrls.test;
 		default:
 		// if not one of those, assume it was a mongodb:// url, so leave it alone
 	}
@@ -735,13 +737,21 @@ function(callback){
 		 		if (result){
 		 			decrementData();
 		 		} else {
+		 			
 		 			models.growPlanInstance.create({
 		 				_id : _data._id,
 		 				users: _data.users,
 		 				owner : _data.owner,
 		 				growPlan: _data.growPlan,
 		 				device: _data.device,
-		 				active : _data.active
+		 				active : _data.active,
+		 				startDate: _data.startDate,
+		 				endDate: _data.endDate,
+		 				active: _data.active,
+		 				phases: _data.phases,
+		 				recentSensorLogs: _data.recentSensorLogs,
+		 				recentPhotoLogs: _data.recentPhotLogs,
+		 				recentTagLogs: _data.recentTagLogs
 		 			},
 		 			function(err, doc){
 		 				if (err) { console.log(err); return callback(err);}
@@ -809,7 +819,7 @@ function(callback){
 		 	models.sensorLog.findById(_data._id, function(err, result){
 		 		if (err) { console.log(err); return callback(err);}
 		 		if (result){
-		 			decrementData();
+		 			return decrementData();
 		 		} else {
 		 			var dataObj = new models.sensorLog({
 		 				_id : _data._id,
