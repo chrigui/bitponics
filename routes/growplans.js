@@ -8,6 +8,7 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   IdealRangesModel = require('../models/growPlan/idealRange').model,
   GrowSystemModel = require('../models/growSystem').model,
   ActionModel = require('../models/action').model,
+  ModelUtils = require('../models/utils'),
 	winston = require('winston'),
 	passport = require('passport'),
 	async = require('async'),
@@ -159,44 +160,37 @@ module.exports = function(app){
 		// 3. Create a new GPI, set owner to the user and activate it
 		// 
 
-		GrowPlanModel.findById(req.body.parentGrowPlan)
-		.populate('controls')
-		.populate('sensors')
-		.populate('plants')
-		.populate('phases.nutrients')
-		.populate('phases.actions')
-		.populate('phases.growSystem')
-		.populate('phases.phaseEndActions')
-		.exec(function(err, growPlanResult){
+		ModelUtils.getFullyPopulatedGrowPlan({_id:req.body.parentGrowPlan}, function(err, growPlans){
 			if (err) { 
 				result.status = 'error';
 				result.errors = [err.message];
 				return res.json(result);
 			}
 
-			var submittedGrowPlan = new GrowPlanModel({
-				parentGrowPlanId: undefined,
-				createdBy: req.user,
-				name: req.body.gpedit_name,
-				description: req.body.gpedit_description,
-				plants: req.body.plants,
-				sensors: [],
-				controls: [],
-				phases: [],
-				visibility: 'public'
-			});
+			var parentGrowPlan = growPlans[0],
+				submittedGrowPlan = new GrowPlanModel({
+					parentGrowPlanId: undefined,
+					createdBy: req.user,
+					name: req.body.gpedit_name,
+					description: req.body.gpedit_description,
+					plants: req.body.plants,
+					sensors: [],
+					controls: [],
+					phases: [],
+					visibility: 'public'
+				});
 
 			async.series([
 				function branchingCheck(callback){
-					growPlanResult.isEquivalentTo(submittedGrowPlan, function(err, isEquivalent){
+					GrowPlan.isEquivalentTo(parentGrowPlan, submittedGrowPlan, function(err, isEquivalent){
 						if (err) { 
 							return callback(err); 
 						}
 						if (isEquivalent) { 
-							return callback(null, growPlanResult); 
+							return callback(null, parentGrowPlan); 
 						} else {
-							// branch the growPlanResult
-							submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
+							// branch the parentGrowPlan
+							submittedGrowPlan.parentGrowPlanId = parentGrowPlan._id;
 							submittedGrowPlan.save(function (err){
 								return callback(err, submittedGrowPlan);
 							});		

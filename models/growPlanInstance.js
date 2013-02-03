@@ -11,7 +11,8 @@ var mongoose = require('mongoose'),
   winston = require('winston'),
   tz = require('timezone/loaded'),
   DeviceModel = require('./device').model,
-  getObjectId = require('./utils').getObjectId;
+  getObjectId = require('./utils').getObjectId,
+  SensorLogSchema = require('./sensorlog').schema;
 
 /**
  * GrowPlanInstance 
@@ -52,16 +53,7 @@ var GrowPlanInstanceSchema = new Schema({
 	/**
 	 * Sensor logs for the past 24 hours.
 	 */
-	recentSensorLogs: [{
-		ts: { type: Date, required: true, default: Date.now },
-		logs : [{
-			/**
-			 * sCode references to Sensor.code
-			 */
-			sCode: { type: String, ref: 'Sensor', required: true },
-			val: { type: Number }
-		}]
-	}],
+	recentSensorLogs: [SensorLogSchema],
 	
 	/**
 	 * Photo logs for the past 24 hours
