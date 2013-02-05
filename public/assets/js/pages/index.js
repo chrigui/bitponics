@@ -5,6 +5,7 @@ define([
     'localscroll',
     'es5shim',
     'utils',
+    'flexslider',
     ],
 function(){
   Bitponics.pages.home = {
@@ -31,9 +32,23 @@ function(){
         $('nav a').localScroll({ lazy: true });  
 
         //get section top values so we know when scrolling to highlight nav item
-        $('#main > .content-module').each(function(){
+        $('#main > .content-module').each(function(i){
+          if(i%2!=0){
+            $(this).addClass('inverted-color');
+          }
           self.sectionPositions[$(this).attr('id')] = $(this).position().top;
         });
+      });
+
+      //setup carousel
+      $('.flexslider').flexslider({
+        animation: "slide",
+        useCSS: true,
+        touch: true,
+        directionNav: true,
+        controlNav: false,
+        prevText: "Previous",
+        nextText: "Next"
       });
       
     },

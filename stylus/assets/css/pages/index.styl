@@ -15,12 +15,33 @@
 
 	.content-module
 		border none
-		min-height 600px
-		height 800px
+		min-height 800px
+		//height 800px
+		background-color white
+		color #00fa8b
+		
+		div, p, span, a, a:visited, a:hover, a:active
+			color #00fa8b
+		
+		.nav-section
+			border-top 1px solid #00fa8b
+
+		&.inverted-color
+			background-color #00fa8b //hot green
+			
+			div, p, span, a, a:visited, a:hover, a:active
+				color white
+
+			.nav-section
+				border-top 1px solid white
+
+		&#home
+			background-color: transparent;
+
 
 	.page
-		background-image url('/img/Bitponics_Hssld_H4D_0085.jpg')
-		background-position 35% -355px
+		//background-image url('/img/home/Bitponics_Hssld_H4D_0085.jpg')
+		background-position 35% -13em
 		// background-size cover
 		background-repeat no-repeat
 
@@ -52,16 +73,55 @@
 		position: relative;
 		top: 0.35em;
 
-	#about, #gallery, #contact
-		background-color #00fa8b //hot green
+	.page-heading
+		.icon-logo
+			display none
 
-		.nav-section
+	.page-content 
+		
+		&.center-img
+			text-align center
+
+			img
+				@extends .display-ib
+
+		p.blurb 
+			position relative
 			border-top 1px solid white
+			padding 2em 0 0 12em
+			line-height 1.5em
+		.icon-logo
+			position absolute
+			top .35em
+			left .5em
+			font-size 6.5em
+			line-height 1em
 
-	#howitworks, #press, #buy
-		background-color white
-		color #00fa8b
-		div, p, span, a, a:visited, a:hover, a:active
-			color #00fa8b
-		.nav-section
-			border-top 1px solid #00fa8b
+	.headline
+		position: absolute;
+		top: 5%;
+		left: 5%;
+
+	.headline-about
+		//@extends .headline
+		position static
+		font-size 4em
+		margin .5em 0 .45em 0
+		line-height 1em
+
+.flexslider
+	//
+.slides
+	li
+		position relative
+		overflow hidden
+.flex-direction-nav
+	position absolute
+	top 0
+	color white
+
+	a 
+	 	color white
+
+
+		

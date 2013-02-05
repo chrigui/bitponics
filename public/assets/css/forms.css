@@ -258,8 +258,8 @@ textarea {
   margin: 0;
   vertical-align: bottom;
   opacity: 0.6;
-  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
   filter: alpha(opacity=60);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
   -webkit-transition: opacity 300ms linear;
   -moz-transition: opacity 300ms linear;
   -o-transition: opacity 300ms linear;
@@ -270,8 +270,8 @@ textarea {
 .steps input[type=radio],
 .steps input[type=checkbox] {
   opacity: 0;
-  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
   filter: alpha(opacity=0);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   height: 0;
   width: 0;
   margin: 0;

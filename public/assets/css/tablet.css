@@ -371,7 +371,7 @@ section#footer {
 .home .nav-section {
   border-top: 1px solid #fff;
   float: left;
-  width: 19.3%;
+  width: 16%;
   margin: 0 0.8% 0 0;
   padding: 0.45em 0 0 0.15em;
   min-height: 6em;
@@ -383,9 +383,9 @@ section#footer {
   margin: 0;
 }
 .home .page-content {
-  clear: both;
-  width: 80%;
-  float: right;
+  width: 50%;
+  float: left;
+  margin-left: 3%;
 }
 .home #main #about,
 .home #main #gallery,
@@ -394,4 +394,9 @@ section#footer {
 .home #main #press,
 .home #main #buy {
   padding-top: 4em;
+}
+.home .headline {
+  color: #fff;
+  width: 30%;
+  font-size: 2em;
 }
