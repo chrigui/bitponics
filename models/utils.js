@@ -3,10 +3,10 @@
  * device.recentSensorLogs & growPlanInstance.recentSensorLogs. Verify against
  * IdealRanges and trigger Actions if necessary.
  *
- * @param pendingSensorLog : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
+ * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
  *      the device's recentSensorLogs
- * @param growPlanInstance : GrowPlanInstance model instance on which to log this to recentSensorLogs
- * @param device : optional. Device Model instance on which to log this to recentSensorLogs
+ * @param options.growPlanInstance {GrowPlan}: GrowPlanInstance model instance on which to log this to recentSensorLogs
+ * @param options.device {Device} : optional. Device Model instance on which to log this to recentSensorLogs
  */
 function logSensorLog(options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
