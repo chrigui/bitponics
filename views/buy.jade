@@ -4,45 +4,9 @@ block content
 
   section.header
       header
-        nav(role="nav")
-          ul
-            li(class="nav-section first")
-              h1(class="logo icon", role="banner")
-                div 
-                  | Bitponics
-                  span &trade;
-                | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
-
-            li.nav-section
-              ul
-                li(class="about", data-name="about") 
-                  a(href="/about") About
-                li(class="howitworks", data-name="howitworks")
-                  a(href="/howitworks") How It Works
-
-            li.nav-section
-              ul
-                li(class="gallery", data-name="gallery")
-                  a(href="/gallery") Gallery
-                li(class="press", data-name="press")
-                  a(href="/press") Press
-
-            li.nav-section
-              ul
-                li(class="contact", data-name="contact")
-                  a(href="/contact") Contact
-
-            li(class="nav-section last")
-              ul
-                li(class="buy", data-name="buy")
-                  a(href="/buy") Buy
+        include /includes/nav/main
 
   section#main(role="main")
-    //- h2(class="logo icon nav-section", role="banner")
-    //-   div 
-    //-     | Bitponics
-    //-     span &trade;
-    //-   | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
     h3(class="page-heading nav-section") 
       div Buy
       | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
@@ -52,10 +16,3 @@ block content
   section#footer
 
 block footer-scripts
-
-  //- script
-  //-   Bitponics.user = !{JSON.stringify(user)};
-  //-   $('nav ul > li a')
-
-  //- script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
-

@@ -361,6 +361,7 @@ td {
 .btn,
 .btn *,
 .control,
+.home .page-content.center-img img,
 .phaseRangeSlider input[type=number],
 .phaseRangeSlider .idealRanges label {
   display: -moz-inline-stack;
@@ -888,12 +889,42 @@ section#footer .content-module {
 }
 .home .content-module {
   border: none;
-  min-height: 600px;
-  height: 800px;
+  min-height: 800px;
+  background-color: #fff;
+  color: #00fa8b;
+}
+.home .content-module div,
+.home .content-module p,
+.home .content-module span,
+.home .content-module a,
+.home .content-module a:visited,
+.home .content-module a:hover,
+.home .content-module a:active {
+  color: #00fa8b;
+}
+.home .content-module .nav-section {
+  border-top: 1px solid #00fa8b;
+}
+.home .content-module.inverted-color {
+  background-color: #00fa8b;
+}
+.home .content-module.inverted-color div,
+.home .content-module.inverted-color p,
+.home .content-module.inverted-color span,
+.home .content-module.inverted-color a,
+.home .content-module.inverted-color a:visited,
+.home .content-module.inverted-color a:hover,
+.home .content-module.inverted-color a:active {
+  color: #fff;
+}
+.home .content-module.inverted-color .nav-section {
+  border-top: 1px solid #fff;
+}
+.home .content-module#home {
+  background-color: transparent;
 }
 .home .page {
-  background-image: url("/img/Bitponics_Hssld_H4D_0085.jpg");
-  background-position: 35% -355px;
+  background-position: 35% -13em;
   background-repeat: no-repeat;
 }
 .home #main > div,
@@ -925,49 +956,46 @@ section#footer .content-module {
   position: relative;
   top: 0.35em;
 }
-.home #about,
-.home #gallery,
-.home #contact {
-  background-color: #00fa8b;
+.home .page-heading .icon-logo {
+  display: none;
 }
-.home #about .nav-section,
-.home #gallery .nav-section,
-.home #contact .nav-section {
+.home .page-content.center-img {
+  text-align: center;
+}
+.home .page-content p.blurb {
+  position: relative;
   border-top: 1px solid #fff;
+  padding: 2em 0 0 12em;
+  line-height: 1.5em;
 }
-.home #howitworks,
-.home #press,
-.home #buy {
-  background-color: #fff;
-  color: #00fa8b;
+.home .page-content .icon-logo {
+  position: absolute;
+  top: 0.35em;
+  left: 0.5em;
+  font-size: 6.5em;
+  line-height: 1em;
 }
-.home #howitworks div,
-.home #press div,
-.home #buy div,
-.home #howitworks p,
-.home #press p,
-.home #buy p,
-.home #howitworks span,
-.home #press span,
-.home #buy span,
-.home #howitworks a,
-.home #press a,
-.home #buy a,
-.home #howitworks a:visited,
-.home #press a:visited,
-.home #buy a:visited,
-.home #howitworks a:hover,
-.home #press a:hover,
-.home #buy a:hover,
-.home #howitworks a:active,
-.home #press a:active,
-.home #buy a:active {
-  color: #00fa8b;
+.home .headline {
+  position: absolute;
+  top: 5%;
+  left: 5%;
 }
-.home #howitworks .nav-section,
-.home #press .nav-section,
-.home #buy .nav-section {
-  border-top: 1px solid #00fa8b;
+.home .headline-about {
+  position: static;
+  font-size: 4em;
+  margin: 0.5em 0 0.45em 0;
+  line-height: 1em;
+}
+.slides li {
+  position: relative;
+  overflow: hidden;
+}
+.flex-direction-nav {
+  position: absolute;
+  top: 0;
+  color: #fff;
+a
+  color: #fff;
 }
 /*
  * Dashboard Page
@@ -1184,8 +1212,8 @@ section#footer .content-module {
 }
 .inactive {
   opacity: 0.45;
-  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=45);
   filter: alpha(opacity=45);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=45)";
   height: 3em;
 }
 .inactive .toggle .add {

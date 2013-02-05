@@ -4,3 +4,6 @@
 [submodule "public/assets/js/libs/rickshaw"]
 	path = public/assets/js/libs/rickshaw
 	url = https://github.com/shutterstock/rickshaw.git
+[submodule "public/assets/js/libs/flexslider"]
+	path = public/assets/js/libs/flexslider
+	url = git@github.com:woothemes/FlexSlider.git

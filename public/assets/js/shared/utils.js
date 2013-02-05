@@ -59,8 +59,8 @@ define(['moment'], function(moment){
           screenHeight = $(window).height() > minHeight ? $(window).height() : minHeight;
       
       $(sectionSelector).each(function(i) {
-        var section = $(this),
-            sectionHeight = section.height();
+        var section = $(this);
+            //sectionHeight = section.height();
         
         if (i == 0) {
           section.outerHeight(screenHeight);

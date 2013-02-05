@@ -4,82 +4,40 @@ block content
 
   section.header
       header
-        nav(role="nav")
-          ul
-            li(class="nav-section first")
-              h1(class="logo icon", role="banner")
-                div 
-                  | Bitponics
-                  span &trade;
-                | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
-
-            li.nav-section
-              ul
-                li(class="about", data-name="about") 
-                  a(href="/about") About
-                li(class="howitworks", data-name="howitworks")
-                  a(href="/howitworks") How It Works
-
-            li.nav-section
-              ul
-                li(class="gallery", data-name="gallery")
-                  a(href="/gallery") Gallery
-                li(class="press", data-name="press")
-                  a(href="/press") Press
-
-            li.nav-section
-              ul
-                li(class="contact", data-name="contact")
-                  a(href="/contact") Contact
-
-            li(class="nav-section last")
-              ul
-                li(class="buy", data-name="buy")
-                  a(href="/buy") Buy
+        include /includes/nav/main
 
   section#main(role="main")
-    //- h2(class="logo icon nav-section", role="banner")
-    //-   div 
-    //-     | Bitponics
-    //-     span &trade;
-    //-   | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
     h3(class="page-heading nav-section") 
       div How It Works
       | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
-    div.page-content
-      p
-        | bitponics is made up of two parts: a sensor device and your online account. Once you sign up, you enter in the details of what you're growing and the type of hydroponic system you have. The next step is to generate a growing plan: Bitponics can either create one for you or you can create your own. The growing plan is the step-by-step roadmap for how to take care of your plants. It will tell you:</p>
+    div(class="page-content center-img")
+      img(src="/img/home/howitworks.png")
+      //- p
+      //-   | bitponics is made up of two parts: a sensor device and your online account. Once you sign up, you enter in the details of what you're growing and the type of hydroponic system you have. The next step is to generate a growing plan: Bitponics can either create one for you or you can create your own. The growing plan is the step-by-step roadmap for how to take care of your plants. It will tell you:</p>
 
-      ul
-        li How many hours of light your plants need per day
-        li When to change the lighting schedule
-        li What pH range is safe for your plants
-        li When to replace your nutrient solution
-        li What balance of nutrients to use for each growing phase
-        li How often to run your water pumps
-      p 
-        | The bitponics device will collect readings from its sensors and log them to your online account. You can also manually log data and even upload photos to track progress. Whenever sensor data deviates too far from your growing plan's recommendations, we'll alert you to how to fix it. The device will initially ship with the following sensors:</p>
+      //- ul
+      //-   li How many hours of light your plants need per day
+      //-   li When to change the lighting schedule
+      //-   li What pH range is safe for your plants
+      //-   li When to replace your nutrient solution
+      //-   li What balance of nutrients to use for each growing phase
+      //-   li How often to run your water pumps
+      //- p 
+      //-   | The bitponics device will collect readings from its sensors and log them to your online account. You can also manually log data and even upload photos to track progress. Whenever sensor data deviates too far from your growing plan's recommendations, we'll alert you to how to fix it. The device will initially ship with the following sensors:</p>
 
-      ul
-        li Water &amp; air temperature
-        li Humidity
-        li Brightness (to determine if your plants are receiving enough light)
-        li pH (for measuring the acidity of the nutrient solution)
-      p
-        | And if you want even more detailed data, you'll be able to purchase an electrical conductivity (EC) sensor for measuring the concentration of nutrients in the solution.</p>
+      //- ul
+      //-   li Water &amp; air temperature
+      //-   li Humidity
+      //-   li Brightness (to determine if your plants are receiving enough light)
+      //-   li pH (for measuring the acidity of the nutrient solution)
+      //- p
+      //-   | And if you want even more detailed data, you'll be able to purchase an electrical conductivity (EC) sensor for measuring the concentration of nutrients in the solution.</p>
 
-      p
-        | The device will also have two power outlets that can be set up on timers via the website to control anything from lights to pumps.</p>
+      //- p
+      //-   | The device will also have two power outlets that can be set up on timers via the website to control anything from lights to pumps.</p>
 
 
 
   section#footer
 
 block footer-scripts
-
-  //- script
-  //-   Bitponics.user = !{JSON.stringify(user)};
-  //-   $('nav ul > li a')
-
-  //- script(src='/assets/js/libs/jquery/jquery.scrollTo.min.js')
-
