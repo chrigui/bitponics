@@ -29,12 +29,12 @@ function logSensorLog(options, callback){
     [
     function parallel1(innerCallback){
       if (!device){ return innerCallback(); }
-      device.recentSensorLogs.push(pendingSensorLog);
+      device.recentSensorLogs.unshift(pendingSensorLog);
       device.save(innerCallback);
     },
     function parallel2(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
-      growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
+      growPlanInstance.recentSensorLogs.unshift(pendingSensorLog);          
       growPlanInstance.save(innerCallback);
     },
     function parallel3(innerCallback){

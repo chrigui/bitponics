@@ -233,10 +233,15 @@ DeviceSchema.pre('save', function(next){
  */
 DeviceSchema.pre('save', function(next){
 	var device = this,
-		now = Date.now(),
-		cutoff = now - (1000 * 60 * 2), // now - 2 hours
+		//now = Date.now(),
+		//cutoff = now - (1000 * 60 * 2), // now - 2 hours
+		cap = 10,
 		logsToRemove = [];
 	
+	while (device.recentSensorLogs.length > cap){
+		device.recentSensorLogs.pop();
+	}
+	/*
 	device.recentSensorLogs.forEach(function(log){
 		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
@@ -244,7 +249,7 @@ DeviceSchema.pre('save', function(next){
 	logsToRemove.forEach(function(log){
 		log.remove();
 	});
-
+	*/
 	next();
 });
 
