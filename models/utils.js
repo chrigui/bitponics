@@ -5,7 +5,7 @@
  *
  * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
  *      the device's recentSensorLogs
- * @param options.growPlanInstance {GrowPlan}: GrowPlanInstance model instance on which to log this to recentSensorLogs
+ * @param options.growPlanInstance {GrowPlan}: optional. GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
  * @param options.device {Device} : optional. Device Model instance on which to log this to recentSensorLogs
  */
 function logSensorLog(options, callback){
@@ -18,9 +18,12 @@ function logSensorLog(options, callback){
       device = options.device,
       user = options.user,
       timezone = user.timezone,
-      activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
-  
-  pendingSensorLog.gpi = growPlanInstance._id;
+      activeGrowPlanInstancePhase;
+
+  if (growPlanInstance){
+    activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
+    pendingSensorLog.gpi = growPlanInstance._id;
+  } 
   
   async.parallel(
     [
@@ -30,6 +33,7 @@ function logSensorLog(options, callback){
       device.save(innerCallback);
     },
     function parallel2(innerCallback){
+      if (!growPlanInstance) { return innerCallback();}
       growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
       growPlanInstance.save(innerCallback);
     },
@@ -38,6 +42,7 @@ function logSensorLog(options, callback){
       sensorLog.save(innerCallback);
     },
     function parallel4(innerCallback){
+      if (!growPlanInstance) { return innerCallback();}
       GrowPlanModel
       .findById(growPlanInstance.growPlan)
       .exec(function(err, growPlan){
@@ -100,8 +105,7 @@ function logSensorLog(options, callback){
     }
     ], 
     function parallelFinal(err, result){
-      if (err) { return callback(err); }
-      return callback();
+      return callback(err);
     }
   );
 }
