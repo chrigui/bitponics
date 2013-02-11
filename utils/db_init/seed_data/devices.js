@@ -30,14 +30,10 @@ module.exports = [
 			recentSensorLogs : [
 				{
 					ts: 1347364818821,
-					logs : [
+					l : [
 						{
-							sCode: "vis",
-							val: 12121
-						},
-						{
-							sCode: "vis",
-							val: 122222112
+							s: "vis",
+							v: 122222112
 						}
 					]
 				}
@@ -66,14 +62,10 @@ module.exports = [
 			recentSensorLogs : [
 				{
 					ts: 1347364818821,
-					logs : [
+					l : [
 						{
-							sCode: "vis",
-							val: 12121
-						},
-						{
-							sCode: "vis",
-							val: 122222112
+							s: "vis",
+							v: 122222112
 						}
 					]
 				}
@@ -107,18 +99,33 @@ module.exports = [
 			recentSensorLogs : [
 				{
 					ts: 1347364818821,
-					logs : [
+					l : [
 						{
-							sCode: "vis",
-							val: 12121
-						},
-						{
-							sCode: "vis",
-							val: 122222112
+							s: "vis",
+							v: 122222112
 						}
 					]
 				}
 			]
 
+		},
+		{
+			_id : '5118232537d976f7050f6186',
+			deviceId: "000666721fc1", //mac address
+			deviceType: "506de2fe8eebf7524342cb37",
+			name : "Michael's Prototype Bitponics Device",
+			users : [],
+			controlMap : [ 
+			  {
+			    control : "506de2fd8eebf7524342cb32",
+			    outputId : "1"
+			  },
+			  {
+			    control : "506de2fc8eebf7524342cb2d",
+			    outputId : "2"
+			  }
+			],
+			recentSensorLogs : []
 		}
+		
 	];
