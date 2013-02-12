@@ -1,8 +1,32 @@
-/*section#header
-	&:after
-		content 'desktop-layout'
-		position absolute
-		top 0
-		right 0
-		background-color green
-		color white*/
+.home #main,
+.home .header {
+  padding: 0;
+}
+.home .header > header {
+  margin: 0 auto;
+  max-width: 60em;
+}
+.home .header li.first {
+  width: 19.3%;
+  margin: 0 0.5% 0 0;
+}
+.home .header .elevated-item,
+.home .header .social-icons {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.home .header .elevated-item {
+  text-align: left;
+  width: 15%;
+  margin: 0;
+  right: 15%;
+}
+.home .header .social-icons {
+  width: 16%;
+  overflow: hidden;
+  margin: 0;
+}
+.home .header .headline {
+  margin-right: 26%;
+}

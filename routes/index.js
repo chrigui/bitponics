@@ -56,6 +56,14 @@ module.exports = function(app){
 	  res.render('gallery', locals);
 	});
 
+	app.get('/pricing', function (req, res){
+	  var locals = {
+    	title: "Pricing",
+    	className: "pricing"
+    };
+	  res.render('pricing', locals);
+	});
+
 	app.get('/press', function (req, res){
 	  var locals = {
     	title: "Press",
@@ -72,12 +80,20 @@ module.exports = function(app){
 	  res.render('contact', locals);
 	});
 
-	app.get('/buy', function (req, res){
+	app.get('/team', function (req, res){
 	  var locals = {
-    	title: "Buy",
-    	className: "buy"
+    	title: "Our Team",
+    	className: "team"
     };
-	  res.render('buy', locals);
+	  res.render('team', locals);
+	});
+
+	app.get('/getstarted', function (req, res){
+	  var locals = {
+    	title: "Get Started",
+    	className: "getstarted"
+    };
+	  res.render('getstarted', locals);
 	});
 
 	app.get('/login', function (req, res){

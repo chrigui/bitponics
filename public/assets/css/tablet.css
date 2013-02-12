@@ -5,7 +5,7 @@
   height: 100%;
 }
 .fixed,
-.home .header-fixed.fixed {
+.home .header.fixed {
   position: fixed;
 }
 .position-r {
@@ -227,6 +227,12 @@ section#footer {
   border: 0 none;
   clear: both;
 }
+.dashboard section#header {
+  height: 1em;
+}
+.dashboard section#header .sub-heading a {
+  color: #24d321;
+}
 .dashboard section#main {
   padding: 6em 1em 1em;
 }
@@ -311,92 +317,167 @@ section#footer {
 .home .header {
   padding: 0;
 }
+.home .content-module {
+  min-height: 800px;
+}
 .home .header {
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
-}
-.home .header-fixed {
+  z-index: 4;
+  padding: 2em 0;
+  height: 3em;
   background: #fff;
   color: #999b9a;
-  top: 800px;
+  padding: 0;
 }
-.home .header-fixed.fixed {
+.home .header .icon-glyphlogo-new {
+  display: block;
+  font-size: 2.8em;
+  position: relative;
+  top: 0.35em;
+}
+.home .header.header-fixed {
+  display: block;
+}
+.home .header.header-fixed .icon-glyphlogo-new,
+.home .header.header-fixed .social-icons {
+  display: none;
+}
+.home .header > header {
+  margin: 0 auto;
+  width: 95%;
+}
+.home .header.fixed {
   top: 0;
   z-index: 1;
 }
-.home .header-fixed header {
-  padding: 0 2.6%;
+.home .header li {
+  padding: 0;
+  margin: 0.25em 0.75em 0 0;
 }
-.home .header-fixed li.first {
+.home .header li.first {
   min-height: auto;
   width: 19.3%;
-  margin: 0 0.8% 0 0;
+  margin: 0 3% 0 0;
   padding: 0.45em 0 0 0.15em;
 }
-.home .header-fixed h1 div,
-.home .header-fixed h1 span {
-  color: #00fa8b;
-}
-.home .header-fixed a {
+.home .header a {
   color: #999b9a;
   line-height: 3em;
+  font-size: 0.85em;
 }
-.home .header-fixed a.active {
+.home .header a.active {
   color: #00fa8b;
 }
-.home .header-fixed h1 i {
-  display: none;
+.home .header h1 i {
+  color: #fff;
 }
-.home .header-fixed .nav-section {
-  border-top: none;
-  width: auto;
+.home .header .nav-section {
+  float: left;
   margin: 0 0 0 0;
   padding: 0 0 0 0;
-  min-height: auto;
-  height: 3em;
 }
-.home .header-fixed .nav-section li {
+.home .header .nav-section li {
   display: inline-block;
-  margin: 0 3em 0 0;
 }
-.home .header-fixed .nav-section li.active {
+.home .header .nav-section li.active {
   float: none;
   height: auto;
 }
-.home .header-fixed .nav-section li.active a {
+.home .header .nav-section li.active a {
   color: #00fa8b;
 }
-.home .nav-section {
-  border-top: 1px solid #fff;
-  float: left;
-  width: 16%;
-  margin: 0 0.8% 0 0;
-  padding: 0.45em 0 0 0.15em;
-  min-height: 6em;
+.home .header .nav-section.elevated-item li {
+  line-height: 3em;
 }
-.home .nav-section li {
+.home .header .nav-section.elevated-item .btn {
   margin: 0;
+  padding: 0.5em;
+  text-align: center;
+  line-height: 1em;
+  color: #999b9a;
+  border-color: #999b9a;
+  background: none;
+}
+.home .header .social-icons {
+  margin: 0;
+  width: auto;
+  clear: right;
+}
+.home .header .social-icons div {
+  text-indent: 100%;
+}
+.home .header .social-icons li {
+  margin: 0.5em 0 0 0.2em;
+  color: #fff;
+  background: #999b9a;
+}
+.home .header .elevated-item li {
+  background: transparent;
+  line-height: 1em;
+  margin: 0;
+}
+.home .header .social-icons,
+.home .header .elevated-item {
+  position: static;
+  float: right;
+  background: transparent;
+}
+.home h1.headline {
+  display: none;
+}
+.home .headline {
+  background: rgba(0,0,0,0);
+  padding: 0.5em;
+  color: #fff;
+  width: 14em;
+  font-size: 2em;
+  margin: 3em auto -6.5em auto;
+  position: relative;
+  height: 4em;
+  line-height: 1.25;
 }
 .home .last {
   margin: 0;
 }
+.home .page-heading,
 .home .page-content {
-  width: 50%;
-  float: left;
-  margin-left: 3%;
+  max-width: 60em;
+  font-size: 1em;
 }
 .home #main #about,
 .home #main #gallery,
 .home #main #contact,
 .home #main #howitworks,
 .home #main #press,
-.home #main #buy {
+.home #main #buy,
+.home #main #pricing,
+.home #main #team {
   padding-top: 4em;
 }
-.home .headline {
+.home .flexslider img {
+  min-height: 100%;
+  min-width: 1440px;
+}
+.home .flex-direction-nav {
+  position: absolute;
+  z-index: 4;
+  top: 18em;
+}
+.home .flex-direction-nav a {
   color: #fff;
-  width: 30%;
-  font-size: 2em;
+}
+.home .flex-direction-nav a:hover,
+.home .flex-direction-nav a:active {
+  color: #fff;
+  text-decoration: none;
+}
+.home #howitworks p {
+  float: left;
+  margin: 0 2%;
+  width: 29%;
+  border-top: 1px solid #00e36c;
+  padding: 1em 0 0 0;
 }

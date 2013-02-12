@@ -52,6 +52,10 @@ section#footer
 			padding 100% 0 0 0 //must match container width
 			border 0 none
 			clear: both
+	section#header
+		height 1em
+		.sub-heading a
+			color color-medium-green
 	section#main
 		padding 6em 1em 1em
 
@@ -162,17 +166,36 @@ section#footer
 	#main, .header
 		padding 0
 
+	.content-module
+		min-height 800px
+
 	.header
 		position absolute
 		width 100%
 		top 0
 		left 0
-
-	.header-fixed
+		z-index 4
+		padding 2em 0
+		height 3em
 		background white
 		color color-text-gray
-		top 800px
-		//margin-top 2em //has to match padding top for .home #main > div, .home header
+		padding 0
+
+		.icon-glyphlogo-new
+			display block
+			font-size: 2.8em;
+			position: relative;
+			top: 0.35em;
+		&.header-fixed
+			display block
+			.icon-glyphlogo-new, .social-icons
+				display none	
+
+		& > header
+			margin: 0 auto;
+			width: 95%;
+
+		
 
 		&.fixed
 			@extends .fixed
@@ -180,38 +203,41 @@ section#footer
 			z-index 1
 
 		header
-			padding 0 2.6%
+			//padding 0 2.6%
 
-		li.first
-			//visibility hidden
-			min-height auto
-			width: 19.3%;
-			margin: 0 0.8% 0 0;
-			padding: 0.45em 0 0 0.15em;
+		li
+			padding 0
+			margin .25em .75em 0 0
+
+			&.first
+				//visibility hidden
+				min-height auto
+				width: 19.3%;
+				margin: 0 3% 0 0;
+				padding: 0.45em 0 0 0.15em;
 
 		h1 div, h1 span
-			color #00fa8b
+			//color #00fa8b
 		a 
 			color color-text-gray
 			line-height: 3em;
+			font-size .85em
 
 			&.active
 				color #00fa8b
 
 		h1 i
-			display none
+			color white
 
 		.nav-section
-			border-top none
-			width auto
+			float left
 			margin 0 0 0 0
 			padding 0 0 0 0
-			min-height auto
-			height 3em
 
 			li
 				display inline-block
-				margin 0 3em 0 0
+				// margin 0 1em 0 0
+
 
 				&.active
 					float none
@@ -219,44 +245,117 @@ section#footer
 					
 					a
 						color #00fa8b
+			&.elevated-item
+				li
+					line-height 3em
+				.btn 
+					margin 0
+					padding .5em
+					text-align center
+					line-height 1em
+					color color-text-gray
+					// color color-hot-green
+					border-color color-text-gray
+					// border-color color-hot-green
+					background none
 
-
-
-			
-
-	.nav-section
-		border-top 1px solid white
-		float left
-		width 16.0%
-		margin 0 0.8% 0 0
-		padding .45em 0 0 .15em
-		min-height 6em
-
-		li
+		.social-icons
+			// width: 16%;
+			// height: 3em;
+			// overflow: hidden;
+			// margin: 0 0 0 3%;
+			//margin 0 0 0 70%
 			margin 0
+			width auto
+			clear right
+			
+			div
+				text-indent 100%
 
+			li
+				margin .5em 0 0 .2em
+				color white
+				background color-text-gray
+
+
+		.elevated-item
+			//margin 0 0 0 20%
+			li
+				background transparent
+				line-height 1em
+				margin: 0;
+				a
+					//background white!important
+
+		.social-icons, .elevated-item
+			position static
+			float right
+			background transparent
+
+			// text-align right
+
+
+	h1.headline
+		display none
+
+	.headline
+		background: rgba(0,0,0,0);
+		padding: .5em;
+		color #fff
+		width 14em
+		font-size 2em
+		margin: 3em auto -6.5em auto
+		position relative
+		height 4em
+		line-height: 1.25;
 
 	.last
 		margin 0
 
+	.page-heading, .page-content
+		max-width 60em
+		font-size 1em
+
 	.page-content
-		width: 50%;
-		float: left;
-		margin-left: 3%;
+		//width: 50%;
+		// float: left;
+		// margin-left: 3%;
 
 
 	#main
-		#about, #gallery, #contact, #howitworks, #press, #buy
+		#about, #gallery, #contact, #howitworks, #press, #buy, #pricing, #team
 			padding-top 4em
 
+	.flexslider
+		img
+			min-height 100%
+			min-width 1440px
+	.flex-direction-nav
+		position absolute
+		z-index: 4;
+		top: 18em;
+
+		a
+			color white
+
+			&:hover, &:active
+				color white
+				text-decoration none
+
+			// &.flex-prev
+			// 	left 1em
+
+			// &.flex-next
+			// 	right 1em
 
 
-	.headline
-		color: white;
-		width: 30%;
-		font-size: 2em;
-
-
+	#howitworks
+		p
+			float left
+			margin 0 2%
+			width: 29%;
+			border-top: 1px solid color-hot-green;
+			padding: 1em 0 0 0;
 
 
 
