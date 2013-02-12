@@ -578,11 +578,12 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 GrowPlanInstanceSchema.pre('save', true, function(next, done){
 	next();
 
-	var now = Date.now(),
-		cutoff = now - (1000 * 60 * 2), // now - 2 hours
-		logsToRemove = [];
+	var cap = 10;
+    //now = Date.now(),
+		//cutoff = now - (1000 * 60 * 2), // now - 2 hours
+		//logsToRemove = [];
 	
-
+    /*
 	this.recentSensorLogs.forEach(function(log){
 		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
@@ -598,6 +599,17 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 	logsToRemove.forEach(function(log){
 		log.remove();
 	});
+*/
+
+  while (this.recentSensorLogs.length > cap){
+    this.recentSensorLogs.pop();
+  }
+  while (this.recentPhotoLogs.length > cap){
+    this.recentPhotoLogs.pop();
+  }
+  while (this.recentTagLogs.length > cap){
+    this.recentTagLogs.pop();
+  }
 
 	done();
 });

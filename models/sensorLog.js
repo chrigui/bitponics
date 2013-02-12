@@ -43,7 +43,7 @@ SensorReadingSchema.virtual('val')
  * SensorLog
  */
 var SensorLogSchema = new Schema({
-	gpi : { type : ObjectId, ref: 'GrowPlanInstance', required: true},
+	gpi : { type : ObjectId, ref: 'GrowPlanInstance'},
 	ts: { type: Date, required: true, default: Date.now },
 	l : [SensorReadingSchema]
 });
