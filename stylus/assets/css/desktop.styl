@@ -1,18 +1,39 @@
+.home
 
-/*section#header
-	&:after
-		content 'desktop-layout'
-		position absolute
-		top 0
-		right 0
-		background-color green
-		color white*/
+  #main, .header
+    padding 0
 
-section#header,
-section#main,
-section#footer
-	//
+  .header
+    & > header
+      margin: 0 auto;
+      max-width: 60em;
 
-section#main
-	//
+    li
+      &.first
+        width: 19.3%;
+        margin: 0 .5% 0 0;
 
+    .elevated-item, .social-icons
+      position absolute
+      top 0
+      right 0
+
+    .elevated-item
+      text-align left
+      width 15%
+      margin 0
+      right 15%
+
+    .social-icons
+      width 16%
+      overflow hidden
+      margin 0
+
+    .headline
+      margin-right 26%
+// .flex-direction-nav
+//   .flex-prev
+//     left 13%
+
+//   .flex-next
+//     right 13%

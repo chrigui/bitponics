@@ -1,21 +1,27 @@
 @import "nib"
+@import "./global/colors"
 
 .home
 	body
 		// background linear-gradient(top, #9e9e9e, #cdd1d2);
-		background-color #cfd5d5
+		//background-color #cfd5d5
 		color white
 		margin 0
 
 	div, p, span, a, a:visited, a:hover, a:active
-		color white
+		color color-text-gray
+
+	section	
+		clear both
+
+
 
 	.main-heading
 		color white
 
 	.content-module
 		border none
-		min-height 800px
+		min-height 300px
 		//height 800px
 		background-color white
 		color #00fa8b
@@ -27,7 +33,7 @@
 			border-top 1px solid #00fa8b
 
 		&.inverted-color
-			background-color #00fa8b //hot green
+			background-color color-hot-green //hot green
 			
 			div, p, span, a, a:visited, a:hover, a:active
 				color white
@@ -46,35 +52,44 @@
 		background-repeat no-repeat
 
 	#main > div, header
-		padding 2em 2.6%
+		//padding 2em 2.6%
 		margin 0
+		z-index 2
 
+	.header-fixed
+		display none
+	
 	nav
 		ul
 			list-style none
 			li
 				display block
-				margin 1em 0
+				margin 0
+				padding .25em .5em
+				background none
+				color color-text-gray
 
 				.first
 					margin 0
 
 	.logo
-		font-size 1.17em
+		font-size 1.45em
 		margin 0
 		width auto
+		height 1em
 
 		span
 			font-size: .65em;
 			vertical-align: top;
 
-	.icon-logo
-		font-size: 2.8em;
-		position: relative;
-		top: 0.35em;
+	.icon-glyphlogo-new
+		display none
 
+	.page-heading, .page-content
+		width 95%
+		margin 0 auto
 	.page-heading
-		.icon-logo
+		.icon-glyphlogo-new
 			display none
 
 	.page-content 
@@ -90,17 +105,24 @@
 			border-top 1px solid white
 			padding 2em 0 0 12em
 			line-height 1.5em
-		.icon-logo
-			position absolute
-			top .35em
-			left .5em
-			font-size 6.5em
-			line-height 1em
+		// .icon-logo
+		// 	display none
+		// 	position absolute
+		// 	top .35em
+		// 	left .5em
+		// 	font-size 6.5em
+		// 	line-height 1em
 
 	.headline
-		position: absolute;
-		top: 5%;
-		left: 5%;
+		position absolute
+		top: 0;
+		left: 0;
+		color: white;
+		background: rgba(0,0,0,.25);
+		margin: 0;
+		width: 100%;
+		min-height: 100%;
+		padding: .5em;
 
 	.headline-about
 		//@extends .headline
@@ -109,19 +131,116 @@
 		margin .5em 0 .45em 0
 		line-height 1em
 
+	// .btn
+
+	// 	&:visited, &:hover, &:active
+	// 		color white
+
+.elevated-item
+	// position absolute
+	// top 0
+	// right 0
+
+	li
+		margin 0
+		padding 0
+
+	.btn
+		padding .5em
+		margin 0 0 0 -.5em
+		background white
+		border 2px solid color-text-gray
+
+.social-icons
+	position absolute
+	top 0
+	right 0
+	
+	li
+		@extends .circle;
+		cursor pointer
+		width 2em
+		height 2em
+		padding .5em 0
+		margin 0 0  0 .25em
+		background color-text-gray
+		color white
+		position relative
+		float left
+		text-align right
+
+		div
+			@extends .hide-text;
+			text-indent 100%
+		
+		i
+			position: absolute;
+			top 0
+			left 0
+			font-size 2em
+			width 1em
+			height 1em
+
+	i.icon-glyphfc-webicon-facebook
+		left -.125em
+		top -.05em
+	i.icon-glyphfc-webicon-twitter
+		left -0.1em
+		top -0.1em
+	i.icon-glyphmail
+		left -.15em
+		top -.15em
+
 .flexslider
-	//
+	ul
+		margin 0
+		padding 0
+	img
+		width 100%
+		height auto
+		display inline
+		// position fixed
+		// top 0
+		// left 0
+		
+		// @media screen and (max-width: 1440px)
+		// 	left: 50%;
+		// 	margin-left: -(1440px/2);   /* 50% */
+
 .slides
 	li
 		position relative
 		overflow hidden
 .flex-direction-nav
-	position absolute
-	top 0
+	// position absolute
+	// top 0
+	position relative
+	top -8em
 	color white
+	z-index 3
+	width 100%
 
-	a 
-	 	color white
+	li
+		position absolute
+		width 100%
 
+	a
+		color white
+		display block
+		position absolute
 
-		
+	.flex-prev
+		left 1em
+
+	.flex-next
+		right 1em
+
+	i
+		color white
+		font-size 3em
+
+#howitworks
+	p
+		text-align left
+		color color-text-gray
+		margin 1em

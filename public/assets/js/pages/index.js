@@ -6,6 +6,7 @@ define([
     'es5shim',
     'utils',
     'flexslider',
+    // 'backstretch'
     ],
 function(){
   Bitponics.pages.home = {
@@ -13,6 +14,9 @@ function(){
     MIN_SECTION_HEIGHT: 800,
 
     sectionPositions: {},
+
+    screenHeight: undefined,
+    screenWidth: undefined,
 
     init: function() {
       var self = this,
@@ -22,20 +26,26 @@ function(){
       Bitponics.Utils.setupPages($('nav ul > li a'), function(){
         
         //match section height to window
-        Bitponics.Utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
+        //create fixed nav
+        self.screenWidth = $(window).width();
+        if(self.screenWidth > 600){
+          Bitponics.Utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
+        }
 
         //create fixed nav
-        screenHeight = $(window).height() > self.MIN_SECTION_HEIGHT ? $(window).height() : self.MIN_SECTION_HEIGHT;
+        self.screenHeight = screenHeight = $(window).height() > self.MIN_SECTION_HEIGHT ? $(window).height() : self.MIN_SECTION_HEIGHT;
         self.sectionNavSetup(screenHeight);
+
+        // self.setupSlideShow();
 
         //smooth anchor scrolling to sections
         $('nav a').localScroll({ lazy: true });  
 
         //get section top values so we know when scrolling to highlight nav item
         $('#main > .content-module').each(function(i){
-          if(i%2!=0){
-            $(this).addClass('inverted-color');
-          }
+          // if(i%2!=0){
+          //   $(this).addClass('inverted-color');
+          // }
           self.sectionPositions[$(this).attr('id')] = $(this).position().top;
         });
       });
@@ -44,12 +54,18 @@ function(){
       $('.flexslider').flexslider({
         animation: "slide",
         useCSS: true,
+        slideshow: true,
         touch: true,
         directionNav: true,
         controlNav: false,
-        prevText: "Previous",
-        nextText: "Next"
+        //controlsContainer: '.flex-direction-nav',
+        prevText: "",
+        nextText: ""
       });
+      
+      //add prev/next icons
+      $('.flex-direction-nav .flex-prev').append('<i class="icon-glyph icon-glypharrow-2" aria-hidden="true"></i>')
+      $('.flex-direction-nav .flex-next').append('<i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>')
       
     },
 
@@ -88,6 +104,42 @@ function(){
           }
         };
       }, 0);
+    },
+
+    setupSlideShow: function() {
+      var self = this,
+          b = $('.slides-container'),
+          li = b.find('li'),
+          n = li.length,
+          src = [],
+          cap = [];
+
+      for (var i = 0; i < n; i++) {
+          src[i] = $(li).eq(i).find('img').attr('src');
+          cap[i] = $(li).eq(i).find('h2');
+      };
+
+      // initializing backstretch.js for background
+      $(b).height(self.screenHeight);
+      $(b).backstretch(src, {
+        duration: 5000, 
+        //centeredY: false,
+        fade: 750
+      });
+      //$(b).data('backstretch').pause();
+      
+      
+      $(b).after('<div class="caption"/>');
+      $(li).css('opacity', '0');
+
+      // coordinating image captions with slides
+      $(window).on("backstretch.show", function (e, instance) {
+        $('div.caption').fadeIn(750)
+          .html(cap[instance.index])
+          .delay(4000)
+          .fadeOut(750);
+      });
+
     }
   }
 

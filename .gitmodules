@@ -7,3 +7,6 @@
 [submodule "public/assets/js/libs/flexslider"]
 	path = public/assets/js/libs/flexslider
 	url = git@github.com:woothemes/FlexSlider.git
+[submodule "public/assets/js/libs/jquery-backstretch"]
+	path = public/assets/js/libs/jquery-backstretch
+	url = git@github.com:srobbin/jquery-backstretch.git
