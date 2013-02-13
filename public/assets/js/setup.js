@@ -4,6 +4,7 @@ $(function(){
 		$connectToDevice = $('#connect-to-device'),
 		$wifiForm = $('#wifi-form'),
 		$wifiSsid = $('#wifi-ssid'),
+		$wifiSsidText = $('#wifi-ssid-text'),
 		$wifiPass = $('#wifi-pass'),
 		$wifiMode = $('#wifi-mode'),
 		$enterWifiData = $('#enter-wifi-data'),
@@ -85,7 +86,7 @@ $(function(){
 	$wifiForm.submit(function(e){
 		e.preventDefault();
 		selectedWifiNetwork = $.grep(scannedWifiNetworks, function(item, index){
-			return item.ssid === $wifiSsid.val();
+			return item.ssid === $wifiSsid.val() || $wifiSsidText.val();
 		})[0];
 		// TODO : validate
 
@@ -124,6 +125,7 @@ $(function(){
 					return ((a.ssid < b.ssid) ? -1 : 1);
 				})
 				
+				$wifiSsid.append('<option value=""> - Select Wifi Network - </option>');	
 				$.each(scannedWifiNetworks, function(index, network){
 					$wifiSsid.append('<option value="' + network.ssid + '">' + network.ssid + '</option>');	
 				});
