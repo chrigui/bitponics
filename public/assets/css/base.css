@@ -394,6 +394,8 @@ td {
 .btn *,
 .control,
 .home .page-content.center-img img,
+.home .featured-press a,
+.home .additional-press a,
 .phaseRangeSlider input[type=number],
 .phaseRangeSlider .idealRanges label {
   display: -moz-inline-stack;
@@ -927,6 +929,11 @@ section#footer .content-module {
 .home section {
   clear: both;
 }
+.home ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .home .main-heading {
   color: #fff;
 }
@@ -936,9 +943,7 @@ section#footer .content-module {
   background-color: #fff;
   color: #00fa8b;
 }
-.home .content-module div,
-.home .content-module p,
-.home .content-module span,
+.home .content-module h3 div,
 .home .content-module a,
 .home .content-module a:visited,
 .home .content-module a:hover,
@@ -978,17 +983,14 @@ section#footer .content-module {
 .home .header-fixed {
   display: none;
 }
-.home nav ul {
-  list-style: none;
-}
-.home nav ul li {
+.home nav li {
   display: block;
   margin: 0;
   padding: 0.25em 0.5em;
   background: none;
   color: #999b9a;
 }
-.home nav ul li .first {
+.home nav li .first {
   margin: 0;
 }
 .home .logo {
@@ -1015,6 +1017,9 @@ section#footer .content-module {
 .home .page-content.center-img {
   text-align: center;
 }
+.home .page-content p {
+  font-size: 0.85em;
+}
 .home .page-content p.blurb {
   position: relative;
   border-top: 1px solid #fff;
@@ -1037,6 +1042,17 @@ section#footer .content-module {
   font-size: 4em;
   margin: 0.5em 0 0.45em 0;
   line-height: 1em;
+}
+.home .featured-press,
+.home .additional-press {
+  padding: 0 1em;
+  margin: 1.5em 0;
+}
+.home .additional-press a {
+  width: 100%;
+}
+.home .additional-press .last a {
+  width: auto;
 }
 .elevated-item li {
   margin: 0;
