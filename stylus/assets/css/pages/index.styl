@@ -14,6 +14,10 @@
 	section	
 		clear both
 
+	ul
+		list-style none
+		margin 0
+		padding 0
 
 
 	.main-heading
@@ -26,7 +30,7 @@
 		background-color white
 		color #00fa8b
 		
-		div, p, span, a, a:visited, a:hover, a:active
+		h3 div, a, a:visited, a:hover, a:active
 			color #00fa8b
 		
 		.nav-section
@@ -60,17 +64,15 @@
 		display none
 	
 	nav
-		ul
-			list-style none
-			li
-				display block
-				margin 0
-				padding .25em .5em
-				background none
-				color color-text-gray
+		li
+			display block
+			margin 0
+			padding .25em .5em
+			background none
+			color color-text-gray
 
-				.first
-					margin 0
+			.first
+				margin 0
 
 	.logo
 		font-size 1.45em
@@ -99,6 +101,9 @@
 
 			img
 				@extends .display-ib
+
+		p
+			font-size .85em
 
 		p.blurb 
 			position relative
@@ -135,6 +140,24 @@
 
 	// 	&:visited, &:hover, &:active
 	// 		color white
+
+	.featured-press,
+	.additional-press
+		padding 0 1em
+		margin 1.5em 0
+		a
+			@extends .display-ib
+
+	.featured-press
+		li, p
+			color-text-gray2
+	
+	.additional-press
+		a
+			width 100%
+		.last
+			a
+				width auto
 
 .elevated-item
 	// position absolute
@@ -239,8 +262,10 @@
 		color white
 		font-size 3em
 
+
 #howitworks
 	p
 		text-align left
 		color color-text-gray
 		margin 1em
+
