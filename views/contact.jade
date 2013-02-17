@@ -12,24 +12,24 @@ block content
       | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
     div.page-content
 
-      h4 We'd love to hear from you!
-      | <div id="wufoo-m7x4a3">
-      | <a href="http://greatsoles.wufoo.com/forms/m7x4a3">Send us an email.</a>.
-      | </div>
-      | <script type="text/javascript">var m7x4a3;(function(d, t) {
-      | var s = d.createElement(t), options = {
-      | 'userName':'greatsoles', 
-      | 'formHash':'m7x4a3', 
-      | 'autoResize':true,
-      | 'height':'514',
-      | 'async':true,
-      | 'header':'show'};
-      | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
-      | s.onload = s.onreadystatechange = function() {
-      | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
-      | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
-      | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
-      | })(document, 'script');</script>
+      p If you have any questions or want to learn more about Bitponics, please don't hesitate to contact us.
+      div(id="wufoo-m7x4a3")
+        a(href="http://greatsoles.wufoo.com/forms/m7x4a3") Send us an email.
+      div.script
+        | var m7x4a3;(function(d, t) {
+        | var s = d.createElement(t), options = {
+        | 'userName':'greatsoles', 
+        | 'formHash':'m7x4a3', 
+        | 'autoResize':true,
+        | 'height':'514',
+        | 'async':true,
+        | 'header':'show'};
+        | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
+        | s.onload = s.onreadystatechange = function() {
+        | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
+        | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
+        | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
+        | })(document, 'script');
 
   section#footer
 

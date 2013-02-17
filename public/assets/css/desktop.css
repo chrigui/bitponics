@@ -1,32 +1,76 @@
-.home #main,
-.home .header {
+.landing-page #main,
+.landing-page .header {
   padding: 0;
 }
-.home .header > header {
+.landing-page .header > header {
   margin: 0 auto;
   max-width: 60em;
 }
-.home .header li.first {
+.landing-page .header li.first {
   width: 19.3%;
   margin: 0 0.5% 0 0;
 }
-.home .header .elevated-item,
-.home .header .social-icons {
+.landing-page .header .elevated-item,
+.landing-page .header .social-icons {
   position: absolute;
   top: 0;
   right: 0;
 }
-.home .header .elevated-item {
+.landing-page .header .elevated-item {
   text-align: left;
   width: 15%;
   margin: 0;
   right: 15%;
 }
-.home .header .social-icons {
+.landing-page .header .social-icons {
   width: 16%;
   overflow: hidden;
   margin: 0;
 }
-.home .header .headline {
+.landing-page .header .headline {
   margin-right: 26%;
+}
+@media screen and (min-width: 65em) {
+  .landing-page .list-grid-wrapper {
+    width: 80%;
+    float: right;
+  }
+  .landing-page #pricing .center {
+    width: 70%;
+  }
+}
+.landing-page.getstarted #main {
+  width: 60%;
+  padding-left: 4%;
+}
+.landing-page.getstarted .retail-price {
+  margin: 0.5em;
+}
+.landing-page.getstarted .preorder-price {
+  margin-top: -1.5em;
+}
+.landing-page.getstarted .preorder-price .additional-text {
+  display: inline-block;
+}
+.landing-page.getstarted .preorder-price .additional-text span {
+  width: 100%;
+}
+.member {
+  clear: both;
+  margin: 0 0 1em 0;
+}
+.member h3 {
+  border-bottom: 1px solid #fff;
+  float: right;
+  width: 50%;
+}
+.member img {
+  float: left;
+  width: 40%;
+  margin: 1.5em 10% 5em 0;
+  border: 4px solid #fff;
+}
+.member p {
+  float: right;
+  width: 50%;
 }

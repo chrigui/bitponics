@@ -2,19 +2,26 @@ extends layout
 
 block content
 
-  section#header
-      header#logo(role="banner") 
-        img(src="/img/leaf-new-green.png", width="15%")
-      div#setup.select-block
-        h2.main-heading #{title}
+  section.header
+      header
+        include /includes/nav/main
 
   section#main(role="main")
-    div#home.content-module.middle
+    h3(class="page-heading nav-section")
+      | Register for your bitponics account.
+    ul
+      li Get access to preorder offers
+      li Receive news and announcements
+      li Third incentive
+
+    div(class="page-content")
       form(id="register-form", method="POST", action="/signup")
         label(for="email") Email
         input(id="email", name="email", type="email", autofocus="autofocus") 
         label(for="password") Password
         input(id="password", name="password", type="password") 
-        input(type="submit", value="Sign Up")
+        input(type="submit", value="Submit")
 
   section#footer
+
+block footer-scripts

@@ -23,7 +23,7 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      Bitponics.Utils.setupPages($('nav ul > li a'), function(){
+      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="getstarted"]) a'), function(){
         
         //match section height to window
         //create fixed nav
@@ -46,7 +46,16 @@ function(){
           // if(i%2!=0){
           //   $(this).addClass('inverted-color');
           // }
+          
+          //eval any page inline scripts (like Wufoo form scipt)
+          $(this).find('div.script').each(function(){
+            eval($(this).text())
+          });
+
           self.sectionPositions[$(this).attr('id')] = $(this).position().top;
+
+          
+
         });
       });
 
@@ -98,7 +107,7 @@ function(){
         var lastSection = 'home';
         for(var section in secPos){
           if(scrollTop >= secPos[section]){
-            console.log('place: '+secPos[section])
+            console.log('place: '+section)
             $('.header-fixed li').removeClass('active');
             $('.header-fixed li[data-name='+section+']').addClass('active');
           }
