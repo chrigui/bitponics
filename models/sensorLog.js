@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId;
+	ObjectId = Schema.ObjectId,
+	SensorLogModel;
 
 
 /**
@@ -21,7 +22,7 @@ var SensorReadingSchema = new Schema({
  * Prevent the _id property since these will only ever be subdocs in SensorLog, don't need 
  * ObjectIds created on them
  */
-{ _id : false } );
+{ _id : false, id : false } );
 
 SensorReadingSchema.virtual('sCode')
 	.get(function () {
@@ -38,6 +39,7 @@ SensorReadingSchema.virtual('val')
 	.set(function(val){
 		this.v = val;
 	});
+
 
 /**
  * SensorLog
@@ -56,7 +58,7 @@ SensorLogSchema.virtual('logs')
 		this.l = logs;
 	});
 
-SensorLogSchema.index({ 'gpi ts': -1 });
+SensorLogSchema.index({ 'gpi ts': -1 }, { sparse: true });
 
 exports.schema = SensorLogSchema;
 exports.model = mongoose.model('SensorLog', SensorLogSchema);
