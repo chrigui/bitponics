@@ -52,6 +52,10 @@ section#footer
 			padding 100% 0 0 0 //must match container width
 			border 0 none
 			clear: both
+	section#header
+		height 1em
+		.sub-heading a
+			color color-medium-green
 	section#main
 		padding 6em 1em 1em
 
@@ -157,22 +161,48 @@ section#footer
 /*
  * Home Page
  */
-.home
+.landing-page
 	
 	#main, .header
 		padding 0
 
+	.content-module
+		min-height 800px
+
+	#footer
+		background-position 45% 100%
+		background-image url('/img/home/footer.jpg')
+		min-height 1323px
+		background-size cover
+		background-repeat no-repeat
+	
 	.header
 		position absolute
 		width 100%
 		top 0
 		left 0
-
-	.header-fixed
+		z-index 4
+		padding 2em 0
+		height 3em
 		background white
 		color color-text-gray
-		top 800px
-		//margin-top 2em //has to match padding top for .home #main > div, .home header
+		padding 0
+
+		.icon-glyphlogo-new
+			display block
+			font-size: 2.8em;
+			position: relative;
+			top: 0.35em;
+		&.header-fixed
+			display block
+			.icon-glyphlogo-new, .social-icons
+				display none	
+
+		& > header
+			margin: 0 auto;
+			width: 95%;
+
+		
 
 		&.fixed
 			@extends .fixed
@@ -180,38 +210,41 @@ section#footer
 			z-index 1
 
 		header
-			padding 0 2.6%
+			//padding 0 2.6%
 
-		li.first
-			//visibility hidden
-			min-height auto
-			width: 19.3%;
-			margin: 0 0.8% 0 0;
-			padding: 0.45em 0 0 0.15em;
+		li
+			padding 0
+			margin .25em .75em 0 0
+
+			&.first
+				//visibility hidden
+				min-height auto
+				width: 19.3%;
+				margin: 0 3% 0 0;
+				padding: 0.45em 0 0 0.15em;
 
 		h1 div, h1 span
-			color #00fa8b
+			//color #00fa8b
 		a 
 			color color-text-gray
 			line-height: 3em;
+			font-size .85em
 
 			&.active
 				color #00fa8b
 
 		h1 i
-			display none
+			color white
 
 		.nav-section
-			border-top none
-			width auto
+			float left
 			margin 0 0 0 0
 			padding 0 0 0 0
-			min-height auto
-			height 3em
 
 			li
 				display inline-block
-				margin 0 3em 0 0
+				// margin 0 1em 0 0
+
 
 				&.active
 					float none
@@ -219,42 +252,278 @@ section#footer
 					
 					a
 						color #00fa8b
+			&.elevated-item
+				li
+					line-height 3em
+				.btn 
+					margin 0
+					padding .5em
+					text-align center
+					line-height 1em
+					color color-text-gray
+					// color color-hot-green
+					border-color color-text-gray
+					// border-color color-hot-green
+					background none
 
-
-
-			
-
-	.nav-section
-		border-top 1px solid white
-		float left
-		width 19.3%
-		margin 0 0.8% 0 0
-		padding .45em 0 0 .15em
-		min-height 6em
-
-		li
+		.social-icons
+			// width: 16%;
+			// height: 3em;
+			// overflow: hidden;
+			// margin: 0 0 0 3%;
+			//margin 0 0 0 70%
 			margin 0
+			width auto
+			clear right
+			
+			div
+				text-indent 100%
 
+			li
+				margin .5em 0 0 .2em
+				color white
+				background color-text-gray
+
+
+		.elevated-item
+			//margin 0 0 0 20%
+			li
+				background transparent
+				line-height 1em
+				margin: 0;
+				a
+					//background white!important
+
+		.social-icons, .elevated-item
+			position static
+			float right
+			background transparent
+
+			// text-align right
+
+	.featured-press, .additional-press
+		margin 1.5em 0 1.5em 16%
+		li
+			float left
+			width 20%
+			margin 0 2.8%
+			border-top 1px solid color-text-gray
+
+			&.last
+				margin 0
+
+	.featured-press
+		clear both
+		min-height 24em
+		li
+			position relative
+			padding-top 6em
+			img
+				position absolute
+				top .5em
+
+
+	h1.headline
+		display none
+
+	.headline
+		background: rgba(0,0,0,0);
+		padding: .5em;
+		color #fff
+		width 14em
+		font-size 2em
+		margin: 3em auto -6.5em auto
+		position relative
+		height 4em
+		line-height: 1.25;
 
 	.last
 		margin 0
 
+	.page-heading, .page-content
+		max-width 60em
+		font-size 1em
+
 	.page-content
-		clear: both;
-		width: 80%;
-		float: right;
+		//width: 50%;
+		// float: left;
+		// margin-left: 3%;
 
 
 	#main
-		#about, #gallery, #contact, #howitworks, #press, #buy
+		#about, #gallery, #contact, #howitworks, #press, #buy, #pricing, #team
 			padding-top 4em
 
+	.flexslider
+		img
+			min-height 100%
+			min-width 1440px
+	.flex-direction-nav
+		position absolute
+		z-index: 4;
+		top: 49%;
+
+		a
+			color white
+
+			&:hover, &:active
+				color white
+				text-decoration none
+
+			// &.flex-prev
+			// 	left 1em
+
+			// &.flex-next
+			// 	right 1em
 
 
+	#howitworks
+		p
+			float left
+			margin 0 2%
+			width: 29%;
+			border-top: 1px solid color-hot-green;
+			padding: 1em 0 0 0;
+
+	//Pricing Page
+.list-grid-wrapper
+	font-size 1em
+	.grid-list
+		float left
+		margin 0
+		li
+			text-align center
+			border-top 1px solid color-light-gray
+			min-height 8em
+			//display: table;
+			width: 100%;
+			h2
+				margin 0
+				span
+					display block
+					
+			& > span
+				width 80%
+				// display: table-cell;
+				display inline-block
+				padding 1em 1em 0
+				font-size .85em
+			&.price
+				// display block
+				.price-number,.price-type,.price-per
+					display inline
+					padding 0
+				.price-number
+					//
+				.price-type
+					//
+				.price-per
+					display block
+					margin-top: -.85em;
+					width 100%
+
+			&.first
+				border 0 none
+				margin-top 1em
+			&.last
+				padding-top: 1em;
+
+		&.feature-icons
+			display block
+			width 10%
+			li
+				// height auto
+				// min-height auto
+				//display block
+				
+				position relative
+				// font-size 2em
+				// min-height 3em
+				i
+					position absolute
+					top: 0;
+					margin-top: 0;
+					font-size: 3em;
+					color color-medium-green
 
 
+			.first
+				min-height 4em
+		&.tier1
+			width 30%
+			.first
+				min-height 4em
+		&.tier2
+			width 30%
+			.first
+				min-height 4em
+		&.tier3
+			width 30%
+			.first
+				min-height 4em
+#pricing
+	.center
+		margin 1em
+
+		a.btn
+			//
+		i
+			//
 
 
+/*
+ * Single landing page overrides
+ */
+@import "./pages/single-page"
 
 
+/*
+ * getstarted/thankyou
+ */
+.landing-page.getstarted
+	#main
+		margin: 10em auto 0 auto;
+		width: 95%
 
+	.page-heading
+		width 100%
+		font-size: 3.5em;
+	.page-content
+		//sdfd
+
+
+.landing-page.register
+	#main
+		//margin-top 0
+
+		.preorder-price
+			margin-top: -1.5em;
+			//   position relative
+			//   font-size 3em
+		  
+			//   span.dollar-sign, span.price-number
+			//     color color-medium-green
+			//   .additional-text
+			//     // font-size .333em
+			//     display inline-block
+			//     // width 2em
+
+			//     span
+			//       display block
+			//       text-align left
+
+//Team Page
+.member
+	clear both
+	margin 0 0 1em 0
+
+	// h3
+	// 	border-bottom 1px solid white
+	// 	float right
+	// 	width 50%
+	img
+		margin: 1.5em 0
+
+	// p
+	// 	float right
+	// 	width 50%

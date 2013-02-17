@@ -27,7 +27,7 @@ module.exports = function(app){
 	app.get('/', function (req, res){
 	  var locals = {
     	title: "Bitponics",
-    	className: "home"
+    	className: "landing-page"
     };
 	  res.render('index', locals);
 	});
@@ -35,7 +35,7 @@ module.exports = function(app){
 	app.get('/about', function (req, res){
 	  var locals = {
     	title: "About",
-    	className: "about"
+    	className: "landing-page about"
     };
 	  res.render('about', locals);
 	});
@@ -43,7 +43,7 @@ module.exports = function(app){
 	app.get('/howitworks', function (req, res){
 	  var locals = {
     	title: "How It Works",
-    	className: "howitworks"
+    	className: "landing-page single-page howitworks"
     };
 	  res.render('howitworks', locals);
 	});
@@ -51,15 +51,23 @@ module.exports = function(app){
 	app.get('/gallery', function (req, res){
 	  var locals = {
     	title: "Gallery",
-    	className: "gallery"
+    	className: "landing-page single-page gallery"
     };
 	  res.render('gallery', locals);
+	});
+
+	app.get('/pricing', function (req, res){
+	  var locals = {
+    	title: "Pricing",
+    	className: "landing-page single-page pricing"
+    };
+	  res.render('pricing', locals);
 	});
 
 	app.get('/press', function (req, res){
 	  var locals = {
     	title: "Press",
-    	className: "press"
+    	className: "landing-page single-page press"
     };
 	  res.render('press', locals);
 	});
@@ -67,24 +75,33 @@ module.exports = function(app){
 	app.get('/contact', function (req, res){
 	  var locals = {
     	title: "Contact",
-    	className: "contact"
+    	className: "landing-page single-page contact"
     };
 	  res.render('contact', locals);
 	});
 
-	app.get('/buy', function (req, res){
+	app.get('/team', function (req, res){
 	  var locals = {
-    	title: "Buy",
-    	className: "buy"
+    	title: "Our Team",
+    	className: "landing-page single-page team"
     };
-	  res.render('buy', locals);
+	  res.render('team', locals);
+	});
+
+	app.get('/getstarted', function (req, res){
+	  var locals = {
+    	title: "Get Started",
+    	className: "landing-page single-page getstarted"
+    };
+	  res.render('getstarted', locals);
 	});
 
 	app.get('/login', function (req, res){
 		var redirect = req.query.redirect,
 			locals = {
 				title: 'Login',
-				formAction : '/login'
+				formAction : '/login',
+				className: "landing-page single-page getstarted"
 			};
 
 		if (redirect){
@@ -111,7 +128,8 @@ module.exports = function(app){
 
 	app.get('/signup', function (req, res){
 		res.render('signup', {
-			title : 'Signup'
+			title : 'Signup',
+			className: "landing-page single-page getstarted"
 		});
 	});
 
@@ -156,13 +174,15 @@ module.exports = function(app){
 							res.render('register', {
 								title: 'Welcome to Bitponics!',
 								message: 'Your registration was successfull.',
-								user: user
+								user: user,
+								className: "landing-page single-page getstarted register"
 							});
 						});
 					} else {
 						res.render('register', {
 							title: 'Welcome to Bitponics!',
-							message: "There was an error validating your account. Please sign up again."
+							message: "There was an error validating your account. Please sign up again.",
+							className: "landing-page single-page getstarted register"
 						});
 					}
 	    	}
@@ -172,7 +192,8 @@ module.exports = function(app){
 	    winston.info(req.user);
 	    res.render('register', {
 	      title: 'Register',
-	      message: 'Thanks for signing up. Check your email.'
+	      message: 'Thanks for signing up. Check your email.',
+	      className: "landing-page single-page getstarted register"
 	    });
 	  }
 	});
