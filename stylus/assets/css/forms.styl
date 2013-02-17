@@ -14,8 +14,15 @@ label, input
 	margin 1em 0
 
 label
-	font-weight bold
+	// font-weight bold
 	margin-bottom 0
+
+label.inline, input.inline
+	display inline
+	vertical-align text-top
+
+input.inline
+	vertical-align baseline
 
 input, textarea
 	margin-top 0
@@ -30,9 +37,9 @@ input:valid, textarea:valid, input:invalid, textarea:invalid
 	background white
 
 input[type=submit]
-	background color-medium-green
-	color white
-	border none
+	background white
+	color color-medium-green
+	border 4px solid color-medium-green
 	font-size 1.5em
 
 button

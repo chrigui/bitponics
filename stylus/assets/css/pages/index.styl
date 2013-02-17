@@ -1,67 +1,348 @@
 @import "nib"
+@import "./global/colors"
 
-.home
+.landing-page
 	body
 		// background linear-gradient(top, #9e9e9e, #cdd1d2);
-		background-color #cfd5d5
+		//background-color #cfd5d5
 		color white
 		margin 0
 
 	div, p, span, a, a:visited, a:hover, a:active
-		color white
+		color color-text-gray
+
+	section	
+		clear both
+
+	ul
+		list-style none
+		margin 0
+		padding 0
+
 
 	.main-heading
 		color white
 
 	.content-module
 		border none
-		min-height 600px
-		height 800px
+		//min-height 300px
+		//height 800px
+		background-color white
+		color #00fa8b
+		
+		h3 div, a, a:visited, a:hover, a:active
+			color #00fa8b
+		
+		.nav-section
+			border-top 1px solid #00fa8b
+
+		&.inverted-color
+			background-color color-hot-green //hot green
+			
+			div, p, span, a, a:visited, a:hover, a:active
+				color white
+
+			.nav-section
+				border-top 1px solid white
+
+		&#home
+			background-color: transparent;
+
 
 	.page
-		background-image url('/img/Bitponics_Hssld_H4D_0085.jpg')
-		background-position 35% -355px
+		//background-image url('/img/home/Bitponics_Hssld_H4D_0085.jpg')
+		background-position 35% -13em
 		// background-size cover
 		background-repeat no-repeat
 
 	#main > div, header
-		padding 2em 2.6%
+		//padding 2em 2.6%
 		margin 0
+		z-index 2
 
+	.header-fixed
+		display none
+	
 	nav
-		ul
-			list-style none
-			li
-				display block
-				margin 1em 0
+		li
+			display block
+			margin 0
+			padding .25em .5em
+			background none
+			color color-text-gray
 
-				.first
-					margin 0
+			.first
+				margin 0
 
 	.logo
-		font-size 1.17em
+		font-size 1.45em
 		margin 0
 		width auto
+		height 1em
 
 		span
 			font-size: .65em;
 			vertical-align: top;
 
-	.icon-logo
-		font-size: 2.8em;
-		position: relative;
-		top: 0.35em;
+	.icon-glyphlogo-new
+		display none
 
-	#about, #gallery, #contact
-		background-color #00fa8b //hot green
+	.page-heading, .page-content
+		width 95%
+		margin 0 auto
+	.page-heading
+		.icon-glyphlogo-new
+			display none
 
-		.nav-section
+	.page-content
+		clear: both;
+		overflow: hidden; 
+		
+		&.center-img
+			text-align center
+
+			img
+				@extends .display-ib
+
+		p
+			font-size .85em
+
+		p.blurb 
+			position relative
 			border-top 1px solid white
+			padding 2em 0 0 12em
+			line-height 1.5em
+		// .icon-logo
+		// 	display none
+		// 	position absolute
+		// 	top .35em
+		// 	left .5em
+		// 	font-size 6.5em
+		// 	line-height 1em
 
-	#howitworks, #press, #buy
-		background-color white
-		color #00fa8b
-		div, p, span, a, a:visited, a:hover, a:active
-			color #00fa8b
-		.nav-section
-			border-top 1px solid #00fa8b
+	.headline
+		position absolute
+		top: 0;
+		left: 0;
+		color: white;
+		background: rgba(0,0,0,.25);
+		margin: 0;
+		width: 100%;
+		min-height: 100%;
+		//padding: .5em;
+		padding: 0.5em 4em;
+		font-size: 1em;
+
+	.headline-about
+		//@extends .headline
+		position static
+		font-size 4em
+		margin .5em 0 .45em 0
+		line-height 1em
+
+	// .btn
+
+	// 	&:visited, &:hover, &:active
+	// 		color white
+
+	.featured-press,
+	.additional-press
+		// padding 0 1em
+		margin 1.5em 0
+		a
+			@extends .display-ib
+
+	.featured-press
+		li, p
+			color-text-gray2
+	
+	.additional-press
+		a
+			width 100%
+		.last
+			a
+				width auto
+
+
+
+.elevated-item
+	// position absolute
+	// top 0
+	// right 0
+
+	li
+		margin 0
+		padding 0
+
+	.btn
+		padding .5em
+		margin 0 0 0 -.5em
+		background white
+		border 2px solid color-text-gray
+
+.social-icons
+	position absolute
+	top 0
+	right 0
+	
+	li
+		@extends .circle;
+		cursor pointer
+		width 2em
+		height 2em
+		padding .5em 0
+		margin 0 0  0 .25em
+		background color-text-gray
+		color white
+		position relative
+		float left
+		text-align right
+
+		div
+			@extends .hide-text;
+			text-indent 100%
+		
+		i
+			position: absolute;
+			top 0
+			left 0
+			font-size 2em
+			width 1em
+			height 1em
+
+	i.icon-glyphfc-webicon-facebook
+		left -.125em
+		top -.05em
+	i.icon-glyphfc-webicon-twitter
+		left -0.1em
+		top -0.1em
+	i.icon-glyphmail
+		left -.15em
+		top -.15em
+
+.flexslider
+	ul
+		margin 0
+		padding 0
+	img
+		width 100%
+		height auto
+		display inline
+		// position fixed
+		// top 0
+		// left 0
+		
+		// @media screen and (max-width: 1440px)
+		// 	left: 50%;
+		// 	margin-left: -(1440px/2);   /* 50% */
+
+.slides
+	li
+		position relative
+		overflow hidden
+.flex-direction-nav
+	// position absolute
+	// top 0
+	position relative
+	top -8em
+	color white
+	z-index 3
+	width 100%
+
+	li
+		position absolute
+		width 100%
+
+	a
+		color white
+		display block
+		position absolute
+
+	.flex-prev
+		left 1em
+
+	.flex-next
+		right 1em
+
+	i
+		color white
+		font-size 3em
+
+
+#howitworks
+	p
+		text-align left
+		color color-text-gray
+		margin 1em
+
+#team, #contact
+	background color-light-gray-bg
+	div, p, a, h3
+		color white
+		border-color white
+
+#getstarted
+	//display none
+
+//Pricing Page
+.list-grid-wrapper
+	padding 0 .5em
+	font-size: 0.75em;
+	.grid-list
+		// width 20%
+		// margin 0 2.6
+		li
+			font-size 1em
+			h2
+				margin 1em 0 0
+				line-height 1em
+				font-size 1.5em
+			span
+				&.price-number
+					font-size 3.5em
+				&.price-type
+					//
+				&.price-per
+					//
+
+			&.first
+				//
+			&.last
+				//
+		&.feature-icons
+			display none
+			li
+				div
+					display none
+		&.tier1
+			h2 span, .price span
+				color color-light-green2
+		&.tier2
+			h2 span, .price span
+				color color-medium-green2
+		&.tier3
+			h2 span, .price span
+				color color-blue-green
+
+//Team Page
+.member
+	clear both
+	margin 0 0 1em 0
+
+	h3
+		border-bottom 1px solid white
+		// float right
+		// width 50%
+	img
+		// float left
+		// width 40%
+		// margin: 1.5em 10% 5em 0;
+		border: 4px solid white;
+
+	p
+		// float right
+		// width 50%
+
+	
+
+

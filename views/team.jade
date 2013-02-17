@@ -1,0 +1,39 @@
+extends layout
+
+block content
+
+  section.header
+      header
+        include /includes/nav/main
+
+  section#main(role="main")
+    h3(class="page-heading nav-section")
+      div Our Team
+      | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
+    
+    div.page-content
+    
+      div.member
+        img(src="/img/home/amit.jpg")
+        h3 Amit Kumar
+        p 
+          | Amit Kumar has been a software engineer for 8 years and a plant lover for 20. After graduating from UCLA with a degree in Cognitive Science, he brought his knowledge of human information processing to the field of web software development, where he strives to produce products that aren’t just outstanding technically, but are also highly intuitive and a pleasure to use. He’s spent his career working with a variety of technologies in all aspects of software development. From the database to the back-end to the front-end, from .NET to PHP to node.js to HTML5/CSS3/Javascript, he crafts code to produce whatever the customer needs and more. He's delivered solutions for companies including Nike, Verizon, Barnes & Noble and American Express.
+        p
+          | After getting started with hydroponic gardening more than 3 years ago, Amit realized that combining it with computer automation was the perfect way to make gardening more accessible to everyone. He’s been working ever since to use his engineering skills to connect people with their plants in ways never before possible.
+      div.member
+        img(src="/img/home/michael.jpg")
+        h3 Michael Zick Doherty
+        p 
+          | Michael Zick Doherty is an engineer and social activist interested in intersections between community, the environment and technology. He did his masters at NYU’s Interactive Telecommunications Program where he worked with team of classmates to prototype an API for home energy monitoring that won honorable mention at the 2010 Techcrunch Disrupt hackathon. He also interned with Windowfarms, which included helping manage the online global community and installing hydroponic systems in locations around the world. For his thesis he developed OpenRTMS, an open source mobile sensing platform for health and the environment that was showcased at the 2011 Personal Democracy Forum.
+        p
+          | Michael also is an instructor at 3rd Ward where he’s taught hardware, software, and hydroponics engineering for the past 3 years. He also ran 3rd Ward's farm plot at the Dekalb Market. Other urban ag projects Michael has been involved with include the Brooklyn Grange and Hayseed's Big City Farm Supply. He is an active member at the Bushwick Food Coop and volunteers his time at Sure We Can, a non-profit recycling center in East Williamsburg.
+      div.member
+        img(src="/img/home/jack.jpg")
+        h3 Jack Bishop
+        p 
+          | Jack Bishop is a software engineer and web enthusiast with a passion for embracing change and building products for the future that he wants to see. For the better part of the last decade he has designed, developed, architected and maintained many popular websites, web applications and native mobile applications. His primary focus and interest has been mobile optimization on the web -- even before it was cool, when mobile was treated as a second-class citizen. Clients include Nike, Johnson & Johnson, Tiffany & Co and AdCouncil. Recently he has become an amatuer gardener, running a small hydroponic garden with basil, tomato and pepper plants. He is currently counting down the days until his garden becomes self-aware, remotely controllable and logs data to the cloud.
+
+
+  section#footer
+
+block footer-scripts
