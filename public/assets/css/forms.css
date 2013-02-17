@@ -134,7 +134,7 @@
   font-size: 16px;
 }
 .hide-text {
-  text-indent: -100%;
+  text-indent: -300%;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -189,8 +189,15 @@ input {
   margin: 1em 0;
 }
 label {
-  font-weight: bold;
   margin-bottom: 0;
+}
+label.inline,
+input.inline {
+  display: inline;
+  vertical-align: text-top;
+}
+input.inline {
+  vertical-align: baseline;
 }
 input,
 textarea {
@@ -206,9 +213,9 @@ textarea:invalid {
   background: #fff;
 }
 input[type=submit] {
-  background: #24d321;
-  color: #fff;
-  border: none;
+  background: #fff;
+  color: #24d321;
+  border: 4px solid #24d321;
   font-size: 1.5em;
 }
 button {

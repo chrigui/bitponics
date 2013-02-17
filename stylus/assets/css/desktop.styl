@@ -1,4 +1,4 @@
-.home
+.landing-page
 
   #main, .header
     padding 0
@@ -31,9 +31,56 @@
 
     .headline
       margin-right 26%
-// .flex-direction-nav
-//   .flex-prev
-//     left 13%
 
-//   .flex-next
-//     right 13%
+    //Pricing Page
+  .list-grid-wrapper
+  //
+    .grid-list
+      li
+        //min-height 4em
+
+  @media screen and (min-width: 65em)
+    .list-grid-wrapper
+      width: 80%;
+      float: right;
+
+    #pricing
+      .center
+        width 70%
+
+.landing-page.getstarted
+  #main
+    width: 60%;
+    padding-left: 4%;
+
+
+  .retail-price
+    margin .5em
+
+  .preorder-price
+    margin-top: -1.5em;
+
+    .additional-text
+      display inline-block
+      span
+        width 100%
+      // display inline-block
+
+//Team Page
+.member
+  clear both
+  margin 0 0 1em 0
+
+  h3
+    border-bottom 1px solid white
+    float right
+    width 50%
+  img
+    float left
+    width 40%
+    margin: 1.5em 10% 5em 0;
+    border: 4px solid white;
+
+  p
+    float right
+    width 50%

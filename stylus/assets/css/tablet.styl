@@ -161,7 +161,7 @@ section#footer
 /*
  * Home Page
  */
-.home
+.landing-page
 	
 	#main, .header
 		padding 0
@@ -169,6 +169,13 @@ section#footer
 	.content-module
 		min-height 800px
 
+	#footer
+		background-position 45% 100%
+		background-image url('/img/home/footer.jpg')
+		min-height 1323px
+		background-size cover
+		background-repeat no-repeat
+	
 	.header
 		position absolute
 		width 100%
@@ -354,7 +361,7 @@ section#footer
 	.flex-direction-nav
 		position absolute
 		z-index: 4;
-		top: 18em;
+		top: 49%;
 
 		a
 			color white
@@ -378,6 +385,145 @@ section#footer
 			border-top: 1px solid color-hot-green;
 			padding: 1em 0 0 0;
 
+	//Pricing Page
+.list-grid-wrapper
+	font-size 1em
+	.grid-list
+		float left
+		margin 0
+		li
+			text-align center
+			border-top 1px solid color-light-gray
+			min-height 8em
+			//display: table;
+			width: 100%;
+			h2
+				margin 0
+				span
+					display block
+					
+			& > span
+				width 80%
+				// display: table-cell;
+				display inline-block
+				padding 1em 1em 0
+				font-size .85em
+			&.price
+				// display block
+				.price-number,.price-type,.price-per
+					display inline
+					padding 0
+				.price-number
+					//
+				.price-type
+					//
+				.price-per
+					display block
+					margin-top: -.85em;
+					width 100%
+
+			&.first
+				border 0 none
+				margin-top 1em
+			&.last
+				padding-top: 1em;
+
+		&.feature-icons
+			display block
+			width 10%
+			li
+				// height auto
+				// min-height auto
+				//display block
+				
+				position relative
+				// font-size 2em
+				// min-height 3em
+				i
+					position absolute
+					top: 0;
+					margin-top: 0;
+					font-size: 3em;
+					color color-medium-green
 
 
+			.first
+				min-height 4em
+		&.tier1
+			width 30%
+			.first
+				min-height 4em
+		&.tier2
+			width 30%
+			.first
+				min-height 4em
+		&.tier3
+			width 30%
+			.first
+				min-height 4em
+#pricing
+	.center
+		margin 1em
 
+		a.btn
+			//
+		i
+			//
+
+
+/*
+ * Single landing page overrides
+ */
+@import "./pages/single-page"
+
+
+/*
+ * getstarted/thankyou
+ */
+.landing-page.getstarted
+	#main
+		margin: 10em auto 0 auto;
+		width: 95%
+
+	.page-heading
+		width 100%
+		font-size: 3.5em;
+	.page-content
+		//sdfd
+
+
+.landing-page.register
+	#main
+		//margin-top 0
+
+		.preorder-price
+			margin-top: -1.5em;
+			//   position relative
+			//   font-size 3em
+		  
+			//   span.dollar-sign, span.price-number
+			//     color color-medium-green
+			//   .additional-text
+			//     // font-size .333em
+			//     display inline-block
+			//     // width 2em
+
+			//     span
+			//       display block
+			//       text-align left
+
+//Team Page
+.member
+	clear both
+	margin 0 0 1em 0
+
+	// h3
+	// 	border-bottom 1px solid white
+	// 	float right
+	// 	width 50%
+	img
+		margin: 1.5em 0
+
+	// p
+	// 	float right
+	// 	width 50%
