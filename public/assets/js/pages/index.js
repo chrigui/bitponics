@@ -23,7 +23,7 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="getstarted"]) a'), function(){
+      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="getstarted"]) a:not(.external)'), function(){
         
         //match section height to window
         //create fixed nav
@@ -39,7 +39,7 @@ function(){
         // self.setupSlideShow();
 
         //smooth anchor scrolling to sections
-        $('nav a').localScroll({ lazy: true });  
+        $('nav a:not(.external)').localScroll({ lazy: true });  
 
         //get section top values so we know when scrolling to highlight nav item
         $('#main > .content-module').each(function(i){
