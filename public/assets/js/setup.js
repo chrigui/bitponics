@@ -4,7 +4,8 @@ $(function(){
 		$connectToDevice = $('#connect-to-device'),
 		$wifiForm = $('#wifi-form'),
 		$wifiSsid = $('#wifi-ssid'),
-		$wifiSsidText = $('#wifi-ssid-text'),
+		$wifiManualSsid = $('#wifi-manual-ssid'),
+		$wifiManualSecurityMode = $('#wifi-manual-security-mode'),
 		$wifiPass = $('#wifi-pass'),
 		$wifiMode = $('#wifi-mode'),
 		$enterWifiData = $('#enter-wifi-data'),
@@ -15,25 +16,33 @@ $(function(){
 			deviceMacAddress : ''
 		};
 		scannedWifiNetworks = [],
+		/**
+		 * Format for wifi network objects:
+		 * { ssid : string, securityMode : string }
+		 */
 		selectedWifiNetwork = {},
 		connectToDeviceRetryTimer = 60000,
 
 		securityModeOptions = {
-			'WPA_MODE' : 'WPA_MODE',
-			'WEP_MODE' : 'WEP_MODE',
+			'WPA' : 'WPA_MODE',
+			'WEP' : 'WEP_MODE',
 			'NONE' : 'NONE'
 		},
 		securityModeMap = {
-			'00' : securityModeOptions['WPA_MODE'],
-			'01' : securityModeOptions['WEP_MODE'],
-			'02' : securityModeOptions['WPA_MODE'],
-			'03' : securityModeOptions['WPA_MODE'],
-			'04' : securityModeOptions['WPA_MODE'],
+			'00' : securityModeOptions['WPA'],
+			'01' : securityModeOptions['WEP'],
+			'02' : securityModeOptions['WPA'],
+			'03' : securityModeOptions['WPA'],
+			'04' : securityModeOptions['WPA'],
 			'05' : securityModeOptions['NONE'],
-			'06' : securityModeOptions['WPA_MODE'],
-			'08' : securityModeOptions['WPA_MODE']
+			'06' : securityModeOptions['WPA'],
+			'08' : securityModeOptions['WPA']
 		};
 
+	// init
+	$wifiManualSecurityMode.append('<option value="' + securityModeOptions['WPA'] + '">WPA</option>');	
+	$wifiManualSecurityMode.append('<option value="' + securityModeOptions['WEP'] + '">WEP</option>');	
+	$wifiManualSecurityMode.append('<option value="' + securityModeOptions['NONE'] + '">None</option>');	
 
 	var postToDevice = function(){
 		var postDataStringPlainText = 'SSID=' + selectedWifiNetwork.ssid + '\n' +
@@ -41,6 +50,8 @@ $(function(){
 			'MODE=' + selectedWifiNetwork.securityMode + '\n' +
 			'SKEY=' + Bitponics.currentUser.privateDeviceKey + '\n' +
 			'PKEY=' + Bitponics.currentUser.publicDeviceKey; 
+
+		console.log('Posting to device', postDataStringPlainText);
 
 		$.ajax({
 			url: deviceUrl,
@@ -70,7 +81,9 @@ $(function(){
 		$.ajax({
 			url: '/setup',
 			type: 'POST',
-			data: dataToPostAfterSuccess,
+			contentType : 'application/json; charset=utf-8',
+			dataType: 'json',
+			data: JSON.stringify(dataToPostAfterSuccess),
 			processData : false,
 			success: function(data){
 				console.log(data);
@@ -86,8 +99,14 @@ $(function(){
 	$wifiForm.submit(function(e){
 		e.preventDefault();
 		selectedWifiNetwork = $.grep(scannedWifiNetworks, function(item, index){
-			return item.ssid === $wifiSsid.val() || $wifiSsidText.val();
+			return item.ssid === $wifiSsid.val();
 		})[0];
+		if (!selectedWifiNetwork){
+			selectedWifiNetwork = {
+				ssid : $wifiManualSsid.val(),
+				securityMode : $wifiManualSecurityMode.val()
+			}
+		}
 		// TODO : validate
 
 		postToDevice();

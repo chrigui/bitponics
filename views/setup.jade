@@ -18,10 +18,10 @@ block content
           a(href='/login?redirect=setup', style='text-decoration:underline;color:#333') Login
           
    - else
-      h1 Setting up your Bitponics device
+      h1 Setting up your Bitponics Base Station
       ol
         li 
-          div Plug your device into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:
+          div Plug your Base Station into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:
             div.led-indicator.scan
             | This indicates that it's scanning the available WiFi networks. Once it starts a slower green blinking:
             div.led-indicator.adhoc
@@ -30,17 +30,22 @@ block content
           div Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it.
         li
           div Once you're connected, click 
-            a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to device 
+            a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to Base Station 
         li#enter-wifi-data
-          div Hooray! We've connected to your Bitponics device, and now you're ready to tell it how to connect to your WiFi network. 
+          div Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
             form#wifi-form(action='')
               ul 
                 li
-                  label(for='wifi-ssid') SSID
-                    select#wifi-ssid(name='wifi-ssid')
-                li
-                  label(for='wifi-ssid-text') SSID not in the list? Enter it in here:
-                    input#wifi-ssid-text(name='wifi-ssid-text')
+                  div(style="float:left;width=50%")
+                    | Select from the scanned Wifi networks:
+                    label(for='wifi-ssid') 
+                      select#wifi-ssid(name='wifi-ssid')
+                  div(style="width:50%")
+                    | Or enter your Wifi network information manually:
+                    label(for='wifi-manual-ssid') Network Name:
+                      input#wifi-manual-ssid(name='wifi-manual-ssid')  
+                    label(for='wifi-manual-security-mode') Security Mode:
+                      select#wifi-manual-security-mode(name='wifi-manual-security-mode')
                 li
                   label(for='wifi-pass') PASS
                     input#wifi-pass(name='wifi-pass')
@@ -53,9 +58,9 @@ block content
           p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to&nbsp;  
             span.selectedNetworkSsid
             |.
-          p After you're back on the&nbsp; 
+          p After you're back on the  
             span.selectedNetworkSsid
-            | network,
+            |  network,
             a(id="submit-device-info", href="javascript:void(0);", style="color:blue;") click here so that we can pair your device to your Bitponics account.
         li#pairing-complete
           p Great, your device is now connected to your account. Let's take a look at the data we're getting:
