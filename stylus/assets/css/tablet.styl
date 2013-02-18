@@ -175,6 +175,12 @@ section#footer
 		min-height 1323px
 		background-size cover
 		background-repeat no-repeat
+		position relative
+
+		div
+			position absolute
+			bottom 1em
+			left 2.5%
 	
 	.header
 		position absolute
@@ -195,8 +201,10 @@ section#footer
 			top: 0.35em;
 		&.header-fixed
 			display block
-			.icon-glyphlogo-new, .social-icons
-				display none	
+			.icon-glyphlogo-new
+				display none
+			.social-icons
+				//
 
 		& > header
 			margin: 0 auto;
@@ -221,7 +229,7 @@ section#footer
 				min-height auto
 				width: 19.3%;
 				margin: 0 3% 0 0;
-				padding: 0.45em 0 0 0.15em;
+				padding: 0.45em 0 0 0;
 
 		h1 div, h1 span
 			//color #00fa8b
@@ -240,7 +248,7 @@ section#footer
 			float left
 			margin 0 0 0 0
 			padding 0 0 0 0
-
+			display block
 			li
 				display inline-block
 				// margin 0 1em 0 0
@@ -272,6 +280,7 @@ section#footer
 			// overflow: hidden;
 			// margin: 0 0 0 3%;
 			//margin 0 0 0 70%
+			position absolute
 			margin 0
 			width auto
 			clear right
@@ -283,7 +292,21 @@ section#footer
 				margin .5em 0 0 .2em
 				color white
 				background color-text-gray
+				position relative
 
+			a
+				position: absolute;
+				top: -.5em;
+				left: 0;
+				font-size: 1.25em;
+				color white
+				i
+					width: 1em;
+					height: 1em;
+
+					.icon-glyphmail
+						left -0.105em
+						top -0.025em
 
 		.elevated-item
 			//margin 0 0 0 20%
@@ -358,6 +381,10 @@ section#footer
 		img
 			min-height 100%
 			min-width 1440px
+			position: relative;
+			left: 50%;
+			margin-left: -720px;
+			
 	.flex-direction-nav
 		position absolute
 		z-index: 4;

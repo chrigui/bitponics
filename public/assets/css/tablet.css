@@ -328,6 +328,12 @@ section#footer {
   -moz-background-size: cover;
   background-size: cover;
   background-repeat: no-repeat;
+  position: relative;
+}
+.landing-page #footer div {
+  position: absolute;
+  bottom: 1em;
+  left: 2.5%;
 }
 .landing-page .header {
   position: absolute;
@@ -350,8 +356,7 @@ section#footer {
 .landing-page .header.header-fixed {
   display: block;
 }
-.landing-page .header.header-fixed .icon-glyphlogo-new,
-.landing-page .header.header-fixed .social-icons {
+.landing-page .header.header-fixed .icon-glyphlogo-new {
   display: none;
 }
 .landing-page .header > header {
@@ -370,7 +375,7 @@ section#footer {
   min-height: auto;
   width: 19.3%;
   margin: 0 3% 0 0;
-  padding: 0.45em 0 0 0.15em;
+  padding: 0.45em 0 0 0;
 }
 .landing-page .header a {
   color: #999b9a;
@@ -387,6 +392,7 @@ section#footer {
   float: left;
   margin: 0 0 0 0;
   padding: 0 0 0 0;
+  display: block;
 }
 .landing-page .header .nav-section li {
   display: inline-block;
@@ -411,6 +417,7 @@ section#footer {
   background: none;
 }
 .landing-page .header .social-icons {
+  position: absolute;
   margin: 0;
   width: auto;
   clear: right;
@@ -422,6 +429,22 @@ section#footer {
   margin: 0.5em 0 0 0.2em;
   color: #fff;
   background: #999b9a;
+  position: relative;
+}
+.landing-page .header .social-icons a {
+  position: absolute;
+  top: -0.5em;
+  left: 0;
+  font-size: 1.25em;
+  color: #fff;
+}
+.landing-page .header .social-icons a i {
+  width: 1em;
+  height: 1em;
+}
+.landing-page .header .social-icons a i .icon-glyphmail {
+  left: -0.105em;
+  top: -0.025em;
 }
 .landing-page .header .elevated-item li {
   background: transparent;
@@ -496,6 +519,9 @@ section#footer {
 .landing-page .flexslider img {
   min-height: 100%;
   min-width: 1440px;
+  position: relative;
+  left: 50%;
+  margin-left: -720px;
 }
 .landing-page .flex-direction-nav {
   position: absolute;
@@ -601,12 +627,28 @@ section#footer {
 /*
  * Single landing page overrides
  */
+.single-page #main,
+.single-page #footer {
+  max-width: 60em;
+  margin: 0 auto;
+  width: 95%;
+}
 .single-page #main {
-  margin-top: 10em;
+  margin: 10em auto;
 }
 .single-page #footer {
   background: none;
   height: auto;
+  min-height: auto;
+  padding: 0;
+  font-size: 1em;
+}
+.single-page #footer div {
+  position: static;
+}
+.single-page .page-content,
+.single-page .page-heading {
+  width: 100%;
 }
 /*
  * getstarted/thankyou
