@@ -1038,6 +1038,12 @@ section#footer .content-module {
 .landing-page section {
   clear: both;
 }
+.landing-page #footer {
+  background-color: #bfc1c3;
+  color: #fff;
+  padding: 0 2.5%;
+  font-size: 0.85em;
+}
 .landing-page ul {
   list-style: none;
   margin: 0;
@@ -1097,9 +1103,13 @@ section#footer .content-module {
   padding: 0.25em 0.5em;
   background: none;
   color: #999b9a;
+  display: none;
 }
-.landing-page nav li .first {
-  margin: 0;
+.landing-page nav li.first {
+  display: block;
+}
+.landing-page nav.open {
+  display: block;
 }
 .landing-page .logo {
   font-size: 1.45em;
@@ -1131,6 +1141,8 @@ section#footer .content-module {
 }
 .landing-page .page-content p {
   font-size: 0.85em;
+  text-align: left;
+  max-width: 35em;
 }
 .landing-page .page-content p.blurb {
   position: relative;
@@ -1149,6 +1161,7 @@ section#footer .content-module {
   min-height: 100%;
   padding: 0.5em 4em;
   font-size: 1em;
+  z-index: 1;
 }
 .landing-page .headline-about {
   position: static;
@@ -1177,8 +1190,8 @@ section#footer .content-module {
   border: 2px solid #999b9a;
 }
 .social-icons {
-  position: absolute;
-  top: 0;
+  position: relative;
+  top: -0.4em;
   right: 0;
 }
 .social-icons li {
@@ -1198,13 +1211,12 @@ section#footer .content-module {
 }
 .social-icons li a,
 .social-icons li i {
+  font-size: 1.4em;
+}
+.social-icons li i {
   position: absolute;
   top: 0;
   left: 0;
-  font-size: 2em;
-  width: 1em;
-  height: 1em;
-  color: #fff;
 }
 .social-icons i.icon-glyphmail {
   left: -0.05em;
@@ -1560,12 +1572,28 @@ section#footer .content-module {
 /*
  * Single landing page overrides
  */
+.single-page #main,
+.single-page #footer {
+  max-width: 60em;
+  margin: 0 auto;
+  width: 95%;
+}
 .single-page #main {
-  margin-top: 10em;
+  margin: 10em auto;
 }
 .single-page #footer {
   background: none;
   height: auto;
+  min-height: auto;
+  padding: 0;
+  font-size: 1em;
+}
+.single-page #footer div {
+  position: static;
+}
+.single-page .page-content,
+.single-page .page-heading {
+  width: 100%;
 }
 /*
  * Register page
