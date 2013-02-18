@@ -11,6 +11,16 @@ var mongoose = require('mongoose'),
   	winston = require('winston');
 
 
+/***************** UTILS **********************/
+var DeviceUtils = {
+	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};',
+	roles : {
+		'owner' : 'owner',
+		'member' : 'member'
+	}
+};
+/***************** END UTILS **********************/
+
 /***************** SCHEMA **********************/
 
 var DeviceSchema = new Schema({
@@ -19,11 +29,11 @@ var DeviceSchema = new Schema({
 	name : { type: String },
 	owner : { type: ObjectId, ref: 'User'},
 	users : [ { type: ObjectId, ref: 'User'}],
-	userAssignments : [
+	userAssignmentLogs : [
 		{
 			ts : { type : Date, default: Date.now, required : true},
 			user : { type : ObjectId, ref: 'User', required: true },
-			assignmentType: { type : String, enum : ['owner', 'member']}
+			assignmentType: { type : String, enum : [DeviceUtils.roles.owner, DeviceUtils.roles.member]}
 		}
 	],
 	sensorMap : [
@@ -257,13 +267,6 @@ DeviceSchema.pre('save', function(next){
 
 /***************** END MIDDLEWARE **********************/
 
-
-
-/***************** UTILS **********************/
-var DeviceUtils = {
-	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};'
-};
-/***************** END UTILS **********************/
 
 exports.schema = DeviceSchema;
 exports.model = mongoose.model('Device', DeviceSchema);
