@@ -213,6 +213,12 @@ module.exports = function(app){
 	require('./growplans')(app);
 	require('./reset')(app);
 
+	/*
+	 * Legacy PHP site routes
+	 */
+	require('./legacy')(app);
+
+
 	// The call to app.use(app.router); is to position the route handler in the middleware chain.
 	// Everything afterward is assumed to have not matched a route.
 	// https://github.com/visionmedia/express/blob/master/examples/error-pages/index.js
