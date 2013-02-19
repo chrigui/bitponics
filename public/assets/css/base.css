@@ -899,7 +899,8 @@ img {
 .icon {
   display: inline-block;
 }
-.icon div {
+.icon div,
+.icon a {
   text-transform: lowercase;
 }
 .btn {

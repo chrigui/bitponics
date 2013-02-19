@@ -385,6 +385,14 @@ section#footer {
 .landing-page .header a.active {
   color: #00fa8b;
 }
+.landing-page .header h1.logo a {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+.landing-page .header h1.logo a:hover {
+  text-decoration: none;
+}
 .landing-page .header h1 i {
   color: #fff;
 }

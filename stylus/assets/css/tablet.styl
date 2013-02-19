@@ -241,8 +241,17 @@ section#footer
 			&.active
 				color #00fa8b
 
-		h1 i
-			color white
+		h1 
+			&.logo a
+				font-size inherit
+				line-height inherit
+				color inherit
+
+				&:hover
+					text-decoration none
+
+			i
+				color white
 
 		.nav-section
 			float left
