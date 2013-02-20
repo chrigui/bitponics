@@ -7,35 +7,36 @@ block content
         include /includes/nav/main
 
   section#main(role="main")
-    h3(class="page-heading nav-section") 
-      div Contact
-      | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
-    div.page-content
+    div(id="contact", class="content-module middle")
+      h3(class="page-heading nav-section") 
+        div Contact
+        | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
+      div.page-content
 
-      p If you have any questions or want to learn more about Bitponics, please don't hesitate to contact us.
-      div(id="wufoo-m7x4a3")
-        a(href="http://greatsoles.wufoo.com/forms/m7x4a3") Send us an email.
-      div.script
-        | var m7x4a3;(function(d, t) {
-        | var s = d.createElement(t), options = {
-        | 'userName':'greatsoles', 
-        | 'formHash':'m7x4a3', 
-        | 'autoResize':true,
-        | 'height':'517',
-        | 'async':true,
-        | 'header':'show'};
-        | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
-        | s.onload = s.onreadystatechange = function() {
-        | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
-        | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
-        | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
-        | })(document, 'script');
+        p If you have any questions or want to learn more about Bitponics, please don't hesitate to contact us.
+        div(id="wufoo-m7x4a3")
+          a(href="http://greatsoles.wufoo.com/forms/m7x4a3") Send us an email.
+        div.script
+          | var m7x4a3;(function(d, t) {
+          | var s = d.createElement(t), options = {
+          | 'userName':'greatsoles', 
+          | 'formHash':'m7x4a3', 
+          | 'autoResize':true,
+          | 'height':'517',
+          | 'async':true,
+          | 'header':'show'};
+          | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
+          | s.onload = s.onreadystatechange = function() {
+          | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
+          | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
+          | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
+          | })(document, 'script');
 
 
-      div(id="email-sub")
-        form(action="http://bitponics.us2.list-manage1.com/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92", method="post", id="mc-embedded-subscribe-form", name="mc-embedded-subscribe-form", class="validate", target="_blank")
-          input(type="email", value="", name="EMAIL", class="subscribe", id="mce-EMAIL", placeholder="Subscribe to email list", required)
-          input(type="submit", value="Submit", name="subscribe", id="mc-embedded-subscribe", class="button")
+        div(id="email-sub")
+          form(action="http://bitponics.us2.list-manage1.com/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92", method="post", id="mc-embedded-subscribe-form", name="mc-embedded-subscribe-form", class="validate", target="_blank")
+            input(type="email", value="", name="EMAIL", class="subscribe", id="mce-EMAIL", placeholder="Subscribe to email list", required)
+            input(type="submit", value="Submit", name="subscribe", id="mc-embedded-subscribe", class="button")
 
 block footer-scripts
   script

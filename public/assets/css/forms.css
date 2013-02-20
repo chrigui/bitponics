@@ -296,12 +296,12 @@ textarea {
 .wufoo {
   background-color: #bfc1c3 !important;
   color: #fff !important;
-  label: , input;
-  display: block !important;
-  margin: 1em 0 !important;
 }
 .wufoo header {
   display: none !important;
+}
+.wufoo li {
+  padding: 0;
 }
 .wufoo label {
   margin-bottom: 0 !important;

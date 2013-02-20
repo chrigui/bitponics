@@ -7,55 +7,56 @@ block content
         include /includes/nav/main
 
   section#main(role="main")
-    h3(class="page-heading nav-section")
-      | Thank you.
-    h3.sub-heading #{message}
-    p You can now preorder the Bitponics device at a 20% discount. This is a limited run of 50, so don't sleep on it.
+    div(id="register", class="content-module middle")
+      h3(class="page-heading nav-section")
+        | Thank you.
+      h3.sub-heading #{message}
+      p You can now preorder the Bitponics device at a 20% discount. This is a limited run of 50, so don't sleep on it.
 
 
-    div(class="page-content")
-      //- - if (!user || !user.id)
-      //-   //- h2.main-heading Welcome
-      //-   //- h3.sub-heading
-      //-   //-   a(href="/signup") Sign up
-      //-   //-   <br>
-      //-   //-   a(href="/login") Log in
-      //- - else
-      //-   h2.main-heading Hi, 
-      //-     //- if user.name.full && user.name.full != ''
-      //-     //-  | #{user.name.full}
-      //-     //- else
-      //-     | #{user.email}
-      //-   //- h3.sub-heading
-      //-   //-     a(href='/logout') Logout
+      div(class="page-content")
+        //- - if (!user || !user.id)
+        //-   //- h2.main-heading Welcome
+        //-   //- h3.sub-heading
+        //-   //-   a(href="/signup") Sign up
+        //-   //-   <br>
+        //-   //-   a(href="/login") Log in
+        //- - else
+        //-   h2.main-heading Hi, 
+        //-     //- if user.name.full && user.name.full != ''
+        //-     //-  | #{user.name.full}
+        //-     //- else
+        //-     | #{user.email}
+        //-   //- h3.sub-heading
+        //-   //-     a(href='/logout') Logout
 
-  
-      img(src="/assets/img/home/Bitponics_Hssld_H4D_0085.jpg", alt="Bitponics Device")
-
-
-      div.retail-price
-        span.dollar-sign $
-        span.price-number 499
-        div.additional-text
-          span Retail 
-          span Price
+    
+        img(src="/assets/img/home/Bitponics_Hssld_H4D_0085.jpg", alt="Bitponics Device")
 
 
-      div.center.preorder-price
-        span.dollar-sign $
-        span.price-number 399
-        div.additional-text
-          span Preorder &nbsp;
-          span Offer
+        div.retail-price
+          span.dollar-sign $
+          span.price-number 499
+          div.additional-text
+            span Retail 
+            span Price
 
-      div(class="center clearfix")
-        a(href="/get-started", class="btn")
-          | Checkout
-          | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
-      div.center.checkout-imgs
-        img(src="/assets/img/home/amazon.jpg", alt="Bitponics Device")
-        img(src="/assets/img/home/cards.png", alt="Bitponics Device")
+        div.center.preorder-price
+          span.dollar-sign $
+          span.price-number 399
+          div.additional-text
+            span Preorder &nbsp;
+            span Offer
+
+        div(class="center clearfix")
+          a(href="/get-started", class="btn")
+            | Checkout
+            | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+
+        div.center.checkout-imgs
+          img(src="/assets/img/home/amazon.jpg", alt="Bitponics Device")
+          img(src="/assets/img/home/cards.png", alt="Bitponics Device")
         
 
   section#footer

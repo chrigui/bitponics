@@ -7,22 +7,23 @@ block content
         include /includes/nav/main
 
   section#main(role="main")
-    h3(class="page-heading nav-section")
-      | Register for your bitponics account.
-    ul
-      li Get access to preorder offers
-      li Receive news and announcements
-      li Third incentive
+    div(id="getstarted", class="content-module middle")
+      h3(class="page-heading nav-section")
+        | Register for your bitponics account.
+      ul
+        li Get access to preorder offers
+        li Receive news and announcements
+        li Third incentive
 
-    div(class="page-content")
-      form(id="register-form", method="POST", action="/signup")
-        label(for="email") Email
-        input(id="email", name="email", type="email", autofocus="autofocus") 
-        label(for="password") Password
-        input(id="password", name="password", type="password") 
-        input(id="newsletter-checkbox", name="newsletter", type="checkbox", class="inline")
-        label.inline Sign up for the Bitponics newsletter
-        input(type="submit", value="Submit")
+      div(class="page-content")
+        form(id="register-form", method="POST", action="/signup")
+          label(for="email") Email
+          input(id="email", name="email", type="email", autofocus="autofocus") 
+          label(for="password") Password
+          input(id="password", name="password", type="password") 
+          input(id="newsletter-checkbox", name="newsletter", type="checkbox", class="inline")
+          label.inline Sign up for the Bitponics newsletter
+          input(type="submit", value="Submit")
 
   section#footer
 
