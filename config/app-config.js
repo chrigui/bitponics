@@ -168,6 +168,7 @@ module.exports = function(app){
 	    				}
 	    			}
 				}
+				return next();
 	    	});
 
 	    	//we probably want to do something like this on heroku:
