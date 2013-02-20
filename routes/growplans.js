@@ -9,6 +9,7 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   GrowSystemModel = require('../models/growSystem').model,
   ActionModel = require('../models/action').model,
   ModelUtils = require('../models/utils'),
+  routeUtils = require('./route-utils'),
 	winston = require('winston'),
 	passport = require('passport'),
 	async = require('async'),
@@ -16,12 +17,7 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 
 module.exports = function(app){
 	
-	app.all('/growplans', function (req, res, next) {
-		if( !(req.user && req.user.id)){
-			return res.redirect('/login?redirect=/growplans');
-		}
-		next();
-	});
+	app.all('/growplans*', routeUtils.middleware.ensureLoggedIn);
 
 	app.get('/growplans', function (req, res){
 		var locals = {

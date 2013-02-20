@@ -124,12 +124,32 @@ module.exports = function(app){
 	  
 			// make the response markup pretty-printed
 			app.locals({pretty: true });
+
+			app.use(function(req, res, next){
+	    		var authorization = req.headers.authorization,
+	    			scheme;
+
+	    		if (req.user){ 
+	    			return next();
+	    		} else {
+	    			if (authorization){
+	    				scheme = authorization.split(' ')[0];
+		    			switch(scheme){
+		    				case 'BPN_DEVICE':
+		    					return passport.authenticate('device', {session: false})(req, res, next);
+		    				case 'BPN_API':
+		    					return passport.authenticate('api', {session: false})(req, res, next);
+	    					// no default. just let it flow down to the connect.basicAuth
+	    				}
+	    			}
+					// For local, dev, & staging, want to put the whole site behind basic auth
+					return connect.basicAuth('bitponics', '8bitpass')(req, res, next);
+	    		}
+	    	});
+	    	break;
 	    case 'production':
 	    	app.disable('verbose errors');
-	    	// Ensure that this is an authenticated request.
-	    	// If it doesn't already have a req.user, 
-	    	// check whether it's attempting HMAC auth,
-	    	// and finally fallback to checking Basic auth
+	    	
 	    	app.use(function(req, res, next){
 	    		var authorization = req.headers.authorization,
 	    			scheme;
@@ -147,8 +167,7 @@ module.exports = function(app){
 	    					// no default. just let it flow down to the connect.basicAuth
 	    				}
 	    			}
-					return connect.basicAuth('bitponics', '8bitpass')(req, res, next);	
-	    		}
+				}
 	    	});
 
 	    	//we probably want to do something like this on heroku:

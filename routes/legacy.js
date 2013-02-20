@@ -9,11 +9,11 @@ module.exports = function (app){
   });
 
   app.get('/how', function (req, res){
-    res.redirect('/howitworks');
+    res.redirect('/how-it-works');
   });
 
   app.get('/how.php', function (req, res){
-    res.redirect('/howitoworks');
+    res.redirect('/how-it-works');
   });
 
   app.get('/photos', function (req, res){
