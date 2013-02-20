@@ -1,8 +1,11 @@
 var UserModel = require('../models/user').model,
+	routeUtils = require('./route-utils'),
 	winston = require('winston'),
 	passport = require('passport');
 
 module.exports = function(app){
+	app.all('/profile*', routeUtils.middleware.ensureLoggedIn);
+
 	app.get('/profile', function (req, res){
 		if( !(req.user && req.user.id)){
 			return res.redirect('/login');

@@ -1,4 +1,5 @@
 var User = require('../models/user').model,
+	routeUtils = require('./route-utils'),
 	winston = require('winston'),
 	passport = require('passport'),
 	verificationEmailDomain = 'bitponics.com';
@@ -15,7 +16,7 @@ module.exports = function(app){
 	});
 
 
-	app.get('/socket_graph_test', function (req, res){
+	app.get('/socket_graph_test', routeUtils.middleware.ensureLoggedIn, function (req, res){
 	  //print_visits(req, res);
 	  res.render('dashboard', {
 	    title: 'Express',
@@ -40,7 +41,7 @@ module.exports = function(app){
 	  res.render('about', locals);
 	});
 
-	app.get('/howitworks', function (req, res){
+	app.get('/how-it-works', function (req, res){
 	  var locals = {
     	title: "How It Works",
     	className: "landing-page single-page howitworks"
@@ -88,7 +89,7 @@ module.exports = function(app){
 	  res.render('team', locals);
 	});
 
-	app.get('/getstarted', function (req, res){
+	app.get('/get-started', function (req, res){
 	  var locals = {
     	title: "Get Started",
     	className: "landing-page single-page getstarted"
