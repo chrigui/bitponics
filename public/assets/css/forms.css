@@ -293,3 +293,44 @@ textarea {
 .steps input[type='checkbox']:checked ~ .info {
   display: block;
 }
+.wufoo {
+  background-color: #bfc1c3 !important;
+  color: #fff !important;
+  label: , input;
+  display: block !important;
+  margin: 1em 0 !important;
+}
+.wufoo header {
+  display: none !important;
+}
+.wufoo label {
+  margin-bottom: 0 !important;
+  color: #fff !important;
+}
+.wufoo label.inline,
+.wufoo input.inline {
+  display: inline !important;
+  vertical-align: text-top !important;
+}
+.wufoo input.inline {
+  vertical-align: baseline !important;
+}
+.wufoo input,
+.wufoo textarea {
+  margin-top: 0 !important;
+  background: #fff !important;
+  border: 1px solid #24d321 !important;
+  padding: 0.5em !important;
+}
+.wufoo input:valid,
+.wufoo textarea:valid,
+.wufoo input:invalid,
+.wufoo textarea:invalid {
+  background: #fff !important;
+}
+.wufoo input[type=submit] {
+  background: #fff !important;
+  color: #24d321 !important;
+  border: 4px solid #24d321 !important;
+  font-size: 1.5em !important;
+}
