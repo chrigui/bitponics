@@ -37,7 +37,20 @@ function(){
         self.sectionNavSetup(screenHeight);
 
         //smooth anchor scrolling to sections
-        $('nav a:not([data-page-include="false"])').localScroll({ lazy: true });  
+        $('nav a:not([data-page-include="false"])').localScroll({
+            onAfter: function(target){
+              history.pushState({'target': target.id}, target.id, target.id);
+            },
+            lazy: true 
+          });
+
+        //TODO: get back/forward working with localscroll
+        // $(window).bind('popstate', function(e){
+        //   console.log(e.originalEvent.state.target)
+        //   if(e.originalEvent.state.target){
+        //     $(window).scrollTo($('#'+e.originalEvent.state.target));
+        //   }
+        // });
 
         //get section top values so we know when scrolling to highlight nav item
         $('#main > .content-module').each(function(i){
