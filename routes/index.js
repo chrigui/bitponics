@@ -206,6 +206,7 @@ module.exports = function(app){
 	require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
+	require('./guides')(app);
 	require('./demo')(app);
 	require('./setup')(app);
 	require('./styleguide')(app);
