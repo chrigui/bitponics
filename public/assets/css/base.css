@@ -1015,7 +1015,7 @@ section#footer .content-module {
 .loader {
   height: 24px;
   width: 24px;
-  background: url("/img/loader.gif") no-repeat 0 0;
+  background: url("/assets/img/loader.gif") no-repeat 0 0;
 }
 .page-content em {
   display: block;

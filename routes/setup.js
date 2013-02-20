@@ -4,11 +4,12 @@ var mongoose = require('mongoose'),
     DeviceUtils = Device.utils,
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId,
+    routeUtils = require('./route-utils'),
     winston = require('winston'),
     async = require('async');
 
 module.exports = function(app){
-	app.get('/setup', function (req, res){
+	app.get('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res){
 	  var locals = {
 	    title: 'Bitponics Device Setup',
 	    className : 'setup'
@@ -22,7 +23,7 @@ module.exports = function(app){
 	 * Posts to /setup should specify a device MAC address, and should
 	 * be an authenenticated user. We then assign the device to the user 
 	 */
-	app.post('/setup', function (req, res, next){
+	app.post('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res, next){
 	  	var rawDeviceMacAddress = req.param('deviceMacAddress'),
 	  		deviceId,
 	  		device,

@@ -5,15 +5,12 @@ SensorModel = require('../models/sensor').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
 ActionUtils = Action.utils,
+routeUtils = require('./route-utils'),
 winston = require('winston'),
 async = require('async'); 
 
 module.exports = function(app){
-	app.get('/dashboard', function (req, res, next) {
-		if( !(req.user && req.user.id)){
-			return res.redirect('/login');
-		}
-
+	app.get('/dashboard', routeUtils.middleware.ensureLoggedIn, function (req, res, next) {
 		var sensors,
 		growPlanInstances,
 		currentGrowPlanInstance,

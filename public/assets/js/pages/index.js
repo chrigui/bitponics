@@ -23,7 +23,7 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="getstarted"]) a:not([data-page-include="false"])'), function(){
+      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
         
         //match section height to window
         //create fixed nav
