@@ -17,7 +17,7 @@ define(['moment'], function(moment){
               url = $this.attr('href').replace('/', '');
 
           $('#main').append('<div id="' + url + '" class="content-module middle"></div>');
-          $this.attr('href', '#'+url);
+          $this.attr('href', '/#'+url);
 
           includingPages.push(
             self.includePage({
