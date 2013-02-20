@@ -1066,7 +1066,7 @@ section#footer .content-module {
   color: #00fa8b;
 }
 .landing-page .content-module .nav-section {
-  border-top: 1px solid #00fa8b;
+  border-top: 1px solid #00f717;
 }
 .landing-page .content-module.inverted-color {
   background-color: #00e36c;
@@ -1262,7 +1262,7 @@ section#footer .content-module {
   color: #fff;
   font-size: 3em;
 }
-#howitworks p {
+#how-it-works p {
   text-align: left;
   color: #999b9a;
   margin: 1em;
@@ -1573,6 +1573,9 @@ section#footer .content-module {
 /*
  * Single landing page overrides
  */
+.single-page .icon-glyphlogo-new {
+  display: none !important;
+}
 .single-page #main,
 .single-page #footer {
   max-width: 60em;
@@ -1580,7 +1583,7 @@ section#footer .content-module {
   width: 95%;
 }
 .single-page #main {
-  margin: 10em auto;
+  margin: 3em auto !important;
 }
 .single-page #footer {
   background: none;
@@ -1595,6 +1598,28 @@ section#footer .content-module {
 .single-page .page-content,
 .single-page .page-heading {
   width: 100%;
+}
+.single-page #register {
+  margin-top: 10em !important;
+}
+.single-page #register h3.nav-section {
+  border-top: 0 none;
+}
+.single-page #team,
+.single-page #contact {
+  background: #fff;
+  color: #999b9a;
+}
+.single-page #team div,
+.single-page #contact div,
+.single-page #team p,
+.single-page #contact p,
+.single-page #team a,
+.single-page #contact a,
+.single-page #team h3,
+.single-page #contact h3 {
+  color: #999b9a;
+  border-color: #999b9a;
 }
 /*
  * Register page

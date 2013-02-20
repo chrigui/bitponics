@@ -517,12 +517,12 @@ section#footer {
 .landing-page #main #about,
 .landing-page #main #gallery,
 .landing-page #main #contact,
-.landing-page #main #howitworks,
+.landing-page #main #how-it-works,
 .landing-page #main #press,
 .landing-page #main #buy,
 .landing-page #main #pricing,
 .landing-page #main #team {
-  padding-top: 4em;
+  padding-top: 3.5em;
 }
 .landing-page .flexslider img {
   min-height: 100%;
@@ -544,12 +544,21 @@ section#footer {
   color: #fff;
   text-decoration: none;
 }
-.landing-page #howitworks p {
+.landing-page p {
+  max-width: 35em;
+}
+.landing-page #how-it-works p {
   float: left;
   margin: 0 2%;
   width: 29%;
   border-top: 1px solid #00e36c;
   padding: 1em 0 0 0;
+}
+.landing-page #contact #wufoo-m7x4a3,
+.landing-page #contact #email-sub {
+  float: left;
+  width: 40%;
+  margin: 1em 10% 0 0;
 }
 .list-grid-wrapper {
   font-size: 1em;
@@ -635,6 +644,9 @@ section#footer {
 /*
  * Single landing page overrides
  */
+.single-page .icon-glyphlogo-new {
+  display: none !important;
+}
 .single-page #main,
 .single-page #footer {
   max-width: 60em;
@@ -642,7 +654,7 @@ section#footer {
   width: 95%;
 }
 .single-page #main {
-  margin: 10em auto;
+  margin: 3em auto !important;
 }
 .single-page #footer {
   background: none;
@@ -658,14 +670,36 @@ section#footer {
 .single-page .page-heading {
   width: 100%;
 }
+.single-page #register {
+  margin-top: 10em !important;
+}
+.single-page #register h3.nav-section {
+  border-top: 0 none;
+}
+.single-page #team,
+.single-page #contact {
+  background: #fff;
+  color: #999b9a;
+}
+.single-page #team div,
+.single-page #contact div,
+.single-page #team p,
+.single-page #contact p,
+.single-page #team a,
+.single-page #contact a,
+.single-page #team h3,
+.single-page #contact h3 {
+  color: #999b9a;
+  border-color: #999b9a;
+}
 /*
- * getstarted/thankyou
+ * get-started/thankyou
  */
-.landing-page.getstarted #main {
+.landing-page.get-started #main {
   margin: 10em auto 0 auto;
   width: 95%;
 }
-.landing-page.getstarted .page-heading {
+.landing-page.get-started .page-heading {
   width: 100%;
   font-size: 3.5em;
 }
