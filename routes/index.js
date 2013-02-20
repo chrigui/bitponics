@@ -44,7 +44,7 @@ module.exports = function(app){
 	app.get('/how-it-works', function (req, res){
 	  var locals = {
     	title: "How It Works",
-    	className: "landing-page single-page howitworks"
+    	className: "landing-page single-page how-it-works"
     };
 	  res.render('howitworks', locals);
 	});
@@ -92,7 +92,7 @@ module.exports = function(app){
 	app.get('/get-started', function (req, res){
 	  var locals = {
     	title: "Get Started",
-    	className: "landing-page single-page getstarted"
+    	className: "landing-page single-page get-started"
     };
 	  res.render('getstarted', locals);
 	});
@@ -102,7 +102,7 @@ module.exports = function(app){
 			locals = {
 				title: 'Login',
 				formAction : '/login',
-				className: "landing-page single-page getstarted"
+				className: "landing-page single-page get-started"
 			};
 
 		if (redirect){
