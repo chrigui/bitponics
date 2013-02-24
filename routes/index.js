@@ -2,6 +2,8 @@ var User = require('../models/user').model,
 	routeUtils = require('./route-utils'),
 	winston = require('winston'),
 	passport = require('passport'),
+	querystring = require('querystring'),
+	http = require('http'),
 	verificationEmailDomain = 'bitponics.com';
 
 module.exports = function(app){
@@ -90,6 +92,8 @@ module.exports = function(app){
 	});
 
 	app.get('/get-started', function (req, res){
+		winston.info('req.error');
+		winston.info(req.error);
 	  var locals = {
     	title: "Get Started",
     	className: "landing-page single-page get-started"
@@ -127,6 +131,7 @@ module.exports = function(app){
 	    })(req, res, next);
 	});
 
+	//we're not currently using the GET view of this page
 	app.get('/signup', function (req, res){
 		res.render('signup', {
 			title : 'Signup',
@@ -134,20 +139,68 @@ module.exports = function(app){
 		});
 	});
 
-	
-
 	app.post('/signup', function (req, res, next){
 		User.createUserWithPassword({
 			email: req.param('email')
 		},
 		req.param('password'),
 		function(err, user){
-			if (err) { return next(err); }
-			req.logIn(user, function(err) {
-		      if (err) { return next(err); }
-		      res.redirect('/register');
-		    });
+			if (err) { 
+				//if already registered email address then just log in and send to register confirmation
+				if(err.toString().indexOf('E11000') != -1 && err.toString().indexOf('bitponics-local.users.$email') != -1){
+					req.logIn(user, function(err) {
+				    if (err) { return next(err); }
+				  	return res.redirect('/register');
+				  });
+				} else {
+					//else generic error
+					return next(err);
+				}
+				// return next(err);
+			} else {
+				req.logIn(user, function(err) {
+			    if (err) { return next(err); }
+			  	res.redirect('/register');
+			  });
+			}
 		});
+
+
+		if(req.param('newsletter') != 'undefined'){
+			/*
+			 * Sign user up for email newsletter if they check the checkbox
+			 */
+
+	  	// Build the post string from an object
+		  var post_data = querystring.stringify({
+		      'EMAIL' : req.param('email')
+		  });
+
+		  // An object of options to indicate where to post to
+		  var post_options = {
+		      host: 'http://bitponics.us2.list-manage1.com',
+		      port: '80',
+		      path: '/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92',
+		      method: 'POST',
+		      headers: {
+		          'Content-Type': 'application/x-www-form-urlencoded',
+		          'Content-Length': post_data.length
+		      }
+		  };
+
+		  // Set up the request
+		  var post_req = http.request(post_options, function(res) {
+		      res.setEncoding('utf8');
+		      res.on('data', function (chunk) {
+		          console.log('Newsletter post Response: ' + chunk);
+		      });
+		  });
+
+		  // post the data
+		  post_req.write(post_data);
+		  post_req.end();
+		}
+		
 	});
 		
 	app.get('/logout', function (req, res) {
@@ -158,50 +211,52 @@ module.exports = function(app){
 
 	
 	/*
-	 * Email verification
+	 * Email verification (and new user preorder offer)
 	 * 
 	 */
 	app.get('/register', function (req, res, next) {
-	  var UserModel = require('../models/user').model;
+	  var UserModel = require('../models/user').model,
+		  	locals = {
+		  		title: 'Welcome to Bitponics!',
+		      message: 'Thanks for signing up. Check your email.',
+		      className: "landing-page single-page getstarted register"
+		    };
+
 	  if(req.query.verify){ //user coming back to verify account
 	    return UserModel.findOne({ activationToken: req.query.verify }, 
 	    	function (err, user) {
 		    	if (err) { return next(err); }
+		    	console.log(user)
 					if (user && user.activationToken !== '') {
 						user.active = true;
 						user.sentEmail = true; //if we get here, this should be true
 						user.save( function(err, user){
 							if (err) { return next(err); }
-							res.render('register', {
-								title: 'Welcome to Bitponics!',
-								message: 'Your registration was successfull.',
-								user: user,
-								className: "landing-page single-page getstarted register"
-							});
+							locals.message = 'Your registration was successfull. Have you preordered a device yet?';
+							locals.user = user;
+							res.render('register', locals);
 						});
 					} else {
-						res.render('register', {
-							title: 'Welcome to Bitponics!',
-							message: "There was an error validating your account. Please sign up again.",
-							className: "landing-page single-page getstarted register"
-						});
+						locals.message = 'There was an error validating your account. Please try signing up again.';
+						res.render('register', locals);
 					}
 	    	}
     	);
-	  } else { //user just signed up
-	    winston.info('req.user:');
-	    winston.info(req.user);
-	    res.render('register', {
-	      title: 'Register',
-	      message: 'Thanks for signing up. Check your email.',
-	      className: "landing-page single-page getstarted register"
-	    });
+    } else if(req.query.status == 'success') { //user preordered successfully
+      locals.message = 'You\'ve successfully preordered a Bitponics device';
+      //TODO: here we could also collect additional info on user (amazon setting)
+    } else if(req.query.status == 'abandon') { //user cancelled preorder process mid-way
+	    locals.message = 'Issues preordering the device?';
+	  } else { //user just signed up, tell them to check email to verify
+	  	locals.title=  'Register';
 	  }
+
+	  return res.render('register', locals);
 	});
 
-	app.get('/robots.txt', function (req, res){
-	  res.send('User-agent: *\r\nDisallow: /');
-	});
+	// app.get('/robots.txt', function (req, res){
+	//   res.send('User-agent: *\r\nDisallow: /');
+	// });
 
 
 	require('./admin')(app);

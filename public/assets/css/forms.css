@@ -203,7 +203,7 @@ input,
 textarea {
   margin-top: 0;
   background: #fff;
-  border: 1px solid #24d321;
+  border: 1px solid #00f717;
   padding: 0.5em;
 }
 input:valid,
@@ -214,13 +214,13 @@ textarea:invalid {
 }
 input[type=submit] {
   background: #fff;
-  color: #24d321;
-  border: 4px solid #24d321;
+  color: #00f717;
+  border: 4px solid #00f717;
   font-size: 1.5em;
 }
 button {
   background: #fff;
-  color: #24d321;
+  color: #00f717;
 }
 select {
   display: block;
@@ -260,7 +260,7 @@ textarea {
   height: 4em;
   line-height: 1em;
   color: #fff;
-  background: #24d321;
+  background: #00f717;
   font-size: 1em;
   margin: 0;
   vertical-align: bottom;
@@ -319,7 +319,7 @@ textarea {
 .wufoo textarea {
   margin-top: 0 !important;
   background: #fff !important;
-  border: 1px solid #24d321 !important;
+  border: 1px solid #00f717 !important;
   padding: 0.5em !important;
 }
 .wufoo input:valid,
@@ -330,7 +330,15 @@ textarea {
 }
 .wufoo input[type=submit] {
   background: #fff !important;
-  color: #24d321 !important;
-  border: 4px solid #24d321 !important;
+  color: #00f717 !important;
+  border: 4px solid #00f717 !important;
   font-size: 1.5em !important;
+}
+.amazon {
+  width: 167px;
+  margin: 0 auto 2em;
+  text-align: center;
+}
+.amazon input {
+  border: 0 none !important;
 }

@@ -50,9 +50,31 @@ block content
             span Offer
 
         div(class="center clearfix")
-          a(href="/get-started", class="btn")
-            | Checkout
-            | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+          div.amazon
+            | <form action="https://authorize.payments-sandbox.amazon.com/pba/paypipeline" method="post">
+            |   <input type="hidden" name="returnUrl" value="http://bitponics.com/register?stat=success" >
+            |   <input type="hidden" name="ipnUrl" value="http://bitponics.com/register?stat=success" >
+            |   <input type="hidden" name="processImmediate" value="0" >
+            |   <input type="hidden" name="signatureMethod" value="HmacSHA256" >
+            |   <input type="hidden" name="accessKey" value="11SEM03K88SD016FS1G2" >
+            |   <input type="hidden" name="collectShippingAddress" value="0" >
+            |   <input type="hidden" name="isDonationWidget" value="0" >
+            |   <input type="hidden" name="amazonPaymentsAccountId" value="MRTNYJUSJWMT6N2DVXQ4SK574AXGCE9QAK1EU9" >
+            |   <input type="hidden" name="referenceId" value="bitponics-preorder-001" >
+            |   <input type="hidden" name="cobrandingStyle" value="logo" >
+            |   <input type="hidden" name="immediateReturn" value="1" >
+            |   <input type="hidden" name="amount" value="USD 399" >
+            |   <input type="hidden" name="description" value="Preorder the Bitponics device. You will not be charged until your unit ships." >
+            |   <input type="hidden" name="abandonUrl" value="http://bitponics.com/register?stat=abandon" >
+            |   <input type="hidden" name="signatureVersion" value="2" >
+            |   <input type="hidden" name="signature" value="vYtWBQdEu/uPRP4jzhuVakayeWD9jcKk2anq5MlKWVQ=" >
+            |   <input type="image" src="http://g-ecx.images-amazon.com/images/G/01/asp/golden_medium_paynow_withmsg_whitebg.gif" border="0">
+            | </form>
+
+
+          //- a(href="/get-started", class="btn")
+          //-   | Checkout
+          //-   | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
         div.center.checkout-imgs
           img(src="/assets/img/home/amazon.jpg", alt="Bitponics Device")
