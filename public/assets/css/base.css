@@ -686,7 +686,7 @@ a,
 a:visited,
 a:hover,
 a:active {
-  color: #24d321;
+  color: #00f717;
 }
 a {
   -ms-word-break: break-all;
@@ -727,7 +727,7 @@ img {
   color: #fff;
   text-align: center;
   position: relative;
-  background-color: #24d321;
+  background-color: #00f717;
   height: 11.5em;
   text-transform: uppercase;
   margin: 0.125em 0;
@@ -864,7 +864,7 @@ img {
   font-weight: bold;
 }
 .sub-heading {
-  color: #24d321;
+  color: #00f717;
   margin: 0.65em 0;
   font-weight: bold;
 }
@@ -906,7 +906,7 @@ img {
 .btn {
   padding: 1em;
   margin: 1em;
-  background: #24d321;
+  background: #00f717;
   color: #fff;
   cursor: pointer;
 }
@@ -931,8 +931,8 @@ img {
 a.btn {
   display: inline-block;
   background: #fff !important;
-  color: #24d321 !important;
-  border: 4px solid #24d321;
+  color: #00f717 !important;
+  border: 4px solid #00f717;
 }
 a.btn i {
   margin: 0 0 0 0.5em;
@@ -955,7 +955,7 @@ a.btn i {
   height: 10em;
   position: relative;
   text-align: center;
-  color: #24d321;
+  color: #00f717;
   font-weight: bold;
   margin: 0 0 1em;
 }
@@ -1220,7 +1220,7 @@ section#footer .content-module {
   left: 0;
 }
 .social-icons i.icon-glyphmail {
-  left: -0.05em;
+  left: -0.15em;
   top: -0.025em;
 }
 .flexslider ul {
@@ -1456,8 +1456,8 @@ section#footer .content-module {
   border-color: #333;
 }
 .phaseRangeSlider .phase-current-indicator input[type=number] {
-  color: #24d321;
-  border: 1px dotted #24d321;
+  color: #00f717;
+  border: 1px dotted #00f717;
   margin-right: 0.25em;
 }
 .phaseRangeSlider .phase-slider-input {
@@ -1629,12 +1629,12 @@ section#footer .content-module {
 }
 .landing-page.getstarted #main .page-heading {
   font-size: 2em;
-  color: #24d321;
+  color: #00f717;
   font-size: 2.5em;
   line-height: 1;
 }
 .landing-page.getstarted #main .page-content {
-  border-top: 1px solid #24d321;
+  border-top: 1px solid #00f717;
 }
 .landing-page.getstarted #main ul {
   padding: 1em;
@@ -1643,7 +1643,7 @@ section#footer .content-module {
 li
 }
 .landing-page.getstarted #main p {
-  color: #24d321;
+  color: #00f717;
 }
 .landing-page.register #main .page-content {
   padding-top: 1em;
@@ -1664,14 +1664,14 @@ li
 }
 .landing-page.register .preorder-price span.dollar-sign,
 .landing-page.register .preorder-price span.price-number {
-  color: #24d321;
+  color: #00f717;
 }
 .landing-page.register .preorder-price .additional-text span {
   display: inline-block;
   text-align: left;
 }
 .landing-page.register .checkout-imgs {
-  border-top: 1px solid #24d321;
+  border-top: 1px solid #00f717;
   padding-top: 1em;
 }
 .landing-page.register .checkout-imgs img {
