@@ -33,7 +33,7 @@ module.exports = function(){
     
     // TODO : vary response type based on Accepts headers
     // TODO : vary the verbosity of response based on environment and/or (admin user+debug param). Careful not to expose sensitive data publicly 
-      res.render('500', { error: err });
+    res.render('500', { error: err });
   });
 
   // Expose some routes for getting to the error pages
