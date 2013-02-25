@@ -39,7 +39,7 @@ module.exports = function(){
   // Expose some routes for getting to the error pages
 
   app.get('/404', function(req, res, next){
-    // trigger a 404 since no other middleware
+    // just call next() to trigger a 404 since no other middleware
     // will match /404 after this one, and we're not
     // responding here
     next();

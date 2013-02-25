@@ -1,4 +1,5 @@
 var winston = require('winston'),
+	routeUtils = require('./route-utils'),
 	ModelUtils = require('../models/utils');
 
 module.exports = function(app){
@@ -6,13 +7,17 @@ module.exports = function(app){
 	 * Admin
 	 * Require authenticated user with property admin=true
 	 */
-	app.all('/admin*', function (req, res, next) {
-	  if (req.user.admin) {
-	    next();
-	  } else {
-	    res.redirect('/login?redirect=' + req.url);
-	  }
-	});
+	app.all('/admin*', 
+		routeUtils.middleware.ensureSecure, 
+		routeUtils.middleware.ensureUserIsAdmin, 
+		function (req, res, next) {
+		  if (req.user.admin) {
+		    next();
+		  } else {
+		    res.redirect('/login?redirect=' + req.url);
+		  }
+		}
+	);
 
 	/* 
 	 * Admin landing
