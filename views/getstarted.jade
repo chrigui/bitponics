@@ -15,15 +15,18 @@ block content
         li Receive news and announcements
         li Third incentive
 
-      div(class="page-content")
-        form(id="register-form", method="POST", action="/signup")
-          label(for="email") Email
-          input(id="email", name="email", type="email", autofocus="autofocus") 
-          label(for="password") Password
-          input(id="password", name="password", type="password") 
-          input(id="newsletter-checkbox", name="newsletter", type="checkbox", class="inline")
-          label.inline Sign up for the Bitponics newsletter
-          input(type="submit", value="Submit")
+      - if (typeof error != 'undefined' && error.length)
+          p #{error}
+      - else
+          div(class="page-content")
+            form(id="register-form", method="POST", action="/signup")
+              label(for="email") Email
+              input(id="email", name="email", type="email", autofocus="autofocus", required) 
+              label(for="password") Password
+              input(id="password", name="password", type="password", required) 
+              input(id="newsletter-checkbox", name="newsletter", type="checkbox", class="inline")
+              label.inline Sign up for the Bitponics newsletter
+              input(type="submit", value="Submit")
 
   section#footer
 

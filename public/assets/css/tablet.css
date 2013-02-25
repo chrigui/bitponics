@@ -231,7 +231,7 @@ section#footer {
   height: 1em;
 }
 .dashboard section#header .sub-heading a {
-  color: #24d321;
+  color: #00f717;
 }
 .dashboard section#main {
   padding: 6em 1em 1em;
@@ -615,7 +615,7 @@ section#footer {
   top: 0;
   margin-top: 0;
   font-size: 3em;
-  color: #24d321;
+  color: #00f717;
 }
 .list-grid-wrapper .grid-list.feature-icons .first {
   min-height: 4em;

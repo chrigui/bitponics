@@ -358,10 +358,10 @@ UserSchema.pre('save', true, function(next, done){
 		if (ex) { return done(ex); }
 		
 		token = buf.toString('hex');
-		user.activationToken = token;
+		user.activationToken = user.activationToken || token;
 		verifyUrl = 'http://' + verificationEmailDomain + '/register?verify=' + user.activationToken;
 
-	  	//send activation email if not activated user
+	  //send activation email if not activated user
 		if(user.active && user.sentEmail){ return done(); }
 			
 		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
