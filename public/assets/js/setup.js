@@ -13,7 +13,8 @@ $(function(){
 		$submitDeviceInfo = $('#submit-device-info'),
 		$pairingComplete = $('#pairing-complete'),
 		dataToPostAfterSuccess = {
-			deviceMacAddress : ''
+			deviceMacAddress : '',
+			publicDeviceKey : Bitponics.currentUser.publicDeviceKey
 		};
 		scannedWifiNetworks = [],
 		/**

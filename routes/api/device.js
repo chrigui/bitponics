@@ -84,7 +84,7 @@ module.exports = function(app) {
    * });
    */
   app.get('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       return res.send(device);
     });
@@ -109,7 +109,7 @@ module.exports = function(app) {
    * });
    */
   app.put('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       device.title = req.body.title;
       return device.save(function (err) {
@@ -136,7 +136,7 @@ module.exports = function(app) {
    * });
    */
   app.delete('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       return device.remove(function (err) {
         if (err) { return next(err); }  
@@ -155,7 +155,7 @@ module.exports = function(app) {
    *
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         pendingSensorLog = { ts : Date.now(), logs : []},
         pendingDeviceLogs,
         sensors,
@@ -183,7 +183,7 @@ module.exports = function(app) {
         },
         function parallel2(callback){
           DeviceModel
-          .findOne({ deviceId: deviceId })
+          .findOne({ macAddress: macAddress })
           .populate('activeGrowPlanInstance')
           .exec(callback);
         }
@@ -237,7 +237,7 @@ module.exports = function(app) {
    * For now, only responds with device CSV. 
    */
   app.get('/api/devices/:id/cycles', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         device,
         growPlanInstance,
         growPlanInstancePhase,
@@ -260,7 +260,7 @@ module.exports = function(app) {
 
     async.waterfall([
       function (callback){
-        DeviceModel.findOne({ deviceId: deviceId }).populate('activeGrowPlanInstance').exec(callback);  
+        DeviceModel.findOne({ macAddress: macAddress }).populate('activeGrowPlanInstance').exec(callback);  
       },
       function (deviceResult, callback){
         if (!deviceResult){ 
@@ -374,7 +374,7 @@ module.exports = function(app) {
    * https://docs.google.com/a/bitponics.com/document/d/1YD6AFDxeuUVzQuMhvIh3W5AKRe9otmEI_scxCohP9u4/edit#
    */
   app.get('/api/devices/:id/refresh_status', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         device,
         growPlanInstance,
         growPlanInstancePhase,
@@ -391,7 +391,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ deviceId: deviceId }).populate('activeActionsOverride.actions').exec(callback);  
+          DeviceModel.findOne({ macAddress: macAddress }).populate('activeActionsOverride.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 
