@@ -173,7 +173,8 @@ module.exports = function(app){
 
 	  	// Build the post string from an object
 		  var post_data = querystring.stringify({
-		      'EMAIL' : req.param('email')
+		      'EMAIL' : req.param('email'),
+		      'subscribe' : req.param('subscribe')
 		  });
 
 		  // An object of options to indicate where to post to
@@ -183,24 +184,45 @@ module.exports = function(app){
 		      path: '/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92',
 		      method: 'POST',
 		      headers: {
-		          'Content-Type': 'application/x-www-form-urlencoded',
-		          'Content-Length': post_data.length
+		      	'Host': 'bitponics.us2.list-manage1.com',
+	          'Content-Type': 'application/x-www-form-urlencoded',
+	          'Content-Length': post_data.length,
+						'Cache-Control':	'max-age=0',
+						'Accept':	'text/html',
+						'Origin':	'http://bitponics.com',
+						'User-Agent':	'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.32 (KHTML, like Gecko) Chrome/27.0.1421.0 Safari/537.32',
+						'Referer': 'http://bitponics.com/contact',
+						// 'Accept-Encoding': 'gzip,deflate,sdch',
+						'Accept-Language': 'en-US,en;q=0.8',
+						// 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+						'Cookie':	'PHPSESSID=nnv0ks7p91s1hmb63e20gupj03; _AVESTA_ENVIRONMENT=prod',
+						'Pragma':	'no-cache',
+						'Cache-Control': 'no-cache'
 		      }
 		  };
 
 		  // Set up the request
 		  var post_req = http.request(post_options, function(res) {
+		  		var response = '';
 		      res.setEncoding('utf8');
 		      res.on('data', function (chunk) {
-		          console.log('Newsletter post Response: ' + chunk);
+		          response += chunk;
+		      });
+		      res.on('end', function(){
+		      	console.log(response);
 		      });
 		  });
+
+		  post_req.on('error', function(e) {
+			  console.log('error:');
+			  console.log(e);
+			});
 
 		  // post the data
 		  post_req.write(post_data);
 		  post_req.end();
 		}
-		
+
 	});
 		
 	app.get('/logout', function (req, res) {
