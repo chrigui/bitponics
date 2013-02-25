@@ -51,7 +51,10 @@ block content
 
         div(class="center clearfix")
           div.amazon
-            | <form action="https://authorize.payments-sandbox.amazon.com/pba/paypipeline" method="post">
+
+            //- Production form version
+            //- - this method bring user to new page
+            | <form action="https://authorize.payments.amazon.com/pba/paypipeline" method="post">
             |   <input type="hidden" name="returnUrl" value="http://bitponics.com/register?stat=success" >
             |   <input type="hidden" name="ipnUrl" value="http://bitponics.com/register?stat=success" >
             |   <input type="hidden" name="processImmediate" value="0" >
@@ -59,7 +62,7 @@ block content
             |   <input type="hidden" name="accessKey" value="11SEM03K88SD016FS1G2" >
             |   <input type="hidden" name="collectShippingAddress" value="0" >
             |   <input type="hidden" name="isDonationWidget" value="0" >
-            |   <input type="hidden" name="amazonPaymentsAccountId" value="MRTNYJUSJWMT6N2DVXQ4SK574AXGCE9QAK1EU9" >
+            |   <input type="hidden" name="amazonPaymentsAccountId" value="ZEBSNTBXFBGM6911LAXAAVGTI8MHKS4RV592M9" >
             |   <input type="hidden" name="referenceId" value="bitponics-preorder-001" >
             |   <input type="hidden" name="cobrandingStyle" value="logo" >
             |   <input type="hidden" name="immediateReturn" value="1" >
@@ -67,9 +70,58 @@ block content
             |   <input type="hidden" name="description" value="Preorder the Bitponics device. You will not be charged until your unit ships." >
             |   <input type="hidden" name="abandonUrl" value="http://bitponics.com/register?stat=abandon" >
             |   <input type="hidden" name="signatureVersion" value="2" >
-            |   <input type="hidden" name="signature" value="vYtWBQdEu/uPRP4jzhuVakayeWD9jcKk2anq5MlKWVQ=" >
+            |   <input type="hidden" name="signature" value="8ucnXqETmz3PEynkfakHDuO7cxsJERfkHB9/Q6gH0Fs=" >
             |   <input type="image" src="http://g-ecx.images-amazon.com/images/G/01/asp/golden_medium_paynow_withmsg_whitebg.gif" border="0">
             | </form>
+
+
+            //- Production script version
+            //- - this method opens in a overlay window
+            //- | <script type="text/javascript" src="https://static-na.payments-amazon.com/cba/js/us/PaymentWidgets.js"></script>
+            //- | <script>
+            //- | RenderCBAButton = function(ordervalue) {
+            //- | var standard1 = new CBA.Widgets.StandardCheckoutWidget({
+            //- | merchantId: "A3M9Z4U2HYPNNT",
+            //- | orderInput: {
+            //- | format: "XML",
+            //- | value: ordervalue}
+            //- | }).render("cbaxmlButton");
+            //- | }
+            //- | </script>
+            //- | 
+            //- | <table><tr>
+            //- | <td>
+            //- | <div id="cbaxmlButton">
+            //- | <img src="https://payments.amazon.com/gp/cba/button?cartOwnerId=A3M9Z4U2HYPNNT&size=large&color=orange&background=white"/><br></div>
+            //- | <SCRIPT LANGUAGE="JAVASCRIPT" TYPE="TEXT/JAVASCRIPT">
+            //- | <!--
+            //- | RenderCBAButton("type:cba-signed-order/sha1-hmac/2;order:PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnPz48T3JkZXIgeG1sbnM9J2h0dHA6Ly9wYXltZW50cy5hbWF6b24uY29tL2NoZWNrb3V0LzIwMDgtMTEtMzAvJz48Q2FydD48SXRlbXM+PEl0ZW0+PE1lcmNoYW50SWQ+QTNNOVo0VTJIWVBOTlQ8L01lcmNoYW50SWQ+PFRpdGxlPkJpdHBvbmljcyBCYXNlIFN0YXRpb248L1RpdGxlPjxQcmljZT48QW1vdW50PjM5OTwvQW1vdW50PjxDdXJyZW5jeUNvZGU+VVNEPC9DdXJyZW5jeUNvZGU+PC9QcmljZT48UXVhbnRpdHk+MTwvUXVhbnRpdHk+PEZ1bGZpbGxtZW50TmV0d29yaz5NRVJDSEFOVDwvRnVsZmlsbG1lbnROZXR3b3JrPjwvSXRlbT48L0l0ZW1zPjwvQ2FydD48L09yZGVyPg==;signature:7Jn/3TIyZV01Y4guHvQCgZobrsc=");
+            //- | //-->
+            //- | </SCRIPT>
+            //- | </td></tr></table>
+            
+
+            //- Sandbox
+            //- 
+            //- | <form action="https://authorize.payments.amazon.com/pba/paypipeline" method="post">
+            //- |   <input type="hidden" name="returnUrl" value="http://bitponics.com/register?stat=success" >
+            //- |   <input type="hidden" name="ipnUrl" value="http://bitponics.com/register?stat=success" >
+            //- |   <input type="hidden" name="processImmediate" value="0" >
+            //- |   <input type="hidden" name="signatureMethod" value="HmacSHA256" >
+            //- |   <input type="hidden" name="accessKey" value="11SEM03K88SD016FS1G2" >
+            //- |   <input type="hidden" name="collectShippingAddress" value="0" >
+            //- |   <input type="hidden" name="isDonationWidget" value="0" >
+            //- |   <input type="hidden" name="amazonPaymentsAccountId" value="MRTNYJUSJWMT6N2DVXQ4SK574AXGCE9QAK1EU9" >
+            //- |   <input type="hidden" name="referenceId" value="bitponics-preorder-001" >
+            //- |   <input type="hidden" name="cobrandingStyle" value="logo" >
+            //- |   <input type="hidden" name="immediateReturn" value="1" >
+            //- |   <input type="hidden" name="amount" value="USD 399" >
+            //- |   <input type="hidden" name="description" value="Preorder the Bitponics device. You will not be charged until your unit ships." >
+            //- |   <input type="hidden" name="abandonUrl" value="http://bitponics.com/register?stat=abandon" >
+            //- |   <input type="hidden" name="signatureVersion" value="2" >
+            //- |   <input type="hidden" name="signature" value="vYtWBQdEu/uPRP4jzhuVakayeWD9jcKk2anq5MlKWVQ=" >
+            //- |   <input type="image" src="http://g-ecx.images-amazon.com/images/G/01/asp/golden_medium_paynow_withmsg_whitebg.gif" border="0">
+            //- | </form>
 
 
           //- a(href="/get-started", class="btn")
@@ -82,3 +134,4 @@ block content
         
 
   section#footer
+
