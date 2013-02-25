@@ -74,22 +74,42 @@ should = require('should');
     });
 
 
-		it('gets a user by public device key', function(done){
-    	User.findOne({email : 'unittest@bitponics.com'},
-    		function(err, user){
-    			should.not.exist(err);
-					should.exist(user);
-    			User.getByPublicDeviceKey(user.deviceKey.public, function(err, nestedUser){
-    				should.not.exist(err);
-						should.exist(nestedUser);
-						(nestedUser._id.equals(user._id)).should.be.ok;
-						done();
-    			});	
-    		});
+	it('ensures an available deviceKey exists, creating one if not', function(done){
+	   User.findOne({email : 'unittest@bitponics.com'},
+		  function(err, user){
+			should.not.exist(err);
+				should.exist(user);
+			user.ensureAvailableDeviceKey(function(){
+                should.not.exist(err);
+                should.exist(user.availableDeviceKey);
+                done();
+            });
+        });
     });
 
+    it('gets a user by device key', function(done){
+       User.findOne({email : 'unittest@bitponics.com'},
+          function(err, user){
+            should.not.exist(err);
+                should.exist(user);
+            user.ensureAvailableDeviceKey(function(){
+                should.not.exist(err);
+                should.exist(user.availableDeviceKey);
 
-		it('gets a user by public api key', function(done){
+                User.getByPublicDeviceKey(user.deviceKeys[0].public, function(err, nestedUser){
+                    should.not.exist(err);
+                    should.exist(nestedUser);
+                    (nestedUser._id.equals(user._id)).should.be.ok;
+                    done();
+                });
+                
+            });
+        });
+    });
+    
+
+
+	it('gets a user by public api key', function(done){
     	User.findOne({email : 'unittest@bitponics.com'},
     		function(err, user){
     			should.not.exist(err);
