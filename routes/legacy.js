@@ -32,4 +32,7 @@ module.exports = function (app){
     res.redirect('/contact');
   });
 
+  app.get('/growplans', function (req, res){
+    res.redirect('/grow-plans');
+  });
 }
