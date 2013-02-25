@@ -10,13 +10,15 @@ var mongoose = require('mongoose'),
 
 module.exports = function(app){
 	app.get('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res){
-	  var locals = {
-	    title: 'Bitponics Device Setup',
-	    className : 'setup'
-	  };
+	  	req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+	  		var locals = {
+	   			title: 'Bitponics Device Setup',
+		    	className : 'setup',
+		    	availableDeviceKey : availableDeviceKey
+	  		};
 
-	  res.render('setup', locals);
-
+	  		res.render('setup', locals);
+	  	});
 	});
 
 	/**
@@ -25,7 +27,7 @@ module.exports = function(app){
 	 */
 	app.post('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res, next){
 	  	var rawDeviceMacAddress = req.param('deviceMacAddress'),
-	  		deviceId,
+	  		cleanDeviceMacAddress,
 	  		device,
 	  		now = Date.now();
 
@@ -40,18 +42,14 @@ module.exports = function(app){
   		if (!rawDeviceMacAddress){
   			return res.json(400, { success : false, error : 'Request requires deviceMacAddress parameter'});
   		}
+  		if (!req.param('publicDeviceKey')) { return res.json(400, { success : false, error : 'Request requires publicDeviceKey parameter'});}
 
-  		deviceId = rawDeviceMacAddress.replace(/:/g,'')
-
-        // TODO : use some sort of "ensureAuthenticated" middleware to do this
-        if (!req.user instanceof Object){
-            return res.json(400, { success : false, error : 'Request requires a User instance'});
-        }
+  		cleanDeviceMacAddress = rawDeviceMacAddress.replace(/:/g,'')
 
 		// See if the device exists.
 		async.series([
 			function(callback){
-				DeviceModel.findOne({ deviceId: deviceId }, 
+				DeviceModel.findOne({ macAddress: cleanDeviceMacAddress }, 
 					function(err, deviceResult){
 						if (err) { return callback(err);}
 						if (deviceResult){
@@ -60,7 +58,7 @@ module.exports = function(app){
 							// TODO : this scenario shouldn't occur in production; we should create Device model instances
 							// at production time. 
 							device = new DeviceModel({
-								deviceId : deviceId
+								macAddrress : cleanDeviceMacAddress
 		                        // will get a default deviceType based on Device middleware
 							});
 						}

@@ -24,7 +24,7 @@ var DeviceUtils = {
 /***************** SCHEMA **********************/
 
 var DeviceSchema = new Schema({
-	deviceId: { type: String, required: true, unique: true }, //mac address
+	macAddress: { type: String, required: true, unique: true }, //mac address
 	deviceType: { type: ObjectId, ref: 'DeviceType', required: false },
 	name : { type: String },
 	owner : { type: ObjectId, ref: 'User'},

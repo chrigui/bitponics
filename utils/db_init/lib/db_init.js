@@ -452,7 +452,7 @@ function(callback){
 		 		} else {
 		 			var dataObj = new models.device({
 		 				_id : _data._id,
-		 				deviceId: _data.deviceId,
+		 				macAddress: _data.macAddress,
 		 				deviceType: _data.deviceType,
 		 				name : _data.name,
 		 				owner: _data.owner,
@@ -465,7 +465,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.deviceId] = doc.id;
+		 				savedObjectIds[dataType][_data.macAddress] = doc.id;
 		 				console.log("created: " + dataType);
 		 				decrementData();
 		 			});
