@@ -55,8 +55,6 @@ module.exports = function(app){
 							[
 								function (innerCallback) {
 									GrowPlanModel.find({ visibility: 'public' })
-									.populate('controls')
-									.populate('sensors')
 									.populate('plants')
 									.populate('phases.nutrients')
 									.populate('phases.actions')

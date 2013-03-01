@@ -698,9 +698,6 @@ function(callback){
 		 				name: _data.name,
 		 				description: _data.description,
 		 				plants: _data.plants,
-		 				expertiseLevel: _data.expertiseLevel,
-		 				sensors: _data.sensors,
-		 				controls: _data.controls,
 		 				phases: _data.phases
 		 			});
 

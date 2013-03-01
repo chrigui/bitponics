@@ -17,25 +17,79 @@ var GrowPlanModel,
 	name: { type: String, required: true },
 	description: { type: String, required: true },
 	plants: [{ type: ObjectId, ref: 'Plant' }],
-	expertiseLevel: { type: String, enum: [
-		'beginner',
-		'intermediate',
-		'expert'
-	]},
-	
 	/**
 	 * Nutrients would just be a de-normalized view of the nutrients across the 
 	 * phases. TODO:  decide if we need it as a property here
 	 */
 	//nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
-	sensors: [{ type: ObjectId, ref: 'Sensor' }],
-	controls: [{ type: ObjectId, ref: 'Control'}],
+	//sensors: [{ type: ObjectId, ref: 'Sensor' }],
+	//controls: [{ type: ObjectId, ref: 'Control'}],
 	phases: [PhaseSchema],
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
 });
 
 GrowPlanSchema.plugin(useTimestamps);
 
+
+/************************** VIRTUALS ***************************/
+
+
+/***********
+ * the 'sensors' and 'controls' virtuals can really only operate with fully-populated GrowPlans
+ * Maybe they should be refactored to be "getSensors", "getControls" static utility methods instead (like isEquivalentTo)
+ */
+
+/**
+ * Sensors is a read-only view of all the sensors used by the GrowPlan.
+ * Checks phases.idealRanges.sCode
+
+GrowPlanSchema.virtual('sensors')
+    .get(function () {
+        var sensors = [];
+        this.phases.each(function(phase){
+            phase.idealRanges.each(function(idealRange){
+                if (sensors.indexOf(idealRange.sCode) < 0){
+                    sensors.push();
+                }
+            });
+        });
+
+        return sensors.sort();
+    });
+
+/**
+ * Controls is a read-only view of all the controls used by the GrowPlan.
+ * Checks phases.actions.control.
+ * TODO : check phases.idealRanges.actionBelowMin, phases.idealRanges.actionAboveMax
+ * Follows the assumption that phaseEndActions will not have controls
+
+GrowPlanSchema.virtual('controls')
+    .get(function () {
+        var controls = [];
+        this.phases.each(function(phase){
+            phase.actions.each(function(action){
+                // TODO : decide how to handle idealRange actions...need to actually pull the action from the db
+                if (!action.control){ return; }
+                var controlId = getObjectId(action.control);
+                // TODO : this indexOf check probably won't be adequate if controlid is actually an object
+                // Maybe store the toString() values instead so we can use a reliable string comparison?
+                if (controls.indexOf(controlId) < 0){
+                    controls.push(controlId);
+                }
+            });
+            phase.idealRanges.each(function(idealRange){
+                // TODO : decide how to handle idealRange actions...need to actually pull the action from the db
+                // if it isn't yet populated. Might get expensive.
+                if (idealRange.actionBelowMin){ }
+                if (idealRange.actionAboveMax){ }
+            });
+        });
+
+        return controls;
+    });
+ */
+
+/************************** END VIRTUALS ***************************/
 
 /************************** MIDDLEWARE  ***************************/
 
@@ -110,7 +164,7 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
  * Given 2 GrowPlan objects, determine whether they're "equivalent" by comparing 
  * all user-defined properties (ignoring _id's, createdAt/updatedAt)
  * 
- * @param source {GrowPlan}. Fully populated, POJO GrowPlan model object. Retrieved 
+ * @param source {GrowPlan}. Fully populated, POJO GrowPlan model object. Retrieved using ModelUtils.getFullyPopulatedGrowPlan
  * @param other {GrowPlan}. Fully populated, POJO GrowPlan model object.
  * @param callback {function} . function(err, result) to be called with result. result is a boolean,
  * 					true if the objects are equivalent, false if not
