@@ -7,19 +7,6 @@ module.exports = [
 			name: "All-Purpose",
 			description: "A generic grow plan suitable for running a garden with a wide variety of plants. It won't get you optimum yields for everything, but it's a good starting point while you learn about the specific needs of your plants.",
 			plants: [],
-			expertiseLevel: "beginner",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3078eebf7524342cb5f",
-				"506de3088eebf7524342cb63"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32",
-				"506de2fc8eebf7524342cb2d"
-			],
 			phases: [
 				{
 					_id : '506de30c8eebf7524342cb72',
@@ -136,17 +123,6 @@ module.exports = [
 			name: "Tomato",
 			description: "Growing indeterminate organic tomatoes (Redfield Beauty OG) for year round fruiting. Growing in a 3’x3’ grow bed filled with 4\" of hydroton.",
 			plants: ["50749126fe420e210be58a6d"],
-			expertiseLevel: "intermediate",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5f"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32"
-			],
 			phases: [
 				{
 					_id : '506de3038eebf7524342cb4e',
@@ -352,17 +328,6 @@ module.exports = [
 			name: "Mixed Greens",
 			description: "A grow plan suited for growing any variety of herbs and leafy greens you want. Basil, cilantro, lettuce, swiss chard, throw it all in!",
 			plants: ["50749120fe420e210be58a69", "50a016f8eb1164c6b88e3038", "5074983aab364e2a9fffd4f1", "5074912dfe420e210be58a82"],
-			expertiseLevel: "intermediate",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5f"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32"
-			],
 			phases: [
 				{
 					_id : '506de30e8eebf7524342cb79',

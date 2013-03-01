@@ -186,9 +186,6 @@ module.exports = function(app) {
       name: req.body.name,
       description: req.body.description,
       plants: req.body.plants,
-      expertiseLevel: req.body.expertiseLevel,
-      sensors: req.body.sensors,
-      controls: req.body.controls,
       phases: req.body.phases
     });
     grow_plan.save(function (err) {

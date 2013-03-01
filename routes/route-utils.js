@@ -12,6 +12,11 @@ module.exports = {
 			}
 			next();
 		},
+		/**
+		 * References:
+		 * http://stackoverflow.com/questions/7450940/automatic-https-connection-redirect-with-node-js-express
+		 * http://stackoverflow.com/questions/13186134/node-js-express-and-heroku-how-to-handle-http-and-https
+		 */
 		ensureSecure : (function(){
 			var app = require('../app');
 			if (app.settings.env === 'local'){
