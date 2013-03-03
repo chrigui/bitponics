@@ -306,5 +306,143 @@ describe('Action', function(){
                 done();
             });
         });
-    });
+    }); // /getStateMessage
+
+
+    describe('isEquivalentTo', function(){
+        it('returns false when description differs', function(done){
+            done();
+        });
+
+        it('returns false when control differs', function(done){
+            done();
+        });
+
+        it('returns false when cycle.states.length differs', function(done){
+            done();
+        });
+
+        it('returns false when cycle.repeat differs', function(done){
+            done();
+        });
+
+        it('returns false when a cycle.state.controlValue differs', function(done){
+            done();
+        });
+
+        it('returns false when a cycle.state.duration differs', function(done){
+            done();
+        });
+
+        it('returns false when a cycle.state.durationType differs', function(done){
+            done();
+        });
+
+        it('returns false when a cycle.state.message differs', function(done){
+            done();
+        });
+
+        it('returns true if the whole shebang\'s the same', function(done){
+            done();
+        });
+    }); // /isEquivalentTo
+
+
+    describe('pre-save validation', function(){
+
+        if('returns an error if greater than 3 cycle states', function(done){
+            done();
+        });
+
+        if('returns an error if a control is specified, but no state specifies a controlValue', function(done){
+            done();
+        });
+
+        if('returns an error if attempting to set a repeat on a single-state cycle', function(done){
+            done();
+        });
+
+        if('returns an error if attempting to save an alternating-state cycle (with 2 states), but no states have a duration', function(done){
+            done();
+        });
+
+        if('returns an error if attempting to save an offset alternating-state cycle (with 3 states) but durations don\'t correctly describe an offset duration', function(done){
+            done();
+        });
+
+    }); // /pre-save validation
+
+
+    describe('ActionUtils.convertDurationToMilliseconds', function(){
+
+        it('handles durations for seconds', function(done){
+            done();
+        });
+
+        it('handles durations for minutes', function(done){
+            done();
+        });
+
+        it('handles durations for hours', function(done){
+            done();
+        });
+
+        it('handles durations for days', function(done){
+            done();
+        });
+
+        it('handles durations for weeks', function(done){
+            done();
+        });
+
+        it('handles durations for months', function(done){
+            done();
+        });
+
+        it('handles non-existent duration', function(done){
+            done();
+        });
+    }); // /ActionUtils.convertDurationToMilliseconds
+
+
+    describe('ActionUtils.getCycleRemainder', function(){
+
+        it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
+            done();
+        });
+
+        it('returns remainder of a non-repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
+            done();
+        });
+
+        it('returns 0 if passing in a phase that hasn\'t started yet', function(done){
+            done();
+        });
+
+    }); // /ActionUtils.convertDurationToMilliseconds
+
+
+    describe('ActionUtils.getSimplifiedCycleFormat', function(){
+
+        it('handles a single-state cycle', function(done){
+            done();
+        });
+
+        it('handles a alternating (2-state) cycle', function(done){
+            done();
+        });
+
+        it('handles an offset alternating (3-state)cycle', function(done){
+            done();
+        });
+    }); // /ActionUtils.getSimplifiedCycleFormat
+
+
+    describe('ActionUtils.getSimplifiedCycleFormat', function(){
+
+        it('returns a string with interpolated action state values', function(done){
+            done();
+        });
+
+    }); // /ActionUtils.getSimplifiedCycleFormat
 });
