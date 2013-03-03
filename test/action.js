@@ -195,4 +195,116 @@ describe('Action', function(){
 
     }); // /virtual overallCycleTimespan property
 
+
+    describe('getStateMessage', function(){
+        it('simply echoes messages when there\'s no control', function(done){
+            var mockMessage = 'test message',
+                action = new Action.model({
+                    description : 'test action',
+                    cycle : {
+                        states : [
+                            {
+                                durationType: 'hours',
+                                duration: 10,
+                                message: mockMessage
+                            }
+                        ]
+                    }
+                });
+
+            action.save(function(err){
+                should.not.exist(err);
+                action.getStateMessage(0).should.equal(mockMessage);
+                done();
+            });
+        });
+
+        it('generates a friendly ON message with duration when there\'s a control, non-zero controlValue & duration', function(done){
+            var mockControlName = 'testControlName',
+                action = new Action.model({
+                    description : 'test action',
+                    control : '506de2fc8eebf7524342cb2d', // water pump
+                    cycle : {
+                        states : [
+                            {
+                                durationType: 'hours',
+                                duration: 10,
+                                controlValue : '1'
+                            }
+                        ]
+                    }
+                });
+
+            action.save(function(err){
+                should.not.exist(err);
+                action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' on for 10 hours');
+                done();
+            });
+        });
+
+        it('generates a friendly ON message when there\'s a control, non-zero controlValue & no duration', function(done){
+            var mockControlName = 'testControlName',
+                action = new Action.model({
+                    description : 'test action',
+                    control : '506de2fc8eebf7524342cb2d', // water pump
+                    cycle : {
+                        states : [
+                            {
+                                controlValue : '1'
+                            }
+                        ]
+                    }
+                });
+
+            action.save(function(err){
+                should.not.exist(err);
+                action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' on');
+                done();
+            });
+        });
+
+        it('generates a friendly OFF message with duration when there\'s a control, zero controlValue & duration', function(done){
+            var mockControlName = 'testControlName',
+                action = new Action.model({
+                    description : 'test action',
+                    control : '506de2fc8eebf7524342cb2d', // water pump
+                    cycle : {
+                        states : [
+                            {
+                                durationType: 'hours',
+                                duration: 10,
+                                controlValue : '0'
+                            }
+                        ]
+                    }
+                });
+
+            action.save(function(err){
+                should.not.exist(err);
+                action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' off for 10 hours');
+                done();
+            });
+        });
+
+        it('generates a friendly OFF message when there\'s a control, zero controlValue & no duration', function(done){
+            var mockControlName = 'testControlName',
+                action = new Action.model({
+                    description : 'test action',
+                    control : '506de2fc8eebf7524342cb2d', // water pump
+                    cycle : {
+                        states : [
+                            {
+                                controlValue : '0'
+                            }
+                        ]
+                    }
+                });
+
+            action.save(function(err){
+                should.not.exist(err);
+                action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' off');
+                done();
+            });
+        });
+    });
 });
