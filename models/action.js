@@ -118,18 +118,21 @@ ActionSchema.virtual('overallCycleTimespan')
  * Used primarily to generate a message for a control trigger when there
  * is no explicit message defined.
  *
- * @param stateIndex (int) Required.
- * @param controlName (string, optional). If no explicit message is defined, and there is a control defined, this param
- * 		  will be interpolated into the message.
+ * @param stateIndex {Number} Required.
+ * @param controlName {String} optional. If no explicit message is defined, and there is a control defined, this param
+ * 		  will be interpolated into the message. Needs to be passed in because we can't assume a populated Control object
  */
 ActionSchema.method('getStateMessage', function(stateIndex, controlName){
 	var state = this.cycle.states[stateIndex];
+
 	if (state.message) { 
 		return state.message;
 	}
 	if (state.controlValue){
-		return 'Turn ' + (controlName ? (controlName + ' ') : '') + (state.controlValue == '0' ? 'off' : 'on');
-	}
+		return 'Turn ' + (controlName ? (controlName + ' ') : '') +
+            (state.controlValue == '0' ? 'off' : 'on') +
+            (state.duration ? (' for ' + state.duration + ' ' + state.durationType) : '');
+    }
 	return '';
 });
 
