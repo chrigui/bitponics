@@ -9,12 +9,39 @@ var mongoose = require('mongoose'),
   	async = require('async'),
   	timezone = require('timezone/loaded'),
   	ControlModel = require('./control').model,
-  	getObjectId = require('./utils').getObjectId;;
+    moment = require('moment'),
+  	getObjectId = require('./utils').getObjectId;
+
+
+/**
+ * Internal schema used for Action. Declared as its own Schema simply to remove unnecessary _id prop
+ * @type {Schema}
+ */
+var ActionStateSchema = new Schema(
+    {
+        controlValue: { type: String },
+
+        durationType: { type: String, enum: [
+            'seconds',
+            'minutes',
+            'hours',
+            'days',
+            'weeks',
+            'months'
+        ]},
+
+        duration: { type: Number },
+
+        message: { type: String }
+    },
+    { _id : false, id : false }
+);
+
 
 ActionSchema = new Schema({
-	
+
 	description: { type: String, required: true },
-	
+
 	control: { type: ObjectId, ref: 'Control', required: false },
 	
 	/**
@@ -31,28 +58,10 @@ ActionSchema = new Schema({
 	 * Also, all fields are optional. 
 	 */
 	cycle: {
-	
-		states: [
-			{
-				controlValue: { type: String },
+        states: [ActionStateSchema],
 
-				durationType: { type: String, enum: [
-					'seconds',
-					'minutes',
-					'hours',
-					'days',
-					'weeks',
-					'months'
-				]},
-				
-				duration: { type: Number },
-				
-				message: { type: String }
-			}
-		],
-
-		repeat: { type: Boolean, default: false }
-	}
+        repeat: { type: Boolean, default: false }
+    }
 });
 
 ActionSchema.plugin(useTimestamps);
@@ -60,12 +69,14 @@ ActionSchema.plugin(useTimestamps);
 
 /**
  * Used by the notification engine to set when actions should expire in 
- * order to recalculate current actions. 
+ * order to recalculate current actions.
+ *
+ * @return Number. Cycle timespan in milliseconds.
  */
 ActionSchema.virtual('overallCycleTimespan')
 	.get(function () {
 		// default to a 1 year max duration
-		var total = 1000 * 60 * 60 * 24 * 365,
+		var total = moment.duration(1, 'year').asMilliseconds(), //1000 * 60 * 60 * 24 * 365,
 			cycle = this.cycle,
 			states;
 
@@ -73,8 +84,18 @@ ActionSchema.virtual('overallCycleTimespan')
 
 		states = cycle.states;
 		switch(states.length){
-			case 1:
-				// Single-state cycle. Infinite (aka, 1-year expiration)
+            case 1:
+				// Single-state cycle. If it has a control, it's considered to be a one-time
+				// trigger that should last until explicitly changed, which means it's effectively
+				// an infinite duration. we can "infinite" at 1-year.
+				if (this.control){
+                    return total;
+                } else {
+                    return 0;
+                }
+
+				// if no control, it's just a message notification (aka, a reminder).
+                // no duration
 				break;
 			case 2:
 			case 3:
@@ -227,20 +248,20 @@ ActionSchema.pre('save', function(next){
 			}
 			break;
 		case 3:
-			// if a cycle has 3 states, the 1st and 3rd must have the same control value
+			// if a cycle has 3 states, the 1st and 3rd must have the same control value & message
 			if (states[0].controlValue !== states[2].controlValue){
 				return next(new Error('First and last control values must be equal'));
 			}
-			// and either the (1st & 3rd) or 2nd states must have durations defined
+            if (states[0].message !== states[2].message){
+                return next(new Error('First and last state\'s messages must be equal'));
+            }
+			// and at least the 1st & 3rd states must have durations defined
 			if (!(
-					(
-						(states[0].durationType && states[0].duration) &&
+                    (states[0].durationType && states[0].duration) &&
 				  	(states[2].durationType && states[2].duration)
-			  	) 
-				  ||
-				  (states[1].durationType && states[1].duration)
-			   )){
-				return next(new Error('In a 3-state cycle, either the (1st and 3rd) or the 2nd state must have a duration defined'));
+			  	)
+			   ){
+				return next(new Error('In a 3-state cycle, at least the 1st and 3rd states must have durations defined'));
 			}	
 			break;
 		// no default; we've enforced that we have one of these values already
@@ -270,27 +291,18 @@ ActionModel = mongoose.model('Action', ActionSchema);
  */
 var ActionUtils = {
 	convertDurationToMilliseconds : function(durationType, duration){
-		switch(durationType){
-			case 'milliseconds':
-				return duration;
-			case 'seconds':
-				return duration * 1000;
-			case 'minutes':
-				return duration * 1000 * 60;
-			case 'hours':
-				return duration * 1000 * 60 * 60;
-			case 'days':
-				return duration * 1000 * 60 * 60 * 24;
-			case 'weeks':
-				return duration * 1000 * 60 * 60 * 24 * 7;
-			case 'months':
-				// TODO : Figure out a proper way to handle month-long durations. variable day spans.
-				return duration * 1000 * 60 * 60 * 24 * 30;
-			case 'untilPhaseEnd':
-			default:
-				// an infinite duration.
-				return -1;
-		}
+        switch(durationType){
+            case 'milliseconds':
+            case 'seconds':
+            case 'minutes':
+            case 'hours':
+            case 'days':
+            case 'weeks':
+            case 'months':
+                return moment.duration(duration, durationType).asMilliseconds();
+            default:
+                return 0;
+        }
 	},
 
 
