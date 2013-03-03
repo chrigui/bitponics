@@ -155,7 +155,7 @@ ActionSchema.method('getStateMessage', function(stateIndex, controlName){
  * @return {boolean}. true if the objects are equivalent, false if not
  */
 ActionSchema.static('isEquivalentTo', function(source, other){
-	if (source.description != other.description){
+	if (source.description !== other.description){
 		return false;
 	}
 	
@@ -178,16 +178,16 @@ ActionSchema.static('isEquivalentTo', function(source, other){
 
 	var allStatesEquivalent = source.cycle.states.every(function(state, index){
 		var otherState = other.cycle.states[index];
-		if (state.controlValue != otherState.controlValue) { 
+		if (state.controlValue !== otherState.controlValue) {
 			return false;
 		}
-		if (state.durationType != otherState.durationType) { 
+		if (state.durationType !== otherState.durationType) {
 			return false;
 		}
-		if (state.duration != otherState.duration) { 
+		if (state.duration !== otherState.duration) {
 			return false;
 		}
-		if (state.message != otherState.message) { 
+		if (state.message !== otherState.message) {
 			return false;
 		}
 		return true;
@@ -333,6 +333,8 @@ var ActionUtils = {
 	 * 
 	 * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
 	 *                Otherwise it's just written straight to the template.
+     *
+     * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
 	 */
 	getSimplifiedCycleFormat : function(actionCycleStates, offset){
 		var states = actionCycleStates,
