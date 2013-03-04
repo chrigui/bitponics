@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
   Action = require('../models/action'),
   should = require('should'),
-  moment = require('moment');
+  moment = require('moment'),
+  i18nKeys = require('../i18n/keys');
 
 
 /*
@@ -651,9 +652,36 @@ describe('Action', function(){
 
   describe('pre-save validation', function(){
 
-    if('returns an error if greater than 3 cycle states', function(done){
-      done();
+    it('returns an error if greater than 3 cycle states', function(done){
+      var action = new Action.model({
+        description : "attempted 2+3 week cycle",
+        cycle: {
+          states : [
+            {
+              duration: 2,
+              durationType : 'weeks'
+            },
+            {
+              message : "do this thing after 2 weeks"
+            },
+            {
+              duration: 3,
+              durationType : 'weeks'
+            },
+            {
+              message: "do this thing 3 weeks after that first thing"
+            }
+          ]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('Invalid number of cycle states'));
+        done();
+      });
     });
+
 
     if('returns an error if a control is specified, but no state specifies a controlValue', function(done){
       done();
@@ -738,12 +766,4 @@ describe('Action', function(){
     });
   }); // /getSimplifiedCycleFormat
 
-
-  describe('getSimplifiedCycleFormat', function(){
-
-    it('returns a string with interpolated action state values', function(done){
-      done();
-    });
-
-  }); // /getSimplifiedCycleFormat
 });
