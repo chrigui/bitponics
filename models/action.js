@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
   getObjectId = require('./utils').getObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
+  i18nKeys = require('../i18n/keys'),
   ActionModel,
   ActionSchema;
 
@@ -354,7 +355,7 @@ ActionSchema.pre('save', function(next){
   // An Action can have no cycle. In this case it's a simple reminder.
   if (!cycle.states.length){
     if (this.control){
-      return next(new Error('An action with a control must define a cycle with 1 or more control states'));
+      return next(new Error(i18nKeys.get('An action with a control must define a cycle with 1 or more control states')));
     }
     // make sure cycle.repeat doesn't exist since it doesn't need to
     delete this.cycle.repeat;
@@ -364,14 +365,14 @@ ActionSchema.pre('save', function(next){
   states = cycle.states;
 
   if ((states.length > 3)){
-    return next(new Error('Invalid number of cycle states'));
+    return next(new Error(i18nKeys.get('Invalid number of cycle states')));
   }
 
   if (action.control){
     if (states.some(function(state){
       return (typeof state.controlValue === 'undefined' || state.controlValue === null);
     })){
-      return next(new Error('If an action has a control, every cycle state must specify a control value'));
+      return next(new Error(i18nKeys.get('If an action has a control, every cycle state must specify a control value')));
     }
   }
 
@@ -384,16 +385,16 @@ ActionSchema.pre('save', function(next){
       // if 2 states, at least one must have a duration defined
       if ( !(states[0].durationType && states[0].duration) &&
            !(states[1].durationType && states[1].duration)){
-        return next(new Error('In a 2-state cycle, at least one state must have a duration defined'));
+        return next(new Error(i18nKeys.get('In a 2-state cycle, at least one state must have a duration defined')));
       }
       break;
     case 3:
       // if a cycle has 3 states, the 1st and 3rd must have the same control value & message
       if (states[0].controlValue !== states[2].controlValue){
-        return next(new Error('First and last control values must be equal'));
+        return next(new Error(i18nKeys.get('First and last control values must be equal')));
       }
       if (states[0].message !== states[2].message){
-        return next(new Error('First and last state\'s messages must be equal'));
+        return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
       }
       // and at least the 1st & 3rd states must have durations defined
       if (!(
@@ -401,7 +402,7 @@ ActionSchema.pre('save', function(next){
         (states[2].durationType && states[2].duration)
         )
         ){
-        return next(new Error('In a 3-state cycle, at least the 1st and 3rd states must have durations defined'));
+        return next(new Error(i18nKeys.get('In a 3-state cycle, at least the 1st and 3rd states must have durations defined')));
       }
       break;
     // no default; we've enforced that we have one of these values already
