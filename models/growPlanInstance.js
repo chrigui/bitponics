@@ -486,7 +486,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : states[0].durationType,
@@ -514,7 +514,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : 'seconds',

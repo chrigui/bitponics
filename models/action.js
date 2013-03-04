@@ -98,7 +98,7 @@ ActionSchema.virtual('overallCycleTimespan')
       case 3:
         total = 0;
         states.forEach(function(state){
-          total += ActionSchema.statics.convertDurationToMilliseconds(state.durationType, state.duration);
+          total += ActionSchema.statics.convertDurationToMilliseconds(state.duration, state.durationType);
         });
         break;
       // no default; we've enforced that we have one of these values already
@@ -199,7 +199,7 @@ ActionSchema.static('isEquivalentTo', function(source, other){
 /**
  *
  */
-ActionSchema.static('convertDurationToMilliseconds', function(durationType, duration){
+ActionSchema.static('convertDurationToMilliseconds', function(duration, durationType){
   switch(durationType){
     case 'milliseconds':
     case 'seconds':
@@ -272,9 +272,9 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
 
       result.offset = offset;
       result.value1 = state0.controlValue;
-      result.duration1 = convertDurationToMilliseconds(state0.durationType, state0.duration);
+      result.duration1 = convertDurationToMilliseconds(state0.duration, state0.durationType);
       result.value2 = state1.controlValue;
-      result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
+      result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
       break;
     case 3:
       // If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
@@ -282,8 +282,8 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
       var state0 = states[0],
         state1 = states[1],
         state2 = states[2],
-        firstDuration = convertDurationToMilliseconds(state0.durationType, state0.duration),
-        thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
+        firstDuration = convertDurationToMilliseconds(state0.duration, state0.durationType),
+        thirdDuration = convertDurationToMilliseconds(state2.duration, state2.durationType),
         totalFirstDuration = firstDuration + thirdDuration;
 
       // for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
@@ -292,7 +292,7 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
       result.value1 = state0.controlValue;
       result.duration1 = totalFirstDuration;
       result.value2 = state1.controlValue;
-      result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
+      result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
       break;
     default:
       winston.info('Serializing a blank actionCycleState');
