@@ -70,7 +70,7 @@ block content
 block footer-scripts
   - if (user && user._id)
     script
-      Bitponics.currentUser = {
+      bpn.currentUser = {
         email: '!{user.email}',
         publicDeviceKey: '!{availableDeviceKey.public}',
         privateDeviceKey: '!{availableDeviceKey.private}'

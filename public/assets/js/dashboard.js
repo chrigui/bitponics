@@ -1,4 +1,4 @@
-Bitponics.pages.dashboard = {
+bpn.pages.dashboard = {
     getPhaseFillColor : function(data, index){
         var num = data.data;
 
@@ -13,7 +13,7 @@ Bitponics.pages.dashboard = {
         }
     },
     drawPhaseGraphs : function(){
-        var phases = Bitponics.user.currentGrowPlanInstance.phases,
+        var phases = bpn.user.currentGrowPlanInstance.phases,
             phaseCount = phases.length,
             $container = $('#phases-graph'),
             outerMargin = 80,
@@ -65,7 +65,7 @@ Bitponics.pages.dashboard = {
                 .attr('d', arc)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1)
-                .attr('fill', Bitponics.pages.dashboard.getPhaseFillColor);
+                .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
         });
     },
     getControlFillColor : function(data, index){
@@ -78,7 +78,7 @@ Bitponics.pages.dashboard = {
         }
     },
     drawControlGraphs : function(){
-        var controls = Bitponics.user.currentGrowPlanInstance.controls,
+        var controls = bpn.user.currentGrowPlanInstance.controls,
             $container = $('#controls'),
             outerMargin = 0,
             width = $container.find('.control').width() - (outerMargin * 2),
@@ -142,7 +142,7 @@ Bitponics.pages.dashboard = {
                 .attr('d', arc)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 1)
-                .attr('fill', Bitponics.pages.dashboard.getControlFillColor);
+                .attr('fill', bpn.pages.dashboard.getControlFillColor);
         });
     },
     initEventHandlers : function(){
@@ -152,7 +152,7 @@ Bitponics.pages.dashboard = {
             var $this = $(this),
                 tooltipContent = $this.data('tooltipContent'),
                 controlKey = $this.data('controlKey'),
-                controlData = Bitponics.user.currentGrowPlanInstance.controls[controlKey];
+                controlData = bpn.user.currentGrowPlanInstance.controls[controlKey];
             
             if (!tooltipContent){
                 // Get the immediately-triggerable actions for this control
@@ -173,7 +173,7 @@ Bitponics.pages.dashboard = {
                                 
                                 $.ajax({
                                     type: 'POST',
-                                    url: '/api/grow_plan_instances/' + Bitponics.user.currentGrowPlanInstance.id + '/action_override_logs',
+                                    url: '/api/grow_plan_instances/' + bpn.user.currentGrowPlanInstance.id + '/action_override_logs',
                                     data: { actionId: actionId },
                                     success: function(data){
                                         $this.find('.loader').remove();
@@ -213,9 +213,9 @@ Bitponics.pages.dashboard = {
 };
 
 $(function () {
-    Bitponics.pages.dashboard.drawPhaseGraphs();
-    Bitponics.pages.dashboard.drawControlGraphs();
-    Bitponics.pages.dashboard.initEventHandlers();
+    bpn.pages.dashboard.drawPhaseGraphs();
+    bpn.pages.dashboard.drawControlGraphs();
+    bpn.pages.dashboard.initEventHandlers();
 });
 
 

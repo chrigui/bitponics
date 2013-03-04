@@ -60,7 +60,7 @@ define(['moment'], function(moment){
    * Used to simplify presentation of durations in UI (avoiding decimals).
    *
    * @param duration. Number. If durationType is omitted, it is assumed to be milliseconds.
-   * @param durationType. String. One of Bitponics.Utils.durationTypes
+   * @param durationType. String. One of bpn.utils.durationTypes
    * @return { 'duration' : number, 'durationType' : string }
    */
   utils.getLargestWholeNumberDurationObject = function(duration, durationType){

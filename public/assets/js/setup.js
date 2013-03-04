@@ -14,7 +14,7 @@ $(function(){
 		$pairingComplete = $('#pairing-complete'),
 		dataToPostAfterSuccess = {
 			deviceMacAddress : '',
-			publicDeviceKey : Bitponics.currentUser.publicDeviceKey
+			publicDeviceKey : bpn.currentUser.publicDeviceKey
 		};
 		scannedWifiNetworks = [],
 		/**
@@ -49,8 +49,8 @@ $(function(){
 		var postDataStringPlainText = 'SSID=' + selectedWifiNetwork.ssid + '\n' +
 			'PASS=' + $wifiPass.val() + '\n' +
 			'MODE=' + selectedWifiNetwork.securityMode + '\n' +
-			'SKEY=' + Bitponics.currentUser.privateDeviceKey + '\n' +
-			'PKEY=' + Bitponics.currentUser.publicDeviceKey; 
+			'SKEY=' + bpn.currentUser.privateDeviceKey + '\n' +
+			'PKEY=' + bpn.currentUser.publicDeviceKey;
 
 		console.log('Posting to device', postDataStringPlainText);
 
