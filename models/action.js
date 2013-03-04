@@ -98,7 +98,7 @@ ActionSchema.virtual('overallCycleTimespan')
       case 3:
         total = 0;
         states.forEach(function(state){
-          total += ActionUtils.convertDurationToMilliseconds(state.durationType, state.duration);
+          total += ActionSchema.statics.convertDurationToMilliseconds(state.durationType, state.duration);
         });
         break;
       // no default; we've enforced that we have one of these values already
@@ -195,6 +195,142 @@ ActionSchema.static('isEquivalentTo', function(source, other){
   return true;
 });
 
+
+/**
+ *
+ */
+ActionSchema.static('convertDurationToMilliseconds', function(durationType, duration){
+  switch(durationType){
+    case 'milliseconds':
+    case 'seconds':
+    case 'minutes':
+    case 'hours':
+    case 'days':
+    case 'weeks':
+    case 'months':
+      return moment.duration(duration, durationType).asMilliseconds();
+    default:
+      return 0;
+  }
+});
+
+
+/**
+ *
+ */
+ActionSchema.static('getCycleRemainder', function(growPlanInstancePhase, action, userTimezone){
+  // http://en.wikipedia.org/wiki/Date_%28Unix%29
+  // get the overall timespan of the cycle.
+  // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
+  // get time elapsed from localized phase start
+  // divide time elapsed by overall timespan. remainder is a component of the offset
+  var now = new Date(),
+    phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
+  // get the midnight of the start date
+    phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+    overallCycleTimespan = action.overallCycleTimespan,
+    phaseTimeElapsed = now - phaseStartDate,
+    cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
+
+  return cycleRemainder;
+});
+
+
+
+/**
+ * Parses cycles and returns simplified 1 or 2 state object, with an offset if necessary.
+ *
+ * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
+ *                Otherwise it's just written straight to the template.
+ *
+ * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
+ */
+ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offset){
+  var states = actionCycleStates,
+    convertDurationToMilliseconds = ActionSchema.statics.convertDurationToMilliseconds,
+    offset = offset || 0,
+    result = {
+      offset : 0,
+      value1 : 0,
+      duration1 : 0,
+      value2 : 0,
+      duration2 : 0
+    };
+
+  switch(states.length){
+    case 1:
+      var infiniteStateControlValue = states[0].controlValue;
+      result.offset = offset;
+      result.value1 = infiniteStateControlValue;
+      result.duration1 = 1;
+      result.value2 = infiniteStateControlValue;
+      result.duration2 = 1;
+      break;
+    case 2:
+      var state0 = states[0],
+        state1 = states[1];
+
+      result.offset = offset;
+      result.value1 = state0.controlValue;
+      result.duration1 = convertDurationToMilliseconds(state0.durationType, state0.duration);
+      result.value2 = state1.controlValue;
+      result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
+      break;
+    case 3:
+      // If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
+
+      var state0 = states[0],
+        state1 = states[1],
+        state2 = states[2],
+        firstDuration = convertDurationToMilliseconds(state0.durationType, state0.duration),
+        thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
+        totalFirstDuration = firstDuration + thirdDuration;
+
+      // for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
+      // and if we got an offset passed in, add that
+      result.offset = offset + thirdDuration;
+      result.value1 = state0.controlValue;
+      result.duration1 = totalFirstDuration;
+      result.value2 = state1.controlValue;
+      result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
+      break;
+    default:
+      winston.info('Serializing a blank actionCycleState');
+      result.offset = 0;
+      result.value1 = 0;
+      result.duration1 = 0;
+      result.value2 = 0;
+      result.duration2 = 0;
+      break;
+  }
+  return result;
+});
+
+
+/**
+ * Takes a string with the tokens {offset},{value1},{duration1},{value2},{duration2}
+ * and replaces each field with the proper values. Offset is returned in milliseconds.
+ *
+ * Assumes it's passed an action with states with controlValues.
+ *
+ * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
+ *                Otherwise it's just written straight to the template.
+ * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
+ */
+ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycleStates, offset){
+  var result = ActionSchema.statics.getSimplifiedCycleFormat(actionCycleStates, offset),
+    resultCycleString = cycleTemplate;
+
+  resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
+  resultCycleString = resultCycleString.replace(/{value1}/, result.value1);
+  resultCycleString = resultCycleString.replace(/{duration1}/, result.duration1);
+  resultCycleString = resultCycleString.replace(/{value2}/, result.value2);
+  resultCycleString = resultCycleString.replace(/{duration2}/, result.duration2);
+  result.cycleString = resultCycleString;
+
+  return result;
+});
+
 /************************** END STATIC METHODS***************************/
 
 
@@ -284,148 +420,8 @@ ActionSchema.pre('save', function(next){
   // Want a sparse index on control (since it's an optional field)
 ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
-
 ActionModel = mongoose.model('Action', ActionSchema);
-
-
-
-
-/**
- * Utilities
- *
- */
-var ActionUtils = {
-  convertDurationToMilliseconds : function(durationType, duration){
-    switch(durationType){
-      case 'milliseconds':
-      case 'seconds':
-      case 'minutes':
-      case 'hours':
-      case 'days':
-      case 'weeks':
-      case 'months':
-        return moment.duration(duration, durationType).asMilliseconds();
-      default:
-        return 0;
-    }
-  },
-
-
-  getCycleRemainder : function(growPlanInstancePhase, action, userTimezone){
-    // http://en.wikipedia.org/wiki/Date_%28Unix%29
-    // get the overall timespan of the cycle.
-    // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
-    // get time elapsed from localized phase start
-    // divide time elapsed by overall timespan. remainder is a component of the offset
-    var now = new Date(),
-      phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
-    // get the midnight of the start date
-      phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
-      overallCycleTimespan = action.overallCycleTimespan,
-      phaseTimeElapsed = now - phaseStartDate,
-      cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
-
-    return cycleRemainder;
-  },
-
-
-
-  /**
-   * Parses cycles and returns simplified 1 or 2 state object, with an offset if necessary.
-   *
-   * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
-   *                Otherwise it's just written straight to the template.
-   *
-   * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
-   */
-  getSimplifiedCycleFormat : function(actionCycleStates, offset){
-    var states = actionCycleStates,
-      convertDurationToMilliseconds = ActionUtils.convertDurationToMilliseconds,
-      offset = offset || 0,
-      result = {
-        offset : 0,
-        value1 : 0,
-        duration1 : 0,
-        value2 : 0,
-        duration2 : 0
-      };
-
-    switch(states.length){
-      case 1:
-        var infiniteStateControlValue = states[0].controlValue;
-        result.offset = offset;
-        result.value1 = infiniteStateControlValue;
-        result.duration1 = 1;
-        result.value2 = infiniteStateControlValue;
-        result.duration2 = 1;
-        break;
-      case 2:
-        var state0 = states[0],
-          state1 = states[1];
-
-        result.offset = offset;
-        result.value1 = state0.controlValue;
-        result.duration1 = convertDurationToMilliseconds(state0.durationType, state0.duration);
-        result.value2 = state1.controlValue;
-        result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
-        break;
-      case 3:
-        // If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
-
-        var state0 = states[0],
-          state1 = states[1],
-          state2 = states[2],
-          firstDuration = convertDurationToMilliseconds(state0.durationType, state0.duration),
-          thirdDuration = convertDurationToMilliseconds(state2.durationType, state2.duration),
-          totalFirstDuration = firstDuration + thirdDuration;
-
-        // for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
-        // and if we got an offset passed in, add that
-        result.offset = offset + thirdDuration;
-        result.value1 = state0.controlValue;
-        result.duration1 = totalFirstDuration;
-        result.value2 = state1.controlValue;
-        result.duration2 = convertDurationToMilliseconds(state1.durationType, state1.duration);
-        break;
-      default:
-        winston.info('Serializing a blank actionCycleState');
-        result.offset = 0;
-        result.value1 = 0;
-        result.duration1 = 0;
-        result.value2 = 0;
-        result.duration2 = 0;
-        break;
-    }
-    return result;
-  },
-
-
-  /**
-   * Takes a string with the tokens {offset},{value1},{duration1},{value2},{duration2}
-   * and replaces each field with the proper values. Offset is returned in milliseconds.
-   *
-   * Assumes it's passed an action with states with controlValues.
-   *
-   * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
-   *                Otherwise it's just written straight to the template.
-   * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
-   */
-  updateCycleTemplateWithStates : function(cycleTemplate, actionCycleStates, offset){
-    var result = ActionUtils.getSimplifiedCycleFormat(actionCycleStates, offset),
-      resultCycleString = cycleTemplate;
-
-    resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
-    resultCycleString = resultCycleString.replace(/{value1}/, result.value1);
-    resultCycleString = resultCycleString.replace(/{duration1}/, result.duration1);
-    resultCycleString = resultCycleString.replace(/{value2}/, result.value2);
-    resultCycleString = resultCycleString.replace(/{duration2}/, result.duration2);
-    result.cycleString = resultCycleString;
-
-    return result;
-  }
-};
 
 
 exports.schema = ActionSchema;
 exports.model = ActionModel;
-exports.utils = ActionUtils;

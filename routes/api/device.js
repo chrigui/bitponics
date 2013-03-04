@@ -6,7 +6,6 @@ var mongoose = require('mongoose'),
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     Action = require('../../models/action'),
     ActionModel = Action.model,
-    ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
     SensorLogModel = require('../../models/sensorLog').model,
     ModelUtils = require('../../models/utils'),
@@ -314,8 +313,8 @@ module.exports = function(app) {
             } else {
               thisCycleString = thisCycleString.replace('{override}','1');
               
-              var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, controlAction, req.user.timezone);
-              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;  
+              var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, controlAction, req.user.timezone);
+              thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
             }
             allCyclesString += thisCycleString;
           }

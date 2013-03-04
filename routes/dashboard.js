@@ -4,7 +4,6 @@ GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 SensorModel = require('../models/sensor').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
-ActionUtils = Action.utils,
 routeUtils = require('./route-utils'),
 winston = require('winston'),
 async = require('async'); 
@@ -130,7 +129,7 @@ module.exports = function(app){
 								action : {
 									description : controlAction.description,
 									cycle : controlAction.cycle,
-									cycleString : ActionUtils.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states).cycleString
+									cycleString : ActionModel.updateCycleTemplateWithStates('{value1},{duration1},{value2},{duration2}', controlAction.cycle.states).cycleString
 								}
 							};
 						});

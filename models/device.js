@@ -1,12 +1,12 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
+	  mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
   	mongoosePlugins = require('../lib/mongoose-plugins'),
-	useTimestamps = mongoosePlugins.useTimestamps,
+	  useTimestamps = mongoosePlugins.useTimestamps,
   	ObjectId = Schema.ObjectId,
   	DeviceTypeModel = require('./deviceType').model,
+    ActionModel = require('./action').model,
   	ActionOverrideLogModel = require('./actionOverrideLog').model,
-  	ActionUtils = require('./action').utils,
   	SensorLogSchema = require('./sensorLog').schema
   	winston = require('winston');
 
@@ -169,7 +169,7 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
               thisCycleString = thisCycleString.replace(/{override}/, '1');
               // overrides are assumed to be immediate actions, so offset will always be 0
               thisCycleString = thisCycleString.replace(/{offset}/, '0');
-              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;  
+              thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;
             }
             deviceMessage += thisCycleString;  
           }
