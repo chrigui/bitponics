@@ -9,7 +9,7 @@ define([
     // 'backstretch'
     ],
 function(){
-  Bitponics.pages.home = {
+  bpn.pages.home = {
     
     MIN_SECTION_HEIGHT: 800,
 
@@ -23,13 +23,13 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
+      bpn.utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
         
         //match section height to window
         //create fixed nav
         self.screenWidth = $(window).width();
         if(self.screenWidth > 700){
-          Bitponics.Utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
+          bpn.utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
         }
 
         //create fixed nav
@@ -125,7 +125,7 @@ function(){
   }
 
   $(function () {
-    Bitponics.pages.home.init();
+    bpn.pages.home.init();
   });
 
 });

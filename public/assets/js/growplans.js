@@ -3,10 +3,10 @@ define([
     'es5shim',
     'steps',
     'moment',
-    'utils',
+    'fe-be-utils'
     ],
 function(viewModels){
-    Bitponics.pages.growplans = {
+    bpn.pages.growplans = {
         init: function() {
             // https://github.com/jrburke/requirejs/issues/507
             // http://www.youtube.com/watch?v=ZhfUv0spHCY&feature=player_profilepage#t=456s
@@ -16,20 +16,20 @@ function(viewModels){
         app: angular.module( "GrowPlanModule", [ "ngResource" ] ),
 
         GrowPlanController : ['$scope', '$filter', '$resource', function($scope, $filter, $resource){
-            $scope.plants = Bitponics.plants;
+            $scope.plants = bpn.plants;
             $scope.filteredPlantList = angular.copy($scope.plants);
-            $scope.controls = Bitponics.controls;
-            $scope.sensors = Bitponics.sensors;
+            $scope.controls = bpn.controls;
+            $scope.sensors = bpn.sensors;
             $scope.plantSelections = {};
             $scope.selectedPlants = [];
             $scope.plantQuery = '';
-            $scope.growSystems = Bitponics.growSystems;
+            $scope.growSystems = bpn.growSystems;
             $scope.growSystemSelections = {};
             $scope.currentGrowPlanDay = 0;
-            $scope.growPlans = Bitponics.growPlans;
+            $scope.growPlans = bpn.growPlans;
             $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
-            $scope.timesOfDayList = Bitponics.Utils.generateTimesOfDayArray();
-            $scope.actionDurationTypeOptions = Bitponics.Utils.durationTypes,
+            $scope.timesOfDayList = bpn.utils.generateTimesOfDayArray();
+            $scope.actionDurationTypeOptions = bpn.utils.durationTypes,
             $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
 
             //Wrapping our ng-model vars {}
@@ -53,7 +53,7 @@ function(viewModels){
                 $scope.selectedGrowPlan = $filter('filter')($scope.growPlans, { _id: $scope.selected.growPlan })[0];
 
                 if (!$scope.selectedGrowPlan) { 
-                    $scope.selectedGrowPlan = Bitponics.growPlanDefault; 
+                    $scope.selectedGrowPlan = bpn.growPlanDefault;
                 }
                 
                 $scope.selectedGrowPlan = GrowPlanModel.get({
@@ -114,7 +114,7 @@ function(viewModels){
 
             $scope.updatefilteredGrowPlans = function(){
                 var selectedPlantIds = $scope.selectedPlants.map(function(plant) { return plant._id }),
-                    growPlanDefault = new GrowPlanModel(Bitponics.growPlanDefault);
+                    growPlanDefault = new GrowPlanModel(bpn.growPlanDefault);
 
                 //hit API with params to filter grow plans
                 $scope.filteredGrowPlanList = GrowPlanModel.query({
@@ -254,7 +254,7 @@ function(viewModels){
             action.cycle.states.forEach(function(state){
                 overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
             });
-            overallDuration = Bitponics.Utils.getLargestWholeNumberDurationObject(overallDuration);
+            overallDuration = bpn.utils.getLargestWholeNumberDurationObject(overallDuration);
 
             action.overallDuration = overallDuration.duration;
             action.overallDurationType = overallDuration.durationType;
@@ -360,8 +360,8 @@ function(viewModels){
          * 
          */
         compileActionViewModelToServerModel: function (action){
-            var ACCESSORY_ON = Bitponics.Utils.accessoryValues.ON,
-                ACCESSORY_OFF = Bitponics.Utils.accessoryValues.OFF,
+            var ACCESSORY_ON = bpn.utils.accessoryValues.ON,
+                ACCESSORY_OFF = bpn.utils.accessoryValues.OFF,
                 dailyOnTimeAsMilliseconds,
                 dailyOffTimeAssMilliseconds;
             if (action.scheduleType === 'repeat'){
@@ -421,7 +421,7 @@ function(viewModels){
                         });
 
                         lastStateDurationAsMilliseconds = (moment.duration(lastStateDuration, lastStateDurationType).asMilliseconds() - moment.duration(action.offsetTimeOfDay).asMilliseconds());
-                        lastStateDurationObject = Bitponics.Utils.getLargestWholeNumberDurationObject(lastStateDurationAsMilliseconds);
+                        lastStateDurationObject = bpn.utils.getLargestWholeNumberDurationObject(lastStateDurationAsMilliseconds);
                         lastStateDurationType = lastStateDurationObject.durationType;
                         lastStateDuration = lastStateDurationObject.duration;
                     }
@@ -452,7 +452,7 @@ function(viewModels){
     };
 
     $(function () {
-        Bitponics.pages.growplans.init();
+        bpn.pages.growplans.init();
     });
 
 });
