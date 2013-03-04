@@ -1,18 +1,17 @@
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
+  ObjectId = Schema.ObjectId,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
-  ObjectId = Schema.ObjectId,
-  ActionModel,
-  ActionSchema,
   async = require('async'),
   timezone = require('timezone/loaded'),
-  ControlModel = require('./control').model,
   moment = require('moment'),
   getObjectId = require('./utils').getObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  ActionModel,
+  ActionSchema;
 
 
 /**
