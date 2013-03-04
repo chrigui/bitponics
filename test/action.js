@@ -842,30 +842,37 @@ describe('Action', function(){
   describe('convertDurationToMilliseconds', function(){
 
     it('handles durations for seconds', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'seconds').should.equal(1000);
       done();
     });
 
     it('handles durations for minutes', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'minutes').should.equal(1000 * 60);
       done();
     });
 
     it('handles durations for hours', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'hours').should.equal(1000 * 60 * 60);
       done();
     });
 
     it('handles durations for days', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'days').should.equal(1000 * 60 * 60 * 24);
       done();
     });
 
     it('handles durations for weeks', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'weeks').should.equal(1000 * 60 * 60 * 24 * 7);
       done();
     });
 
     it('handles durations for months', function(done){
+      Action.model.convertDurationToMilliseconds(1, 'months').should.equal(1000 * 60 * 60 * 24 * 30);
       done();
     });
 
     it('handles non-existent duration', function(done){
+      Action.model.convertDurationToMilliseconds().should.equal(0);
       done();
     });
   }); // /convertDurationToMilliseconds
