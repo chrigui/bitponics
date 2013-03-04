@@ -483,13 +483,13 @@ describe('Action', function(){
               message : "message",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '0'
+              controlValue : '1'
             },
             {
               message : "message",
               duration : 2,
               durationType : 'minutes',
-              controlValue : '1'
+              controlValue : '0'
             }
           ],
           repeat : true
@@ -532,13 +532,13 @@ describe('Action', function(){
               message : "message",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '0'
+              controlValue : '1'
             },
             {
               message : "message",
               duration : 1,
               durationType : 'hours',
-              controlValue : '1'
+              controlValue : '0'
             }
           ],
           repeat : true
@@ -580,13 +580,13 @@ describe('Action', function(){
               message : "message",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '0'
+              controlValue : '1'
             },
             {
               message : "message2",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '1'
+              controlValue : '0'
             }
           ],
           repeat : true
@@ -622,19 +622,20 @@ describe('Action', function(){
       });
       var action2 = new Action.model({
         description : "desc",
+        control : "506de2fc8eebf7524342cb2e", // humidifier
         cycle : {
           states : [
             {
               message : "message",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '0'
+              controlValue : '1'
             },
             {
               message : "message",
               duration : 1,
               durationType : 'minutes',
-              controlValue : '1'
+              controlValue : '0'
             }
           ],
           repeat : true
@@ -642,7 +643,7 @@ describe('Action', function(){
       });
 
       var isEquivalent = Action.model.isEquivalentTo(action1, action2);
-      isEquivalent.should.be.false;
+      isEquivalent.should.be.true;
       done();
     });
   }); // /isEquivalentTo
