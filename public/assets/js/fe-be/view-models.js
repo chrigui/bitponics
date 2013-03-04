@@ -178,8 +178,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    *
    */
   viewModels.compileActionViewModelToServerModel = function(action){
-    var ACCESSORY_ON = utils.accessoryValues.ON,
-      ACCESSORY_OFF = utils.accessoryValues.OFF,
+    var ACCESSORY_ON = utils.ACCESSORY_VALUES.ON,
+      ACCESSORY_OFF = utils.ACCESSORY_VALUES.OFF,
       dailyOnTimeAsMilliseconds,
       dailyOffTimeAssMilliseconds;
     if (action.scheduleType === 'repeat'){
