@@ -1,15 +1,11 @@
 var should = require('should'),
-requirejs = require('requirejs'),
+requirejs = require('../lib/requirejs-wrapper'),
 Models = require('../models'),
 sampleGrowPlans = require('../utils/db_init/seed_data/growPlans'),
 sampleActions = require('../utils/db_init/seed_data/actions'),
 Action = Models.action,
 ModelUtils = Models.utils;
 
-requirejs.config({
-	nodeRequire: require,
-	baseUrl : 'public/assets/js/shared'
-});
 var viewModels = requirejs('viewmodels');
 
 describe('ViewModels', function(){

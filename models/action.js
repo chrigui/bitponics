@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
+	  mongooseTypes = require('mongoose-types'),
   	Schema = mongoose.Schema,
   	mongoosePlugins = require('../lib/mongoose-plugins'),
     useTimestamps = mongoosePlugins.useTimestamps,
@@ -10,7 +10,8 @@ var mongoose = require('mongoose'),
   	timezone = require('timezone/loaded'),
   	ControlModel = require('./control').model,
     moment = require('moment'),
-  	getObjectId = require('./utils').getObjectId;
+  	getObjectId = require('./utils').getObjectId,
+    requirejs = require('../lib/requirejs-wrapper');
 
 
 /**
