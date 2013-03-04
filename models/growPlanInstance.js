@@ -241,7 +241,6 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
 GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),
       ActionModel = Action.model,
-      ActionUtils = Action.utils,
       NotificationModel = require('./notification').model,
       ActionOverrideLogModel = require('./actionOverrideLog').model,
       UserModel = require('./user').model,
@@ -487,7 +486,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionUtils.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : states[0].durationType,
@@ -515,7 +514,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionUtils.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : 'seconds',

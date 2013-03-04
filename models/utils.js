@@ -124,7 +124,6 @@ function triggerActionOverride(options, callback){
     GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
-    ActionUtils = Action.utils,
     ActionOverrideLogModel = require('./actionOverrideLog').model,
     NotificationModel = require('./notification').model,
     SensorLogModel = require('./sensorLog').model,
@@ -172,7 +171,7 @@ function triggerActionOverride(options, callback){
                 .exec(function(err, actionResult){
                   if (err) { return innerCallback(err);}
                   if (!actionResult){ return innerCallback(); }
-                  var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);      
+                  var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);
                   expires = now.valueOf() + cycleRemainder;
                   return innerCallback();  
                 });
@@ -192,7 +191,7 @@ function triggerActionOverride(options, callback){
             .exec(function(err, actionResult){
               if (err) { return innerCallback(err);}
               if (!actionResult){ return innerCallback(); }
-              var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);      
+              var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);
               expires = now.valueOf() + cycleRemainder;
               actionHasDeviceControl = true;
               return innerCallback();  
@@ -437,7 +436,6 @@ function getFullyPopulatedGrowPlan(query, callback){
       winston = require('winston'),
       Action = require('./action'),
       ActionModel = Action.model,
-      ActionUtils = Action.utils,
       growPlans;
       
   async.series(

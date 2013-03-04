@@ -2,7 +2,6 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
     ActionOverrideLogModel = require('../../models/actionOverrideLog').model,
-    ActionUtils = require('../../models/action').utils,
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async');

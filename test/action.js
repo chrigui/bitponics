@@ -674,7 +674,7 @@ describe('Action', function(){
   }); // /pre-save validation
 
 
-  describe('ActionUtils.convertDurationToMilliseconds', function(){
+  describe('convertDurationToMilliseconds', function(){
 
     it('handles durations for seconds', function(done){
       done();
@@ -703,10 +703,10 @@ describe('Action', function(){
     it('handles non-existent duration', function(done){
       done();
     });
-  }); // /ActionUtils.convertDurationToMilliseconds
+  }); // /convertDurationToMilliseconds
 
 
-  describe('ActionUtils.getCycleRemainder', function(){
+  describe('getCycleRemainder', function(){
 
     it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
       done();
@@ -720,10 +720,10 @@ describe('Action', function(){
       done();
     });
 
-  }); // /ActionUtils.convertDurationToMilliseconds
+  }); // /convertDurationToMilliseconds
 
 
-  describe('ActionUtils.getSimplifiedCycleFormat', function(){
+  describe('getSimplifiedCycleFormat', function(){
 
     it('handles a single-state cycle', function(done){
       done();
@@ -736,14 +736,14 @@ describe('Action', function(){
     it('handles an offset alternating (3-state)cycle', function(done){
       done();
     });
-  }); // /ActionUtils.getSimplifiedCycleFormat
+  }); // /getSimplifiedCycleFormat
 
 
-  describe('ActionUtils.getSimplifiedCycleFormat', function(){
+  describe('getSimplifiedCycleFormat', function(){
 
     it('returns a string with interpolated action state values', function(done){
       done();
     });
 
-  }); // /ActionUtils.getSimplifiedCycleFormat
+  }); // /getSimplifiedCycleFormat
 });
