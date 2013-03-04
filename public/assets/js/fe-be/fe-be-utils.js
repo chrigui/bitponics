@@ -5,6 +5,22 @@ define(['moment'], function(moment){
 
   /**
    *
+   * @type {Array}
+   */
+  utils.DURATION_TYPES = ['seconds','minutes','hours','days','weeks','months'];
+
+
+  /**
+   *
+   * @type {Object}
+   */
+  utils.ACCESSORY_VALUES = {
+    ON : '1',
+    OFF : '0'
+  };
+
+  /**
+   *
    * @param str
    * @return {*}
    */
@@ -46,13 +62,6 @@ define(['moment'], function(moment){
   utils.isWholeNumber = function (n) {
     return n % 1 === 0;
   };
-
-
-  /**
-   *
-   * @type {Array}
-   */
-  utils.durationTypes = ['seconds','minutes','hours','days','weeks','months'];
 
 
   /**
@@ -102,16 +111,6 @@ define(['moment'], function(moment){
       duration : transformedDuration,
       durationType : 'seconds'
     }
-  };
-
-
-  /**
-   *
-   * @type {Object}
-   */
-  utils.accessoryValues = {
-    ON : '1',
-    OFF : '0'
   };
 
   return utils;

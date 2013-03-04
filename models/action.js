@@ -11,7 +11,8 @@ var mongoose = require('mongoose'),
   	ControlModel = require('./control').model,
     moment = require('moment'),
   	getObjectId = require('./utils').getObjectId,
-    requirejs = require('../lib/requirejs-wrapper');
+    requirejs = require('../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils');
 
 
 /**
@@ -22,14 +23,7 @@ var ActionStateSchema = new Schema(
     {
         controlValue: { type: String },
 
-        durationType: { type: String, enum: [
-            'seconds',
-            'minutes',
-            'hours',
-            'days',
-            'weeks',
-            'months'
-        ]},
+        durationType: { type: String, enum: feBeUtils.DURATION_TYPES},
 
         duration: { type: Number },
 
