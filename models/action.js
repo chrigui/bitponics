@@ -357,7 +357,7 @@ ActionSchema.pre('save', function(next){
     if (this.control){
       return next(new Error(i18nKeys.get('An action with a control must define a cycle with 1 or more control states')));
     }
-    // make sure cycle.repeat doesn't exist since it doesn't need to
+    // make sure cycle.repeat doesn't exist, since it doesn't need to
     delete this.cycle.repeat;
     return next();
   }

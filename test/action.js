@@ -683,22 +683,159 @@ describe('Action', function(){
     });
 
 
-    if('returns an error if a control is specified, but no state specifies a controlValue', function(done){
-      done();
+    it('returns an error if a control is specified, but no states exist', function(done){
+      var action = new Action.model({
+        description : "desc",
+        control : "506de2fc8eebf7524342cb2e", // humidifier
+        cycle: {
+          states : []
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('An action with a control must define a cycle with 1 or more control states'));
+        done();
+      });
     });
 
-    if('returns an error if attempting to set a repeat on a single-state cycle', function(done){
-      done();
+
+    it('returns an error if a control is specified, but not every state specifies a controlValue', function(done){
+      var action = new Action.model({
+        description : "desc",
+        control : "506de2fc8eebf7524342cb2e", // humidifier
+        cycle: {
+          states : [{
+            message: "msg"
+          }]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('If an action has a control, every cycle state must specify a control value'));
+        done();
+      });
     });
 
-    if('returns an error if attempting to save an alternating-state cycle (with 2 states), but no states have a duration', function(done){
-      done();
+
+    it('returns an error if attempting to save an alternating-state cycle (with 2 states), but no states have a duration', function(done){
+      var action = new Action.model({
+        description : "desc",
+        control : "506de2fc8eebf7524342cb2e", // humidifier
+        cycle: {
+          states : [
+            {
+              controlValue : "1"
+            },
+            {
+              controlValue : "0"
+            }
+          ]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('In a 2-state cycle, at least one state must have a duration defined'));
+        done();
+      });
     });
 
-    if('returns an error if attempting to save an offset alternating-state cycle (with 3 states) but durations don\'t correctly describe an offset duration', function(done){
-      done();
+
+    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with control, but durations don\'t correctly describe an offset duration', function(done){
+      var action = new Action.model({
+        description : "desc",
+        control : "506de2fc8eebf7524342cb2e", // humidifier
+        cycle: {
+          states : [
+            {
+              controlValue : "1",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              controlValue : "0",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              controlValue : "0",
+              duration : 1,
+              durationType : "hours"
+            }
+          ]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('First and last control values must be equal'));
+        done();
+      });
     });
 
+
+    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
+      var action = new Action.model({
+        description : "desc",
+        cycle: {
+          states : [
+            {
+              message : "msg1",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              message : "msg2",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              message : "msg3",
+              duration : 1,
+              durationType : "hours"
+            }
+          ]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('First and last state\'s messages must be equal'));
+        done();
+      });
+    });
+
+
+    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
+      var action = new Action.model({
+        description : "desc",
+        cycle: {
+          states : [
+            {
+              message : "msg1",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              message : "msg2",
+              duration : 1,
+              durationType : "hours"
+            },
+            {
+              message : "msg1"
+            }
+          ]
+        }
+      });
+
+      action.save(function(err){
+        should.exist(err);
+        err.message.should.equal(i18nKeys.get('In a 3-state cycle, at least the 1st and 3rd states must have durations defined'));
+        done();
+      });
+    });
   }); // /pre-save validation
 
 
