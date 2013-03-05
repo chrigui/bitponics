@@ -171,7 +171,7 @@ function triggerActionOverride(options, callback){
                 .exec(function(err, actionResult){
                   if (err) { return innerCallback(err);}
                   if (!actionResult){ return innerCallback(); }
-                  var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);
+                  var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
                   expires = now.valueOf() + cycleRemainder;
                   return innerCallback();  
                 });
@@ -191,7 +191,7 @@ function triggerActionOverride(options, callback){
             .exec(function(err, actionResult){
               if (err) { return innerCallback(err);}
               if (!actionResult){ return innerCallback(); }
-              var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, actionResult, timezone);
+              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
               expires = now.valueOf() + cycleRemainder;
               actionHasDeviceControl = true;
               return innerCallback();  

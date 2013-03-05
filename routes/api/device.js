@@ -296,7 +296,8 @@ module.exports = function(app) {
         device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
+                now = new Date();
             
             winston.info('controlAction');
             winston.info(controlAction);
@@ -313,7 +314,7 @@ module.exports = function(app) {
             } else {
               thisCycleString = thisCycleString.replace('{override}','1');
               
-              var cycleRemainder = ActionModel.getCycleRemainder(growPlanInstancePhase, controlAction, req.user.timezone);
+              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, controlAction, req.user.timezone);
               thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
             }
             allCyclesString += thisCycleString;
