@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
   Action = require('../models/action'),
   should = require('should'),
   moment = require('moment'),
-  i18nKeys = require('../i18n/keys');
+  i18nKeys = require('../i18n/keys'),
+  timezone = require('timezone/loaded');
 
 
 /*
@@ -881,6 +882,43 @@ describe('Action', function(){
   describe('getCycleRemainder', function(){
 
     it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
+      var userTimezone = "America/Los_Angeles",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-01-01 10:30", userTimezone),
+          //userTimezoneOffset = timezone(startDate, userTimezone, "%:z"),
+          //userTimezoneOffsetHours = parseInt(userTimezoneOffset.split(':')[0], 10),
+          //userTimezoneOffsetMinutes = parseInt(userTimezoneOffset.split(':')[1], 10),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration : 10,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 8,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining
+      Action.model.getCycleRemainder(fromDate, mockGPIPhase, action, userTimezone).should.equal(moment.duration(13.5, 'hours').asMilliseconds());
+
       done();
     });
 

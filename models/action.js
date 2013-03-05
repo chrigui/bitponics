@@ -216,21 +216,28 @@ ActionSchema.static('convertDurationToMilliseconds', function(duration, duration
 
 
 /**
+ * Returns the time remaining in the current iteration of the action's cycle.
+ * Calculated assuming the action started at 00:00:00 on the day the phase started.
  *
+ * @param fromDate {Date} Date from which to calculate cycle remainder
+ * @param growPlanInstancePhase {object}
+ * @param action {Action}
+ * @param userTimezone {String}
+ *
+ * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
  */
-ActionSchema.static('getCycleRemainder', function(growPlanInstancePhase, action, userTimezone){
+ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhase, action, userTimezone){
   // http://en.wikipedia.org/wiki/Date_%28Unix%29
   // get the overall timespan of the cycle.
   // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
   // get time elapsed from localized phase start
   // divide time elapsed by overall timespan. remainder is a component of the offset
-  var now = new Date(),
-    phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
+  var phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
   // get the midnight of the start date
     phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
     overallCycleTimespan = action.overallCycleTimespan,
-    phaseTimeElapsed = now - phaseStartDate,
-    cycleRemainder = phaseTimeElapsed % overallCycleTimespan;
+    phaseTimeElapsed = fromDate - phaseStartDate,
+    cycleRemainder = overallCycleTimespan - (phaseTimeElapsed % overallCycleTimespan);
 
   return cycleRemainder;
 });
