@@ -51,14 +51,14 @@ module.exports = [
 						},
 						{
 							_id : '506de30b8eebf7524342cb6e',
-							sCode: "full",
+							sCode: "lux",
 							valueRange: {
 								min: 2000,
-								max: 10000
+								max: 4000
 							},
 							applicableTimeSpan: {
-								startTime: 28800000, //8am
-								endTime: 72000000 //8pm
+								startTime: (6 * 60 * 60 * 1000), //6am
+								endTime: (22 * 60 * 60 * 1000)//10pm
 							},
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
@@ -91,15 +91,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30b8eebf7524342cb6d',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 15000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -146,15 +146,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30e8eebf7524342cb7b',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 3000,
+                max: 4000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -197,15 +197,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30f8eebf7524342cb7d',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 20000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -247,15 +247,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30f8eebf7524342cb7f',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 50000,
+                max: 107500
+              },
+              applicableTimeSpan: {
+                startTime: (8 * 60 * 60 * 1000), //8am
+                endTime: (20 * 60 * 60 * 1000)//8pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -296,15 +296,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3108eebf7524342cb81',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 50000,
+                max: 107500
+              },
+              applicableTimeSpan: {
+                startTime: (8 * 60 * 60 * 1000), //8am
+                endTime: (20 * 60 * 60 * 1000)//8pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -351,15 +351,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3118eebf7524342cb83',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 2000,
+                max: 4000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -402,15 +402,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3118eebf7524342cb85',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 15000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},

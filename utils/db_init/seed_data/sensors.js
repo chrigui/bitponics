@@ -69,9 +69,9 @@ module.exports = [
 			_id : '506de3088eebf7524342cb61',
 			name: "Lux",
 			abbrev: "Lux",
-			unit: "Lumens",
+			unit: "lm/(m^2)",
 			code: "lux",
-			visible : false
+			visible : true
 		},
 		{
 			_id : '506de3088eebf7524342cb62',
@@ -95,6 +95,6 @@ module.exports = [
 			abbrev: "Visible Light",
 			unit: "Lumens",
 			code: "vis",
-			visible : true
+			visible : false
 		}
 	];
