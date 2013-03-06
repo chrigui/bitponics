@@ -245,14 +245,25 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
 
 
 /**
- * Parses cycles and returns simplified 1 or 2 state object, with an offset if necessary.
+ * Parses cycles and returns a flat object formatted for the Bitponics device.
+ * Should only be called for Actions that have a control.
+ *
+ * The device is only able to parse a single format, which means
+ * we have to represent single-state cycles as having 2 states.
+ * Single-state cycles simply become infinite durations of that state's controlValue.
+ *
+ * The firmware parses "infinite duration" by discovering that value1 and value2 are the same
+ * and duration1 and duration2 are both non-zero.
+ *
+ * ControlValues are parsed into integers since that's all the firmware can parse.
+ *
  *
  * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
  *                Otherwise it's just written straight to the template.
  *
  * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
  */
-ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offset){
+ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
   var states = actionCycleStates,
     convertDurationToMilliseconds = ActionSchema.statics.convertDurationToMilliseconds,
     offset = offset || 0,
@@ -266,7 +277,7 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
 
   switch(states.length){
     case 1:
-      var infiniteStateControlValue = states[0].controlValue;
+      var infiniteStateControlValue = parseInt(states[0].controlValue, 10);
       result.offset = offset;
       result.value1 = infiniteStateControlValue;
       result.duration1 = 1;
@@ -278,9 +289,9 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
         state1 = states[1];
 
       result.offset = offset;
-      result.value1 = state0.controlValue;
+      result.value1 = parseInt(state0.controlValue, 10);
       result.duration1 = convertDurationToMilliseconds(state0.duration, state0.durationType);
-      result.value2 = state1.controlValue;
+      result.value2 = parseInt(state1.controlValue, 10);
       result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
       break;
     case 3:
@@ -296,9 +307,9 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
       // for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
       // and if we got an offset passed in, add that
       result.offset = offset + thirdDuration;
-      result.value1 = state0.controlValue;
+      result.value1 = parseInt(state0.controlValue, 10);
       result.duration1 = totalFirstDuration;
-      result.value2 = state1.controlValue;
+      result.value2 = parseInt(state1.controlValue, 10);
       result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
       break;
     default:
@@ -325,7 +336,7 @@ ActionSchema.static('getSimplifiedCycleFormat', function(actionCycleStates, offs
  * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
  */
 ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycleStates, offset){
-  var result = ActionSchema.statics.getSimplifiedCycleFormat(actionCycleStates, offset),
+  var result = ActionSchema.statics.getDeviceCycleFormat(actionCycleStates, offset),
     resultCycleString = cycleTemplate;
 
   resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
