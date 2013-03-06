@@ -57,7 +57,8 @@ var SensorLogSchema = new Schema({
      * logs
      */
     l : [SensorReadingSchema]
-});
+},
+{ id : false });
 
 SensorLogSchema.virtual('logs')
 	.get(function () {
@@ -66,6 +67,34 @@ SensorLogSchema.virtual('logs')
 	.set(function(logs){
 		this.l = logs;
 	});
+
+
+/*************** SERIALIZATION *************************/
+
+/**
+ * Remove the db-only-optimized property names and expose only the friendly names
+ *
+ * "Transforms are applied to the document and each of its sub-documents"
+ * http://mongoosejs.com/docs/api.html#document_Document-toObject
+ */
+SensorLogSchema.set('toObject', {
+  getters : true,
+  transform : function(doc, ret, options){
+    if (doc.schema === SensorReadingSchema){
+      delete ret.s;
+      delete ret.v;
+    } else {
+      // else we're operating on the parent doc (the SensorLog doc)
+      delete ret.l;
+    }
+  }
+});
+SensorLogSchema.set('toJSON', {
+  getters : true,
+  transform : SensorLogSchema.options.toObject.transform
+});
+/*************** END SERIALIZATION *************************/
+
 
 SensorLogSchema.index({ 'gpi ts': -1 }, { sparse: true });
 

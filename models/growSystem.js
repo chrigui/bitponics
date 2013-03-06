@@ -29,7 +29,8 @@ var GrowSystemSchema = new Schema({
 	},
 
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
-});
+},
+{ id : false });
 
 GrowSystemSchema.plugin(useTimestamps);
 

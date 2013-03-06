@@ -95,7 +95,8 @@ UserSchema = new Schema({
 		]
   	}
   ]
-});
+},
+{ id : false });
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 

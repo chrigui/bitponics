@@ -186,7 +186,7 @@ block content
                         label Nutrients
                         ul.grid
                           li(ng-repeat="nutrient in phase.nutrients")
-                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient.id}}", checked=true)
+                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
                             label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
 
                       

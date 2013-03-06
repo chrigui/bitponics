@@ -22,7 +22,7 @@ module.exports = function(app){
 						pageState : undefined
 					};
 
-			if( !(user && user.id)){
+			if( !(user && user._id)){
 				return verify ?
 					res.redirect('/login?redirect=/reset?verify=' + verify) :
 					res.redirect('/login?redirect=/reset');
@@ -63,11 +63,11 @@ module.exports = function(app){
 					newpw = req.body['confirm_password'],
 					newpw2 = req.body['new_password'];
 					
-			if ( !(req.user && req.user.id)) {
+			if ( !(req.user && req.user._id)) {
 				return res.redirect('/login?redirect=/reset');
 			}
 
-			User.findById(req.user.id, 
+			User.findById(req.user._id,
 	    	function (err, user) {
 	    		console.log(err);
 	    		console.log('current user form mongo:');

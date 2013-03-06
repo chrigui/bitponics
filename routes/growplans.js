@@ -81,7 +81,7 @@ module.exports = function(app){
 										.exec(function (err, actions) {
 											if (err) { return innerCallback(err); }
 											actions.forEach(function(item, index) {
-												locals.actions[item.id] = item;
+												locals.actions[item._id] = item;
 											});
 											innerCallback();
 										});
@@ -115,7 +115,7 @@ module.exports = function(app){
 
 					//convert controls into obj with id as keys
 					controls.forEach(function (item, index) {
-						locals.controls[item.id] = item;
+						locals.controls[item._id] = item;
 					});
 
 					//convert sensors into obj with id as keys

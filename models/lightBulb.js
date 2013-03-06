@@ -10,7 +10,8 @@ var LightBulbSchema = new Schema({
 	watts: { type : Number },
 	brand : { type : String },
 	name : { type : String }
-});
+},
+{ id : false });
 
 LightBulbSchema.plugin(useTimestamps);
 

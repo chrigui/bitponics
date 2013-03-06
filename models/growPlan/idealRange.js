@@ -10,7 +10,7 @@ var IdealRangeSchema = new Schema({
 	 * sCode references Sensor.code
 	 */
 	sCode: { type: String, ref: 'Sensor', required: true },
-		
+
 	valueRange: {
 		min: { type: Number, required: true },
 		max: { type: Number, required: true }
@@ -22,19 +22,20 @@ var IdealRangeSchema = new Schema({
 
 	/**
 	 * applicableTimeSpan. optional. Describes the portion of a 24-hour day
-	 * during which this idealRange is operational.  
+	 * during which this idealRange is operational.
 	 *
 	 * Values are milliseconds since 00:00.
 	 *
-	 * If startTime is greater than endTime, it will be parsed as an "overnight" span. 
-	 * 
+	 * If startTime is greater than endTime, it will be parsed as an "overnight" span.
+	 *
 	 * If undefined, idealRange is always operational.
 	 */
-	applicableTimeSpan: { 
+	applicableTimeSpan: {
 		startTime: { type: Number },
 		endTime: { type: Number }
 	}
-});
+},
+{ id : false });
 
 
 /************************** INSTANCE METHODS  ***************************/

@@ -17,7 +17,8 @@ var DeviceTypeSchema = new Schema({
 		outputId: { type: String, required: true }, //‘ph’
 		control : { type: ObjectId, ref: 'Control', required: true }	
 	}]
-});
+},
+{ id : false });
 
 DeviceTypeSchema.plugin(useTimestamps);
 

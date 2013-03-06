@@ -26,7 +26,8 @@ var GrowPlanModel,
 	//controls: [{ type: ObjectId, ref: 'Control'}],
 	phases: [PhaseSchema],
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
-});
+},
+{ id : false });
 
 GrowPlanSchema.plugin(useTimestamps);
 

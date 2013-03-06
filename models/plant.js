@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
 
 var PlantSchema = new Schema({
 	name: { type: String, required: true }
-});
+},
+{ id : false });
 
 PlantSchema.plugin(useTimestamps);
 

@@ -76,7 +76,8 @@ var DeviceSchema = new Schema({
 		lastSent: Date,
 		expires : Date
 	}
-});
+},
+{ id : false });
 
 DeviceSchema.plugin(useTimestamps);
 

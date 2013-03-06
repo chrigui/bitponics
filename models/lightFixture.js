@@ -14,7 +14,8 @@ var LightFixtureSchema = new Schema({
 	 * Number of bulbs the fixture holds
 	 */
 	bulbCapacity : { type : Number, default:  1 }
-});
+},
+{ id : false });
 
 LightFixtureSchema.plugin(useTimestamps);
 

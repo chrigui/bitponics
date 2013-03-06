@@ -21,7 +21,8 @@ var PhotoLogSchema = new Schema({
 		url: { type : mongoose.SchemaTypes.Url, required: true},
 		tags: { type : [String]}
 	}]
-});
+},
+{ id : false });
 
 PhotoLogSchema.index({ 'gpi ts logs.tags': -1 });
 

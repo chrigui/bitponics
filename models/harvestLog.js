@@ -52,7 +52,8 @@ var HarvestLogSchema = new Schema({
      * logs
      */
     l : [HarvestReadingSchema]
-});
+},
+{ id : false });
 
 HarvestLogSchema.virtual('logs')
     .get(function () {

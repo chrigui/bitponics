@@ -41,7 +41,8 @@ var PhaseSchema = new Schema({
 	idealRanges: [IdealRangeSchema],
 
 	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],
-});
+},
+{ id : false });
 
 /************************** INSTANCE METHODS  ***************************/
 
