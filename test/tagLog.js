@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  PhotoLog = require('../models/photoLog'),
+  TagLog = require('../models/tagLog'),
   should = require('should');
 
 
@@ -15,16 +15,16 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('PhotoLog', function(){
+describe('TagLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new PhotoLog.model({
+    var log = new TagLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          url : "http://localhost/img.jpg",
-          tags: ["seedling", "tomato"]
+          val : "my garden journal entry",
+          tags: ["journal"]
         }
       ]
     });
@@ -34,24 +34,23 @@ describe('PhotoLog', function(){
     should.exist(result.logs);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
+      should.not.exist(log.v);
       should.not.exist(log.t);
-      should.exist(log.url);
+      should.exist(log.val);
       should.exist(log.tags);
-      log.tags.should.include("seedling")
-      log.tags.should.include("tomato")
+      log.tags.should.include("journal");
     });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new PhotoLog.model({
+    var log = new TagLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          url : "http://localhost/img.jpg",
-          tags: ["seedling", "tomato"]
+          val : "my garden journal entry",
+          tags: ["journal"]
         }
       ]
     });
@@ -62,13 +61,13 @@ describe('PhotoLog', function(){
     should.exist(result.logs);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
+      should.not.exist(log.v);
       should.not.exist(log.t);
-      should.exist(log.url);
+      should.exist(log.val);
       should.exist(log.tags);
-      log.tags.should.include("seedling")
-      log.tags.should.include("tomato")
+      log.tags.should.include("journal");
     });
+
 
   });
 
