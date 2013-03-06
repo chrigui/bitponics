@@ -5,9 +5,14 @@ var mongoose = require('mongoose'),
 
 
 var HarvestReadingSchema = new Schema({
-    p: { type : ObjectId, ref: 'Plant', required: true},
+
     /**
-     * Value of HarvestLog is stored as weight in kilograms.
+     * Plant
+     */
+    p: { type : ObjectId, ref: 'Plant', required: true},
+
+    /**
+     * Value of HarvestLog is stored as weight in grams.
      * Localized at the view level depending on user settings
      */
     w: { type : Number, required: true}
@@ -62,6 +67,34 @@ HarvestLogSchema.virtual('logs')
     .set(function(logs){
         this.l = logs;
     });
+
+
+/*************** SERIALIZATION *************************/
+
+/**
+ * Remove the db-only-optimized property names and expose only the friendly names
+ *
+ * "Transforms are applied to the document and each of its sub-documents"
+ * http://mongoosejs.com/docs/api.html#document_Document-toObject
+ */
+HarvestLogSchema.set('toObject', {
+  getters : true,
+  transform : function(doc, ret, options){
+    if (doc.schema === HarvestReadingSchema){
+      delete ret.p;
+      delete ret.w;
+    } else {
+      // else we're operating on the parent doc (the SensorLog doc)
+      delete ret.l;
+    }
+  }
+});
+HarvestLogSchema.set('toJSON', {
+  getters : true,
+  transform : HarvestLogSchema.options.toObject.transform
+});
+/*************** END SERIALIZATION *************************/
+
 
 HarvestLogSchema.index({ 'gpi ts plant': -1 });
 
