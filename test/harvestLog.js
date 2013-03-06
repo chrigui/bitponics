@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-  SensorLog = require('../models/sensorLog'),
+  ObjectID = require('mongodb').ObjectID,
+  HarvestLog = require('../models/harvestLog'),
   should = require('should');
 
 
@@ -14,51 +15,55 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('SensorLog', function(){
+describe('HarvestLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new HarvestLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
 
-    var result = sensorLog.toObject();
+    var result = log.toObject();
     should.not.exist(result.l)
     should.exist(result.logs);
+
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      should.not.exist(log.p);
+      should.not.exist(log.w);
+      should.exist(log.plant);
+      should.exist(log.weight);
+    });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new HarvestLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
 
-    var result = sensorLog.toJSON();
+    var result = log.toJSON();
     should.not.exist(result.l)
     should.exist(result.logs);
+
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      should.not.exist(log.p);
+      should.not.exist(log.w);
+      should.exist(log.plant);
+      should.exist(log.weight);
+    });
   });
 
 });
