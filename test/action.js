@@ -1188,4 +1188,62 @@ describe('Action', function(){
 
   }); // /getDeviceCycleFormat
 
+
+  describe('updateCycleTemplateWithStates', function(){
+
+    it('interpolates device-formatted cycle values into a string template', function(done){
+      var cycleTemplate = '{offset},{value1},{duration1},{value2},{duration2}',
+          action = new Action.model({
+          description : "Turn something on. And then off. Repeat. Foreverrrrr",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration: 2,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration: 4,
+                durationType : 'hours',
+                controlValue : '1'
+              }
+            ],
+            repeat : true
+          }
+        }),
+
+      // Expected result is that we have a 5-hour total duration for state1 and 2-hour for state2,
+      // and that we tell the firmware to start the cycle so that there's only 1 hour left in
+      // its first iteration on state1.
+      // Basically we want it to obey the Action by doing 1 hour at state1, then 2 hours at state2, and then from there on out
+      // doing a (5-hour state1, 2-hour state2) cycle
+        offset = 100,
+        expectedResult = {
+          offset : (action.cycle.states[2].duration * 60 * 60 * 1000) + offset,
+          value1 : 1,
+          duration1 : (5 * 60 * 60 * 1000), // 5 hours
+          value2 : 0,
+          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+        };
+
+      expectedResult.cycleString =
+        expectedResult.offset  + ',' +
+        expectedResult.value1  + ',' +
+        expectedResult.duration1 + ',' +
+        expectedResult.value2 + ',' +
+        expectedResult.duration2;
+
+      var result = Action.model.updateCycleTemplateWithStates(cycleTemplate, action.cycle.states, offset);
+      result.should.include(expectedResult);
+
+      done();
+    });
+
+  }); // /updateCycleTemplateWithStates
 });

@@ -333,7 +333,14 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
  *
  * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
  *                Otherwise it's just written straight to the template.
- * @return Object. {cycleString, offset, value1, duration1, value2, duration2}
+ * @return Object. {
+ *    cycleString : String,
+ *    offset : Number,
+ *    value1 : Number,
+ *    duration1 : Number,
+ *    value2 : Number,
+ *    duration2 : Number
+ *  }
  */
 ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycleStates, offset){
   var result = ActionSchema.statics.getDeviceCycleFormat(actionCycleStates, offset),
