@@ -881,13 +881,10 @@ describe('Action', function(){
 
   describe('getCycleRemainder', function(){
 
-    it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
+    it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone, with a fromDate within the first cycle iteration', function(done){
       var userTimezone = "America/Los_Angeles",
           startDate = timezone("2013-01-01 08:00", userTimezone),
           fromDate = timezone("2013-01-01 10:30", userTimezone),
-          //userTimezoneOffset = timezone(startDate, userTimezone, "%:z"),
-          //userTimezoneOffsetHours = parseInt(userTimezoneOffset.split(':')[0], 10),
-          //userTimezoneOffsetMinutes = parseInt(userTimezoneOffset.split(':')[1], 10),
           mockGPIPhase = {
             startDate : startDate
           },
@@ -922,30 +919,273 @@ describe('Action', function(){
       done();
     });
 
+
+    it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone, with a fromDate occurring after multiple cycle iterations', function(done){
+      var userTimezone = "America/Los_Angeles",
+        startDate = timezone("2013-01-01 08:00", userTimezone),
+        fromDate = timezone("2013-01-20 10:45:30", userTimezone),
+        mockGPIPhase = {
+          startDate : startDate
+        },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 15,
+                durationType : 'minutes',
+                controlValue : '0'
+              },
+              {
+                duration : 15,
+                durationType : 'minutes',
+                controlValue : '1'
+              }
+            ],
+            repeat : true
+          }
+        });
+
+      // 30 minute cycle. fromDate at :45:30 means we should have 14.5 minutes left
+      Action.model.getCycleRemainder(fromDate, mockGPIPhase, action, userTimezone).should.equal(moment.duration(14.5, 'minutes').asMilliseconds());
+
+      done();
+    });
+
+
     it('returns remainder of a non-repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone', function(done){
+      var userTimezone = "America/Los_Angeles",
+        startDate = timezone("2013-01-01 08:00", userTimezone),
+        fromDate = timezone("2013-01-21 00:00", userTimezone),
+        mockGPIPhase = {
+          startDate : startDate
+        },
+        action = new Action.model({
+          description : "desc",
+          cycle : {
+            states : [
+              {
+                duration : 4,
+                durationType : 'weeks'
+              },
+              {
+                message : "Refill the reservoir"
+              }
+            ]
+          }
+        });
+
+      // from 20 days into the phase, 28-day action
+      Action.model.getCycleRemainder(fromDate, mockGPIPhase, action, userTimezone).should.equal(moment.duration(8, 'days').asMilliseconds());
+
       done();
     });
 
-    it('returns 0 if passing in a phase that hasn\'t started yet', function(done){
+  }); // /getCycleRemainder
+
+
+  describe('getDeviceCycleFormat', function(){
+
+    it('handles a no-state cycle', function(done){
+      var action = new Action.model({
+          description : "desc",
+          cycle : {
+            states : []
+          }
+        }),
+        expectedResult = {
+          offset : 0,
+          value1 : 0,
+          duration1 : 0,
+          value2 : 0,
+          duration2 : 0
+        };
+
+      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
       done();
     });
 
-  }); // /convertDurationToMilliseconds
+    it('parses a single-state cycle as an infinite duration of the state\'s controlValue', function(done){
+      var action = new Action.model({
+          description : "Turn something on. And leave it on!",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                controlValue : '1'
+              }
+            ]
+          }
+        }),
+        expectedResult = {
+          offset : 0,
+          value1 : 1,
+          duration1 : 1,
+          value2 : 1,
+          duration2 : 1
+        };
 
-
-  describe('getSimplifiedCycleFormat', function(){
-
-    it('handles a single-state cycle', function(done){
+      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
       done();
     });
 
     it('handles a alternating (2-state) cycle', function(done){
+      var action = new Action.model({
+          description : "Turn something on. And then off. Repeat. Foreverrrrr",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            repeat : true
+          }
+        }),
+        expectedResult = {
+          offset : 0,
+          value1 : 1,
+          duration1 : (60 * 60 * 1000),
+          value2 : 0,
+          duration2 : (60 * 60 * 1000)
+        };
+
+      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
       done();
     });
 
-    it('handles an offset alternating (3-state)cycle', function(done){
+
+    it('handles a alternating (2-state) cycle and echoes the offset', function(done){
+      var action = new Action.model({
+          description : "Turn something on. And then off. Repeat. Foreverrrrr",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            repeat : true
+          }
+        }),
+        offset = 100,
+        expectedResult = {
+          offset : 100,
+          value1 : 1,
+          duration1 : (60 * 60 * 1000),
+          value2 : 0,
+          duration2 : (60 * 60 * 1000)
+        };
+
+      Action.model.getDeviceCycleFormat(action.cycle.states, offset).should.include(expectedResult);
       done();
     });
-  }); // /getSimplifiedCycleFormat
+
+
+    it('handles an offset alternating (3-state) cycle', function(done){
+      var action = new Action.model({
+          description : "Turn something on. And then off. Repeat. Foreverrrrr",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration: 2,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration: 4,
+                durationType : 'hours',
+                controlValue : '1'
+              }
+            ],
+            repeat : true
+          }
+        }),
+
+      // Expected result is that we have a 5-hour total duration for state1 and 2-hour for state2,
+      // and that we tell the firmware to start the cycle so that there's only 1 hour left in
+      // its first iteration on state1.
+      // Basically we want it to obey the Action by doing 1 hour at state1, then 2 hours at state2, and then from there on out
+      // doing a (5-hour state1, 2-hour state2) cycle
+
+        expectedResult = {
+          offset : (action.cycle.states[2].duration * 60 * 60 * 1000),
+          value1 : 1,
+          duration1 : (5 * 60 * 60 * 1000), // 5 hours
+          value2 : 0,
+          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+        };
+
+      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
+      done();
+    });
+
+
+    it('handles an offset alternating (3-state) cycle, with an additional offset', function(done){
+      var action = new Action.model({
+          description : "Turn something on. And then off. Repeat. Foreverrrrr",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration: 1,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration: 2,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration: 4,
+                durationType : 'hours',
+                controlValue : '1'
+              }
+            ],
+            repeat : true
+          }
+        }),
+
+      // Expected result is that we have a 5-hour total duration for state1 and 2-hour for state2,
+      // and that we tell the firmware to start the cycle so that there's only 1 hour left in
+      // its first iteration on state1.
+      // Basically we want it to obey the Action by doing 1 hour at state1, then 2 hours at state2, and then from there on out
+      // doing a (5-hour state1, 2-hour state2) cycle
+        offset = 100,
+        expectedResult = {
+          offset : (action.cycle.states[2].duration * 60 * 60 * 1000) + offset,
+          value1 : 1,
+          duration1 : (5 * 60 * 60 * 1000), // 5 hours
+          value2 : 0,
+          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+        };
+
+      Action.model.getDeviceCycleFormat(action.cycle.states, offset).should.include(expectedResult);
+      done();
+    });
+
+  }); // /getDeviceCycleFormat
 
 });
