@@ -21,7 +21,8 @@ var TagLogSchema = new Schema({
 		val: { type : String, required: true},
 		tags: { type : [String]}
 	}]
-});
+},
+{ id : false });
 
 TagLogSchema.index({ 'gpi ts logs.tags': -1 });
 

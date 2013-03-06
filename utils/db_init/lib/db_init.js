@@ -258,7 +258,7 @@ function(callback){
 					"8bitpass", //default password
 					function(err, user){
 						if (err) { console.log(err); return callback(err);}
-						savedObjectIds[dataType][_data.email] = user.id;
+						savedObjectIds[dataType][_data.email] = user._id;
 						console.log("created user");
 						decrementData();
 					});
@@ -299,7 +299,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.code] = doc.id;
+		 				savedObjectIds[dataType][_data.code] = doc._id;
 		 				console.log("created sensor");
 		 				decrementData();
 		 			});		
@@ -337,7 +337,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created controls");
 		 				decrementData();
 		 			});
@@ -375,7 +375,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created sensor");
 		 				decrementData();
 		 			});
@@ -418,7 +418,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created: " + dataType);
 		 				decrementData();
 		 			});
@@ -465,7 +465,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.macAddress] = doc.id;
+		 				savedObjectIds[dataType][_data.macAddress] = doc._id;
 		 				console.log("created: " + dataType);
 		 				decrementData();
 		 			});
@@ -504,7 +504,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created lightBulb");
 		 				decrementData();
 		 			});
@@ -544,7 +544,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created lightFixture");
 		 				decrementData();
 		 			});
@@ -584,7 +584,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created grow system");
 		 				decrementData();
 		 			});
@@ -620,7 +620,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created plant");
 		 				decrementData();
 		 			});
@@ -658,7 +658,7 @@ function(callback){
 		 			});
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}			 			
-		 				savedObjectIds[dataType][_data.description] = doc.id;
+		 				savedObjectIds[dataType][_data.description] = doc._id;
 		 				console.log("created action");
 		 				decrementData();
 		 			});
@@ -703,7 +703,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][_data.name] = doc.id;
+		 				savedObjectIds[dataType][_data.name] = doc._id;
 		 				console.log("created phase");
 		 				decrementData();
 		 			});
@@ -827,7 +827,7 @@ function(callback){
 
 		 			dataObj.save(function (err, doc) {
 		 				if (err) { console.log(err); return callback(err);}
-		 				savedObjectIds[dataType][doc.id] = doc.id;
+		 				savedObjectIds[dataType][doc._id] = doc._id;
 		 				console.log("created sensor log");
 		 				decrementData();
 		 			});

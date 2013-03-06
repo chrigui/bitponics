@@ -59,7 +59,8 @@ ActionSchema = new Schema({
 
     repeat: { type: Boolean }
   }
-});
+},
+{ id : false });
 
 ActionSchema.plugin(useTimestamps);
 

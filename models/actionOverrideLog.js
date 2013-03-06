@@ -48,7 +48,8 @@ var ActionOverrideLogSchema = new Schema({
 	 * that's not implemented. For now we'll just mark this as true whenever an action is sent.
 	 */
 	done: {type : Boolean, default : false }
-});
+},
+{ id : false });
 
 ActionOverrideLogSchema.index({ 'gpi expires timeSent': -1 });
 

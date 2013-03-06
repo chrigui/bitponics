@@ -8,9 +8,6 @@ module.exports = function(app){
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res){
-			if( !(req.user && req.user.id)){
-				return res.redirect('/login');
-			}
 
 			res.render('profile', {
 				title : 'Profile',

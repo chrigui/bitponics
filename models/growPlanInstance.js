@@ -77,7 +77,8 @@ var GrowPlanInstanceSchema = new Schema({
 		}]
 	}],
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
-});
+},
+{ id : false });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 

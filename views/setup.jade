@@ -5,20 +5,7 @@ block css
 
 block content
 
-   - if (!( user && user.id))
-    header.default-border-b
-         h1
-          span Not Authenticated
-
-    section.stack1of1 
-       div
-        #signup
-          a(href='/signup?redirect=setup', style='text-decoration:underline;color:#333') Sign up
-        #password-login
-          a(href='/login?redirect=setup', style='text-decoration:underline;color:#333') Login
-          
-   - else
-      h1 Setting up your Bitponics Base Station
+   h1 Setting up your Bitponics Base Station
       ol
         li 
           div Plug your Base Station into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:

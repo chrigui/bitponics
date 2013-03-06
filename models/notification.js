@@ -66,7 +66,8 @@ var NotificationSchema = new Schema({
 	// Phase Actions being started (at phase activation)
 	// Actions triggered by IdealRange violations
 	// Action cycles triggering repeating notifications
-});
+},
+{ id : false });
 
 NotificationSchema.plugin(useTimestamps);
 
