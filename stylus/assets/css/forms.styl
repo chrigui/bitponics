@@ -116,7 +116,49 @@ textarea
 	input[type='checkbox']:checked ~ .info
 		display block
 
+.wufoo
+	background-color color-light-gray-bg!important
+	color white!important
 
+	header
+		display none!important
+
+	li
+		padding 0
+
+	label, input
+		// display block!important
+		// margin 1em 0!important
+
+	label
+		// font-weight bold
+		margin-bottom 0!important
+		color: white!important;
+
+	label.inline, input.inline
+		display inline!important
+		vertical-align text-top!important
+
+	input.inline
+		vertical-align baseline!important
+
+	input, textarea
+		margin-top 0!important
+		//background color-medium-green
+		background white!important
+		border 1px solid color-medium-green!important
+		padding .5em!important
+		//color color-light-green
+
+	input:valid, textarea:valid, input:invalid, textarea:invalid
+		//background color-medium-green
+		background white!important
+
+	input[type=submit]
+		background white!important
+		color color-medium-green!important
+		border 4px solid color-medium-green!important
+		font-size 1.5em!important
 
 // inline MailChimp mailing list form
 #mc-embedded-subscribe-form

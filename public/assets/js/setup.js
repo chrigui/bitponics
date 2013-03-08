@@ -54,6 +54,8 @@ $(function(){
 
 		console.log('Posting to device', postDataStringPlainText);
 
+		console.log('Posting to device', postDataStringPlainText);
+
 		$.ajax({
 			url: deviceUrl,
 			type: 'POST',
