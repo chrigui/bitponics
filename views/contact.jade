@@ -13,31 +13,34 @@ block content
         | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
       div.page-content
 
-        p If you have any questions, please don't hesitate to contact us.
-        #wufoo-m7x4a3
-          a(href='http://bitponics.wufoo.com/forms/contact-us') Send us an email.
-          div.script
-            | var m7x4a3;(function(d, t) {
-            | var s = d.createElement(t), options = {
-            | 'userName':'bitponics',
-            | 'formHash':'m7x4a3',
-            | 'autoResize':true,
-            | 'height':'517',
-            | 'async':true,
-            | 'header':'show'};
-            | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
-            | s.onload = s.onreadystatechange = function() {
-            | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
-            | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
-            | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
-            | })(document, 'script');
+        div#wufoo-wrapper
+          p If you have any questions, please don't hesitate to contact us.
+          #wufoo-m7x4a3
+            a(href='http://bitponics.wufoo.com/forms/contact-us') Send us an email.
+            div.script
+              | var m7x4a3;(function(d, t) {
+              | var s = d.createElement(t), options = {
+              | 'userName':'bitponics',
+              | 'formHash':'m7x4a3',
+              | 'autoResize':true,
+              | 'height':'517',
+              | 'async':true,
+              | 'header':'show'};
+              | s.src = ('https:' == d.location.protocol ? 'https://' : 'http://') + 'wufoo.com/scripts/embed/form.js';
+              | s.onload = s.onreadystatechange = function() {
+              | var rs = this.readyState; if (rs) if (rs != 'complete') if (rs != 'loaded') return;
+              | try { m7x4a3 = new WufooForm();m7x4a3.initialize(options);m7x4a3.display(); } catch (e) {}};
+              | var scr = d.getElementsByTagName(t)[0], par = scr.parentNode; par.insertBefore(s, scr);
+              | })(document, 'script');
 
 
 
-        div(id="email-sub")
+        div#email-sub
+          p 
+            | To stay updated, sign up for our mailing list.
           form(action="http://bitponics.us2.list-manage1.com/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92", method="post", id="mc-embedded-subscribe-form", name="mc-embedded-subscribe-form", class="validate", target="_blank")
-            input(type="email", value="", name="EMAIL", class="subscribe", id="mce-EMAIL", placeholder="Subscribe to mailing list", required)
-            input(type="submit", value="Submit", name="subscribe", id="mc-embedded-subscribe", class="button")
+            input(type="email", value="", name="EMAIL", class="subscribe", id="mce-EMAIL", placeholder="Email", required)
+            input(type="submit", value="Subscribe", name="subscribe", id="mc-embedded-subscribe", class="button")
 
 block footer-scripts
   script

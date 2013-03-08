@@ -294,7 +294,7 @@ textarea {
   display: block;
 }
 .wufoo {
-  background-color: #bfc1c3 !important;
+  background-color: #c1c2c4 !important;
   color: #fff !important;
 }
 .wufoo header {
@@ -302,6 +302,9 @@ textarea {
 }
 .wufoo li {
   padding: 0;
+}
+.wufoo li .buttons {
+  padding-left: 0;
 }
 .wufoo label {
   margin-bottom: 0 !important;
@@ -333,6 +336,7 @@ textarea {
   color: #00f717 !important;
   border: 4px solid #00f717 !important;
   font-size: 1.5em !important;
+  cursor: pointer;
 }
 .amazon {
   width: 167px;
