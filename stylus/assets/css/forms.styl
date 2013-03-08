@@ -116,11 +116,21 @@ textarea
 	input[type='checkbox']:checked ~ .info
 		display block
 
+
+
+// inline MailChimp mailing list form
+#mc-embedded-subscribe-form
+	input[type=email]
+		width: 70%
+
 // inline wufoo form
 #wufoo-form 
 	.buttons
 		margin-top 1em
-		
+
+	input[type=text],input[type=email],textarea
+		width:90%
+
 	input[type=submit]
 		font-size 1.1em
 
