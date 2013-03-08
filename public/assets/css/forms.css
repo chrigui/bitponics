@@ -293,6 +293,12 @@ textarea {
 .steps input[type='checkbox']:checked ~ .info {
   display: block;
 }
+#wufoo-form .buttons {
+  margin-top: 1em;
+}
+#wufoo-form input[type=submit] {
+  font-size: 1.1em;
+}
 .wufoo {
   background-color: #c1c2c4 !important;
   color: #fff !important;
@@ -335,7 +341,7 @@ textarea {
   background: #fff !important;
   color: #00f717 !important;
   border: 4px solid #00f717 !important;
-  font-size: 1.5em !important;
+  font-size: 1.5em;
   cursor: pointer;
 }
 .amazon {
