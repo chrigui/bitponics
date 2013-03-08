@@ -1302,9 +1302,18 @@ section#footer .content-module {
 .page-content-inner-wrapper {
   padding: 0 0.5em;
 }
+#pricing.content-module {
+  min-height: auto;
+  height: auto;
+}
 #pricing .development-status {
   color: #00fa8b;
   font-size: 1.5em;
+  margin-bottom: 0;
+}
+#pricing .base-station-preorder .btn {
+  margin-top: 0;
+  margin-left: 0;
 }
 #pricing .price {
   padding-left: 1em;
