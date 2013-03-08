@@ -18,13 +18,22 @@ block content
           p.development-status
             | Bitponics is still in development and will launch later this spring. But if you'd like to how much it'll cost, here you go:
 
-          .price.base-station-price
+          div.price.base-station-price
             span.price-number 
               span.price-currency $
               | 499
             span.price-type
             span.price-per Base Station
 
+          div.base-station-preorder
+            | To get notified when preorders are available,
+            br
+            a(href="#contact", class="btn")
+                | Sign up for our mailing list 
+                | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+          
+          div.clearfix
+          
           ul.list-grid-wrapper
             li
               ul.feature-icons.grid-list
