@@ -13,6 +13,9 @@
 
 	section	
 		clear both
+
+	input[type=submit]
+		font-size 1.1em
 	
 	#footer
 		background-color color-light-gray-bg
@@ -279,6 +282,21 @@
 		text-align left
 		color color-text-gray
 		margin 1em
+	
+	#details
+		.detail-block
+			margin 1em
+
+			p
+				float none
+				margin 0
+				width auto
+				border none
+			ul 
+				font-size 0.85em
+				text-align left
+				list-style disc inside
+
 
 #team, #contact
 	background color-light-gray-bg
@@ -289,9 +307,42 @@
 #get-started
 	//display none
 
-//Pricing Page
-.list-grid-wrapper
+
+.page-content-inner-wrapper 
 	padding 0 .5em
+
+//Pricing Page
+#pricing 
+	.development-status
+		color #00fa8b
+		font-size: 1.5em
+		//width 70%
+
+	.price
+		padding-left 1em
+
+		&.base-station-price 
+			display block
+			margin 0 auto
+			span
+				color #00fa8b
+
+		span
+			&.price-number
+				font-size 3.5em
+				position relative
+		
+				.price-currency
+					font-size .5em
+					position absolute
+					top .1em
+					left -.7em
+			&.price-type
+				//
+			&.price-per
+				//
+
+.list-grid-wrapper
 	font-size: 0.75em;
 	.grid-list
 		// width 20%
@@ -302,14 +353,7 @@
 				margin 1em 0 0
 				line-height 1em
 				font-size 1.5em
-			span
-				&.price-number
-					font-size 3.5em
-				&.price-type
-					//
-				&.price-per
-					//
-
+			
 			&.first
 				//
 			&.last

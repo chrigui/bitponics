@@ -1039,8 +1039,11 @@ section#footer .content-module {
 .landing-page section {
   clear: both;
 }
+.landing-page input[type=submit] {
+  font-size: 1.1em;
+}
 .landing-page #footer {
-  background-color: #bfc1c3;
+  background-color: #c1c2c4;
   color: #fff;
   padding: 0 2.5%;
   font-size: 0.85em;
@@ -1267,9 +1270,23 @@ section#footer .content-module {
   color: #999b9a;
   margin: 1em;
 }
+#how-it-works #details .detail-block {
+  margin: 1em;
+}
+#how-it-works #details .detail-block p {
+  float: none;
+  margin: 0;
+  width: auto;
+  border: none;
+}
+#how-it-works #details .detail-block ul {
+  font-size: 0.85em;
+  text-align: left;
+  list-style: disc inside;
+}
 #team,
 #contact {
-  background: #bfc1c3;
+  background: #c1c2c4;
 }
 #team div,
 #contact div,
@@ -1282,8 +1299,34 @@ section#footer .content-module {
   color: #fff;
   border-color: #fff;
 }
-.list-grid-wrapper {
+.page-content-inner-wrapper {
   padding: 0 0.5em;
+}
+#pricing .development-status {
+  color: #00fa8b;
+  font-size: 1.5em;
+}
+#pricing .price {
+  padding-left: 1em;
+}
+#pricing .price.base-station-price {
+  display: block;
+  margin: 0 auto;
+}
+#pricing .price.base-station-price span {
+  color: #00fa8b;
+}
+#pricing .price span.price-number {
+  font-size: 3.5em;
+  position: relative;
+}
+#pricing .price span.price-number .price-currency {
+  font-size: 0.5em;
+  position: absolute;
+  top: 0.1em;
+  left: -0.7em;
+}
+.list-grid-wrapper {
   font-size: 0.75em;
 }
 .list-grid-wrapper .grid-list li {
@@ -1293,9 +1336,6 @@ section#footer .content-module {
   margin: 1em 0 0;
   line-height: 1em;
   font-size: 1.5em;
-}
-.list-grid-wrapper .grid-list li span.price-number {
-  font-size: 3.5em;
 }
 .list-grid-wrapper .grid-list.feature-icons {
   display: none;

@@ -376,8 +376,11 @@ section#footer
 		max-width 60em
 		font-size 1em
 
+	.page-heading
+		line-height 2em
+
 	#main
-		#about, #gallery, #contact, #how-it-works, #press, #buy, #pricing, #team
+		#about, #gallery, #contact, #how-it-works, #press, #buy, #pricing, #team, #details
 			padding-top 3.5em
 
 	.flexslider
@@ -417,14 +420,33 @@ section#footer
 			border-top: 1px solid color-hot-green;
 			padding: 1em 0 0 0;
 
+		#details
+			.detail-block 
+				width 100%
+
 	#contact
-		#wufoo-m7x4a3, #email-sub
+		#wufoo-wrapper, #email-sub
 			float left
 			width: 40%;
 			margin: 1em 10% 0 0;
 
 
-	//Pricing Page
+//Pricing Page
+#pricing
+	.price
+		// display block
+		.price-number,.price-type,.price-per
+			display inline
+			padding 0
+		.price-number
+			//
+		.price-type
+			//
+		.price-per
+			display block
+			margin-top: -.85em;
+			width 100%
+
 .list-grid-wrapper
 	font-size 1em
 	.grid-list
@@ -447,20 +469,7 @@ section#footer
 				display inline-block
 				padding 1em 1em 0
 				font-size .85em
-			&.price
-				// display block
-				.price-number,.price-type,.price-per
-					display inline
-					padding 0
-				.price-number
-					//
-				.price-type
-					//
-				.price-per
-					display block
-					margin-top: -.85em;
-					width 100%
-
+	
 			&.first
 				border 0 none
 				margin-top 1em

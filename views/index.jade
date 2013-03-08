@@ -33,6 +33,6 @@ block content
           
 
 block footer-scripts
-
-  script
+  - if (user && user._id)
+    script
       bpn.user = !{JSON.stringify(user.toPublicJSON())};

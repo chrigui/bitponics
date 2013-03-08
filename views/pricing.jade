@@ -13,104 +13,135 @@ block content
         | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
       div.page-content
         
-        ul.list-grid-wrapper
-          li
-            ul.feature-icons.grid-list
-              li.first.space
-                span 
-                  //
-              li
-                div Cloud
-                span 
-                  | <i class="icon-glyph-new icon-06_cloud" aria-hidden="true"></i>
-              li
-                div Notifications
-                span 
-                  | <i class="icon-glyph-new icon-15_notifications" aria-hidden="true"></i>
-              li
-                div Photos
-                span 
-                  | <i class="icon-glyph-new icon-17_photos" aria-hidden="true"></i>
-              li
-                div History
-                span 
-                  | <i class="icon-glyph-new icon-21_time" aria-hidden="true"></i>
-              li
-                div Privacy
-                span 
-                  | <i class="icon-glyph-new icon-13_lock" aria-hidden="true"></i>
-              li
-                div Support
-                span 
-                  | <i class="icon-glyph-new icon-16_phone" aria-hidden="true"></i>
-              li.last.space
-          li
-            ul.tier1.grid-list
-              li.first
-                h2 
-                  span Free 
-                  span Trial
-              li
-                span Logging once a day
-              li
-                span Only in-app
-              li.space
-              li
-                span Store up to 3 months of grow history
-              li
-                span Grow plan instances are public
-              li.space
-              li.last.price 
-                span.price-number $0
-                span.price-type /mo
-          li
-            ul.tier2.grid-list
+        div.page-content-inner-wrapper 
+
+          p.development-status
+            | Bitponics is still in development and will launch later this spring. But if you'd like to how much it'll cost, here you go:
+
+          .price.base-station-price
+            span.price-number 
+              span.price-currency $
+              | 499
+            span.price-type
+            span.price-per Base Station
+
+          ul.list-grid-wrapper
+            li
+              ul.feature-icons.grid-list
+                li.first.space
+                  span 
+                    //
+                li
+                  div Cloud
+                  span 
+                    | <i class="icon-glyph-new icon-06_cloud" aria-hidden="true"></i>
+                li
+                  div Notifications
+                  span 
+                    | <i class="icon-glyph-new icon-15_notifications" aria-hidden="true"></i>
+                li
+                  div Photos
+                  span 
+                    | <i class="icon-glyph-new icon-17_photos" aria-hidden="true"></i>
+                li
+                  div History
+                  span 
+                    | <i class="icon-glyph-new icon-21_time" aria-hidden="true"></i>
+                li
+                  div Privacy
+                  span 
+                    | <i class="icon-glyph-new icon-13_lock" aria-hidden="true"></i>
+                li
+                  div Support
+                  span 
+                    | <i class="icon-glyph-new icon-16_phone" aria-hidden="true"></i>
+                li
+                  div Team
+                  span 
+                    | <i class="icon-glyph-new" aria-hidden="true"></i>
+                li.last.space
+            li
+              ul.tier1.grid-list
                 li.first
                   h2 
-                    span Serious 
-                    span Grower
+                    span Trial
                 li
-                  span Logging every 15 minutes
+                  span Automated logging once a day
                 li
-                  span Email notifications when your garden needs attention
+                  span 
+                li.space
                 li
-                  span Up to 1000 Photos
+                  span 3 months of grow history storage
                 li
-                  span Unlimited grow history storage
-                li
-                  span Can optionally keep all data private
+                  span Garden data is public
+                li.space
                 li.space
                 li.last.price 
-                  span.price-number $9
-                  span.price-type /mo 
-                  span.price-per per garden
-          li
-            ul.tier3.grid-list
-                li.first
-                  h2 
-                    span Industrial 
-                    span Agriculturalist
-                li
-                  span Logging every 5 minutes
-                li
-                  span Email &amp; SMS notifications when your garden needs attention
-                li
-                  span Up to 10,000 photos
-                li
-                  span Unlimited grow history storage
-                li
-                  span Can optionally keep all data private
-                li
-                  span Premium Support Services
-                li.last.price 
-                  span.price-number $50
-                  span.price-type /mo 
-                  span.price-per per garden
+                  span.price-number
+                    span.price-currency $
+                    | 0
+                  span.price-type /mo
+            li
+              ul.tier2.grid-list
+                  li.first
+                    h2 
+                      span Serious 
+                      span Grower
+                  li
+                    span Automated logging every 15 minutes
+                  li
+                    span Email notifications when your garden needs attention
+                  li
+                    span Store up to 1000 Photos
+                  li
+                    span Unlimited grow history storage
+                  li
+                    span Option to keep garden data private
+                  li.space
+                  li.space
+                  li.last.price 
+                    
+                    span.price-number 
+                      span.price-currency $
+                      | 9
+                    span.price-type /mo 
+                    span.price-per per garden
+            li
+              ul.tier3.grid-list
+                  li.first
+                    h2 
+                      span Commercial
+                      span Grower
+                  li
+                    span Automated logging every 5 minutes
+                  li
+                    span Email &amp; SMS notifications when your garden needs attention
+                  li
+                    span Store up to 10,000 photos
+                  li
+                    span Unlimited grow history storage
+                  li
+                    span Option to keep garden data private
+                  li
+                    span Premium Support Services
+                  li
+                    span Advanced Team Management
+                  li.last.price 
+                    span.price-number 
+                      span.price-currency $
+                      | 49
+                    span.price-type /mo 
+                    span.price-per per garden
 
-        div(class="center clearfix")
-          a(href="/get-started", class="btn")
-            | Get Started For Free
-            | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+          div(class="center clearfix")
+            | To get notified when preorders are available,
+            br
+            a(href="#contact", class="btn")
+              | Sign up for our mailing list 
+              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            //- a(href="/get-started", class="btn")
+              | Get Started For Free
+              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
 
   section#footer
