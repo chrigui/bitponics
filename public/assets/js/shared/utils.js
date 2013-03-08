@@ -50,7 +50,7 @@ define(['moment'], function(moment){
       .error(function() { console.log('error'); })
       .complete(function(res, status) {
         if (status === 'success' || status === 'notmodified') {
-          $(settings.localElement).append($(res.responseText).find(settings.remoteSelector));
+          $(settings.localElement).append($(res.responseText).find(settings.remoteSelector).html());
         } else {
           console.log('bad response:');
           console.log(res.responseText);
