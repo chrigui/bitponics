@@ -1,7 +1,7 @@
 var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
-    ActionOverrideLogModel = require('../../models/actionOverrideLog').model,
+    ImmediateActionLogModel = require('../../models/immediateActionLog').model,
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async');
@@ -179,12 +179,12 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
     
-      ModelUtils.triggerActionOverride(
+      ModelUtils.triggerImmediateAction(
         {
           growPlanInstance : growPlanInstance, 
           device : growPlanInstance.device, 
           actionId : req.body.actionId, 
-          actionOverrideMessage : req.body.message,
+          immediateActionMessage : req.body.message,
           user : req.user
         },
         function(err){

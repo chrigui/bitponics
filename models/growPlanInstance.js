@@ -243,7 +243,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),
       ActionModel = Action.model,
       NotificationModel = require('./notification').model,
-      ActionOverrideLogModel = require('./actionOverrideLog').model,
+      ImmediateActionLogModel = require('./immediateActionLog').model,
       UserModel = require('./user').model,
       growPlanInstance = this,
       growPlan = growPlanInstance.growPlan,
@@ -363,35 +363,35 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             device.save(innerParallelCallback);
           },
           
-          // Expire actionOverrides that conflict with a device controlled action in the new phase
+          // Expire immediateActions that conflict with a device controlled action in the new phase
           function (innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
-            ActionOverrideLogModel
+            ImmediateActionLogModel
             .find()
             .where('gpi')
             .equals(growPlanInstance._id)
             .where('expires')
             .gt(now)
             .populate('action')
-            .exec(function(err, actionOverrideLogResults){
+            .exec(function(err, immediateActionLogResults){
               if (err) { return innerParallelCallback(err);}
-              if (!actionOverrideLogResults.length){ return innerParallelCallback(); }
+              if (!immediateActionLogResults.length){ return innerParallelCallback(); }
             
-              var actionOverrideLogsToExpire = [];
-              actionOverrideLogResults.forEach(function(actionOverrideLog){
-                if (!actionOverrideLog.action.control) { return; } 
+              var immediateActionLogsToExpire = [];
+              immediateActionLogResults.forEach(function(immediateActionLog){
+                if (!immediateActionLog.action.control) { return; } 
                 if (actionsWithDeviceControl.some(function(action){
-                  return actionOverrideLog.action.control.equals(action.control);
+                  return immediateActionLog.action.control.equals(action.control);
                 })){
-                  actionOverrideLogsToExpire.push(actionOverrideLog);
+                  immediateActionLogsToExpire.push(immediateActionLog);
                 } 
               });
 
-              async.forEach(actionOverrideLogsToExpire, 
-                function(actionOverrideLog, iteratorCallback){
-                  actionOverrideLog.expires = now;
-                  actionOverrideLog.save(iteratorCallback);
+              async.forEach(immediateActionLogsToExpire, 
+                function(immediateActionLog, iteratorCallback){
+                  immediateActionLog.expires = now;
+                  immediateActionLog.save(iteratorCallback);
                 }, 
                 function(err){
                   if (err) { return innerParallelCallback(err);}

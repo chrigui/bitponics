@@ -4,11 +4,11 @@ var mongoose = require('mongoose'),
 	ObjectId = Schema.ObjectId;
 
 /**
- * ActionOverrideLog
+ * ImmediateActionLog
  * Actions requested that weren't part of standard phase actions.
  * Manually triggered or IdealRange-triggered actions.
  */
-var ActionOverrideLogSchema = new Schema({
+var ImmediateActionLogSchema = new Schema({
 	/**
 	 * The GrowPlanInstance
 	 */
@@ -51,7 +51,7 @@ var ActionOverrideLogSchema = new Schema({
 },
 { id : false });
 
-ActionOverrideLogSchema.index({ 'gpi expires timeSent': -1 });
+ImmediateActionLogSchema.index({ 'gpi expires timeSent': -1 });
 
-exports.schema = ActionOverrideLogSchema;
-exports.model = mongoose.model('ActionOverrideLog', ActionOverrideLogSchema);
+exports.schema = ImmediateActionLogSchema;
+exports.model = mongoose.model('ImmediateActionLog', ImmediateActionLogSchema);

@@ -6,7 +6,7 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId,
   	DeviceTypeModel = require('./deviceType').model,
     ActionModel = require('./action').model,
-  	ActionOverrideLogModel = require('./actionOverrideLog').model,
+  	ImmediateActionLogModel = require('./immediateActionLog').model,
   	SensorLogSchema = require('./sensorLog').schema
   	winston = require('winston');
 
@@ -71,7 +71,7 @@ var DeviceSchema = new Schema({
 	 * If expired, it's refreshed inside refresh_status
 	 */
 	activeActionsOverride : {
-		actionOverrideLogs: [{ type: ObjectId, ref: 'ActionOverrideLog'}],
+		immediateActionLogs: [{ type: ObjectId, ref: 'ImmediateActionLog'}],
 		deviceMessage : { type : String },
 		lastSent: Date,
 		expires : Date
@@ -96,68 +96,68 @@ DeviceSchema.plugin(useTimestamps);
 /**
  * Remove expired actions & update deviceMessage & expires times. 
  * Saves the model at the end.
- * Originally written to be called after adding an entry to ActionOverrideLog collection.
+ * Originally written to be called after adding an entry to ImmediateActionLog collection.
  */
 DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
 	var device = this,
 		now = new Date();
   	  	
-  	ActionOverrideLogModel
+  	ImmediateActionLogModel
   	.find({ gpi : device.activeGrowPlanInstance })
   	.where('expires').gt(now)
   	.sort('-timeRequested')
   	.populate('action')
-  	.exec(function(err, actionOverrideLogResults){
+  	.exec(function(err, immediateActionLogResults){
   		if (err) { return callback(err);}
 
-  		var conflictingActionOverrideIds = [],
-  			conflictingActionOverrideIndices = [],
-  			existingActionOverrideControls = {},
-  			soonestActionOverrideExpiration = now + (365 * 24 * 60 * 60 * 1000),
+  		var conflictingImmediateActionIds = [],
+  			conflictingImmediateActionIndices = [],
+  			existingImmediateActionControls = {},
+  			soonestImmediateActionExpiration = now + (365 * 24 * 60 * 60 * 1000),
   			deviceMessage = '',
   			cycleTemplate = DeviceUtils.cycleTemplate;
 
   		// first, ensure that the results are clean. results are sorted by 
   		// descending timeRequested, so the last ones in take precedence. 
   		// eliminate conflicts by expiring them.
-  		actionOverrideLogResults.forEach(function(actionOverrideLog, index){
-  			if (existingActionOverrideControls[actionOverrideLog.action.control]){
-  				conflictingActionOverrideIds.push(actionOverrideLog._id);
-  				conflictingActionOverrideIndices.push(index);
+  		immediateActionLogResults.forEach(function(immediateActionLog, index){
+  			if (existingImmediateActionControls[immediateActionLog.action.control]){
+  				conflictingImmediateActionIds.push(immediateActionLog._id);
+  				conflictingImmediateActionIndices.push(index);
   				return;
   			}
   			
-  			existingActionOverrideControls[actionOverrideLog.action.control] = true;
+  			existingImmediateActionControls[immediateActionLog.action.control] = true;
   			
-  			if (actionOverrideLog.expires < soonestActionOverrideExpiration) { 
-  				soonestActionOverrideExpiration = actionOverrideLog.expires;
+  			if (immediateActionLog.expires < soonestImmediateActionExpiration) { 
+  				soonestImmediateActionExpiration = immediateActionLog.expires;
   			}
   		});
 
-  		if (conflictingActionOverrideIds.length > 0){
-  			ActionOverrideLogModel.update({_id : {$in: conflictingActionOverrideIds}}, { expires : now - 1000 }).exec();	
+  		if (conflictingImmediateActionIds.length > 0){
+  			ImmediateActionLogModel.update({_id : {$in: conflictingImmediateActionIds}}, { expires : now - 1000 }).exec();	
 
-  			conflictingActionOverrideIndices.forEach(function(indexToRemove, index){
+  			conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
 			  	// since we're removing elements from the target array as we go,
 			  	// the indexToRemove will be off by however many we've removed so far
 			  	indexToRemove -= index;
-		  		actionOverrideLogResults.splice(indexToRemove, 1);
+		  		immediateActionLogResults.splice(indexToRemove, 1);
 		  	});
   		}
 
 		// ok, now we're clean.
-		// replace device.activeActionsOverride.actionOverrideLogs with the result set
-  		device.activeActionsOverride.actionOverrideLogs = actionOverrideLogResults;//.map(function(actionOverrideLog){return actionOverrideLog._id;});
+		// replace device.activeActionsOverride.immediateActionLogs with the result set
+  		device.activeActionsOverride.immediateActionLogs = immediateActionLogResults;//.map(function(immediateActionLog){return immediateActionLog._id;});
 
   		// generate new device message. compare with current deviceMessage.
   		device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
-                controlActionOverrideLog = actionOverrideLogResults.filter(function(actionOverrideLog){ return actionOverrideLog.action.control.equals(controlOutputPair.control);})[0],
+                controlImmediateActionLog = immediateActionLogResults.filter(function(immediateActionLog){ return immediateActionLog.action.control.equals(controlOutputPair.control);})[0],
                 controlAction;
               
             // Need an entry for every control, even if there's no associated cycle
-            if (!controlActionOverrideLog){ 
+            if (!controlImmediateActionLog){ 
               // if no action, just 0 everything out
               thisCycleString = thisCycleString.replace(/{override}/, '0');
               thisCycleString = thisCycleString.replace(/{offset}/, '0');
@@ -166,7 +166,7 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
               thisCycleString = thisCycleString.replace(/{value2}/, '0');    
               thisCycleString = thisCycleString.replace(/{duration2}/, '0');     
             } else {
-    		  controlAction = controlActionOverrideLog.action;
+    		  controlAction = controlImmediateActionLog.action;
               thisCycleString = thisCycleString.replace(/{override}/, '1');
               // overrides are assumed to be immediate actions, so offset will always be 0
               thisCycleString = thisCycleString.replace(/{offset}/, '0');
@@ -182,7 +182,7 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
 
 		device.activeActionsOverride.deviceMessage = deviceMessage;
 		device.activeActionsOverride.lastSent = null;
-		device.activeActionsOverride.expires = soonestActionOverrideExpiration;
+		device.activeActionsOverride.expires = soonestImmediateActionExpiration;
 		device.activeActions.deviceRefreshRequired = true;
 
 		winston.info('refreshActiveActionsOverride for device ' + device._id + ' ' + JSON.stringify(device.activeActionsOverride));

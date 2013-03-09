@@ -23,7 +23,7 @@ var now = Date.now();
 // SensorLogs : (minutes in a day / log frequency in minutes) * 365)
 // TagLogs : 365
 // PhotoLogs: 24 * 365
-// ActionOverride Logs
+// ImmediateActionLogs
 
 var minuteFrequency = 15;
 // minutes per day = 24 * 60

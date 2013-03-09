@@ -204,10 +204,10 @@ mongoose.connect(db_url);
 		 			});
 		 		},
 		 		function(innerCallback){
-		 			if (!mongoose.connection.collections['actionoverridelogs']){ return innerCallback();}
-		 			mongoose.connection.collections['actionoverridelogs'].drop( function(err) {
+		 			if (!mongoose.connection.collections['immediateactionlogs']){ return innerCallback();}
+		 			mongoose.connection.collections['immediateactionlogs'].drop( function(err) {
 		 				if (err){ return innerCallback(err);}
-		 				console.log('actionoverridelogs collection dropped');
+		 				console.log('immediateactionlogs collection dropped');
 		 				innerCallback();
 		 			});
 		 		}

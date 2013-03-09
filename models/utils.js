@@ -66,12 +66,12 @@ function logSensorLog(options, callback){
               
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
-              triggerActionOverride(
+              triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
-                  actionOverrideMessage : message, 
+                  immediateActionMessage : message, 
                   user : user 
                 },
                 function(err){
@@ -82,12 +82,12 @@ function logSensorLog(options, callback){
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
-              triggerActionOverride(
+              triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
-                  actionOverrideMessage : message, 
+                  immediateActionMessage : message, 
                   user : user 
                 },
                 function(err){
@@ -116,7 +116,7 @@ function logSensorLog(options, callback){
  *
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control. 
  */
-function triggerActionOverride(options, callback){
+function triggerImmediateAction(options, callback){
   var Device = require('./device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
@@ -124,7 +124,7 @@ function triggerActionOverride(options, callback){
     GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
-    ActionOverrideLogModel = require('./actionOverrideLog').model,
+    ImmediateActionLogModel = require('./immediateActionLog').model,
     NotificationModel = require('./notification').model,
     SensorLogModel = require('./sensorLog').model,
     EmailConfig = require('../config/email-config'),
@@ -136,7 +136,7 @@ function triggerActionOverride(options, callback){
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
       actionId = options.actionId,
-      actionOverrideMessage = options.actionOverrideMessage,
+      immediateActionMessage = options.immediateActionMessage,
       user = options.user,
       timezone = user.timezone,
       action;
@@ -146,7 +146,7 @@ function triggerActionOverride(options, callback){
     if (!actionResult) { return callback(new Error('Invalid action id'));}
 
     action = actionResult;
-    // calculate when the actionOverride should expire.
+    // calculate when the immediateAction should expire.
     var now = new Date(),
         expires = now + (365 * 24 * 60 * 60 * 1000),
         actionHasDeviceControl = false;
@@ -203,9 +203,9 @@ function triggerActionOverride(options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationMessage = actionOverrideMessage + '. ';
+            notificationMessage = immediateActionMessage + '. ';
 
-        winston.info('Logging actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
+        winston.info('Logging immediateAction for ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
           notificationType = 'actionNeeded';
@@ -216,22 +216,22 @@ function triggerActionOverride(options, callback){
         }
 
         // In parallel: 
-        // log to ActionOverrideLog
+        // log to ImmediateActionLog
         // log a Notification, and 
         // if device has a relevant control, refresh its commands
         async.parallel(
           [
             function(innerCallback){
-              var actionLog = new ActionOverrideLogModel({
+              var actionLog = new ImmediateActionLogModel({
                   gpi : growPlanInstance._id,
-                  msg : actionOverrideMessage,
+                  msg : immediateActionMessage,
                   timeRequested : now,
                   action : action,
                   // TODO : handle expires for the no-device case 
                   expires : expires
                 });
 
-              // push the log to ActionOverrideLogModel
+              // push the log to ImmediateActionLogModel
               actionLog.save(innerCallback);
             },
             function(innerCallback){
@@ -499,7 +499,7 @@ function getFullyPopulatedGrowPlan(query, callback){
 
 module.exports = {
   logSensorLog : logSensorLog,
-  triggerActionOverride : triggerActionOverride,
+  triggerImmediateAction : triggerImmediateAction,
   scanForPhaseChanges : scanForPhaseChanges,
   clearPendingNotifications : clearPendingNotifications,
   getObjectId : getObjectId,
