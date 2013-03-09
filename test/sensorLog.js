@@ -28,8 +28,15 @@ describe('SensorLog', function(){
     });
 
     var result = sensorLog.toObject();
-    should.not.exist(result.l)
+
+    // only friendly 'logs' should exist
+    should.not.exist(result.l);
     should.exist(result.logs);
+
+    // only friendly 'timestamp' should exist
+    should.not.exist(result.ts);
+    should.exist(result.timestamp);
+
     result.logs.forEach(function(log){
       should.not.exist(log.s);
       should.not.exist(log.v);
@@ -51,8 +58,15 @@ describe('SensorLog', function(){
     });
 
     var result = sensorLog.toJSON();
-    should.not.exist(result.l)
+
+    // only friendly 'logs' should exist
+    should.not.exist(result.l);
     should.exist(result.logs);
+
+    // only friendly 'timestamp' should exist
+    should.not.exist(result.ts);
+    should.exist(result.timestamp);
+
     result.logs.forEach(function(log){
       should.not.exist(log.s);
       should.not.exist(log.v);

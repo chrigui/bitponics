@@ -30,8 +30,14 @@ describe('HarvestLog', function(){
     });
 
     var result = log.toObject();
-    should.not.exist(result.l)
+
+    // only friendly 'logs' should exist
+    should.not.exist(result.l);
     should.exist(result.logs);
+
+    // only friendly 'timestamp' should exist
+    should.not.exist(result.ts);
+    should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
       should.not.exist(log.p);
@@ -55,8 +61,14 @@ describe('HarvestLog', function(){
     });
 
     var result = log.toJSON();
-    should.not.exist(result.l)
+
+    // only friendly 'logs' should exist
+    should.not.exist(result.l);
     should.exist(result.logs);
+
+    // only friendly 'timestamp' should exist
+    should.not.exist(result.ts);
+    should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
       should.not.exist(log.p);
