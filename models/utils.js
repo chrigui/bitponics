@@ -250,8 +250,8 @@ function triggerImmediateAction(options, callback){
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
-                winston.info('Calling refreshActiveActionsOverride for device : ' + device._id.toString());
-                return device.refreshActiveActionsOverride(innerCallback);
+                winston.info('Calling refreshActiveImmediateActions for device : ' + device._id.toString());
+                return device.refreshActiveImmediateActions(innerCallback);
               } 
               return innerCallback();
             }

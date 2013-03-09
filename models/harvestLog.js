@@ -104,7 +104,7 @@ HarvestLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-HarvestLogSchema.index({ 'gpi ts plant': -1 });
+HarvestLogSchema.index({ 'gpi ts': -1 });
 
 exports.schema = HarvestLogSchema;
 exports.model = mongoose.model('HarvestLog', HarvestLogSchema);

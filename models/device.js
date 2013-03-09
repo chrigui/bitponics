@@ -65,12 +65,12 @@ var DeviceSchema = new Schema({
 	},
 
 	/**
-	 * activeActionsOverride are any automatically or manually triggered actions. 
+	 * activeImmediateActions are any automatically or manually triggered actions. 
 	 * They override the phase cycles until they expire.
 	 * 
 	 * If expired, it's refreshed inside refresh_status
 	 */
-	activeActionsOverride : {
+	activeImmediateActions : {
 		immediateActionLogs: [{ type: ObjectId, ref: 'ImmediateActionLog'}],
 		deviceMessage : { type : String },
 		lastSent: Date,
@@ -98,7 +98,7 @@ DeviceSchema.plugin(useTimestamps);
  * Saves the model at the end.
  * Originally written to be called after adding an entry to ImmediateActionLog collection.
  */
-DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
+DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
 	var device = this,
 		now = new Date();
   	  	
@@ -146,8 +146,8 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
   		}
 
 		// ok, now we're clean.
-		// replace device.activeActionsOverride.immediateActionLogs with the result set
-  		device.activeActionsOverride.immediateActionLogs = immediateActionLogResults;//.map(function(immediateActionLog){return immediateActionLog._id;});
+		// replace device.activeImmediateActions.immediateActionLogs with the result set
+  		device.activeImmediateActions.immediateActionLogs = immediateActionLogResults;//.map(function(immediateActionLog){return immediateActionLog._id;});
 
   		// generate new device message. compare with current deviceMessage.
   		device.controlMap.forEach(
@@ -176,16 +176,16 @@ DeviceSchema.method('refreshActiveActionsOverride', function(callback) {
           }
         );  
   		
-  		if (device.activeActionsOverride.deviceMessage == deviceMessage){
+  		if (device.activeImmediateActions.deviceMessage == deviceMessage){
   			return callback();
   		}
 
-		device.activeActionsOverride.deviceMessage = deviceMessage;
-		device.activeActionsOverride.lastSent = null;
-		device.activeActionsOverride.expires = soonestImmediateActionExpiration;
+		device.activeImmediateActions.deviceMessage = deviceMessage;
+		device.activeImmediateActions.lastSent = null;
+		device.activeImmediateActions.expires = soonestImmediateActionExpiration;
 		device.activeActions.deviceRefreshRequired = true;
 
-		winston.info('refreshActiveActionsOverride for device ' + device._id + ' ' + JSON.stringify(device.activeActionsOverride));
+		winston.info('refreshActiveImmediateActions for device ' + device._id + ' ' + JSON.stringify(device.activeImmediateActions));
 		device.save(callback);
   	});
 });

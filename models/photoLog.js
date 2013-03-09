@@ -102,7 +102,7 @@ PhotoLogSchema.set('toJSON', {
 
 
 
-PhotoLogSchema.index({ 'gpi ts logs.tags': -1 });
+PhotoLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = PhotoLogSchema;
 exports.model = mongoose.model('PhotoLog', PhotoLogSchema);

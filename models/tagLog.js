@@ -99,7 +99,7 @@ TagLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-TagLogSchema.index({ 'gpi ts logs.tags': -1 });
+TagLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = TagLogSchema;
 exports.model = mongoose.model('TagLog', TagLogSchema);

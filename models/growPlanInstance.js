@@ -358,7 +358,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             if (!device){ return innerParallelCallback(); }
             
             device.activeActions.expires = now - 1000;
-            device.activeActionsOverride.expires = now - 1000;
+            device.activeImmediateActions.expires = now - 1000;
 
             device.save(innerParallelCallback);
           },

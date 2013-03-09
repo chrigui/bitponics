@@ -379,7 +379,7 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        activeActionsOverrideActions,
+        activeImmediateActionsActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate,
@@ -391,7 +391,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ macAddress: macAddress }).populate('activeActionsOverride.actions').exec(callback);  
+          DeviceModel.findOne({ macAddress: macAddress }).populate('activeImmediateActions.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 
@@ -402,17 +402,17 @@ module.exports = function(app) {
           // Set whether we need to ask the device to refresh its cycles
           responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
 
-          if (device.activeActionsOverride.expires > Date.now()){
+          if (device.activeImmediateActions.expires > Date.now()){
             return callback();
           } else {
-            device.refreshActiveActionsOverride(callback);
+            device.refreshActiveImmediateActions(callback);
           }
         }
       ],
       function(err){
         if (err) { return next(err);}
         
-        responseBody = responseBody.replace(/{overrides}/, device.activeActionsOverride.deviceMessage);
+        responseBody = responseBody.replace(/{overrides}/, device.activeImmediateActions.deviceMessage);
         
         res.status(200);
         res.header('X-Bpn-ResourceName', 'refresh_status');
