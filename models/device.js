@@ -104,9 +104,9 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
   	  	
   	ImmediateActionLogModel
   	.find({ gpi : device.activeGrowPlanInstance })
-  	.where('expires').gt(now)
-  	.sort('-timeRequested')
-  	.populate('action')
+  	.where('e').gt(now)
+  	.sort('-tr')
+  	.populate('a')
   	.exec(function(err, immediateActionLogResults){
   		if (err) { return callback(err);}
 
@@ -135,7 +135,7 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
   		});
 
   		if (conflictingImmediateActionIds.length > 0){
-  			ImmediateActionLogModel.update({_id : {$in: conflictingImmediateActionIds}}, { expires : now - 1000 }).exec();	
+  			ImmediateActionLogModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();	
 
   			conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
 			  	// since we're removing elements from the target array as we go,

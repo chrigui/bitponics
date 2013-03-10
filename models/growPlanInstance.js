@@ -371,9 +371,9 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             .find()
             .where('gpi')
             .equals(growPlanInstance._id)
-            .where('expires')
+            .where('e')
             .gt(now)
-            .populate('action')
+            .populate('a')
             .exec(function(err, immediateActionLogResults){
               if (err) { return innerParallelCallback(err);}
               if (!immediateActionLogResults.length){ return innerParallelCallback(); }

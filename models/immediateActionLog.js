@@ -16,10 +16,11 @@ var ImmediateActionLogSchema = new Schema({
 
 
     /**
+     * message (virtual)
      * Message is a chance to explain what triggered this action,
      * for example when actions are triggered by an IdealRange violation
      */
-    msg : { type : String, required: false },
+    m : { type : String, required: false },
 
     /**
      * timeRequested (virtual)
@@ -63,6 +64,14 @@ ImmediateActionLogSchema.virtual('growPlanInstance')
   })
   .set(function(growPlanInstance){
     this.gpi = growPlanInstance;
+  });
+
+ImmediateActionLogSchema.virtual('message')
+  .get(function(){
+    return this.m;
+  })
+  .set(function(message){
+    this.m = message;
   });
 
 ImmediateActionLogSchema.virtual('timeRequested')
@@ -123,6 +132,7 @@ ImmediateActionLogSchema.set('toObject', {
     delete ret.e;
     delete ret.a;
     delete ret.d;
+    delete ret.m;
   }
 });
 ImmediateActionLogSchema.set('toJSON', {
