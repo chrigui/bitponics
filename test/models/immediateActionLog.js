@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  ImmediateActionLog = require('../models/immediateActionLog'),
+  ImmediateActionLog = require('../../models/immediateActionLog'),
   should = require('should');
 
 
@@ -21,7 +21,7 @@ describe('ImmediateActionLog', function(){
     var now = Date.now(),
       log = new ImmediateActionLog.model({
         growPlanInstance : new ObjectID(),
-        msg : 'msg',
+        message : 'message',
         timeRequested : now,
         timeSent : now,
         expires : now,
@@ -34,6 +34,10 @@ describe('ImmediateActionLog', function(){
     // only friendly 'growPlanInstance' should exist
     should.not.exist(result.gpi);
     should.exist(result.growPlanInstance);
+
+    // only friendly 'message' should exist
+    should.not.exist(result.m);
+    should.exist(result.message);
 
     // only friendly 'timeRequested' should exist
     should.not.exist(result.tr);
@@ -61,7 +65,7 @@ describe('ImmediateActionLog', function(){
     var now = Date.now(),
       log = new ImmediateActionLog.model({
         growPlanInstance : new ObjectID(),
-        msg : 'msg',
+        message : 'message',
         timeRequested : now,
         timeSent : now,
         expires : now,
@@ -74,6 +78,10 @@ describe('ImmediateActionLog', function(){
     // only friendly 'growPlanInstance' should exist
     should.not.exist(result.gpi);
     should.exist(result.growPlanInstance);
+
+    // only friendly 'message' should exist
+    should.not.exist(result.m);
+    should.exist(result.message);
 
     // only friendly 'timeRequested' should exist
     should.not.exist(result.tr);

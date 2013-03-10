@@ -34,7 +34,9 @@ exports.get = function(key){
   if (!val){ return "Invalid i18n key"; }
   
   if (arguments.length > 1){
+    // turn arguments into an array
     args = Array.prototype.slice.call(arguments);
+    // then call nodeUtil's placeholder replacement 
     val = nodeUtil.format.apply(null, [val].concat(args.slice(1))); 
   }
   return val;

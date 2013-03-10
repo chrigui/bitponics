@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-  SensorLog = require('../models/sensorLog'),
+  ObjectID = require('mongodb').ObjectID,
+  PhotoLog = require('../../models/photoLog'),
   should = require('should');
 
 
@@ -14,20 +15,21 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('SensorLog', function(){
+describe('PhotoLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new PhotoLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          url : "http://localhost/img.jpg",
+          tags: ["seedling", "tomato"]
         }
       ]
     });
 
-    var result = sensorLog.toObject();
+    var result = log.toObject();
 
     // only friendly 'logs' should exist
     should.not.exist(result.l);
@@ -38,26 +40,29 @@ describe('SensorLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      should.not.exist(log.u);
+      should.not.exist(log.t);
+      should.exist(log.url);
+      should.exist(log.tags);
+      log.tags.should.include("seedling")
+      log.tags.should.include("tomato")
+    });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new PhotoLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          url : "http://localhost/img.jpg",
+          tags: ["seedling", "tomato"]
         }
       ]
     });
 
-    var result = sensorLog.toJSON();
+    var result = log.toJSON();
 
     // only friendly 'logs' should exist
     should.not.exist(result.l);
@@ -68,11 +73,14 @@ describe('SensorLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      should.not.exist(log.u);
+      should.not.exist(log.t);
+      should.exist(log.url);
+      should.exist(log.tags);
+      log.tags.should.include("seedling")
+      log.tags.should.include("tomato")
+    });
+
   });
 
 });

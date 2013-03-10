@@ -86,7 +86,7 @@ TagLogSchema.set('toObject', {
       delete ret.v;
       delete ret.t;
     } else {
-      // else we're operating on the parent doc (the SensorLog doc)
+      // else we're operating on the parent doc (the TagLog doc)
       delete ret.l;
       delete ret.ts;
     }

@@ -49,10 +49,11 @@ var SensorLogSchema = new Schema({
      * The GrowPlanInstance
      */
     gpi : { type : ObjectId, ref: 'GrowPlanInstance'},
+    
     /**
      * timestamp
      */
-	ts: { type: Date, required: true, default: Date.now },
+	  ts: { type: Date, required: true, default: Date.now },
     /**
      * logs
      */

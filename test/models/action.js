@@ -1,8 +1,8 @@
 var mongoose = require('mongoose'),
-  Action = require('../models/action'),
+  Action = require('../../models/action'),
   should = require('should'),
   moment = require('moment'),
-  i18nKeys = require('../i18n/keys'),
+  i18nKeys = require('../../i18n/keys'),
   timezone = require('timezone/loaded');
 
 

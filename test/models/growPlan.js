@@ -1,10 +1,10 @@
 var mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../models'),
+Models = require('../../models'),
 GrowPlan = Models.growPlan,
 ModelUtils = Models.utils,
 should = require('should'),
-sampleGrowPlans = require('../utils/db_init/seed_data/growPlans');
+sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans');
 
 
 /*

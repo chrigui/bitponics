@@ -20,14 +20,18 @@
  before(function(done){
   	// Connecting to a local test database or creating it on the fly
   	mongoose.connect(mongoUrl);
+    var now = new Date();
+
   	exec('db_init ' + mongoUrl + ' clear', 
   		function (error, stdout, stderr){
   			if (error) { console.log(error); return done(new Error(error));}
   			if (stderr) { console.log(stderr); return done(new Error(stderr));}
+        console.log('took ' + (new Date() - now) + ' to init');
   			return done();
   		}
-	);
-});
+	  );
+  }
+);
 
 /*
  * after Method

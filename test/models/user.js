@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-User = require('../models/user').model,
+User = require('../../models/user').model,
 should = require('should');
 
 
@@ -17,9 +17,9 @@ should = require('should');
 
  	var currentUser = null;
 
- 	/*
-   * beforeEach Method
-   *
+ 	/**
+     * beforeEach Method
+     *
 	 * Run before each test.
 	 * Create an active user.
 	 */

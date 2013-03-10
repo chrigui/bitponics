@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  PhotoLog = require('../models/photoLog'),
+  HarvestLog = require('../../models/harvestLog'),
   should = require('should');
 
 
@@ -15,16 +15,16 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('PhotoLog', function(){
+describe('HarvestLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new PhotoLog.model({
+    var log = new HarvestLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          url : "http://localhost/img.jpg",
-          tags: ["seedling", "tomato"]
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
@@ -40,24 +40,22 @@ describe('PhotoLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
-      should.not.exist(log.t);
-      should.exist(log.url);
-      should.exist(log.tags);
-      log.tags.should.include("seedling")
-      log.tags.should.include("tomato")
+      should.not.exist(log.p);
+      should.not.exist(log.w);
+      should.exist(log.plant);
+      should.exist(log.weight);
     });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new PhotoLog.model({
+    var log = new HarvestLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          url : "http://localhost/img.jpg",
-          tags: ["seedling", "tomato"]
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
@@ -73,14 +71,11 @@ describe('PhotoLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
-      should.not.exist(log.t);
-      should.exist(log.url);
-      should.exist(log.tags);
-      log.tags.should.include("seedling")
-      log.tags.should.include("tomato")
+      should.not.exist(log.p);
+      should.not.exist(log.w);
+      should.exist(log.plant);
+      should.exist(log.weight);
     });
-
   });
 
 });

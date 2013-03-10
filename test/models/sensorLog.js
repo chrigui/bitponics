@@ -1,6 +1,5 @@
 var mongoose = require('mongoose'),
-  ObjectID = require('mongodb').ObjectID,
-  TagLog = require('../models/tagLog'),
+  SensorLog = require('../../models/sensorLog'),
   should = require('should');
 
 
@@ -15,21 +14,20 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('TagLog', function(){
+describe('SensorLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new TagLog.model({
-      gpi : new ObjectID(),
+    var sensorLog = new SensorLog.model({
       ts : Date.now(),
       logs : [
         {
-          val : "my garden journal entry",
-          tags: ["journal"]
+          sCode : 'vis',
+          val : 1234
         }
       ]
     });
 
-    var result = log.toObject();
+    var result = sensorLog.toObject();
 
     // only friendly 'logs' should exist
     should.not.exist(result.l);
@@ -40,28 +38,26 @@ describe('TagLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
+      should.not.exist(log.s);
       should.not.exist(log.v);
-      should.not.exist(log.t);
+      should.exist(log.sCode);
       should.exist(log.val);
-      should.exist(log.tags);
-      log.tags.should.include("journal");
-    });
+    })
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new TagLog.model({
-      gpi : new ObjectID(),
+    var sensorLog = new SensorLog.model({
       ts : Date.now(),
       logs : [
         {
-          val : "my garden journal entry",
-          tags: ["journal"]
+          sCode : 'vis',
+          val : 1234
         }
       ]
     });
 
-    var result = log.toJSON();
+    var result = sensorLog.toJSON();
 
     // only friendly 'logs' should exist
     should.not.exist(result.l);
@@ -72,14 +68,11 @@ describe('TagLog', function(){
     should.exist(result.timestamp);
 
     result.logs.forEach(function(log){
+      should.not.exist(log.s);
       should.not.exist(log.v);
-      should.not.exist(log.t);
+      should.exist(log.sCode);
       should.exist(log.val);
-      should.exist(log.tags);
-      log.tags.should.include("journal");
-    });
-
-
+    })
   });
 
 });

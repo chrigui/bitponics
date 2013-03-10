@@ -114,7 +114,18 @@ function logSensorLog(options, callback){
 /**
  * Trigger an action override. Can be called because of an IdealRange violation or manually.
  *
- * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control. 
+ * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
+ *
+ * @param options {Object}
+ *    {
+ *      growPlanInstance : GrowPlanInstanceModel (required),
+ *      actionId : ObjectID (required),
+ *      device : DeviceModel (optional. Device of GrowPlanInstance),
+ *      immediateActionMessage : String,
+ *      user : UserModel (required. owner of GrowPlanInstance)
+ *    }
+ *
+ * @param callback
  */
 function triggerImmediateAction(options, callback){
   var Device = require('./device'),
@@ -131,7 +142,8 @@ function triggerImmediateAction(options, callback){
     nodemailer = require('nodemailer'),
     winston = require('winston'),
     async = require('async'),
-    tz = require('timezone/loaded');
+    tz = require('timezone/loaded'),
+    i18nKeys = require('../i18n/keys');
 
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
@@ -143,7 +155,7 @@ function triggerImmediateAction(options, callback){
 
   ActionModel.findById(actionId, function(err, actionResult){
     if (err) { return callback(err);}
-    if (!actionResult) { return callback(new Error('Invalid action id'));}
+    if (!actionResult) { return callback(new Error(i18nKeys.get('Invalid action id')));}
 
     action = actionResult;
     // calculate when the immediateAction should expire.
@@ -155,6 +167,8 @@ function triggerImmediateAction(options, callback){
       [
         function(innerCallback){
           if (!action.control){ return innerCallback(); }
+
+          // If we're here, action does have a control
 
           if (!device){
             GrowPlanModel.findById(growPlanInstance.growPlan)
@@ -212,7 +226,7 @@ function triggerImmediateAction(options, callback){
           notificationMessage += action.description;
         } else {
           notificationType = 'info';
-          notificationMessage += 'Device has automatically triggered the following action : "' + action.description + '".';
+          notificationMessage += i18nKeys.get('device action trigger message', action.description);
         }
 
         // In parallel: 
@@ -224,7 +238,7 @@ function triggerImmediateAction(options, callback){
             function(innerCallback){
               var actionLog = new ImmediateActionLogModel({
                   gpi : growPlanInstance._id,
-                  msg : immediateActionMessage,
+                  message : immediateActionMessage,
                   timeRequested : now,
                   action : action,
                   // TODO : handle expires for the no-device case 
