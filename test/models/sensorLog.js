@@ -30,19 +30,19 @@ describe('SensorLog', function(){
     var result = sensorLog.toObject();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      log.should.not.have.property('s');
+      log.should.not.have.property('v');
+      log.should.have.property('sCode');
+      log.should.have.property('val');
+    });
 
   });
 
@@ -60,19 +60,20 @@ describe('SensorLog', function(){
     var result = sensorLog.toJSON();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      log.should.not.have.property('s');
+      log.should.not.have.property('v');
+      log.should.have.property('sCode');
+      log.should.have.property('val');
+    });
+
   });
 
 });

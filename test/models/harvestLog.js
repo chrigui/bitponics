@@ -32,18 +32,18 @@ describe('HarvestLog', function(){
     var result = log.toObject();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.p);
-      should.not.exist(log.w);
-      should.exist(log.plant);
-      should.exist(log.weight);
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
 
   });
@@ -63,18 +63,18 @@ describe('HarvestLog', function(){
     var result = log.toJSON();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.p);
-      should.not.exist(log.w);
-      should.exist(log.plant);
-      should.exist(log.weight);
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
   });
 

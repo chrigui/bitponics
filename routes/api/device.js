@@ -11,7 +11,8 @@ var mongoose = require('mongoose'),
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async'),
-    timezone = require('timezone/loaded');
+    timezone = require('timezone/loaded'),
+    routeUtils = require('../route-utils');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -21,12 +22,16 @@ var mongoose = require('mongoose'),
 module.exports = function(app) {
 
    //List devices
-  app.get('/api/devices', function (req, res, next){
-    return DeviceModel.find(function (err, devices) {
-      if (err) { return next(err); }
-      return res.send(devices);
-    });
-  });
+  app.get('/api/devices', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return DeviceModel.find(function (err, devices) {
+        if (err) { return next(err); }
+        return res.send(devices);
+      });
+    }
+  );
 
   /*
    * Create single device

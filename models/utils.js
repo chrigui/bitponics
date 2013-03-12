@@ -112,20 +112,17 @@ function logSensorLog(options, callback){
 
 
 /**
- * Trigger an action override. Can be called because of an IdealRange violation or manually.
+ * Trigger an immediate action. Can be called manually or because of an IdealRange violation.
  *
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
  *
- * @param options {Object}
- *    {
- *      growPlanInstance : GrowPlanInstanceModel (required),
- *      actionId : ObjectID (required),
- *      device : DeviceModel (optional. Device of GrowPlanInstance),
- *      immediateActionMessage : String,
- *      user : UserModel (required. owner of GrowPlanInstance)
- *    }
- *
- * @param callback
+ * @param {object} options  
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel (required),
+ * @param {object|string} options.actionId : ObjectID (required),
+ * @param {object=} options.device : DeviceModel (optional. Device of GrowPlanInstance),
+ * @param {string} options.immediateActionMessage : message to log with the immediateAction
+ * @param {User} options.user : UserModel (required. owner of GrowPlanInstance)
+ * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
 function triggerImmediateAction(options, callback){
   var Device = require('./device'),
@@ -135,7 +132,7 @@ function triggerImmediateAction(options, callback){
     GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
-    ImmediateActionLogModel = require('./immediateActionLog').model,
+    ImmediateActionModel = require('./immediateAction').model,
     NotificationModel = require('./notification').model,
     SensorLogModel = require('./sensorLog').model,
     EmailConfig = require('../config/email-config'),
@@ -158,6 +155,7 @@ function triggerImmediateAction(options, callback){
     if (!actionResult) { return callback(new Error(i18nKeys.get('Invalid action id')));}
 
     action = actionResult;
+
     // calculate when the immediateAction should expire.
     var now = new Date(),
         expires = now + (365 * 24 * 60 * 60 * 1000),
@@ -217,26 +215,26 @@ function triggerImmediateAction(options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationMessage = immediateActionMessage + '. ';
+            notificationMessage;
 
-        winston.info('Logging immediateAction for ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
+        winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
           notificationType = 'actionNeeded';
-          notificationMessage += action.description;
+          notificationMessage = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
           notificationType = 'info';
-          notificationMessage += i18nKeys.get('device action trigger message', action.description);
+          notificationMessage = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 
         // In parallel: 
-        // log to ImmediateActionLog
+        // log to ImmediateAction
         // log a Notification, and 
         // if device has a relevant control, refresh its commands
         async.parallel(
           [
             function(innerCallback){
-              var actionLog = new ImmediateActionLogModel({
+              var immediateAction = new ImmediateActionModel({
                   gpi : growPlanInstance._id,
                   message : immediateActionMessage,
                   timeRequested : now,
@@ -245,22 +243,19 @@ function triggerImmediateAction(options, callback){
                   expires : expires
                 });
 
-              // push the log to ImmediateActionLogModel
-              actionLog.save(innerCallback);
+              // push the log to ImmediateActionModel
+              immediateAction.save(innerCallback);
             },
             function(innerCallback){
               var notification = new NotificationModel({
                   users : [user],
-                  gpi : growPlanInstance,
+                  growPlanInstance : growPlanInstance,
                   timeToSend : now,
-                  msg : notificationMessage,
+                  message : notificationMessage,
                   type : notificationType
               });
               winston.info('Creating notification : ' + notification.toString());
-              notification.save(function(err){
-                if (err) { return innerCallback(err); }
-                return innerCallback();
-              });
+              notification.save(innerCallback);
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
@@ -270,9 +265,13 @@ function triggerImmediateAction(options, callback){
               return innerCallback();
             }
           ],
-          function(err){
+          function(err, results){
             if (err) { return callback(err); }
-            return callback();
+            var data = {
+              immediateAction : results[0][0],
+              notification : results[1][0]
+            }
+            return callback(null, data);
           }
         );
       }
@@ -363,9 +362,9 @@ function clearPendingNotifications (NotificationModel, callback){
   var now = new Date();
   NotificationModel
   .find()
-  .where('timeToSend')
+  .where('tts')
   .lte(now)
-  .populate('users', 'email') // only need the email field for Users
+  .populate('u', 'email') // only need the email field for Users
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
     if (!notificationResults.length){ return callback(); }
@@ -381,8 +380,8 @@ function clearPendingNotifications (NotificationModel, callback){
             from: "notifications@bitponics.com", // sender address
             to: notification.users.map(function(user) { return user.email; }).join(', '), 
             subject: subject, // Subject line
-            text: notification.msg,
-            html: notification.msg
+            text: notification.message,
+            html: notification.message
         };
         
         emailTransport.sendMail(mailOptions, function(err, response){
@@ -391,7 +390,7 @@ function clearPendingNotifications (NotificationModel, callback){
           notification.sentLogs.push({ts: now});
           
           if (notification.repeat && notification.repeat.duration){
-            notification.timeToSend = tz(notification.timeToSend, notification.tz, notification.repeat.tz, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
+            notification.timeToSend = tz(notification.timeToSend, notification.timezone, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
           } else {
             notification.timeToSend = null;
           }

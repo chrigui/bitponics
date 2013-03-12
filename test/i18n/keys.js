@@ -29,10 +29,11 @@ describe('i18n keys', function(){
     });
 
     it('returns the requested string, populated with the provided arguments', function(){
-      var actionDescription = "actionDescription",
-        expected = "Device has automatically triggered the following action : actionDescription.",
+      var immediateActionMessage = "action triggered by something",
+        actionDescription = "actionDescription",
+        expected = "action triggered by something. Device has automatically triggered the following action : actionDescription.",
         key = "device action trigger message";
-        i18nKeys.get(key, actionDescription).should.equal(expected);  
+        i18nKeys.get(key, immediateActionMessage, actionDescription).should.equal(expected);  
     });
   });
 });

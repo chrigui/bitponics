@@ -1,11 +1,13 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  ImmediateActionLog = require('../../models/immediateActionLog').model,
+  ImmediateAction = require('../../models/immediateAction').model,
   GrowPlanInstance = require('../../models/growPlanInstance').model,
   ModelUtils = require('../../models/utils'),
   should = require('should'),
   User = require('../../models/user').model,
-  async = require('async');
+  async = require('async'),
+  getObjectId = ModelUtils.getObjectId,
+  i18nKeys = require('../../i18n/keys');
 
 
 /*
@@ -72,20 +74,97 @@ describe('Model Utils', function(){
       );
     });
 
-    it('dum dada dum', function(done){
+    it('handles action without control', function(done){
+      // triggering an action without a control is actually 
+      // probably never going to happen. but no reason to block it,
+      // and the code handles it so i'm unit-testing it
+
       should.exist(this.user);
       should.exist(this.gpi);
       should.exist(this.actionId);
 
+      var immediateActionSettings = {
+        growPlanInstance : this.gpi, 
+        actionId : "506de2fc8eebf7524342cb2c", // pollinate blossons
+        immediateActionMessage : "triggering pollination action blam.", 
+        user : this.user
+      };
+
       ModelUtils.triggerImmediateAction(
-        {
-          growPlanInstance : this.gpi, 
-          actionId : this.actionid, 
-          immediateActionMessage : 'message', 
-          user : this.user
-        },
-        function(err){
-          //should.not.exist(err);
+        immediateActionSettings,
+        function(err, results){
+          should.not.exist(err);
+          
+          var now = new Date(),
+              immediateAction = results.immediateAction,
+              notification = results.notification;
+
+          should.exist(immediateAction);
+          should.exist(notification);
+
+          /*
+{ immediateAction: 
+   [ { __v: 0,
+       _id: 513e675aa5e4d51c100000a6,
+       done: false,
+       action: 506de2fc8eebf7524342cb2c,
+       expires: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
+       timeSent: undefined,
+       timeRequested: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
+       message: 'triggering pollination action blam',
+       growPlanInstance: 513e675aa5e4d51c10000098 },
+     1 ],
+  notification: 
+   [ { __v: 0,
+       createdAt: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
+       updatedAt: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
+       gpi: 513e675aa5e4d51c10000098,
+       msg: 'triggering pollination action blamPollinate any new blossoms. Use a small paintbrush or cotton swab brush to distribute pollen between flowers.',
+       type: 'actionNeeded',
+       _id: 513e675aa5e4d51c100000a7,
+       sentLogs: [],
+       timeToSend: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
+       users: [ 513e675a5ebe751c1000001e ] },
+     1 ] }
+          */
+          
+          // immediateAction
+          // timeSent should be undefined (hasn't been sent yet)
+          should.not.exist(immediateAction.timeSent);
+          // timeRequested should be less than now
+          immediateAction.timeRequested.should.be.below(now);
+          // action should be settings.action
+          getObjectId(immediateAction.action).equals(getObjectId(immediateActionSettings.actionId)).should.be.true;
+          // done should not be true
+          immediateAction.done.should.be.false;
+          // message should be message
+          immediateAction.message.should.equal(immediateActionSettings.immediateActionMessage);
+          // growPlanInstance should be settings.growPlanInstance
+          getObjectId(immediateAction.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+          
+
+          // notification
+          // growPlanInstance should be settings.growPlanInstance
+          getObjectId(notification.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+          // message should be message of action
+          notification.message.should.equal(i18nKeys.get('manual action trigger message', immediateActionSettings.immediateActionMessage, "Pollinate any new blossoms. Use a small paintbrush or cotton swab brush to distribute pollen between flowers."));
+          // type should be actionneeded
+          notification.type.should.equal('actionNeeded');
+          // sentLogs should be empty array
+          notification.sentLogs.should.be.empty;
+          // timeToSend should be less than now
+          notification.timeToSend.should.be.below(now);
+          // users should include settings.user
+          notification.users.should.include(immediateActionSettings.user._id.toString());
+          // repeat shouldn't exist
+          notification.repeat.should.not.have.property('repeatType');
+          notification.repeat.should.not.have.property('duration');
+          notification.repeat.should.not.have.property('timezone');
+          notification.repeat.should.not.have.property('rt');
+          notification.repeat.should.not.have.property('d');
+          notification.repeat.should.not.have.property('tz');
+          
+
           done();
         }
       );

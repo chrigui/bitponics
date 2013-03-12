@@ -32,18 +32,18 @@ describe('TagLog', function(){
     var result = log.toObject();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.v);
-      should.not.exist(log.t);
-      should.exist(log.val);
-      should.exist(log.tags);
+      log.should.not.have.property('v');
+      log.should.not.have.property('t');
+      log.should.have.property('val');
+      log.should.have.property('tags');
       log.tags.should.include("journal");
     });
 
@@ -64,22 +64,20 @@ describe('TagLog', function(){
     var result = log.toJSON();
 
     // only friendly 'logs' should exist
-    should.not.exist(result.l);
-    should.exist(result.logs);
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
 
     // only friendly 'timestamp' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timestamp);
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.v);
-      should.not.exist(log.t);
-      should.exist(log.val);
-      should.exist(log.tags);
+      log.should.not.have.property('v');
+      log.should.not.have.property('t');
+      log.should.have.property('val');
+      log.should.have.property('tags');
       log.tags.should.include("journal");
     });
-
-
   });
 
 });

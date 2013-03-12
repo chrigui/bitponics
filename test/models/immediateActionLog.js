@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  ImmediateActionLog = require('../../models/immediateActionLog'),
+  ImmediateAction = require('../../models/immediateAction'),
   should = require('should');
 
 
@@ -15,11 +15,11 @@ var mongoose = require('mongoose'),
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('ImmediateActionLog', function(){
+describe('ImmediateAction', function(){
 
   it('uses only friendly property names in toObject result', function(){
     var now = Date.now(),
-      log = new ImmediateActionLog.model({
+      log = new ImmediateAction.model({
         growPlanInstance : new ObjectID(),
         message : 'message',
         timeRequested : now,
@@ -32,38 +32,38 @@ describe('ImmediateActionLog', function(){
     var result = log.toObject();
 
     // only friendly 'growPlanInstance' should exist
-    should.not.exist(result.gpi);
-    should.exist(result.growPlanInstance);
+    result.should.not.have.property('gpi');
+    result.should.have.property('growPlanInstance');
 
     // only friendly 'message' should exist
-    should.not.exist(result.m);
-    should.exist(result.message);
+    result.should.not.have.property('m');
+    result.should.have.property('message');
 
     // only friendly 'timeRequested' should exist
-    should.not.exist(result.tr);
-    should.exist(result.timeRequested);
+    result.should.not.have.property('r');
+    result.should.have.property('timeRequested');
 
     // only friendly 'timeSent' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timeSent);
+    result.should.not.have.property('ts');
+    result.should.have.property('timeSent');
 
     // only friendly 'expires' should exist
-    should.not.exist(result.e);
-    should.exist(result.expires);
+    result.should.not.have.property('e');
+    result.should.have.property('expires');
 
     // only friendly 'action' should exist
-    should.not.exist(result.a);
-    should.exist(result.action);
+    result.should.not.have.property('a');
+    result.should.have.property('action');
 
     // only friendly 'done' should exist
-    should.not.exist(result.d);
-    should.exist(result.done);
+    result.should.not.have.property('d');
+    result.should.have.property('done');
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
     var now = Date.now(),
-      log = new ImmediateActionLog.model({
+      log = new ImmediateAction.model({
         growPlanInstance : new ObjectID(),
         message : 'message',
         timeRequested : now,
@@ -76,33 +76,32 @@ describe('ImmediateActionLog', function(){
     var result = log.toJSON();
 
     // only friendly 'growPlanInstance' should exist
-    should.not.exist(result.gpi);
-    should.exist(result.growPlanInstance);
+    result.should.not.have.property('gpi');
+    result.should.have.property('growPlanInstance');
 
     // only friendly 'message' should exist
-    should.not.exist(result.m);
-    should.exist(result.message);
+    result.should.not.have.property('m');
+    result.should.have.property('message');
 
     // only friendly 'timeRequested' should exist
-    should.not.exist(result.tr);
-    should.exist(result.timeRequested);
+    result.should.not.have.property('r');
+    result.should.have.property('timeRequested');
 
     // only friendly 'timeSent' should exist
-    should.not.exist(result.ts);
-    should.exist(result.timeSent);
+    result.should.not.have.property('ts');
+    result.should.have.property('timeSent');
 
     // only friendly 'expires' should exist
-    should.not.exist(result.e);
-    should.exist(result.expires);
+    result.should.not.have.property('e');
+    result.should.have.property('expires');
 
     // only friendly 'action' should exist
-    should.not.exist(result.a);
-    should.exist(result.action);
+    result.should.not.have.property('a');
+    result.should.have.property('action');
 
     // only friendly 'done' should exist
-    should.not.exist(result.d);
-    should.exist(result.done);
-
+    result.should.not.have.property('d');
+    result.should.have.property('done');
 
   });
 

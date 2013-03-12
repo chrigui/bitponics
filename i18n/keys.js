@@ -20,7 +20,8 @@ exports.keys = {
   "First and last state\'s messages must be equal" : "First and last state\'s messages must be equal",
   "In a 3-state cycle, at least the 1st and 3rd states must have durations defined" : "In a 3-state cycle, at least the 1st and 3rd states must have durations defined",
   "Invalid action id" : "Invalid action id",
-  "device action trigger message" : "Device has automatically triggered the following action : %s."
+  "manual action trigger message" : "%s. %s.",
+  "device action trigger message" : "%s. Device has automatically triggered the following action : %s."
 };
 
 /**
