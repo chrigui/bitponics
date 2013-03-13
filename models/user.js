@@ -207,7 +207,7 @@ UserSchema.static('getByPublicDeviceKey', function(key, done) {
       if (!user) { return done(new Error('No such device key'), false); }
       var matchingPrivateKey = user.deviceKeys.filter(function(deviceKey){
       	return deviceKey.public === key;
-      })[0];
+      })[0].private;
       return done(null, user, matchingPrivateKey);
   });
 });

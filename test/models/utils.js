@@ -101,32 +101,6 @@ describe('Model Utils', function(){
 
           should.exist(immediateAction);
           should.exist(notification);
-
-          /*
-{ immediateAction: 
-   [ { __v: 0,
-       _id: 513e675aa5e4d51c100000a6,
-       done: false,
-       action: 506de2fc8eebf7524342cb2c,
-       expires: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
-       timeSent: undefined,
-       timeRequested: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
-       message: 'triggering pollination action blam',
-       growPlanInstance: 513e675aa5e4d51c10000098 },
-     1 ],
-  notification: 
-   [ { __v: 0,
-       createdAt: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
-       updatedAt: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
-       gpi: 513e675aa5e4d51c10000098,
-       msg: 'triggering pollination action blamPollinate any new blossoms. Use a small paintbrush or cotton swab brush to distribute pollen between flowers.',
-       type: 'actionNeeded',
-       _id: 513e675aa5e4d51c100000a7,
-       sentLogs: [],
-       timeToSend: Mon Mar 11 2013 19:23:06 GMT-0400 (EDT),
-       users: [ 513e675a5ebe751c1000001e ] },
-     1 ] }
-          */
           
           // immediateAction
           // timeSent should be undefined (hasn't been sent yet)
@@ -168,8 +142,14 @@ describe('Model Utils', function(){
           done();
         }
       );
+    });
 
-      
+    it('handles action with control', function(done){
+      done();
+    });
+
+    it('handles action without control and repeat', function(done){
+      done();
     });
 
   });

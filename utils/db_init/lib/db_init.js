@@ -252,7 +252,7 @@ async.series([
               admin :  _data.admin,
               activationToken : _data.activationToken,
               sentEmail : _data.sentEmail,
-              deviceKey : _data.deviceKey,
+              deviceKeys : _data.deviceKeys,
               apiKey : _data.apiKey
             },
             "8bitpass", //default password
