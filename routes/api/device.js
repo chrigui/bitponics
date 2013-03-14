@@ -6,7 +6,6 @@ var mongoose = require('mongoose'),
     GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     Action = require('../../models/action'),
     ActionModel = Action.model,
-    ActionUtils = Action.utils,
     SensorModel = require('../../models/sensor').model,
     SensorLogModel = require('../../models/sensorLog').model,
     ModelUtils = require('../../models/utils'),
@@ -84,7 +83,7 @@ module.exports = function(app) {
    * });
    */
   app.get('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       return res.send(device);
     });
@@ -109,7 +108,7 @@ module.exports = function(app) {
    * });
    */
   app.put('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       device.title = req.body.title;
       return device.save(function (err) {
@@ -136,7 +135,7 @@ module.exports = function(app) {
    * });
    */
   app.delete('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ deviceId: req.params.id }, function (err, device) {
+    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
       if (err) { return next(err); }
       return device.remove(function (err) {
         if (err) { return next(err); }  
@@ -155,7 +154,7 @@ module.exports = function(app) {
    *
    */
   app.put('/api/devices/:id/sensor_logs', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         pendingSensorLog = { ts : Date.now(), logs : []},
         pendingDeviceLogs,
         sensors,
@@ -183,7 +182,7 @@ module.exports = function(app) {
         },
         function parallel2(callback){
           DeviceModel
-          .findOne({ deviceId: deviceId })
+          .findOne({ macAddress: macAddress })
           .populate('activeGrowPlanInstance')
           .exec(callback);
         }
@@ -237,7 +236,7 @@ module.exports = function(app) {
    * For now, only responds with device CSV. 
    */
   app.get('/api/devices/:id/cycles', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         device,
         growPlanInstance,
         growPlanInstancePhase,
@@ -260,7 +259,7 @@ module.exports = function(app) {
 
     async.waterfall([
       function (callback){
-        DeviceModel.findOne({ deviceId: deviceId }).populate('activeGrowPlanInstance').exec(callback);  
+        DeviceModel.findOne({ macAddress: macAddress }).populate('activeGrowPlanInstance').exec(callback);  
       },
       function (deviceResult, callback){
         if (!deviceResult){ 
@@ -297,7 +296,8 @@ module.exports = function(app) {
         device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0];
+                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
+                now = new Date();
             
             winston.info('controlAction');
             winston.info(controlAction);
@@ -314,8 +314,8 @@ module.exports = function(app) {
             } else {
               thisCycleString = thisCycleString.replace('{override}','1');
               
-              var cycleRemainder = ActionUtils.getCycleRemainder(growPlanInstancePhase, controlAction, req.user.timezone);
-              thisCycleString = ActionUtils.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;  
+              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, controlAction, req.user.timezone);
+              thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
             }
             allCyclesString += thisCycleString;
           }
@@ -374,12 +374,12 @@ module.exports = function(app) {
    * https://docs.google.com/a/bitponics.com/document/d/1YD6AFDxeuUVzQuMhvIh3W5AKRe9otmEI_scxCohP9u4/edit#
    */
   app.get('/api/devices/:id/refresh_status', function (req, res, next){
-    var deviceId = req.params.id.replace(/:/g,''),
+    var macAddress = req.params.id.replace(/:/g,''),
         device,
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        activeActionsOverrideActions,
+        activeImmediateActionsActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate,
@@ -391,7 +391,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ deviceId: deviceId }).populate('activeActionsOverride.actions').exec(callback);  
+          DeviceModel.findOne({ macAddress: macAddress }).populate('activeImmediateActions.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 
@@ -402,17 +402,17 @@ module.exports = function(app) {
           // Set whether we need to ask the device to refresh its cycles
           responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
 
-          if (device.activeActionsOverride.expires > Date.now()){
+          if (device.activeImmediateActions.expires > Date.now()){
             return callback();
           } else {
-            device.refreshActiveActionsOverride(callback);
+            device.refreshActiveImmediateActions(callback);
           }
         }
       ],
       function(err){
         if (err) { return next(err);}
         
-        responseBody = responseBody.replace(/{overrides}/, device.activeActionsOverride.deviceMessage);
+        responseBody = responseBody.replace(/{overrides}/, device.activeImmediateActions.deviceMessage);
         
         res.status(200);
         res.header('X-Bpn-ResourceName', 'refresh_status');

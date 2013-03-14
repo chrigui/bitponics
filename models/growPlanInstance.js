@@ -77,7 +77,8 @@ var GrowPlanInstanceSchema = new Schema({
 		}]
 	}],
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
-});
+},
+{ id : false });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
@@ -241,9 +242,8 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
 GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),
       ActionModel = Action.model,
-      ActionUtils = Action.utils,
       NotificationModel = require('./notification').model,
-      ActionOverrideLogModel = require('./actionOverrideLog').model,
+      ImmediateActionLogModel = require('./immediateActionLog').model,
       UserModel = require('./user').model,
       growPlanInstance = this,
       growPlan = growPlanInstance.growPlan,
@@ -358,40 +358,40 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             if (!device){ return innerParallelCallback(); }
             
             device.activeActions.expires = now - 1000;
-            device.activeActionsOverride.expires = now - 1000;
+            device.activeImmediateActions.expires = now - 1000;
 
             device.save(innerParallelCallback);
           },
           
-          // Expire actionOverrides that conflict with a device controlled action in the new phase
+          // Expire immediateActions that conflict with a device controlled action in the new phase
           function (innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
-            ActionOverrideLogModel
+            ImmediateActionLogModel
             .find()
             .where('gpi')
             .equals(growPlanInstance._id)
-            .where('expires')
+            .where('e')
             .gt(now)
-            .populate('action')
-            .exec(function(err, actionOverrideLogResults){
+            .populate('a')
+            .exec(function(err, immediateActionLogResults){
               if (err) { return innerParallelCallback(err);}
-              if (!actionOverrideLogResults.length){ return innerParallelCallback(); }
+              if (!immediateActionLogResults.length){ return innerParallelCallback(); }
             
-              var actionOverrideLogsToExpire = [];
-              actionOverrideLogResults.forEach(function(actionOverrideLog){
-                if (!actionOverrideLog.action.control) { return; } 
+              var immediateActionLogsToExpire = [];
+              immediateActionLogResults.forEach(function(immediateActionLog){
+                if (!immediateActionLog.action.control) { return; } 
                 if (actionsWithDeviceControl.some(function(action){
-                  return actionOverrideLog.action.control.equals(action.control);
+                  return immediateActionLog.action.control.equals(action.control);
                 })){
-                  actionOverrideLogsToExpire.push(actionOverrideLog);
+                  immediateActionLogsToExpire.push(immediateActionLog);
                 } 
               });
 
-              async.forEach(actionOverrideLogsToExpire, 
-                function(actionOverrideLog, iteratorCallback){
-                  actionOverrideLog.expires = now;
-                  actionOverrideLog.save(iteratorCallback);
+              async.forEach(immediateActionLogsToExpire, 
+                function(immediateActionLog, iteratorCallback){
+                  immediateActionLog.expires = now;
+                  immediateActionLog.save(iteratorCallback);
                 }, 
                 function(err){
                   if (err) { return innerParallelCallback(err);}
@@ -487,7 +487,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionUtils.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : states[0].durationType,
@@ -515,7 +515,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
                       gpi : growPlanInstance,
-                      timeToSend : now + ActionUtils.convertDurationToMilliseconds(states[0].durationType, states[0].duration),
+                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
                       msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : 'seconds',

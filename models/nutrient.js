@@ -8,7 +8,8 @@ var mongoose = require('mongoose'),
 var NutrientSchema = new Schema({
 	brand: { type: String, required: true },
 	name: { type: String, required: true }
-});
+},
+{ id : false });
 
 NutrientSchema.plugin(useTimestamps);
 

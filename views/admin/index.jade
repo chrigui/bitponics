@@ -1,0 +1,11 @@
+extends ../layout
+
+block content
+  h1 Admin Panel
+  form(action="/admin/trigger_clearPendingNotifications")
+    input(type="submit", value="Trigger clearPendingNotifications") 
+  form(action="/admin/trigger_scanForPhaseChanges")
+    input(type="submit", value="Trigger scanForPhaseChanges")
+  div
+    a(href='/admin/add-device', style='text-decoration:underline;color:#333') Add Device
+  

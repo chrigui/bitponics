@@ -44,7 +44,7 @@ block content
 
   section(ng-cloak="")#main(role="main")
     div.content-module.middle
-      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="Bitponics.pages.growplans.GrowPlanController", novalidate)
+      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.pages.growplans.GrowPlanController", novalidate)
         h4 Let's find you a grow plan.         
         section(id="system_selection", class="step", data-required="1")
           h4 What type of system do you have?
@@ -186,7 +186,7 @@ block content
                         label Nutrients
                         ul.grid
                           li(ng-repeat="nutrient in phase.nutrients")
-                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient.id}}", checked=true)
+                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
                             label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
 
                       
@@ -356,14 +356,14 @@ block content
 block footer-scripts
 
   script
-    Bitponics.user = !{JSON.stringify(user.toPublicJSON())};
-    Bitponics.growPlans = !{JSON.stringify(growPlans)};
-    Bitponics.growSystems = !{JSON.stringify(growSystems)};
-    Bitponics.actions = !{JSON.stringify(actions)};
-    Bitponics.controls = !{JSON.stringify(controls)};
-    Bitponics.sensors = !{JSON.stringify(sensors)};
-    Bitponics.plants = !{JSON.stringify(plants)};
-    Bitponics.growPlanDefault = !{JSON.stringify(growPlanDefault)};
+    bpn.user = !{JSON.stringify(user.toPublicJSON())};
+    bpn.growPlans = !{JSON.stringify(growPlans)};
+    bpn.growSystems = !{JSON.stringify(growSystems)};
+    bpn.actions = !{JSON.stringify(actions)};
+    bpn.controls = !{JSON.stringify(controls)};
+    bpn.sensors = !{JSON.stringify(sensors)};
+    bpn.plants = !{JSON.stringify(plants)};
+    bpn.growPlanDefault = !{JSON.stringify(growPlanDefault)};
   
   //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
   //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')

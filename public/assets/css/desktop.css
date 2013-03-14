@@ -31,9 +31,13 @@
   margin-right: 26%;
 }
 @media screen and (min-width: 65em) {
-  .landing-page .list-grid-wrapper {
-    width: 80%;
+  .landing-page .page-content-inner-wrapper {
+    width: 84%;
     float: right;
+  }
+  .landing-page #how-it-works #details .detail-block {
+    width: 40%;
+    float: left;
   }
   .landing-page #pricing .center {
     width: 70%;

@@ -17,7 +17,7 @@ script window.jQuery || document.write('<script src="/assets/js/libs/jquery/jque
 
 
 script
-	Bitponics = {
+	bpn = {
 		appUrl : '!{appUrl}',
 		pages : {}
 	};
@@ -27,14 +27,15 @@ mixin requirejs(datamain)
 	script
 		require.config({
 			paths: {
-				'viewmodels': '/assets/js/shared/viewmodels', 
+				'view-models': '/assets/js/fe-be/view-models',
 				'es5shim': '/assets/js/libs/es5-shim.min',
 				'steps': '/assets/js/libs/Steps',
 				'moment': '/assets/js/libs/moment.min',
 				'utils': '/assets/js/shared/utils',
+				'fe-be-utils': '/assets/js/fe-be/fe-be-utils',
 				'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
 				'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
 				'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
-				'backstretch': '/assets/js/libs/jquery-backstretch/jquery.backstretch.min'
+				'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min'
 			}
 		});

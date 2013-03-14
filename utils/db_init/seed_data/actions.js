@@ -223,14 +223,12 @@ module.exports = [
 					{
 						controlValue: '1',
 						durationType: 'minutes',
-						duration: 15, 
-						message: "Turn pump on for 15 minutes"
+						duration: 15
 					},
 					{
 						controlValue: '0',
 						durationType: 'minutes',
-						duration: 15, 
-						message: "Turn pump off for 15 minutes"
+						duration: 15
 					}
 				],
 				repeat: true
@@ -246,21 +244,18 @@ module.exports = [
 					{
 						controlValue: '0',
 						durationType: 'hours',
-						duration: 6,
-						message: "Turn light off."
+						duration: 6
 					},
 					{
 						controlValue: '1',
 						durationType: 'hours',
-						duration: 16,
-						message: "Turn light on."
+						duration: 16
 					},
 					// finish off the 24 hour day with off
 					{
 						controlValue: '0',
 						durationType: 'hours',
-						duration: 2,
-						message: "Turn light off."
+						duration: 2
 					}
 				],
 				repeat: true
@@ -268,6 +263,6 @@ module.exports = [
 		},
 		{
 			_id : '506de2fc8eebf7524342cb2c',
-			description: "Pollinate any new blossoms. Use a small paintbrush or cottom swab brush to distribute pollen between flowers."
+			description: "Pollinate any new blossoms. Use a small paintbrush or cotton swab brush to distribute pollen between flowers."
 		}
 	];

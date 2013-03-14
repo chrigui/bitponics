@@ -3,7 +3,7 @@ var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
 module.exports = [
 		{
 			_id : '506de2fe8eebf7524342cb34',
-			deviceId: "0006667211cf", //mac address
+			macAddress: "0006667211cf", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 1",
 			users : [
@@ -41,7 +41,7 @@ module.exports = [
 		},
 		{
 			_id : '506de2fe8eebf7524342cb35',
-			deviceId: "0006667288ae", //mac address
+			macAddress: "0006667288ae", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 2",
 			users : [
@@ -73,7 +73,7 @@ module.exports = [
 		},
 		{
 			_id : '506de2fe8eebf7524342cb36',
-			deviceId: "0006668033ae", //mac address
+			macAddress: "0006668033ae", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 3",
 			users : [
@@ -111,7 +111,7 @@ module.exports = [
 		},
 		{
 			_id : '5118232537d976f7050f6186',
-			deviceId: "000666721fc1", //mac address
+			macAddress: "000666721fc1", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Michael's Prototype Bitponics Device",
 			users : [],

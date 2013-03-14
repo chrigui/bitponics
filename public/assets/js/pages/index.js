@@ -6,14 +6,14 @@ define([
     'es5shim',
     'utils',
     'flexslider',
-    // 'backstretch'
+    'throttle-debounce'
     ],
 function(){
-  Bitponics.pages.home = {
+  bpn.pages.home = {
     
     MIN_SECTION_HEIGHT: 800,
 
-    sectionPositions: {},
+    sectionPositions: [],
 
     screenHeight: undefined,
     screenWidth: undefined,
@@ -23,13 +23,13 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      Bitponics.Utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
+      bpn.utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
         
         //match section height to window
         //create fixed nav
         self.screenWidth = $(window).width();
         if(self.screenWidth > 700){
-          Bitponics.Utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
+          bpn.utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
         }
 
         //create fixed nav
@@ -54,13 +54,16 @@ function(){
 
         //get section top values so we know when scrolling to highlight nav item
         $('#main > .content-module').each(function(i){
+          var id = $(this).attr('id'),
+              top = $(this).position().top;
 
           //eval any page inline scripts (like Wufoo form scipt)
           $(this).find('div.script').each(function(){
             eval($(this).text())
           });
 
-          self.sectionPositions[$(this).attr('id')] = $(this).position().top;
+
+          self.sectionPositions[i] = { 'id': id, 'top': Math.floor(top) };
 
           
         });
@@ -95,37 +98,54 @@ function(){
                             .insertAfter('#home'),
           originalStyles = headerFixed.attr('style');
       
-      $(window).scroll(function (event) {
-        var y = $(this).scrollTop(),
+      $(window).scroll($.throttle( 250, sectionNavHighlight));
+
+      function sectionNavHighlight(event) {
+        var y = self.scrollTop = $(this).scrollTop(),
             secPos = self.sectionPositions;
+        console.log(y)
+        console.log(self.screenHeight)
+        if (y >= self.screenHeight) {
+          
+          console.log(y);
 
-        if (y >= screenHeight) {
+          // setTimeout(function(){
+            // var closest = null;
+
+            // $.each(theArray, function(){
+            //   if (closest == null || Math.abs(this - goal) < Math.abs(closest - goal)) {
+            //     closest = this;
+            //   }
+            // });
+            var i = secPos.length;
+            while(i--){
+              console.log(y + ' >= '+secPos[i].top+': '+secPos[i].id)
+              if(y >= secPos[i].top){
+                console.log(secPos[i].id)
+                $('.header-fixed li').removeClass('active');
+                $('.header-fixed li[data-name='+secPos[i].id+']').addClass('active');
+                break;
+              }
+            };
+          // }, 0);
+          
           headerFixed.attr('style', '').addClass('fixed');
-          self.sectionNavHighlight(y, secPos);
-        } else {
-          headerFixed.attr('style', originalStyles).removeClass('fixed');
-        }
-      });
-    },
 
-    sectionNavHighlight: function(scrollTop, secPos) {
-      var secPos = secPos;
-      setTimeout(function(){
-        var lastSection = 'home';
-        for(var section in secPos){
-          if(scrollTop >= secPos[section]){
-            console.log('place: '+section)
-            $('.header-fixed li').removeClass('active');
-            $('.header-fixed li[data-name='+section+']').addClass('active');
-          }
-        };
-      }, 0);
+        } else {
+
+          headerFixed.attr('style', originalStyles).removeClass('fixed');
+
+        }
+
+      }
     }
+
+
 
   }
 
   $(function () {
-    Bitponics.pages.home.init();
+    bpn.pages.home.init();
   });
 
 });

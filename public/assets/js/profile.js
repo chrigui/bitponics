@@ -1,4 +1,5 @@
-Bitponics.pages.profile = {
+bpn = bpn || {};
+bpn.pages.profile = {
     
     container: $('body'),
 
@@ -9,8 +10,8 @@ Bitponics.pages.profile = {
         });
         this.initEventHandlers();
 
-        $('#country_timezone').val(Bitponics.user.timezone);
-        $('#locale_timezone').val(Bitponics.user.locale.territory);
+        $('#country_timezone').val(bpn.user.timezone);
+        $('#locale_timezone').val(bpn.user.locale.territory);
     },
 
     initEventHandlers: function() {
@@ -38,5 +39,5 @@ Bitponics.pages.profile = {
 };
 
 $(function () {   
-    Bitponics.pages.profile.init();
+    bpn.pages.profile.init();
 });

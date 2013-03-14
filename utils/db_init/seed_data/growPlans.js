@@ -7,19 +7,6 @@ module.exports = [
 			name: "All-Purpose",
 			description: "A generic grow plan suitable for running a garden with a wide variety of plants. It won't get you optimum yields for everything, but it's a good starting point while you learn about the specific needs of your plants.",
 			plants: [],
-			expertiseLevel: "beginner",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3078eebf7524342cb5f",
-				"506de3088eebf7524342cb63"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32",
-				"506de2fc8eebf7524342cb2d"
-			],
 			phases: [
 				{
 					_id : '506de30c8eebf7524342cb72',
@@ -64,14 +51,14 @@ module.exports = [
 						},
 						{
 							_id : '506de30b8eebf7524342cb6e',
-							sCode: "full",
+							sCode: "lux",
 							valueRange: {
 								min: 2000,
-								max: 10000
+								max: 4000
 							},
 							applicableTimeSpan: {
-								startTime: 28800000, //8am
-								endTime: 72000000 //8pm
+								startTime: (6 * 60 * 60 * 1000), //6am
+								endTime: (22 * 60 * 60 * 1000)//10pm
 							},
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
@@ -104,15 +91,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30b8eebf7524342cb6d',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 15000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -136,17 +123,6 @@ module.exports = [
 			name: "Tomato",
 			description: "Growing indeterminate organic tomatoes (Redfield Beauty OG) for year round fruiting. Growing in a 3’x3’ grow bed filled with 4\" of hydroton.",
 			plants: ["50749126fe420e210be58a6d"],
-			expertiseLevel: "intermediate",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5f"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32"
-			],
 			phases: [
 				{
 					_id : '506de3038eebf7524342cb4e',
@@ -170,15 +146,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30e8eebf7524342cb7b',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 3000,
+                max: 4000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -221,15 +197,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30f8eebf7524342cb7d',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 20000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -271,15 +247,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de30f8eebf7524342cb7f',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 50000,
+                max: 107500
+              },
+              applicableTimeSpan: {
+                startTime: (8 * 60 * 60 * 1000), //8am
+                endTime: (20 * 60 * 60 * 1000)//8pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -320,15 +296,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3108eebf7524342cb81',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 50000,
+                max: 107500
+              },
+              applicableTimeSpan: {
+                startTime: (8 * 60 * 60 * 1000), //8am
+                endTime: (20 * 60 * 60 * 1000)//8pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -352,17 +328,6 @@ module.exports = [
 			name: "Mixed Greens",
 			description: "A grow plan suited for growing any variety of herbs and leafy greens you want. Basil, cilantro, lettuce, swiss chard, throw it all in!",
 			plants: ["50749120fe420e210be58a69", "50a016f8eb1164c6b88e3038", "5074983aab364e2a9fffd4f1", "5074912dfe420e210be58a82"],
-			expertiseLevel: "intermediate",
-			sensors: [
-				"506de3068eebf7524342cb59",
-				"506de3078eebf7524342cb5d",
-				"506de3078eebf7524342cb5e",
-				"506de3068eebf7524342cb5a",
-				"506de3078eebf7524342cb5f"
-			],
-			controls: [
-				"506de2fd8eebf7524342cb32"
-			],
 			phases: [
 				{
 					_id : '506de30e8eebf7524342cb79',
@@ -386,15 +351,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3118eebf7524342cb83',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 2000,
+                max: 4000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},
@@ -437,15 +402,15 @@ module.exports = [
 					idealRanges: [
 						{
 							_id : '506de3118eebf7524342cb85',
-							sCode: "full",
-							valueRange: {
-								min: 2000,
-								max: 10000
-							},
-							applicableTimeSpan: {
-								startTime: 21600000, //6am
-								endTime: 64800000 //10pm
-							},
+              sCode: "lux",
+              valueRange: {
+                min: 15000,
+                max: 27000
+              },
+              applicableTimeSpan: {
+                startTime: (6 * 60 * 60 * 1000), //6am
+                endTime: (22 * 60 * 60 * 1000)//10pm
+              },
 							actionBelowMin : "506de2fb8eebf7524342cb28",
 							actionAboveMax : "506de2fb8eebf7524342cb29"
 						},

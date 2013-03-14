@@ -9,12 +9,10 @@ var ControlSchema = new Schema({
 	name: { type: String, required: true },
 	onAction: { type: ObjectId, ref: 'Action', required: false },
 	offAction: { type: ObjectId, ref: 'Action', required: false }
-});
+},
+{ id : false });
 
 ControlSchema.plugin(useTimestamps);
-
-ControlSchema.suggestions = {
-};
 
 exports.schema = ControlSchema;
 exports.model = mongoose.model('Control', ControlSchema);

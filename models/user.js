@@ -51,16 +51,23 @@ UserSchema = new Schema({
   	email: { type: Boolean, default: true },
   	sms: { type: Boolean, default: false }
   },
-  deviceKey : {
-  	/**
-  	 * Public device key is a 16-char random hex string
-  	 */
-  	public : String,
-  	/**
-  	 * Private device key is a 16-char random hex string
-  	 */
-  	private : String
-  },
+  deviceKeys : [
+	  {
+	  	/**
+	  	 * deviceId not required. We temporarily create & save unassociated deviceKeys
+	  	 * for use during the setup process
+	  	 */
+	  	deviceId : { type: ObjectId, ref : 'Device'},
+	  	/**
+	  	 * Public device key is a 16-char random hex string
+	  	 */
+	  	public : String,
+	  	/**
+	  	 * Private device key is a 16-char random hex string
+	  	 */
+	  	private : String
+	  }
+  ],
   apiKey : {
   	/**
   	 * Public API key is a 16-char random hex string
@@ -88,7 +95,8 @@ UserSchema = new Schema({
 		]
   	}
   ]
-});
+},
+{ id : false });
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
@@ -136,6 +144,25 @@ UserSchema.virtual('timezoneOffset')
 		return timezoneoffset;
 	});
 
+/**
+ *  Get the available device key, if exists
+ */
+UserSchema.virtual('availableDeviceKey')
+	.get(function(){
+		var user = this,
+			i,
+			currentDeviceKey;
+
+		if (!user.deviceKeys) { return; }
+		
+		for (i = user.deviceKeys.length - 1; i >= 0; i--) {
+			currentDeviceKey = user.deviceKeys[i];
+			if (!currentDeviceKey.deviceId){
+				return currentDeviceKey;
+			}
+		};
+	});
+
 /************************** STATIC METHODS  ***************************/
 
 UserSchema.static('createUserWithPassword', function(userProperties, password, done){
@@ -175,11 +202,13 @@ UserSchema.static('authenticate', function(email, password, done) {
  * Used by Passport BPN_DEVICE strategy
  */
 UserSchema.static('getByPublicDeviceKey', function(key, done) {
-  User.findOne({ 'deviceKey.public': key }, function(err, user) {
+  User.findOne({ 'deviceKeys.public': key }, function(err, user) {
 	  if (err) { return done(err); }
       if (!user) { return done(new Error('No such device key'), false); }
-
-      return done(null, user, user.deviceKey.private);
+      var matchingPrivateKey = user.deviceKeys.filter(function(deviceKey){
+      	return deviceKey.public === key;
+      })[0];
+      return done(null, user, matchingPrivateKey);
   });
 });
 
@@ -212,13 +241,56 @@ UserSchema.method('toPublicJSON', function() {
   	timezone: this.timezone,
   	active : this.active,
   	notificationPreferences: this.notificationPreferences,
-  	deviceKey : {
-  		public : this.deviceKey.public
-  	},
+  	deviceKeys : this.deviceKeys.map(
+  		function(el){ 
+  			return { deviceId : el.deviceId, 'public' : el.public};
+  		}
+	),
   	apiKey : {
   		public: this.apiKey.public
   	}
   };
+});
+
+/**
+ *  Give user device keys if needed. This can be done in parallel with other pre save hooks.
+ *  http://mongoosejs.com/docs/middleware.html
+ */
+UserSchema.method('ensureAvailableDeviceKey', function(done){
+	var user = this,
+		availableDeviceKey,
+		i,
+		currentDeviceKey;
+
+	user.deviceKeys = user.deviceKeys || [];
+
+	for (i = user.deviceKeys.length - 1; i >= 0; i--) {
+		currentDeviceKey = user.deviceKeys[i];
+		if (!currentDeviceKey.deviceId){
+			availableDeviceKey = currentDeviceKey;
+			break;
+		}
+	};
+	if (availableDeviceKey){
+		return done(null, availableDeviceKey);
+	} else {
+		crypto.randomBytes(32, function(ex, buf) {
+			if (ex) { return done(ex); }
+		  	var keysSource = buf.toString('hex'),
+		  		publicKey = keysSource.substr(0, 16),
+		  		privateKey = keysSource.substr(16, 16);
+		  	
+		  	availableDeviceKey = {
+		  		'public' : publicKey,
+		  		'private' : privateKey
+		  	};
+		  	user.deviceKeys.push(availableDeviceKey);
+		  	user.save(function(err){
+		  		if (err) { return done(err);}
+		  		return done(null, availableDeviceKey);
+		  	})
+		});	
+	}
 });
 
 /************** END INSTANCE METHODS ********************/
@@ -228,28 +300,18 @@ UserSchema.method('toPublicJSON', function() {
 
 /***************** MIDDLEWARE **********************/
 
+
+
 /**
- *  Give user device keys if needed. This can be done in parallel with other pre save hooks.
- *  http://mongoosejs.com/docs/middleware.html
+ * TODO 
+ * Make sure there's a max of 1 "available" deviceKey at a time
  */
 UserSchema.pre('save', true, function(next, done){
 	var user = this;
+	
 	next();
-	if (user.deviceKey && user.deviceKey.public && user.deviceKey.private){ return done(); }
-
-	crypto.randomBytes(32, function(ex, buf) {
-		if (ex) { return done(ex); }
-	  	var keysSource = buf.toString('hex'),
-	  		publicKey = keysSource.substr(0, 16),
-	  		privateKey = keysSource.substr(16, 16);
-	  	
-	  	user.deviceKey = {
-	  		public : publicKey,
-	  		private : privateKey
-	  	};
-	  	done();
-	  	
-  	});
+	
+	done();	
 });
 
 /**
@@ -332,7 +394,7 @@ UserSchema.pre('save', true, function(next, done){
 
 /***************** INDEXES ************************************/
 UserSchema.index({ 'email': 1 });
-UserSchema.index({ 'deviceKey.public': 1 });
+UserSchema.index({ 'deviceKeys.public': 1 });
 UserSchema.index({ 'apiKey.public': 1 });
 /***************** END INDEXES ********************************/
 

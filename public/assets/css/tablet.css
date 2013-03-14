@@ -514,6 +514,9 @@ section#footer {
   max-width: 60em;
   font-size: 1em;
 }
+.landing-page .page-heading {
+  line-height: 2em;
+}
 .landing-page #main #about,
 .landing-page #main #gallery,
 .landing-page #main #contact,
@@ -521,7 +524,8 @@ section#footer {
 .landing-page #main #press,
 .landing-page #main #buy,
 .landing-page #main #pricing,
-.landing-page #main #team {
+.landing-page #main #team,
+.landing-page #main #details {
   padding-top: 3.5em;
 }
 .landing-page .flexslider img {
@@ -554,11 +558,25 @@ section#footer {
   border-top: 1px solid #00e36c;
   padding: 1em 0 0 0;
 }
-.landing-page #contact #wufoo-m7x4a3,
+.landing-page #how-it-works #details .detail-block {
+  width: 100%;
+}
+.landing-page #contact #wufoo-wrapper,
 .landing-page #contact #email-sub {
   float: left;
   width: 40%;
   margin: 1em 10% 0 0;
+}
+#pricing .price .price-number,
+#pricing .price .price-type,
+#pricing .price .price-per {
+  display: inline;
+  padding: 0;
+}
+#pricing .price .price-per {
+  display: block;
+  margin-top: -0.85em;
+  width: 100%;
 }
 .list-grid-wrapper {
   font-size: 1em;
@@ -584,17 +602,6 @@ section#footer {
   display: inline-block;
   padding: 1em 1em 0;
   font-size: 0.85em;
-}
-.list-grid-wrapper .grid-list li.price .price-number,
-.list-grid-wrapper .grid-list li.price .price-type,
-.list-grid-wrapper .grid-list li.price .price-per {
-  display: inline;
-  padding: 0;
-}
-.list-grid-wrapper .grid-list li.price .price-per {
-  display: block;
-  margin-top: -0.85em;
-  width: 100%;
 }
 .list-grid-wrapper .grid-list li.first {
   border: 0 none;

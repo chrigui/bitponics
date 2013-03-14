@@ -116,6 +116,24 @@ textarea
 	input[type='checkbox']:checked ~ .info
 		display block
 
+
+
+// inline MailChimp mailing list form
+#mc-embedded-subscribe-form
+	input[type=email]
+		width: 70%
+
+// inline wufoo form
+#wufoo-form 
+	.buttons
+		margin-top 1em
+
+	input[type=text],input[type=email],textarea
+		width:90%
+
+	input[type=submit]
+		font-size 1.1em
+
 .wufoo
 	background-color color-light-gray-bg!important
 	color white!important
@@ -125,6 +143,9 @@ textarea
 
 	li
 		padding 0
+
+		.buttons
+			padding-left 0
 
 	label, input
 		// display block!important
@@ -158,7 +179,8 @@ textarea
 		background white!important
 		color color-medium-green!important
 		border 4px solid color-medium-green!important
-		font-size 1.5em!important
+		font-size 1.5em
+		cursor pointer
 
 
 .amazon

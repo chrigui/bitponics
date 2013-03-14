@@ -61,7 +61,7 @@ block content
 
 block footer-scripts
   script
-    Bitponics.user = !{JSON.stringify(user)}
+    bpn.user = !{JSON.stringify(user.toPublicJSON())};
 
   script(src='/assets/js/libs/jquery/jquery.maphilight.min.js')
   script(src='/assets/js/libs/jquery/jquery.timezone-picker.js')

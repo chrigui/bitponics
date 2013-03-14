@@ -9,79 +9,85 @@ var mongoose = require('mongoose'),
     async = require('async');
 
 module.exports = function(app){
-	app.get('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res){
-	  var locals = {
-	    title: 'Bitponics Device Setup',
-	    className : 'setup'
-	  };
+	app.get('/setup', 
+		routeUtils.middleware.ensureSecure,
+		routeUtils.middleware.ensureLoggedIn, 
+		function (req, res){
+		  	req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+		  		var locals = {
+		   			title: 'Bitponics Device Setup',
+			    	className : 'setup',
+			    	availableDeviceKey : availableDeviceKey
+		  		};
 
-	  res.render('setup', locals);
-
-	});
+		  		res.render('setup', locals);
+		  	});
+		}
+	);
 
 	/**
 	 * Posts to /setup should specify a device MAC address, and should
 	 * be an authenenticated user. We then assign the device to the user 
 	 */
-	app.post('/setup', routeUtils.middleware.ensureLoggedIn, function (req, res, next){
-	  	var rawDeviceMacAddress = req.param('deviceMacAddress'),
-	  		deviceId,
-	  		device,
-	  		now = Date.now();
+	app.post('/setup', 
+		routeUtils.middleware.ensureSecure,
+		routeUtils.middleware.ensureLoggedIn, 
+		function (req, res, next){
+		  	var rawDeviceMacAddress = req.param('deviceMacAddress'),
+		  		cleanDeviceMacAddress,
+		  		device,
+		  		now = Date.now();
 
-	  	console.log('req.params');
-	  	console.log(req.params);
-	  	console.log('req.body');
-	  	console.log(req.body);
-		console.log('req.user');
-	  	console.log(req.user);
-	  	
+		  	winston.info('/setup');
+		  	winston.info('req.params');
+		  	winston.info(req.params);
+		  	winston.info('req.body');
+		  	winston.info(req.body);
+			winston.info('req.user');
+		  	winston.info(req.user);
+		  	
+	  		if (!rawDeviceMacAddress){
+	  			return res.json(400, { success : false, error : 'Request requires deviceMacAddress parameter'});
+	  		}
+	  		if (!req.param('publicDeviceKey')) { return res.json(400, { success : false, error : 'Request requires publicDeviceKey parameter'});}
 
-  		if (!rawDeviceMacAddress){
-  			return res.json(400, { success : false, error : 'Request requires deviceMacAddress parameter'});
-  		}
+	  		cleanDeviceMacAddress = rawDeviceMacAddress.replace(/:/g,'')
 
-  		deviceId = rawDeviceMacAddress.replace(/:/g,'')
+			// See if the device exists.
+			async.series([
+				function(callback){
+					DeviceModel.findOne({ macAddress: cleanDeviceMacAddress }, 
+						function(err, deviceResult){
+							if (err) { return callback(err);}
+							if (deviceResult){
+								device = deviceResult;
+							} else {
+								// TODO : this scenario shouldn't occur in production; we should create Device model instances
+								// at production time. 
+								device = new DeviceModel({
+									macAddrress : cleanDeviceMacAddress
+			                        // will get a default deviceType based on Device middleware
+								});
+							}
 
-        // TODO : use some sort of "ensureAuthenticated" middleware to do this
-        if (!req.user instanceof Object){
-            return res.json(400, { success : false, error : 'Request requires a User instance'});
-        }
-
-		// See if the device exists.
-		async.series([
-			function(callback){
-				DeviceModel.findOne({ deviceId: deviceId }, 
-					function(err, deviceResult){
-						if (err) { return callback(err);}
-						if (deviceResult){
-							device = deviceResult;
-						} else {
-							// TODO : this scenario shouldn't occur in production; we should create Device model instances
-							// at production time. 
-							device = new DeviceModel({
-								deviceId : deviceId
-		                        // will get a default deviceType based on Device middleware
+							device.userAssignmentLogs = device.userAssignmentLogs || [];
+							device.userAssignmentLogs.push({
+								ts: now,
+								user : req.user,
+			                    assignmentType : DeviceUtils.roles.owner
 							});
+			                device.owner = req.user;
+
+			                device.save(callback)
 						}
-
-						device.userAssignmentLogs = device.userAssignmentLogs || [];
-						device.userAssignmentLogs.push({
-							ts: now,
-							user : req.user,
-		                    assignmentType : DeviceUtils.roles.owner
-						});
-		                device.owner = req.user;
-
-		                device.save(callback)
-					}
-				);
-			}
-            ],
-			function(err, result){
-                if (err){ return next(err); }
-                return res.json(200, {success: true});
-			}
-		);
-	});	
+					);
+				}
+	            ],
+				function(err, result){
+	                if (err){ return next(err); }
+	                return res.json(200, {success: true});
+				}
+			);
+		}
+	);	
 };
