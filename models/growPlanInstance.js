@@ -243,7 +243,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),
       ActionModel = Action.model,
       NotificationModel = require('./notification').model,
-      ActionOverrideLogModel = require('./actionOverrideLog').model,
+      ImmediateActionModel = require('./immediateAction').model,
       UserModel = require('./user').model,
       growPlanInstance = this,
       growPlan = growPlanInstance.growPlan,
@@ -336,7 +336,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             .find()
             .where('gpi')
             .equals(growPlanInstance._id)
-            .where('timeToSend')
+            .where('tts')
             .gte(now)
             .exec(function(err, existingNotifications){
               if (err) { return innerParallelCallback(err); }
@@ -358,40 +358,40 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             if (!device){ return innerParallelCallback(); }
             
             device.activeActions.expires = now - 1000;
-            device.activeActionsOverride.expires = now - 1000;
+            device.activeImmediateActions.expires = now - 1000;
 
             device.save(innerParallelCallback);
           },
           
-          // Expire actionOverrides that conflict with a device controlled action in the new phase
+          // Expire immediateActions that conflict with a device controlled action in the new phase
           function (innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
-            ActionOverrideLogModel
+            ImmediateActionModel
             .find()
             .where('gpi')
             .equals(growPlanInstance._id)
-            .where('expires')
+            .where('e')
             .gt(now)
-            .populate('action')
-            .exec(function(err, actionOverrideLogResults){
+            .populate('a')
+            .exec(function(err, immediateActionResults){
               if (err) { return innerParallelCallback(err);}
-              if (!actionOverrideLogResults.length){ return innerParallelCallback(); }
+              if (!immediateActionResults.length){ return innerParallelCallback(); }
             
-              var actionOverrideLogsToExpire = [];
-              actionOverrideLogResults.forEach(function(actionOverrideLog){
-                if (!actionOverrideLog.action.control) { return; } 
+              var immediateActionsToExpire = [];
+              immediateActionResults.forEach(function(immediateAction){
+                if (!immediateAction.action.control) { return; } 
                 if (actionsWithDeviceControl.some(function(action){
-                  return actionOverrideLog.action.control.equals(action.control);
+                  return immediateAction.action.control.equals(action.control);
                 })){
-                  actionOverrideLogsToExpire.push(actionOverrideLog);
+                  immediateActionsToExpire.push(immediateAction);
                 } 
               });
 
-              async.forEach(actionOverrideLogsToExpire, 
-                function(actionOverrideLog, iteratorCallback){
-                  actionOverrideLog.expires = now;
-                  actionOverrideLog.save(iteratorCallback);
+              async.forEach(immediateActionsToExpire, 
+                function(immediateAction, iteratorCallback){
+                  immediateAction.expires = now;
+                  immediateAction.save(iteratorCallback);
                 }, 
                 function(err){
                   if (err) { return innerParallelCallback(err);}
@@ -427,7 +427,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     users : growPlanInstance.users,
                     gpi : growPlanInstance,
                     timeToSend : now,
-                    msg : prevPhase.name + ' phase ended. Time for the following action: "' + action.description + '".'
+                    message : prevPhase.name + ' phase ended. Time for the following action: "' + action.description + '".'
                   });
 
               actionNotification.save(iteratorCallback);
@@ -458,7 +458,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   users : growPlanInstance.users,
                   gpi : growPlanInstance,
                   timeToSend : now,
-                  msg : growPlanPhase.name + ' phase started. Time for the following action: "' + action.description + '".'
+                  message : growPlanPhase.name + ' phase started. Time for the following action: "' + action.description + '".'
                 });
 
               notificationsToSave.push(actionNotification);
@@ -470,13 +470,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   })
                   ){
                     actionNotification.type = 'info';
-                    actionNotification.msg += ' Since you have a ' + action.control.name + ' connected, we\'ve triggered this automatically.';
+                    actionNotification.message += ' Since you have a ' + action.control.name + ' connected, we\'ve triggered this automatically.';
               } else {
                 actionNotification.type = 'actionNeeded';
-                actionNotification.msg += ' ';
+                actionNotification.message += ' ';
 
                 if (action.cycle.repeat){
-                  actionNotification.msg += " This action has a repeating cycle associated with it. We'll notify you whenever an action is required.";
+                  actionNotification.message += " This action has a repeating cycle associated with it. We'll notify you whenever an action is required.";
                   // cycles with repeat=true are required to have 2 or 3 states (through validation rules)
                   // since a 3-state cycle is just an offset 2-state cycle,
                   // the logic for them ends up being the same here
@@ -486,13 +486,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     // state 0 has a duration and state 1 does not
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
-                      gpi : growPlanInstance,
+                      growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : states[0].durationType,
                         duration : states[0].duration,
-                        tz : growPlanInstance.owner.timezone
+                        timezone : growPlanInstance.owner.timezone
                       },
                       type : 'actionNeeded'
                     }));
@@ -500,13 +500,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     // state 0 does not have a duration and state 1 does
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
-                      gpi : growPlanInstance,
+                      growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : states[1].durationType,
                         duration : states[1].duration,
-                        tz : growPlanInstance.owner.timezone
+                        timezone : growPlanInstance.owner.timezone
                       },
                       type : 'actionNeeded'
                     }));
@@ -514,26 +514,26 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     // both states have durations
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
-                      gpi : growPlanInstance,
+                      growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
-                        tz : growPlanInstance.owner.timezone
+                        timezone : growPlanInstance.owner.timezone
                       },
                       type : 'actionNeeded'
                     }));
 
                     notificationsToSave.push(new NotificationModel({
                       users : growPlanInstance.users,
-                      gpi : growPlanInstance,
+                      growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      msg : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
-                        tz : growPlanInstance.owner.timezone
+                        timezone : growPlanInstance.owner.timezone
                       },
                       type : 'actionNeeded'
                     }));

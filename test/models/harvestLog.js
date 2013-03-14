@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  HarvestLog = require('../models/harvestLog'),
+  HarvestLog = require('../../models/harvestLog'),
   should = require('should');
 
 
@@ -30,14 +30,20 @@ describe('HarvestLog', function(){
     });
 
     var result = log.toObject();
-    should.not.exist(result.l)
-    should.exist(result.logs);
+
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.p);
-      should.not.exist(log.w);
-      should.exist(log.plant);
-      should.exist(log.weight);
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
 
   });
@@ -55,14 +61,20 @@ describe('HarvestLog', function(){
     });
 
     var result = log.toJSON();
-    should.not.exist(result.l)
-    should.exist(result.logs);
+
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.p);
-      should.not.exist(log.w);
-      should.exist(log.plant);
-      should.exist(log.weight);
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
   });
 

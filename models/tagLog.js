@@ -61,6 +61,15 @@ TagLogSchema.virtual('logs')
     this.l = logs;
   });
 
+TagLogSchema.virtual('timestamp')
+  .get(function () {
+    return this.ts;
+  })
+  .set(function(timestamp){
+    this.ts = timestamp;
+  });
+
+
 
 /*************** SERIALIZATION *************************/
 
@@ -77,8 +86,9 @@ TagLogSchema.set('toObject', {
       delete ret.v;
       delete ret.t;
     } else {
-      // else we're operating on the parent doc (the SensorLog doc)
+      // else we're operating on the parent doc (the TagLog doc)
       delete ret.l;
+      delete ret.ts;
     }
   }
 });
@@ -89,7 +99,7 @@ TagLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-TagLogSchema.index({ 'gpi ts logs.tags': -1 });
+TagLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = TagLogSchema;
 exports.model = mongoose.model('TagLog', TagLogSchema);

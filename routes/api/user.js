@@ -1,5 +1,6 @@
 var UserModel = require('../../models/user').model,
-    winston = require('winston');
+    winston = require('winston'),
+    routeUtils = require('../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -9,12 +10,16 @@ var UserModel = require('../../models/user').model,
 module.exports = function(app) {
   
   //List users
-  app.get('/api/users', function (req, res, next){
-    return UserModel.find(function (err, users) {
-      if (err) { return next(err); }
-      return res.send(users);
-    });
-  });
+  app.get('/api/users', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return UserModel.find(function (err, users) {
+        if (err) { return next(err); }
+        return res.send(users);
+      });
+    }
+  );
 
   /*
    * Create single user
@@ -29,21 +34,25 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/users', function (req, res, next){
-    var user;
-    winston.info("POST: ");
-    winston.info(req.body);
-    user = new UserModel({
-      email : req.body.email,
-      name : req.body.name,
-      locale: req.body.locale,
-      active : req.body.active
-    });
-    user.save(function (err) {
-      if (err) { return next(err); }
-      return res.send(user);
-    });
-  });
+  app.post('/api/users', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      var user;
+      winston.info("POST: ");
+      winston.info(req.body);
+      user = new UserModel({
+        email : req.body.email,
+        name : req.body.name,
+        locale: req.body.locale,
+        active : req.body.active
+      });
+      user.save(function (err) {
+        if (err) { return next(err); }
+        return res.send(user);
+      });
+    }
+  );
 
   /*
    * Read a user
@@ -56,12 +65,16 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/users/:id', function (req, res, next){
-    return UserModel.findById(req.params.id, function (err, user) {
-      if (err) { return next(err); }
-      return res.send(user);
-    });
-  });
+  app.get('/api/users/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return UserModel.findById(req.params.id, function (err, user) {
+        if (err) { return next(err); }
+        return res.send(user);
+      });
+    }
+  );
 
   /*
    * Update a user
@@ -81,16 +94,20 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/users/:id', function (req, res, next){
-    return UserModel.findById(req.params.id, function (err, user) {
-      if (err) { return next(err); }
-      user.actionBelowMin = req.body.actionBelowMin;
-      return user.save(function (err) {
+  app.put('/api/users/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return UserModel.findById(req.params.id, function (err, user) {
         if (err) { return next(err); }
-        return res.send(user);
+        user.actionBelowMin = req.body.actionBelowMin;
+        return user.save(function (err) {
+          if (err) { return next(err); }
+          return res.send(user);
+        });
       });
-    });
-  });
+    }
+  );
 
   /*
    * Delete a user
@@ -107,13 +124,17 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/users/:id', function (req, res, next){
-    return UserModel.findById(req.params.id, function (err, user) {
-      if (err) { return next(err); }
-      return user.remove(function (err) {
+  app.delete('/api/users/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return UserModel.findById(req.params.id, function (err, user) {
         if (err) { return next(err); }
-        return res.send('');
+        return user.remove(function (err) {
+          if (err) { return next(err); }
+          return res.send('');
+        });
       });
-    });
-  });
+    }
+  );
 };

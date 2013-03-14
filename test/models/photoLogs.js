@@ -1,6 +1,6 @@
 var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  PhotoLog = require('../models/photoLog'),
+  PhotoLog = require('../../models/photoLog'),
   should = require('should');
 
 
@@ -30,14 +30,20 @@ describe('PhotoLog', function(){
     });
 
     var result = log.toObject();
-    should.not.exist(result.l)
-    should.exist(result.logs);
+
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
-      should.not.exist(log.t);
-      should.exist(log.url);
-      should.exist(log.tags);
+      log.should.not.have.property('u');
+      log.should.not.have.property('t');
+      log.should.have.property('url');
+      log.should.have.property('tags');
       log.tags.should.include("seedling")
       log.tags.should.include("tomato")
     });
@@ -58,14 +64,19 @@ describe('PhotoLog', function(){
 
     var result = log.toJSON();
 
-    should.not.exist(result.l)
-    should.exist(result.logs);
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      should.not.exist(log.u);
-      should.not.exist(log.t);
-      should.exist(log.url);
-      should.exist(log.tags);
+      log.should.not.have.property('u');
+      log.should.not.have.property('t');
+      log.should.have.property('url');
+      log.should.have.property('tags');
       log.tags.should.include("seedling")
       log.tags.should.include("tomato")
     });

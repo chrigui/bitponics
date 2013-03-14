@@ -65,6 +65,13 @@ PhotoLogSchema.virtual('logs')
     this.l = logs;
   });
 
+PhotoLogSchema.virtual('timestamp')
+  .get(function () {
+    return this.ts;
+  })
+  .set(function(timestamp){
+    this.ts = timestamp;
+  });
 
 /*************** SERIALIZATION *************************/
 
@@ -83,6 +90,7 @@ PhotoLogSchema.set('toObject', {
     } else {
       // else we're operating on the parent doc (the SensorLog doc)
       delete ret.l;
+      delete ret.ts;
     }
   }
 });
@@ -94,7 +102,7 @@ PhotoLogSchema.set('toJSON', {
 
 
 
-PhotoLogSchema.index({ 'gpi ts logs.tags': -1 });
+PhotoLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = PhotoLogSchema;
 exports.model = mongoose.model('PhotoLog', PhotoLogSchema);

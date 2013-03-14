@@ -9,7 +9,8 @@
 
  var mongoose = require('mongoose'),
  mongoUrl = require('../config/mongo-config').urls.test,
- exec = require('child_process').exec;
+ exec = require('child_process').exec,
+ winston = require('winston');
 
 /*
  * before Method
@@ -26,8 +27,9 @@
   			if (stderr) { console.log(stderr); return done(new Error(stderr));}
   			return done();
   		}
-	);
-});
+	  );
+  }
+);
 
 /*
  * after Method

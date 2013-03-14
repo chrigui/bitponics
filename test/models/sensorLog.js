@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-  SensorLog = require('../models/sensorLog'),
+  SensorLog = require('../../models/sensorLog'),
   should = require('should');
 
 
@@ -28,14 +28,21 @@ describe('SensorLog', function(){
     });
 
     var result = sensorLog.toObject();
-    should.not.exist(result.l)
-    should.exist(result.logs);
+
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
+
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      log.should.not.have.property('s');
+      log.should.not.have.property('v');
+      log.should.have.property('sCode');
+      log.should.have.property('val');
+    });
 
   });
 
@@ -51,14 +58,22 @@ describe('SensorLog', function(){
     });
 
     var result = sensorLog.toJSON();
-    should.not.exist(result.l)
-    should.exist(result.logs);
+
+    // only friendly 'logs' should exist
+    result.should.not.have.property('l');
+    result.should.have.property('logs');
+
+    // only friendly 'timestamp' should exist
+    result.should.not.have.property('ts');
+    result.should.have.property('timestamp');
+
     result.logs.forEach(function(log){
-      should.not.exist(log.s);
-      should.not.exist(log.v);
-      should.exist(log.sCode);
-      should.exist(log.val);
-    })
+      log.should.not.have.property('s');
+      log.should.not.have.property('v');
+      log.should.have.property('sCode');
+      log.should.have.property('val');
+    });
+
   });
 
 });

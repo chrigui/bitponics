@@ -66,12 +66,12 @@ function logSensorLog(options, callback){
               
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
-              triggerActionOverride(
+              triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
-                  actionOverrideMessage : message, 
+                  immediateActionMessage : message, 
                   user : user 
                 },
                 function(err){
@@ -82,12 +82,12 @@ function logSensorLog(options, callback){
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
-              triggerActionOverride(
+              triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
-                  actionOverrideMessage : message, 
+                  immediateActionMessage : message, 
                   user : user 
                 },
                 function(err){
@@ -112,11 +112,19 @@ function logSensorLog(options, callback){
 
 
 /**
- * Trigger an action override. Can be called because of an IdealRange violation or manually.
+ * Trigger an immediate action. Can be called manually or because of an IdealRange violation.
  *
- * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control. 
+ * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
+ *
+ * @param {object} options  
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel (required),
+ * @param {object|string} options.actionId : ObjectID (required),
+ * @param {object=} options.device : DeviceModel (optional. Device of GrowPlanInstance),
+ * @param {string} options.immediateActionMessage : message to log with the immediateAction
+ * @param {User} options.user : UserModel (required. owner of GrowPlanInstance)
+ * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
-function triggerActionOverride(options, callback){
+function triggerImmediateAction(options, callback){
   var Device = require('./device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
@@ -124,29 +132,31 @@ function triggerActionOverride(options, callback){
     GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
-    ActionOverrideLogModel = require('./actionOverrideLog').model,
+    ImmediateActionModel = require('./immediateAction').model,
     NotificationModel = require('./notification').model,
     SensorLogModel = require('./sensorLog').model,
     EmailConfig = require('../config/email-config'),
     nodemailer = require('nodemailer'),
     winston = require('winston'),
     async = require('async'),
-    tz = require('timezone/loaded');
+    tz = require('timezone/loaded'),
+    i18nKeys = require('../i18n/keys');
 
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
       actionId = options.actionId,
-      actionOverrideMessage = options.actionOverrideMessage,
+      immediateActionMessage = options.immediateActionMessage,
       user = options.user,
       timezone = user.timezone,
       action;
 
   ActionModel.findById(actionId, function(err, actionResult){
     if (err) { return callback(err);}
-    if (!actionResult) { return callback(new Error('Invalid action id'));}
+    if (!actionResult) { return callback(new Error(i18nKeys.get('Invalid action id')));}
 
     action = actionResult;
-    // calculate when the actionOverride should expire.
+
+    // calculate when the immediateAction should expire.
     var now = new Date(),
         expires = now + (365 * 24 * 60 * 60 * 1000),
         actionHasDeviceControl = false;
@@ -155,6 +165,8 @@ function triggerActionOverride(options, callback){
       [
         function(innerCallback){
           if (!action.control){ return innerCallback(); }
+
+          // If we're here, action does have a control
 
           if (!device){
             GrowPlanModel.findById(growPlanInstance.growPlan)
@@ -203,62 +215,63 @@ function triggerActionOverride(options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationMessage = actionOverrideMessage + '. ';
+            notificationMessage;
 
-        winston.info('Logging actionOverride for ' + growPlanInstance._id + ' "' + actionOverrideMessage + '", action ' + action._id);
+        winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
           notificationType = 'actionNeeded';
-          notificationMessage += action.description;
+          notificationMessage = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
           notificationType = 'info';
-          notificationMessage += 'Device has automatically triggered the following action : "' + action.description + '".';
+          notificationMessage = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 
         // In parallel: 
-        // log to ActionOverrideLog
+        // log to ImmediateAction
         // log a Notification, and 
         // if device has a relevant control, refresh its commands
         async.parallel(
           [
             function(innerCallback){
-              var actionLog = new ActionOverrideLogModel({
+              var immediateAction = new ImmediateActionModel({
                   gpi : growPlanInstance._id,
-                  msg : actionOverrideMessage,
+                  message : immediateActionMessage,
                   timeRequested : now,
                   action : action,
                   // TODO : handle expires for the no-device case 
                   expires : expires
                 });
 
-              // push the log to ActionOverrideLogModel
-              actionLog.save(innerCallback);
+              // push the log to ImmediateActionModel
+              immediateAction.save(innerCallback);
             },
             function(innerCallback){
               var notification = new NotificationModel({
                   users : [user],
-                  gpi : growPlanInstance,
+                  growPlanInstance : growPlanInstance,
                   timeToSend : now,
-                  msg : notificationMessage,
+                  message : notificationMessage,
                   type : notificationType
               });
               winston.info('Creating notification : ' + notification.toString());
-              notification.save(function(err){
-                if (err) { return innerCallback(err); }
-                return innerCallback();
-              });
+              notification.save(innerCallback);
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
-                winston.info('Calling refreshActiveActionsOverride for device : ' + device._id.toString());
-                return device.refreshActiveActionsOverride(innerCallback);
+                winston.info('Calling refreshActiveImmediateActions for device : ' + device._id.toString());
+                return device.refreshActiveImmediateActions(innerCallback);
               } 
               return innerCallback();
             }
           ],
-          function(err){
+          function(err, results){
             if (err) { return callback(err); }
-            return callback();
+            var data = {
+              immediateAction : results[0][0],
+              notification : results[1][0]
+            }
+            return callback(null, data);
           }
         );
       }
@@ -349,9 +362,9 @@ function clearPendingNotifications (NotificationModel, callback){
   var now = new Date();
   NotificationModel
   .find()
-  .where('timeToSend')
+  .where('tts')
   .lte(now)
-  .populate('users', 'email') // only need the email field for Users
+  .populate('u', 'email') // only need the email field for Users
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
     if (!notificationResults.length){ return callback(); }
@@ -367,8 +380,8 @@ function clearPendingNotifications (NotificationModel, callback){
             from: "notifications@bitponics.com", // sender address
             to: notification.users.map(function(user) { return user.email; }).join(', '), 
             subject: subject, // Subject line
-            text: notification.msg,
-            html: notification.msg
+            text: notification.message,
+            html: notification.message
         };
         
         emailTransport.sendMail(mailOptions, function(err, response){
@@ -377,7 +390,7 @@ function clearPendingNotifications (NotificationModel, callback){
           notification.sentLogs.push({ts: now});
           
           if (notification.repeat && notification.repeat.duration){
-            notification.timeToSend = tz(notification.timeToSend, notification.tz, notification.repeat.tz, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
+            notification.timeToSend = tz(notification.timeToSend, notification.timezone, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
           } else {
             notification.timeToSend = null;
           }
@@ -497,11 +510,95 @@ function getFullyPopulatedGrowPlan(query, callback){
   );
 }
 
+
+/**
+ * Assigns a User to a Device as an owner.
+ * Pairs by assigning user to device.owner and assigning deviceId to a User.deviceKey
+ *
+ * Designed to be called by /setup route. Assumes that the setup page echoed the available deviceKey
+ * that was created or retrieved on pageload of /setup
+ * 
+ * @param {object} settings
+ * @param {string} settings.deviceMacAddress - macAddress as sent by the device.
+ * @param {string} settings.publicDeviceKey : User.deviceKeys.public string to use to select which key to assign to the device.
+ * @param {User} settings.user
+ * @param {function(err, {device: Device, user: User})} callback 
+ */
+function assignDeviceToUser(settings, callback){
+  var Device = require('./device'),
+      DeviceModel = Device.model,
+      DeviceUtils = Device.utils,
+      async = require('async'),
+      winston = require('winston'),
+      UserModel = require('./user').model,
+      deviceMacAddress = settings.deviceMacAddress,
+      publicDeviceKey = settings.publicDeviceKey,
+      user = settings.user,
+      i18nKeys = require('../i18n/keys'),
+      device;
+
+  async.series(
+    [
+      function deviceStep(innerCallback){
+        DeviceModel.findOne({ macAddress: deviceMacAddress },
+          function(err, deviceResult){
+            if (err) { return callback(err);}
+            if (deviceResult){
+              device = deviceResult;
+            } else {
+              // TODO : this scenario shouldn't occur in production; we should create Device model instances
+              // at production time.
+              device = new DeviceModel({
+                macAddrress : deviceMacAddress
+                // will get a default deviceType based on Device middleware
+              });
+            }
+
+            device.userAssignmentLogs = device.userAssignmentLogs || [];
+            device.userAssignmentLogs.push({
+              ts: new Date(),
+              user : user,
+              assignmentType : DeviceUtils.ROLES.OWNER
+            });
+            device.owner = user;
+
+            device.save(innerCallback)
+          }
+        );
+      },
+      function userStep(innerCallback){
+        var deviceKey = user.deviceKeys.filter(function(deviceKey){
+          return deviceKey.public === publicDeviceKey;
+        })[0];
+        if (!deviceKey || deviceKey.deviceId){ 
+          return innerCallback(
+            new Error(i18nKeys.get("unavailable device key", publicDeviceKey))
+          );
+        }
+
+        deviceKey.deviceId = device._id;
+
+        user.save(innerCallback);
+      }
+    ],
+    function(err, results){
+      if (err) { return callback(err); }
+      var data = {
+        device : results[0][0],
+        user : results[1][0]
+      }
+      return callback(null, data);
+    }
+  );
+}
+
+
 module.exports = {
   logSensorLog : logSensorLog,
-  triggerActionOverride : triggerActionOverride,
+  triggerImmediateAction : triggerImmediateAction,
   scanForPhaseChanges : scanForPhaseChanges,
   clearPendingNotifications : clearPendingNotifications,
   getObjectId : getObjectId,
-  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan
+  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan,
+  assignDeviceToUser : assignDeviceToUser
 };

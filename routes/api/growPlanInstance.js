@@ -1,10 +1,10 @@
 var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
-    ActionOverrideLogModel = require('../../models/actionOverrideLog').model,
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
-    async = require('async');
+    async = require('async'),
+    routeUtils = require('../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -162,7 +162,7 @@ module.exports = function(app) {
       message (optional)
    }
 
-   jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/action_override_logs", 
+   jQuery.post("/api/grow_plan_instances/505d551472b1680000000069/immediate_action_logs", 
     { 
       actionId: "505d551372b1680000000059",
       message: "Manually triggered from web dashboard"
@@ -171,7 +171,7 @@ module.exports = function(app) {
       console.log("Post response:"); console.dir(data); console.log(textStatus);                                        
     });
    */
-  app.post('/api/grow_plan_instances/:id/action_override_logs', function (req, res, next){
+  app.post('/api/grow_plan_instances/:id/immediate_action_logs', function (req, res, next){
     GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
@@ -179,12 +179,12 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
     
-      ModelUtils.triggerActionOverride(
+      ModelUtils.triggerImmediateAction(
         {
           growPlanInstance : growPlanInstance, 
           device : growPlanInstance.device, 
           actionId : req.body.actionId, 
-          actionOverrideMessage : req.body.message,
+          immediateActionMessage : req.body.message,
           user : req.user
         },
         function(err){

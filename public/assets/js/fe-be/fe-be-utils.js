@@ -7,8 +7,12 @@ define(['moment'], function(moment){
    *
    * @type {Array}
    */
-  utils.DURATION_TYPES = ['seconds','minutes','hours','days','weeks','months'];
+  utils.DURATION_TYPES = [
+    'seconds',
+    'minutes',
+    'hours','days','weeks','months'];
 
+  utils.NOTIFICATION_TYPES = ["info","actionNeeded","error"];
 
   /**
    *

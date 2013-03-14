@@ -11,7 +11,8 @@ var mongoose = require('mongoose'),
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async'),
-    timezone = require('timezone/loaded');
+    timezone = require('timezone/loaded'),
+    routeUtils = require('../route-utils');
     
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -21,12 +22,16 @@ var mongoose = require('mongoose'),
 module.exports = function(app) {
 
    //List devices
-  app.get('/api/devices', function (req, res, next){
-    return DeviceModel.find(function (err, devices) {
-      if (err) { return next(err); }
-      return res.send(devices);
-    });
-  });
+  app.get('/api/devices', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return DeviceModel.find(function (err, devices) {
+        if (err) { return next(err); }
+        return res.send(devices);
+      });
+    }
+  );
 
   /*
    * Create single device
@@ -50,26 +55,30 @@ module.exports = function(app) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/devices', function (req, res, next){
-    var device;
-    winston.info("POST: ");
-    winston.info(req.body);
-    device = new DeviceModel({
-      id: req.body.id,
-      name: req.body.name,
-      deviceType: req.body.deviceType,
-      owner: req.body.owner,
-      users : req.body.users,
-      sensorMap : req.body.sensorMap,
-      controlMap : req.body.controlMap
-    });
-    device.save(function (err) {
-      if (err) { return next(err); }
-      winston.info("created device");
-      return res.send(device);
-    });
-    
-  });
+  app.post('/api/devices', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      var device;
+      winston.info("POST: ");
+      winston.info(req.body);
+      device = new DeviceModel({
+        id: req.body.id,
+        name: req.body.name,
+        deviceType: req.body.deviceType,
+        owner: req.body.owner,
+        users : req.body.users,
+        sensorMap : req.body.sensorMap,
+        controlMap : req.body.controlMap
+      });
+      device.save(function (err) {
+        if (err) { return next(err); }
+        winston.info("created device");
+        return res.send(device);
+      });
+      
+    }
+  );
 
   /*
    * Read a device
@@ -82,12 +91,16 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
-      if (err) { return next(err); }
-      return res.send(device);
-    });
-  });
+  app.get('/api/devices/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
+        if (err) { return next(err); }
+        return res.send(device);
+      });
+    }
+  );
 
   /*
    * Update a device
@@ -107,17 +120,21 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
-      if (err) { return next(err); }
-      device.title = req.body.title;
-      return device.save(function (err) {
+  app.put('/api/devices/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
         if (err) { return next(err); }
-        winston.info("updated device");
-        return res.send(device);
+        device.title = req.body.title;
+        return device.save(function (err) {
+          if (err) { return next(err); }
+          winston.info("updated device");
+          return res.send(device);
+        });
       });
-    });
-  });
+    }
+  );
 
   /*
    * Delete a device
@@ -134,16 +151,20 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/devices/:id', function (req, res, next){
-    return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
-      if (err) { return next(err); }
-      return device.remove(function (err) {
-        if (err) { return next(err); }  
-        winston.info("removed");
-        return res.send('');
+  app.delete('/api/devices/:id', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
+        if (err) { return next(err); }
+        return device.remove(function (err) {
+          if (err) { return next(err); }  
+          winston.info("removed");
+          return res.send('');
+        });
       });
-    });
-  });
+    }
+  );
 
   /*
    * Sensor Logs -> route to current grow plan instance for this device
@@ -379,7 +400,7 @@ module.exports = function(app) {
         growPlanInstance,
         growPlanInstancePhase,
         phase,
-        activeActionsOverrideActions,
+        activeImmediateActionsActions,
         cycleTemplate = DeviceUtils.cycleTemplate,
         responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
         responseBody = responseBodyTemplate,
@@ -391,7 +412,7 @@ module.exports = function(app) {
     async.waterfall(
       [
         function (callback){
-          DeviceModel.findOne({ macAddress: macAddress }).populate('activeActionsOverride.actions').exec(callback);  
+          DeviceModel.findOne({ macAddress: macAddress }).populate('activeImmediateActions.actions').exec(callback);  
         },
         function (deviceResult, callback){
           if (!deviceResult){ 
@@ -402,17 +423,17 @@ module.exports = function(app) {
           // Set whether we need to ask the device to refresh its cycles
           responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
 
-          if (device.activeActionsOverride.expires > Date.now()){
+          if (device.activeImmediateActions.expires > Date.now()){
             return callback();
           } else {
-            device.refreshActiveActionsOverride(callback);
+            device.refreshActiveImmediateActions(callback);
           }
         }
       ],
       function(err){
         if (err) { return next(err);}
         
-        responseBody = responseBody.replace(/{overrides}/, device.activeActionsOverride.deviceMessage);
+        responseBody = responseBody.replace(/{overrides}/, device.activeImmediateActions.deviceMessage);
         
         res.status(200);
         res.header('X-Bpn-ResourceName', 'refresh_status');

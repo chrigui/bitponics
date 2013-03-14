@@ -68,6 +68,13 @@ HarvestLogSchema.virtual('logs')
         this.l = logs;
     });
 
+HarvestLogSchema.virtual('timestamp')
+  .get(function () {
+    return this.ts;
+  })
+  .set(function(timestamp){
+    this.ts = timestamp;
+  });
 
 /*************** SERIALIZATION *************************/
 
@@ -86,6 +93,7 @@ HarvestLogSchema.set('toObject', {
     } else {
       // else we're operating on the parent doc (the SensorLog doc)
       delete ret.l;
+      delete ret.ts;
     }
   }
 });
@@ -96,7 +104,7 @@ HarvestLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-HarvestLogSchema.index({ 'gpi ts plant': -1 });
+HarvestLogSchema.index({ 'gpi ts': -1 });
 
 exports.schema = HarvestLogSchema;
 exports.model = mongoose.model('HarvestLog', HarvestLogSchema);

@@ -30,7 +30,7 @@ var growPlanInstanceModels = {
 
 /**
  * Once a day at 00:00
- * - phase advancement checks
+ * - phase advancement checks. Should eventually be switched to every hour to handle all timezones
  *
  */
 new cronJob('0 0 0 * * *', function(){

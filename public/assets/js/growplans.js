@@ -178,7 +178,8 @@ function(viewModels){
             $scope.submit = function(){
                 if($scope.selectedGrowPlan){
                     console.log('submit!');
-                    console.log(viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan));
+                    var growPlanInstance = viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan);
+                    console.log(growPlanInstance);
                 }
             }
         }]

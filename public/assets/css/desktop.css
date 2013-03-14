@@ -39,6 +39,13 @@
     width: 40%;
     float: left;
   }
+  .landing-page #how-it-works #details .detail-block img {
+    float: left;
+    margin-right: 1em;
+  }
+  .landing-page #how-it-works #details .detail-block p {
+    float: none;
+  }
   .landing-page #pricing .center {
     width: 70%;
   }
