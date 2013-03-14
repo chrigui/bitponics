@@ -204,10 +204,10 @@ async.series([
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['immediateactionlogs']){ return innerCallback();}
-          mongoose.connection.collections['immediateactionlogs'].drop( function(err) {
+          if (!mongoose.connection.collections['immediateactions']){ return innerCallback();}
+          mongoose.connection.collections['immediateactions'].drop( function(err) {
             if (err){ return innerCallback(err);}
-            console.log('immediateactionlogs collection dropped');
+            console.log('immediateactions collection dropped');
             innerCallback();
           });
         }
@@ -252,7 +252,7 @@ async.series([
               admin :  _data.admin,
               activationToken : _data.activationToken,
               sentEmail : _data.sentEmail,
-              deviceKey : _data.deviceKey,
+              deviceKeys : _data.deviceKeys,
               apiKey : _data.apiKey
             },
             "8bitpass", //default password

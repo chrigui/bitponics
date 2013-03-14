@@ -4,11 +4,11 @@ var mongoose = require('mongoose'),
   ObjectId = Schema.ObjectId;
 
 /**
- * ImmediateActionLog
+ * ImmediateAction
  * Actions requested that weren't part of standard phase actions.
  * Manually triggered or IdealRange-triggered actions.
  */
-var ImmediateActionLogSchema = new Schema({
+var ImmediateActionSchema = new Schema({
     /**
      * The GrowPlanInstance
      */
@@ -58,7 +58,7 @@ var ImmediateActionLogSchema = new Schema({
   { id : false });
 
 
-ImmediateActionLogSchema.virtual('growPlanInstance')
+ImmediateActionSchema.virtual('growPlanInstance')
   .get(function(){
     return this.gpi;
   })
@@ -66,7 +66,7 @@ ImmediateActionLogSchema.virtual('growPlanInstance')
     this.gpi = growPlanInstance;
   });
 
-ImmediateActionLogSchema.virtual('message')
+ImmediateActionSchema.virtual('message')
   .get(function(){
     return this.m;
   })
@@ -74,7 +74,7 @@ ImmediateActionLogSchema.virtual('message')
     this.m = message;
   });
 
-ImmediateActionLogSchema.virtual('timeRequested')
+ImmediateActionSchema.virtual('timeRequested')
   .get(function(){
     return this.tr;
   })
@@ -82,7 +82,7 @@ ImmediateActionLogSchema.virtual('timeRequested')
     this.tr = timeRequested;
   });
 
-ImmediateActionLogSchema.virtual('timeSent')
+ImmediateActionSchema.virtual('timeSent')
   .get(function(){
     return this.ts;
   })
@@ -90,7 +90,7 @@ ImmediateActionLogSchema.virtual('timeSent')
     this.ts = timeSent;
   });
 
-ImmediateActionLogSchema.virtual('expires')
+ImmediateActionSchema.virtual('expires')
   .get(function(){
     return this.e;
   })
@@ -98,7 +98,7 @@ ImmediateActionLogSchema.virtual('expires')
     this.e = expires;
   });
 
-ImmediateActionLogSchema.virtual('action')
+ImmediateActionSchema.virtual('action')
   .get(function(){
     return this.a;
   })
@@ -106,7 +106,7 @@ ImmediateActionLogSchema.virtual('action')
     this.a = action;
   });
 
-ImmediateActionLogSchema.virtual('done')
+ImmediateActionSchema.virtual('done')
   .get(function(){
     return this.d;
   })
@@ -123,7 +123,7 @@ ImmediateActionLogSchema.virtual('done')
  * "Transforms are applied to the document and each of its sub-documents"
  * http://mongoosejs.com/docs/api.html#document_Document-toObject
  */
-ImmediateActionLogSchema.set('toObject', {
+ImmediateActionSchema.set('toObject', {
   getters : true,
   transform : function(doc, ret, options){
     delete ret.gpi;
@@ -135,15 +135,15 @@ ImmediateActionLogSchema.set('toObject', {
     delete ret.m;
   }
 });
-ImmediateActionLogSchema.set('toJSON', {
+ImmediateActionSchema.set('toJSON', {
   getters : true,
-  transform : ImmediateActionLogSchema.options.toObject.transform
+  transform : ImmediateActionSchema.options.toObject.transform
 });
 /*************** END SERIALIZATION *************************/
 
 
 
-ImmediateActionLogSchema.index({ 'gpi e ts': -1 });
+ImmediateActionSchema.index({ 'gpi e ts': -1 });
 
-exports.schema = ImmediateActionLogSchema;
-exports.model = mongoose.model('ImmediateActionLog', ImmediateActionLogSchema);
+exports.schema = ImmediateActionSchema;
+exports.model = mongoose.model('ImmediateAction', ImmediateActionSchema);

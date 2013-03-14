@@ -6,7 +6,7 @@ var mongoose = require('mongoose'),
   	ObjectId = Schema.ObjectId,
   	DeviceTypeModel = require('./deviceType').model,
     ActionModel = require('./action').model,
-  	ImmediateActionLogModel = require('./immediateActionLog').model,
+  	ImmediateActionModel = require('./immediateAction').model,
   	SensorLogSchema = require('./sensorLog').schema
   	winston = require('winston');
 
@@ -14,9 +14,9 @@ var mongoose = require('mongoose'),
 /***************** UTILS **********************/
 var DeviceUtils = {
 	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};',
-	roles : {
-		'owner' : 'owner',
-		'member' : 'member'
+	ROLES : {
+		OWNER : 'owner',
+		MEMBER : 'member'
 	}
 };
 /***************** END UTILS **********************/
@@ -33,7 +33,7 @@ var DeviceSchema = new Schema({
 		{
 			ts : { type : Date, default: Date.now, required : true},
 			user : { type : ObjectId, ref: 'User', required: true },
-			assignmentType: { type : String, enum : [DeviceUtils.roles.owner, DeviceUtils.roles.member]}
+			assignmentType: { type : String, enum : [DeviceUtils.ROLES.OWNER, DeviceUtils.ROLES.MEMBER ]}
 		}
 	],
 	sensorMap : [
@@ -71,7 +71,7 @@ var DeviceSchema = new Schema({
 	 * If expired, it's refreshed inside refresh_status
 	 */
 	activeImmediateActions : {
-		immediateActionLogs: [{ type: ObjectId, ref: 'ImmediateActionLog'}],
+		immediateActions: [{ type: ObjectId, ref: 'ImmediateAction'}],
 		deviceMessage : { type : String },
 		lastSent: Date,
 		expires : Date
@@ -96,18 +96,18 @@ DeviceSchema.plugin(useTimestamps);
 /**
  * Remove expired actions & update deviceMessage & expires times. 
  * Saves the model at the end.
- * Originally written to be called after adding an entry to ImmediateActionLog collection.
+ * Originally written to be called after adding an entry to ImmediateAction collection.
  */
 DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
 	var device = this,
 		now = new Date();
   	  	
-  	ImmediateActionLogModel
+  	ImmediateActionModel
   	.find({ gpi : device.activeGrowPlanInstance })
   	.where('e').gt(now)
   	.sort('-tr')
   	.populate('a')
-  	.exec(function(err, immediateActionLogResults){
+  	.exec(function(err, immediateActionResults){
   		if (err) { return callback(err);}
 
   		var conflictingImmediateActionIds = [],
@@ -120,44 +120,44 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
   		// first, ensure that the results are clean. results are sorted by 
   		// descending timeRequested, so the last ones in take precedence. 
   		// eliminate conflicts by expiring them.
-  		immediateActionLogResults.forEach(function(immediateActionLog, index){
-  			if (existingImmediateActionControls[immediateActionLog.action.control]){
-  				conflictingImmediateActionIds.push(immediateActionLog._id);
+  		immediateActionResults.forEach(function(immediateAction, index){
+  			if (existingImmediateActionControls[immediateAction.action.control]){
+  				conflictingImmediateActionIds.push(immediateAction._id);
   				conflictingImmediateActionIndices.push(index);
   				return;
   			}
   			
-  			existingImmediateActionControls[immediateActionLog.action.control] = true;
+  			existingImmediateActionControls[immediateAction.action.control] = true;
   			
-  			if (immediateActionLog.expires < soonestImmediateActionExpiration) { 
-  				soonestImmediateActionExpiration = immediateActionLog.expires;
+  			if (immediateAction.expires < soonestImmediateActionExpiration) { 
+  				soonestImmediateActionExpiration = immediateAction.expires;
   			}
   		});
 
   		if (conflictingImmediateActionIds.length > 0){
-  			ImmediateActionLogModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();	
+  			ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();	
 
   			conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
 			  	// since we're removing elements from the target array as we go,
 			  	// the indexToRemove will be off by however many we've removed so far
 			  	indexToRemove -= index;
-		  		immediateActionLogResults.splice(indexToRemove, 1);
+		  		immediateActionResults.splice(indexToRemove, 1);
 		  	});
   		}
 
 		// ok, now we're clean.
-		// replace device.activeImmediateActions.immediateActionLogs with the result set
-  		device.activeImmediateActions.immediateActionLogs = immediateActionLogResults;//.map(function(immediateActionLog){return immediateActionLog._id;});
+		// replace device.activeImmediateActions.immediateActions with the result set
+  		device.activeImmediateActions.immediateActions = immediateActionResults;//.map(function(immediateAction){return immediateAction._id;});
 
   		// generate new device message. compare with current deviceMessage.
   		device.controlMap.forEach(
           function(controlOutputPair){
             var thisCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
-                controlImmediateActionLog = immediateActionLogResults.filter(function(immediateActionLog){ return immediateActionLog.action.control.equals(controlOutputPair.control);})[0],
+                controlImmediateAction = immediateActionResults.filter(function(immediateAction){ return immediateAction.action.control.equals(controlOutputPair.control);})[0],
                 controlAction;
               
             // Need an entry for every control, even if there's no associated cycle
-            if (!controlImmediateActionLog){ 
+            if (!controlImmediateAction){ 
               // if no action, just 0 everything out
               thisCycleString = thisCycleString.replace(/{override}/, '0');
               thisCycleString = thisCycleString.replace(/{offset}/, '0');
@@ -166,7 +166,7 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
               thisCycleString = thisCycleString.replace(/{value2}/, '0');    
               thisCycleString = thisCycleString.replace(/{duration2}/, '0');     
             } else {
-    		  controlAction = controlImmediateActionLog.action;
+    		  controlAction = controlImmediateAction.action;
               thisCycleString = thisCycleString.replace(/{override}/, '1');
               // overrides are assumed to be immediate actions, so offset will always be 0
               thisCycleString = thisCycleString.replace(/{offset}/, '0');

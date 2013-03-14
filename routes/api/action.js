@@ -1,5 +1,6 @@
 var ActionModel = require('../../models/action').model,
-    winston = require('winston');
+    winston = require('winston'),
+    routeUtils = require('../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -9,23 +10,27 @@ var ActionModel = require('../../models/action').model,
 module.exports = function(app) {
 
    //List actions
-  app.get('/api/actions', function (req, res, next){
-    var query = ActionModel.find();
+  app.get('/api/actions', 
+    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureUserIsAdmin, 
+    function (req, res, next){
+      var query = ActionModel.find();
 
-    if (req.query['control']){
-      query = query.where('control').equals(req.query['control']);
+      if (req.query['control']){
+        query = query.where('control').equals(req.query['control']);
+      }
+      if (req.query['repeat']){
+        query = query.where('cycle.repeat').equals(req.query['repeat'].toLowerCase() == 'true' ? true : false);
+      }
+
+      return query.exec(function (err, actions) {
+        winston.info("in ActionModel callback");
+        if (err) { return next(err); }
+
+        return res.send(actions);
+      });
     }
-    if (req.query['repeat']){
-      query = query.where('cycle.repeat').equals(req.query['repeat'].toLowerCase() == 'true' ? true : false);
-    }
-
-    return query.exec(function (err, actions) {
-      winston.info("in ActionModel callback");
-      if (err) { return next(err); }
-
-      return res.send(actions);
-    });
-  });
+  );
 
   /*
    * Create single action

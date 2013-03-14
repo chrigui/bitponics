@@ -33,6 +33,14 @@ module.exports = function(app){
 	    title: 'Bitponics Admin'
 	  })
 	});
+
+  app.post('/admin/add-device', function (req, res) {
+    
+    res.render('admin/add-device', {
+      title: 'Bitponics Admin',
+      creationStatus : 'success'
+    })
+  });
 		
 	app.post('/admin/trigger_clearPendingNotifications', function (req, res) {
 	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err){

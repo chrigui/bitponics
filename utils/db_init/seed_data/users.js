@@ -133,9 +133,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		        "public": "8f67dbb482f720a2",
 		        "private": "7f163018dae9b388170c2c2d5d7bad01"
 		    },
-		    "deviceKey": {
-		        "public": "dedf72f732cd6f66",
+		    "deviceKeys": [{
+		        "deviceId" : "506de2fe8eebf7524342cb34",
+            "public": "dedf72f732cd6f66",
 		        "private": "7f27ad4bf71ae693"
-		    }
+		    }]
 		}
 	];

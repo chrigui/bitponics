@@ -111,9 +111,9 @@ module.exports = [
 		},
 		{
 			_id : '5118232537d976f7050f6186',
-			macAddress: "000666721fc1", //mac address
+			macAddress: "000666721fc1",
 			deviceType: "506de2fe8eebf7524342cb37",
-			name : "Michael's Prototype Bitponics Device",
+			name : "Michael's Prototype Bitponics Device 1",
 			users : [],
 			controlMap : [ 
 			  {
@@ -126,6 +126,26 @@ module.exports = [
 			  }
 			],
 			recentSensorLogs : []
-		}
+		},
+    {
+      _id : '513e37cd66e5c0dfc41e101d',
+      macAddress: "000666722947", //mac address
+      deviceType: "506de2fe8eebf7524342cb37",
+      name : "Michael's Prototype Bitponics Device 2",
+      owner: "506de3098eebf7524342cb68",
+      users : [],
+      activeGrowPlanInstance: "513fee362bc4e204932a467a",
+      controlMap : [ 
+        {
+          control : "506de2fd8eebf7524342cb32",
+          outputId : "1"
+        },
+        {
+          control : "506de2fc8eebf7524342cb2d",
+          outputId : "2"
+        }
+      ],
+      recentSensorLogs : []
+    }
 		
 	];
