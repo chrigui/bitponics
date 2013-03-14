@@ -14,9 +14,9 @@ var mongoose = require('mongoose'),
 /***************** UTILS **********************/
 var DeviceUtils = {
 	cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};',
-	roles : {
-		'owner' : 'owner',
-		'member' : 'member'
+	ROLES : {
+		OWNER : 'owner',
+		MEMBER : 'member'
 	}
 };
 /***************** END UTILS **********************/
@@ -33,7 +33,7 @@ var DeviceSchema = new Schema({
 		{
 			ts : { type : Date, default: Date.now, required : true},
 			user : { type : ObjectId, ref: 'User', required: true },
-			assignmentType: { type : String, enum : [DeviceUtils.roles.owner, DeviceUtils.roles.member]}
+			assignmentType: { type : String, enum : [DeviceUtils.ROLES.OWNER, DeviceUtils.ROLES.MEMBER ]}
 		}
 	],
 	sensorMap : [

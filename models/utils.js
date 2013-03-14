@@ -510,11 +510,95 @@ function getFullyPopulatedGrowPlan(query, callback){
   );
 }
 
+
+/**
+ * Assigns a User to a Device as an owner.
+ * Pairs by assigning user to device.owner and assigning deviceId to a User.deviceKey
+ *
+ * Designed to be called by /setup route. Assumes that the setup page echoed the available deviceKey
+ * that was created or retrieved on pageload of /setup
+ * 
+ * @param {object} settings
+ * @param {string} settings.deviceMacAddress - macAddress as sent by the device.
+ * @param {string} settings.publicDeviceKey : User.deviceKeys.public string to use to select which key to assign to the device.
+ * @param {User} settings.user
+ * @param {function(err, {device: Device, user: User})} callback 
+ */
+function assignDeviceToUser(settings, callback){
+  var Device = require('./device'),
+      DeviceModel = Device.model,
+      DeviceUtils = Device.utils,
+      async = require('async'),
+      winston = require('winston'),
+      UserModel = require('./user').model,
+      deviceMacAddress = settings.deviceMacAddress,
+      publicDeviceKey = settings.publicDeviceKey,
+      user = settings.user,
+      i18nKeys = require('../i18n/keys'),
+      device;
+
+  async.series(
+    [
+      function deviceStep(innerCallback){
+        DeviceModel.findOne({ macAddress: deviceMacAddress },
+          function(err, deviceResult){
+            if (err) { return callback(err);}
+            if (deviceResult){
+              device = deviceResult;
+            } else {
+              // TODO : this scenario shouldn't occur in production; we should create Device model instances
+              // at production time.
+              device = new DeviceModel({
+                macAddrress : deviceMacAddress
+                // will get a default deviceType based on Device middleware
+              });
+            }
+
+            device.userAssignmentLogs = device.userAssignmentLogs || [];
+            device.userAssignmentLogs.push({
+              ts: new Date(),
+              user : user,
+              assignmentType : DeviceUtils.ROLES.OWNER
+            });
+            device.owner = user;
+
+            device.save(innerCallback)
+          }
+        );
+      },
+      function userStep(innerCallback){
+        var deviceKey = user.deviceKeys.filter(function(deviceKey){
+          return deviceKey.public === publicDeviceKey;
+        })[0];
+        if (!deviceKey || deviceKey.deviceId){ 
+          return innerCallback(
+            new Error(i18nKeys.get("unavailable device key", publicDeviceKey))
+          );
+        }
+
+        deviceKey.deviceId = device._id;
+
+        user.save(innerCallback);
+      }
+    ],
+    function(err, results){
+      if (err) { return callback(err); }
+      var data = {
+        device : results[0][0],
+        user : results[1][0]
+      }
+      return callback(null, data);
+    }
+  );
+}
+
+
 module.exports = {
   logSensorLog : logSensorLog,
   triggerImmediateAction : triggerImmediateAction,
   scanForPhaseChanges : scanForPhaseChanges,
   clearPendingNotifications : clearPendingNotifications,
   getObjectId : getObjectId,
-  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan
+  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan,
+  assignDeviceToUser : assignDeviceToUser
 };

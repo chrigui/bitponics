@@ -132,7 +132,9 @@ module.exports = [
       macAddress: "000666722947", //mac address
       deviceType: "506de2fe8eebf7524342cb37",
       name : "Michael's Prototype Bitponics Device 2",
+      owner: "506de3098eebf7524342cb68",
       users : [],
+      activeGrowPlanInstance: "513fee362bc4e204932a467a",
       controlMap : [ 
         {
           control : "506de2fd8eebf7524342cb32",

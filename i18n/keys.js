@@ -21,7 +21,8 @@ exports.keys = {
   "In a 3-state cycle, at least the 1st and 3rd states must have durations defined" : "In a 3-state cycle, at least the 1st and 3rd states must have durations defined",
   "Invalid action id" : "Invalid action id",
   "manual action trigger message" : "%s. %s.",
-  "device action trigger message" : "%s. Device has automatically triggered the following action : %s."
+  "device action trigger message" : "%s. Device has automatically triggered the following action : %s.",
+  "unavailable device key" : "%s does not match any available device keys for this user"
 };
 
 /**

@@ -16,6 +16,30 @@ var mongoose = require('mongoose'),
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
+
+/**
+ * Internal schema used only for User. Created separately just to exclude
+ * unnecessary _id prop
+ */
+var DeviceKeySchema = new Schema({
+  /**
+   * deviceId not required. We temporarily create & save unassociated deviceKeys
+   * for use during the setup process
+   */
+  deviceId : { type: ObjectId, ref : 'Device'},
+  /**
+   * Public device key is a 16-char random hex string
+   */
+  public : String,
+  /**
+   * Private device key is a 16-char random hex string
+   */
+  private : String
+
+}, 
+{ _id : false, id : false });
+
+
 UserSchema = new Schema({
   name : {
 	    first: String
@@ -41,7 +65,7 @@ UserSchema = new Schema({
   	lang: { type: String, default : 'en' },
   	territory : { type : String, default: 'US'}
   },
-  timezone: { type : String, default : 'America/New_York' }, // TODO : make this an enum to restrict the values? 
+  timezone: { type : String, default : 'America/New_York' }, 
   active : { type : Boolean, default : false },
   admin :  { type : Boolean, default : false },
   activationToken : { type : String, default : '' },
@@ -51,23 +75,7 @@ UserSchema = new Schema({
   	email: { type: Boolean, default: true },
   	sms: { type: Boolean, default: false }
   },
-  deviceKeys : [
-	  {
-	  	/**
-	  	 * deviceId not required. We temporarily create & save unassociated deviceKeys
-	  	 * for use during the setup process
-	  	 */
-	  	deviceId : { type: ObjectId, ref : 'Device'},
-	  	/**
-	  	 * Public device key is a 16-char random hex string
-	  	 */
-	  	public : String,
-	  	/**
-	  	 * Private device key is a 16-char random hex string
-	  	 */
-	  	private : String
-	  }
-  ],
+  deviceKeys : [ DeviceKeySchema ],
   apiKey : {
   	/**
   	 * Public API key is a 16-char random hex string
@@ -165,6 +173,13 @@ UserSchema.virtual('availableDeviceKey')
 
 /************************** STATIC METHODS  ***************************/
 
+
+/**
+ *
+ * @param {object} userProperties : any User model properties
+ * @param {string} password
+ * @param {function(err, user)} done
+ */
 UserSchema.static('createUserWithPassword', function(userProperties, password, done){
 	var newUser = new User(userProperties);
 
@@ -252,9 +267,11 @@ UserSchema.method('toPublicJSON', function() {
   };
 });
 
+
 /**
- *  Give user device keys if needed. This can be done in parallel with other pre save hooks.
- *  http://mongoosejs.com/docs/middleware.html
+ * Make sure User has an unassigned deviceKey
+ *
+ * @param {function(err, object )} done : Passed the available deviceKey object ({ deviceId : undefined, public : string, private : string })
  */
 UserSchema.method('ensureAvailableDeviceKey', function(done){
 	var user = this,
@@ -311,7 +328,7 @@ UserSchema.pre('save', true, function(next, done){
 	
 	next();
 	
-	done();	
+	user.ensureAvailableDeviceKey(done);
 });
 
 /**
@@ -392,11 +409,13 @@ UserSchema.pre('save', true, function(next, done){
 /***************** END MIDDLEWARE **********************/
 
 
+
 /***************** INDEXES ************************************/
 UserSchema.index({ 'email': 1 });
 UserSchema.index({ 'deviceKeys.public': 1 });
 UserSchema.index({ 'apiKey.public': 1 });
 /***************** END INDEXES ********************************/
+
 
 User = mongoose.model('User', UserSchema);
 

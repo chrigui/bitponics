@@ -2,6 +2,9 @@ var mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
   ImmediateAction = require('../../models/immediateAction').model,
   GrowPlanInstance = require('../../models/growPlanInstance').model,
+  Device = require('../../models/device'),
+  DeviceModel = Device.model,
+  DeviceUtils = Device.utils,
   ModelUtils = require('../../models/utils'),
   should = require('should'),
   User = require('../../models/user').model,
@@ -153,5 +156,113 @@ describe('Model Utils', function(){
     });
 
   });
+
+
+  describe('assignDeviceToUser', function(){
+    /**
+     * beforeEach Method
+     *
+     * Run before each test.
+     * Create an active user.
+     */
+    beforeEach(function(done){
+      var self = this;
+      
+      async.parallel(
+        [
+          function(innerCallback){
+            User.createUserWithPassword(
+              {
+                email : 'unittest@bitponics.com',
+                name : {
+                  first : "Testfirstname",
+                  last : "Testlastname"
+                },
+                locale: "en_US",
+                active : true,
+                activationToken : "1234567890",
+                sentEmail : true
+              },
+              '8bitpass',
+              function(err, user){
+                self.user = user;
+                innerCallback();
+              }
+            );
+          },
+          function(innerCallback){
+            var device = new DeviceModel({
+              macAddress : '123456123456'
+            });
+            device.save(function(err, deviceResult){
+              self.device = device;
+              innerCallback();  
+            });
+          }
+        ],
+        function(err, results){
+          return done(err);
+        }
+      );
+      
+    });
+
+
+    /*
+     * afterEach method
+     *
+     * Run after each test.
+     * Remove the test user.
+     */
+    afterEach(function(done){
+      User.remove({email: 'unittest@bitponics.com'}, done);
+    });
+
+
+    it('assigns a device to a user and a user to the device', function(done){
+      var self = this,
+          user = self.user,
+          device = self.device,
+          deviceMacAddress = device.macAddress,
+          availableDeviceKey = user.availableDeviceKey,
+          publicDeviceKey = availableDeviceKey.public,
+          device;
+
+      
+
+      ModelUtils.assignDeviceToUser(
+        { 
+          deviceMacAddress : deviceMacAddress, 
+          user : user,
+          publicDeviceKey : publicDeviceKey
+        },
+        function(err, result){
+          should.not.exist(err);
+          should.exist(result.user);
+          should.exist(result.device);
+          
+          user.deviceKeys.some(
+            function(deviceKey) { 
+              return deviceKey.deviceId.equals(result.device._id);
+            }
+          ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
+
+          result.device.owner.equals(result.user._id).should.equal(true, "device owner is user");   
+          
+          var now = new Date();
+          
+          result.device.userAssignmentLogs.some(
+            function(userAssignment) { 
+              return ((userAssignment.ts < now) && userAssignment.user.equals(result.user._id) && (userAssignment.assignmentType === DeviceUtils.ROLES.OWNER));
+            }
+          ).should.equal(true, "device.userAssignmentLogs contains a record of assigning the user as owner");
+
+          done();
+        }
+      );
+
+
+    });
+  })
 
 });

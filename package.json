@@ -41,6 +41,6 @@
 		, "should" : "=1.2.0"
 	}
 	, "scripts": {
-	    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 4000"
+	    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 4000 --slow 50"
 	}
 }
