@@ -3,7 +3,8 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     DeviceModel = require('../../models/device').model,
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
-    async = require('async');
+    async = require('async'),
+    routeUtils = require('../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 

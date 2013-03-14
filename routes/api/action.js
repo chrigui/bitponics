@@ -1,5 +1,6 @@
 var ActionModel = require('../../models/action').model,
-    winston = require('winston');
+    winston = require('winston'),
+    routeUtils = require('../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
