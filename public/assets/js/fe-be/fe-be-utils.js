@@ -12,7 +12,11 @@ define(['moment'], function(moment){
     'minutes',
     'hours','days','weeks','months'];
 
-  utils.NOTIFICATION_TYPES = ["info","actionNeeded","error"];
+  utils.NOTIFICATION_TYPES = {
+    INFO : "info",
+    ACTION_NEEDED : "actionNeeded",
+    ERROR : "error"
+  };
 
   /**
    *

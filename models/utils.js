@@ -117,11 +117,11 @@ function logSensorLog(options, callback){
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
  *
  * @param {object} options  
- * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel (required),
- * @param {object|string} options.actionId : ObjectID (required),
- * @param {object=} options.device : DeviceModel (optional. Device of GrowPlanInstance),
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel 
+ * @param {ObjectId|string} options.actionId : ObjectID 
+ * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
  * @param {string} options.immediateActionMessage : message to log with the immediateAction
- * @param {User} options.user : UserModel (required. owner of GrowPlanInstance)
+ * @param {User} options.user : required. owner of GrowPlanInstance
  * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
 function triggerImmediateAction(options, callback){
@@ -140,7 +140,9 @@ function triggerImmediateAction(options, callback){
     winston = require('winston'),
     async = require('async'),
     tz = require('timezone/loaded'),
-    i18nKeys = require('../i18n/keys');
+    i18nKeys = require('../i18n/keys'),
+    requirejs = require('../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils');
 
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
@@ -149,6 +151,8 @@ function triggerImmediateAction(options, callback){
       user = options.user,
       timezone = user.timezone,
       action;
+
+  if (growPlanInstance.device && !device){ return callback(new Error('If a GrowPlanInstance has a device, Device document must be passed into triggerImmediateAction'))}
 
   ActionModel.findById(actionId, function(err, actionResult){
     if (err) { return callback(err);}
@@ -168,7 +172,31 @@ function triggerImmediateAction(options, callback){
 
           // If we're here, action does have a control
 
-          if (!device){
+          if (device){
+            // get any other actions that exist for the same control.
+            var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
+            
+
+            actionHasDeviceControl = device.controlMap.some(
+              function(controlMapItem){
+                return getObjectId(controlMapItem.control).equals(getObjectId(action.control));
+              }
+            );
+        
+            ActionModel.findOne()
+            .where('_id')
+            .in(device.activeActions.actions)
+            .where('control')
+            .equals(action.control)
+            .exec(function(err, actionResult){
+              if (err) { return innerCallback(err);}
+              if (!actionResult){ return innerCallback(); }
+              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
+              expires = now.valueOf() + cycleRemainder;
+              return innerCallback();  
+            });
+
+          } else {
             GrowPlanModel.findById(growPlanInstance.growPlan)
             .populate('phases.actions')
             .exec(function(err, growPlan){
@@ -189,25 +217,7 @@ function triggerImmediateAction(options, callback){
                 });
                 
               }
-            );
-            
-          } else {
-            // get any other actions that exist for the same control.
-            var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
-            
-            ActionModel.findOne()
-            .where('_id')
-            .in(device.activeActions.actions)
-            .where('control')
-            .equals(action.control)
-            .exec(function(err, actionResult){
-              if (err) { return innerCallback(err);}
-              if (!actionResult){ return innerCallback(); }
-              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-              expires = now.valueOf() + cycleRemainder;
-              actionHasDeviceControl = true;
-              return innerCallback();  
-            });
+            );            
           }
         }
       ],
@@ -220,10 +230,10 @@ function triggerImmediateAction(options, callback){
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
-          notificationType = 'actionNeeded';
+          notificationType = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
           notificationMessage = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
-          notificationType = 'info';
+          notificationType = feBeUtils.NOTIFICATION_TYPES.INFO;
           notificationMessage = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 

@@ -99,7 +99,11 @@ var NotificationSchema = new Schema({
   /**
    * type
    */
-	t : { type: String, enum: feBeUtils.NOTIFICATION_TYPES }
+	t : { type: String, enum: [
+      feBeUtils.NOTIFICATION_TYPES.INFO,
+      feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+      feBeUtils.NOTIFICATION_TYPES.ERROR
+    ]}
 	
 
 },

@@ -31,7 +31,7 @@ describe('i18n keys', function(){
     it('returns the requested string, populated with the provided arguments', function(){
       var immediateActionMessage = "action triggered by something",
         actionDescription = "actionDescription",
-        expected = "action triggered by something. Device has automatically triggered the following action : actionDescription.",
+        expected = "action triggered by something. Your device has automatically handled the following action : actionDescription.",
         key = "device action trigger message";
         i18nKeys.get(key, immediateActionMessage, actionDescription).should.equal(expected);  
     });

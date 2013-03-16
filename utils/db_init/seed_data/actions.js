@@ -3,7 +3,7 @@ var ObjectId = require('mongoose').Schema.ObjectId;
 module.exports = [
 		{
 			_id : '506de2fb8eebf7524342cb28',
-			description: "Turn supplemental lights on",
+			description: "Turn lights on",
 			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
@@ -15,7 +15,7 @@ module.exports = [
 		},
 		{
 			_id : '506de2fb8eebf7524342cb29',
-			description: "Turn supplemental lights off",
+			description: "Turn lights off",
 			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [

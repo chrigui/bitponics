@@ -413,7 +413,8 @@ async.series([
             name: _data.name,
             firmwareVersion: _data.firmwareVersion,
             microprocessor: _data.microprocessor,
-            sensorMap: _data.sensorMap
+            sensorMap: _data.sensorMap,
+            controlMap : _data.controlMap
           });
 
           dataObj.save(function (err, doc) {

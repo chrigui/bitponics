@@ -10,7 +10,9 @@ var mongoose = require('mongoose'),
   User = require('../../models/user').model,
   async = require('async'),
   getObjectId = ModelUtils.getObjectId,
-  i18nKeys = require('../../i18n/keys');
+  i18nKeys = require('../../i18n/keys'),
+  requirejs = require('../../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
 
 /*
@@ -60,7 +62,7 @@ describe('Model Utils', function(){
           function(innerCallback){
             GrowPlanInstance.create(
               {
-                growPlan : '506de2ff8eebf7524342cb3a',
+                growPlan : '506de2ff8eebf7524342cb3a', // 1st phase has a "Light cycle, with lights on between 6am and 10pm.",
                 owner : newUserObjectID,
                 active : true
               },
@@ -77,14 +79,19 @@ describe('Model Utils', function(){
       );
     });
 
+    afterEach(function(done){
+      User.remove({email: 'unittest@bitponics.com'}, done);
+    });
+
+
     it('handles action without control', function(done){
       // triggering an action without a control is actually 
       // probably never going to happen. but no reason to block it,
       // and the code handles it so i'm unit-testing it
 
-      should.exist(this.user);
-      should.exist(this.gpi);
-      should.exist(this.actionId);
+      should.exist(this.user, 'user exists');
+      should.exist(this.gpi, 'gpi  exists');
+      should.exist(this.actionId, 'actionId exists');
 
       var immediateActionSettings = {
         growPlanInstance : this.gpi, 
@@ -126,7 +133,7 @@ describe('Model Utils', function(){
           // message should be message of action
           notification.message.should.equal(i18nKeys.get('manual action trigger message', immediateActionSettings.immediateActionMessage, "Pollinate any new blossoms. Use a small paintbrush or cotton swab brush to distribute pollen between flowers."));
           // type should be actionneeded
-          notification.type.should.equal('actionNeeded');
+          notification.type.should.equal(feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED);
           // sentLogs should be empty array
           notification.sentLogs.should.be.empty;
           // timeToSend should be less than now
@@ -145,20 +152,205 @@ describe('Model Utils', function(){
           done();
         }
       );
-    });
+    }); // /handles action without control
 
-    it('handles action with control', function(done){
-      done();
-    });
 
-    it('handles action without control and repeat', function(done){
+    it('handles action with control & growPlanInstance without device', function(done){
+      should.exist(this.user, 'user exists');
+      should.exist(this.gpi, 'gpi  exists');
+      should.exist(this.actionId, 'actionId exists');
+
+      var immediateActionSettings = {
+        growPlanInstance : this.gpi, 
+        actionId : "506de2fb8eebf7524342cb28", // turn lights on
+        immediateActionMessage : "triggering turning lights on", 
+        user : this.user
+      };
+
+      ModelUtils.triggerImmediateAction(
+        immediateActionSettings,
+        function(err, results){
+          should.not.exist(err);
+          
+          var now = new Date(),
+              immediateAction = results.immediateAction,
+              notification = results.notification;
+
+          should.exist(immediateAction);
+          should.exist(notification);
+          
+          // immediateAction
+          // timeSent should be undefined (hasn't been sent yet)
+          should.not.exist(immediateAction.timeSent);
+          // timeRequested should be less than now
+          immediateAction.timeRequested.should.be.below(now);
+          // action should be settings.action
+          getObjectId(immediateAction.action).equals(getObjectId(immediateActionSettings.actionId)).should.be.true;
+          // done should not be true
+          immediateAction.done.should.be.false;
+          // message should be message
+          immediateAction.message.should.equal(immediateActionSettings.immediateActionMessage);
+          // growPlanInstance should be settings.growPlanInstance
+          getObjectId(immediateAction.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+          // this growPlan has a 24-hour light cycle.
+          // so this immediateAction of turning on the light should
+          // expire with the next roll-around of the cycle, which 
+          // means sometime in the next 24 hours
+          immediateAction.expires.valueOf().should.be.below(now.valueOf() + (24 * 60 * 60 * 1000), "Should expire within 24 hours (duration of the growPlan's light cycle");
+
+
+
+
+          // notification
+          // growPlanInstance should be settings.growPlanInstance
+          getObjectId(notification.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+          // message should be message of action
+          notification.message.should.equal(i18nKeys.get('manual action trigger message', immediateActionSettings.immediateActionMessage, "Turn lights on"));
+          // since there's no device to automatically handle things, 
+          // type should be actionneeded
+          notification.type.should.equal(feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED);
+          // sentLogs should be empty array
+          notification.sentLogs.should.be.empty;
+          // timeToSend should be less than now
+          notification.timeToSend.should.be.below(now);
+          // users should include settings.user
+          notification.users.should.include(immediateActionSettings.user._id.toString());
+          // repeat shouldn't exist
+          notification.repeat.should.not.have.property('repeatType');
+          notification.repeat.should.not.have.property('duration');
+          notification.repeat.should.not.have.property('timezone');
+          notification.repeat.should.not.have.property('rt');
+          notification.repeat.should.not.have.property('d');
+          notification.repeat.should.not.have.property('tz');
+          
+
+          done();
+        }
+      );
+    }); // /handles action with control & growPlanInstance without device
+
+
+
+    it('handles action control and a growPlanInstance with a device', function(done){
+      should.exist(this.user, 'user exists');
+      should.exist(this.gpi, 'gpi  exists');
+      should.exist(this.actionId, 'actionId exists');
+
+      var self = this;
+
+      async.series(
+        [
+          // Pair the GPI to a device
+          function(innerCallback){
+            var device = new DeviceModel({
+              macAddress : "123456654321",
+              deviceType : "506de2fe8eebf7524342cb37",
+              owner : self.user,
+
+            });
+            device.save(function(err, deviceResult){
+              should.not.exist(err);
+              console.log(deviceResult);
+              should.exist(deviceResult, 'newly created device should exist');
+
+              self.device = deviceResult;
+              self.device.owner.equals(self.user._id).should.equal(true, 'device should be paired to owner')
+
+              console.log(device);
+
+              self.gpi.pairWithDevice({
+                deviceId : self.device._id,
+                saveGrowPlanInstance : true
+              },
+              innerCallback
+              )
+            })
+          }
+        ],
+        function(err){
+          should.not.exist(err);
+
+
+          var immediateActionSettings = {
+            growPlanInstance : self.gpi, 
+            actionId : "506de2fb8eebf7524342cb28", // turn lights on
+            immediateActionMessage : "You've requested to turn on your lights", 
+            user : self.user,
+            device : self.device
+          };
+
+          ModelUtils.triggerImmediateAction(
+            immediateActionSettings,
+            function(err, results){
+              should.not.exist(err);
+              
+              var now = new Date(),
+                  immediateAction = results.immediateAction,
+                  notification = results.notification;
+
+              should.exist(immediateAction);
+              should.exist(notification);
+              
+              // immediateAction
+              // timeSent should be undefined (hasn't been sent yet)
+              should.not.exist(immediateAction.timeSent);
+              // timeRequested should be less than now
+              immediateAction.timeRequested.should.be.below(now);
+              // action should be settings.action
+              getObjectId(immediateAction.action).equals(getObjectId(immediateActionSettings.actionId)).should.be.true;
+              // done should not be true
+              immediateAction.done.should.be.false;
+              // message should be message
+              immediateAction.message.should.equal(immediateActionSettings.immediateActionMessage);
+              // growPlanInstance should be settings.growPlanInstance
+              getObjectId(immediateAction.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+              // this growPlan has a 24-hour light cycle.
+              // so this immediateAction of turning on the light should
+              // expire with the next roll-around of the cycle, which 
+              // means sometime in the next 24 hours
+              immediateAction.expires.valueOf().should.be.below(now.valueOf() + (24 * 60 * 60 * 1000), "Should expire within 24 hours (duration of the growPlan's light cycle");
+
+
+
+              // notification
+              // growPlanInstance should be settings.growPlanInstance
+              getObjectId(notification.growPlanInstance).equals(getObjectId(immediateActionSettings.growPlanInstance)).should.be.true;
+              // message should be message of action
+              notification.message.should.equal(i18nKeys.get('device action trigger message', immediateActionSettings.immediateActionMessage, "Turn lights on"));
+              // since there's no device to automatically handle things, 
+              // type should be actionneeded
+              notification.type.should.equal(feBeUtils.NOTIFICATION_TYPES.INFO);
+              // sentLogs should be empty array
+              notification.sentLogs.should.be.empty;
+              // timeToSend should be less than now
+              notification.timeToSend.should.be.below(now);
+              // users should include settings.user
+              notification.users.should.include(immediateActionSettings.user._id.toString());
+              // repeat shouldn't exist
+              notification.repeat.should.not.have.property('repeatType');
+              notification.repeat.should.not.have.property('duration');
+              notification.repeat.should.not.have.property('timezone');
+              notification.repeat.should.not.have.property('rt');
+              notification.repeat.should.not.have.property('d');
+              notification.repeat.should.not.have.property('tz');
+              
+
+              done();
+            }
+          );
+        }
+      );
+    }); // /handles action control and a growPlanInstance with a device
+
+
+    it("handles action control and an active growPlanInstance with a device", function(done){
       done();
     });
 
   });
 
 
-  describe('assignDeviceToUser', function(){
+  describe('.assignDeviceToUser', function(){
     /**
      * beforeEach Method
      *
@@ -263,6 +455,9 @@ describe('Model Utils', function(){
 
 
     });
-  })
+  });
+  /* /assignDeviceToUser */
+
+
 
 });

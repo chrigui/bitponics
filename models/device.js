@@ -204,7 +204,8 @@ DeviceSchema.pre('save', function(next){
 	var device = this;
 	if(device.deviceType){ return next(); }
 
-	DeviceTypeModel.findOne({ name: 'Bitponics Beta Device 1' }, function(err, deviceType){
+  // Bitponics Base Station 1
+	DeviceTypeModel.findOne({ _id: "506de2fe8eebf7524342cb37" }, function(err, deviceType){
 		if (err) { return next(err); }
 		device.deviceType = deviceType;
 		next();
@@ -216,7 +217,7 @@ DeviceSchema.pre('save', function(next){
  */
 DeviceSchema.pre('save', function(next){
 	var device = this;
-	if(device.sensorMap){ return next(); }
+	if(device.sensorMap && device.sensorMap.length){ return next(); }
 
 	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
 		if (err) { return next(err); }
@@ -230,7 +231,7 @@ DeviceSchema.pre('save', function(next){
  */
 DeviceSchema.pre('save', function(next){
 	var device = this;
-	if(device.controlMap){ return next(); }
+	if(device.controlMap && device.controlMap.length){ return next(); }
 
 	DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
 		if (err) { return next(err); }

@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 var DeviceTypeSchema = new Schema({
 	name: { type: String, required: true }, //‘Bitponics Beta Device 1’
 	firmwareVersion: { type: String, required: true }, //‘0.1’
-	microprocessor: { type: String, required: true },
+	microprocessor: { type: String },
 	sensorMap: [{
 		inputId: { type: String, required: true }, //‘ph’
 		sensor : { type: ObjectId, ref: 'Sensor', required: true }
