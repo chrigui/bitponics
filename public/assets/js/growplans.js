@@ -175,11 +175,37 @@ function(viewModels){
                 phase.actions.unshift(newAction);
             };
 
-            $scope.submit = function(){
+            $scope.submit = function(e){
+                //e.preventDefault();
+
                 if($scope.selectedGrowPlan){
-                    console.log('submit!');
-                    var growPlanInstance = viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan);
-                    console.log(growPlanInstance);
+                    var dataToSubmit = {
+                      submittedGrowPlan : viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan),
+                      growPlanInstance : {
+                        currentGrowPlanDay : 1 // TODO
+                      },
+                      deviceId : "" // TODO
+                    };
+                    
+                    console.log(dataToSubmit);
+                    
+                    // TODO : show spinner
+                    $.ajax({
+                      url: '/grow-plans',
+                      type: 'POST',
+                      contentType : 'application/json; charset=utf-8',
+                      dataType: 'json',
+                      data: JSON.stringify(dataToSubmit),
+                      processData : false,
+                      success: function(data){
+                        console.log(data);
+                        // TODO : Show message, take user to /dashboard
+                      },
+                      error: function(jqXHR, textStatus, error){
+                        console.log('error', jqXHR, textStatus, error);
+                        // TODO : show an error message
+                      }
+                    });
                 }
             }
         }]

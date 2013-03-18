@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
+	ObjectIdSchema = Schema.ObjectId,
 	GrowPlanModel = require('./growPlan').growPlan.model,
 	User = require('./user').model,
 	GrowPlanInstanceModel,
@@ -20,13 +20,13 @@ var mongoose = require('mongoose'),
  */
 var GrowPlanInstanceSchema = new Schema({
 
-	users : [{ type: ObjectId, ref: 'User' }],
+	users : [{ type: ObjectIdSchema, ref: 'User' }],
 	
-	owner : { type: ObjectId, ref: 'User', required: true },
+	owner : { type: ObjectIdSchema, ref: 'User', required: true },
 
-	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true },
+	growPlan : { type : ObjectIdSchema, ref : 'GrowPlan', required: true },
 	
-	device : { type : ObjectId, ref : 'Device', required: false }, //the bitponics device
+	device : { type : ObjectIdSchema, ref : 'Device', required: false }, //the bitponics device
 	
 	startDate: { type: Date },
 

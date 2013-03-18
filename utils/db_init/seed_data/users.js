@@ -1,4 +1,4 @@
-var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+var ObjectIdSchema = require('mongoose').Schema.ObjectId;
 
 module.exports = [ //default pw is "8bitpass" for all init users
 		{

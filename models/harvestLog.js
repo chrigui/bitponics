@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
     mongooseTypes = require('mongoose-types'),
     Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+    ObjectIdSchema = Schema.ObjectId;
 
 
 var HarvestReadingSchema = new Schema({
@@ -9,7 +9,7 @@ var HarvestReadingSchema = new Schema({
     /**
      * Plant
      */
-    p: { type : ObjectId, ref: 'Plant', required: true},
+    p: { type : ObjectIdSchema, ref: 'Plant', required: true},
 
     /**
      * Value of HarvestLog is stored as weight in grams.
@@ -46,7 +46,7 @@ var HarvestLogSchema = new Schema({
     /**
      * The GrowPlanInstance
      */
-    gpi : { type: ObjectId, ref: 'GrowPlanInstance', required: true },
+    gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: true },
 
     /**
      * timestamp

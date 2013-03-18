@@ -1,4 +1,4 @@
-var ObjectId = mongoose = require('mongoose').Schema.ObjectId;
+var ObjectIdSchema = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{
@@ -13,11 +13,7 @@ module.exports = [
 					name : 'Seedling',
 					description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway. This phase is for the "All-Purpose" grow plan so its sensor ranges aren\'t optimal for any specific plant, but instead describe a range that should be adequate for most plants.',
 					expectedNumberOfDays: 7,
-					light: {
-						fixture: "506de3028eebf7524342cb47",
-						fixtureQuantity : 1,
-						bulb : "506de3018eebf7524342cb42"
-					},
+					light: "514634951323e95fe1e61c05",
 					growSystem: "506de3008eebf7524342cb40",
 					growMedium: "rockwool",
 					nutrients: [],
@@ -70,11 +66,7 @@ module.exports = [
 					name : 'Vegetative',
 					description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 					expectedNumberOfDays: 28,
-					light: {
-						fixture: "506de3028eebf7524342cb48",
-						fixtureQuantity: 1,
-						bulb: "506de3018eebf7524342cb43",
-					},
+					light: "514634961323e95fe1e61c06",
 					growSystem: "506de30d8eebf7524342cb77",
 					growMedium: "hydroton",
 					nutrients: [
@@ -129,11 +121,7 @@ module.exports = [
 					name : 'Seedling',
 					description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway.',
 					expectedNumberOfDays: 10,
-					light: {
-						fixture: "506de3028eebf7524342cb47",
-						fixtureQuantity : 1,
-						bulb : "506de3018eebf7524342cb42"
-					},
+					light: "514634951323e95fe1e61c05",
 					growSystem: "506de3008eebf7524342cb40",
 					growMedium: "rockwool",
 					nutrients: [],
@@ -176,11 +164,7 @@ module.exports = [
 					name : 'Vegetative',
 					description: 'Vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 					expectedNumberOfDays: 28,
-					light: {
-						fixture: "506de3028eebf7524342cb48",
-						fixtureQuantity: 1,
-						bulb: "506de3018eebf7524342cb43",
-					},
+					light: "514634961323e95fe1e61c06",
 					growSystem: "506de2ff8eebf7524342cb3c",
 					growMedium: "hydroton",
 					nutrients: [
@@ -226,11 +210,7 @@ module.exports = [
 					name : "Blooming",
 					description: "Open-ended blooming phase. After about 7 days, you should begin to see blossoms.",
 					expectedNumberOfDays: 7,
-					light: {
-						fixture: "506de3028eebf7524342cb48",
-						fixtureQuantity: 1,
-						bulb: "506de3018eebf7524342cb43",
-					},
+					light: "514634961323e95fe1e61c06",
 					growSystem: "506de2ff8eebf7524342cb3c",
 					growMedium: "hydroton",
 					nutrients: [
@@ -276,11 +256,7 @@ module.exports = [
 					name : "Fruiting",
 					description: "Fruiting phase. Continue to pollinate blossoms and harvest fruit when fully ripened (red).",
 					expectedNumberOfDays: 21,
-					light: {
-						fixture: "506de3028eebf7524342cb48",
-						fixtureQuantity: 1,
-						bulb: "506de3018eebf7524342cb43",
-					},
+					light: "514634961323e95fe1e61c06",
 					growSystem: "506de2ff8eebf7524342cb3c",
 					growMedium: "hydroton",
 					nutrients: [
@@ -334,11 +310,7 @@ module.exports = [
 					name : 'Seedling',
 					description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway.',
 					expectedNumberOfDays: 10,
-					light: {
-						fixture: "506de3028eebf7524342cb47",
-						fixtureQuantity : 1,
-						bulb : "506de3018eebf7524342cb42"
-					},
+					light: "514634951323e95fe1e61c05",
 					growSystem: "506de3008eebf7524342cb40",
 					growMedium: "rockwool",
 					nutrients: [],
@@ -381,11 +353,7 @@ module.exports = [
 					name : 'Vegetative',
 					description: 'Vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
 					expectedNumberOfDays: 28,
-					light: {
-						fixture: "506de3028eebf7524342cb48",
-						fixtureQuantity: 1,
-						bulb: "506de3018eebf7524342cb43",
-					},
+					light: "514634961323e95fe1e61c06",
 					growSystem: "506de2ff8eebf7524342cb3c",
 					growMedium: "hydroton",
 					nutrients: [

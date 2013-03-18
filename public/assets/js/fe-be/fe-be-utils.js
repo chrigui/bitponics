@@ -10,13 +10,22 @@ define(['moment'], function(moment){
   utils.DURATION_TYPES = [
     'seconds',
     'minutes',
-    'hours','days','weeks','months'];
+    'hours',
+    'days',
+    'weeks',
+    'months'
+  ];
 
+
+  /**
+   *
+   */
   utils.NOTIFICATION_TYPES = {
     INFO : "info",
     ACTION_NEEDED : "actionNeeded",
     ERROR : "error"
   };
+
 
   /**
    *
@@ -25,6 +34,34 @@ define(['moment'], function(moment){
   utils.ACCESSORY_VALUES = {
     ON : '1',
     OFF : '0'
+  };
+
+
+  /**
+   * 
+   */
+  utils.VISIBILITY_OPTIONS = {
+    PRIVATE : "private",
+    PUBLIC : "public"
+  };
+
+
+  /**
+   * Suggestions for auto-complete in UI
+   */
+  utils.suggestions = {
+    lightTypes : [
+      'Fluorescent',
+      'Metal Halide',
+      'High Pressure Sodium (HPS)',
+      'LED'
+    ],
+    growSystemNames : [
+      'Flood & Drain',
+      'NFT (Nutrient Film Technique)',
+      'Deep Water Culture (DWC)',
+      'Aquaponic'
+    ]
   };
 
   /**

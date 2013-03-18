@@ -57,7 +57,7 @@ describe('Model Utils', function(){
                 self.user = user;
                 return innerCallback();
               }
-            );      
+            );
           },
           function(innerCallback){
             GrowPlanInstance.create(

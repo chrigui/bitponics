@@ -176,7 +176,6 @@ function triggerImmediateAction(options, callback){
             // get any other actions that exist for the same control.
             var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
             
-
             actionHasDeviceControl = device.controlMap.some(
               function(controlMapItem){
                 return getObjectId(controlMapItem.control).equals(getObjectId(action.control));
@@ -215,7 +214,6 @@ function triggerImmediateAction(options, callback){
                   expires = now.valueOf() + cycleRemainder;
                   return innerCallback();  
                 });
-                
               }
             );            
           }
@@ -427,15 +425,20 @@ function getObjectId (object){
   var constructor = object.constructor.name.toLowerCase();
   if (constructor === 'objectid'){ return object; }
   if (constructor === 'string'){ return new ObjectID(object); } 
-  // else, assume it's a populated model and return _id property
-  return object._id;
+  // else, assume it's a populated model and has an _id property
+  var _idConstructor = object._id.constructor.name.toLowerCase();
+  if (_idConstructor === 'objectid') { return object._id; } 
+  // might be a POJO so coerce it to an ObjectID object
+  return new ObjectID(object._id.toString());
 }
 
 
 /**
  * Retrieves a GrowPlan and populates all of its nested objects:
+ * plants
  * phases.nutrients
  * phases.growSystem
+ * phases.light
  * phases.light.fixture
  * phases.light.bulb
  * phases.actions
@@ -459,6 +462,9 @@ function getFullyPopulatedGrowPlan(query, callback){
       winston = require('winston'),
       Action = require('./action'),
       ActionModel = Action.model,
+      LightModel = require('./light').model,
+      LightBulbModel = require('./lightBulb').model,
+      LightFixtureModel = require('./lightFixture').model,
       growPlans;
       
   async.series(
@@ -470,6 +476,7 @@ function getFullyPopulatedGrowPlan(query, callback){
         .populate('phases.growSystem')
         .populate('phases.actions')
         .populate('phases.phaseEndActions')
+        .populate('phases.light')
         .exec(function(err, growPlanResults){
           growPlans = growPlanResults.map(function(growPlanResult){ return growPlanResult.toObject(); });
           innerCallback();
@@ -511,6 +518,77 @@ function getFullyPopulatedGrowPlan(query, callback){
 
           innerCallback();
         });
+      },
+
+      function populateLights(innerCallback){
+        var lightFixtureIds = [];
+        var lightBulbIds = [];
+        growPlans.forEach(function(growPlan) {
+          growPlan.phases.forEach(function(phase) {
+            if (phase.light){
+              if (phase.light.fixture){
+                lightFixtureIds.push(phase.light.fixture);
+              }
+              if (phase.light.bulb){
+                lightBulbIds.push(phase.light.bulb);
+              }
+            }
+          });
+        });
+
+        async.parallel(
+          [
+            function loadLightFixtures(innerInnerCallback){
+              LightFixtureModel.find({})
+              .where('_id').in(lightFixtureIds)
+              .exec(function (err, lightFixtures) {
+                if (err) { return innerCallback(err); }
+                
+                var lightFixturesById = {};
+                lightFixtures.forEach(function(item, index) {
+                   lightFixturesById[item._id.toString()] = item;
+                });
+
+                growPlans.forEach(function(growPlan) {
+                  growPlan.phases.forEach(function(phase) {
+                    if (phase.light && phase.light.fixture){
+                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                    }
+                  });
+                });
+
+                return innerInnerCallback();
+              });
+            },
+
+            function loadLightBulbs(innerInnerCallback){
+              LightBulbModel.find({})
+              .where('_id').in(lightBulbIds)
+              .exec(function (err, lightBulbs) {
+                if (err) { return innerCallback(err); }
+                
+                var lightBulbsById = {};
+                lightBulbs.forEach(function(item, index) {
+                   lightBulbsById[item._id.toString()] = item;
+                });
+
+                growPlans.forEach(function(growPlan) {
+                  growPlan.phases.forEach(function(phase) {
+                    if (phase.light && phase.light.fixture){
+                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                    }
+                  });
+                });
+
+                return innerInnerCallback();
+              });
+            }
+          ],
+          function lightParallelEnd(err, results){
+            innerCallback();
+          }
+        );
+        
       }
     ],
     function (err, result) {

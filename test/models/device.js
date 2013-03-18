@@ -17,7 +17,7 @@ should = require('should');
  * For asynchronous tests you need to have a done method that you call after
  * your code should be done executing so Mocha runs to test properly.
  */
- describe('GrowPlan', function(){
+ describe('Device', function(){
  	
   /*
    * beforeEach Method
@@ -41,6 +41,13 @@ should = require('should');
 
 
     describe('#refreshActiveImmediateActions', function(){
+      beforeEach(function(done){
+        
+      });
+
+      afterEach(function(done){
+
+      });
       
     });
   });

@@ -3,20 +3,26 @@ var mongoose = require('mongoose'),
 	mongoosePlugins = require('../../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
+	ObjectIdSchema = Schema.ObjectId,
+  ObjectId = mongoose.Types.ObjectId,
 	PhaseSchema = require('./phase').schema,
 	Phase = require('./phase').model,
 	async = require('async'),
-	getObjectId = require('../utils').getObjectId;
-
+  ModelUtils = require('../utils'),
+	getObjectId = ModelUtils.getObjectId,
+  requirejs = require('../../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils'),
+  PlantModel = require('../plant').model,
+  i18nKeys = require('../../i18n/keys');
+  
 
 var GrowPlanModel,
 	GrowPlanSchema = new Schema({
-	parentGrowPlanId: { type: ObjectId, ref: 'GrowPlan' },
-	createdBy: { type: ObjectId, ref: 'User' },
+	parentGrowPlanId: { type: ObjectIdSchema, ref: 'GrowPlan' },
+	createdBy: { type: ObjectIdSchema, ref: 'User' },
 	name: { type: String, required: true },
 	description: { type: String, required: true },
-	plants: [{ type: ObjectId, ref: 'Plant' }],
+	plants: [{ type: ObjectIdSchema, ref: 'Plant' }],
 	/**
 	 * Nutrients would just be a de-normalized view of the nutrients across the 
 	 * phases. TODO:  decide if we need it as a property here
@@ -25,7 +31,14 @@ var GrowPlanModel,
 	//sensors: [{ type: ObjectId, ref: 'Sensor' }],
 	//controls: [{ type: ObjectId, ref: 'Control'}],
 	phases: [PhaseSchema],
-	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
+	visibility : { 
+    type: String, 
+    enum: [
+      feBeUtils.VISIBILITY_OPTIONS.PUBLIC, 
+      feBeUtils.VISIBILITY_OPTIONS.PRIVATE
+    ], 
+    default: feBeUtils.VISIBILITY_OPTIONS.PUBLIC
+  }
 },
 { id : false });
 
@@ -167,7 +180,7 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
  * 
  * @param source {GrowPlan}. Fully populated, POJO GrowPlan model object. Retrieved using ModelUtils.getFullyPopulatedGrowPlan
  * @param other {GrowPlan}. Fully populated, POJO GrowPlan model object.
- * @param callback {function} . function(err, result) to be called with result. result is a boolean,
+ * @param callback {function(err, bool)} : to be called with result. result is a boolean,
  * 					true if the objects are equivalent, false if not
  *
  */
@@ -236,6 +249,104 @@ GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
 		}
 	);
 });
+
+
+/**
+ * Takes a fully-populated GrowPlan object (such as is submitted from grow-plans creation page)
+ * and, for all nested documents (plants, phases.actions, phases.nutrients, etc) creates them if they don't match existing DB entries
+ * Then saves the whole shebang and returns it
+ * 
+ * @param {object} options.growPlan : fully-populated grow plan POJO
+ * @param {User} options.user : used to set "createdBy" field for new objects
+ * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {function(err, GrowPlan)} callback : Returns the GrowPlanModel object (the document from the database, not a POJO)
+ */
+GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
+  var submittedGrowPlan = options.growPlan,
+      user = options.user,
+      visibility = options.visibility,
+      GrowPlanModel = this;
+
+
+  ModelUtils.getFullyPopulatedGrowPlan( { _id: submittedGrowPlan._id }, function(err, growPlanResults){
+    if (err) { return callback(err); }
+
+    var growPlanResult = growPlanResults[0];
+
+    if (!growPlanResult){ 
+      return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
+    }
+
+    GrowPlanModel.isEquivalentTo(submittedGrowPlan, growPlanResult, function(err, isEquivalent){
+      if (err) { return callback(err); }
+
+      if (isEquivalent) { 
+        return callback(null, growPlanResult); 
+      } 
+      
+      // if not equivalent, branch the  source GrowPlan
+      submittedGrowPlan._id = new ObjectId();
+      submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
+      submittedGrowPlan.createdBy = user;
+      submittedGrowPlan.visibility = visibility;
+
+      async.parallel(
+        [
+          function plantsCheck(innerCallback){
+            var validatedPlants = [];
+
+            async.forEach(submittedGrowPlan.plants, 
+              function validatePlant(plant, plantCallback){
+                PlantModel.createNewIfUserDefinedPropertiesModified({
+                  plant : plant,
+                  user : user,
+                  visibility : visibility
+                },
+                function(err, validatedPlant){
+                  if (err) { return plantCallback(err); }
+                  validatedPlants.push(validatedPlant);
+                  return plantCallback();
+                });
+              },
+              function plantLoopEnd(err){
+                if (err) { return innerCallback(err); }
+                submittedGrowPlan.plants = validatedPlants;
+                return innerCallback();
+              }
+            );
+          },
+          function phasesCheck(innerCallback){
+            async.forEach(submittedGrowPlan.phases, 
+              function (phase, phaseCallback){
+                PhaseSchema.statics.createNewIfUserDefinedPropertiesModified(
+                  {
+                    phase : phase,
+                    user : user,
+                    visibility : visibility
+                  },
+                  function(err, validatedPhase){
+                    return phaseCallback();  
+                  }
+                );            
+              },
+              function phaseLoopEnd(err){
+                return innerCallback();
+              }
+            );
+          }
+        ],
+        function(err, results){
+          // at this point, everything should have valid, saved referenced documents
+          var newGrowPlan = new GrowPlanModel(submittedGrowPlan);
+          newGrowPlan.save(callback);
+          //.create(submittedGrowPlan, callback);
+        }
+      );
+    });
+  });
+}); // /.createNewIfUserDefinedPropertiesModified
+
+
 /************************** END STATIC METHODS  ***************************/
 
 GrowPlanModel = mongoose.model('GrowPlan', GrowPlanSchema);
