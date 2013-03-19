@@ -70,13 +70,6 @@ section#footer
 		#controls, #reminders
 			float right
 
-/*
- * Grow Plans Page
- */
-.growplans
-	//
-
-
 
 @media screen and (min-width: 60em)
 	/*body
@@ -134,9 +127,13 @@ section#footer
 /*
  * Grow Plans Page
  */
-.phaseRangeSlider {
+.grid
+	li
+		float: left;
+		width: 15em;
+		// min-height: 600px;
+		
 
-}
 .idealRanges {
 	li {
 		clearfix()
@@ -518,11 +515,16 @@ section#footer
 		i
 			//
 
-
+//TODO: this is repeating these styles, need better solution
 /*
  * Single landing page overrides
  */
 @import "./pages/single-page"
+
+/*
+ * App page overrides
+ */
+@import "./pages/app-page"
 
 
 /*
@@ -575,3 +577,16 @@ section#footer
 	// p
 	// 	float right
 	// 	width 50%
+
+//App pages
+.question
+	float left
+	width 40%
+	margin-right 5%
+
+.question-wrap-right
+	float right
+	width: 60%;
+	
+	.question
+		width 60%

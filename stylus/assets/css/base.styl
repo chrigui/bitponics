@@ -246,7 +246,7 @@ img
 	@extends .display-ib
 	padding 1em
 	margin 1em
-	background color-medium-green
+	background color-hot-green
 	color white
 	cursor pointer
 
@@ -268,6 +268,9 @@ img
 		display block
 		clear both
 		margin 0
+
+	&.add
+		border 0 none
 
 .page-content
 	.center
@@ -373,6 +376,11 @@ section#footer
 		display block
 
 /*
+ * Overlay
+ */
+@import "./components/overlay"
+
+/*
  * Home Page
  */
 @import "./pages/index"
@@ -388,12 +396,6 @@ section#footer
  */
 @import "./pages/profile"
 
-
-/*
- * Grow Plans Page
- */
-@import "./pages/growplans"
-
 /*
  * Single landing page overrides
  */
@@ -403,3 +405,14 @@ section#footer
  * Register page
  */
 @import "./pages/getstarted"
+
+/*
+ * App Page
+ */
+@import "./pages/app-page"
+
+/*
+ * Grow Plans Page
+ */
+@import "./pages/growplans"
+

@@ -1,6 +1,7 @@
 @import "nib"
 @import "./helpers"
 @import "./global/colors"
+@import "./global/utils"
 
 
 
@@ -26,25 +27,29 @@ input.inline
 
 input, textarea
 	margin-top 0
-	//background color-medium-green
-	background white
-	border 1px solid color-medium-green
-	padding .5em
-	//color color-light-green
+	background-color color-bg-gray
+	border none
+	// border 1px solid color-hot-green
+	padding .75em
+	color color-text-gray
 
 input:valid, textarea:valid, input:invalid, textarea:invalid
-	//background color-medium-green
-	background white
+	//background color-hot-green
+	background-color color-bg-gray
+
+input:focus, textarea:focus
+	background-color white
+	color black
 
 input[type=submit]
 	background white
-	color color-medium-green
-	border 4px solid color-medium-green
+	color color-hot-green
+	border 4px solid color-hot-green
 	font-size 1.5em
 
 button
 	background white
-	color color-medium-green
+	color color-hot-green
 	//border none
 
 select
@@ -55,66 +60,79 @@ select
 textarea
 	width 100%
 	min-height 4em
-	padding .25em .5em
+	// padding .25em .5em
 
-.steps
-	
-	.step
-		position relative
-		padding-bottom 5em
-	h4
-		font-weight bold
-		margin 1em 0 0
-		font-size 4em
-		line-height 1em
+input[type=radio], input[type=checkbox]
+	display none
+	opacity 0
+	height 0
+	width 0
+	margin 0
 
-	.grid
-		margin-left 0
-		padding-left 0
-		li
-			@extends .display-ib
-			text-align center
-			vertical-align middle
-			margin .15em 0
-			padding 0
-		&.sortlist li
-			margin .15em
+input[type='radio']:checked + label,
+input[type='checkbox']:checked + label
+	display block
+
+.question
+	margin: 0 0 3em;
+.question-title
+	//
+
+.dropdown-wrap
+	position relative
+	min-height: 1em;
+
+.dropdown
+	position: absolute;
+	top 0
+	left 0
+	width: 200px;
+	padding: 10px;
+	margin: 0 auto;
+	background: color-hot-green;
+	color: #fff;
+	outline: none;
+	cursor: pointer;
+	font-weight: bold;
+	min-height: 1em;
+
+	&.initial
+		.select label
+			display block
+			padding .25em .5em
+
+	&.open
+		z-index 1
 		label
-			@extends .display-ib
-			padding 1.5em 1em 0
-			height 4em
-			line-height	1em
-			color white
-			background color-medium-green
-			font-size 1em
-			margin 0
-			vertical-align bottom
-			opacity .6
-			transition opacity 300ms linear
-			border 1px solid white
-		label.large-label
-			// height auto
-		input[type=radio], input[type=checkbox]
-			@extends .display-ib
-	// .dark-bg .grid label
-	// 	color color-medium-green
-	// 	background white
+			display block
 
+		input[type='radio'] + label,
+		input[type='checkbox'] + label
+			display block
 
-	input[type=radio], input[type=checkbox]
-		//display none
-		opacity 0
-		height 0
-		width 0
+			&:after
+				display none
+
+	label
+		display none
+		position relative
+		padding .25em .5em
 		margin 0
+		&:after
+			right: .5em;
+			top: 44.55%;
+			create-triangle('down', 5px, white)
 
-	input[type='radio']:checked + label,
-	input[type='checkbox']:checked + label
-		opacity 1
+	.select label
+		&:after
+			content: '';
 
-	input[type='radio']:checked ~ .info,
-	input[type='checkbox']:checked ~ .info
-		display block
+		&:after
+			content: '';
+
+	// input[type='radio']:checked ~ .info,
+	// input[type='checkbox']:checked ~ .info
+	// 	display block
 
 .wufoo
 	background-color color-light-gray-bg!important
@@ -144,20 +162,20 @@ textarea
 
 	input, textarea
 		margin-top 0!important
-		//background color-medium-green
+		//background color-hot-green
 		background white!important
-		border 1px solid color-medium-green!important
+		border 1px solid color-hot-green!important
 		padding .5em!important
 		//color color-light-green
 
 	input:valid, textarea:valid, input:invalid, textarea:invalid
-		//background color-medium-green
+		//background color-hot-green
 		background white!important
 
 	input[type=submit]
 		background white!important
-		color color-medium-green!important
-		border 4px solid color-medium-green!important
+		color color-hot-green!important
+		border 4px solid color-hot-green!important
 		font-size 1.5em!important
 
 // inline MailChimp mailing list form
@@ -207,20 +225,20 @@ textarea
 
 	input, textarea
 		margin-top 0!important
-		//background color-medium-green
+		//background color-hot-green
 		background white!important
-		border 1px solid color-medium-green!important
+		border 1px solid color-hot-green!important
 		padding .5em!important
 		//color color-light-green
 
 	input:valid, textarea:valid, input:invalid, textarea:invalid
-		//background color-medium-green
+		//background color-hot-green
 		background white!important
 
 	input[type=submit]
 		background white!important
-		color color-medium-green!important
-		border 4px solid color-medium-green!important
+		color color-hot-green!important
+		border 4px solid color-hot-green!important
 		font-size 1.5em
 		cursor pointer
 

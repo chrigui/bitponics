@@ -906,7 +906,7 @@ img {
 .btn {
   padding: 1em;
   margin: 1em;
-  background: #00f717;
+  background: #00e36c;
   color: #fff;
   cursor: pointer;
 }
@@ -920,6 +920,9 @@ img {
   display: block;
   clear: both;
   margin: 0;
+}
+.btn.add {
+  border: 0 none;
 }
 .page-content .center {
   width: 100%;
@@ -1021,6 +1024,28 @@ section#footer .content-module {
   display: block;
 }
 /*
+ * Overlay
+ */
+.overlay {
+  position: absolute;
+  top: 5em;
+  left: 10%;
+  background: #fff;
+  border: 4px solid #999b9a;
+  width: 80%;
+  right: 10%;
+  z-index: 5;
+  overflow: hidden;
+}
+.overlay .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  background: #fff;
+  color: #000;
+}
+/*
  * Home Page
  */
 .landing-page body {
@@ -1038,6 +1063,12 @@ section#footer .content-module {
 }
 .landing-page section {
   clear: both;
+}
+.landing-page #footer {
+  background-color: #c1c2c4;
+  color: #fff;
+  padding: 0 2.5%;
+  font-size: 0.85em;
 }
 .landing-page input[type=submit] {
   font-size: 1.1em;
@@ -1389,14 +1420,184 @@ section#footer .content-module {
  * Profile Page
  */
 /*
- * Grow Plans Page
+ * Single landing page overrides
  */
-.growplans .grid .info {
-  display: none;
+.single-page .icon-glyphlogo-new {
+  display: none !important;
+}
+.single-page #main,
+.single-page #footer {
+  max-width: 60em;
+  margin: 0 auto;
+  width: 95%;
+}
+.single-page #main {
+  margin: 3em auto !important;
+}
+.single-page #footer {
+  background: none;
+  height: auto;
+  min-height: auto;
+  padding: 0;
+  font-size: 1em;
+}
+.single-page #footer div {
+  position: static;
+}
+.single-page .page-content,
+.single-page .page-heading {
+  width: 100%;
+}
+.single-page #register {
+  margin-top: 10em !important;
+}
+.single-page #register h3.nav-section {
+  border-top: 0 none;
+}
+.single-page #team,
+.single-page #contact {
+  background: #fff;
+  color: #999b9a;
+}
+.single-page #team div,
+.single-page #contact div,
+.single-page #team p,
+.single-page #contact p,
+.single-page #team a,
+.single-page #contact a,
+.single-page #team h3,
+.single-page #contact h3 {
+  color: #999b9a;
+  border-color: #999b9a;
+}
+/*
+ * Register page
+ */
+.landing-page.getstarted #main {
+  margin: 1em 1em 0;
+}
+.landing-page.getstarted #main .page-heading {
+  font-size: 2em;
+  color: #00f717;
+  font-size: 2.5em;
+  line-height: 1;
+}
+.landing-page.getstarted #main .page-content {
+  border-top: 1px solid #00f717;
+}
+.landing-page.getstarted #main ul {
+  padding: 1em;
+  margin-left: 1em;
+  list-style: initial;
+li
+}
+.landing-page.getstarted #main p {
+  color: #00f717;
+}
+.landing-page.register #main .page-content {
+  padding-top: 1em;
+}
+.landing-page.register .retail-price,
+.landing-page.register .preorder-price {
+  float: left;
+  font-size: 2em;
+}
+.landing-page.register .retail-price .additional-text,
+.landing-page.register .preorder-price .additional-text {
+  font-size: 10px;
+  text-align: center;
+}
+.landing-page.register .preorder-price {
+  position: relative;
+  font-size: 3em;
+}
+.landing-page.register .preorder-price span.dollar-sign,
+.landing-page.register .preorder-price span.price-number {
+  color: #00f717;
+}
+.landing-page.register .preorder-price .additional-text span {
+  display: inline-block;
   text-align: left;
 }
-.growplans .grid .large-label .info * {
-  color: #fff;
+.landing-page.register .checkout-imgs {
+  border-top: 1px solid #00f717;
+  padding-top: 1em;
+}
+.landing-page.register .checkout-imgs img {
+  display: block;
+  width: auto;
+  margin: 0 auto;
+}
+/*
+ * App Page
+ */
+.app-page .header .nav-section {
+  display: none;
+}
+.app-page .header .nav-section.first,
+.app-page .header .nav-section.social-icons {
+  display: block;
+}
+.app-page .header h1.logo a,
+.app-page .header h1.logo span {
+  color: #00e36c;
+}
+.app-page .label {
+  font-size: 0.75em;
+}
+.app-page .value {
+  font-size: 1.5em;
+  color: #333;
+}
+/*
+ * Grow Plans Page
+ */
+.landing-page.growplans .page-heading {
+  color: #333;
+  font-size: 3em;
+  border-bottom: 1px solid #999b9a;
+  font-weight: bold;
+}
+.landing-page.growplans .grid li {
+  margin: 1em 1em 0 1em;
+}
+.landing-page.growplans .grid .label {
+  margin: 0;
+  padding: 0.45em 0 0;
+  border-top: 1px solid #999b9a;
+}
+.landing-page.growplans .grid .first .label {
+  border: 0 none;
+}
+.landing-page.growplans .grid .value {
+  margin: 0 0 1em;
+}
+.landing-page.growplans .next-step-btn {
+  background: #fff !important;
+  color: #00e36c !important;
+  border: 4px solid #00e36c;
+  padding: 0.5em 2em;
+  display: block;
+  text-align: center;
+  width: 15em;
+}
+.landing-page.growplans #growplan_customize .grid li {
+  margin: 0;
+  width: auto;
+}
+.landing-page.growplans #growplan_customize .grid li .btn {
+  margin-left: 0;
+}
+.landing-page.growplans #growplan_customize .add {
+  float: left;
+  clear: left;
+  margin-left: 0;
+}
+.landing-page.growplans .icon-glyph-new {
+  height: 1em;
+  font-size: 0.75em;
+  position: relative;
+  top: -0.25em;
 }
 .phaseRangeSlider {
   position: relative;
@@ -1618,113 +1819,4 @@ section#footer .content-module {
 .fruiting .ui-slider-handle {
   background-color: #0e4800;
   background-image: none;
-}
-/*
- * Single landing page overrides
- */
-.single-page .icon-glyphlogo-new {
-  display: none !important;
-}
-.single-page #main,
-.single-page #footer {
-  max-width: 60em;
-  margin: 0 auto;
-  width: 95%;
-}
-.single-page #main {
-  margin: 3em auto !important;
-}
-.single-page #footer {
-  background: none;
-  height: auto;
-  min-height: auto;
-  padding: 0;
-  font-size: 1em;
-}
-.single-page #footer div {
-  position: static;
-}
-.single-page .page-content,
-.single-page .page-heading {
-  width: 100%;
-}
-.single-page #register {
-  margin-top: 10em !important;
-}
-.single-page #register h3.nav-section {
-  border-top: 0 none;
-}
-.single-page #team,
-.single-page #contact {
-  background: #fff;
-  color: #999b9a;
-}
-.single-page #team div,
-.single-page #contact div,
-.single-page #team p,
-.single-page #contact p,
-.single-page #team a,
-.single-page #contact a,
-.single-page #team h3,
-.single-page #contact h3 {
-  color: #999b9a;
-  border-color: #999b9a;
-}
-/*
- * Register page
- */
-.landing-page.getstarted #main {
-  margin: 1em 1em 0;
-}
-.landing-page.getstarted #main .page-heading {
-  font-size: 2em;
-  color: #00f717;
-  font-size: 2.5em;
-  line-height: 1;
-}
-.landing-page.getstarted #main .page-content {
-  border-top: 1px solid #00f717;
-}
-.landing-page.getstarted #main ul {
-  padding: 1em;
-  margin-left: 1em;
-  list-style: initial;
-li
-}
-.landing-page.getstarted #main p {
-  color: #00f717;
-}
-.landing-page.register #main .page-content {
-  padding-top: 1em;
-}
-.landing-page.register .retail-price,
-.landing-page.register .preorder-price {
-  float: left;
-  font-size: 2em;
-}
-.landing-page.register .retail-price .additional-text,
-.landing-page.register .preorder-price .additional-text {
-  font-size: 10px;
-  text-align: center;
-}
-.landing-page.register .preorder-price {
-  position: relative;
-  font-size: 3em;
-}
-.landing-page.register .preorder-price span.dollar-sign,
-.landing-page.register .preorder-price span.price-number {
-  color: #00f717;
-}
-.landing-page.register .preorder-price .additional-text span {
-  display: inline-block;
-  text-align: left;
-}
-.landing-page.register .checkout-imgs {
-  border-top: 1px solid #00f717;
-  padding-top: 1em;
-}
-.landing-page.register .checkout-imgs img {
-  display: block;
-  width: auto;
-  margin: 0 auto;
 }
