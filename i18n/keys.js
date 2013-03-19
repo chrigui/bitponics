@@ -1,4 +1,4 @@
-/*
+/**
  * This module is used to key into the i18n values elsewhere in the i18n folder.
  *
  * Used to store any strings that are used multiple places in the code or that
@@ -19,10 +19,13 @@ exports.keys = {
   "First and last control values must be equal" : "First and last control values must be equal",
   "First and last state\'s messages must be equal" : "First and last state\'s messages must be equal",
   "In a 3-state cycle, at least the 1st and 3rd states must have durations defined" : "In a 3-state cycle, at least the 1st and 3rd states must have durations defined",
-  "Invalid action id" : "Invalid action id",
+  "Invalid action id" : "Invalid Action id",
+  "Invalid Grow Plan id" : "Invalid Grow Plan id %s",
   "manual action trigger message" : "%s. %s.",
-  "device action trigger message" : "%s. Device has automatically triggered the following action : %s.",
-  "unavailable device key" : "%s does not match any available device keys for this user"
+  "device action trigger message" : "%s. Your device has automatically handled the following action : %s.",
+  "unavailable device key" : "%s does not match any available device keys for this user",
+  "no device" : "No device found for specified id %s",
+  "Only device owner can assign a device to their garden" : "Only device owner can assign a device to their garden"
 };
 
 /**

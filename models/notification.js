@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
 	useTimestamps = mongoosePlugins.useTimestamps,
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
-	ObjectId = Schema.ObjectId;
+	ObjectIdSchema = Schema.ObjectId,
+  ObjectId = mongoose.Types.ObjectId;
 
 
 var NotificationSentLogSchema = new Schema({ 
@@ -41,13 +42,13 @@ var NotificationSchema = new Schema({
    * users
    * Users to send the notification to.
    */
-  u : [{ type: ObjectId, ref: 'User', required: true }],
+  u : [{ type: ObjectIdSchema, ref: 'User', required: true }],
 
 
 	/**
 	 * GrowPlanInstance. Optional.
 	 */
-	gpi: { type: ObjectId, ref: 'GrowPlanInstance', required: false },
+	gpi: { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false },
 
 
 	/**
@@ -99,7 +100,11 @@ var NotificationSchema = new Schema({
   /**
    * type
    */
-	t : { type: String, enum: feBeUtils.NOTIFICATION_TYPES }
+	t : { type: String, enum: [
+      feBeUtils.NOTIFICATION_TYPES.INFO,
+      feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+      feBeUtils.NOTIFICATION_TYPES.ERROR
+    ]}
 	
 
 },

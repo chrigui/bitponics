@@ -1,9 +1,10 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-  	Schema = mongoose.Schema,
-  	ObjectId = Schema.ObjectId,
-  	Action = require('../action').model,
-  	getObjectId = require('../utils').getObjectId;
+	Schema = mongoose.Schema,
+	ObjectId = Schema.ObjectId,
+	ActionModel = require('../action').model,
+	getObjectId = require('../utils').getObjectId,
+  async = require('async');
 
 var IdealRangeSchema = new Schema({
 	/**
@@ -77,14 +78,14 @@ IdealRangeSchema.static('isEquivalentTo', function(source, other){
 		return false;
 	}
 	if (source.actionBelowMin){
-		if (!Action.isEquivalentTo(source.actionBelowMin, other.actionBelowMin)) { return false;}
+		if (!ActionModel.isEquivalentTo(source.actionBelowMin, other.actionBelowMin)) { return false;}
 	}
 
 	if (!((source.actionAboveMax && other.actionAboveMax) || (!source.actionAboveMax && !other.actionAboveMax))) {
 		return false;
 	}
 	if (source.actionAboveMax){
-		if (!Action.isEquivalentTo(source.actionAboveMax, other.actionAboveMax)) { return false;}
+		if (!ActionModel.isEquivalentTo(source.actionAboveMax, other.actionAboveMax)) { return false;}
 	}
 
 	if (!((source.applicableTimeSpan && other.applicableTimeSpan) || (!source.applicableTimeSpan && !other.applicableTimeSpan))) {
@@ -103,6 +104,60 @@ IdealRangeSchema.static('isEquivalentTo', function(source, other){
 	return true;
 });
 
+
+/**
+ * Takes a fully-populated IdealRange object (such as is submitted from grow-plans creation page)
+ * and, for all nested documents (actionBelowMin, actionAboveMax), creates them if they don't match existing DB entries
+ * Then returns IdealRange object
+ * 
+ * @param {object} options.idealRange
+ * @param {User} options.user : used to set "createdBy" field for new objects
+ * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {function(err, IdealRange)} callback
+ */
+IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
+  var submittedIdealRange = options.idealRange,
+    user = options.user,
+    visibility = options.visibility;
+
+  async.parallel(
+    [
+      function validateActionBelowMin(innerCallback){
+        if (!submittedIdealRange.actionBelowMin) { return innerCallback(); }
+        
+        ActionModel.createNewIfUserDefinedPropertiesModified({
+          action : submittedIdealRange.actionBelowMin,
+          user : user,
+          visibility : visibility
+        },
+        function(err, validatedAction){
+          if (err) { return innerCallback(err); }
+          submittedIdealRange.actionBelowMin = validatedAction._id;
+          return innerCallback();
+        });
+      },
+      function validateActionAboveMax(innerCallback){
+        if (!submittedIdealRange.actionAboveMax) { return innerCallback(); }
+        
+        ActionModel.createNewIfUserDefinedPropertiesModified({
+          action : submittedIdealRange.actionAboveMax,
+          user : user,
+          visibility : visibility
+        },
+        function(err, validatedAction){
+          if (err) { return innerCallback(err); }
+          submittedIdealRange.actionAboveMax = validatedAction._id;
+          return innerCallback();
+        });
+      },
+    ],
+    function parallelEnd(err, results){
+      // force mongoose to create a new _id
+      delete submittedIdealRange._id;
+      return callback(err, submittedIdealRange);
+    }
+  );
+});
 /************************** END STATIC METHODS  ***************************/
 
 exports.schema = IdealRangeSchema;

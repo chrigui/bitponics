@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId;
+  ObjectIdSchema = Schema.ObjectId;
 
 /**
  * ImmediateAction
@@ -12,7 +12,7 @@ var ImmediateActionSchema = new Schema({
     /**
      * The GrowPlanInstance
      */
-    gpi : { type: ObjectId, ref: 'GrowPlanInstance', required: true },
+    gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: true },
 
 
     /**
@@ -45,7 +45,7 @@ var ImmediateActionSchema = new Schema({
      * action (virtual)
      * Reference to the action
      */
-    a : {type: ObjectId, ref: 'Action', required: true },
+    a : {type: ObjectIdSchema, ref: 'Action', required: true },
 
     /**
      * done (virtual)

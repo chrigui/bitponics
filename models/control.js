@@ -1,14 +1,15 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-  	Schema = mongoose.Schema,
-  	mongoosePlugins = require('../lib/mongoose-plugins'),
+	Schema = mongoose.Schema,
+	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
-  	ObjectId = Schema.ObjectId;
+	ObjectIdSchema = Schema.ObjectId;
 
 var ControlSchema = new Schema({
 	name: { type: String, required: true },
-	onAction: { type: ObjectId, ref: 'Action', required: false },
-	offAction: { type: ObjectId, ref: 'Action', required: false }
+	onAction: { type: ObjectIdSchema, ref: 'Action', required: false },
+	offAction: { type: ObjectIdSchema, ref: 'Action', required: false },
+  createdBy: { type: ObjectIdSchema, ref: 'User'}
 },
 { id : false });
 

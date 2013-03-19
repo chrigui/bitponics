@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
+	ObjectIdSchema = Schema.ObjectId,
 	UserSchema = undefined,
 	User = undefined,
 	nodemailer = require('nodemailer'),
@@ -26,7 +26,7 @@ var DeviceKeySchema = new Schema({
    * deviceId not required. We temporarily create & save unassociated deviceKeys
    * for use during the setup process
    */
-  deviceId : { type: ObjectId, ref : 'Device'},
+  deviceId : { type: ObjectIdSchema, ref : 'Device'},
   /**
    * Public device key is a 16-char random hex string
    */
@@ -93,7 +93,7 @@ UserSchema = new Schema({
 			'serious',
 			'industrial'
 		]},
-		device : { type: ObjectId, ref : 'Device'},
+		device : { type: ObjectIdSchema, ref : 'Device'},
 		createdAt : { type : Date, default : Date.now },
 		payments : [
 			{

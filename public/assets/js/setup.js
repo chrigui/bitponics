@@ -96,7 +96,7 @@ $(function(){
 				console.log('error', jqXHR, textStatus, error);
 				// TODO retry a certain number of times
 			}
-		});			
+		});
 	})
 
 	$wifiForm.submit(function(e){

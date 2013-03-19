@@ -1,9 +1,10 @@
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
-  ObjectId = Schema.ObjectId,
+  ObjectIdSchema = Schema.ObjectId,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
+  ObjectId = mongoose.Types.ObjectId,
   async = require('async'),
   timezone = require('timezone/loaded'),
   moment = require('moment'),
@@ -23,7 +24,7 @@ var ActionStateSchema = new Schema(
   {
     controlValue: { type: String },
 
-    durationType: { type: String, enum: feBeUtils.DURATION_TYPES},
+    durationType: { type: String, enum: feBeUtils.DURATION_TYPES },
 
     duration: { type: Number },
 
@@ -37,7 +38,7 @@ ActionSchema = new Schema({
 
   description: { type: String, required: true },
 
-  control: { type: ObjectId, ref: 'Control', required: false },
+  control: { type: ObjectIdSchema, ref: 'Control', required: false },
 
   /**
    * Action schedules are represented by a cycle.
@@ -195,6 +196,42 @@ ActionSchema.static('isEquivalentTo', function(source, other){
 
   return true;
 });
+
+
+/**
+ * Takes a fully-populated Action object, sees if it exists in the database as defined.
+ * If not, creates a new Action and returns it
+ * 
+ * @param {object} options.action
+ * @param {User} options.user : used to set "createdBy" field for new objects
+ * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {function(err, Action)} callback
+ */
+ActionSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
+  var submittedAction = options.action,
+      user = options.user,
+      visibility = options.visibility,
+      ActionModel = this;
+
+    ActionModel.findById(submittedAction._id, function(err, actionResult){
+      if (err) { return callback(err); }
+
+      if (actionResult && ActionModel.isEquivalentTo(submittedAction, actionResult)){
+        return callback(null, actionResult);
+      }
+      
+      // If we've gotten here, either there was no actionResult
+      // or the item wasn't equivalent
+      submittedAction._id = new ObjectId();
+      submittedAction.createdBy = user;
+      submittedAction.visibility = visibility;
+
+      ActionModel.create(submittedAction, function(err, createdAction){
+        return callback(err, createdAction);
+      });  
+    });
+  } 
+);
 
 
 /**

@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
-  ObjectId = Schema.ObjectId;
+  ObjectIdSchema = Schema.ObjectId;
 
 var SensorSchema = new Schema({
     name: { type: String, required: true },
