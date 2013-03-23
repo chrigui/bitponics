@@ -71,7 +71,10 @@ module.exports = function(app){
 	  app.use(express.favicon(__dirname + '/../public/favicon.ico', { maxAge: 2592000000 }));
 	  app.use(express.static(path.join(__dirname, '/../public')));
 	  
-	  // Set the CDN options
+	  // by default, express adds an "X-Powered-By:ExpressJS" header. prevent that.
+    app.disable('x-powered-by');
+
+    // Set the CDN options
 	  
 	  var options = {
 	      publicDir  : path.join(__dirname, '/../public')

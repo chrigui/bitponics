@@ -13,7 +13,6 @@ module.exports = function(app){
 		res.locals({
 			user : req.user
 		});
-		res.removeHeader('X-Powered-By');
 		next();
 	});
 
