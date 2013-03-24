@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
+	ObjectIdSchema = Schema.ObjectId,
 	GrowPlanModel = require('./growPlan').growPlan.model,
 	User = require('./user').model,
 	GrowPlanInstanceModel,
@@ -12,20 +12,21 @@ var mongoose = require('mongoose'),
   tz = require('timezone/loaded'),
   DeviceModel = require('./device').model,
   getObjectId = require('./utils').getObjectId,
-  SensorLogSchema = require('./sensorLog').schema;
+  SensorLogSchema = require('./sensorLog').schema,
+  i18nKeys = require('../i18n/keys');
 
 /**
  * GrowPlanInstance 
  */
 var GrowPlanInstanceSchema = new Schema({
 
-	users : [{ type: ObjectId, ref: 'User' }],
+	users : [{ type: ObjectIdSchema, ref: 'User' }],
 	
-	owner : { type: ObjectId, ref: 'User', required: true },
+	owner : { type: ObjectIdSchema, ref: 'User', required: true },
 
-	growPlan : { type : ObjectId, ref : 'GrowPlan', required: true },
+	growPlan : { type : ObjectIdSchema, ref : 'GrowPlan', required: true },
 	
-	device : { type : ObjectId, ref : 'Device', required: false }, //the bitponics device
+	device : { type : ObjectIdSchema, ref : 'Device', required: false }, //the bitponics device
 	
 	startDate: { type: Date },
 
@@ -138,13 +139,10 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
       function (innerCallback){
         if (!options.device) { return innerCallback(); }
 
-        DeviceModel.findById(options.device, function(err, device){
-          if (err) { return innerCallback(err); }
-          if (!device) { return innerCallback(new Error('Invalid device id')); }
-          if (!device.owner.equals(getObjectId(options.owner))){return innerCallback(new Error('Only device owner can assign device to grow plan')); }
-          gpi.device = device;
-          return innerCallback();
-        });
+        gpi.pairWithDevice({
+          deviceId : getObjectId(options.device),
+          saveGrowPlanInstance : false
+        }, innerCallback);
       }
     ],
     function(err, results){
@@ -176,14 +174,74 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
 /************** INSTANCE METHODS ********************/
 
+/**
+ * Pair a device with this grow plan instance.
+ * 
+ * Pairing has no relation to activating. Non-active gpi's can have devices paired to them
+ * 
+ * @param {ObjectId|string} options.deviceId : ObjectId of device to pair
+ * @param {bool=} options.saveGrowPlanInstance (optional) Boolean indicating whether the GrowPlanInstance should be saved in the end (should be false if caller will execute a save). Device will be saved regardless.
+ * @param {function(err, { device : Device, growPlanInstance : growPlanInstance })} callback
+ */
+GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
+  var gpi = this;
+
+  DeviceModel.findById(options.deviceId, function(err, deviceResult){
+    if (err) { return callback(err); }
+    
+    if (!deviceResult){ return callback(new Error(i18nKeys.get('no device', options.deviceId))); }
+    
+    if (!deviceResult.owner.equals(getObjectId(gpi.owner))){
+      return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden'))); 
+    }
+    
+    DeviceModel.update(
+      { 
+        "activeGrowPlanInstance": gpi._id,
+        "_id" : { "$ne" : deviceResult._id }
+      }, 
+      { "$unset": { "activeGrowPlanInstance": 1 } }, 
+      function(err){
+        async.parallel(
+          [
+            function(innerCallback){
+              deviceResult.activeGrowPlanInstance = gpi;
+              
+              deviceResult.save(innerCallback);
+            },
+            function(innerCallback){
+              gpi.device = deviceResult._id;
+
+              if (options.saveGrowPlanInstance){
+                gpi.save(innerCallback)
+              } else {
+                innerCallback(null, [gpi]);
+              }
+            }
+          ],
+          function(err, results){
+            if (err) { return callback(err); }
+            var data = {
+              device : results[0][0],
+              growPlanInstance : results[1][0]
+            };
+            return callback(null, data);
+          }
+        );
+      }
+    );
+  });
+});
+
 
 /**
  * Activate an existing grow plan instance. If there's a device, update the device's activeGrowPlanInstance property
  * and remove the device from any other GPI's that are using it. 
  *
- * @param options.activePhaseId (optional) The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance. If not present,
- *        the first phase will be activated.
- * @param options.activePhaseDay (optional) Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
+ * @param {Object}           options
+ * @param {ObjectId|string=} options.activePhaseId : optional. The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance. If not present,
+ *                                                   the first phase will be activated.
+ * @param {Number=}          options.activePhaseDay : optional. Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
  */
 GrowPlanInstanceSchema.method('activate', function(options, callback) {
 	var gpi = this,
@@ -208,19 +266,11 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
         function (innerCallback){
           if (!gpi.device){ return innerCallback();}
 
-          DeviceModel.findById(gpi.device, function(err, deviceResult){
-            if (err) { return innerCallback(err); }
-            if (!deviceResult){ return innerCallback(new Error('No device found for specified id')); }
-            if (!deviceResult.owner.equals(getObjectId(gpi.owner))){return innerCallback(new Error('Only device owner can assign device to grow plan')); }
-            deviceResult.activeGrowPlanInstance = gpi;
-
-            deviceResult.save(function(err){
-              if (err) { return innerCallback(err); }
-              return gpi.save(innerCallback);     
-            });
-          });
-
-          // TODO : check for other Devices that have activeGrowPlanInstance set to this. do something....
+          gpi.pairWithDevice({
+            deviceId : getObjectId(gpi.device),
+            saveGrowPlanInstance : false
+          },
+          innerCallback);
         }
       ],
       function(err, results){
@@ -235,9 +285,9 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
  * Activate a phase on a grow plan instance. 
  * 
  *
- * @param options.phaseId (required) phaseId of the growPlan.phase
- * @param options.phaseDay (optional) Number of days into the phase. Used to offset phase.expectedEndDate
- * @param options.save (optional) Boolean indicating whether the GrowPlanInstance should be saved in the end (should be false if calling function will execute a save)
+ * @param {ObjectId|string} options.phaseId : (required) phaseId of the growPlan.phase
+ * @param {Number=} options.phaseDay : (optional) Number of days into the phase. Used to offset phase.expectedEndDate
+ * @param {bool=} options.save : (optional) Indicates whether the GrowPlanInstance should be saved in the end (should be false if caller will execute a save)
  */
 GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),

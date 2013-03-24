@@ -8,6 +8,8 @@ window.Steps = (function( window, document, undefined ) {
 
     CURRENT_STEP_CLASS = '',
 
+    NEXT_STEP_BUTTON_CLASS = '.next-step-btn',
+
     //UPDATE_PANEL_CLASS = '.update-panel',
 
     initialStepIndex = 0,
@@ -24,33 +26,45 @@ window.Steps = (function( window, document, undefined ) {
       //Steps.updatePanel = Steps.steps.find(UPDATE_PANEL_CLASS);
       Steps.stepsInteractedWith = {};
       Steps.stepsInvalid = {};
+      Steps.validate = validate;
       initEventHandlers();
       setInitialStepStyles();
     })();
     
     function initEventHandlers() {
-      Steps.form.on('change blur', ':input', validate);
+      // Steps.form.on('change blur', ':input', validate);
+      // Steps.form.on('click change', NEXT_STEP_BUTTON_CLASS, validate);
+      $(NEXT_STEP_BUTTON_CLASS).on('click', validate);
     }
 
     function setInitialStepStyles() {
       Steps.currentStep.find(':input').removeAttr('disabled');
-      /*
+      
       Steps.steps.filter(':gt(' + Steps.currentStepIndex + ')')
-        .addClass('dim')
+        .addClass('hide')
         .find(':input:not(.no-disable)')
-        .attr('disabled', true);
-        */
+        // .attr('disabled', true);
+        
     }
 
     function validate(e) {
-      var activeStep = $(e.target).closest('.step'),
-        nextStep = activeStep.next(STEP_CLASS);
+      var activeStep, nextStep;
+
+      if(e){
+        activeStep = $(e.target).closest('.step') 
+      }else{
+        activeStep = Steps.currentStep;
+      }
+      
+      nextStep = activeStep.next(STEP_CLASS);
       
       if (!Steps.stepsInteractedWith[activeStep.index()]) {
         //add to list of steps user has interacted with and scroll to next
         Steps.stepsInteractedWith[activeStep.index()] = activeStep;
         if (doScroll && nextStep.length) {
           scrollToNextSection(nextStep.offset().top);
+          Steps.currentStep = nextStep;
+          Steps.currentStepIndex = nextStep.index();
         }
       }
 
@@ -58,7 +72,7 @@ window.Steps = (function( window, document, undefined ) {
       var steps = Steps.stepsInteractedWith;
       for(var step in steps) {
         if (isValidStep(steps[step])) {
-          steps[step].addClass('complete');
+          steps[step].addClass('complete hide');
           if (nextStep.length) {
             steps[step].next(STEP_CLASS).removeClass('dim hide').find(':input').removeAttr('disabled');
           }
@@ -123,13 +137,15 @@ window.Steps = (function( window, document, undefined ) {
       return Steps.form.find('[name="' + name + '"]');
     }
 
+    //TODO: rename/refactor for different transition
     function scrollToNextSection( top ) {
-      var delay = 0;
-      setTimeout(function(){
-        $('html, body').animate({
-          scrollTop: top
-        }, 1000);
-      }, delay)
+      scrollTo(0, 0);
+      // var delay = 0;
+      // setTimeout(function(){
+      //   $('html, body').animate({
+      //     scrollTop: top
+      //   }, 1000);
+      // }, delay)
     }
 
     Steps._version = version;

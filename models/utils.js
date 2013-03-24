@@ -117,11 +117,11 @@ function logSensorLog(options, callback){
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
  *
  * @param {object} options  
- * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel (required),
- * @param {object|string} options.actionId : ObjectID (required),
- * @param {object=} options.device : DeviceModel (optional. Device of GrowPlanInstance),
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel 
+ * @param {ObjectId|string} options.actionId : ObjectID 
+ * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
  * @param {string} options.immediateActionMessage : message to log with the immediateAction
- * @param {User} options.user : UserModel (required. owner of GrowPlanInstance)
+ * @param {User} options.user : required. owner of GrowPlanInstance
  * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
 function triggerImmediateAction(options, callback){
@@ -140,7 +140,9 @@ function triggerImmediateAction(options, callback){
     winston = require('winston'),
     async = require('async'),
     tz = require('timezone/loaded'),
-    i18nKeys = require('../i18n/keys');
+    i18nKeys = require('../i18n/keys'),
+    requirejs = require('../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils');
 
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
@@ -149,6 +151,8 @@ function triggerImmediateAction(options, callback){
       user = options.user,
       timezone = user.timezone,
       action;
+
+  if (growPlanInstance.device && !device){ return callback(new Error('If a GrowPlanInstance has a device, Device document must be passed into triggerImmediateAction'))}
 
   ActionModel.findById(actionId, function(err, actionResult){
     if (err) { return callback(err);}
@@ -168,7 +172,30 @@ function triggerImmediateAction(options, callback){
 
           // If we're here, action does have a control
 
-          if (!device){
+          if (device){
+            // get any other actions that exist for the same control.
+            var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
+            
+            actionHasDeviceControl = device.controlMap.some(
+              function(controlMapItem){
+                return getObjectId(controlMapItem.control).equals(getObjectId(action.control));
+              }
+            );
+        
+            ActionModel.findOne()
+            .where('_id')
+            .in(device.activeActions.actions)
+            .where('control')
+            .equals(action.control)
+            .exec(function(err, actionResult){
+              if (err) { return innerCallback(err);}
+              if (!actionResult){ return innerCallback(); }
+              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
+              expires = now.valueOf() + cycleRemainder;
+              return innerCallback();  
+            });
+
+          } else {
             GrowPlanModel.findById(growPlanInstance.growPlan)
             .populate('phases.actions')
             .exec(function(err, growPlan){
@@ -187,27 +214,8 @@ function triggerImmediateAction(options, callback){
                   expires = now.valueOf() + cycleRemainder;
                   return innerCallback();  
                 });
-                
               }
-            );
-            
-          } else {
-            // get any other actions that exist for the same control.
-            var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
-            
-            ActionModel.findOne()
-            .where('_id')
-            .in(device.activeActions.actions)
-            .where('control')
-            .equals(action.control)
-            .exec(function(err, actionResult){
-              if (err) { return innerCallback(err);}
-              if (!actionResult){ return innerCallback(); }
-              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-              expires = now.valueOf() + cycleRemainder;
-              actionHasDeviceControl = true;
-              return innerCallback();  
-            });
+            );            
           }
         }
       ],
@@ -220,10 +228,10 @@ function triggerImmediateAction(options, callback){
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
-          notificationType = 'actionNeeded';
+          notificationType = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
           notificationMessage = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
-          notificationType = 'info';
+          notificationType = feBeUtils.NOTIFICATION_TYPES.INFO;
           notificationMessage = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 
@@ -417,15 +425,20 @@ function getObjectId (object){
   var constructor = object.constructor.name.toLowerCase();
   if (constructor === 'objectid'){ return object; }
   if (constructor === 'string'){ return new ObjectID(object); } 
-  // else, assume it's a populated model and return _id property
-  return object._id;
+  // else, assume it's a populated model and has an _id property
+  var _idConstructor = object._id.constructor.name.toLowerCase();
+  if (_idConstructor === 'objectid') { return object._id; } 
+  // might be a POJO so coerce it to an ObjectID object
+  return new ObjectID(object._id.toString());
 }
 
 
 /**
  * Retrieves a GrowPlan and populates all of its nested objects:
+ * plants
  * phases.nutrients
  * phases.growSystem
+ * phases.light
  * phases.light.fixture
  * phases.light.bulb
  * phases.actions
@@ -449,6 +462,9 @@ function getFullyPopulatedGrowPlan(query, callback){
       winston = require('winston'),
       Action = require('./action'),
       ActionModel = Action.model,
+      LightModel = require('./light').model,
+      LightBulbModel = require('./lightBulb').model,
+      LightFixtureModel = require('./lightFixture').model,
       growPlans;
       
   async.series(
@@ -460,6 +476,7 @@ function getFullyPopulatedGrowPlan(query, callback){
         .populate('phases.growSystem')
         .populate('phases.actions')
         .populate('phases.phaseEndActions')
+        .populate('phases.light')
         .exec(function(err, growPlanResults){
           growPlans = growPlanResults.map(function(growPlanResult){ return growPlanResult.toObject(); });
           innerCallback();
@@ -501,6 +518,77 @@ function getFullyPopulatedGrowPlan(query, callback){
 
           innerCallback();
         });
+      },
+
+      function populateLights(innerCallback){
+        var lightFixtureIds = [];
+        var lightBulbIds = [];
+        growPlans.forEach(function(growPlan) {
+          growPlan.phases.forEach(function(phase) {
+            if (phase.light){
+              if (phase.light.fixture){
+                lightFixtureIds.push(phase.light.fixture);
+              }
+              if (phase.light.bulb){
+                lightBulbIds.push(phase.light.bulb);
+              }
+            }
+          });
+        });
+
+        async.parallel(
+          [
+            function loadLightFixtures(innerInnerCallback){
+              LightFixtureModel.find({})
+              .where('_id').in(lightFixtureIds)
+              .exec(function (err, lightFixtures) {
+                if (err) { return innerCallback(err); }
+                
+                var lightFixturesById = {};
+                lightFixtures.forEach(function(item, index) {
+                   lightFixturesById[item._id.toString()] = item;
+                });
+
+                growPlans.forEach(function(growPlan) {
+                  growPlan.phases.forEach(function(phase) {
+                    if (phase.light && phase.light.fixture){
+                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                    }
+                  });
+                });
+
+                return innerInnerCallback();
+              });
+            },
+
+            function loadLightBulbs(innerInnerCallback){
+              LightBulbModel.find({})
+              .where('_id').in(lightBulbIds)
+              .exec(function (err, lightBulbs) {
+                if (err) { return innerCallback(err); }
+                
+                var lightBulbsById = {};
+                lightBulbs.forEach(function(item, index) {
+                   lightBulbsById[item._id.toString()] = item;
+                });
+
+                growPlans.forEach(function(growPlan) {
+                  growPlan.phases.forEach(function(phase) {
+                    if (phase.light && phase.light.fixture){
+                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                    }
+                  });
+                });
+
+                return innerInnerCallback();
+              });
+            }
+          ],
+          function lightParallelEnd(err, results){
+            innerCallback();
+          }
+        );
+        
       }
     ],
     function (err, result) {

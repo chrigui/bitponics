@@ -5,9 +5,6 @@ var User = require('../models/user').model,
 	winston = require('winston'),
 	timezone = require('timezone/loaded'),	
 	verificationEmailDomain = 'bitponics.com'
-	mongoose = require('mongoose'),
-	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
 	routeUtils = require('./route-utils');
 
 module.exports = function(app){

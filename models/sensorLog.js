@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId,
+	ObjectIdSchema = Schema.ObjectId,
 	SensorLogModel;
 
 
@@ -48,7 +48,7 @@ var SensorLogSchema = new Schema({
     /**
      * The GrowPlanInstance
      */
-    gpi : { type : ObjectId, ref: 'GrowPlanInstance'},
+    gpi : { type : ObjectIdSchema, ref: 'GrowPlanInstance'},
     
     /**
      * timestamp

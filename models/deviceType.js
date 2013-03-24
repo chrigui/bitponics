@@ -1,21 +1,21 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
-  	Schema = mongoose.Schema,
-  	mongoosePlugins = require('../lib/mongoose-plugins'),
+	Schema = mongoose.Schema,
+	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
-  	ObjectId = Schema.ObjectId;
+	ObjectIdSchema = Schema.ObjectId;
 
 var DeviceTypeSchema = new Schema({
 	name: { type: String, required: true }, //‘Bitponics Beta Device 1’
 	firmwareVersion: { type: String, required: true }, //‘0.1’
-	microprocessor: { type: String, required: true },
+	microprocessor: { type: String },
 	sensorMap: [{
 		inputId: { type: String, required: true }, //‘ph’
-		sensor : { type: ObjectId, ref: 'Sensor', required: true }
+		sensor : { type: ObjectIdSchema, ref: 'Sensor', required: true }
 	}],
 	controlMap : [{
 		outputId: { type: String, required: true }, //‘ph’
-		control : { type: ObjectId, ref: 'Control', required: true }	
+		control : { type: ObjectIdSchema, ref: 'Control', required: true }	
 	}]
 },
 { id : false });

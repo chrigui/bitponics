@@ -45,7 +45,7 @@ sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans');
     });
     
 
-    describe('#isEquivalentTo(other, callback)', function(){
+    describe('.isEquivalentTo', function(){
 
       beforeEach(function(done){
         var self = this,
@@ -461,6 +461,115 @@ sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans');
         );
       });
       
-    });
+    }); // /.isEquivalentTo
+
+
+    describe('.createNewIfUserDefinedPropertiesModified', function(){
+
+      beforeEach(function(done){
+        var self = this,
+            sourceGrowPlanId = "506de30c8eebf7524342cb70";
+        
+        self.userId = "506de30a8eebf7524342cb6c";
+        
+        ModelUtils.getFullyPopulatedGrowPlan(
+          {_id : sourceGrowPlanId },
+          function(err, growPlans){
+            self.sourceGrowPlan = growPlans[0];
+            self.originalGrowPlan = JSON.parse(JSON.stringify(self.sourceGrowPlan));
+            done();    
+          }
+        );
+      });
+
+
+      it('returns the original GrowPlan if there haven\'t been any modifications', function(done){
+        var self = this;
+        should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+        GrowPlan.createNewIfUserDefinedPropertiesModified(
+          {
+            growPlan : self.sourceGrowPlan,
+            user : self.userId,
+            visibility : 'public'
+          },
+          function(err, validatedGrowPlan){
+            should.not.exist(err);
+            should.exist(validatedGrowPlan);
+            console.log(validatedGrowPlan);
+
+            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be the same");
+
+            ModelUtils.getFullyPopulatedGrowPlan(
+              {_id : validatedGrowPlan._id },
+              function(err, growPlans){
+                var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                should.exist(fullyPopulatedValidatedGrowPlan);
+
+                GrowPlan.isEquivalentTo(
+                  self.originalGrowPlan, 
+                  fullyPopulatedValidatedGrowPlan, 
+                  function(err, isEquivalent){
+                    should.not.exist(err);
+                    isEquivalent.should.equal(true, "sourceGrowPlan and result growPlan should be the same");
+                    done();
+                  }
+                );
+              }
+            );   
+          }
+        );
+      }); // /returns the original GrowPlan if there haven\'t been any modifications
+  
+  
+      it('returns a branched GrowPlan if name has been modified', function(done){
+        var self = this;
+        should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+        self.sourceGrowPlan.name = "new unittest grow plan name";
+
+        GrowPlan.createNewIfUserDefinedPropertiesModified(
+          {
+            growPlan : self.sourceGrowPlan,
+            user : self.userId,
+            visibility : 'public'
+          },
+          function(err, validatedGrowPlan){
+            should.not.exist(err);
+            should.exist(validatedGrowPlan);
+            console.log(validatedGrowPlan);
+
+            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(false, "_id's should be different");
+
+            ModelUtils.getFullyPopulatedGrowPlan(
+              {_id : validatedGrowPlan._id },
+              function(err, growPlans){
+                var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                should.exist(fullyPopulatedValidatedGrowPlan);
+
+                GrowPlan.isEquivalentTo(
+                  self.originalGrowPlan, 
+                  fullyPopulatedValidatedGrowPlan, 
+                  function(err, isEquivalent){
+                    should.not.exist(err);
+                    
+                    isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should be different");
+                    
+                    self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
+                    self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
+
+                    done();
+                  }
+                );
+              }
+            );   
+          }
+        );
+      }); // /returns a branched GrowPlan if name has been modified
+
+    }); // /createNewIfUserDefinedPropertiesModified
     
+
+    
+
   });

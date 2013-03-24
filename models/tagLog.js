@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
-	ObjectId = Schema.ObjectId;
+	ObjectIdSchema = Schema.ObjectId;
 
 
 
@@ -41,7 +41,7 @@ var TagLogSchema = new Schema({
 	/**
 	 * The GrowPlanInstance
 	 */
-	gpi : { type: ObjectId, ref: 'GrowPlanInstance', required: true },
+	gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: true },
 
 	/**
 	 * timestamp

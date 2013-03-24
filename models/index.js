@@ -9,6 +9,7 @@ module.exports = {
 	plant: require('./plant').model,
 	lightBulb: require('./lightBulb').model,
 	lightFixture: require('./lightFixture').model,
+  light: require('./light').model,
 	notification: require('./notification').model,
 	nutrient: require('./nutrient').model,
 	sensor: require('./sensor').model,

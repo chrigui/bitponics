@@ -7,6 +7,7 @@ var data = {
 	devices: require('./devices'),
 	lightFixtures: require('./lightFixtures'),
 	lightBulbs: require('./lightBulbs'),
+  lights: require('./lights'),
 	growSystems: require('./growSystems'),
 	plants: require('./plants'),
 	actions: require('./actions'),

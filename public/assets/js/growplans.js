@@ -11,6 +11,26 @@ function(viewModels){
             // https://github.com/jrburke/requirejs/issues/507
             // http://www.youtube.com/watch?v=ZhfUv0spHCY&feature=player_profilepage#t=456s
             angular.bootstrap(document, ["GrowPlanModule"]);
+
+            //custom dropdown
+            $('.dropdown').on('click', function(e){
+                var dd = $(this);
+                dd.toggleClass('open').removeClass('initial');
+                
+                $(dd.filter('.open'))
+                    .off('click.dropdown')
+                    .on('click.dropdown', 'label', labelClick);
+
+                function labelClick(e){
+                    console.log('clicked label')
+                    var option = $(this),
+                        dd = option.parents('.dropdown');
+                    // option.closest('.select').remove();
+                    dd.toggleClass('open');
+                }
+            });
+
+
         },
 
         app: angular.module( "GrowPlanModule", [ "ngResource" ] ),
@@ -31,6 +51,7 @@ function(viewModels){
             $scope.timesOfDayList = bpn.utils.generateTimesOfDayArray();
             $scope.actionDurationTypeOptions = bpn.utils.DURATION_TYPES,
             $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
+            $scope.showPlantOverlay = false;
 
             //Wrapping our ng-model vars {}
             //This is necessary so ng-change always fires, due to: https://github.com/angular/angular.js/issues/1100
@@ -62,6 +83,7 @@ function(viewModels){
                     viewModels.initGrowPlanViewModel($scope.selectedGrowPlan);
 
                     // Update grow plan plants.
+                    // $scope.updateSelectedGrowPlanPlants();
                     $scope.selectedPlants.forEach(function(plant, index){
                         if (0 === $.grep($scope.selectedGrowPlan.plants, function(gpPlant){ return gpPlant.name == plant.name; }).length){
                             //only add if not already in grow plan's plant list
@@ -69,9 +91,14 @@ function(viewModels){
                         }
                     });
                     $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-                    
+
+
                     $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
                 });
+
+                if(Steps){
+                    Steps.validate();
+                }
 
             };
 
@@ -85,7 +112,7 @@ function(viewModels){
 
             $scope.updateSelectedGrowSystem = function(){
                 $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
-                if($scope.selectedPlants.length){
+                if($scope.selectedPlants && $scope.selectedPlants.length){
                     $scope.updatefilteredGrowPlans();
                 }
             };
@@ -102,6 +129,7 @@ function(viewModels){
             };  
 
             $scope.updateSelectedPlants = function(){
+                console.log('updateSelectedPlants')
                 for (var i = $scope.plants.length; i--;) {
                     Object.keys($scope.selected.plant).forEach(function(_id) {
                         if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
@@ -109,7 +137,13 @@ function(viewModels){
                         }
                     });
                 }
-                $scope.updatefilteredGrowPlans();
+                if($scope.selectedGrowSystem){
+                    $scope.updatefilteredGrowPlans();
+                }
+            };
+
+            $scope.updateSelectedGrowPlanPlants = function(){
+                console.log('updatedSelectedGrowPlanPlants')
             };
 
             $scope.updatefilteredGrowPlans = function(){
@@ -175,15 +209,74 @@ function(viewModels){
                 phase.actions.unshift(newAction);
             };
 
-            $scope.submit = function(){
+            $scope.showPlantList = function(){
+                console.log('focused on plant search')
+                $('#plant_list').addClass('open');
+            };
+
+            $scope.togglePlantOverlay = function(){
+                console.log('plant overlay time');
+                $scope.showPlantOverlay ? $scope.showPlantOverlay = false : $scope.showPlantOverlay = true;
+            };
+
+            $scope.submit = function(e){
+                //e.preventDefault();
+
                 if($scope.selectedGrowPlan){
-                    console.log('submit!');
-                    var growPlanInstance = viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan);
-                    console.log(growPlanInstance);
+                    var dataToSubmit = {
+                      submittedGrowPlan : viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan),
+                      growPlanInstance : {
+                        currentGrowPlanDay : 1 // TODO
+                      },
+                      deviceId : "" // TODO
+                    };
+                    
+                    console.log(dataToSubmit);
+                    
+                    // TODO : show spinner
+                    $.ajax({
+                      url: '/grow-plans',
+                      type: 'POST',
+                      contentType : 'application/json; charset=utf-8',
+                      dataType: 'json',
+                      data: JSON.stringify(dataToSubmit),
+                      processData : false,
+                      success: function(data){
+                        console.log(data);
+                        // TODO : Show message, take user to /dashboard
+                      },
+                      error: function(jqXHR, textStatus, error){
+                        console.log('error', jqXHR, textStatus, error);
+                        // TODO : show an error message
+                      }
+                    });
                 }
             }
         }]
     };
+
+    bpn.pages.growplans.app.directive('onFocus', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elm, attrs) {
+                console.log('onfocus');
+                elm.bind('focus', function() {
+                    scope.$apply(attrs.onFocus);
+                });
+            }
+        };        
+    });
+
+    bpn.pages.growplans.app.directive('onBlur', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elm, attrs) {
+                elm.bind('blur', function() {
+                    scope.$apply(attrs.onBlur);
+                });
+            }
+        };        
+    });
 
     $(function () {
         bpn.pages.growplans.init();

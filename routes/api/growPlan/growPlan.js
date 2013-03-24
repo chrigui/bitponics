@@ -1,5 +1,6 @@
 var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     ActionModel = require('../../../models/action').model,
+    UserModel = require('../../../models/user').model,
     LightFixtureModel = require('../../../models/lightFixture').model,
     LightBulbModel = require('../../../models/lightBulb').model,
     winston = require('winston'),
@@ -73,12 +74,44 @@ module.exports = function(app) {
             }
           },
           {
-            name: 1,
-            description: 1
+            'name': 1,
+            //description: 1,
+            'phases.expectedNumberOfDays': 1,
+            'createdBy': 1
           }
         ).exec(function (err, grow_plans) {
           if (err) { return next(err); }
-          return res.send(grow_plans);
+          
+          var userIds = [],
+              gpObjects = [],
+              overallTimeSpan = 0;
+
+          grow_plans.forEach(function(gp){
+            var gpo = gp.toObject();
+            userIds.push(gp.createdBy);
+            gpo.overallTimeSpan = gpo.phases.reduce(function(prev, curr){
+              var value1 = prev.expectedNumberOfDays,
+                  value2 = curr.expectedNumberOfDays;
+              if(typeof value1 != 'number'){ value1 = 0; }
+              if(typeof value2 != 'number'){ value2 = 0; }
+              return value1 + value2
+            });
+            console.log('gpObjects:'+gpo.overallTimeSpan);
+            gpObjects.push(gpo);
+            
+          });
+          
+          UserModel.find().where('_id').in(userIds).select('name').exec(function (err, users){
+            gpObjects.forEach(function(gp){
+              gp.createdBy = users.filter(function(user){ 
+                return user._id.toString() == gp.createdBy.toString()
+              });
+            });
+
+            return res.send(gpObjects);
+          });
+
+          
         });
 
     } else if (full) { //return single growplan with all data populated
@@ -92,6 +125,7 @@ module.exports = function(app) {
         .populate('phases.actions')
         .populate('phases.growSystem')
         .populate('phases.phaseEndActions')
+        // .populate('phases.light')
         .exec(function(err, grow_plan){
           if (err) { return next(err); }
 
@@ -115,19 +149,20 @@ module.exports = function(app) {
                 ActionModel.find({})
                   .where('_id').in(actionIds)
                   .exec(callback);
-              },
-              function parallel2(callback){
-                //query on all fixture ids
-                LightFixtureModel.find({})
-                  .where('_id').in(fixtureIds)
-                  .exec(callback);
-              },
-              function parallel3(callback){
-                //query on all bulb ids
-                LightBulbModel.find({})
-                  .where('_id').in(bulbIds)
-                  .exec(callback);
               }
+              // ,
+              // function parallel2(callback){
+              //   //query on all fixture ids
+              //   LightFixtureModel.find({})
+              //     .where('_id').in(fixtureIds)
+              //     .exec(callback);
+              // },
+              // function parallel3(callback){
+              //   //query on all bulb ids
+              //   LightBulbModel.find({})
+              //     .where('_id').in(bulbIds)
+              //     .exec(callback);
+              // }
             ],
             function parallelFinal(err, result){
               if (err) { return next(err); }
@@ -139,8 +174,10 @@ module.exports = function(app) {
               //manually "populate" our nested phase props
               growPlan.phases.forEach(function(phase) {
                 var light = phase.light;
-                light.fixture = fixtures.filter(function(fixture){ return fixture._id.toString() == phase.light.fixture.toString() })[0];
-                light.bulb = bulbs.filter(function(bulb){ return bulb._id.toString() == phase.light.bulb.toString() })[0];
+                if(fixtures)
+                  light.fixture = fixtures.filter(function(fixture){ return fixture._id.toString() == phase.light.fixture.toString() })[0];
+                if(bulbs)
+                  light.bulb = bulbs.filter(function(bulb){ return bulb._id.toString() == phase.light.bulb.toString() })[0];
                 phase.light = light;
 
                 phase.idealRanges.forEach(function(idealRange) {

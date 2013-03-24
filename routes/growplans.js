@@ -13,7 +13,9 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 	winston = require('winston'),
 	passport = require('passport'),
 	async = require('async'),
-	allPurposeGrowPlanId = '506de30c8eebf7524342cb70';
+	allPurposeGrowPlanId = '506de30c8eebf7524342cb70'
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
 module.exports = function(app){
 	
@@ -23,7 +25,7 @@ module.exports = function(app){
 		function (req, res){
 			var locals = {
 				title : 'Grow Plans',
-				className : 'growplans',
+				className : 'app-page landing-page single-page growplans',
 				//message : req.flash('info') //TODO: this isn't coming thru
 				growSystems: {},
 				plants: {},
@@ -137,98 +139,86 @@ module.exports = function(app){
 		}
 	);
 
+
+  /**
+   * Create and activate a GrowPlanInstance based on the provided GrowPlan, 
+   * branching a new GrowPlan if necessary
+   * 
+   * Request body properties:
+   * 
+   * @param {object} req.body.submittedGrowPlan
+   * @param {number} req.body.growPlanInstance.currentGrowPlanDay 
+   * @param {string=} req.body.deviceId : optional. Define if device should be activated with this GrowPlan instance
+   */
 	app.post('/grow-plans', 
 		routeUtils.middleware.ensureSecure, 
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res) {
 			var user = req.user,
-				growplans = req.body.growplan,
-				result = {
+				submittedGrowPlan = req.body.submittedGrowPlan,
+        sourceGrowPlanId = req.body.submittedGrowPlan._id,
+        result = {
 					status : 'success',
 					message : '',
 					errors : []
 				};
 
+      winston.info("POST to /grow-plans, req.body: ");
+      winston.info(JSON.stringify(req.body));
 
 			// regex to match on ObjectId: /[0-9a-f]{24}/
-			// Steps:
+			
+      // Steps:
 			// 1. get the grow plan by id
-			// 2. check whether the form contains any edits to the grow plan. 
+			// 2. check whether the submitted grow plan contains any edits to the grow plan. 
 			//      if yes, branch the GP (create new with parentGrowPlan set to the old one)
-			//      if no, cool.
+      //        also, for any nested objects that have been modified, create new
+			//      if no edits, carry on.
 			// 3. Create a new GPI, set owner to the user and activate it
 			// 
+			GrowPlanModel.createNewIfUserDefinedPropertiesModified(
+      {
+        growPlan : submittedGrowPlan,
+        user : user,
+        visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC
+      }, 
+      function(err, validatedGrowPlan){
+        if (err) { 
+          result.status = 'error';
+          result.errors = [err.message];
+          return res.json(result);
+        }
 
-			ModelUtils.getFullyPopulatedGrowPlan({_id:req.body.parentGrowPlan}, function(err, growPlans){
-				if (err) { 
-					result.status = 'error';
-					result.errors = [err.message];
-					return res.json(result);
-				}
-
-				var parentGrowPlan = growPlans[0],
-					submittedGrowPlan = new GrowPlanModel({
-						parentGrowPlanId: undefined,
-						createdBy: req.user,
-						name: req.body.gpedit_name,
-						description: req.body.gpedit_description,
-						plants: req.body.plants,
-						sensors: [],
-						controls: [],
-						phases: [],
-						visibility: 'public'
-					});
-
-				async.series([
-					function branchingCheck(callback){
-						GrowPlan.isEquivalentTo(parentGrowPlan, submittedGrowPlan, function(err, isEquivalent){
-							if (err) { 
-								return callback(err); 
-							}
-							if (isEquivalent) { 
-								return callback(null, parentGrowPlan); 
-							} else {
-								// branch the parentGrowPlan
-								submittedGrowPlan.parentGrowPlanId = parentGrowPlan._id;
-								submittedGrowPlan.save(function (err){
-									return callback(err, submittedGrowPlan);
-								});		
-							}
-						});
-					}
-				],
-				function (err, results){
-					if (err) { 
-						result.status = 'error';
-						result.errors = [err.message];
-						return res.json(result);
-					}
-
-					var growPlanToUse = results[0],
-						startingPhaseData = growPlanToUse.getPhaseAndDayFromStartDay(parseInt(req.growPlan.currentGrowPlanDay, 10));
-					
-					GrowPlanInstanceModel.create({
-						growPlan : growPlanToUse._id,
-						owner : req.user._id,
-						active : true,
-						activePhaseId : startingPhaseData.phaseId,
-						activePhaseDay : startingPhaseData.day,
-						device : req.body.device
-					},
-					function(err, growPlanInstance){
-						if (err) { 
-							result.status = 'error';
-							result.errors = [err.message];
-						} else {
-							result.status = 'success';
-							result.message = 'Activated grow plan';
-							winston.info('activated grow plan for user ' + req.user._id.toString() + ', gp id ' + growPlanResult._id.toString() + ', gpi id ' + growPlanInstance._id.toString());
-						}
-						return res.json(result);
-					});			
-				}	
-				);			
-			});
+        var startingPhaseData = validatedGrowPlan.getPhaseAndDayFromStartDay(parseInt(req.body.growPlanInstance.currentGrowPlanDay, 10));
+        
+        GrowPlanInstanceModel.create(
+          {
+            growPlan : validatedGrowPlan._id,
+            owner : user,
+            active : true,
+            activePhaseId : startingPhaseData.phaseId,
+            activePhaseDay : startingPhaseData.day,
+            device : req.body.device
+          },
+          function(err, createdGrowPlanInstance){
+            if (err) { 
+              result.status = 'error';
+              result.errors = [err.message];
+            } else {
+              result.status = 'success';
+              result.message = 'Activated grow plan';
+              winston.info(
+                'activated grow plan for user ' + user._id.toString() + 
+                ', gp id ' + validatedGrowPlan._id.toString() + 
+                ', gpi id ' + createdGrowPlanInstance._id.toString()
+              );
+            }
+            return res.json(result);
+          }
+        );      
+      });
 		}
-	);
+	); // /app.post('/grow-plans'
+
+
 };

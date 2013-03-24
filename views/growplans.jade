@@ -7,7 +7,7 @@ block head
       $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
       $.mobile.ajaxLinksEnabled = false;
     });
-  script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
+  //script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
   //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
   
   script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
@@ -16,7 +16,7 @@ block head
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
-  link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
+  //link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
   //- TEMP hacks
   style
@@ -25,75 +25,148 @@ block css
     input[type=radio].ng-binding { opacity : 1; height: auto; width: auto; }
 
 block content
+  
+  section.header
+      header
+        include /includes/nav/main
+  //- section#header
+  //-   header#logo(role="banner") 
+  //-     img(src="/assets/img/leaf-new-green.png", width="15%")
 
-  section#header
-    header#logo(role="banner") 
-      img(src="/assets/img/leaf-new-green.png", width="15%")
-
-    div#setup.select-block
-      h2.main-heading #{title}
-      h3.sub-heading Selection
-      //h3.sub-heading
-    div#user.select-block
-      h2.main-heading User
-      h3.sub-heading
-          if user.name.full != ''
-           | #{user.name.full}
-          else
-           | #{user.email}
+  //-   div#setup.select-block
+  //-     h2.main-heading #{title}
+  //-     h3.sub-heading Selection
+  //-     //h3.sub-heading
+  //-   div#user.select-block
+  //-     h2.main-heading User
+  //-     h3.sub-heading
+  //-         if user.name.full != ''
+  //-          | #{user.name.full}
+  //-         else
+  //-          | #{user.email}
 
   section(ng-cloak="")#main(role="main")
     div.content-module.middle
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.pages.growplans.GrowPlanController", novalidate)
-        h4 Let's find you a grow plan.         
-        section(id="system_selection", class="step", data-required="1")
-          h4 What type of system do you have?
-          ul(class="grid photos")
-            li(ng-repeat="system in growSystems | orderBy:name")
-              input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
-              label(for="{{system._id}}") {{system.name}}
+        section(id="step1", class="step", data-required="1")
+          h4.page-heading Ready to set up your grow plan?
+          div.question
+            h5.question-title What kind of hydroponic system are you using?
+            div.dropdown-wrap
+              ul(class="dropdown initial")
+                li.select
+                  label Select
+                li(ng-repeat="system in growSystems | orderBy:name")
+                  input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
+                  label(for="{{system._id}}") {{system.name}}
 
-        section(id="plant_selection", class="step")
-          h4 What would you like to grow?
-
-          input(class="search no-validate", ng-model="plantQuery", ng-change="filterPlantList()")
-          div(ng-hide="filteredPlantList.length") 
-            button(class="add", ng-click="addPlant()") Add
+          div.question
+            h5.question-title What are you going to be growing?
+            input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
+            div(ng-hide="filteredPlantList.length") 
+              label(href="#", class="add btn", ng-click="addPlant()") Add
+            
+            div.dropdown-wrap
+              ul(id="plant_list", class="dropdown initial sortlist", ng-class="{open: focused}")
+                li.select
+                  label Select
+                li(ng-repeat="plant in filteredPlantList | orderBy:name")
+                  input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
+                  label(for="{{plant._id}}", class="plant") {{plant.name}}
           
-          ul(class="grid sortlist")
-            li(ng-repeat="plant in filteredPlantList | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
-              label(for="{{plant._id}}", class="plant") {{plant.name}}
+          div.step-footer
+            a(class="btn next-step-btn") Next Step
+              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+        //- section(id="plant_selection", class="step")
+          
 
         section(id="growplan_results", class="step update-panel hide", data-required="1")
-          h4 We've found grow plans for you
+          h4.page-heading Select a Grow Plan
           ul(class="grid sortlist photos")
             //- each growPlan, i in growPlans
             li(ng-repeat="growPlan in filteredGrowPlanList")
+              div.img-wrapper
+                img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest {{growPlan.name}} photo")
+              div.first
+                h5.label Name
+                div.value {{growPlan.name}}
+              div
+                h5.label Number of Phases
+                div.value {{growPlan.phases.length}}
+              div
+                h5.label Overall Time Span
+                div.value {{growPlan.overallTimeSpan || 'Open ended'}}
+              div
+                h5.label In use by
+                div.value *TODO*
+              div.last
+                h5.label Created by
+                div(class="value", ng-show="growPlan.createdBy[0].name.first") {{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}
+                div(class="value", ng-show="!growPlan.createdBy[0].name.first") Bitponics
+
+              //- div.info
+              //-   div(class="gplist_description") {{growPlan.description}}
               input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="selected.growPlan", ng-change="setSelectedGrowPlan()")
-              label(for="gplist_input_{{growPlan._id}}") {{growPlan.name}}
-                div.info
-                  div(class="gplist_description") {{growPlan.description}}
+              label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
+                | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+
+        section(id="growplan_customize", class="step hide")
+          h4.page-heading Customize your grow plan
+          div.question
+            label(for="gpedit_name", class="question-title") Name
+            input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
+          
+          div(class="question-wrap-right")
+            div.question
+              label.question-title Plants
+              ul(class="grid plantlist")
+                //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+                li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
+                  input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
+                  label(for="{{plant._id}}", class="plant btn") 
+                    {{plant.name}}
+                    | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+              label(class="add btn", ng-click="togglePlantOverlay()") 
+                | Add
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+
+              div(ng-hide="!showPlantOverlay", class="overlay")
+                div(class="close btn", ng-click="togglePlantOverlay()")
+                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                ul(class="grid plantlist")
+                  li(ng-repeat="plant in filteredPlantList | orderBy:name")
+                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
+                    label(for="search_{{plant._id}}", class="plant btn") {{plant.name}}
+
+          div(class="question")
+            label(for="gpedit_description", class="question-title") Description
+            textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description", rows="8")
+
+          
+          div.step-footer
+            a(class="btn next-step-btn") Next Step
+              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
 
-        section(id="growplan_edit", class="hide")
+        section(id="growplan_edit", class="step hide")
           h4 Tailor this grow plan to your needs
 
           //set as default grow plan, will change dynamically based on previous step selection
           input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="selectedGrowPlan._id") 
 
-          label Name
-          input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
+          //- label Name
+          //- input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
           
-          label Description
-          textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description")
+          //- label Description
+          //- textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description")
 
           label Plants
-          ul(class="grid plantlist")
-            //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-            li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="plant._id")
-              label(for="{{plant._id}}", class="plant") {{plant.name}}
+          //- ul(class="grid plantlist")
+          //-   //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+          //-   li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
+          //-     input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="plant._id")
+          //-     label(for="{{plant._id}}", class="plant") {{plant.name}}
 
           //- label Suggested Sensors
           //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
@@ -351,7 +424,8 @@ block content
                   input(id="device_#{device._id}", type='radio', name="device", value="#{device._id}")
                   label(for="device_#{device._id}", class="device") #{device.name}
 
-        input(id="growplans_activate", type="submit", value="Activate Grow Plan")
+          input(id="growplans_activate", type="submit", value="Activate Grow Plan")     
+        
 
 block footer-scripts
 

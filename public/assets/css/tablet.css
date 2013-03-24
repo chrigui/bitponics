@@ -246,9 +246,6 @@ section#footer {
 .dashboard section#main #reminders {
   float: right;
 }
-/*
- * Grow Plans Page
- */
 @media screen and (min-width: 60em) {
   .content-module {
     float: left;
@@ -291,6 +288,10 @@ section#footer {
 /*
  * Grow Plans Page
  */
+.grid li {
+  float: left;
+  width: 15em;
+}
 .idealRanges li {
   zoom: 1;
 }
@@ -700,6 +701,27 @@ section#footer {
   border-color: #999b9a;
 }
 /*
+ * App page overrides
+ */
+.app-page .header .nav-section {
+  display: none;
+}
+.app-page .header .nav-section.first,
+.app-page .header .nav-section.social-icons {
+  display: block;
+}
+.app-page .header h1.logo a,
+.app-page .header h1.logo span {
+  color: #00e36c;
+}
+.app-page .label {
+  font-size: 0.75em;
+}
+.app-page .value {
+  font-size: 1.5em;
+  color: #333;
+}
+/*
  * get-started/thankyou
  */
 .landing-page.get-started #main {
@@ -719,4 +741,16 @@ section#footer {
 }
 .member img {
   margin: 1.5em 0;
+}
+.question {
+  float: left;
+  width: 40%;
+  margin-right: 5%;
+}
+.question-wrap-right {
+  float: right;
+  width: 60%;
+}
+.question-wrap-right .question {
+  width: 60%;
 }

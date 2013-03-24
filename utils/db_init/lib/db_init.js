@@ -30,8 +30,8 @@ var mongoose   = require('mongoose'),
   async = require('async'),
   models = require('../../../models'),
   mongoUrls = require('../../../config/mongo-config').urls,
-  db_url = process.argv.slice(2)[0], //get's first cmd line arg
-  clear = process.argv.slice(2)[1], //get's second cmd line arg
+  db_url = process.argv.slice(2)[0], //gets first cmd line arg
+  clear = process.argv.slice(2)[1], //gets second cmd line arg
   data = require('../seed_data'),
   appDomains = require('../../../config/app-domain-config'),
   appDomain = 'bitponics.com',
@@ -43,6 +43,7 @@ var mongoose   = require('mongoose'),
     devices: {},
     lightBulbs: {},
     lightFixtures: {},
+    lights : {},
     growSystems: {},
     plants: {},
     controls: {},
@@ -145,6 +146,14 @@ async.series([
             innerCallback();
           });
 
+        },
+        function(innerCallback){
+          if (!mongoose.connection.collections['lights']){ return innerCallback();}
+          mongoose.connection.collections['lights'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('lights collection dropped');
+            innerCallback();
+          });
         },
         function(innerCallback){
           if (!mongoose.connection.collections['growsystems']){ return innerCallback();}
@@ -413,7 +422,8 @@ async.series([
             name: _data.name,
             firmwareVersion: _data.firmwareVersion,
             microprocessor: _data.microprocessor,
-            sensorMap: _data.sensorMap
+            sensorMap: _data.sensorMap,
+            controlMap : _data.controlMap
           });
 
           dataObj.save(function (err, doc) {
@@ -546,6 +556,44 @@ async.series([
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][_data.name] = doc._id;
             console.log("created lightFixture");
+            decrementData();
+          });
+        }
+      });
+    });
+  },
+
+  function(callback){
+    /**
+     * Lights
+     */
+    var dataType = 'lights',
+      dataCount = data[dataType].length,
+      decrementData = function(){
+        dataCount--;
+        if (dataCount === 0){
+          callback();
+        }
+      };
+
+    console.log('####### ' + dataType + ' #######');
+
+    data[dataType].forEach(function(_data){
+      models.light.findById(_data._id, function(err, result){
+        if (err) { console.log(err); return callback(err);}
+        if (result){
+          decrementData();
+        } else {
+          var dataObj = new models.light({
+            _id : _data._id,
+            fixture : data.fixture,
+            fixtureQuantity : data.fixtureQuantity,
+            bulb : data.bulb
+          });
+          dataObj.save(function (err, doc) {
+            if (err) { console.log(err); return callback(err);}
+            savedObjectIds[dataType][_data.name] = doc._id;
+            console.log("created light");
             decrementData();
           });
         }

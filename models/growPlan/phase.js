@@ -1,12 +1,16 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	mongoosePlugins = require('../../lib/mongoose-plugins'),
-  	Schema = mongoose.Schema,
-  	ObjectId = Schema.ObjectId,
-  	IdealRangeSchema = require('./idealRange').schema,
-  	async = require('async'),
-  	Action = require('../action').model,
-  	getObjectId = require('../utils').getObjectId;
+	Schema = mongoose.Schema,
+	ObjectIdSchema = Schema.ObjectId,
+  ObjectId = mongoose.Types.ObjectId,
+	IdealRangeSchema = require('./idealRange').schema,
+	async = require('async'),
+	ActionModel = require('../action').model,
+  GrowSystemModel = require('../growSystem').model,
+  NutrientModel = require('../nutrient').model,
+  LightModel = require('../light').model,
+  getObjectId = require('../utils').getObjectId;
 
 var PhaseSchema = new Schema({
 	
@@ -22,25 +26,21 @@ var PhaseSchema = new Schema({
 	/**
 	 * Light definition. Optional. Defines fixtures, bulbs, and quantities.
 	 */
-	light: {
-		fixture: { type: ObjectId, ref: 'LightFixture'},
-		fixtureQuantity: { type : Number },
-		bulb: { type : ObjectId, ref: 'LightBulb'}
-	},
+	light: { type : ObjectIdSchema, ref: 'Light'	},
 
-	growSystem: { type: ObjectId, ref: 'GrowSystem' },
+	growSystem: { type: ObjectIdSchema, ref: 'GrowSystem' },
 	
 	growMedium: { type: String },
 
-	actions: [{ type: ObjectId, ref: 'Action', required: true }],
+	actions: [{ type: ObjectIdSchema, ref: 'Action', required: true }],
 	
-	phaseEndActions : [{ type: ObjectId, ref: 'Action', required: true }],
+	phaseEndActions : [{ type: ObjectIdSchema, ref: 'Action', required: true }],
 
 	phaseEndDescription : { type : String },
 
 	idealRanges: [IdealRangeSchema],
 
-	nutrients : [{ type: ObjectId, ref: 'Nutrient', required: false }],
+	nutrients : [{ type: ObjectIdSchema, ref: 'Nutrient', required: false }],
 },
 { id : false });
 
@@ -59,11 +59,12 @@ var PhaseSchema = new Schema({
 
 /**
  * Given 2 Phase objects, determine whether they're equivalent.
+ * Assumes fully-populated Phase objects.
  * Comparing only user-defined properties.
  * 
- * @param source {Phase} Phase model object
- * @param other {Phase} Phase model object
- * @param callback. Function to be called with result. Passed a boolean argument,
+ * @param {Phase} source : Fully-populated Phase object
+ * @param {Phase} other : Fully-populated Phase object
+ * @param {function(err, bool)} callback : Function to be called with result. Passed a boolean argument,
  * 					true if the objects are equivalent, false if not
  *
  */
@@ -81,27 +82,27 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 	if (source.growMedium !== other.growMedium) { return callback(null, false); }	
 
 
-	// compare growSystem
-	if ( !(
-			(source.growSystem && other.growSystem)
-			||
-			(!source.growSystem && !other.growSystem)
-		  )
-		)
-	{ 
-		return callback(null, false); 
-	}
-	if (source.growSystem){
-		var thisGrowSystemId = getObjectId(source.growSystem),
-			otherGrowSystemId = getObjectId(other.growSystem);
-		if (!thisGrowSystemId.equals(otherGrowSystemId)){
-			return callback(null, false);
-		}
-	}
-
 	// compare phaseEndDescription
 	if (source.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
 
+
+  // compare growSystem, shallow
+  if ( !(
+      (source.growSystem && other.growSystem)
+      ||
+      (!source.growSystem && !other.growSystem)
+      )
+    )
+  { 
+    return callback(null, false); 
+  }
+  if (source.growSystem){
+    var thisGrowSystemId = getObjectId(source.growSystem),
+      otherGrowSystemId = getObjectId(other.growSystem);
+    if (!thisGrowSystemId.equals(otherGrowSystemId)){
+      return callback(null, false);
+    }
+  }
 
 	// compare light, shallow
 	if (!(
@@ -186,7 +187,11 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 
 	async.parallel(
 		[
-			function lightComparison(innerCallback){
+      function growSystemComparison(innerCallback){
+        if (!source.growSystem){ return innerCallback(null, true); }
+        return innerCallback(null, GrowSystemModel.isEquivalentTo(source.growSystem, other.growSystem));
+      },
+      function lightComparison(innerCallback){
 				if (!source.light){ return innerCallback(null, true); }
 
 				if (source.light.fixture){
@@ -217,7 +222,7 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 						actionFound = false;
 					for (var j = 0; j < length; j++){
 						var otherAction = other.actions[j];
-						if (Action.isEquivalentTo(action, otherAction)) {
+						if (ActionModel.isEquivalentTo(action, otherAction)) {
 							actionFound = true;
 							break;
 						}
@@ -241,7 +246,7 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 						actionFound = false;
 					for (var j = 0; j < length; j++){
 						var otherAction = other.phaseEndActions[j];
-						if (Action.isEquivalentTo(action, otherAction)){
+						if (ActionModel.isEquivalentTo(action, otherAction)){
 							actionFound = true;
 							break;
 						}
@@ -310,6 +315,154 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 	);
 });
 
+
+/**
+ * Takes a fully-populated Phase object (such as is submitted from grow-plans creation page)
+ * and, for all nested documents (actions, nutrients, growSystem, light, idealRanges), creates them if they don't match existing DB entries
+ * Then returns Phase object
+ * 
+ * @param {object} options.phase
+ * @param {User} options.user : used to set "createdBy" field for new objects
+ * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {function(err, Phase)} callback
+ */
+PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
+  var submittedPhase = options.phase,
+      user = options.user,
+      visibility = options.visibility;
+
+  async.parallel(
+    [
+      function validateActions(innerCallback){
+        var validatedActions = [];
+
+        async.forEach(submittedPhase.actions, 
+          function validateAction(action, actionCallback){
+            ActionModel.createNewIfUserDefinedPropertiesModified({
+              action : action,
+              user : user,
+              visibility : visibility
+            },
+            function(err, validatedAction){
+              if (err) { return actionCallback(err); }
+              validatedActions.push(validatedAction._id);
+              return actionCallback();
+            });
+          },
+          function actionLoopEnd(err){
+            if (err) { return innerCallback(err); }
+            submittedPhase.actions = validatedActions;
+            return innerCallback();
+          }
+        );
+      },
+      function validatePhaseEndActions(innerCallback){
+        var validatedActions = [];
+
+        async.forEach(submittedPhase.phaseEndActions, 
+          function validateAction(action, actionCallback){
+            ActionModel.createNewIfUserDefinedPropertiesModified({
+              action : action,
+              user : user,
+              visibility : visibility
+            },
+            function(err, validatedAction){
+              if (err) { return actionCallback(err); }
+              validatedActions.push(validatedAction._id);
+              return actionCallback();
+            });
+          },
+          function actionLoopEnd(err){
+            if (err) { return innerCallback(err); }
+            submittedPhase.phaseEndActions = validatedActions;
+            return innerCallback();
+          }
+        );
+      },
+      function validateGrowSystem(innerCallback){
+        if (!submittedPhase.growSystem){ return innerCallback(); }
+        
+        GrowSystemModel.createNewIfUserDefinedPropertiesModified(
+          {
+            growSystem : submittedPhase.growSystem,
+            user : user,
+            visibility : visibility
+          },
+          function(err, validatedGrowSystem){
+            if (err) { return innerCallback(err); }
+            submittedPhase.growSystem = validatedGrowSystem._id;
+            return innerCallback(); 
+          }
+        );
+      },
+      function validateNutrients(innerCallback){
+        if (!(submittedPhase.nutrients && submittedPhase.nutrients.length)) { return innerCallback(); }
+
+        var validatedNutrients = [];
+
+        async.forEach(submittedPhase.nutrients, 
+          function validateNutrient(nutrient, nutrientCallback){
+            NutrientModel.createNewIfUserDefinedPropertiesModified({
+              nutrient : nutrient,
+              user : user,
+              visibility : visibility
+            },
+            function(err, validatedNutrient){
+              if (err) { return nutrientCallback(err); }
+              validatedNutrients.push(validatedNutrient._id);
+              return nutrientCallback();
+            });
+          },
+          function nutrientLoopEnd(err){
+            if (err) { return innerCallback(err); }
+            submittedPhase.nutrients = validatedNutrients;
+            return innerCallback();
+          }
+        );
+      },
+      function validateLight(innerCallback){
+        if (!submittedPhase.light){ return innerCallback(); }
+
+        LightModel.createNewIfUserDefinedPropertiesModified(
+          {
+            light : submittedPhase.light,
+            user : user,
+            visibility : visibility
+          },
+          function(err, light){
+            if (err) { return innerCallback(err); }
+            submittedPhase.light = light._id;
+            return innerCallback();
+          }
+        );
+      },
+      function validateIdealRanges(innerCallback){
+        async.forEach(submittedPhase.idealRanges, 
+          function (idealRange, idealRangeCallback){
+            IdealRangeSchema.statics.createNewIfUserDefinedPropertiesModified(
+              {
+                idealRange : idealRange,
+                user : user,
+                visibility : visibility
+              }, 
+              function(err, validatedIdealRange){
+                return idealRangeCallback();  
+              }
+            );            
+          },
+          function idealRangeLoopEnd(err){
+            return innerCallback();
+          }
+        );  
+      },
+    ],
+    function parallelEnd(err, results){
+      // force mongoose to create a new _id
+      delete submittedPhase._id;
+      return callback(err, submittedPhase);
+    }
+  );
+});
 /*********************** END STATIC METHODS **************************/
 
 exports.schema = PhaseSchema;
