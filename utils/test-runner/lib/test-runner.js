@@ -34,6 +34,10 @@ fs.watch("./models",function(event,file) {
   runTests();
 });
 
+fs.watch("./models/growPlan",function(event,file) {
+  runTests();
+});
+
 fs.watch("./test",function(event,file) {
   runTests();
 });

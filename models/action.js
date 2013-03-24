@@ -12,6 +12,7 @@ var mongoose = require('mongoose'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
   i18nKeys = require('../i18n/keys'),
+  winston = require('winston'),
   ActionModel,
   ActionSchema;
 

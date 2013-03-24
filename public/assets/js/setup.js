@@ -124,7 +124,8 @@ $(function(){
 				console.log(data);
 				// Data will be in the following form:
 				/*
-				{ 
+				//  row count, Security Mode, SSID
+        { 
           “mac”: “00:06:66:72:11:cf”,
           “networks”:  [ 
             “01,01,5HMV5”,

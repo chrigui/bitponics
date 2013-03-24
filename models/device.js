@@ -7,8 +7,9 @@ var mongoose = require('mongoose'),
   DeviceTypeModel = require('./deviceType').model,
   ActionModel = require('./action').model,
   ImmediateActionModel = require('./immediateAction').model,
-  SensorLogSchema = require('./sensorLog').schema
-winston = require('winston');
+  SensorLogSchema = require('./sensorLog').schema,
+  async = require('async'),
+  winston = require('winston');
 
 
 /***************** UTILS **********************/
@@ -17,18 +18,96 @@ var DeviceUtils = {
   ROLES : {
     OWNER : 'owner',
     MEMBER : 'member'
+  },
+  CALIB_MODES : {
+    "PH_4" : "ph_4",
+    "PH_7" : "ph_7",
+    "PH_10" : "ph_10",
+    "EC_LO" : "ec_lo",
+    "EC_HI" : "ec_hi"
+  },
+  CALIB_STATUSES : {
+    "SUCCESS" : "success",
+    "ERROR" : "error"
   }
 };
 /***************** END UTILS **********************/
 
+
+var CalibrationLogSchema = new Schema({
+  ts : { type : Date, default: Date.now, required : true},
+  m : { 
+    type : String, 
+    enum : [
+      DeviceUtils.CALIB_MODES.PH_4, 
+      DeviceUtils.CALIB_MODES.PH_7,
+      DeviceUtils.CALIB_MODES.PH_10,
+      DeviceUtils.CALIB_MODES.EC_LO, 
+      DeviceUtils.CALIB_MODES.EC_HI
+    ],
+    required : true
+  },
+  s : {
+    type : String, 
+    enum : [
+      DeviceUtils.CALIB_STATUSES.SUCCESS, 
+      DeviceUtils.CALIB_STATUSES.ERROR
+    ],
+    required : true
+  },
+  msg : { type : String }
+},
+{ id : false, _id : false }
+);
+
+
+CalibrationLogSchema.virtual('timestamp')
+  .get(function () {
+    return this.ts;
+  })
+  .set(function (timestamp){
+    this.ts = timestamp;
+  });
+
+CalibrationLogSchema.virtual('mode')
+  .get(function () {
+    return this.m;
+  })
+  .set(function (mode){
+    this.m = mode;
+  });
+
+CalibrationLogSchema.virtual('status')
+  .get(function () {
+    return this.s;
+  })
+  .set(function (status){
+    this.s = status;
+  });
+
+CalibrationLogSchema.virtual('message')
+  .get(function () {
+    return this.msg;
+  })
+  .set(function (message){
+    this.msg = msg;
+  });
+
+
 /***************** SCHEMA **********************/
 
 var DeviceSchema = new Schema({
+    
     macAddress: { type: String, required: true, unique: true }, //mac address
+    
     deviceType: { type: ObjectIdSchema, ref: 'DeviceType', required: false },
+    
     name : { type: String },
+    
     owner : { type: ObjectIdSchema, ref: 'User'},
+    
     users : [ { type: ObjectIdSchema, ref: 'User'}],
+    
     userAssignmentLogs : [
       {
         ts : { type : Date, default: Date.now, required : true},
@@ -36,24 +115,31 @@ var DeviceSchema = new Schema({
         assignmentType: { type : String, enum : [DeviceUtils.ROLES.OWNER, DeviceUtils.ROLES.MEMBER ]}
       }
     ],
+    
     sensorMap : [
       {
         sensor : { type: ObjectIdSchema, ref: 'Sensor' },
         inputId : { type: String }
       }
     ],
+    
     controlMap : [
       {
         control : { type: ObjectIdSchema, ref: 'Control' },
         outputId : { type: String }
       }
     ],
+    
     recentSensorLogs : [SensorLogSchema],
+    
+    calibrationLogs : [CalibrationLogSchema],
+
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
     /**
-     *  Cache of the active phase actions for this device. Right now it's
-     *  refreshed inside of /api/device/:id/cycles
+     * Cache of the active phase actions for this device. 
+     * AKA, "baseline" actions. 
+     * Right now it's refreshed inside of /api/device/:id/cycles
      *
      */
     activeActions : {
@@ -66,9 +152,9 @@ var DeviceSchema = new Schema({
 
     /**
      * activeImmediateActions are any automatically or manually triggered actions.
-     * They override the phase cycles until they expire.
+     * They override the phase actions until they expire.
      *
-     * If expired, it's refreshed inside refresh_status
+     * If expired, it's refreshed inside /api/device/:id/refresh_status
      */
     activeImmediateActions : {
       immediateActions: [{ type: ObjectIdSchema, ref: 'ImmediateAction'}],
@@ -84,10 +170,33 @@ DeviceSchema.plugin(useTimestamps);
 /***************** END SCHEMA PROPERTIES **********************/
 
 
+
+/*************** SERIALIZATION *************************/
+
 /**
- * Add indexes. Do it here after all the fields have been added
+ * Remove the db-only-optimized property names and expose only the friendly names
  *
+ * "Transforms are applied to the document and each of its sub-documents"
+ * http://mongoosejs.com/docs/api.html#document_Document-toObject
  */
+DeviceSchema.set('toObject', {
+  getters : true,
+  transform : function(doc, ret, options){
+    if (doc.schema === CalibrationLogSchema){
+      delete ret.ts;
+      delete ret.m;
+      delete ret.s;
+      delete ret.msg;
+    } else {
+      // else we're operating on the parent doc (the Device doc)
+    }
+  }
+});
+DeviceSchema.set('toJSON', {
+  getters : true,
+  transform : DeviceSchema.options.toObject.transform
+});
+/*************** END SERIALIZATION *************************/
 
 
 
@@ -194,6 +303,56 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
 
 
 
+
+
+
+
+/**************** STATIC METHODS ****************************/
+
+/**
+ *
+ * @param {string} settings.macAddress
+ * @param {CalibrationLogSchema} settings.calibrationLog
+ * @param {DeviceUtils.CALIB_MODES} settings.calibrationLog.mode
+ * @param {DeviceUtils.CALIB_STATUSES} settings.calibrationLog.status
+ * @param {string=} settings.calibrationLog.message
+ */
+DeviceSchema.static('logCalibration', function(settings, callback) {
+  var DeviceModel = this,
+      macAddress = settings.macAddress;
+
+  async.waterfall(
+    [
+      function (innerCallback){
+        DeviceModel.findOne({ macAddress: macAddress })
+        .select("-users -userAssignmentLogs -sensorMap -controlMap -recentSensorLogs -activeGrowPlanInstance -activeActions -activeImmediateActions")
+        .exec(innerCallback);
+      },
+      function (device, innerCallback){
+        if (!device){ 
+          return innerCallback(new Error('No device found for id ' + req.params.id));
+        }
+        // Shift to put the most recent log at the beginning of the array
+        
+        device.calibrationLogs.unshift(settings.calibrationLog);
+        console.log(settings.calibrationLog);
+        console.log('device.calibrationLogs');
+        console.log(device.calibrationLogs);
+        device.save(innerCallback);
+      }  
+    ],
+    function(err, deviceResult){
+      return callback(err, deviceResult);
+    }
+  );
+});
+/**************** END STATIC METHODS ****************************/
+
+
+
+
+
+
 /***************** MIDDLEWARE **********************/
 
 /**
@@ -214,7 +373,8 @@ DeviceSchema.pre('save', function(next){
 });
 
 /**
- *  If sensorMap is undefined then use the deviceType's default sensorMap
+ *  If sensorMap is undefine
+ d then use the deviceType's default sensorMap
  */
 DeviceSchema.pre('save', function(next){
   var device = this;
@@ -251,11 +411,14 @@ DeviceSchema.pre('save', function(next){
   //cap = 10,
     logsToRemove = [];
 
+  if (!device.recentSensorLogs) { return next(); }
+
   /*
    while (device.recentSensorLogs.length > cap){
    device.recentSensorLogs.pop();
    }
    */
+  
 
   device.recentSensorLogs.forEach(function(log){
     if (log.ts < cutoff) { logsToRemove.push(log); }

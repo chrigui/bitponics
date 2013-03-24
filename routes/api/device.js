@@ -22,9 +22,9 @@ var mongoose = require('mongoose'),
 module.exports = function(app) {
 
    //List devices
-  app.get('/api/devices', 
-    routeUtils.middleware.ensureSecure, 
-    routeUtils.middleware.ensureUserIsAdmin, 
+  app.get('/api/devices',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureUserIsAdmin,
     function (req, res, next){
       return DeviceModel.find(function (err, devices) {
         if (err) { return next(err); }
@@ -174,218 +174,224 @@ module.exports = function(app) {
    *
    *
    */
-  app.put('/api/devices/:id/sensor_logs', function (req, res, next){
-    var macAddress = req.params.id.replace(/:/g,''),
-        pendingSensorLog = { ts : Date.now(), logs : []},
-        pendingDeviceLogs,
-        sensors,
-        device,
-        growPlanInstance;
+  app.put('/api/devices/:id/sensor_logs', 
+    routeUtils.middleware.ensureDeviceLoggedIn,
+    function (req, res, next){
+      var macAddress = req.params.id.replace(/:/g,''),
+          pendingSensorLog = { ts : Date.now(), logs : []},
+          pendingDeviceLogs,
+          sensors,
+          device,
+          growPlanInstance;
 
-    winston.info('sensor_logs req.body');
-    winston.info(JSON.stringify(req.body));
+      winston.info('sensor_logs req.body');
+      winston.info(JSON.stringify(req.body));
 
-    // For now, only accept requests that use the device content-type
-    if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
-      return next(new Error('Invalid Content-Type'));
-    }
-
-    if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
-      pendingDeviceLogs = JSON.parse(req.rawBody);
-    }
-
-    
-    // In parallel, get the Device and all Sensors
-    async.parallel(
-      [
-        function parallel1(callback){
-          SensorModel.find().exec(callback);
-        },
-        function parallel2(callback){
-          DeviceModel
-          .findOne({ macAddress: macAddress })
-          .populate('activeGrowPlanInstance')
-          .exec(callback);
-        }
-      ],
-      function parallelFinal(err, results){
-        if (err) { return next(err);}
-      
-        sensors = results[0];
-        device = results[1];
-        if (!device){ 
-          return next(new Error('Attempted to log to a nonexistent device'));
-        }
-
-        Object.keys(pendingDeviceLogs).forEach(function(key){
-          pendingSensorLog.logs.push({
-            sCode : key,
-            val : pendingDeviceLogs[key]
-          });
-        });
-        
-        winston.info('pendingSensorLog');
-        winston.info(JSON.stringify(pendingSensorLog));
-
-        ModelUtils.logSensorLog(
-          {
-            pendingSensorLog : pendingSensorLog, 
-            growPlanInstance : device.activeGrowPlanInstance, 
-            device : device, 
-            user : req.user 
-          },
-          function(err){
-            if (err) { return next(err); }
-            var responseBody = 'success';
-            res.status(200);
-            res.header('X-Bpn-ResourceName', 'sensor_logs');
-            res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-            // To end response for the firmware, send the Bell character
-            responseBody += String.fromCharCode(7);
-            res.send(responseBody);              
-          }
-        );
+      // For now, only accept requests that use the device content-type
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
+        return next(new Error('Invalid Content-Type'));
       }
-    );
-  });
+
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
+        pendingDeviceLogs = JSON.parse(req.rawBody);
+      }
+
+      
+      // In parallel, get the Device and all Sensors
+      async.parallel(
+        [
+          function parallel1(callback){
+            SensorModel.find().exec(callback);
+          },
+          function parallel2(callback){
+            DeviceModel
+            .findOne({ macAddress: macAddress })
+            .populate('activeGrowPlanInstance')
+            .exec(callback);
+          }
+        ],
+        function parallelFinal(err, results){
+          if (err) { return next(err);}
+        
+          sensors = results[0];
+          device = results[1];
+          if (!device){ 
+            return next(new Error('Attempted to log to a nonexistent device'));
+          }
+
+          Object.keys(pendingDeviceLogs).forEach(function(key){
+            pendingSensorLog.logs.push({
+              sCode : key,
+              val : pendingDeviceLogs[key]
+            });
+          });
+          
+          winston.info('pendingSensorLog');
+          winston.info(JSON.stringify(pendingSensorLog));
+
+          ModelUtils.logSensorLog(
+            {
+              pendingSensorLog : pendingSensorLog, 
+              growPlanInstance : device.activeGrowPlanInstance, 
+              device : device, 
+              user : req.user 
+            },
+            function(err){
+              if (err) { return next(err); }
+              var responseBody = 'success';
+              res.status(200);
+              res.header('X-Bpn-ResourceName', 'sensor_logs');
+              res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+              // To end response for the firmware, send the Bell character
+              responseBody += String.fromCharCode(7);
+              res.send(responseBody);              
+            }
+          );
+        }
+      );
+    }
+  );
 
 
-  /*
+  /**
    * Get the current cycle data for the device. 
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
    * For now, only responds with device CSV. 
    */
-  app.get('/api/devices/:id/cycles', function (req, res, next){
-    var macAddress = req.params.id.replace(/:/g,''),
-        device,
-        growPlanInstance,
-        growPlanInstancePhase,
-        phase,
-        actions,
-        responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7),
-        responseBody = responseBodyTemplate,
-        cycleTemplate = DeviceUtils.cycleTemplate;
+  app.get('/api/devices/:id/cycles', 
+    routeUtils.middleware.ensureDeviceLoggedIn,
+    function (req, res, next){
+      var macAddress = req.params.id.replace(/:/g,''),
+          device,
+          growPlanInstance,
+          growPlanInstancePhase,
+          phase,
+          actions,
+          responseBodyTemplate = "CYCLES={cycles}" + String.fromCharCode(7),
+          responseBody = responseBodyTemplate,
+          cycleTemplate = DeviceUtils.cycleTemplate;
 
-    winston.info('In /cycles');
-    winston.info(JSON.stringify(req.headers));  
-    
-    req.session.destroy();
-    res.clearCookie('connect.sid', { path: '/' }); 
-    
-    //get device by mac address id. 
-    //get the active GPI that's using the device.
-    //get the active phase of the GPI.
-    //get the actions/cycles of the phase.
+      winston.info('In /cycles');
+      winston.info(JSON.stringify(req.headers));  
+      
+      req.session.destroy();
+      res.clearCookie('connect.sid', { path: '/' }); 
+      
+      //get device by mac address id. 
+      //get the active GPI that's using the device.
+      //get the active phase of the GPI.
+      //get the actions/cycles of the phase.
 
-    async.waterfall([
-      function (callback){
-        DeviceModel.findOne({ macAddress: macAddress }).populate('activeGrowPlanInstance').exec(callback);  
-      },
-      function (deviceResult, callback){
-        if (!deviceResult){ 
-          return callback(new Error('No device found for id ' + req.params.id));
-        }
-        device = deviceResult;
-
-        growPlanInstance = device.activeGrowPlanInstance;
-
-        if (!growPlanInstance){ 
-          return callback(new Error('No active grow plan instance found for device'));
-        }
-        
-        growPlanInstancePhase = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
-        
-        if (!growPlanInstancePhase){
-          return callback(new Error('No active phase found for this grow plan instance.'));
-        }
-
-        GrowPlanModel.findById(growPlanInstance.growPlan)
-        .populate('phases.actions')
-        .exec(callback);
-      },
-      function (growPlanResult, callback){
-        var allCyclesString = '';
-
-        phase = growPlanResult.phases.filter(function(item){return item._id.equals(growPlanInstancePhase.phase);})[0];
-        // get the actions that have a control reference & a cycle definition & are repeating
-        actions = phase.actions || [];
-        actions = actions.filter(function(action){ return !!action.control && !!action.cycle && !!action.cycle.repeat; });
-   
-        // get the device's controlMap. Use this as the outer
-        // loop to get the actions the device can handle
-        device.controlMap.forEach(
-          function(controlOutputPair){
-            var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
-                controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
-                now = new Date();
-            
-            winston.info('controlAction');
-            winston.info(controlAction);
-            
-            // Need an entry for every control, even if there's no associated cycle
-            if (!controlAction){ 
-              // if no action, just 0 everything out
-              thisCycleString = thisCycleString.replace('{override}','0');
-              thisCycleString = thisCycleString.replace('{offset}','0');
-              thisCycleString = thisCycleString.replace('{value1}','0');    
-              thisCycleString = thisCycleString.replace('{duration1}','0');    
-              thisCycleString = thisCycleString.replace('{value2}','0');    
-              thisCycleString = thisCycleString.replace('{duration2}','0');     
-            } else {
-              thisCycleString = thisCycleString.replace('{override}','1');
-              
-              var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, controlAction, req.user.timezone);
-              thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
-            }
-            allCyclesString += thisCycleString;
+      async.waterfall([
+        function (callback){
+          DeviceModel.findOne({ macAddress: macAddress }).populate('activeGrowPlanInstance').exec(callback);  
+        },
+        function (deviceResult, callback){
+          if (!deviceResult){ 
+            return callback(new Error('No device found for id ' + req.params.id));
           }
-        );
-        return callback(null, allCyclesString);
-      }
-    ],
-    function (err, allCyclesString) {
-      if (err) { return next(err);}
-      
-      var now = Date.now();
-      
-      responseBody = responseBody.replace('{cycles}', allCyclesString);
+          device = deviceResult;
 
-      device.activeGrowPlanInstance = growPlanInstance;
-      device.activeActions = {
-        actions: actions,
-        deviceMessage : responseBody,
-        lastSent : now,
-        deviceRefreshRequired : false
-      };
-      // Expires at the expected end of the current phase.
-      // now + (total expected phase time - elapsed phase time)
-      // TODO : or...since phase transitions have to be manually approved,
-      // should this just expire like 1 year into the future and get refreshed
-      // on phase transitions?
-      if (phase.expectedNumberOfDays){
-        device.activeActions.expires = 
-          now + 
-          (
-            (phase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
-            (now - growPlanInstancePhase.startDate)
+          growPlanInstance = device.activeGrowPlanInstance;
+
+          if (!growPlanInstance){ 
+            return callback(new Error('No active grow plan instance found for device'));
+          }
+          
+          growPlanInstancePhase = growPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+          
+          if (!growPlanInstancePhase){
+            return callback(new Error('No active phase found for this grow plan instance.'));
+          }
+
+          GrowPlanModel.findById(growPlanInstance.growPlan)
+          .populate('phases.actions')
+          .exec(callback);
+        },
+        function (growPlanResult, callback){
+          var allCyclesString = '';
+
+          phase = growPlanResult.phases.filter(function(item){return item._id.equals(growPlanInstancePhase.phase);})[0];
+          // get the actions that have a control reference & a cycle definition & are repeating
+          actions = phase.actions || [];
+          actions = actions.filter(function(action){ return !!action.control && !!action.cycle && !!action.cycle.repeat; });
+     
+          // get the device's controlMap. Use this as the outer
+          // loop to get the actions the device can handle
+          device.controlMap.forEach(
+            function(controlOutputPair){
+              var thisCycleString = cycleTemplate.replace('{outputId}',controlOutputPair.outputId),
+                  controlAction = actions.filter(function(action){ return action.control.equals(controlOutputPair.control);})[0],
+                  now = new Date();
+              
+              winston.info('controlAction');
+              winston.info(controlAction);
+              
+              // Firmware dictates that we need an entry for every control, even if there's no associated cycle
+              if (!controlAction){ 
+                // if no action, just 0 everything out
+                thisCycleString = thisCycleString.replace('{override}','0');
+                thisCycleString = thisCycleString.replace('{offset}','0');
+                thisCycleString = thisCycleString.replace('{value1}','0');    
+                thisCycleString = thisCycleString.replace('{duration1}','0');    
+                thisCycleString = thisCycleString.replace('{value2}','0');    
+                thisCycleString = thisCycleString.replace('{duration2}','0');     
+              } else {
+                thisCycleString = thisCycleString.replace('{override}','1');
+                
+                var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, controlAction, req.user.timezone);
+                thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
+              }
+              allCyclesString += thisCycleString;
+            }
           );
-      } else {
-        // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
-        // Make the device check back in in a year anyway.
-        device.activeActions.expires = now + (365*24*60*60*1000);
-      }
-      
-      // We don't need to make the response wait for this particular save. 
-      device.save();
+          return callback(null, allCyclesString);
+        }
+      ],
+      function (err, allCyclesString) {
+        if (err) { return next(err);}
+        
+        var now = Date.now();
+        
+        responseBody = responseBody.replace('{cycles}', allCyclesString);
 
-      res.status(200);
-      res.header('X-Bpn-ResourceName', 'cycles');
-      res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-      res.send(responseBody);
-    });
+        device.activeGrowPlanInstance = growPlanInstance;
+        device.activeActions = {
+          actions: actions,
+          deviceMessage : responseBody,
+          lastSent : now,
+          deviceRefreshRequired : false
+        };
+        // Expires at the expected end of the current phase.
+        // now + (total expected phase time - elapsed phase time)
+        // TODO : or...since phase transitions have to be manually approved,
+        // should this just expire like 1 year into the future and get refreshed
+        // on phase transitions?
+        if (phase.expectedNumberOfDays){
+          device.activeActions.expires = 
+            now + 
+            (
+              (phase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
+              (now - growPlanInstancePhase.startDate)
+            );
+        } else {
+          // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
+          // Make the device check back in in a year anyway.
+          device.activeActions.expires = now + (365*24*60*60*1000);
+        }
+        
+        // We don't need to make the response wait for this particular save. 
+        device.save();
 
-  });  
+        res.status(200);
+        res.header('X-Bpn-ResourceName', 'cycles');
+        res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+        res.send(responseBody);
+      });
+
+    }
+  );  
 
   
   /*
@@ -394,52 +400,133 @@ module.exports = function(app) {
    * 
    * https://docs.google.com/a/bitponics.com/document/d/1YD6AFDxeuUVzQuMhvIh3W5AKRe9otmEI_scxCohP9u4/edit#
    */
-  app.get('/api/devices/:id/refresh_status', function (req, res, next){
-    var macAddress = req.params.id.replace(/:/g,''),
-        device,
-        growPlanInstance,
-        growPlanInstancePhase,
-        phase,
-        activeImmediateActionsActions,
-        cycleTemplate = DeviceUtils.cycleTemplate,
-        responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
-        responseBody = responseBodyTemplate,
-        allCyclesString = '';
+  app.get('/api/devices/:id/refresh_status', 
+    routeUtils.middleware.ensureDeviceLoggedIn,
+    function (req, res, next){
+      var macAddress = req.params.id.replace(/:/g,''),
+          device,
+          growPlanInstance,
+          growPlanInstancePhase,
+          phase,
+          activeImmediateActionsActions,
+          cycleTemplate = DeviceUtils.cycleTemplate,
+          responseBodyTemplate = "REFRESH={refresh}\nOVERRIDES={overrides}" + String.fromCharCode(7),
+          responseBody = responseBodyTemplate,
+          allCyclesString = '';
+
+      req.session.destroy();
+      res.clearCookie('connect.sid', { path: '/' }); 
+      
+      async.waterfall(
+        [
+          function (callback){
+            DeviceModel.findOne({ macAddress: macAddress })
+            .populate('activeImmediateActions.actions')
+            .exec(callback);  
+          },
+          function (deviceResult, callback){
+            if (!deviceResult){ 
+              return callback(new Error('No device found for id ' + req.params.id));
+            }
+            device = deviceResult;
+
+            // Set whether we need to ask the device to refresh its cycles
+            responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
+
+            if (device.activeImmediateActions.expires > Date.now()){
+              return callback();
+            } else {
+              device.refreshActiveImmediateActions(callback);
+            }
+          }
+        ],
+        function(err){
+          if (err) { return next(err);}
+          
+          responseBody = responseBody.replace(/{overrides}/, device.activeImmediateActions.deviceMessage);
+          
+          res.status(200);
+          res.header('X-Bpn-ResourceName', 'refresh_status');
+          res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+          res.send(responseBody);
+        }
+      );
+    }
+  );
+
+
+    
+  /**
+   * required request parameters:
+
+   * @param req.body.calibrationLog
+   * @param req.body.calibrationLog.mode
+   * @param req.body.calibrationLog.status
+   * @param req.body.calibrationLog.message
+   */
+  app.post('/api/devices/:id/calibrate', 
+    routeUtils.middleware.ensureDeviceLoggedIn,
+    function (req, res, next){
+      var macAddress = req.params.id.replace(/:/g,''),
+          calibrationLog;
+
+      winston.info('In /devices/:id/calibrate');
+      winston.info(JSON.stringify(req.headers));  
+      
+      // For now, only accept requests that use the device content-type
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
+        return next(new Error('Invalid Content-Type'));
+      }
+
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
+        calibrationLog = JSON.parse(req.rawBody);
+      }
+
+      DeviceModel.logCalibration({
+        macAddress : macAddress,
+        calibrationLog : calibrationLog
+      },
+      function(err){
+        if (err) { return next(err);}
+        return sendDeviceResponse({
+          req : req,
+          res : res,
+          resourceName : "calibrate"
+        });
+      });
+    }
+  );
+
+  /**
+   *
+   * @param {object} settings
+   * @param {Request} settings.req : Express request object
+   * @param {Response} settings.res : Express response object
+   * @param {string} settings.resourceName : "refresh_status"|"cycle"|"calibration"
+   * @param {string} responseBody
+   */
+  var sendDeviceResponse = function(settings){
+    var DEVICE_RESPONSE_END_CHAR = String.fromCharCode(7), // BELL CHAR
+      req = settings.req,
+      res = settings.res,
+      responseBody = settings.responseBody;
 
     req.session.destroy();
     res.clearCookie('connect.sid', { path: '/' }); 
-    
-    async.waterfall(
-      [
-        function (callback){
-          DeviceModel.findOne({ macAddress: macAddress }).populate('activeImmediateActions.actions').exec(callback);  
-        },
-        function (deviceResult, callback){
-          if (!deviceResult){ 
-            return callback(new Error('No device found for id ' + req.params.id));
-          }
-          device = deviceResult;
+    res.header('X-Bpn-ResourceName', settings.resourceName);
+    res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
 
-          // Set whether we need to ask the device to refresh its cycles
-          responseBody = responseBody.replace(/{refresh}/, device.activeActions.deviceRefreshRequired ? '1' : '0');
+    if (responseBody){
+      res.status(200);
 
-          if (device.activeImmediateActions.expires > Date.now()){
-            return callback();
-          } else {
-            device.refreshActiveImmediateActions(callback);
-          }
-        }
-      ],
-      function(err){
-        if (err) { return next(err);}
-        
-        responseBody = responseBody.replace(/{overrides}/, device.activeImmediateActions.deviceMessage);
-        
-        res.status(200);
-        res.header('X-Bpn-ResourceName', 'refresh_status');
-        res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
-        res.send(responseBody);
+      if (responseBody[responseBody.length - 1] !== DEVICE_RESPONSE_END_CHAR) {
+        responseBody += DEVICE_RESPONSE_END_CHAR;
       }
-    );
-  });
+    } else {
+      // 204 No Content
+      res.status(204);
+    }
+    
+    res.send(responseBody);
+  };
 };
