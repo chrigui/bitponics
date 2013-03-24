@@ -1,0 +1,92 @@
+extends ../layout
+
+block content
+  div
+    p Device auth is done using an HMAC key in the “Authorization” HTTP header. The auth scheme is “BPN_DEVICE”. 
+    p The hash is a SHA-256 hash of privateKey with  (req.method + ' ' + req.url + ' HTTP/' + req.httpVersion + req.rawBody + randomValue). The randomValue should be included in the header under the “X-Bpn-Fert” field.
+    p 
+      | Authorization: BPN_DEVICE {{publicKey}}:{{hash}} <br/>  
+      | X-Bpn-Fert: {{randomValue}}
+
+  div(style="margin:2em 0;")
+    | Amit's owned device:
+    | macAddress : 0006667211cf
+    | deviceId : "506de2fe8eebf7524342cb34",
+    | publicKey : "dedf72f732cd6f66",
+    | privateKey : "7f27ad4bf71ae693"
+    | randomValue : 1.123089
+
+    button#use-amits-device(style="display:block ") Use
+
+  form#request-form
+    h1 Your values
+    label HTTP Method
+      input(type="text", id="method", placeholder="HTTP method", value="POST")  
+
+    label Relative Url
+      input(type="text", id="url", placeholder="relative url", value="/api/devices/0006667211cf/calibrate")  
+
+    label MAC Address
+      input(type="text", id="mac-address", placeholder="MAC Address", value="0006667211cf")  
+
+    label Public Key
+      input(type="text", id="public-key", placeholder="PUBLIC KEY", value="dedf72f732cd6f66")
+    
+    label Private Key
+      input(type="text", id="private-key", placeholder="PRIVATE KEY", value="7f27ad4bf71ae693")
+
+    label Salt (X-Bpn-Fert)
+      input(type="text", id="salt", placeholder="Salt", value="1.123089")
+
+    label Request Body
+      textarea(id="request-body", placeholder="request body")
+        | {"mode":"ph_4","status":"success"}
+
+    button(type="submit") Submit
+
+  h1 Generated sample request
+  textarea#generated-request(style="height:300px")
+
+  h1 Do it! 
+  button (TBD)
+
+  script(src="/assets/js/libs/sha256.js")
+  script
+    $(function(){
+      //$("input:text").focus(function() { $(this).select(); } );
+
+      $('#request-form').submit(function(e){
+        e.preventDefault();
+
+        var template = "{method} {url} HTTP/1.1{body}{salt}";
+        var populatedTemplate = template
+          .replace('{method}', $('#method').val())
+          .replace('{url}', $('#url').val())
+          .replace('{body}', $('#request-body').val())
+          .replace('{salt}', $('#salt').val());
+
+          console.log(populatedTemplate);
+
+
+        var shaObj = new jsSHA(populatedTemplate, "TEXT");
+        var hash = shaObj.getHash("SHA-256", "HEX");
+        var hmac = shaObj.getHMAC($('#private-key').val(), "TEXT", "SHA-256", "HEX");
+
+        var resultTemplate = "{method} {url} HTTP/1.1\r\n" + 
+          "Accept: application/vnd.bitponics.v1.deviceText\r\n" + 
+          "Authorization: BPN_DEVICE {publicKey}:{hmac}\r\n"+
+          "X-Bpn-Fert: {salt}\r\n\r\n" +
+          "{body}";
+
+        var populatedResult = resultTemplate
+        .replace("{method}", $('#method').val())
+        .replace('{url}', $('#url').val())
+        .replace('{publicKey}', $('#public-key').val())
+        .replace('{body}', $('#request-body').val())
+        .replace('{salt}', $('#salt').val())
+        .replace('{hmac}', hmac);
+
+        $('#generated-request').html(populatedResult).focus().select();
+
+      });
+    });

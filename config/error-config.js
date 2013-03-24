@@ -5,6 +5,12 @@ module.exports = function(){
   
   // https://github.com/visionmedia/express/blob/master/examples/error-pages/index.js
 
+  /**
+   * 3 parameters means it acts like regular middleware. 
+   * Because this file is included last, that means this is the last
+   * of the entire route chain, which means it catches any requests
+   * that didn't match a route. AKA, 404.
+   */
   app.use(function(req, res, next){
     res.status(404);
     winston.info('404\'ed');
@@ -25,16 +31,25 @@ module.exports = function(){
   });
 
 
-
+  /**
+   * 4 parameters catches errors
+   */
   app.use(function(err, req, res, next){
     winston.info('In the error middleware');
     winston.error(err);   
     res.status(err.status || 500);
     
+    if (err.headers){
+      res.set(err.headers);
+    }
+
+    winston.info(res.get("WWW-Authenticate"));
+
     // TODO : vary response type based on Accepts headers
     // TODO : vary the verbosity of response based on environment and/or (admin user+debug param). Careful not to expose sensitive data publicly 
     res.render('500', { error: err });
   });
+
 
   // Expose some routes for getting to the error pages
 

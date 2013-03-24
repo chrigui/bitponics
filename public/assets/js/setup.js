@@ -124,18 +124,21 @@ $(function(){
 				console.log(data);
 				// Data will be in the following form:
 				/*
-				{ “mac”: “00:06:66:72:11:cf”,
-				  “networks”:  [ “01,06,-79,01,3104,00,00,00:26:62:96:a8:8e,5HMV5”,
-				 	            02,11,-42,03,3104,1c,00,00:1f:90:e6:9e:d2,55378008”
-						]
-				 }
+				//  row count, Security Mode, SSID
+        { 
+          “mac”: “00:06:66:72:11:cf”,
+          “networks”:  [ 
+            “01,01,5HMV5”,
+            “02,03,55378008”
+          ]
+        }
 				*/
 				dataToPostAfterSuccess.deviceMacAddress = data.mac.replace(/:/g, '');
 				
 				$.each(data.networks, function(index, networkString){
 					var parts = networkString.split(','),
-						ssid = parts[parts.length - 1],
-						securityModeKey = parts[3];
+						ssid = parts[2],
+						securityModeKey = parts[1];
 					
 					scannedWifiNetworks.push({
 						ssid : ssid, 

@@ -28,14 +28,20 @@ module.exports = function(app){
 	  })
 	});
 
-	app.get('/admin/add-device', function (req, res) {
+	
+  app.get('/admin/generate-sample-device-request', function (req, res) {
+    res.render('admin/generate-sample-device-request', {
+      title: 'Bitponics Admin'
+    })
+  });
+
+  app.get('/admin/add-device', function (req, res) {
 	  res.render('admin/add-device', {
 	    title: 'Bitponics Admin'
 	  })
 	});
 
   app.post('/admin/add-device', function (req, res) {
-    
     res.render('admin/add-device', {
       title: 'Bitponics Admin',
       creationStatus : 'success'

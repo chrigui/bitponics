@@ -31,9 +31,9 @@ NotificationSentLogSchema.virtual('timestamp')
  * Current triggers for notifications:
  * IdealRange violation that can be handled by device (type="info")
  * IdealRange violation that can't be handled by device (type="actionNeeded")
- * Phase Actions being started (at phase activation)
+ * Phase Actions being started (at phase activation) 
  * Actions triggered by IdealRange violations
- * Action cycles that aren't handled by device triggering repeating notifications
+ * Action cycles that aren't handled by device triggering repeating notifications (type="actionNeeded")
  */
 var NotificationSchema = new Schema({
 	
