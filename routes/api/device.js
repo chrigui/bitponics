@@ -458,7 +458,7 @@ module.exports = function(app) {
     
   /**
    * required request parameters:
-
+   *
    * @param req.body.calibrationLog
    * @param req.body.calibrationLog.mode
    * @param req.body.calibrationLog.status

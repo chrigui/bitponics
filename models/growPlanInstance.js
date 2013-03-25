@@ -28,7 +28,9 @@ var GrowPlanInstanceSchema = new Schema({
 	
 	device : { type : ObjectIdSchema, ref : 'Device', required: false }, //the bitponics device
 	
-	startDate: { type: Date },
+	name : { type : String },
+
+  startDate: { type: Date },
 
 	endDate: { type: Date },
 
@@ -191,8 +193,9 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
     
     if (!deviceResult){ return callback(new Error(i18nKeys.get('no device', options.deviceId))); }
     
-    if (!deviceResult.owner.equals(getObjectId(gpi.owner))){
-      return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden'))); 
+    if (deviceResult.owner && !getObjectId(deviceResult.owner).equals(getObjectId(gpi.owner))){
+      //console.log(deviceResult.owner, gpi.owner)
+      return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden')));
     }
     
     DeviceModel.update(

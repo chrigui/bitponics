@@ -1,5 +1,5 @@
 var connect    = require('connect'),
-	express    = require('express'),
+	express    = require('express.io'),
 	http       = require('http'),
 	net        = require('net'),
 	fs         = require('fs'),

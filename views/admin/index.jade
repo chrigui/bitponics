@@ -1,12 +1,19 @@
 extends ../layout
 
+
+
 block content
+  style
+    a {
+      display:block;text-decoration:underline;
+    }
+
   h1 Admin Panel
   form(action="/admin/trigger_clearPendingNotifications")
     input(type="submit", value="Trigger clearPendingNotifications") 
   form(action="/admin/trigger_scanForPhaseChanges")
     input(type="submit", value="Trigger scanForPhaseChanges")
   div
-    a(href='/admin/add-device', style='text-decoration:underline;color:#333') Add Device
-    a(href='/admin/generate-sample-device-request', style='text-decoration:underline;color:#333') Generate device request
+    a(href='/admin/add-device') Add Device
+    a(href='/admin/generate-sample-device-request') Generate device request
   

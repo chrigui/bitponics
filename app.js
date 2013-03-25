@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var express    = require('express'),
+var express    = require('express.io'),
     app        = module.exports = express(),
     winston    = require('winston');
 
