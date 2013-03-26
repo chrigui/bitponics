@@ -3,8 +3,8 @@
  * Module dependencies.
  */
 
-var express    = require('express.io'),
-    app        = module.exports = express().http().io(),
+var express    = require('express'),
+    app        = module.exports = express(),
     winston    = require('winston');
 
 // Configure the app instance

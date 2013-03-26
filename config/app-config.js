@@ -1,5 +1,5 @@
 var connect    = require('connect'),
-	express    = require('express.io'),
+	express    = require('express'),
 	http       = require('http'),
 	net        = require('net'),
 	fs         = require('fs'),
@@ -118,10 +118,12 @@ module.exports = function(app){
 
     // Heroku requires that we force socket.io to use long-polling
     // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+    /*
     app.io.configure(function () { 
       app.io.set("transports", ["xhr-polling"]); 
       app.io.set("polling duration", 10); 
     });
+*/
 
  	  // custom "verbose errors" setting
 	  // which we can use in the templates
