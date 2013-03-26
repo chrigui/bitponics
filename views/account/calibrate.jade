@@ -1,0 +1,22 @@
+extends ../layout
+
+block css 
+  link(rel='stylesheet', href='/assets/css/pages/calibrate.css')
+
+block content
+
+   h1 Calibrate your pH probe
+      ol
+        li 
+          div 
+            | [TBD Directions], then click
+            button Calibrate ph4
+
+        
+             
+
+block footer-scripts
+  - if (user && user._id)
+    
+
+  script(src='/assets/js/pages/calibrate.js')

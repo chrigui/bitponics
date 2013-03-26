@@ -1,5 +1,5 @@
 var connect    = require('connect'),
-	express    = require('express'),
+	express    = require('express.io'),
 	http       = require('http'),
 	net        = require('net'),
 	fs         = require('fs'),
@@ -114,6 +114,14 @@ module.exports = function(app){
 	  mongoose.connect(app.config.mongoUrl);
 	  app.use(passport.initialize());
  	  app.use(passport.session());
+
+
+    // Heroku requires that we force socket.io to use long-polling
+    // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+    app.io.configure(function () { 
+      app.io.set("transports", ["xhr-polling"]); 
+      app.io.set("polling duration", 10); 
+    });
 
  	  // custom "verbose errors" setting
 	  // which we can use in the templates

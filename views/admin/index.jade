@@ -1,13 +1,12 @@
 extends ../layout
 
-
-
-block content
+block head
   style
     a {
       display:block;text-decoration:underline;
     }
 
+block content
   h1 Admin Panel
   form(action="/admin/trigger_clearPendingNotifications")
     input(type="submit", value="Trigger clearPendingNotifications") 

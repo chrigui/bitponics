@@ -56,7 +56,7 @@ module.exports = function(app){
 
       ModelUtils.assignDeviceToUser({
         deviceMacAddress : cleanDeviceMacAddress,
-        publicDeviceKey : publicDeviceKey,
+        publicDeviceKey : req.param('publicDeviceKey'),
         user : req.user
       }, function(err, result){
         if (err){ return next(err); }

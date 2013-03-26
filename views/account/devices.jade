@@ -1,0 +1,57 @@
+extends ../layout
+
+block head
+  style
+    .device-list {
+
+    }
+    .device-list .label {
+      
+    }
+
+    .device-list .value {
+      font-style: italic;
+    }
+
+
+block content
+
+  h1 Manage Devices
+
+  if (userOwnedDevices.length > 0)
+    ul.device-list
+      each device in userOwnedDevices
+        li
+          
+          div
+            span.label Name: 
+            span.value.device-name #{device.name}
+
+          div
+            span.label MAC Address: 
+            span.value.device-mac-address #{device.macAddress}
+
+          div
+            span.label Last log: 
+            span.value #{device.recentSensorLogs[0]}
+
+          div
+            span.label Power Outlet Mapping: 
+            ul 
+              each controlMapping in device.controlMap
+                li
+                  div 
+                    span.label Outlet: 
+                    span.value #{controlMapping.outputId}
+                  div
+                    span.label Accessory: 
+                    span.value #{controlMapping.control.name}
+
+
+          div
+            a.calibrate-device-item(href="/account/devices/calibrate/#{device._id}") 
+              | Calibrate 
+            
+
+
+  a(href="/setup") Set up a new Bitponics Device

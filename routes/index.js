@@ -298,16 +298,17 @@ module.exports = function(app){
 	// });
 
 
-	require('./admin')(app);
+	require('./account')(app);
+  require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
+  require('./demo')(app);
+  require('./growplans')(app);
 	require('./guides')(app);
-	require('./demo')(app);
-	require('./setup')(app);
-	require('./styleguide')(app);
-	require('./profile')(app);
-	require('./growplans')(app);
 	require('./reset')(app);
+  require('./setup')(app);
+	require('./styleguide')(app);
+	
 
 	/*
 	 * Legacy PHP site routes

@@ -1,22 +1,22 @@
-var UserModel = require('../models/user').model,
-	routeUtils = require('./route-utils'),
-	winston = require('winston'),
-	passport = require('passport');
+var UserModel = require('../../models/user').model,
+	routeUtils = require('../route-utils'),
+	winston = require('winston');
+
 
 module.exports = function(app){
-	app.get('/profile', 
+  app.get('/account/profile', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res){
 
-			res.render('profile', {
+			res.render('account/profile', {
 				title : 'Profile',
 				className : 'profile'
 			});
 		}
 	);
 
-	app.put('/profile', 
+	app.put('/account/profile', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next){
@@ -52,9 +52,9 @@ module.exports = function(app){
 
 		    user.save(function (err) {
 		      if (err) { return next(err); }
-	      	res.render('profile', locals);
+	      	res.render('account/profile', locals);
 		    });
 		  });
 		}
 	);
-}
+};
