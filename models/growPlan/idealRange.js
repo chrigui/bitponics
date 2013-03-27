@@ -41,12 +41,14 @@ var IdealRangeSchema = new Schema({
 
 /************************** INSTANCE METHODS  ***************************/
 
-IdealRangeSchema.method('checkIfWithinTimespan', function(timezone, date){
-	var applicableTimeSpan = this.applicableTimeSpan;
-	if (!applicableTimeSpan){ return true; }
+IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
+	var tz = require('timezone/loaded'),
+    applicableTimeSpan = this.applicableTimeSpan;
 	
-	var dateParts = timezone(dateParts, userTimezone, '%T').split(':'),
-        millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);
+  if (!applicableTimeSpan){ return true; }
+	
+	var dateParts = tz(date, userTimezone, '%T').split(':'),
+      millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);
 
     return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) && (millisecondsIntoDay <= applicableTimeSpan.endTime) );
 });
