@@ -10,7 +10,7 @@ block content
         li 
           div 
             | [TBD Directions], then click
-            button Calibrate ph4
+            button#calibrate-ph4 Calibrate ph4
 
         
              
@@ -18,5 +18,5 @@ block content
 block footer-scripts
   - if (user && user._id)
     
-
+  script(src='/socket.io/socket.io.js')
   script(src='/assets/js/pages/calibrate.js')

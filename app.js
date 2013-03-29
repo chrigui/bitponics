@@ -41,28 +41,38 @@ if (app.settings.env === 'local'){
     key: fs.readFileSync('config/ssl/local/server.key'),
     cert: fs.readFileSync('config/ssl/local/server.crt')
   };
-  https.createServer(options, app).listen(443);
+  var httpsServer = https.createServer(options, app);
+  var httpsIO = require('socket.io').listen(httpsServer);
+  httpsServer.listen(443);
 }
 
 
 
 /*
  * socket.io code
- *
+ */
+var onConnection = function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('client event', function (data) {
+    console.log("GGOIJSOPIDJOPSIJDPOSDKPSODK")
+    socket.broadcast.emit('sensor_event', data);
+    socket.emit('news', { one : 'love'})
+  });
+};
 
 io.configure(function () { 
     io.set("transports", ["xhr-polling"]); 
     io.set("polling duration", 10); 
 });
-
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('client event', function (data) {
-    console.log("GGOIJSOPIDJOPSIJDPOSDKPSODK")
-    socket.broadcast.emit('sensor_event', data);
-  });
+httpsIO.configure(function () { 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
 });
-*/
+
+io.sockets.on('connection', onConnection);
+httpsIO.sockets.on('connection', onConnection);
+
+/*
 
 /**
  * Legacy POC code
