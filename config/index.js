@@ -29,7 +29,7 @@ var winston = require('winston'),
  * 
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
-module.exports = function(app) {
+module.exports = function(app, io) {
   //var // on local machine, routing bitponics.com to localhost in order to have external oauth's (goog, fb) route back without complaining 
       //PORT = process.env.PORT || 80, // run node as sudo to use port 80
       //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
@@ -76,7 +76,7 @@ module.exports = function(app) {
   });
 
   require('./auth-config')(app);
-  require('./app-config')(app);
+  require('./app-config')(app, io);
   
 };
 

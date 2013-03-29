@@ -5,10 +5,12 @@
 
 var express    = require('express'),
     app        = module.exports = express(),
+    server     = require('http').createServer(app),
+    io         = require('socket.io').listen(server),
     winston    = require('winston');
 
 // Configure the app instance
-require('./config')(app);
+require('./config')(app, io);
 
 // Add Routes to the app
 require('./routes')(app);
@@ -23,7 +25,7 @@ require('./config/error-config')(app);
 
 
 // Finally, start up the server
-var server = app.listen(process.env.PORT || 80, function(){
+server.listen(process.env.PORT || 80, function(){
   //var address = server.address();
   //app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);
   

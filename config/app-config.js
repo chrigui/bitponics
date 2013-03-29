@@ -14,7 +14,7 @@ var connect    = require('connect'),
 	semver  = require('semver'),
   	path    = require('path');
 
-module.exports = function(app){
+module.exports = function(app, io){
 	
 	/**
 	 * Standard config. 
@@ -41,6 +41,11 @@ module.exports = function(app){
 	  app.set('view engine', 'jade');
 	  
 	  app.use(express.logger(':method :url :status'));
+
+
+    // Since we're on Heroku (and hence behind a proxy), tell express proxied requests are cool
+    // http://expressjs.com/guide.html#proxies
+    app.enable('trust proxy');
 
 	  // If we've got a device request or an HMAC-authed request, need the raw body
 	  app.use (function(req, res, next) {
@@ -118,12 +123,12 @@ module.exports = function(app){
 
     // Heroku requires that we force socket.io to use long-polling
     // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
-    /*
-    app.io.configure(function () { 
-      app.io.set("transports", ["xhr-polling"]); 
-      app.io.set("polling duration", 10); 
+    
+    io.configure(function () { 
+      io.set("transports", ["xhr-polling"]); 
+      io.set("polling duration", 10); 
     });
-*/
+
 
  	  // custom "verbose errors" setting
 	  // which we can use in the templates
