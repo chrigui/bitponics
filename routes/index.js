@@ -307,6 +307,7 @@ module.exports = function(app){
 	require('./guides')(app);
 	require('./reset')(app);
   require('./setup')(app);
+  require('./sockets')(app);
 	require('./styleguide')(app);
 	
 

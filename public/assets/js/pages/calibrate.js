@@ -1,5 +1,5 @@
 $(function(){
-var socket = io.connect('https://bitponics.com');
+var socket = io.connect('/calibrate');
   socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });

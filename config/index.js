@@ -1,35 +1,14 @@
 var winston = require('winston'),
     winstonConfig = require('./winston-config')(),
     mongoConfig = require('./mongo-config'),
-    appDomains = require('./app-domain-config'),
-    mongo = { 
-      "hostname": "localhost",
-      "port": 27017,
-      "username": "", 
-      "password": "",
-      "name": "",
-      "db":"bitponics"
-    },
-    generateMongoUrl = function(app){
-      /*
-      obj.hostname = (obj.hostname || 'localhost');
-      obj.port = (obj.port || 27017);
-      obj.db = (obj.db || 'test');
-      console.log('mongodb db is:' + obj.db);
-
-      if(obj.username && obj.password){
-        return "mongodb://" + obj.username + ":" + obj.password + "@" + obj.hostname + ":" + obj.port + "/" + obj.db;
-      } else{
-        return "mongodb://" + obj.hostname + ":" + obj.port + "/" + obj.db;
-      }*/
-  };
+    appDomains = require('./app-domain-config');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
  * 
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
-module.exports = function(app, io) {
+module.exports = function(app) {
   //var // on local machine, routing bitponics.com to localhost in order to have external oauth's (goog, fb) route back without complaining 
       //PORT = process.env.PORT || 80, // run node as sudo to use port 80
       //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
@@ -75,8 +54,28 @@ module.exports = function(app, io) {
     className: undefined
   });
 
+
+  if (app.settings.env === 'local'){
+    var fs = require('fs'),
+        https = require('https');
+        
+    var httpOptions = {
+      key: fs.readFileSync('config/ssl/local/server.key'),
+      cert: fs.readFileSync('config/ssl/local/server.crt')
+    };
+
+    var httpsServer = https.createServer(httpOptions, app);
+
+    app.config.https = {
+      server : httpsServer,
+      io : require('socket.io').listen(httpsServer)
+    };
+
+    app.socketIOs.push(app.config.https.io);
+  }
+
   require('./auth-config')(app);
-  require('./app-config')(app, io);
+  require('./app-config')(app);
   
 };
 
