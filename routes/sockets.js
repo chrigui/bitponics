@@ -1,4 +1,5 @@
-var DeviceModel = require('../models/device').model;
+var DeviceModel = require('../models/device').model,
+    CalibrationLogModel = require('../models/calibrationLog').model;
 
 module.exports = function(app){
   
@@ -8,6 +9,7 @@ module.exports = function(app){
     .of('/calibrate')
     .on('connection', function(socket){
       var session = socket.handshake.session,
+          userId = session.passport.user,
           checkIntervalId
 
       socket.on('disconnect', function () {
@@ -17,30 +19,23 @@ module.exports = function(app){
       socket.on('ready', function (data) {
         var deviceId = data.deviceId,
             started = Date.now();
-        if (!deviceId) { return; }
 
+        if (!deviceId) { return; }
 
         checkIntervalId = setInterval(function () {
           console.log("checking device calib", deviceId);
-          DeviceModel.findById(deviceId, function(err, deviceResult){
-            if (err || !deviceResult) { return; }
-            console.log('current calib logs', deviceResult.calibrationLogs);
-            if (deviceResult.calibrationLogs[0] && deviceResult.calibrationLogs[0].timestamp.valueOf() > started){
-              console.log('cool! sending');
-              socket.emit(
-                'device_calibration_response', 
-                deviceResult.calibrationLogs[0]
-              );
-            }
-            
+          CalibrationLogModel.find({
+            d : deviceId,
+            ts : { $gt : started }
+          }, function(err, calibrationLogResults){
+            if (err || (!(calibrationLogResults && calibrationLogResults.length))) { return; }
+            console.log('recent calib logs', calibrationLogResults);
+            socket.emit(
+              'device_calibration_response', 
+              calibrationLogResults
+            );
           });
-          
         }, 5 * 1000);
-
-        console.log(session);
-        console.log(session.passport.user);
-
-        session.lastUpdatedMe = Date.now();
       });
     });  
   });

@@ -18,80 +18,10 @@ var DeviceUtils = {
   ROLES : {
     OWNER : 'owner',
     MEMBER : 'member'
-  },
-  CALIB_MODES : {
-    "PH_4" : "ph_4",
-    "PH_7" : "ph_7",
-    "PH_10" : "ph_10",
-    "EC_LO" : "ec_lo",
-    "EC_HI" : "ec_hi"
-  },
-  CALIB_STATUSES : {
-    "SUCCESS" : "success",
-    "ERROR" : "error"
   }
 };
 /***************** END UTILS **********************/
 
-
-var CalibrationLogSchema = new Schema({
-  ts : { type : Date, default: Date.now, required : true},
-  m : { 
-    type : String, 
-    enum : [
-      DeviceUtils.CALIB_MODES.PH_4, 
-      DeviceUtils.CALIB_MODES.PH_7,
-      DeviceUtils.CALIB_MODES.PH_10,
-      DeviceUtils.CALIB_MODES.EC_LO, 
-      DeviceUtils.CALIB_MODES.EC_HI
-    ],
-    required : true
-  },
-  s : {
-    type : String, 
-    enum : [
-      DeviceUtils.CALIB_STATUSES.SUCCESS, 
-      DeviceUtils.CALIB_STATUSES.ERROR
-    ],
-    required : true
-  },
-  msg : { type : String }
-},
-{ id : false, _id : false }
-);
-
-
-CalibrationLogSchema.virtual('timestamp')
-  .get(function () {
-    return this.ts;
-  })
-  .set(function (timestamp){
-    this.ts = timestamp;
-  });
-
-CalibrationLogSchema.virtual('mode')
-  .get(function () {
-    return this.m;
-  })
-  .set(function (mode){
-    this.m = mode;
-  });
-
-CalibrationLogSchema.virtual('status')
-  .get(function () {
-    return this.s;
-  })
-  .set(function (status){
-    this.s = status;
-  });
-
-CalibrationLogSchema.virtual('message')
-  .get(function () {
-    return this.msg;
-  })
-  .set(function (message){
-    this.msg = msg;
-  });
 
 
 /***************** SCHEMA **********************/
@@ -131,9 +61,7 @@ var DeviceSchema = new Schema({
     ],
     
     recentSensorLogs : [SensorLogSchema],
-    
-    calibrationLogs : [CalibrationLogSchema],
-
+  
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
     /**
@@ -182,11 +110,8 @@ DeviceSchema.plugin(useTimestamps);
 DeviceSchema.set('toObject', {
   getters : true,
   transform : function(doc, ret, options){
-    if (doc.schema === CalibrationLogSchema){
-      delete ret.ts;
-      delete ret.m;
-      delete ret.s;
-      delete ret.msg;
+    if (doc.schema === SensorLogSchema){
+      return SensorLogSchema.options.toObject.transform(doc, ret, options);
     } else {
       // else we're operating on the parent doc (the Device doc)
     }
@@ -310,15 +235,18 @@ DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
 /**************** STATIC METHODS ****************************/
 
 /**
- *
+ * Log a CalibrationLog for the device. Used by the device API
+ * 
  * @param {string} settings.macAddress
- * @param {CalibrationLogSchema} settings.calibrationLog
- * @param {DeviceUtils.CALIB_MODES} settings.calibrationLog.mode
- * @param {DeviceUtils.CALIB_STATUSES} settings.calibrationLog.status
- * @param {string=} settings.calibrationLog.message
+ * @param {CalibrationLog|object} settings.calibrationLog. "device" property shouldn't be set; we'll set it after we grab the device through macAddress
+ * @param {CalibrationUtils.CALIB_MODES} settings.calibrationLog.mode
+ * @param {CalibrationUtils.CALIB_STATUSES} settings.calibrationLog.status
+ * @param {string=} settings.calibrationLog.message. optional.
+ * @param {function(err, CalibrationLog)} callback
  */
 DeviceSchema.static('logCalibration', function(settings, callback) {
   var DeviceModel = this,
+      CalibrationLogModel = require('./calibrationLog').model,
       macAddress = settings.macAddress;
 
   async.waterfall(
@@ -330,19 +258,16 @@ DeviceSchema.static('logCalibration', function(settings, callback) {
       },
       function (device, innerCallback){
         if (!device){ 
-          return innerCallback(new Error('No device found for id ' + req.params.id));
+          return innerCallback(new Error('No device found for macAddress ' + macAddress));
         }
-        // Shift to put the most recent log at the beginning of the array
         
-        device.calibrationLogs.unshift(settings.calibrationLog);
-        console.log(settings.calibrationLog);
-        console.log('device.calibrationLogs');
-        console.log(device.calibrationLogs);
-        device.save(innerCallback);
+        settings.calibrationLog.device = device._id;
+
+        CalibrationLogModel.create(settings.calibrationLog, innerCallback);
       }  
     ],
-    function(err, deviceResult){
-      return callback(err, deviceResult);
+    function(err, calibrationLogResult){
+      return callback(err, calibrationLogResult);
     }
   );
 });

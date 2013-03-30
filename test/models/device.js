@@ -71,8 +71,9 @@ should = require('should');
         DeviceModel.remove({macAddress: this.macAddress}, done);
       });
       
-      it('appends a calibrationLog to the beginning of the array, with the current timestamp', function(done){
-        var self = this;
+      it('logs a calibration log, with the current timestamp', function(done){
+        var self = this,
+            now = Date.now();
 
         should.exist(self.device);
         self.device.macAddress.should.equal(self.macAddress);
@@ -82,33 +83,20 @@ should = require('should');
           macAddress : self.device.macAddress,
           calibrationLog : {
             mode : "ph_4",
-            status : "success"
+            status : "success",
+            message : "calibration message"
           }
         },
-        function(err, device){
+        function(err, calibrationLog){
           should.not.exist(err);
-          should.exist(device);
-          device.calibrationLogs.length.should.equal(1);
+          should.exist(calibrationLog);
           
-
-          DeviceModel.logCalibration(
-          {
-            macAddress : self.device.macAddress,
-            calibrationLog : {
-              mode : "ph_7",
-              status : "success"
-            }
-          },
-          function(err, device){
-            should.not.exist(err);
-            should.exist(device);
-            device.calibrationLogs.length.should.equal(2);
-            device.calibrationLogs[0].mode.should.equal("ph_7", "most recent log should be first in calibrationLogs");
-            device.calibrationLogs[1].mode.should.equal("ph_4", "older log should be last in calibrationLogs");
-            device.calibrationLogs[0].timestamp.valueOf().should.be.above(device.calibrationLogs[1].timestamp.valueOf(), "logs should be in descencing timestamp order");
-
-            done();
-          });
+          calibrationLog.mode.should.equal("ph_4");
+          calibrationLog.status.should.equal("success");
+          calibrationLog.message.should.equal("calibration message");
+          calibrationLog.timestamp.valueOf().should.be.above(now);
+          
+          done();
         });
       });
     });

@@ -484,12 +484,6 @@ module.exports = function(app) {
 
       calibrationLog.timestamp = calibrationLog.timestamp || Date.now();
 
-      req.session.deviceCalibrationResponseQueue = req.session.deviceCalibrationResponseQueue || [];
-
-      req.session.deviceCalibrationResponseQueue.push(calibrationLog);
-
-      console.log('wrote to session', req.session);
-
       DeviceModel.logCalibration({
         macAddress : macAddress,
         calibrationLog : calibrationLog
