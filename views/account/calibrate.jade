@@ -16,7 +16,10 @@ block content
              
 
 block footer-scripts
-  - if (user && user._id)
+  script 
+    bpn.pages.calibrate = {
+        "deviceId" : !{JSON.stringify(device._id)}
+    };
     
   script(src='/socket.io/socket.io.js')
   script(src='/assets/js/pages/calibrate.js')

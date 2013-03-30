@@ -41,6 +41,9 @@ module.exports = function(app){
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
+      
+      if (!req.param('id')) { return res.redirect('/account/devices'); }
+
       var locals = {
         title : 'Calibrate Sensors',
         classname : 'calibrate'
