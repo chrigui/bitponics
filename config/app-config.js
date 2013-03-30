@@ -7,6 +7,7 @@ var connect    = require('connect'),
 	nib        = require('nib'),
 	mongodb    = require('mongodb'),
 	mongoose   = require('mongoose'),
+  MongoStore = require('connect-mongo')(express),
 	passport   = require('passport'),
 	csv        = require('express-csv'),
 	winston    = require('winston'),
@@ -106,9 +107,17 @@ module.exports = function(app, io){
 	  //   app.dynamicHelpers({ CDN: CDN });
 	  // }
 
-	  // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
+	  
+    mongoose.connect(app.config.mongoUrl);
+
+    // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
 	  app.use(express.cookieParser()); 
-	  app.use(express.session({ secret: 'somethingrandom'}));
+	  app.use(express.session({ 
+      secret: 'somethingrandom',
+      store : new MongoStore({
+        mongoose_connection : mongoose.connection
+      })
+    }));
 	  
 	  //flash messages are separate as of express 3
 	  app.use(flash());
@@ -116,7 +125,7 @@ module.exports = function(app, io){
 	 //  	res.locals.flashMessages = req.flash();
 		// });
 		
-	  mongoose.connect(app.config.mongoUrl);
+	  
 	  app.use(passport.initialize());
  	  app.use(passport.session());
 
