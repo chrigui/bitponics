@@ -46,6 +46,7 @@ passport.use(new HmacStrategy({
 //   serialize users into and deserialize users out of the session.  Typically,
 //   this will be as simple as storing the user ID when serializing, and finding
 //   the user by ID when deserializing.
+// http://passportjs.org/guide/configure/
 passport.serializeUser(function(user, done) {
   done(null, user._id);
 });
