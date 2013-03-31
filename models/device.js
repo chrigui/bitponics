@@ -316,7 +316,11 @@ DeviceSchema.method('refreshStatus', function(callback) {
       },
 
       function saveDevice(innerCallback){
-        device.status = newDeviceStatus;
+        device.status.expires = newDeviceStatus.expires;
+        device.status.actions = newDeviceStatus.actions;
+        device.status.immediateActions = newDeviceStatus.immediateActions;
+        device.status.activeActions = newDeviceStatus.activeActions;
+        device.status.lastSent = undefined;
         device.save(innerCallback);
       }
     ],
@@ -407,8 +411,8 @@ DeviceSchema.method('getStatusResponse', function(callback) {
 
         statusResponseBody += "CYCLES=" + cyclesResponseBody;
         
-        if (device.status.calibMode){
-          statusResponseBody += "\nCALIB_MODE=" + device.status.calibMode;
+        if (device.status.calibrationMode){
+          statusResponseBody += "\nCALIB_MODE=" + device.status.calibrationMode;
         }
         
         statusResponseBody += String.fromCharCode(7);

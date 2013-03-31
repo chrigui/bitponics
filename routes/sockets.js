@@ -23,10 +23,12 @@ module.exports = function(app){
 
         if (!deviceId) { return; }
 
+        DeviceModel.update({_id : deviceId }, { "status.calibrationMode" : mode }).exec();
+        
         clearInterval(checkIntervalId);
         
         checkIntervalId = setInterval(function(){
-          console.log("checking device calib", deviceId, mode);
+          
           CalibrationLogModel.find({
             d : deviceId,
             ts : { $gt : started },
