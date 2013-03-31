@@ -250,13 +250,11 @@ describe('Model Utils', function(){
             });
             device.save(function(err, deviceResult){
               should.not.exist(err);
-              console.log(deviceResult);
+              
               should.exist(deviceResult, 'newly created device should exist');
 
               self.device = deviceResult;
               self.device.owner.equals(self.user._id).should.equal(true, 'device should be paired to owner')
-
-              console.log(device);
 
               self.gpi.pairWithDevice({
                 deviceId : self.device._id,
@@ -267,9 +265,14 @@ describe('Model Utils', function(){
             })
           }
         ],
-        function(err){
+        function(err, results){
           should.not.exist(err);
 
+          var pairResult = results[0];
+
+          // make sure we're using the updated gpi and device
+          self.device = pairResult.device;
+          self.gpi = pairResult.growPlanInstance;
 
           var immediateActionSettings = {
             growPlanInstance : self.gpi, 

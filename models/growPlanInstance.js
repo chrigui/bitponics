@@ -194,7 +194,6 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
     if (!deviceResult){ return callback(new Error(i18nKeys.get('no device', options.deviceId))); }
     
     if (deviceResult.owner && !getObjectId(deviceResult.owner).equals(getObjectId(gpi.owner))){
-      //console.log(deviceResult.owner, gpi.owner)
       return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden')));
     }
     
@@ -362,7 +361,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           device = deviceResult;
           actionsWithDeviceControl = growPlanPhase.actions.filter(
             function(item){ 
-              return (item.control && device.controlMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
+              return (item.control && device.outputMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
             }
           );
           
@@ -406,13 +405,12 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             });
           },
           
-          // Force refresh of device actions
+          // Force refresh of device status on next request
           function (innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
-            device.activeActions.expires = now - 1000;
-            device.activeImmediateActions.expires = now - 1000;
-
+            device.status.expires = now;
+            
             device.save(innerParallelCallback);
           },
           

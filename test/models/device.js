@@ -40,7 +40,7 @@ should = require('should');
     });
 
 
-    describe('#refreshActiveImmediateActions', function(){
+    describe('#refreshStatus', function(){
       beforeEach(function(done){
         done();        
       });

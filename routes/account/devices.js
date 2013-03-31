@@ -21,7 +21,7 @@ module.exports = function(app){
           function(innerCallback){
             DeviceModel.find({ owner : req.user._id })
             .populate('activeGrowPlanInstance')
-            .populate('controlMap.control')
+            .populate('outputMap.control')
             .exec(function(err, deviceResults){
               if (err) { return innerCallback(err); }
               locals.userOwnedDevices = deviceResults;
@@ -51,7 +51,7 @@ module.exports = function(app){
 
       DeviceModel.find({ _id : req.param('id') })
       .populate('activeGrowPlanInstance')
-      .populate('controlMap.control')
+      .populate('outputMap.control')
       .exec(function(err, deviceResults){
         if (err) { return next(err); }
         locals.device = deviceResults[0];

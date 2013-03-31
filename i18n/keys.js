@@ -25,7 +25,9 @@ exports.keys = {
   "device action trigger message" : "%s. Your device has automatically handled the following action : %s.",
   "unavailable device key" : "%s does not match any available device keys for this user",
   "no device" : "No device found for specified id %s",
-  "Only device owner can assign a device to their garden" : "Only device owner can assign a device to their garden"
+  "Only device owner can assign a device to their garden" : "Only device owner can assign a device to their garden",
+  "No active grow plan instance found for device" : "No active grow plan instance found for device",
+  "No active phase found for this grow plan instance" : "No active phase found for this grow plan instance"
 };
 
 /**

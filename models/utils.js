@@ -173,18 +173,19 @@ function triggerImmediateAction(options, callback){
           // If we're here, action does have a control
 
           if (device){
-            // get any other actions that exist for the same control.
+            // get any other phase actions that exist for the same control.
             var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
             
-            actionHasDeviceControl = device.controlMap.some(
-              function(controlMapItem){
-                return getObjectId(controlMapItem.control).equals(getObjectId(action.control));
+            actionHasDeviceControl = device.outputMap.some(
+              function(outputMapItem){
+                return getObjectId(outputMapItem.control).equals(getObjectId(action.control));
               }
             );
         
+            // Expire the immediateAction on the next cycle of a baseline phase action
             ActionModel.findOne()
             .where('_id')
-            .in(device.activeActions.actions)
+            .in(device.status.actions)
             .where('control')
             .equals(action.control)
             .exec(function(err, actionResult){
@@ -267,8 +268,8 @@ function triggerImmediateAction(options, callback){
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
-                winston.info('Calling refreshActiveImmediateActions for device : ' + device._id.toString());
-                return device.refreshActiveImmediateActions(innerCallback);
+                winston.info('Calling refreshStatus for device : ' + device._id.toString());
+                return device.refreshStatus(innerCallback);
               } 
               return innerCallback();
             }

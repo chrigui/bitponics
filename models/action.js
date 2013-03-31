@@ -298,7 +298,8 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
  *
  *
  * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
- *                Otherwise it's just written straight to the template.
+ *                Otherwise it's just written straight to the template. 
+ *                For single-state cycles, this is ignored and offset is set to 0.
  *
  * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
  */
@@ -317,7 +318,7 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
   switch(states.length){
     case 1:
       var infiniteStateControlValue = parseInt(states[0].controlValue, 10);
-      result.offset = offset;
+      result.offset = 0;
       result.value1 = infiniteStateControlValue;
       result.duration1 = 1;
       result.value2 = infiniteStateControlValue;

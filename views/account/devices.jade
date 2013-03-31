@@ -38,14 +38,14 @@ block content
           div
             span.label Power Outlet Mapping: 
             ul 
-              each controlMapping in device.controlMap
+              each outputMapping in device.outputMap
                 li
                   div 
                     span.label Outlet: 
-                    span.value #{controlMapping.outputId}
+                    span.value #{outputMapping.outputId}
                   div
                     span.label Accessory: 
-                    span.value #{controlMapping.control.name}
+                    span.value #{outputMapping.control.name}
 
 
           div

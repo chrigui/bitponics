@@ -8,8 +8,10 @@ var mongoose = require('mongoose'),
   ActionModel = require('./action').model,
   ImmediateActionModel = require('./immediateAction').model,
   SensorLogSchema = require('./sensorLog').schema,
+  CalibrationLogUtils = require('./calibrationLog').utils,
   async = require('async'),
-  winston = require('winston');
+  winston = require('winston'),
+  i18nKeys = require('../i18n/keys');
 
 
 /***************** UTILS **********************/
@@ -23,6 +25,18 @@ var DeviceUtils = {
 /***************** END UTILS **********************/
 
 
+
+var SensorMapSchema = new Schema({
+  sensor : { type: ObjectIdSchema, ref: 'Sensor' },
+  inputId : { type: String }
+},
+{ id : false, _id : false });
+
+var OutputMapSchema = new Schema({
+  control : { type: ObjectIdSchema, ref: 'Control' },
+  outputId : { type: String }
+},
+{ id : false, _id : false });
 
 /***************** SCHEMA **********************/
 
@@ -46,48 +60,43 @@ var DeviceSchema = new Schema({
       }
     ],
     
-    sensorMap : [
-      {
-        sensor : { type: ObjectIdSchema, ref: 'Sensor' },
-        inputId : { type: String }
-      }
-    ],
+    sensorMap : [ SensorMapSchema ],
     
-    controlMap : [
-      {
-        control : { type: ObjectIdSchema, ref: 'Control' },
-        outputId : { type: String }
-      }
-    ],
+    outputMap : [ OutputMapSchema ],
     
     recentSensorLogs : [SensorLogSchema],
   
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
     /**
-     * Cache of the active phase actions for this device. 
-     * AKA, "baseline" actions. 
-     * Right now it's refreshed inside of /api/device/:id/cycles
-     *
+     * Current device status. Actions and ImmediateActions are just a denormalized 
+     * view into Actions and ImmediateActions.
+     * 
      */
-    activeActions : {
+    status : {
+      
       actions : [{type: ObjectIdSchema, ref: 'Action'}],
-      deviceMessage : String,
-      lastSent : Date,
-      expires : Date,
-      deviceRefreshRequired : { type: Boolean, default: true }
-    },
-
-    /**
-     * activeImmediateActions are any automatically or manually triggered actions.
-     * They override the phase actions until they expire.
-     *
-     * If expired, it's refreshed inside /api/device/:id/refresh_status
-     */
-    activeImmediateActions : {
+      
       immediateActions: [{ type: ObjectIdSchema, ref: 'ImmediateAction'}],
-      deviceMessage : { type : String },
-      lastSent: Date,
+      
+      /** 
+       * The consolidated list of immediateActions+actions
+       */
+      activeActions : [{type: ObjectIdSchema, ref: 'Action'}],
+      
+      calibrationMode : { 
+        type : String, 
+        enum : [ 
+          CalibrationLogUtils.CALIB_MODES.PH_4,
+          CalibrationLogUtils.CALIB_MODES.PH_7,
+          CalibrationLogUtils.CALIB_MODES.PH_10,
+          CalibrationLogUtils.CALIB_MODES.EC_LO,
+          CalibrationLogUtils.CALIB_MODES.EC_HI
+        ]
+      },
+      
+      lastSent : Date,
+      
       expires : Date
     }
   },
@@ -96,6 +105,7 @@ var DeviceSchema = new Schema({
 DeviceSchema.plugin(useTimestamps);
 
 /***************** END SCHEMA PROPERTIES **********************/
+
 
 
 
@@ -128,102 +138,290 @@ DeviceSchema.set('toJSON', {
 /************** INSTANCE METHODS ************************/
 
 /**
+ * 
  * Remove expired actions & update deviceMessage & expires times.
  * Saves the model at the end.
- * Originally written to be called after adding an entry to ImmediateAction collection.
+ * 
+ * Called in the following scenarios:
+ *   - after adding an entry to ImmediateAction collection 
+ *   - in device /status if device.status is expired
+ *   - when activating a phase on the activeGrowPlanInstance
+ * 
+ * @param {function(err, Device)} callback
  */
-DeviceSchema.method('refreshActiveImmediateActions', function(callback) {
+DeviceSchema.method('refreshStatus', function(callback) {
   var device = this,
-    now = new Date();
+      GrowPlanInstance = require('./growPlanInstance'),
+      GrowPlanInstanceSchema = GrowPlanInstance.schema,
+      GrowPlanInstanceModel = GrowPlanInstance.model,
+      GrowPlan = require('./growPlan').growPlan,
+      GrowPlanSchema = GrowPlan.schema,
+      GrowPlanModel = GrowPlan.model,
+      getObjectId = require('./utils').getObjectId,
+      now = new Date(),
+      deviceOwner,
+      activeGrowPlanInstance,
+      newDeviceStatus = {};
+      
 
-  ImmediateActionModel
-    .find({ gpi : device.activeGrowPlanInstance })
-    .where('e').gt(now)
-    .sort('-tr')
-    .populate('a')
-    .exec(function(err, immediateActionResults){
-      if (err) { return callback(err);}
+  if (!device.activeGrowPlanInstance) { 
+    return callback(new Error(i18nKeys.get("No active grow plan instance found for device"))); 
+  }
 
-      var conflictingImmediateActionIds = [],
-        conflictingImmediateActionIndices = [],
-        existingImmediateActionControls = {},
-        soonestImmediateActionExpiration = now + (365 * 24 * 60 * 60 * 1000),
-        deviceMessage = '',
-        cycleTemplate = DeviceUtils.cycleTemplate;
-
-      // first, ensure that the results are clean. results are sorted by
-      // descending timeRequested, so the last ones in take precedence.
-      // eliminate conflicts by expiring them.
-      immediateActionResults.forEach(function(immediateAction, index){
-        if (existingImmediateActionControls[immediateAction.action.control]){
-          conflictingImmediateActionIds.push(immediateAction._id);
-          conflictingImmediateActionIndices.push(index);
-          return;
+  async.waterfall(
+    [
+      function getGrowPlanInstance(innerCallback){
+        if (device.activeGrowPlanInstance.schema === GrowPlanInstanceSchema){
+          return innerCallback(device.activeGrowPlanInstance);
         }
 
-        existingImmediateActionControls[immediateAction.action.control] = true;
+        GrowPlanInstanceModel
+        .findById(device.activeGrowPlanInstance)
+        .exec(innerCallback);
+      },
+      
+      function getPopulatedGrowPlan(activeGrowPlanInstanceResult, innerCallback){
+        activeGrowPlanInstance = activeGrowPlanInstanceResult;
 
-        if (immediateAction.expires < soonestImmediateActionExpiration) {
-          soonestImmediateActionExpiration = immediateAction.expires;
+        GrowPlanModel.findById(activeGrowPlanInstance.growPlan)
+        .populate('phases.actions')
+        .exec(innerCallback)
+      },
+
+      function processPhaseActions(growPlan, innerCallback) {
+        var activeGrowPlanInstancePhase = activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+          
+        if (!activeGrowPlanInstancePhase){
+          return innerCallback(
+            new Error(i18nKeys.get("No active phase found for this grow plan instance."))
+          );
         }
-      });
-
-      if (conflictingImmediateActionIds.length > 0){
-        ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();
-
-        conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
-          // since we're removing elements from the target array as we go,
-          // the indexToRemove will be off by however many we've removed so far
-          indexToRemove -= index;
-          immediateActionResults.splice(indexToRemove, 1);
-        });
-      }
-
-      // ok, now we're clean.
-      // replace device.activeImmediateActions.immediateActions with the result set
-      device.activeImmediateActions.immediateActions = immediateActionResults;//.map(function(immediateAction){return immediateAction._id;});
-
-      // generate new device message.
-      device.controlMap.forEach(
-        function(controlOutputPair){
-          var thisCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
-            controlImmediateAction = immediateActionResults.filter(function(immediateAction){ return immediateAction.action.control.equals(controlOutputPair.control);})[0],
-            controlAction;
-
-          // Need an entry for every control, even if there's no associated cycle
-          if (!controlImmediateAction){
-            // if no action, just 0 everything out
-            thisCycleString = thisCycleString.replace(/{override}/, '0');
-            thisCycleString = thisCycleString.replace(/{offset}/, '0');
-            thisCycleString = thisCycleString.replace(/{value1}/, '0');
-            thisCycleString = thisCycleString.replace(/{duration1}/, '0');
-            thisCycleString = thisCycleString.replace(/{value2}/, '0');
-            thisCycleString = thisCycleString.replace(/{duration2}/, '0');
-          } else {
-            controlAction = controlImmediateAction.action;
-            thisCycleString = thisCycleString.replace(/{override}/, '1');
-            // overrides are assumed to be immediate actions, so offset will always be 0
-            thisCycleString = thisCycleString.replace(/{offset}/, '0');
-            thisCycleString = ActionModel.updateCycleTemplateWithStates(thisCycleString, controlAction.cycle.states).cycleString;
+        
+        var activeGrowPlanPhase = growPlan.phases.filter(
+          function(item){
+            return item._id.equals(getObjectId(activeGrowPlanInstancePhase.phase));
           }
-          deviceMessage += thisCycleString;
+        )[0];
+
+        // get the actions that have a control reference & a cycle definition & are repeating
+        var actions = activeGrowPlanPhase.actions || [];
+        actions = actions.filter(
+          function(action){ 
+            return !!action.control && !!action.cycle && !!action.cycle.repeat; 
+          }
+        );
+
+        newDeviceStatus.actions = actions;
+
+        // Expires at the expected end of the current phase.
+        // now + (total expected phase time - elapsed phase time)
+        // TODO : or...if phase transitions have to be manually approved,
+        // should this just expire like 1 year into the future and get refreshed
+        // on phase transitions?
+        if (activeGrowPlanPhase.expectedNumberOfDays){
+          newDeviceStatus.expires = 
+            now + 
+            (
+              (activeGrowPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
+              (now - activeGrowPlanInstancePhase.startDate)
+            );
+        } else {
+          // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
+          // Make the device check back in in a year anyway.
+          newDeviceStatus.expires = now + (365*24*60*60*1000);
+        }      
+
+        return innerCallback();
+      },
+
+      function processImmediateActions(innerCallback){
+        ImmediateActionModel
+        .find({ gpi : device.activeGrowPlanInstance })
+        .where('e').gt(now)
+        .sort('-tr')
+        .populate('a')
+        .exec(function(err, immediateActionResults){
+          if (err) { return innerCallback(err);}
+
+          var conflictingImmediateActionIds = [],
+            conflictingImmediateActionIndices = [],
+            existingImmediateActionControls = {},
+            soonestImmediateActionExpiration = now + (365 * 24 * 60 * 60 * 1000);
+            
+          // first, ensure that the results are clean. immediateActionResults are returned sorted by
+          // descending timeRequested, so the last ones in take precedence.
+          // eliminate conflicts by expiring them.
+          immediateActionResults.forEach(function(immediateAction, index){
+            if (existingImmediateActionControls[immediateAction.action.control]){
+              conflictingImmediateActionIds.push(immediateAction._id);
+              conflictingImmediateActionIndices.push(index);
+              return;
+            }
+
+            existingImmediateActionControls[immediateAction.action.control] = true;
+
+            if (immediateAction.expires < soonestImmediateActionExpiration) {
+              soonestImmediateActionExpiration = immediateAction.expires;
+            }
+          });
+
+          if (conflictingImmediateActionIds.length > 0){
+            // Expire all the expired ImmediateActions. Deciding not to wait on the result to move forward
+            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();
+
+            conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
+              // since we're removing elements from the target array as we go,
+              // the indexToRemove will be off by however many we've removed so far
+              indexToRemove -= index;
+              immediateActionResults.splice(indexToRemove, 1);
+            });
+          }
+
+          // ok, now we're clean.
+          // replace device.status.immediateActions with the result set
+          newDeviceStatus.immediateActions = immediateActionResults;
+
+          if (newDeviceStatus.expires > soonestImmediateActionExpiration){
+            newDeviceStatus.expires = soonestImmediateActionExpiration;
+          }
+
+          return innerCallback();
+        });
+      },
+
+      function filterActiveActions(innerCallback){
+        var activeActionsByControl = {},
+            controlKey,
+            activeActions = [];
+
+        newDeviceStatus.actions.forEach(function(action){
+          activeActionsByControl[action.control] = action;
+        });
+
+        // override with immediateActions
+        newDeviceStatus.immediateActions.forEach(function(immediateAction, index){
+          activeActionsByControl[immediateAction.action.control] = immediateAction.action;
+        });        
+
+        for (controlKey in activeActionsByControl) {
+          if (activeActionsByControl.hasOwnProperty(controlKey)) {
+            activeActions.push(activeActionsByControl[controlKey]);
+          }
         }
-      );
 
-      // compare with current deviceMessage.
-      if (device.activeImmediateActions.deviceMessage == deviceMessage){
-        return callback();
+        newDeviceStatus.activeActions = activeActions;
+
+        return innerCallback();
+      },
+
+      function saveDevice(innerCallback){
+        device.status = newDeviceStatus;
+        device.save(innerCallback);
       }
-
-      device.activeImmediateActions.deviceMessage = deviceMessage;
-      device.activeImmediateActions.lastSent = null;
-      device.activeImmediateActions.expires = soonestImmediateActionExpiration;
-      device.activeActions.deviceRefreshRequired = true;
-
-      winston.info('refreshActiveImmediateActions for device ' + device._id + ' ' + JSON.stringify(device.activeImmediateActions));
-      device.save(callback);
-    });
+    ],
+    function (err, updatedDevice){
+      return callback(err, updatedDevice);
+    }
+  );
 });
+
+
+/**
+ * Get the compiled device status response, to be send to the device when requested at /status
+ *
+ * @param {function(err, statusResponse)} callback
+ *
+ */
+DeviceSchema.method('getStatusResponse', function(callback) {
+  var device = this,
+      User = require('./user'),
+      UserSchema = User.schema,
+      UserModel = User.model,
+      DeviceModel = this.model(this.constructor.modelName),
+      getObjectId = require('./utils').getObjectId,
+      now = new Date(),
+      deviceOwner,
+      cyclesResponseBody = ''
+      statusResponseBody = '';
+
+
+  console.log("GET STASTUS RESPONSE", device.status);
+
+  async.waterfall(
+    [
+      function getDeviceOwner(innerCallback){
+        if (device.owner.schema === UserSchema){
+          deviceOwner = device.owner;
+          return innerCallback();
+        }
+        UserModel.findById(device.owner).exec(function(err, userResult) {
+          if (err) { return innerCallback(err); }
+          deviceOwner = userResult;
+          return innerCallback();
+        });
+      },
+      function getPopulatedDevice(innerCallback){
+        DeviceModel.findById(device)
+        .populate('activeGrowPlanInstance')
+        .populate('status.activeActions')
+        .exec(function(err, deviceResult){
+          device = deviceResult;
+          innerCallback();
+        });
+      },
+      function compileStatusBody(innerCallback){
+        var cycleTemplate = DeviceUtils.cycleTemplate,
+            activeGrowPlanInstancePhase = device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+            cyclesResponseBody = '';
+
+
+        device.outputMap.forEach(
+          function(controlOutputPair){
+            
+            var controlCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
+                controlAction = device.status.activeActions.filter(
+                  function(action){ 
+                    return getObjectId(action.control).equals(controlOutputPair.control);
+                  }
+                )[0],
+                cycleRemainder;
+
+            // Need an entry for every output, even if there's no associated cycle
+            if (!controlAction){
+              // if no action, just 0 everything out
+              controlCycleString = controlCycleString.replace(/{override}/, '0');
+              controlCycleString = controlCycleString.replace(/{offset}/, '0');
+              controlCycleString = controlCycleString.replace(/{value1}/, '0');
+              controlCycleString = controlCycleString.replace(/{duration1}/, '0');
+              controlCycleString = controlCycleString.replace(/{value2}/, '0');
+              controlCycleString = controlCycleString.replace(/{duration2}/, '0');
+            } else {
+              controlCycleString = controlCycleString.replace(/{override}/, '1');
+              cycleRemainder = ActionModel.getCycleRemainder(now, activeGrowPlanInstancePhase, controlAction, deviceOwner.timezone);
+              controlCycleString = ActionModel.updateCycleTemplateWithStates(controlCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
+            }
+            cyclesResponseBody += controlCycleString;
+          }
+        );
+
+        statusResponseBody += "CYCLES=" + cyclesResponseBody;
+        
+        if (device.status.calibMode){
+          statusResponseBody += "\nCALIB_MODE=" + device.status.calibMode;
+        }
+        
+        statusResponseBody += String.fromCharCode(7);
+
+        return innerCallback(null);
+      },
+
+    ],
+    function(err){
+      return callback(err, statusResponseBody);
+    }
+  );
+});
+
 /**************** END INSTANCE METHODS ****************************/
 
 
@@ -253,7 +451,7 @@ DeviceSchema.static('logCalibration', function(settings, callback) {
     [
       function (innerCallback){
         DeviceModel.findOne({ macAddress: macAddress })
-        .select("-users -userAssignmentLogs -sensorMap -controlMap -recentSensorLogs -activeGrowPlanInstance -activeActions -activeImmediateActions")
+        .select("-users -userAssignmentLogs -sensorMap -outputMap -recentSensorLogs -activeGrowPlanInstance -status")
         .exec(innerCallback);
       },
       function (device, innerCallback){
@@ -313,15 +511,15 @@ DeviceSchema.pre('save', function(next){
 });
 
 /**
- *  If controlMap is undefined then use the deviceType's default controlMap
+ *  If outputMap is undefined then use the deviceType's default outputMap
  */
 DeviceSchema.pre('save', function(next){
   var device = this;
-  if(device.controlMap && device.controlMap.length){ return next(); }
+  if(device.outputMap && device.outputMap.length){ return next(); }
 
   DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
     if (err) { return next(err); }
-    device.controlMap = deviceType.controlMap;
+    device.outputMap = deviceType.outputMap;
     next();
   });
 });

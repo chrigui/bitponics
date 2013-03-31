@@ -423,7 +423,7 @@ async.series([
             firmwareVersion: _data.firmwareVersion,
             microprocessor: _data.microprocessor,
             sensorMap: _data.sensorMap,
-            controlMap : _data.controlMap
+            outputMap : _data.outputMap
           });
 
           dataObj.save(function (err, doc) {
@@ -468,7 +468,7 @@ async.series([
             owner: _data.owner,
             users : _data.users,
             sensorMap : _data.sensorMap,
-            controlMap : _data.controlMap,
+            outputMap : _data.outputMap,
             recentSensorLogs: _data.recentSensorLogs,
             activeGrowPlanInstance : _data.activeGrowPlanInstance
           });
