@@ -1,25 +1,88 @@
 extends ../layout
 
-block css 
-  link(rel='stylesheet', href='/assets/css/pages/calibrate.css')
 
-block content
-
-   h1 Calibrate your pH probe
-      ol
-        li 
-          div 
-            | [TBD Directions], then click
-            button#calibrate-ph4 Calibrate ph4
-
-        
-             
-
-block footer-scripts
+block head
   script 
     bpn.pages.calibrate = {
         "deviceId" : !{JSON.stringify(device._id)}
     };
-    
-  script(src='/socket.io/socket.io.js')
-  script(src='/assets/js/pages/calibrate.js')
+
+  mixin requirejs("/assets/js/pages/calibrate")
+
+  
+block css 
+  style
+    button {
+      display: block;
+    }
+    .step {
+      display:none;
+    }
+    .step.active {
+      display:block;
+      float:none;
+      height:auto;
+    }
+
+    .overlay {
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:0;
+      right:0;
+      width: 100%;
+      height: 100%;
+      background:#fff;
+      opacity:.9;
+      display:none;
+    }
+
+block content
+
+  h1 Calibrate your pH probe
+
+  p 
+    | Calibrating pH is a 3-step process. You'll calibrate your probe to pH 4, pH 7, and finally pH 10. And then you'll be all set!
+
+  ol
+    li.step.active
+      div 
+        h2 Step 1
+        p 
+          | We'll start with pH 4. 
+        ul 
+          li Unscrew the cap on your pH probe. 
+          li Rinse the tip of the probe under tap water. 
+          li You should have a bottle labeled "pH 4 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
+          li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
+            button#calibrate-ph4 Calibrate ph 4
+    li.step
+      div 
+        h2 Step 2
+        p Great! ph 4 is done, onto pH 7.
+        ul
+          li Rinse the tip of the probe under tap water. 
+          li You should have a bottle labeled "pH 7 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
+          li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
+            button#calibrate-ph7 Calibrate ph 7
+    li.step
+      div 
+        h2 Last Step
+        p Great! ph 7 is done, onto pH 10.
+        ul
+          li Rinse the tip of the probe under tap water. 
+          li You should have a bottle labeled "pH 10 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
+          li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
+        button#calibrate-ph10 Calibrate ph 10
+    li.step 
+      div
+        h2 All done! Now you can check out your latest probe readings on your 
+          a(href="/account/devices") devices page, 
+          | or head over to your 
+          a(href="/dashboard") Dashboard
+          | .
+        
+  div#overlay.overlay
+
+block footer-scripts
+  

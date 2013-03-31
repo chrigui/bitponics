@@ -46,6 +46,20 @@ define(['moment'], function(moment){
   };
 
 
+  utils.CALIB_MODES = {
+    "PH_4" : "ph_4",
+    "PH_7" : "ph_7",
+    "PH_10" : "ph_10",
+    "EC_LO" : "ec_lo",
+    "EC_HI" : "ec_hi"
+  };
+  
+  utils.CALIB_STATUSES = {
+    "SUCCESS" : "success",
+    "ERROR" : "error"
+  };
+
+
   /**
    * Suggestions for auto-complete in UI
    */

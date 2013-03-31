@@ -18,21 +18,27 @@ module.exports = function(app){
 
       socket.on('ready', function (data) {
         var deviceId = data.deviceId,
+            mode = data.mode,
             started = Date.now();
 
         if (!deviceId) { return; }
 
-        checkIntervalId = setInterval(function () {
-          console.log("checking device calib", deviceId);
+        clearInterval(checkIntervalId);
+        
+        checkIntervalId = setInterval(function(){
+          console.log("checking device calib", deviceId, mode);
           CalibrationLogModel.find({
             d : deviceId,
-            ts : { $gt : started }
-          }, function(err, calibrationLogResults){
+            ts : { $gt : started },
+            m : mode
+          })
+          .sort('-ts')
+          .exec(function (err, calibrationLogResults){
             if (err || (!(calibrationLogResults && calibrationLogResults.length))) { return; }
             console.log('recent calib logs', calibrationLogResults);
             socket.emit(
               'device_calibration_response', 
-              calibrationLogResults
+              calibrationLogResults[0]
             );
           });
         }, 5 * 1000);

@@ -8,10 +8,11 @@ var mongoose = require('mongoose'),
   ActionModel = require('./action').model,
   ImmediateActionModel = require('./immediateAction').model,
   SensorLogSchema = require('./sensorLog').schema,
-  CalibrationLogUtils = require('./calibrationLog').utils,
   async = require('async'),
   winston = require('winston'),
-  i18nKeys = require('../i18n/keys');
+  i18nKeys = require('../i18n/keys'),
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');;
 
 
 /***************** UTILS **********************/
@@ -87,11 +88,11 @@ var DeviceSchema = new Schema({
       calibrationMode : { 
         type : String, 
         enum : [ 
-          CalibrationLogUtils.CALIB_MODES.PH_4,
-          CalibrationLogUtils.CALIB_MODES.PH_7,
-          CalibrationLogUtils.CALIB_MODES.PH_10,
-          CalibrationLogUtils.CALIB_MODES.EC_LO,
-          CalibrationLogUtils.CALIB_MODES.EC_HI
+          feBeUtils.CALIB_MODES.PH_4,
+          feBeUtils.CALIB_MODES.PH_7,
+          feBeUtils.CALIB_MODES.PH_10,
+          feBeUtils.CALIB_MODES.EC_LO,
+          feBeUtils.CALIB_MODES.EC_HI
         ]
       },
       

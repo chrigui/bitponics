@@ -3,22 +3,10 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
-  ObjectIdSchema = Schema.ObjectId;
+  ObjectIdSchema = Schema.ObjectId,
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
-
-var CalibrationLogUtils = {
-  CALIB_MODES : {
-    "PH_4" : "ph_4",
-    "PH_7" : "ph_7",
-    "PH_10" : "ph_10",
-    "EC_LO" : "ec_lo",
-    "EC_HI" : "ec_hi"
-  },
-  CALIB_STATUSES : {
-    "SUCCESS" : "success",
-    "ERROR" : "error"
-  }
-};
 
 var CalibrationLogSchema = new Schema({
   d : { type : ObjectIdSchema, ref : 'Device', required : true },
@@ -26,19 +14,19 @@ var CalibrationLogSchema = new Schema({
   m : { 
     type : String, 
     enum : [
-      CalibrationLogUtils.CALIB_MODES.PH_4, 
-      CalibrationLogUtils.CALIB_MODES.PH_7,
-      CalibrationLogUtils.CALIB_MODES.PH_10,
-      CalibrationLogUtils.CALIB_MODES.EC_LO, 
-      CalibrationLogUtils.CALIB_MODES.EC_HI
+      feBeUtils.CALIB_MODES.PH_4, 
+      feBeUtils.CALIB_MODES.PH_7,
+      feBeUtils.CALIB_MODES.PH_10,
+      feBeUtils.CALIB_MODES.EC_LO, 
+      feBeUtils.CALIB_MODES.EC_HI
     ],
     required : true
   },
   s : {
     type : String, 
     enum : [
-      CalibrationLogUtils.CALIB_STATUSES.SUCCESS, 
-      CalibrationLogUtils.CALIB_STATUSES.ERROR
+      feBeUtils.CALIB_STATUSES.SUCCESS, 
+      feBeUtils.CALIB_STATUSES.ERROR
     ],
     required : true
   },
@@ -117,4 +105,3 @@ CalibrationLogSchema.index({ 'd ts': -1 });
 
 exports.schema = CalibrationLogSchema;
 exports.model = mongoose.model('CalibrationLog', CalibrationLogSchema);
-exports.utils = CalibrationLogUtils;
