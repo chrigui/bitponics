@@ -6,7 +6,8 @@ module.exports = function(app){
 	require('./growPlan')(app);
 	require('./growPlanInstance')(app);
 	require('./growSystem')(app);
-	require('./lightBulb')(app);
+	require('./light')(app);
+  require('./lightBulb')(app);
 	require('./lightFixture')(app);
 	require('./nutrient')(app);
 	require('./sensor')(app);
