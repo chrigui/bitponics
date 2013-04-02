@@ -528,10 +528,10 @@ function getFullyPopulatedGrowPlan(query, callback){
           growPlan.phases.forEach(function(phase) {
             if (phase.light){
               if (phase.light.fixture){
-                lightFixtureIds.push(phase.light.fixture);
+                lightFixtureIds.push(getObjectId(phase.light.fixture));
               }
               if (phase.light.bulb){
-                lightBulbIds.push(phase.light.bulb);
+                lightBulbIds.push(getObjectId(phase.light.bulb));
               }
             }
           });
@@ -553,7 +553,7 @@ function getFullyPopulatedGrowPlan(query, callback){
                 growPlans.forEach(function(growPlan) {
                   growPlan.phases.forEach(function(phase) {
                     if (phase.light && phase.light.fixture){
-                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                      phase.light.fixture = lightFixturesById[getObjectId(phase.light.fixture).toString()];
                     }
                   });
                 });
@@ -575,8 +575,8 @@ function getFullyPopulatedGrowPlan(query, callback){
 
                 growPlans.forEach(function(growPlan) {
                   growPlan.phases.forEach(function(phase) {
-                    if (phase.light && phase.light.fixture){
-                      phase.light.fixture = actionsById[getObjectId(phase.light.fixture).toString()];
+                    if (phase.light && phase.light.bulb){
+                      phase.light.bulb = lightBulbsById[getObjectId(phase.light.bulb).toString()];
                     }
                   });
                 });

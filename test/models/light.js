@@ -102,8 +102,8 @@ describe('Light', function(){
             should.exist(originalLight);
 
             should.equal(validatedLight._id.toString(), originalLight._id.toString());
-            should.equal(validatedLight.fixture.toString(), originalLight.fixture.toString());
-            should.equal(validatedLight.bulb.toString(), originalLight.bulb.toString());
+            should.equal(validatedLight.fixture._id.toString(), originalLight.fixture.toString());
+            should.equal(validatedLight.bulb._id.toString(), originalLight.bulb.toString());
             should.equal(validatedLight.fixtureQuantity, originalLight.fixtureQuantity);
     
 

@@ -611,13 +611,13 @@ async.series([
         } else {
           var dataObj = new models.light({
             _id : _data._id,
-            fixture : data.fixture,
-            fixtureQuantity : data.fixtureQuantity,
-            bulb : data.bulb
+            fixture : _data.fixture,
+            fixtureQuantity : _data.fixtureQuantity,
+            bulb : _data.bulb
           });
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
-            savedObjectIds[dataType][_data.name] = doc._id;
+            savedObjectIds[dataType][_data._id] = doc._id;
             console.log("created light");
             decrementData();
           });
