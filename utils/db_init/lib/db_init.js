@@ -88,12 +88,37 @@ async.series([
      * clear old data in parallel if clear option
      */
     if(clear) {
+
       async.parallel([
         function(innerCallback){
           if (!mongoose.connection.collections['users']){ return innerCallback();}
           mongoose.connection.collections['users'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('users collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongoose.connection.collections['plants']){ return innerCallback();}
+          mongoose.connection.collections['plants'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('plants collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongoose.connection.collections['harvestlogs']){ return innerCallback();}
+          mongoose.connection.collections['harvestlogs'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('harvestlogs collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongoose.connection.collections['calibrationlogs']){ return innerCallback();}
+          mongoose.connection.collections['calibrationlogs'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('calibrationlogs collection dropped');
             innerCallback();
           });
         },

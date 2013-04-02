@@ -539,7 +539,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
                       repeat : {
                         type : states[0].durationType,
                         duration : states[0].duration,
@@ -553,7 +553,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
                       repeat : {
                         type : states[1].durationType,
                         duration : states[1].duration,
@@ -567,7 +567,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
@@ -580,7 +580,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,

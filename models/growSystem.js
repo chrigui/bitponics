@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
+  async = require('async'),
   feBeUtils = requirejs('fe-be-utils');
 
 var GrowSystemSchema = new Schema({
@@ -16,14 +17,14 @@ var GrowSystemSchema = new Schema({
 
 	createdBy: { type: ObjectIdSchema, ref: 'User'},
 	
-	type: { type: String, required: true },
+	type: { type: String},
 	
 	/**
 	 * reservoirSize is number of gallons
 	 */
 	reservoirSize: { type: Number },
 	
-	plantCapacity: { type: Number, required: true },
+	plantCapacity: { type: Number },
 
 	overallSize: {
 		w: { type: Number },
@@ -116,31 +117,45 @@ GrowSystemSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.growSystem
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
  */
 GrowSystemSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedGrowSystem = options.growSystem,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       GrowSystemModel = this;
 
-    GrowSystemModel.findById(submittedGrowSystem._id, function(err, growSystemResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedGrowSystem._id)){
+            return innerCallback(null, null);
+          } 
+          
+          GrowSystemModel.findById(submittedGrowSystem._id, innerCallback);
+        },
+        function (matchedGrowSystem, innerCallback){
+          if (matchedGrowSystem && GrowSystemModel.isEquivalentTo(submittedGrowSystem, matchedGrowSystem)){
+            return innerCallback(null, matchedGrowSystem);
+          }
+          // If we've gotten here, either there was no growSystemResult
+          // or the item wasn't equivalent
+          submittedGrowSystem._id = new ObjectId();
+          submittedGrowSystem.createdBy = user;
+          submittedGrowSystem.visibility = visibility;
 
-      if (growSystemResult && GrowSystemModel.isEquivalentTo(submittedGrowSystem, growSystemResult)){
-        return callback(null, growSystemResult);
+          GrowSystemModel.create(submittedGrowSystem, innerCallback);
+        }
+      ],
+      function(err, validatedGrowSystem){
+        if (silentValidationFail){
+          return callback(null, validatedGrowSystem);
+        }
+        return callback(err, validatedGrowSystem);
       }
-      
-      // If we've gotten here, either there was no growSystemResult
-      // or the item wasn't equivalent
-      submittedGrowSystem._id = new ObjectId();
-      submittedGrowSystem.createdBy = user;
-      submittedGrowSystem.visibility = visibility;
-
-      GrowSystemModel.create(submittedGrowSystem, function(err, createdGrowSystem){
-        return callback(err, createdGrowSystem);
-      });  
-    });
+    );
   } 
 );
 

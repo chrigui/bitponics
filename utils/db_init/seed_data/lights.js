@@ -2,43 +2,33 @@ var ObjectIdSchema = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{
-			_id : '506de3028eebf7524342cb46',
-			type: "fluorescent",
-			watts: 48,
-			brand : "Hydrofarm",
-			name : "T5 2-tube 2-foot System",
-			bulbCapacity : 4
+			_id : '515a540205e45bc5a590301b',
+			fixture: '506de3028eebf7524342cb46', // fluorescent
+      fixtureQuantity : 1,
+      bulb : '506de3008eebf7524342cb41'
 		},
 		{
-			_id : '506de3028eebf7524342cb47',
-			type: "compact fluorescent",
-			watts: 40,
-			brand : "",
-			name : "Any fixture that takes 1 standard CFL bulb.",
-			bulbCapacity : 1
+			_id : '515a540905e45bc5a590301c',
+      fixture: '506de3028eebf7524342cb47', // CFL
+      fixtureQuantity : 1,
+      bulb : '506de3018eebf7524342cb42'
 		},
 		{
-			_id : '506de3028eebf7524342cb48',
-			type: "metal halide",
-			watts: 250,
-			brand : "lights.com",
-			name : "metal halide",
-			bulbCapacity : 1
+			_id : '515a540a05e45bc5a590301d',
+			fixture: '506de3028eebf7524342cb48', // Metal Halide
+      fixtureQuantity : 1,
+      bulb : '506de3018eebf7524342cb43'
 		},
 		{
-			_id : '506de3028eebf7524342cb49',
-			type: "high pressure sodium (HPS)",
-			watts: 300,
-			brand : "lights.com",
-			name : "high pressure sodium (HPS)",
-			bulbCapacity : 1
+			_id : '515a540a05e45bc5a590301e',
+			fixture: '506de3028eebf7524342cb49', // HPS
+      fixtureQuantity : 1,
+      bulb : '506de3018eebf7524342cb44'
 		},
 		{
-			_id : '506de3028eebf7524342cb4a',
-			type: "LED",
-			watts: 10,
-			brand : "lights.com",
-			name : "LED",
-			bulbCapacity : 1
+			_id : '515a540b05e45bc5a590301f',
+			fixture: '506de3028eebf7524342cb4a', // LED
+      fixtureQuantity : 1,
+      bulb : '506de3018eebf7524342cb45'
 		}
 	];

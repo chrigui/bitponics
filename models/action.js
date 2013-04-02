@@ -206,31 +206,46 @@ ActionSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.action
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
  */
 ActionSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedAction = options.action,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       ActionModel = this;
 
-    ActionModel.findById(submittedAction._id, function(err, actionResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getActionIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedAction._id)){
+            return innerCallback(null, null);
+          } 
+          
+          ActionModel.findById(submittedAction._id, innerCallback);
+        },
+        function (matchedAction, innerCallback){
+          if (matchedAction && ActionModel.isEquivalentTo(submittedAction, matchedAction)){
+            return innerCallback(null, matchedAction);
+          }
 
-      if (actionResult && ActionModel.isEquivalentTo(submittedAction, actionResult)){
-        return callback(null, actionResult);
+          // If we've gotten here, either there was no matchedAction
+          // or the item wasn't equivalent
+          submittedAction._id = new ObjectId();
+          submittedAction.createdBy = user;
+          submittedAction.visibility = visibility;
+
+          ActionModel.create(submittedAction, innerCallback);
+        }
+      ],
+      function(err, validatedAction){
+        if (silentValidationFail){
+          return callback(null, validatedAction);
+        }
+        return callback(err, validatedAction);
       }
-      
-      // If we've gotten here, either there was no actionResult
-      // or the item wasn't equivalent
-      submittedAction._id = new ObjectId();
-      submittedAction.createdBy = user;
-      submittedAction.visibility = visibility;
-
-      ActionModel.create(submittedAction, function(err, createdAction){
-        return callback(err, createdAction);
-      });  
-    });
+    )
   } 
 );
 
@@ -401,6 +416,7 @@ ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, act
 
 /************************** MIDDLEWARE ***************************/
 
+
 /**
  *  Validate cycle states
  *
@@ -475,6 +491,106 @@ ActionSchema.pre('save', function(next){
 
   return next();
 });
+
+
+
+/**
+ *  Validate cycle state messages
+ */
+ActionSchema.pre('save', function(next){
+  var Control = require('./control'),
+      ControlSchema = Control.schema,
+      ControlModel = Control.model,
+      action = this;
+
+  
+  async.waterfall([
+      function getControlName(innerCallback){
+        if (!action.control){
+          return innerCallback(null, '');
+        }
+        if (action.control.schema === ControlSchema){
+          return innerCallback(null, action.control.name);
+        } else {
+          ControlModel.findById(action.control)
+          .exec(function(err, controlResult){
+            if (err) { return innerCallback(err);}
+            return innerCallback(null, controlResult.name);
+          });
+        }
+      },
+      function (controlName, innerCallback){
+        action.cycle.states.forEach(function(state){
+          if (!state.message){
+            if (controlName && state.controlValue){
+              state.message = "Turn " + controlName + " " + (state.controlValue === '0' ? "off" : "on");
+            } else {
+              // no control, no message. Hopefully there's a duration. It's a waiting state!
+              state.message = "Wait";
+            }
+
+            if (state.duration){
+              state.message += " for " + state.duration + " " + state.durationType; 
+            }
+          } 
+        });
+        return innerCallback();
+      }
+    ],
+    function(err){
+      return next(err);
+    }
+  );
+});
+
+/**
+ *  Validate description
+ */
+ActionSchema.pre('save', function(next){
+  var Control = require('./control'),
+      ControlSchema = Control.schema,
+      ControlModel = Control.model,
+      action = this;
+
+  if (this.description){
+    return next();
+  }
+    
+  async.waterfall(
+    [
+      function getControlName(innerCallback){
+        if (!action.control){
+          return innerCallback();
+        }
+
+        if (action.control.schema === ControlSchema){
+          return innerCallback(null, action.control.name);
+        } else {
+          ControlModel.findById(action.control)
+          .exec(function(err, controlResult){
+            if (err) { return innerCallback(err);}
+            return innerCallback(controlResult.name);
+          });
+        }
+      },
+      function (controlName, innerCallback){
+        if (controlName && action.cycle.states.length > 1){
+          action.description = controlName + " cycle";
+        }
+
+        if (!action.description){
+          action.description = action.states[0].message || (action.states[1] ? action.states[1].message : '') || "No action description";  
+        }
+        
+        return next();
+      }
+    ],
+    function(err, results){
+      return next(err);
+    }
+  );
+});
+
 
 /************************** END MIDDLEWARE ***************************/
 

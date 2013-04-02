@@ -116,9 +116,14 @@ GrowPlanSchema.pre('save', function(next){
 	// Ensure unique names across phases
 	for (var i = 0, length = phases.length; i < length; i++){
 		var phaseName = phases[i].name;
+
+    if (!phaseName){
+      phases[i].name = feBeUtils.getOrdinal(i);
+    }
+
 		for (var j = i+1; j < length; j++){
 			if (phaseName === phases[j].name){
-				return next(new Error("Duplicate phase name. Phases in a grow plan must have unique names."));
+				return next(new Error("Duplicate phase name \"" + phaseName + "\". Phases in a grow plan must have unique names."));
 			}
 		}
 	}
@@ -166,7 +171,6 @@ GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){
 		day : phases[length - 1].expectedNumberOfDays
 	};
 });
-
 
 
 /************************** END INSTANCE METHODS  ***************************/
@@ -259,12 +263,14 @@ GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
  * @param {object} options.growPlan : fully-populated grow plan POJO
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, GrowPlan)} callback : Returns the GrowPlanModel object (the document from the database, not a POJO)
  */
 GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedGrowPlan = options.growPlan,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       GrowPlanModel = this;
 
 
@@ -300,46 +306,54 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
                 PlantModel.createNewIfUserDefinedPropertiesModified({
                   plant : plant,
                   user : user,
-                  visibility : visibility
+                  visibility : visibility,
+                  silentValidationFail : silentValidationFail
                 },
                 function(err, validatedPlant){
-                  if (err) { return plantCallback(err); }
-                  validatedPlants.push(validatedPlant);
-                  return plantCallback();
+                  if (validatedPlant){
+                    validatedPlants.push(validatedPlant);    
+                  }
+                  if (silentValidationFail){
+                    return plantCallback();  
+                  }
+                  return plantCallback(err);
                 });
               },
               function plantLoopEnd(err){
-                if (err) { return innerCallback(err); }
                 submittedGrowPlan.plants = validatedPlants;
-                return innerCallback();
+                return innerCallback(err);
               }
             );
           },
           function phasesCheck(innerCallback){
+            var validatedPhases = [];
+
             async.forEach(submittedGrowPlan.phases, 
               function (phase, phaseCallback){
                 PhaseSchema.statics.createNewIfUserDefinedPropertiesModified(
                   {
                     phase : phase,
                     user : user,
-                    visibility : visibility
+                    visibility : visibility,
+                    silentValidationFail : silentValidationFail
                   },
                   function(err, validatedPhase){
-                    return phaseCallback();  
+                    if (validatedPhase){
+                      validatedPhases.push(validatedPhase);
+                    }
+                    return phaseCallback(err);  
                   }
                 );            
               },
               function phaseLoopEnd(err){
-                return innerCallback();
+                return innerCallback(err);
               }
             );
           }
         ],
         function(err, results){
           // at this point, everything should have valid, saved referenced documents
-          var newGrowPlan = new GrowPlanModel(submittedGrowPlan);
-          newGrowPlan.save(callback);
-          //.create(submittedGrowPlan, callback);
+          var newGrowPlan = GrowPlanModel.create(submittedGrowPlan, callback);
         }
       );
     });

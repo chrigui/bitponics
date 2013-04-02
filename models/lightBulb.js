@@ -6,10 +6,11 @@ var mongoose = require('mongoose'),
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
+  async = require('async'),
   feBeUtils = requirejs('fe-be-utils');
 
 var LightBulbSchema = new Schema({
-	type: { type : String, required : true },
+	type: { type : String },
 	watts: { type : Number },
 	brand : { type : String },
 	name : { type : String },
@@ -61,33 +62,50 @@ LightBulbSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.lightBulb
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
  */
 LightBulbSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedLightBulb = options.lightBulb,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       LightBulbModel = this;
 
-    LightBulbModel.findById(submittedLightBulb._id, function(err, lightBulbResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedLightBulb._id)){
+            return innerCallback(null, null);
+          } 
+          
+          LightBulbModel.findById(submittedLightBulb._id, innerCallback);
+        },
+        function (matchedLightBulb, innerCallback){
+          if (matchedLightBulb && LightBulbModel.isEquivalentTo(submittedLightBulb, matchedLightBulb)){
+            return callback(null, matchedLightBulb);
+          }
+          
+          // If we've gotten here, either there was no matchedLightBulb
+          // or the item wasn't equivalent
+          submittedLightBulb._id = new ObjectId();
+          submittedLightBulb.createdBy = user;
+          submittedLightBulb.visibility = visibility;
 
-      if (lightBulbResult && LightBulbModel.isEquivalentTo(submittedLightBulb, lightBulbResult)){
-        return callback(null, lightBulbResult);
+          LightBulbModel.create(submittedLightBulb, innerCallback);
+        }
+      ],
+      function(err, validatedLightBulb){
+        if (silentValidationFail){
+          return callback(null, validatedLightBulb);
+        }
+        return callback(err, validatedLightBulb);
       }
-      
-      // If we've gotten here, either there was no lightBulbResult
-      // or the item wasn't equivalent
-      submittedLightBulb._id = new ObjectId();
-      submittedLightBulb.createdBy = user;
-      submittedLightBulb.visibility = visibility;
-
-      LightBulbModel.create(submittedLightBulb, function(err, createdLightBulb){
-        return callback(err, createdLightBulb);
-      });  
-    });
+    );
   } 
 );
+
+
 /*********************** END STATIC METHODS **************************/
 
 exports.schema = LightBulbSchema;

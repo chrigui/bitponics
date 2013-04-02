@@ -78,6 +78,20 @@ define(['moment'], function(moment){
     ]
   };
 
+  
+  /**
+   * Checks whether the provided string matches the ObjectId format.
+   * Used when checking user-generated _id's, to avoid parse exceptions when passing them to 
+   * MongooseModel.findById
+   * 
+   * @param {string|ObjectId} str. String or object to test for parsability.
+   * @return {bool}
+   */
+  utils.canParseAsObjectId = function(str){
+    if (!str) { return false; }
+    return /^[0-9a-fA-F]{24}$/.test(str.toString());
+  };
+
   /**
    *
    * @param str
@@ -170,6 +184,16 @@ define(['moment'], function(moment){
       duration : transformedDuration,
       durationType : 'seconds'
     }
+  };
+
+
+  utils.getOrdinal = function(number){
+    var b = number % 10;
+    var output = (~~ (number % 100 / 10) === 1) ? 'th' :
+        (b === 1) ? 'st' :
+        (b === 2) ? 'nd' :
+        (b === 3) ? 'rd' : 'th';
+    return number + output;
   };
 
   return utils;

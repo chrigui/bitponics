@@ -115,12 +115,14 @@ IdealRangeSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.idealRange
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, IdealRange)} callback
  */
 IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedIdealRange = options.idealRange,
     user = options.user,
-    visibility = options.visibility;
+    visibility = options.visibility,
+    silentValidationFail = options.silentValidationFail;
 
   async.parallel(
     [
@@ -130,12 +132,14 @@ IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
         ActionModel.createNewIfUserDefinedPropertiesModified({
           action : submittedIdealRange.actionBelowMin,
           user : user,
-          visibility : visibility
+          visibility : visibility,
+          silentValidationFail : silentValidationFail
         },
         function(err, validatedAction){
-          if (err) { return innerCallback(err); }
-          submittedIdealRange.actionBelowMin = validatedAction._id;
-          return innerCallback();
+          if (validatedAction){
+            submittedIdealRange.actionBelowMin = validatedAction._id;  
+          }
+          return innerCallback(err);
         });
       },
       function validateActionAboveMax(innerCallback){
@@ -144,18 +148,37 @@ IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
         ActionModel.createNewIfUserDefinedPropertiesModified({
           action : submittedIdealRange.actionAboveMax,
           user : user,
-          visibility : visibility
+          visibility : visibility,
+          silentValidationFail : silentValidationFail
         },
         function(err, validatedAction){
-          if (err) { return innerCallback(err); }
-          submittedIdealRange.actionAboveMax = validatedAction._id;
-          return innerCallback();
+          if (validatedAction){
+            submittedIdealRange.actionAboveMax = validatedAction._id;  
+          }
+          return innerCallback(err);
         });
       },
     ],
     function parallelEnd(err, results){
+      
       // force mongoose to create a new _id
+      // TODO : investigate whether this is the right thing to do
       delete submittedIdealRange._id;
+
+      if (silentValidationFail){
+        if (err || 
+            !submittedIdealRange.actionAboveMax || 
+            !submittedIdealRange.actionBelowMin ||
+            !submittedIdealRange.sCode || 
+            !submittedIdealRange.valueRange ||
+            !submittedIdealRange.valueRange.min || 
+            !submittedIdealRange.valueRange.max
+          ){
+          return callback();
+        }
+        return callback(null, submittedIdealRange);
+      }
+      
       return callback(err, submittedIdealRange);
     }
   );
