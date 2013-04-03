@@ -46,6 +46,8 @@ bpn.pages.dashboard = {
                 className = 'phase' + index,
                 phaseGroup;
 
+            ghettoHackVar = className;
+
             var phaseDaySummaries = [];
             for (var i = 0; i < phase.phase.expectedNumberOfDays; i++){
                 var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
@@ -74,14 +76,59 @@ bpn.pages.dashboard = {
                     .attr('id', function(d,i){
                         return 'phase'+i;}+phase._id)*/
 
-            var sel = phaseGroup.selectAll('path')
+           /* var sel = phaseGroup.selectAll('path')
                 .data(equalPie(phaseDaySummaries))
+                //.attr('class',)
                 .enter()
                     .append('svg:path')
                     .attr('d', arc)
                     .attr('stroke', '#fff')
                     .attr('stroke-width', 1)
-                    .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+                    .attr('fill', bpn.pages.dashboard.getPhaseFillColor)
+                    .append("svg:text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + arc.centroid(d) + ")"; 
+                        })
+                        .attr("dy", ".35em")
+                        .attr("text-anchor", "middle")
+                        .text(function(d, i) { return "TEST " + i });*/
+
+            var allArcs = phaseGroup.selectAll('path')
+                .data(equalPie(phaseDaySummaries));
+
+            allArcs
+                .enter()
+                    .append('svg:g')
+                        .attr('id', function(d, i) {
+                            return ghettoHackVar+'-arc'+i;
+                        } )
+                        .append('svg:path')
+                            .attr('d', arc)
+                            .attr('stroke', '#fff')
+                            .attr('stroke-width', 1)
+                            .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+            allArcs
+                .on('click', function(d, i) {
+                    var barberPole = $('.barberPolePattern');
+                    var angle = d.startAngle + ((d.endAngle - d.startAngle)/2);
+
+                    barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+                    barberPole.css('mask', 'url(#mask-'+$(this).attr('id')+')');
+
+                    $(this).append($('.barberPolePattern'));
+                });
+
+            var allMasks = svg.append('defs')
+                .data(equalPie(phaseDaySummaries))
+                    .append('svg:mask')
+                        .append('svg:path')
+                        .attr('id', function(d, i) {
+                            return 'mask-'+ghettoHackVar+'-arc'+i;
+                        } )
+                        .attr('d', arc)
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 1)
+                        .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
         });
         
 
@@ -165,10 +212,18 @@ bpn.pages.dashboard = {
             .data(pie(cycleGraphData))
             .enter()
                 .append('svg:path')
-                .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', bpn.pages.dashboard.getControlFillColor);
+                    .attr('d', arc)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    .attr('fill', bpn.pages.dashboard.getControlFillColor)
+                    /*.append("svg:text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + arc.centroid(d) + ")"; 
+                        })
+                        .attr("dy", ".35em")
+                        .attr("text-anchor", "middle")
+                        .text(function(d, i) { return "TEST " + i });*/
+
         });
     },
     initEventHandlers : function(){
@@ -370,6 +425,7 @@ bpn.pages.dashboard = {
         var svg = d3.select(target).append('svg:svg'),
             numBars = 10,
             startLoc = 0,
+            totalHeight = ((barWidth*numBars)+(barSpacing*(numBars-1))),
             //startLoc = ((barWidth*numBars) + (barSpacing*numBars))/-2,
             bar,
             barGroup;
@@ -383,8 +439,8 @@ bpn.pages.dashboard = {
         for (var i = 0; i<10; i++) {
             barGroup
                 .append("svg:rect")
-                    .attr('x', 0)
-                    .attr('y', (startLoc + (barWidth*i) + (barSpacing*i)))
+                    .attr('x', (totalHeight / -2))
+                    .attr('y', ((startLoc + (barWidth*i) + (barSpacing*i)) + (totalHeight / -2)  ) )
                     .attr('width', barLength)
                     .attr('height', barWidth);
         }
@@ -444,13 +500,22 @@ for(var i=0; i<100; i++){
     };
 }
 
+Math.radians = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+ 
+Math.degrees = function(radians) {
+  return radians * 180 / Math.PI;
+};
+
+
 $(function () {
     bpn.pages.dashboard.drawPhaseGraphs();
     bpn.pages.dashboard.drawControlGraphs();
     bpn.pages.dashboard.initEventHandlers();
     bpn.pages.dashboard.drawSparkGraph($('#footer').get(0), dataSet, 35, 55, 0.1);
     bpn.pages.dashboard.makeDayProgressClock($('#phases-graph svg').get(0), 200, 10);
-    bpn.pages.dashboard.drawBarSet($('#footer').get(0), 30, 500, 20);
+    bpn.pages.dashboard.drawBarSet($('#footer').get(0), 20, 500, 15);
 });
 
 
