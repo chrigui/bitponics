@@ -220,7 +220,7 @@ async = require('async');
         },
         function(err, gpi){
           should.not.exist(err);
-          should.exist(gpi);
+          should.exist(gpi, 'gpi should be returned from create');
           gpi.should.be.an.instanceof(GrowPlanInstance);
           should.exist(gpi.active);
           should.exist(gpi.device);

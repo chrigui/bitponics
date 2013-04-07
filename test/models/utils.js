@@ -245,20 +245,17 @@ describe('Model Utils', function(){
             var device = new DeviceModel({
               macAddress : "123456654321",
               deviceType : "506de2fe8eebf7524342cb37",
-              owner : self.user,
-
+              owner : self.user
             });
             device.save(function(err, deviceResult){
               should.not.exist(err);
               
               should.exist(deviceResult, 'newly created device should exist');
 
-              self.device = deviceResult;
-              self.device.owner.equals(self.user._id).should.equal(true, 'device should be paired to owner')
+              deviceResult.owner.equals(self.user._id).should.equal(true, 'device should be paired to owner')
 
               self.gpi.pairWithDevice({
-                deviceId : self.device._id,
-                saveGrowPlanInstance : true
+                deviceId : deviceResult._id
               },
               innerCallback
               )
@@ -281,6 +278,8 @@ describe('Model Utils', function(){
             user : self.user,
             device : self.device
           };
+
+          console.log('imm ac set', immediateActionSettings)
 
           ModelUtils.triggerImmediateAction(
             immediateActionSettings,

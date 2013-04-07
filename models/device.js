@@ -160,6 +160,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
       GrowPlanModel = GrowPlan.model,
       getObjectId = require('./utils').getObjectId,
       now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
       deviceOwner,
       activeGrowPlanInstance,
       newDeviceStatus = {};
@@ -173,11 +174,11 @@ DeviceSchema.method('refreshStatus', function(callback) {
     [
       function getGrowPlanInstance(innerCallback){
         if (device.activeGrowPlanInstance.schema === GrowPlanInstanceSchema){
-          return innerCallback(device.activeGrowPlanInstance);
+          return innerCallback(null, device.activeGrowPlanInstance);
         }
 
         GrowPlanInstanceModel
-        .findById(device.activeGrowPlanInstance)
+        .findById(getObjectId(device.activeGrowPlanInstance))
         .exec(innerCallback);
       },
       
@@ -221,15 +222,15 @@ DeviceSchema.method('refreshStatus', function(callback) {
         // on phase transitions?
         if (activeGrowPlanPhase.expectedNumberOfDays){
           newDeviceStatus.expires = 
-            now + 
+            nowAsMilliseconds + 
             (
               (activeGrowPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
-              (now - activeGrowPlanInstancePhase.startDate)
+              (nowAsMilliseconds - activeGrowPlanInstancePhase.startDate)
             );
         } else {
           // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
           // Make the device check back in in a year anyway.
-          newDeviceStatus.expires = now + (365*24*60*60*1000);
+          newDeviceStatus.expires = nowAsMilliseconds + (365*24*60*60*1000);
         }      
 
         return innerCallback();
@@ -247,7 +248,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
           var conflictingImmediateActionIds = [],
             conflictingImmediateActionIndices = [],
             existingImmediateActionControls = {},
-            soonestImmediateActionExpiration = now + (365 * 24 * 60 * 60 * 1000);
+            soonestImmediateActionExpiration = nowAsMilliseconds + (365 * 24 * 60 * 60 * 1000);
             
           // first, ensure that the results are clean. immediateActionResults are returned sorted by
           // descending timeRequested, so the last ones in take precedence.
@@ -268,7 +269,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
 
           if (conflictingImmediateActionIds.length > 0){
             // Expire all the expired ImmediateActions. Deciding not to wait on the result to move forward
-            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : now - 1000 }).exec();
+            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }).exec();
 
             conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
               // since we're removing elements from the target array as we go,
@@ -345,12 +346,10 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       DeviceModel = this.model(this.constructor.modelName),
       getObjectId = require('./utils').getObjectId,
       now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
       deviceOwner,
       cyclesResponseBody = ''
       statusResponseBody = '';
-
-
-  console.log("GET STASTUS RESPONSE", device.status);
 
   async.waterfall(
     [

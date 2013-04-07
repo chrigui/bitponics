@@ -286,11 +286,12 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
   // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
   // get time elapsed from localized phase start
   // divide time elapsed by overall timespan. remainder is a component of the offset
-  var phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
+  var fromDateAsMilliseconds = (fromDate instanceof Date) ? fromDate.valueOf() : fromDate,
+      phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
   // get the midnight of the start date
-    phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+    phaseStartDate = growPlanInstancePhase.startDate.valueOf() - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
     overallCycleTimespan = action.overallCycleTimespan,
-    phaseTimeElapsed = fromDate - phaseStartDate,
+    phaseTimeElapsed = fromDateAsMilliseconds - phaseStartDate,
     cycleRemainder = overallCycleTimespan - (phaseTimeElapsed % overallCycleTimespan);
 
   return cycleRemainder;

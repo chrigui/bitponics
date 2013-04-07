@@ -113,7 +113,8 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
 GrowPlanInstanceSchema.static('create', function(options, callback) {
   var gpiInitData = {
     owner : options.owner,
-    users : options.users || [options.owner]
+    users : options.users || [options.owner],
+    device : options.device
   };
   if (options._id){
     gpiInitData._id = options._id;
@@ -124,8 +125,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
   var gpi = new GrowPlanInstanceModel(gpiInitData);
  
-  async.parallel([
-      function (innerCallback){
+  async.series([
+      function initGrowPlanData (innerCallback){
         GrowPlanModel.findById(options.growPlan, function(err, growPlan){
           if (err) { return innerCallback(err); }
           if (!growPlan) { return innerCallback(new Error('Invalid grow plan id')); }
@@ -135,30 +136,24 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           growPlan.phases.forEach(function(phase){
             gpi.phases.push({ phase : phase._id});
           });
+
           return innerCallback();
         });
-      },
-      function (innerCallback){
-        if (!options.device) { return innerCallback(); }
-
-        gpi.pairWithDevice({
-          deviceId : getObjectId(options.device),
-          saveGrowPlanInstance : false
-        }, innerCallback);
       }
     ],
     function(err, results){
       if (err) { return callback(err); }
 
-      gpi.save(function(err){
+      gpi.save(function(err, createdGrowPlan){
         if (err) { return callback(err); }
 
-        winston.info('Created new gpi for user ' + options.owner + ' gpi id ' + gpi._id);
+        winston.info('Created new gpi for user ' + createdGrowPlan.owner + ' gpi id ' + createdGrowPlan._id);
+       
         if (!options.active){
-          return callback(err, gpi);
+          return callback(err, createdGrowPlan);
         }
          
-        return gpi.activate({ 
+        return createdGrowPlan.activate({ 
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
@@ -208,23 +203,17 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
           [
             function(innerCallback){
               deviceResult.activeGrowPlanInstance = gpi;
-              
-              deviceResult.save(innerCallback);
+              deviceResult.refreshStatus(innerCallback);
             },
             function(innerCallback){
               gpi.device = deviceResult._id;
-
-              if (options.saveGrowPlanInstance){
-                gpi.save(innerCallback)
-              } else {
-                innerCallback(null, [gpi]);
-              }
+              gpi.save(innerCallback);
             }
           ],
           function(err, results){
             if (err) { return callback(err); }
             var data = {
-              device : results[0][0],
+              device : results[0],
               growPlanInstance : results[1][0]
             };
             return callback(null, data);
@@ -256,7 +245,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
     gpi.save(function (err){
       if (err) { return callback(err);}
 
-      async.parallel([
+      async.waterfall([
         function (innerCallback){
           gpi.activatePhase({
             phaseId : activePhaseId,
@@ -265,18 +254,17 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           },
           innerCallback);
         },
-        function (innerCallback){
-          if (!gpi.device){ return innerCallback();}
+        function (gpiWithActivePhase, innerCallback){
+          if (!gpiWithActivePhase.device){ return innerCallback(null, gpiWithActivePhase); }
 
-          gpi.pairWithDevice({
-            deviceId : getObjectId(gpi.device),
-            saveGrowPlanInstance : false
+          gpiWithActivePhase.pairWithDevice({
+            deviceId : getObjectId(gpiWithActivePhase.device)
           },
           innerCallback);
         }
       ],
-      function(err, results){
-        return callback(err, gpi);
+      function(err, activatedGPI){
+        return callback(err, activatedGPI);
       }
     );
   });
@@ -611,8 +599,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       }
     ],
     function(err, results){
-      if (err) { return callback(err);}
-      return callback();
+      return callback(err, growPlanInstance);
     }
   );
 });

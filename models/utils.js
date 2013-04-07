@@ -162,7 +162,8 @@ function triggerImmediateAction(options, callback){
 
     // calculate when the immediateAction should expire.
     var now = new Date(),
-        expires = now + (365 * 24 * 60 * 60 * 1000),
+        nowAsMilliseconds = now.valueOf(),
+        expires = nowAsMilliseconds + (365 * 24 * 60 * 60 * 1000),
         actionHasDeviceControl = false;
 
     async.series(
@@ -192,7 +193,7 @@ function triggerImmediateAction(options, callback){
               if (err) { return innerCallback(err);}
               if (!actionResult){ return innerCallback(); }
               var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-              expires = now.valueOf() + cycleRemainder;
+              expires = nowAsMilliseconds + cycleRemainder;
               return innerCallback();  
             });
 
@@ -212,7 +213,7 @@ function triggerImmediateAction(options, callback){
                   if (err) { return innerCallback(err);}
                   if (!actionResult){ return innerCallback(); }
                   var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-                  expires = now.valueOf() + cycleRemainder;
+                  expires = nowAsMilliseconds + cycleRemainder;
                   return innerCallback();  
                 });
               }
@@ -296,7 +297,8 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
       winston = require('winston');
 
   var now = new Date(),
-      tomorrow = new Date(now + (24 * 60 * 60 * 1000));
+      nowAsMilliseconds = now.valueOf(),
+      tomorrow = new Date(nowAsMilliseconds + (24 * 60 * 60 * 1000));
 
     GrowPlanInstanceModel
     .find()
@@ -368,7 +370,8 @@ function clearPendingNotifications (NotificationModel, callback){
       async = require('async'),
       winston = require('winston');
 
-  var now = new Date();
+  var now = new Date(),
+      nowAsMilliseconds = now.valueOf();
   NotificationModel
   .find()
   .where('tts')
