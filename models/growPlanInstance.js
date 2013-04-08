@@ -36,17 +36,42 @@ var GrowPlanInstanceSchema = new Schema({
 
   active: { type: Boolean },
 
-	phases: [{
-		phase: Schema.Types.ObjectId, // ObjectId of GrowPlan.Phase
-		startDate: { type: Date }, // actual date the phase was started. null/undefined if not yet started
-		endDate: { type: Date }, // actual date the phase was ended. null/undefined if not yet ended
-		/**
-		 * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
-		 * used by the worker process to query & notify of impending phase advancement
-		 */
-		expectedEndDate : { type : Date }, 
-		active: { type: Boolean }
-	}],
+  phases: [{
+    /**
+     * ObjectId of GrowPlan.Phase
+     */
+    phase: Schema.Types.ObjectId,
+
+
+    /**
+     * actual date the phase was started. null/undefined if not yet started
+     */
+    startDate: { type: Date },
+
+    /**
+     * Day of the GrowPlan phase on which this GPI Phase started.
+     * 0-based.
+     * Allows for saying "I started on day 5 of this phase"
+     */
+    startedOnDay : { type : Number, default : 0 },
+
+    /**
+     * actual date the phase was ended. null/undefined if not yet ended
+     */
+    endDate: { type: Date },
+
+    /**
+     * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
+     * used by the worker process to query & notify of impending phase advancement
+     */
+    expectedEndDate : { type : Date },
+
+    /**
+     * Whether the phase is currently active. Should be max 1 phase active at a time.
+     */
+    active: { type: Boolean }
+  }],
+
 
 	// not in use yet, but this will be how a user configures the view on their Dashboard
 	settings : {
@@ -170,6 +195,41 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
 
 /************** INSTANCE METHODS ********************/
+
+
+/**
+ * Given a target date, get the number of days elapsed since phase start.
+ * Since phase starts are always normalized to the localized 00:00 of the user's timezone,
+ * we can be sure we're getting a useful number here.
+ *
+ * @param {GrowPlanInstancePhase} growPlanInstancePhase
+ * @param {Date|Number} targetDate
+ *
+ */
+GrowPlanInstanceSchema.method('getPhaseDay', function(growPlanInstancePhase, targetDate){
+    var moment = require('moment'),
+        phaseStart = moment(growPlanInstancePhase.startDate).subtract('days', growPlanInstancePhase.startedOnDay),
+        target = moment(targetDate);
+
+    return target.diff(phaseStart, 'days');
+});
+
+
+/**
+ * Given the id of a GrowPlan Phase, return the GrowPlanInstance phase object
+ * 
+ * @param {ObjectId} growPlanPhaseId
+ * @return {GrowPlanInstancePhase}
+ */
+GrowPlanInstanceSchema.method('getPhaseByGrowPlanPhaseId', function(growPlanPhaseId) {
+    for (var i = this.phases.length; i--;){
+      if (this.phases[i].phase.equals(growPlanPhaseId)){
+        return this.phases[i];
+      }
+    }
+});
+
+
 
 /**
  * Pair a device with this grow plan instance.
@@ -326,7 +386,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           growPlanInstance.phases.forEach(function(phase){
             if (phase.phase.equals(phaseId)){
               phase.active = true;
-              phase.startDate = now; 
+              phase.startDate = now;
+              phase.startedOnDay = phaseDay;
               phase.expectedEndDate = now.valueOf() + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
             } else {
               if (phase.active == true){

@@ -252,10 +252,41 @@ async = require('async');
 
     describe('#activate', function(){
       
-    });
+    }); // /#activate
     
 
     describe('#activatePhase', function(){
       
-    });
+    }); // /#activatePhase
+
+
+    describe('#getPhaseDay', function(){
+      it('retrieves expected day of a growPlanInstance phase, offset by phase.startedOnDay', function(done){
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
+          owner : '506de30a8eebf7524342cb6c',
+          active : true,
+          activePhaseId : '506de3048eebf7524342cb4f', // Vegetative phase
+          activePhaseDay : 3
+        },
+        function(err, gpi){
+          should.not.exist(err);
+          should.exist(gpi);
+          gpi.should.be.an.instanceof(GrowPlanInstance);
+          should.exist(gpi.active);
+        
+          var today = new Date(),
+              todayDateString = today.toDateString(),
+              foundActivePhase = false;
+        
+          var gpiPhase = gpi.getPhaseByGrowPlanPhaseId("506de3048eebf7524342cb4f");
+
+          // since we started on day 3 of the phase, getting phaseDay with today
+          // as a target date should return 3
+          gpi.getPhaseDay(gpiPhase, today).should.equal(3);
+
+          return done();
+        });
+      });
+    }); // /#getPhaseDay
 });
