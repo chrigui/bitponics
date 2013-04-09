@@ -12,7 +12,7 @@ function logSensorLog(options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
       SensorLogModel = require('./sensorLog').model,
-      requirejs = require('../../lib/requirejs-wrapper'),
+      requirejs = require('../lib/requirejs-wrapper'),
       feBeUtils = requirejs('fe-be-utils');
 
   var pendingSensorLog = options.pendingSensorLog,
@@ -27,6 +27,10 @@ function logSensorLog(options, callback){
     pendingSensorLog.gpi = growPlanInstance._id;
   }
 
+  if (!(pendingSensorLog instanceof SensorLogModel)) {
+    pendingSensorLog = new SensorLogModel(pendingSensorLog);
+  }
+
   if (!pendingSensorLog.ts){
     pendingSensorLog.ts = new Date();
   }
@@ -35,17 +39,20 @@ function logSensorLog(options, callback){
     [
     function parallel1(innerCallback){
       if (!device){ return innerCallback(); }
-      device.recentSensorLogs.unshift(pendingSensorLog);
+      // for some goddamn mysterious reason, unshift is causing pendingSensorLog.logs to 
+      // be an empty array when persisted to device.recentSensorLogs. 
+      // Only push is getting the whole thing in. Gotta
+      // abandon desc-sorted recentSensorLogs for now because of that
+      device.recentSensorLogs.push(pendingSensorLog);
       device.save(innerCallback);
     },
     function parallel2(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
-      growPlanInstance.recentSensorLogs.unshift(pendingSensorLog);          
+      growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
       growPlanInstance.save(innerCallback);
     },
     function parallel3(innerCallback){
-      var sensorLog = new SensorLogModel(pendingSensorLog);
-      sensorLog.save(innerCallback);
+      pendingSensorLog.save(innerCallback);
     },
     function parallel4(innerCallback){
       if (!growPlanInstance) { return innerCallback();}

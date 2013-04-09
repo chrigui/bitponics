@@ -57,7 +57,7 @@ var SensorLogSchema = new Schema({
     /**
      * logs
      */
-    l : [SensorReadingSchema]
+    l : [ SensorReadingSchema ]
 },
 { id : false });
 

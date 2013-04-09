@@ -334,7 +334,7 @@ feBeUtils = requirejs('fe-be-utils');
           {
             growPlanInstancePhase : gpiPhase,
             date : today,
-            phaseDaySummary : phaseDaySummary
+            daySummary : phaseDaySummary
           },
           function(err, updatedGrowPlanInstance){
             should.not.exist(err);

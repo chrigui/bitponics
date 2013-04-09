@@ -65,7 +65,7 @@ var DeviceSchema = new Schema({
     
     outputMap : [ OutputMapSchema ],
     
-    recentSensorLogs : [SensorLogSchema],
+    recentSensorLogs : [ SensorLogSchema ],
   
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
@@ -455,7 +455,7 @@ DeviceSchema.static('logCalibration', function(settings, callback) {
     [
       function (innerCallback){
         DeviceModel.findOne({ macAddress: macAddress })
-        .select("-users -userAssignmentLogs -sensorMap -outputMap -recentSensorLogs -activeGrowPlanInstance -status")
+        .select("_id")
         .exec(innerCallback);
       },
       function (device, innerCallback){
@@ -546,9 +546,8 @@ DeviceSchema.pre('save', function(next){
    }
    */
   
-
   device.recentSensorLogs.forEach(function(log){
-    if (log.ts < cutoff) { logsToRemove.push(log); }
+    if (log.ts.valueOf() < cutoff) { logsToRemove.push(log); }
   });
 
   logsToRemove.forEach(function(log){

@@ -275,14 +275,14 @@ GrowPlanInstanceSchema.method('getPhaseByGrowPlanPhaseId', function(growPlanPhas
  *
  * @param {GrowPlanInstancePhase} settings.growPlanInstancePhase
  * @param {Date} settings.date
- * @param {PhaseDaySummary} settings.phaseDaySummary
+ * @param {PhaseDaySummary} settings.daySummary
  * @param {function(err, GrowPlanInstance)} callback : function called after GPI has been modified and saved
  */
 GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callback) {
   var gpi = this,
       growPlanInstancePhase = settings.growPlanInstancePhase,
       date = settings.date,
-      submittedPhaseDaySummary = settings.phaseDaySummary,
+      submittedPhaseDaySummary = settings.daySummary,
       phaseDay = gpi.getPhaseDay(growPlanInstancePhase, date),
       daySummary = growPlanInstancePhase.daySummaries[phaseDay],
       sensorKey;
