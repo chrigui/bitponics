@@ -41,6 +41,8 @@ bpn.pages.dashboard = {
                 .attr('width', width)
                 .attr('height', height);
 
+        //$('#phases-graph').append($('.barberPolePattern'));
+
         $.each(phases, function(index, phase){
             var arc = d3.svg.arc(),
                 className = 'phase' + index,
@@ -109,26 +111,43 @@ bpn.pages.dashboard = {
                             .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
             allArcs
                 .on('click', function(d, i) {
-                    var barberPole = $('.barberPolePattern');
+                    var barberPoleCont = $('.barberPoleCont');
+                    var barberPolePattern = $('.barberPolePattern');
                     var angle = d.startAngle + ((d.endAngle - d.startAngle)/2);
+                    var centroidX = arc.centroid(d)[0] + width/2;
+                    var centroidY = arc.centroid(d)[1] + width/2;
 
-                    barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
-                    barberPole.css('mask', 'url(#mask-'+$(this).attr('id')+')');
+                    barberPolePattern.attr('transform', 'rotate(' + (Math.degrees(angle) + 45) + ')');
 
-                    $(this).append($('.barberPolePattern'));
+                    //barberPole.attr('transform', 'translate(' + centroidX + ',' + centroidY + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+                    barberPoleCont.css('mask', 'url(#mask-'+$(this).attr('id')+')');
+                    barberPoleCont.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+
+                    console.log("WIDTH " + width);
+
+                    //barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+
+                    
                 });
 
-            var allMasks = svg.append('defs')
+            var maskGroup = svg.append('defs').append('g')
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+            var allMasks = maskGroup.selectAll('mask')
                 .data(equalPie(phaseDaySummaries))
+            
+            allMasks
+                .enter()
                     .append('svg:mask')
-                        .append('svg:path')
                         .attr('id', function(d, i) {
                             return 'mask-'+ghettoHackVar+'-arc'+i;
                         } )
-                        .attr('d', arc)
-                        .attr('stroke', '#fff')
-                        .attr('stroke-width', 1)
-                        .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+                        .append('svg:path')
+                            .attr('d', arc)
+                            .attr('stroke', '#fff')
+                            .attr('stroke-width', 1)
+                            .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
         });
         
 
@@ -421,25 +440,26 @@ bpn.pages.dashboard = {
             GlobalThumbTimer = setInterval(globalThumbFunc, 1000);
         }
     },
-    drawBarSet : function (target, barWidth, barLength, barSpacing){
-        var svg = d3.select(target).append('svg:svg'),
-            numBars = 10,
+    drawBarSet : function (target, barWidth, barLength, barSpacing, numBars){
+        var svg,
             startLoc = 0,
             totalHeight = ((barWidth*numBars)+(barSpacing*(numBars-1))),
             //startLoc = ((barWidth*numBars) + (barSpacing*numBars))/-2,
             bar,
             barGroup;
 
+        svg = d3.select(target).append('svg:g').attr('class', 'barberPoleCont');
+
         barGroup = svg
-            .attr('width', barWidth)
+            .attr('width', barLength)
             .attr('height', ((barWidth*numBars)+(barSpacing*(numBars-1))))
                 .append('svg:g')
                 .attr('class', 'barberPolePattern');
 
-        for (var i = 0; i<10; i++) {
+        for (var i = 0; i<numBars; i++) {
             barGroup
                 .append("svg:rect")
-                    .attr('x', (totalHeight / -2))
+                    .attr('x', (barLength / -2))
                     .attr('y', ((startLoc + (barWidth*i) + (barSpacing*i)) + (totalHeight / -2)  ) )
                     .attr('width', barLength)
                     .attr('height', barWidth);
@@ -515,7 +535,7 @@ $(function () {
     bpn.pages.dashboard.initEventHandlers();
     bpn.pages.dashboard.drawSparkGraph($('#footer').get(0), dataSet, 35, 55, 0.1);
     bpn.pages.dashboard.makeDayProgressClock($('#phases-graph svg').get(0), 200, 10);
-    bpn.pages.dashboard.drawBarSet($('#footer').get(0), 20, 500, 15);
+    bpn.pages.dashboard.drawBarSet($('#phases-graph svg').get(0), 20, 2000, 15, 30);
 });
 
 
