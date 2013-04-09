@@ -17,21 +17,36 @@ var mongoose = require('mongoose'),
   
 
 var GrowPlanModel,
-	GrowPlanSchema = new Schema({
-	parentGrowPlanId: { type: ObjectIdSchema, ref: 'GrowPlan' },
-	createdBy: { type: ObjectIdSchema, ref: 'User' },
-	name: { type: String, required: true },
-	description: { type: String, required: true },
-	plants: [{ type: ObjectIdSchema, ref: 'Plant' }],
-	/**
-	 * Nutrients would just be a de-normalized view of the nutrients across the 
-	 * phases. TODO:  decide if we need it as a property here
-	 */
-	//nutrients: [{ type: ObjectId, ref: 'Nutrient' }],
-	//sensors: [{ type: ObjectId, ref: 'Sensor' }],
-	//controls: [{ type: ObjectId, ref: 'Control'}],
-	phases: [PhaseSchema],
-	visibility : { 
+	
+GrowPlanSchema = new Schema({
+	
+  /**
+   * The GrowPlan from which this GrowPlan was branched and customized
+   */
+  parentGrowPlanId: { type: ObjectIdSchema, ref: 'GrowPlan' },
+	
+
+  /**
+   * User that created this GP
+   */
+  createdBy: { type: ObjectIdSchema, ref: 'User' },
+	
+  /**
+   * Name
+   */
+  name: { type: String, required: true },
+	
+
+  description: { type: String, required: true },
+	
+
+  plants: [{ type: ObjectIdSchema, ref: 'Plant' }],
+	
+
+  phases: [PhaseSchema],
+	
+  
+  visibility : { 
     type: String, 
     enum: [
       feBeUtils.VISIBILITY_OPTIONS.PUBLIC, 

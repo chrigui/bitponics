@@ -11,7 +11,9 @@
 function logSensorLog(options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
-      SensorLogModel = require('./sensorLog').model;
+      SensorLogModel = require('./sensorLog').model,
+      requirejs = require('../../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils');
 
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
@@ -23,7 +25,11 @@ function logSensorLog(options, callback){
   if (growPlanInstance){
     activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
     pendingSensorLog.gpi = growPlanInstance._id;
-  } 
+  }
+
+  if (!pendingSensorLog.ts){
+    pendingSensorLog.ts = new Date();
+  }
   
   async.parallel(
     [
@@ -53,19 +59,34 @@ function logSensorLog(options, callback){
         if (!phase){ return new Error('Active phase not found for this grow plan instance'); }
         if (!phase.idealRanges){ return innerCallback();}
         
+
+        var phaseDaySummary = {
+          status : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+          sensorSummaries : {}
+        };
+
         async.forEach(
           pendingSensorLog.logs, 
           function(log, iteratorCallback){
             var idealRange = phase.idealRanges.filter(function(idealRange){ return idealRange.sCode == log.sCode})[0],
                 valueRange,
                 message = '';
+
+            phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
+
             if (!idealRange){ return iteratorCallback(); }
+            
             valueRange = idealRange.valueRange;
+            
             if (log.val < valueRange.min) {
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               
+              phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
+              
               triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
@@ -81,7 +102,12 @@ function logSensorLog(options, callback){
               );
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
+              
+              phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
+              
               triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
@@ -99,7 +125,18 @@ function logSensorLog(options, callback){
               return iteratorCallback(); 
             }
           },
-          innerCallback
+          function(err){
+            if (err) { return innerCallback(err);}
+
+            growPlanInstance.mergePhaseDaySummary(
+              {
+                growPlanInstancePhase : activeGrowPlanInstancePhase,
+                date : pendingSensorLog.ts,
+                daySummary : phaseDaySummary
+              },
+              innerCallback
+            );
+          }
         );
       });
     }

@@ -13,7 +13,35 @@ var mongoose = require('mongoose'),
   DeviceModel = require('./device').model,
   getObjectId = require('./utils').getObjectId,
   SensorLogSchema = require('./sensorLog').schema,
-  i18nKeys = require('../i18n/keys');
+  i18nKeys = require('../i18n/keys'),
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
+
+
+var PhaseDaySummarySchema = new Schema({
+  
+  status : { 
+  
+    type: String, 
+  
+    enum: [
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD
+    ],
+  
+    default: feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD
+  },
+  
+  /**
+   * sensorSummaries is a hash, 
+   * Keys are Sensor.sCode
+   * Values are feBeUtils.PHASE_DAY_SUMMARY_STATUSES
+   */
+  sensorSummaries : Schema.Types.Mixed
+}, 
+{ id : false, _id : false });
+
+
 
 /**
  * GrowPlanInstance 
@@ -69,7 +97,14 @@ var GrowPlanInstanceSchema = new Schema({
     /**
      * Whether the phase is currently active. Should be max 1 phase active at a time.
      */
-    active: { type: Boolean }
+    active: { type: Boolean },
+
+    
+    /**
+     * Summary of each day that's passed in this GPI Phase.
+     * Used in Dashboard display.
+     */
+    daySummaries : [ PhaseDaySummarySchema ]
   }],
 
 
@@ -104,6 +139,8 @@ var GrowPlanInstanceSchema = new Schema({
 			tags: { type : [String]}
 		}]
 	}],
+
+
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
 },
 { id : false });
@@ -229,6 +266,53 @@ GrowPlanInstanceSchema.method('getPhaseByGrowPlanPhaseId', function(growPlanPhas
     }
 });
 
+
+/**
+ * Add a phaseDaySummary to the specified GPI Phase, merging if a summary already exists.
+ * Day summary statuses are by default good and can only turn from good to bad.
+ * 
+ * Saves the GrowPlanInstance.
+ *
+ * @param {GrowPlanInstancePhase} settings.growPlanInstancePhase
+ * @param {Date} settings.date
+ * @param {PhaseDaySummary} settings.phaseDaySummary
+ * @param {function(err, GrowPlanInstance)} callback : function called after GPI has been modified and saved
+ */
+GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callback) {
+  var gpi = this,
+      growPlanInstancePhase = settings.growPlanInstancePhase,
+      date = settings.date,
+      submittedPhaseDaySummary = settings.phaseDaySummary,
+      phaseDay = gpi.getPhaseDay(growPlanInstancePhase, date),
+      daySummary = growPlanInstancePhase.daySummaries[phaseDay],
+      sensorKey;
+
+  if (daySummary){
+    if (submittedPhaseDaySummary.status === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD){
+      daySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+    }
+    
+    for (sensorKey in submittedPhaseDaySummary.sensorSummaries){
+      if (submittedPhaseDaySummary.sensorSummaries.hasOwnProperty(sensorKey)) {
+
+        if (
+            (submittedPhaseDaySummary.sensorSummaries[sensorKey] === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD) 
+            || 
+            (!daySummary.sensorSummaries[sensorKey])
+           ){
+          daySummary.sensorSummaries[sensorKey] = submittedPhaseDaySummary.sensorSummaries[sensorKey];
+        }    
+      }
+    }
+  } else {
+    daySummary = submittedPhaseDaySummary;
+  }
+
+  // http://mongoosejs.com/docs/faq.html
+  growPlanInstancePhase.daySummaries.set(phaseDay, daySummary);
+
+  gpi.save(callback);
+});
 
 
 /**

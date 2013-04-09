@@ -38,7 +38,7 @@ define(['moment'], function(moment){
 
 
   /**
-   * 
+   * Visibility for various user-generated models
    */
   utils.VISIBILITY_OPTIONS = {
     PRIVATE : "private",
@@ -46,6 +46,9 @@ define(['moment'], function(moment){
   };
 
 
+  /**
+   * Used during device sensor calibration
+   */
   utils.CALIB_MODES = {
     "PH_4" : "ph_4",
     "PH_7" : "ph_7",
@@ -54,11 +57,23 @@ define(['moment'], function(moment){
     "EC_HI" : "ec_hi"
   };
   
+  
+  /**
+   * Used during device sensor calibration
+   */
   utils.CALIB_STATUSES = {
     "SUCCESS" : "success",
     "ERROR" : "error"
   };
 
+
+  /**
+   * Used during device sensor calibration
+   */
+  utils.PHASE_DAY_SUMMARY_STATUSES = {
+    "GOOD" : "good",
+    "BAD" : "bad"
+  };
 
   /**
    * Suggestions for auto-complete in UI
