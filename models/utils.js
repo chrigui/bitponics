@@ -72,6 +72,7 @@ function logSensorLog(options, callback){
           sensorSummaries : {}
         };
 
+
         async.forEach(
           pendingSensorLog.logs, 
           function(log, iteratorCallback){
@@ -82,7 +83,6 @@ function logSensorLog(options, callback){
             phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
 
             if (!idealRange){ return iteratorCallback(); }
-            
             valueRange = idealRange.valueRange;
             
             if (log.val < valueRange.min) {

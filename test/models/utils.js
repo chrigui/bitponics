@@ -497,7 +497,7 @@ describe('Model Utils', function(){
           function createGpi(innerCallback){
             GrowPlanInstance.create(
               {
-                growPlan : '506de2ff8eebf7524342cb3a', // 1st phase has a "Light cycle, with lights on between 6am and 10pm.",
+                growPlan : '506de2ff8eebf7524342cb3a', // Tomato grow plan. 1st phase has a "Light cycle, with lights on between 6am and 10pm.",
                 owner : newUserObjectID,
                 active : true,
                 activePhaseDay : 3
@@ -575,7 +575,7 @@ describe('Model Utils', function(){
         logs : [
           {
             sCode : 'ph',
-            val : 6.4
+            val : 6.5
           }
         ]
       };
@@ -649,6 +649,104 @@ describe('Model Utils', function(){
       );
       
     });
+
+
+
+
+
+    it('triggers an immediateAction if the sensorLog violates an idealRange', function(done){
+      var self = this;
+
+      should.exist(this.user, 'user exists');
+      should.exist(this.gpi, 'gpi  exists');
+      should.exist(this.actionId, 'actionId exists');
+      should.exist(this.device, 'device exists');
+
+      var now = new Date();
+
+      var pendingSensorLog = {
+        ts : now,
+        logs : [
+          {
+            sCode : 'air',
+            val : 28 // below idealRange min of 30
+          }
+        ]
+      };
+
+      ModelUtils.logSensorLog(
+        {
+          pendingSensorLog : pendingSensorLog, 
+          growPlanInstance : self.gpi, 
+          device : self.device, 
+          user : self.user 
+        },
+        function(err){
+          // check the SensorLog, Device, & GPI
+          async.parallel(
+            [
+              function checkSensorLog(innerCallback){
+                SensorLogModel.find({ ts : { $gte : now }, gpi : self.gpi._id } )
+                .exec(function(err, sensorLogs){
+                  should.not.exist(err);
+                  should.exist(sensorLogs);
+
+                  sensorLogs[0].ts.toDateString().should.equal(pendingSensorLog.ts.toDateString());
+                  sensorLogs[0].logs[0].sCode.should.equal(pendingSensorLog.logs[0].sCode);
+                  sensorLogs[0].logs[0].val.should.equal(pendingSensorLog.logs[0].val);
+                  
+                  innerCallback();
+                })
+              },
+              function checkDevice(innerCallback){
+                DeviceModel.findById(self.device._id)
+                .exec(function(err, updatedDevice){
+                  should.not.exist(err);
+                  should.exist(updatedDevice);
+
+                  var lastIndex = updatedDevice.recentSensorLogs.length - 1;
+                  updatedDevice.recentSensorLogs[lastIndex].ts.toDateString().should.equal(pendingSensorLog.ts.toDateString());
+                  updatedDevice.recentSensorLogs[lastIndex].logs[0].sCode.should.equal(pendingSensorLog.logs[0].sCode);
+                  updatedDevice.recentSensorLogs[lastIndex].logs[0].val.should.equal(pendingSensorLog.logs[0].val);
+                  
+                  innerCallback();
+                });
+                
+              },
+              function checkGpi(innerCallback){
+                GrowPlanInstance.findById(self.gpi._id)
+                .exec(function(err, updatedGrowPlanInstance){
+                  should.not.exist(err);
+                  should.exist(updatedGrowPlanInstance);
+
+                  var lastIndex = updatedGrowPlanInstance.recentSensorLogs.length - 1;
+                  updatedGrowPlanInstance.recentSensorLogs[lastIndex].ts.toDateString().should.equal(pendingSensorLog.ts.toDateString());
+                  updatedGrowPlanInstance.recentSensorLogs[lastIndex].logs[0].sCode.should.equal(pendingSensorLog.logs[0].sCode);
+                  updatedGrowPlanInstance.recentSensorLogs[lastIndex].logs[0].val.should.equal(pendingSensorLog.logs[0].val);
+                  
+                  // started on phaseDay 3 (0-based), so should have 4 entries in daySummaries
+                  updatedGrowPlanInstance.phases[0].daySummaries.length.should.equal(4);
+
+                  should.exist(updatedGrowPlanInstance.phases[0].daySummaries[3]);
+
+                  updatedGrowPlanInstance.phases[0].daySummaries[3].should.include({status: 'bad', sensorSummaries: { air: 'bad' } });
+                  
+                  innerCallback();
+                });
+              }
+            ],
+            function(err, results){
+              done();  
+            }
+          );
+        }
+      );
+      
+    });
+
+
+
+
   }); // /.logSensorLog
 
 });

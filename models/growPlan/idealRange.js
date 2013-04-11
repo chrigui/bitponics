@@ -45,7 +45,7 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
 	var tz = require('timezone/loaded'),
     applicableTimeSpan = this.applicableTimeSpan;
 	
-  if (!applicableTimeSpan){ return true; }
+  if (!applicableTimeSpan || !applicableTimeSpan.startTime || !applicableTimeSpan.endTime){ return true; }
 	
 	var dateParts = tz(date, userTimezone, '%T').split(':'),
       millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);
