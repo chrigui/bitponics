@@ -1,0 +1,21 @@
+extends layout
+
+block content
+
+  section.header
+      header
+        include /includes/nav/main
+
+  section#main(role="main")
+    div(id="about", class="about content-module middle")
+      h3(class="page-heading nav-section")
+        | About
+      div.page-content
+        p 
+          | bitponics is a NY State LLC, located at 160 South 3rd St, Suite 15, Brooklyn NY 11211.
+        p 
+          | Contact us through our 
+          a(href="/contact") contact page 
+          | or by emailing us directly at 
+          a(href="mailto:hello@bitponics.com") hello@bitponics.com
+          | .

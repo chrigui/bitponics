@@ -45,6 +45,8 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
 	var tz = require('timezone/loaded'),
     applicableTimeSpan = this.applicableTimeSpan;
 	
+  // Not sure of exact reason for this, but Mongoose is storing an empty object for applicableTimeSpan
+  // instead of undefined, so we need to check properties as well
   if (!applicableTimeSpan || !applicableTimeSpan.startTime || !applicableTimeSpan.endTime){ return true; }
 	
 	var dateParts = tz(date, userTimezone, '%T').split(':'),

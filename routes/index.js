@@ -40,7 +40,7 @@ module.exports = function(app){
 	app.get('/about', function (req, res){
 	  var locals = {
     	title: "About",
-    	className: "landing-page about"
+    	className: "landing-page single-page about"
     };
 	  res.render('about', locals);
 	});
@@ -102,6 +102,22 @@ module.exports = function(app){
     };
 	  res.render('getstarted', locals);
 	});
+
+  app.get('/privacy', function (req, res){
+    var locals = {
+      title: "Privacy",
+      className: "landing-page  single-page privacy"
+    };
+    res.render('privacy', locals);
+  });
+
+  app.get('/returns', function (req, res){
+    var locals = {
+      title: "Return",
+      className: "landing-page  single-page returns"
+    };
+    res.render('returns', locals);
+  });
 
 	app.get('/login', 
 		routeUtils.middleware.ensureSecure, 

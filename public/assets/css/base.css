@@ -1009,6 +1009,14 @@ a.btn i {
 section#footer {
   clear: both;
 }
+section#footer div {
+  width: 100%;
+  text-align: center;
+}
+section#footer a {
+  margin: 0 1em;
+  display: inline-block;
+}
 section#footer .content-module {
   background-color: #fff;
 }
@@ -1269,6 +1277,12 @@ section#footer .content-module {
 .slides li {
   position: relative;
   overflow: hidden;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.45, #a4a4a4), color-stop(0.7, #cacecf));
+  background: -webkit-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -moz-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -o-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -ms-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
 }
 .flex-direction-nav {
   position: relative;
