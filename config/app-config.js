@@ -292,19 +292,24 @@ module.exports = function(app){
     app.use(express.errorHandler());
     app.enable('view cache');
 
-    io.enable('browser client minification');  // send minified client
-    io.enable('browser client etag');          // apply etag caching logic based on version number
-    io.enable('browser client gzip');          // gzip the file
-    io.set('log level', 1);
+    app.socketIOs.forEach(function(io){
+    	io.enable('browser client minification');  // send minified client
+	    io.enable('browser client etag');          // apply etag caching logic based on version number
+	    io.enable('browser client gzip');          // gzip the file
+	    io.set('log level', 1);
+    });
+    
   });
 
   app.configure('production', function(){
     app.use(express.errorHandler());
     app.enable('view cache');
 
-    io.enable('browser client minification');  // send minified client
-    io.enable('browser client etag');          // apply etag caching logic based on version number
-    io.enable('browser client gzip');          // gzip the file
-    io.set('log level', 1);
+    app.socketIOs.forEach(function(io){
+    	io.enable('browser client minification');  // send minified client
+	    io.enable('browser client etag');          // apply etag caching logic based on version number
+	    io.enable('browser client gzip');          // gzip the file
+	    io.set('log level', 1);
+    });
   });
 };
