@@ -347,10 +347,12 @@ input[type='checkbox']:checked + label {
   background: #fff !important;
   color: #00e36c !important;
   border: 4px solid #00e36c !important;
-  font-size: 1.5em !important;
+  font-size: 1.2em !important;
 }
 #mc-embedded-subscribe-form input[type=email] {
   width: 70%;
+  background: #fff;
+  border: 1px solid #00e36c;
 }
 #wufoo-form .buttons {
   margin-top: 1em;

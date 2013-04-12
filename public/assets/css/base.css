@@ -1448,6 +1448,9 @@ section#footer .content-module {
 .single-page #main {
   margin: 3em auto !important;
 }
+.single-page .content-module {
+  padding-top: 1.5em;
+}
 .single-page #footer {
   background: none;
   height: auto;
@@ -1483,6 +1486,15 @@ section#footer .content-module {
 .single-page #contact h3 {
   color: #999b9a;
   border-color: #999b9a;
+}
+.single-page #contact .wufoo * {
+  background-color: #fff;
+  color: #999b9a;
+}
+@media screen and (min-width: 40em) {
+  #main .content-module {
+    padding-top: 1em !important;
+  }
 }
 /*
  * Register page
