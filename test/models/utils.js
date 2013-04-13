@@ -13,7 +13,7 @@
 
 describe('Model Utils', function(){
 	var mongoose = require('mongoose'),
-	mongooseConnection = require('../config/mongoose-connection').open('test'),
+	mongooseConnection = require('../../config/mongoose-connection').open('test'),
   ObjectID = require('mongodb').ObjectID,
   ImmediateAction = require('../../models/immediateAction').model,
   GrowPlanInstance = require('../../models/growPlanInstance').model,
