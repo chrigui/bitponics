@@ -25,7 +25,7 @@ dependencies:
 
 test:
   override:
-    - ./node_modules/.bin/mocha --reporter tap --timeout 4000
+    - ./node_modules/.bin/mocha --reporter tap --recursive --timeout 5000
 
 deployment:
   production:
