@@ -491,11 +491,14 @@ td {
 .btn,
 .btn *,
 .control,
+.overlay .pagination li,
 .landing-page .page-content.center-img img,
 .landing-page .featured-press a,
 .landing-page .additional-press a,
-.phaseRangeSlider input[type=number],
-.phaseRangeSlider .idealRanges label {
+.landing-page.growplans .idealRanges .hi input[type=number],
+.landing-page.growplans .actions .hi input[type=number],
+.landing-page.growplans .idealRanges .lo input[type=number],
+.landing-page.growplans .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -652,6 +655,9 @@ td {
   outline: none;
   border: none;
 }
+.separator-top {
+  border-top: 1px solid #cccdcc;
+}
 html {
   min-height: 100%;
 }
@@ -675,6 +681,10 @@ h4,
 h5,
 h6 {
   font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+}
+h1 {
+  font-weight: bold;
 }
 abbr[title] {
   border: none;
@@ -700,6 +710,15 @@ img {
   max-width: 100%;
   height: auto;
 }
+dd,
+dt {
+  margin: 0;
+  padding: 0;
+}
+input,
+label {
+  max-width: 100%;
+}
 .script {
   display: none;
 }
@@ -709,7 +728,7 @@ img {
 .content-module {
   min-width: 9em;
   margin: 0 0 2.25em;
-  border-top: 4px solid #46f121;
+  border-top: 3px solid #46f121;
 }
 .content-module.small {
   width: 25%;
@@ -935,10 +954,13 @@ a.btn {
   display: inline-block;
   background: #fff !important;
   color: #00f717 !important;
-  border: 4px solid #00f717;
+  border: 3px solid #00f717;
 }
 a.btn i {
   margin: 0 0 0 0.5em;
+}
+.step {
+  padding: 3em 0 0;
 }
 /*
  * Visualizer
@@ -1006,10 +1028,10 @@ a.btn i {
   display: inline-block;
   vertical-align: top;
 }
-section#footer {
+section.footer {
   clear: both;
 }
-section#footer .content-module {
+section.footer .content-module {
   background-color: #fff;
 }
 /*
@@ -1031,11 +1053,12 @@ section#footer .content-module {
   top: 5em;
   left: 10%;
   background: #fff;
-  border: 4px solid #999b9a;
+  border: 3px solid #cccdcc;
   width: 80%;
   right: 10%;
   z-index: 5;
   overflow: hidden;
+  padding: 1em 2em 1em;
 }
 .overlay .close {
   position: absolute;
@@ -1044,6 +1067,31 @@ section#footer .content-module {
   cursor: pointer;
   background: #fff;
   color: #000;
+}
+.overlay .page-heading {
+  text-align: center;
+  border: 0 none !important;
+}
+.overlay dd {
+  color: #000;
+}
+.overlay .pagination {
+  text-align: center;
+  clear: both;
+  margin: 2em 0 0;
+}
+.overlay .pagination li {
+  margin: 0 0.5em;
+}
+.overlay .pagination li.active {
+  float: none;
+  font-weight: bold;
+  font-size: 1.25em;
+}
+.overlay input[type='radio']:checked + label,
+.overlay input[type='checkbox']:checked + label {
+  color: #fff !important;
+  background: #00e36c !important;
 }
 /*
  * Home Page
@@ -1064,16 +1112,10 @@ section#footer .content-module {
 .landing-page section {
   clear: both;
 }
-.landing-page #footer {
-  background-color: #c1c2c4;
-  color: #fff;
-  padding: 0 2.5%;
-  font-size: 0.85em;
-}
 .landing-page input[type=submit] {
   font-size: 1.1em;
 }
-.landing-page #footer {
+.landing-page .footer {
   background-color: #c1c2c4;
   color: #fff;
   padding: 0 2.5%;
@@ -1151,6 +1193,7 @@ section#footer .content-module {
   margin: 0;
   width: auto;
   height: 1em;
+  white-space: nowrap;
 }
 .landing-page .logo span {
   font-size: 0.65em;
@@ -1422,11 +1465,14 @@ section#footer .content-module {
 /*
  * Single landing page overrides
  */
+.single-page .content-module {
+  min-height: 600px;
+}
 .single-page .icon-glyphlogo-new {
   display: none !important;
 }
 .single-page #main,
-.single-page #footer {
+.single-page .footer {
   max-width: 60em;
   margin: 0 auto;
   width: 95%;
@@ -1434,14 +1480,14 @@ section#footer .content-module {
 .single-page #main {
   margin: 3em auto !important;
 }
-.single-page #footer {
+.single-page .footer {
   background: none;
   height: auto;
   min-height: auto;
   padding: 0;
   font-size: 1em;
 }
-.single-page #footer div {
+.single-page .footer div {
   position: static;
 }
 .single-page .page-content,
@@ -1542,6 +1588,9 @@ li
 .app-page .header h1.logo span {
   color: #00e36c;
 }
+.app-page .footer {
+  min-height: 0;
+}
 .app-page .label {
   font-size: 0.75em;
 }
@@ -1554,9 +1603,37 @@ li
  */
 .landing-page.growplans .page-heading {
   color: #333;
-  font-size: 3em;
-  border-bottom: 1px solid #999b9a;
+  font-size: 3.25em;
   font-weight: bold;
+  line-height: 1.25em;
+  margin: 0 0 0.25em 0;
+}
+.landing-page.growplans .page-heading-large {
+  font-size: 2em;
+  line-height: 1.25em;
+  margin: 0;
+  color: #333;
+  border-width: 0;
+  font-weight: bold;
+}
+.landing-page.growplans .page-heading-large span,
+.landing-page.growplans .page-heading-large input,
+.landing-page.growplans .page-heading-large div {
+  color: #333;
+}
+.landing-page.growplans .separator-top {
+  border-width: 1px 0 0;
+  padding-top: 0.25em;
+  margin-top: 0.25em;
+}
+.landing-page.growplans .dropdown {
+  margin: 1em auto;
+}
+.landing-page.growplans .plantlist {
+  padding: 1em 0 0;
+}
+.landing-page.growplans .btn {
+  padding: 0.5em;
 }
 .landing-page.growplans .grid li {
   margin: 1em 1em 0 1em;
@@ -1572,26 +1649,33 @@ li
 .landing-page.growplans .grid .value {
   margin: 0 0 1em;
 }
-.landing-page.growplans .next-step-btn {
+.landing-page.growplans .next-step-btn,
+.landing-page.growplans .phase-tabs .btn {
   background: #fff !important;
   color: #00e36c !important;
-  border: 4px solid #00e36c;
+  border: 3px solid #00e36c;
   padding: 0.5em 2em;
   display: block;
   text-align: center;
   width: 15em;
 }
-.landing-page.growplans #growplan_customize .grid li {
+.landing-page.growplans .next-step-btn .icon-glyph-new,
+.landing-page.growplans .phase-tabs .btn .icon-glyph-new {
+  color: #00e36c;
+}
+.landing-page.growplans .question .grid li {
   margin: 0;
   width: auto;
 }
-.landing-page.growplans #growplan_customize .grid li .btn {
+.landing-page.growplans .question .grid li .btn {
   margin-left: 0;
+  margin-top: 0;
 }
-.landing-page.growplans #growplan_customize .add {
+.landing-page.growplans .question .add {
   float: left;
   clear: left;
   margin-left: 0;
+  margin-top: 0;
 }
 .landing-page.growplans .icon-glyph-new {
   height: 1em;
@@ -1599,224 +1683,111 @@ li
   position: relative;
   top: -0.25em;
 }
-.phaseRangeSlider {
-  position: relative;
-  padding-top: 3em;
-/* move both sliders - adressing 1st slider with CSS is hard */
+.landing-page.growplans #growplans_activate {
+  clear: both;
 }
-.phaseRangeSlider div.ui-slider {
-  position: absolute;
-  left: 0;
-  margin: 1em 0;
-  background: transparent;
-  height: 1em;
-  top: 0;
-  -webkit-border-radius: 0;
-  border-radius: 0;
-  border: 1px solid #23b500;
-  width: 100%;
+.landing-page.growplans .phaseDescription {
+  margin: 0 0 2em 0;
 }
-.phaseRangeSlider div.ui-slider:last-child {
-  position: absolute;
-  left: 0px;
-}
-.phaseRangeSlider .slide-back {
-  position: absolute;
-  height: 1em;
-  top: 1em;
-  text-align: center;
-}
-.phaseRangeSlider .phase-tabs {
+.landing-page.growplans .phase-tabs {
   list-style: none;
-  margin: 0;
-  padding: 0;
+  clear: both;
+  overflow: hidden;
 }
-.phaseRangeSlider .phase-tabs li {
+.landing-page.growplans .phase-tabs .btn {
+  width: auto;
+}
+.landing-page.growplans .phase-tabs .selected {
+  background: #00e36c !important;
+  color: #fff !important;
+}
+.landing-page.growplans .phase-tabs .selected .icon-glyph-new {
+  color: #fff !important;
+}
+.landing-page.growplans .phase-tabs li {
   position: relative;
-  width: 25%;
+  width: auto;
   float: left;
-  padding: 1em;
-  color: #fff;
-  cursor: pointer;
-  height: auto;
-  font-weight: bold;
+  padding: 0.25em 0.5em;
+  margin: 1em 0.25em 1em 0;
 }
-.phaseRangeSlider .phase-tabs li.focused {
+.landing-page.growplans .phase-tabs li.focused {
   text-decoration: underline;
 }
-.phaseRangeSlider .phase-tabs li.inactive {
+.landing-page.growplans .phase-tabs li.inactive {
   display: block;
   opacity: 1;
   -ms-filter: none;
   filter: none;
   background-color: rgba(36,211,33,0.6);
 }
-.phaseRangeSlider .phase-tabs li .toggle {
+.landing-page.growplans .phase-tabs li .toggle {
   text-decoration: none;
 }
-.phaseRangeSlider .phase-slider {
-  color: #fff;
-  overflow: hidden;
-  width: 100%;
-  height: 0;
-  padding: 0;
-}
-.phaseRangeSlider .phase-slider label,
-.phaseRangeSlider .phase-slider span,
-.phaseRangeSlider .phase-slider div {
-  color: #fff;
-  font-weight: bold;
-}
-.phaseRangeSlider .phase-slider.focused {
-  height: auto;
-  padding: 0.5em;
-  float: left;
-}
-.phaseRangeSlider .phase-slider.inactive .slide-back {
-  display: none;
-}
-.phaseRangeSlider .phase-slider .phase-slider-info {
-  position: relative;
-}
-.phaseRangeSlider .date-range {
-  display: block;
-}
-.phaseRangeSlider input[type=number] {
-  width: 2.75em;
-  padding: 0.4em;
-  background: none;
-  border: 1px dotted #fff;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  -webkit-border-radius: 0;
-  border-radius: 0;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-  color: #fff;
-  border-color: #fff;
-  font-weight: bold;
-  font-size: 1.5em;
-}
-.phaseRangeSlider .phase-current-indicator .ui-slider-handle {
-  z-index: 2;
-}
-.phaseRangeSlider .phase-current-indicator .ui-slider-handle .ui-btn-inner {
-  background-color: #333;
-  border-color: #333;
-}
-.phaseRangeSlider .phase-current-indicator input[type=number] {
-  color: #00f717;
-  border: 1px dotted #00f717;
-  margin-right: 0.25em;
-}
-.phaseRangeSlider .phase-slider-input {
-  display: none !important;
-}
-.phaseRangeSlider .idealRanges {
+.landing-page.growplans .idealRanges,
+.landing-page.growplans .actions {
   position: relative;
   zoom: 1;
 }
-.phaseRangeSlider .idealRanges:before,
-.phaseRangeSlider .idealRanges:after {
+.landing-page.growplans .idealRanges:before,
+.landing-page.growplans .actions:before,
+.landing-page.growplans .idealRanges:after,
+.landing-page.growplans .actions:after {
   content: "";
   display: table;
 }
-.phaseRangeSlider .idealRanges:after {
+.landing-page.growplans .idealRanges:after,
+.landing-page.growplans .actions:after {
   clear: both;
 }
-.phaseRangeSlider .idealRanges ul {
+.landing-page.growplans .idealRanges ul,
+.landing-page.growplans .actions ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.phaseRangeSlider .idealRanges li {
-  background: rgba(0,0,0,0.25);
-  padding: 0.5em;
-  margin: 0 0 1em;
+.landing-page.growplans .idealRanges .question,
+.landing-page.growplans .actions .question {
+  margin: 0 8% 1em 0;
 }
-.phaseRangeSlider .idealRanges input[type=checkbox] {
+.landing-page.growplans .idealRanges .btn,
+.landing-page.growplans .actions .btn {
+  margin-left: 0;
+  margin-top: 0;
+}
+.landing-page.growplans .idealRanges input[type=checkbox],
+.landing-page.growplans .actions input[type=checkbox] {
   opacity: 1;
   -ms-filter: none;
   filter: none;
   height: auto;
   width: auto;
   margin: auto;
-}
-.phaseRangeSlider .idealRanges input[type=number] {
-  width: 3.75em;
-}
-.phaseRangeSlider .idealRanges input[type=checkbox] {
   display: inline;
 }
-.phaseRangeSlider .idealRanges textarea {
-  max-width: 300px;
+.landing-page.growplans .idealRanges .separator-top,
+.landing-page.growplans .actions .separator-top {
+  margin-top: 1em;
 }
-.phaseRangeSlider .idealRanges .hi label,
-.phaseRangeSlider .idealRanges .lo label,
-.phaseRangeSlider .idealRanges .hi textarea,
-.phaseRangeSlider .idealRanges .lo textarea {
+.landing-page.growplans .idealRanges .hi label,
+.landing-page.growplans .actions .hi label,
+.landing-page.growplans .idealRanges .lo label,
+.landing-page.growplans .actions .lo label,
+.landing-page.growplans .idealRanges .hi textarea,
+.landing-page.growplans .actions .hi textarea,
+.landing-page.growplans .idealRanges .lo textarea,
+.landing-page.growplans .actions .lo textarea {
   display: block;
   width: 100%;
 }
-.phaseRangeSlider .idealRanges .hi label,
-.phaseRangeSlider .idealRanges .lo label {
-  font-size: 2em;
+.landing-page.growplans .idealRanges .hi input[type=number],
+.landing-page.growplans .actions .hi input[type=number],
+.landing-page.growplans .idealRanges .lo input[type=number],
+.landing-page.growplans .actions .lo input[type=number] {
+  width: 6em;
+  margin-right: 1em;
 }
-.toggle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  font-size: 1.25em;
-}
-.toggle .add,
-.toggle .remove {
-  padding: 0 0.25em;
-  margin: 0;
-  background: none;
-}
-.toggle .add {
-  display: none;
-}
-.toggle .remove {
-  display: block;
-}
-.active {
-  float: left;
-  height: 3em;
-}
-.focused {
-  height: auto;
-}
-.inactive {
-  opacity: 0.45;
-  filter: alpha(opacity=45);
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=45)";
-  height: 3em;
-}
-.inactive .toggle .add {
-  display: block;
-}
-.inactive .toggle .remove {
-  display: none;
-}
-.seedling,
-.seedling .ui-slider-handle {
-  background-color: #30f700;
-  background-image: none;
-}
-.vegetative,
-.vegetative .ui-slider-handle {
-  background-color: #29d600;
-  background-image: none;
-}
-.blooming,
-.blooming .ui-slider-handle {
-  background-color: #1c9100;
-  background-image: none;
-}
-.fruiting,
-.fruiting .ui-slider-handle {
-  background-color: #0e4800;
-  background-image: none;
+.landing-page.growplans .phaseEndDescription {
+  margin: 2em 0 2em;
+  clear: both;
 }

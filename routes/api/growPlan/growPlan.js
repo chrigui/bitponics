@@ -3,6 +3,7 @@ var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     UserModel = require('../../../models/user').model,
     LightFixtureModel = require('../../../models/lightFixture').model,
     LightBulbModel = require('../../../models/lightBulb').model,
+    ModelUtils = require('../../../models/utils'),
     winston = require('winston'),
     allPurposeGrowPlanId = '506de30c8eebf7524342cb70',
     async = require('async');
@@ -36,8 +37,6 @@ module.exports = function(app) {
         plants = req.query.plants,
         growSystem = req.query.growSystem;
     
-
-
     if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
       filter = true;
       plants = plants.split(',');
@@ -45,8 +44,6 @@ module.exports = function(app) {
     }else if(!!id){
       full = true;
     }
-
-
 
     if(!filter && !full) { //return all grow plans
       
@@ -115,84 +112,18 @@ module.exports = function(app) {
         });
 
     } else if (full) { //return single growplan with all data populated
+      ModelUtils.getFullyPopulatedGrowPlan( { _id: id }, function(err, growPlanResults){
+        if (err) { return callback(err); }
 
-      return GrowPlanModel
-        .findById(id)
-        .populate('controls')
-        .populate('sensors')
-        .populate('plants')
-        .populate('phases.nutrients')
-        .populate('phases.actions')
-        .populate('phases.growSystem')
-        .populate('phases.phaseEndActions')
-        // .populate('phases.light')
-        .exec(function(err, grow_plan){
-          if (err) { return next(err); }
+        var growPlanResult = growPlanResults[0];
 
-          //Populate idealRange actions ids for querying
-          var actionIds = [],
-            fixtureIds = [],
-            bulbIds = [];
+        if (!growPlanResult){ 
+          return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
+        }
 
-          grow_plan.phases.forEach(function(phase) {
-            phase.idealRanges.forEach(function(idealRange, i) {
-              actionIds.push(idealRange.actionAboveMax, idealRange.actionBelowMin);
-            });
-            fixtureIds.push(phase.light.fixture);
-            bulbIds.push(phase.light.bulb);
-          });
+        return res.send(growPlanResult);
 
-          async.parallel(
-            [
-              function parallel1(callback){
-                //Query on all action ids
-                ActionModel.find({})
-                  .where('_id').in(actionIds)
-                  .exec(callback);
-              }
-              // ,
-              // function parallel2(callback){
-              //   //query on all fixture ids
-              //   LightFixtureModel.find({})
-              //     .where('_id').in(fixtureIds)
-              //     .exec(callback);
-              // },
-              // function parallel3(callback){
-              //   //query on all bulb ids
-              //   LightBulbModel.find({})
-              //     .where('_id').in(bulbIds)
-              //     .exec(callback);
-              // }
-            ],
-            function parallelFinal(err, result){
-              if (err) { return next(err); }
-              var actions = result[0],
-                fixtures = result[1],
-                bulbs = result[2],
-                growPlan = grow_plan.toObject(); //in order to have properties update as expected
-              
-              //manually "populate" our nested phase props
-              growPlan.phases.forEach(function(phase) {
-                var light = phase.light;
-                if(fixtures)
-                  light.fixture = fixtures.filter(function(fixture){ return fixture._id.toString() == phase.light.fixture.toString() })[0];
-                if(bulbs)
-                  light.bulb = bulbs.filter(function(bulb){ return bulb._id.toString() == phase.light.bulb.toString() })[0];
-                phase.light = light;
-
-                phase.idealRanges.forEach(function(idealRange) {
-                  idealRange.actionAboveMax = actions.filter(function(action){ return action._id.toString() == idealRange.actionAboveMax })[0];
-                  idealRange.actionBelowMin = actions.filter(function(action){ return action._id.toString() == idealRange.actionBelowMin })[0];
-                });
-
-              });
-
-              return res.send(growPlan);
-
-            }
-          );
-
-        });
+      });
     }
   });
 

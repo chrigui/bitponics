@@ -3,7 +3,8 @@ define([
     'es5shim',
     'steps',
     'moment',
-    'fe-be-utils'
+    'fe-be-utils',
+    'overlay'
     ],
 function(viewModels){
     bpn.pages.growplans = {
@@ -13,22 +14,21 @@ function(viewModels){
             angular.bootstrap(document, ["GrowPlanModule"]);
 
             //custom dropdown
-            $('.dropdown').on('click', function(e){
-                var dd = $(this);
-                dd.toggleClass('open').removeClass('initial');
+            // $('.dropdown').on('click', function(e){
+            //     var dd = $(this);
+            //     dd.toggleClass('open').removeClass('initial');
                 
-                $(dd.filter('.open'))
-                    .off('click.dropdown')
-                    .on('click.dropdown', 'label', labelClick);
+            //     $(dd.filter('.open'))
+            //         .off('click.dropdown')
+            //         .on('click.dropdown', 'label', labelClick);
 
-                function labelClick(e){
-                    console.log('clicked label')
-                    var option = $(this),
-                        dd = option.parents('.dropdown');
-                    // option.closest('.select').remove();
-                    dd.toggleClass('open');
-                }
-            });
+            //     function labelClick(e){
+            //         var option = $(this),
+            //             dd = option.parents('.dropdown');
+            //         // option.closest('.select').remove();
+            //         dd.toggleClass('open');
+            //     }
+            // });
 
 
         },
@@ -37,9 +37,14 @@ function(viewModels){
 
         GrowPlanController : ['$scope', '$filter', '$resource', function($scope, $filter, $resource){
             $scope.plants = bpn.plants;
+            $scope.lights = bpn.lights;
+            $scope.lightFixtures = bpn.lightFixtures;
+            $scope.lightBulbs = bpn.lightBulbs;
+            $scope.nutrients = bpn.nutrients;
             $scope.filteredPlantList = angular.copy($scope.plants);
             $scope.controls = bpn.controls;
             $scope.sensors = bpn.sensors;
+            $scope.userOwnedDevices = bpn.userOwnedDevices;
             $scope.plantSelections = {};
             $scope.selectedPlants = [];
             $scope.plantQuery = '';
@@ -52,13 +57,34 @@ function(viewModels){
             $scope.actionDurationTypeOptions = bpn.utils.DURATION_TYPES,
             $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
             $scope.showPlantOverlay = false;
+            $scope.showFixtureOverlay = false;
+            $scope.showGrowSystemOverlay = false;
+            $scope.showGrowMediumOverlay = false;
+            $scope.showNutrientOverlay = false;
+            $scope.overlayItems = [];
+            $scope.growPlanPhaseSectionUITabs = ['Grow System','Light','Sensor Ranges','Actions'];
+            // $scope.UI.suggestions = {
+            //     lightFixtures: bpn.utils.suggestions.lightFixtures,
+            //     lightBulbs: bpn.utils.suggestions.lightTypes
+            // }
+
+            if($scope.userOwnedDevices.length > 0){
+                $scope.growPlanPhaseSectionUITabs.push('Device')
+            }
 
             //Wrapping our ng-model vars {}
             //This is necessary so ng-change always fires, due to: https://github.com/angular/angular.js/issues/1100
             $scope.selected = {
                 growSystem: undefined,
                 growPlan: undefined,
-                plant: {}
+                plant: {},
+                selectedGrowPlanPhase: 0,
+                selectedGrowPlanPhaseSection: 0,
+                selectedDevice: undefined,
+                lightFixture: undefined,
+                lightBulb: undefined,
+                growMedium: undefined,
+                nutrients: undefined
             };
 
             var GrowPlanModel = $resource(
@@ -83,16 +109,8 @@ function(viewModels){
                     viewModels.initGrowPlanViewModel($scope.selectedGrowPlan);
 
                     // Update grow plan plants.
-                    // $scope.updateSelectedGrowPlanPlants();
-                    $scope.selectedPlants.forEach(function(plant, index){
-                        if (0 === $.grep($scope.selectedGrowPlan.plants, function(gpPlant){ return gpPlant.name == plant.name; }).length){
-                            //only add if not already in grow plan's plant list
-                            $scope.selectedGrowPlan.plants.push(plant);
-                        }
-                    });
-                    $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
-
-
+                    $scope.updateSelectedGrowPlanPlants(true);
+                    
                     $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
                 });
 
@@ -117,33 +135,93 @@ function(viewModels){
                 }
             };
 
-            $scope.filterPlantList = function(){
-                var filteredPlantList = $filter('filter')($scope.plants, { name : $scope.plantQuery });
-                $scope.filteredPlantList = filteredPlantList;
-            };
-
-            $scope.addPlant = function(){
-                var newPlant = {name : $scope.plantQuery };
+            $scope.addPlant = function(obj){
+                var newPlant = {_id: obj.query || $scope.query, name : obj.query || $scope.query };
                 $scope.filteredPlantList.push(newPlant);
                 $scope.selectedPlants.push(newPlant);
-            };  
-
-            $scope.updateSelectedPlants = function(){
-                console.log('updateSelectedPlants')
-                for (var i = $scope.plants.length; i--;) {
-                    Object.keys($scope.selected.plant).forEach(function(_id) {
-                        if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
-                            $scope.selectedPlants.push($scope.plants[i]);
-                        }
-                    });
-                }
-                if($scope.selectedGrowSystem){
-                    $scope.updatefilteredGrowPlans();
-                }
+                $scope.selected.plant[newPlant._id] = true;
+                $scope.query = "";
+                $scope.$$childHead.query = "";
+                $scope.$$childHead.search();
+                obj.query = "";
             };
 
-            $scope.updateSelectedGrowPlanPlants = function(){
-                console.log('updatedSelectedGrowPlanPlants')
+            // $scope.updateSelectedPlants = function(){
+            //     $scope.selectedPlants = [];
+            //     for (var i = $scope.plants.length; i--;) {
+            //         Object.keys($scope.selected.plant).forEach(function(_id) {
+            //             if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
+            //                 $scope.selectedPlants.push($scope.plants[i]);
+            //             }
+            //         });
+            //     }
+
+            //     $scope.updateSelectedGrowPlanPlants();
+
+            //     if($scope.selectedGrowSystem){
+            //         $scope.updatefilteredGrowPlans();
+            //     }
+            // };
+
+            $scope.updateSelected = {
+
+                'plants': function(){
+                    $scope.selectedPlants = [];
+                    for (var i = $scope.plants.length; i--;) {
+                        Object.keys($scope.selected.plant).forEach(function(_id) {
+                            if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
+                                $scope.selectedPlants.push($scope.plants[i]);
+                            }
+                        });
+                    }
+
+                    $scope.updateSelectedGrowPlanPlants();
+
+                    if($scope.selectedGrowSystem){
+                        $scope.updatefilteredGrowPlans();
+                    }
+                },
+
+                'lightFixtures': function(){
+                    console.log('lightFixture')
+                },
+
+                'lightBulbs': function(){
+                    console.log('lightBulb')
+                },
+
+                'growSystem': function(gs){
+                    console.log('growSystem: '+gs)
+                },
+
+                'growMedium': function(){
+                    console.log('growMedium')
+                },
+
+                'nutrients': function(){
+                    console.log('nutrients')
+                }
+
+            };
+
+            $scope.updateSelectedGrowPlanPlants = function(initial){
+                //add any selected plants that arent in grow plan, only once when grow plan requested
+                if(initial){
+                    $scope.selectedPlants.forEach(function(plant, index){
+                        if (0 === $.grep($scope.selectedGrowPlan.plants, function(gpPlant){ return gpPlant.name == plant.name; }).length){
+                            //only add if not already in grow plan's plant list
+                            $scope.selectedGrowPlan.plants.push(plant);
+                        }
+                    });
+                    //also set any grow plan plants selected
+                    $scope.selectedGrowPlan.plants.forEach(function(plant, index){
+                        $scope.selected.plant[plant._id] = true;
+                    });
+                }else if(typeof $scope.selectedGrowPlan != 'undefined'){
+                    //else just add selected to grow plan plant list if its already defined (meaning we already requested it)
+                    $scope.selectedGrowPlan.plants = $scope.selectedPlants;
+                    $scope.selectedGrowPlan.plants.sort(function(a, b) { return a.name < b.name; });
+                }
             };
 
             $scope.updatefilteredGrowPlans = function(){
@@ -160,31 +238,38 @@ function(viewModels){
                 });
             };
             
-            $scope.updatePhaseDurations = function(){
-                var currentExpectedPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;}),
-                    difference = $scope.expectedGrowPlanDuration - currentExpectedPlanDuration,
-                    phases = $scope.selectedGrowPlan.phases,
-                    i, phase;
-                
-                
-                // If it's a positive change, just add all the days onto the last phase
-                if (difference > 0){
-                    phases[phases.length - 1].expectedNumberOfDays += difference;
-                } else if (difference < 0){
-                    // If it's a negative change, decrement from the final phase first, preserving a min of 1 day duration. Then start
-                    // removing days from earlier phases. Preserve at least 1 day in all phases
-                    for (i = phases.length; i--;){
-                        phase = phases[i];
-                        while (phase.expectedNumberOfDays > 1 && difference < 0){
-                            phase.expectedNumberOfDays--;
-                            difference++;        
-                        } 
-                    }
-                }
-                
-                $scope.expectedGrowPlanDuration = $scope.selectedGrowPlan.phases.reduce(function(prev, cur){ return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
+            $scope.setExpectedGrowPlanDuration = function(){
+                var currentExpectedPlanDuration = 0;
+                $scope.selectedGrowPlan.phases.forEach(function(phase){
+                    currentExpectedPlanDuration += phase.expectedNumberOfDays;
+                });
+                $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
             };
 
+            $scope.setCurrentPhaseTab = function(index){
+                $scope.selected.selectedGrowPlanPhase = index;
+            };
+
+            $scope.setCurrentPhaseSectionTab = function(index){
+                $scope.selected.selectedGrowPlanPhaseSection = index;
+            };
+
+            $scope.addPhase = function(){
+                var existingPhaseLength = $scope.selectedGrowPlan.phases.length,
+                    phase = {
+                        _id: existingPhaseLength.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
+                        actionsViewModel: [],
+                        idealRanges: []
+                    };
+                $scope.selectedGrowPlan.phases.push(phase);
+                $scope.setCurrentPhaseTab(existingPhaseLength);
+            };
+
+            $scope.removePhase = function(index){
+                var existingPhaseLength = $scope.selectedGrowPlan.phases.length;
+                $scope.selectedGrowPlan.phases.splice(index, 1);
+                $scope.setCurrentPhaseTab(0);
+            };
 
             $scope.addIdealRange = function(e){
                 var phase = e.phase,
@@ -199,7 +284,6 @@ function(viewModels){
                 phase.idealRanges.unshift(newIdealRange);
             };
 
-
             $scope.addAction = function(e){
                 var phase = e.phase,
                     newAction = {
@@ -209,14 +293,43 @@ function(viewModels){
                 phase.actions.unshift(newAction);
             };
 
-            $scope.showPlantList = function(){
-                console.log('focused on plant search')
-                $('#plant_list').addClass('open');
-            };
-
-            $scope.togglePlantOverlay = function(){
-                console.log('plant overlay time');
-                $scope.showPlantOverlay ? $scope.showPlantOverlay = false : $scope.showPlantOverlay = true;
+            $scope.toggleOverlay = function(overlayType, overlayModel){
+                $scope.overlayModel = overlayModel;
+                switch(overlayType){
+                    case 'showPlantOverlay':
+                        $scope.overlayItems = $scope.filteredPlantList;
+                        $scope.overlayItemKey = "plants";
+                        break;
+                    case 'showFixtureOverlay':
+                        $scope.overlayItems = $scope.lightFixtures;
+                        $scope.overlayItemKey = "lightFixture";
+                        break;
+                    case 'showBulbOverlay':
+                        $scope.overlayItems = $scope.lightBulbs;
+                        $scope.overlayItemKey = "lightBulb";
+                        break;
+                    case 'showGrowSystemOverlay':
+                        $scope.overlayItems = $scope.growSystems;
+                        $scope.overlayItemKey = "growSystem";
+                        break;
+                    case 'showNutrientsOverlay':
+                        $scope.overlayItems = $scope.nutrients;
+                        $scope.overlayItemKey = "nutrients";
+                        break;
+                    default:
+                        $scope.overlayItems = [];
+                        $scope.overlayItemKey = '';
+                        break;
+                }
+                if($scope[overlayType]){
+                    $scope.overlayItems = [];
+                    $scope.overlayItemKey = '';
+                    $scope[overlayType] = false;
+                }else{
+                    // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
+                    $scope.$broadcast('newOverlay');
+                    $scope[overlayType] = true;
+                }
             };
 
             $scope.submit = function(e){
@@ -255,28 +368,34 @@ function(viewModels){
         }]
     };
 
-    bpn.pages.growplans.app.directive('onFocus', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, elm, attrs) {
-                console.log('onfocus');
-                elm.bind('focus', function() {
-                    scope.$apply(attrs.onFocus);
-                });
-            }
-        };        
-    });
+    // bpn.pages.growplans.app.service('setOverlayData', function() {
+    //     this.setData = function(itemArray) {
+    //         return itemArray
+    //     };
+    // });
 
-    bpn.pages.growplans.app.directive('onBlur', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, elm, attrs) {
-                elm.bind('blur', function() {
-                    scope.$apply(attrs.onBlur);
-                });
-            }
-        };        
-    });
+    // bpn.pages.growplans.app.directive('onFocus', function() {
+    //     return {
+    //         restrict: 'A',
+    //         link: function(scope, elm, attrs) {
+    //             console.log('onfocus');
+    //             elm.bind('focus', function() {
+    //                 scope.$apply(attrs.onFocus);
+    //             });
+    //         }
+    //     };        
+    // });
+
+    // bpn.pages.growplans.app.directive('onBlur', function() {
+    //     return {
+    //         restrict: 'A',
+    //         link: function(scope, elm, attrs) {
+    //             elm.bind('blur', function() {
+    //                 scope.$apply(attrs.onBlur);
+    //             });
+    //         }
+    //     };        
+    // });
 
     $(function () {
         bpn.pages.growplans.init();

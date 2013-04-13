@@ -176,6 +176,9 @@
   outline: none;
   border: none;
 }
+.separator-top {
+  border-top: 1px solid #cccdcc;
+}
 /*
  * Forms
  */
@@ -227,11 +230,11 @@ button {
 select {
   display: block;
   margin: 0.5em 0 0;
-  max-width: 14em;
+  max-width: 100%;
 }
 textarea {
   width: 100%;
-  min-height: 4em;
+  min-height: 5em;
 }
 input[type=radio],
 input[type=checkbox] {
@@ -243,30 +246,61 @@ input[type=checkbox] {
   width: 0;
   margin: 0;
 }
-input[type='radio']:checked + label,
-input[type='checkbox']:checked + label {
-  display: block;
-}
 .question {
   margin: 0 0 3em;
+}
+.question input {
+  width: 100%;
+}
+.question-title {
+  margin: 1.25em 0 0;
 }
 .dropdown-wrap {
   position: relative;
   min-height: 1em;
+}
+.seamless-input-wrap {
+  color: #000;
+  font-size: 2em;
+}
+.seamless-input,
+.seamless-input-with-bg {
+  border: 0 none;
+  color: #000;
+  background: none;
+  width: 2.35em;
+  display: inline;
+  padding: 0.25em 0;
+  margin: 0;
+}
+.seamless-input::-webkit-outer-spin-button,
+.seamless-input::-webkit-inner-spin-button {
+/* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0;
+/* <-- Apparently some margin are still there even though it's hidden */
+}
+.inverse-color,
+.seamless-input-with-bg {
+  background-color: #00e36c !important;
+  color: #fff !important;
 }
 .dropdown {
   position: absolute;
   top: 0;
   left: 0;
   width: 200px;
-  padding: 10px;
-  margin: 0 auto;
+  padding: 0.5em;
+  margin: 1em auto;
   background: #00e36c;
   color: #fff;
   outline: none;
   cursor: pointer;
-  font-weight: bold;
   min-height: 1em;
+}
+.dropdown input[type='radio']:checked + label,
+.dropdown input[type='checkbox']:checked + label {
+  display: block;
 }
 .dropdown.initial .select label {
   display: block;
@@ -308,12 +342,41 @@ input[type='checkbox']:checked + label {
 .dropdown .select label:after {
   content: '';
 }
+.custom-dropdown-wrap {
+  position: relative;
+  white-space: nowrap;
+}
+.custom-dropdown-wrap .dblarrow {
+  margin-left: -2em;
+  display: inline-block;
+}
+.custom-dropdown-wrap .dblarrow i {
+  width: 0;
+  height: 0.5em;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #fff;
+  display: block;
+}
+.custom-dropdown-wrap select.custom-dropdown,
+.custom-dropdown-wrap select.custom-dropdown option {
+  background: #00e36c;
+  color: #fff;
+}
+.custom-dropdown-wrap select.custom-dropdown {
+  border: none;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+  outline: none;
+  margin-right: 15px;
+  font-size: 1.4em;
+  display: inline-block;
+/*Important*/
+  padding: 0.25em 1.25em 0.25em 0.25em;
+}
 .wufoo {
   background-color: #c1c2c4 !important;
   color: #fff !important;
-}
-.wufoo header {
-  display: none !important;
 }
 .wufoo li {
   padding: 0;

@@ -8,10 +8,6 @@ var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
   IdealRangesModel = require('../models/growPlan/idealRange').model,
   GrowSystemModel = require('../models/growSystem').model,
   ActionModel = require('../models/action').model,
-  LightModel = require('../models/light').model,
-  LightFixtureModel = require('../models/lightFixture').model,
-  LightBulbModel = require('../models/lightBulb').model,
-  NutrientModel = require('../models/nutrient').model,
   ModelUtils = require('../models/utils'),
   routeUtils = require('./route-utils'),
 	winston = require('winston'),
@@ -105,23 +101,7 @@ module.exports = function(app){
 					function parallel6(callback){
 						// Get all sensors
 						SensorModel.find({}, callback);
-					},
-          function parallel7(callback){
-            // Get all lights
-            LightModel.find({}, callback);
-          },
-          function parallel8(callback){
-            // Get all lights
-            LightFixtureModel.find({}, callback);
-          },
-          function parallel9(callback){
-            // Get all lights
-            LightBulbModel.find({}, callback);
-          },
-          function parallel10(callback){
-            // Get all lights
-            NutrientModel.find({}, callback);
-          }
+					}
 				],
 				function parallelFinal(err, result){
 					if (err) { return next(err); }
@@ -129,30 +109,22 @@ module.exports = function(app){
 							plants = result[1],
 							controls = result[2],
 							userOwnedDevices = result[4],
-              sensors = result[5],
-              lights = result[6],
-              lightFixtures = result[7],
-              lightBulbs = result[8],
-              nutrients = result[9];
-          
+							sensors = result[5];
+
 					locals.growSystems = growSystems;
 					locals.plants = plants;
-          locals.userOwnedDevices = userOwnedDevices;
-          locals.lights = lights;
-          locals.lightFixtures = lightFixtures;
-					locals.lightBulbs = lightBulbs;
-          locals.nutrients = nutrients;
-          
+					locals.userOwnedDevices = userOwnedDevices;
+
 					//convert controls into obj with id as keys
 					controls.forEach(function (item, index) {
 						locals.controls[item._id] = item;
 					});
-          
+
 					//convert sensors into obj with id as keys
 					sensors.forEach(function (item, index) {
 						locals.sensors[item.code] = item;
 					});
-          
+
 					//single out the default grow plan
 					locals.growPlans.forEach(function (item, index) {
 						if(item._id == allPurposeGrowPlanId){
@@ -249,4 +221,59 @@ module.exports = function(app){
 	); // /app.post('/grow-plans'
 
 
+<<<<<<< HEAD
+				async.series([
+					function branchingCheck(callback){
+						GrowPlan.isEquivalentTo(parentGrowPlan, submittedGrowPlan, function(err, isEquivalent){
+							if (err) { 
+								return callback(err); 
+							}
+							if (isEquivalent) { 
+								return callback(null, parentGrowPlan); 
+							} else {
+								// branch the parentGrowPlan
+								submittedGrowPlan.parentGrowPlanId = parentGrowPlan._id;
+								submittedGrowPlan.save(function (err){
+									return callback(err, submittedGrowPlan);
+								});		
+							}
+						});
+					}
+				],
+				function (err, results){
+					if (err) { 
+						result.status = 'error';
+						result.errors = [err.message];
+						return res.json(result);
+					}
+
+					var growPlanToUse = results[0],
+						startingPhaseData = growPlanToUse.getPhaseAndDayFromStartDay(parseInt(req.growPlan.currentGrowPlanDay, 10));
+					
+					GrowPlanInstanceModel.create({
+						growPlan : growPlanToUse._id,
+						owner : req.user._id,
+						active : true,
+						activePhaseId : startingPhaseData.phaseId,
+						activePhaseDay : startingPhaseData.day,
+						device : req.body.device
+					},
+					function(err, growPlanInstance){
+						if (err) { 
+							result.status = 'error';
+							result.errors = [err.message];
+						} else {
+							result.status = 'success';
+							result.message = 'Activated grow plan';
+							winston.info('activated grow plan for user ' + req.user._id.toString() + ', gp id ' + growPlanResult._id.toString() + ', gpi id ' + growPlanInstance._id.toString());
+						}
+						return res.json(result);
+					});			
+				}	
+				);			
+			});
+		}
+	);
+=======
+>>>>>>> 43290fed377186703dc7f789021c39467bc8ef22
 };

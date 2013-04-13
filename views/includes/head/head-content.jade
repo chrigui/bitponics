@@ -22,20 +22,4 @@ script
 		pages : {}
 	};
 
-mixin requirejs(datamain)
-	script(src='/assets/js/libs/require.js', data-main=datamain)
-	script
-		require.config({
-			paths: {
-				'view-models': '/assets/js/fe-be/view-models',
-				'es5shim': '/assets/js/libs/es5-shim.min',
-				'steps': '/assets/js/libs/Steps',
-				'moment': '/assets/js/libs/moment.min',
-				'utils': '/assets/js/shared/utils',
-				'fe-be-utils': '/assets/js/fe-be/fe-be-utils',
-				'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
-				'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
-				'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
-				'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min'
-			}
-		});
+include mixins

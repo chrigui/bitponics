@@ -11,8 +11,9 @@ module.exports = function(app) {
 
    //List lights
   app.get('/api/lights', function (req, res, next){
-
+    console.log('stuff')
     return LightModel.find(function (err, lights) {
+      console.log(lights);
       if (err) { return next(err); }
       return res.send(lights);
     });

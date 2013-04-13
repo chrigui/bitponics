@@ -25,6 +25,10 @@ body
 
 h1,h2,h3,h4,h5,h6
 	font-weight normal
+	-webkit-font-smoothing antialiased
+
+h1
+	font-weight bold
 
 abbr[title]
 	border none
@@ -44,6 +48,14 @@ img
 	max-width 100%
 	height auto
 
+dd, dt
+	margin 0
+	padding 0
+
+input, label
+	max-width 100%
+	// width 100%
+
 .script
 	display none
 
@@ -53,7 +65,7 @@ img
 .content-module
 	min-width 9em
 	margin 0 0 2.25em
-	border-top 4px solid color-light-green
+	border-top 3px solid color-light-green
 	&.small
 		width 25%
 	&.medium
@@ -284,9 +296,12 @@ a.btn
 	display inline-block
 	background white!important
 	color color-medium-green!important
-	border 4px solid color-medium-green
+	border 3px solid color-medium-green
 	i
 		margin: 0 0 0 .5em;
+
+.step
+	padding 3em 0 0
 
 /*
  * Visualizer
@@ -350,7 +365,7 @@ a.btn
 		display: inline-block;
 		vertical-align: top;
 
-section#footer
+section.footer
 	clear both
 
 	.content-module

@@ -23,7 +23,7 @@ body
 
 section.header,
 section#main,
-section#footer
+section.footer
 	padding 1em
 			
 
@@ -91,7 +91,7 @@ section#footer
 	/*
 	 * Footer
 	 */
-	section#footer
+	section.footer
 		//position fixed
 		//bottom 0
 		width 100%
@@ -132,15 +132,25 @@ section#footer
 		float: left;
 		width: 15em;
 		// min-height: 600px;
-		
+	
+// .question
+// 	.plantlist
+// 	 	li
+// 			float none
+// 			width auto
+// 			margin 0
+// 			label
+// 				margin 0
+// 				@extends .display-ib
 
 .idealRanges {
 	li {
 		clearfix()
+		max-width 15em
 	}
 	.hi, .lo {
-		width: 50%;
-		float: left;
+		// width: 50%;
+		// float: left;
 
 		label {
 			@extends .display-ib
@@ -149,7 +159,7 @@ section#footer
 	}
 
 	.lo {
-		float: right;
+		// float: right;
 	}
 }
 
@@ -166,7 +176,7 @@ section#footer
 	.content-module
 		min-height 800px
 
-	#footer
+	.footer
 		background-position 45% 100%
 		background-image url('/assets/img/home/footer.jpg')
 		min-height 1323px
@@ -343,7 +353,7 @@ section#footer
 
 	.featured-press
 		clear both
-		min-height 24em
+		min-height 25em
 		li
 			position relative
 			padding-top 6em
@@ -586,7 +596,10 @@ section#footer
 
 .question-wrap-right
 	float right
-	width: 60%;
+	width: 55%;
 	
 	.question
-		width 60%
+		width 80%
+
+.overlay
+	padding 1em 2em 1em

@@ -1,27 +1,37 @@
 .landing-page.growplans
+
 	.page-heading
 		color color-text-graydark
-		font-size: 3em;
-		border-bottom 1px solid color-text-gray
+		font-size 3.25em
 		font-weight bold
-	// #growplan_results
-	// 	//padding-bottom 10em
-	// 	.grid
-	// 		// li
-	// 		// 	width 33%
-	// 		// 	height 10em
-	// .grid
-	// 	.info
-	// 		display none
-	// 		// position absolute
-	// 		// bottom auto
-	// 		// left 0
-	// 		// height 5em
-	// 		// width 50%
-	// 		text-align left
-	// 	.large-label
-	// 		.info *
-	// 			color white
+		line-height 1.25em
+		margin 0 0 .25em 0
+
+	.page-heading-large
+		// @extends .page-heading
+		font-size 2em
+		line-height 1.25em
+		margin 0
+		color #333
+		border-width 0
+		font-weight bold
+		span, input, div
+			color #333
+
+	.separator-top
+		border-width 1px 0 0
+		padding-top .25em
+		margin-top .25em
+
+	.dropdown
+		margin 1em auto
+	
+	.plantlist
+		padding 1em 0 0
+
+	.btn
+		padding .5em
+
 	.grid
 		li
 			margin: 1em 1em 0 1em;
@@ -37,16 +47,19 @@
 		.value
 			margin 0 0 1em
 
-	.next-step-btn
+	.next-step-btn, .phase-tabs .btn
 		background white!important
 		color color-hot-green!important
-		border 4px solid color-hot-green
+		border 3px solid color-hot-green
 		padding .5em 2em
 		display block
 		text-align center
 		width 15em
 
-	#growplan_customize
+		.icon-glyph-new
+			color color-hot-green
+
+	.question
 		.grid 
 			ul
 				// clear both
@@ -55,10 +68,14 @@
 				width auto
 				.btn
 					margin-left 0
+					margin-top 0
+
 		.add
 			float left
 			clear left
 			margin-left 0
+			margin-top 0	
+
 
 
 	.icon-glyph-new
@@ -67,260 +84,123 @@
 		position relative
 		top -.25em
 
-.phaseRangeSlider{
-    position: relative;
-    padding-top: 3em;
 
-		div.ui-slider{
-		    position: absolute;
-		    left: 0;
-				margin: 1em 0;
-				background: transparent;
-				height: 1em;
-				top: 0;
-				border-radius: 0;
-				border: 1px solid color-logo-green;
-				width: 100%;
-		}                   /* move both sliders - adressing 1st slider with CSS is hard */ 
-		div.ui-slider:last-child{
-		    position: absolute;
-		    left: 0px;
-		}
-		.slide-back {
-		    position:absolute;
-		    height: 1em;
-		    top: 1em;
-		    text-align: center;
-		}
-		.phase-tabs {
-			list-style: none;
-			margin: 0;
-			padding: 0;
+	#growplans_activate
+		clear both
 
-			li {
-				position: relative;
-				width: 25%;
-				float: left;
-				padding: 1em;
-				color: white;
-				//background: green;
-				cursor: pointer;
-				height: auto;
-				//text-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
-				font-weight: bold;
+	.phaseDescription
+		margin 0 0 2em 0
+		
+	.phase-tabs 
+		list-style: none;
+		// margin: 0;
+		// padding: 0;
+		clear: both;
+		overflow: hidden;
 
-				&.focused {
-					text-decoration: underline;
-				}
+		.btn
+			width auto
 
-				&.inactive {
-					display: block;
-					opacity: 1;
-					background-color: rgba(36, 211, 33, .6);
-				}
+		.selected
+			background color-hot-green!important
+			color white!important
 
-				.toggle {
-					text-decoration: none;
-				}
-			}
-		}
-		.phase-slider {
-			//display: inline-block;
-			color: white;
-			overflow: hidden;
-			width: 100%;
-			//text-decoration: none;
-			height: 0;
-			padding: 0;
+			.icon-glyph-new
+				color white!important
 
-			label, span, div {
-				color: white;
-	    	//text-shadow: 1px 1px 1px rgba(0, 0, 0, .25);
-				font-weight: bold;
-			}
+		li {
+			position: relative;
+			// width: 25%;
+			width auto
+			float: left;
+			padding: .25em .5em;
+			// color: white;
+			//background: green;
+			// cursor: pointer;
+			// height: auto;
+			//text-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+			// font-weight: bold;
+			margin: 1em .25em 1em 0;
 
 			&.focused {
-				//text-decoration: underline;
-				height: auto;
-				padding: .5em;
-				float: left;
-			}
-
-			&.active {
-
+				text-decoration: underline;
 			}
 
 			&.inactive {
-
-				.slide-back {
-					display: none;
-				}
+				display: block;
+				opacity: 1;
+				background-color: rgba(36, 211, 33, .6);
 			}
 
-			.phase-slider-info {
-				position: relative;
+			.toggle {
+				text-decoration: none;
 			}
-
-			
-
 		}
 
-		.date-range {
-			display: block;
+
+	.idealRanges, .actions {
+		position: relative;
+		clearfix()
+
+		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
 		}
 
-		input[type=number] {
-			@extends .display-ib
-			width: 2.75em;
-			padding: .4em;
-			background: none;
-			border: 1px dotted white;
-			box-shadow: none;
-			border-radius: 0;
-			box-sizing: content-box;
-			color: white;
-			border-color: white;
-			font-weight: bold;
-			font-size: 1.5em;
+		.question {
+			margin: 0 8% 1em 0;
 		}
 
-		.phase-current-indicator {
-			.ui-slider-handle {
-				z-index: 2; //bump up above phase handles
-			 	.ui-btn-inner{
-					background-color: #333;
-					border-color: #333;
-				}
-			}
-			
-			input[type=number] {
-				color: color-medium-green;
-				border: 1px dotted color-medium-green;
-				margin-right: .25em;
-			}
-
-			
+		.btn {
+			margin-left 0
+			margin-top 0
+		}
+		input[type=checkbox] {
+			opacity: 1;
+			height: auto;
+			width: auto;
+			margin: auto;
+			display: inline;
 		}
 
-		.phase-slider-input {
-			display: none!important;
-		}
-
-		// .phaseDescription, .growSystem, .growMedium, .nutrients, .actions {
-		// 	width: 50%;
-		// 	float: left;
+		// input[type=number] {
+		// 	width: 3.75em;
 		// }
 
-		.idealRanges {
-			position: relative;
-			clearfix()
+		// textarea {
+		// 	max-width: 300px
+		// }
 
-			ul {
-				list-style: none;
-				margin: 0;
-				padding: 0;
-			}
+		// label {
+		// 	@extends .display-ib
+		// }
 
-			li {
-				background: rgba(0, 0, 0, .25);
-				padding: .5em;
-				margin: 0 0 1em;
-			}
+		.separator-top {
+			margin-top: 1em;
+		}
 
-			input[type=checkbox] {
-				opacity: 1;
-				height: auto;
-				width: auto;
-				margin: auto;
+		.hi, .lo {
+
+			label, textarea {
+				display: block;
+				width: 100%;
 			}
 
 			input[type=number] {
-				width: 3.75em;
-			}
-
-			input[type=checkbox] {
-				display: inline;
-			}
-
-			textarea {
-				max-width: 300px
+				@extends .display-ib;
+				width: 6em;
+				margin-right: 1em;
 			}
 
 			label {
-				@extends .display-ib
+				// font-size: 2em;
 			}
-
-			.hi, .lo {
-
-				label, textarea {
-					display: block;
-					width: 100%;
-				}
-
-				label {
-					font-size: 2em;
-				}
-			}
-
 		}
 
-
-}
-
-.toggle {
-	position: absolute;
-	top: 0;
-	right: 0;
-	font-size: 1.25em;
-	
-	.add, .remove {
-		padding: 0 .25em;
-		margin: 0;
-		background: none;
 	}
+	.phaseEndDescription
+		margin 2em 0 2em
+		clear both
 
-	.add {
-		display: none;
-	}
-
-	.remove {
-		display: block;
-	}
-}
-
-.active {
-	float: left;
-	height: 3em;
-}
-
-.focused {
-	height: auto;
-}
-
-.inactive {
-	opacity: .45;
-	height: 3em;
-
-	.toggle {
-		.add { display: block; }
-		.remove { display: none; }
-	}
-}
-
-
-.seedling, .seedling .ui-slider-handle {
-	background-color color-phase-seedling
-	background-image none
-}
-.vegetative, .vegetative .ui-slider-handle {
-	background-color color-phase-vegetative
-	background-image none
-}
-.blooming, .blooming .ui-slider-handle {
-	background-color color-phase-blooming
-	background-image none
-}
-.fruiting, .fruiting .ui-slider-handle {
-	background-color color-phase-fruiting
-	background-image none
-}
+		

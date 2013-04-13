@@ -18,12 +18,6 @@ block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
   //link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
-  //- TEMP hacks
-  style
-    [ng-cloak] { display: none; }
-    .phase-slider { height: auto !important; background: gray;}
-    input[type=radio].ng-binding { opacity : 1; height: auto; width: auto; }
-
 block content
   
   section.header
@@ -50,31 +44,45 @@ block content
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.pages.growplans.GrowPlanController", novalidate)
         section(id="step1", class="step", data-required="1")
           h4.page-heading Ready to set up your grow plan?
-          div.question
-            h5.question-title What kind of hydroponic system are you using?
-            div.dropdown-wrap
-              ul(class="dropdown initial")
-                li.select
-                  label Select
-                li(ng-repeat="system in growSystems | orderBy:name")
-                  input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
-                  label(for="{{system._id}}") {{system.name}}
+          div.separator-top
+            div.question
+              h5.question-title What kind of hydroponic system are you using?
+              div.dropdown-wrap
+                ul(class="dropdown initial")
+                  li.select
+                    label Select
+                  li(ng-repeat="system in growSystems | orderBy:name")
+                    input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
+                    label(for="{{system._id}}") {{system.name}}
 
-          div.question
-            h5.question-title What are you going to be growing?
-            input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
-            div(ng-hide="filteredPlantList.length") 
-              label(href="#", class="add btn", ng-click="addPlant()") Add
-            
-            div.dropdown-wrap
-              ul(id="plant_list", class="dropdown initial sortlist", ng-class="{open: focused}")
-                li.select
-                  label Select
-                li(ng-repeat="plant in filteredPlantList | orderBy:name")
-                  input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
-                  label(for="{{plant._id}}", class="plant") {{plant.name}}
+            div(class="question-wrap-right")
+              div.question
+                h5.question-title What are you going to be growing?
+                //- input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
+                //- div(ng-hide="filteredPlantList.length") 
+                //-   label(href="#", class="add btn", ng-click="addPlant()") Add
+                
+                //- div.dropdown-wrap
+                //-   ul(id="plant_list", class="dropdown initial sortlist", ng-class="{open: focused}")
+                //-     li.select
+                //-       label Select
+                //-     li(ng-repeat="plant in filteredPlantList | orderBy:name")
+                //-       input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
+                //-       label(for="{{plant._id}}", class="plant") {{plant.name}}
+                
+                
+                ul(class="grid plantlist")
+                  li(ng-repeat="plant in selectedPlants | orderBy:name")
+                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+                    label(for="{{plant._id}}", class="plant btn") 
+                      {{plant.name}}
+                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+                label(class="add btn", ng-click="toggleOverlay('showPlantOverlay');") 
+                  | Add
+                  | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
           
-          div.step-footer
+          div(class="step-footer separator-top")
             a(class="btn next-step-btn") Next Step
               | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         //- section(id="plant_selection", class="step")
@@ -82,7 +90,7 @@ block content
 
         section(id="growplan_results", class="step update-panel hide", data-required="1")
           h4.page-heading Select a Grow Plan
-          ul(class="grid sortlist photos")
+          ul(class="grid sortlist photos separator-top")
             //- each growPlan, i in growPlans
             li(ng-repeat="growPlan in filteredGrowPlanList")
               div.img-wrapper
@@ -96,9 +104,9 @@ block content
               div
                 h5.label Overall Time Span
                 div.value {{growPlan.overallTimeSpan || 'Open ended'}}
-              div
-                h5.label In use by
-                div.value *TODO*
+              //- div
+              //-   h5.label In use by
+              //-   div.value *TODO*
               div.last
                 h5.label Created by
                 div(class="value", ng-show="growPlan.createdBy[0].name.first") {{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}
@@ -112,105 +120,108 @@ block content
 
         section(id="growplan_customize", class="step hide")
           h4.page-heading Customize your grow plan
-          div.question
-            label(for="gpedit_name", class="question-title") Name
-            input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
-          
-          div(class="question-wrap-right")
+          div.separator-top
             div.question
-              label.question-title Plants
-              ul(class="grid plantlist")
-                //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-                li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
-                  input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
-                  label(for="{{plant._id}}", class="plant btn") 
-                    {{plant.name}}
-                    | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-
-              label(class="add btn", ng-click="togglePlantOverlay()") 
-                | Add
-                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-
-              div(ng-hide="!showPlantOverlay", class="overlay")
-                div(class="close btn", ng-click="togglePlantOverlay()")
-                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              label(for="gpedit_name", class="question-title") Name
+              input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
+            
+            div(class="question-wrap-right")
+              div.question
+                label.question-title Plants
                 ul(class="grid plantlist")
-                  li(ng-repeat="plant in filteredPlantList | orderBy:name")
-                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
-                    label(for="search_{{plant._id}}", class="plant btn") {{plant.name}}
+                  //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+                  li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
+                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+                    label(for="{{plant._id}}", class="plant btn") 
+                      {{plant.name}}
+                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-          div(class="question")
-            label(for="gpedit_description", class="question-title") Description
-            textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description", rows="8")
+                label(class="add btn", ng-click="toggleOverlay('showPlantOverlay')") 
+                  | Add
+                  | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
+            div(class="question clear-l")
+              label(for="gpedit_description", class="question-title") Description
+              textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description", rows="8")
           
-          div.step-footer
-            a(class="btn next-step-btn") Next Step
+          div(class="step-footer separator-top")
+            a(class="btn next-step-btn", ng-click="setExpectedGrowPlanDuration();setCurrentPhaseTab(0)") Next Step
               | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
 
         section(id="growplan_edit", class="step hide")
-          h4 Tailor this grow plan to your needs
+          h4.page-heading Your grow plan
 
           //set as default grow plan, will change dynamically based on previous step selection
           input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="selectedGrowPlan._id") 
 
-          //- label Name
-          //- input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selectedGrowPlan.name")
-          
-          //- label Description
-          //- textarea(id="gpedit_description", name="gpedit_description", ng-model="selectedGrowPlan.description")
-
-          label Plants
-          //- ul(class="grid plantlist")
-          //-   //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-          //-   li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
-          //-     input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="plant._id")
-          //-     label(for="{{plant._id}}", class="plant") {{plant.name}}
-
-          //- label Suggested Sensors
-          //- input(id="gpedit_sensors", type='text', name="gpedit_sensors", value="#{growPlanDefault.sensors}")
-
-          //- label Suggested Accessories *Aggregated from the accessories(controls) across phases.actions, phases.phaseEndActions, and phases.idealRanges
-          //- input(id="gpedit_controls", type='text', name="gpedit_controls", value="#{growPlanDefault.controls}")
-
           div.Phases
             div.phaseRangeSlider
-              div.phase-current-indicator
-                span This grow plan lasts  
-                input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182", ng-model="expectedGrowPlanDuration", ng-change="updatePhaseDurations()") 
-                span days and I am on day  
-                input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
-                
-              div.phase-sliders
+              section.separator-top
+                h5.question-title Total grow plan duration  
+                //- input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182", ng-model="expectedGrowPlanDuration", ng-change="updatePhaseDurations()") 
+                h4(class="page-heading-large seamless-input-wrap")
+                  input(type="number", 
+                        readonly,
+                        name="expectedGrowPlanDuration", 
+                        id="expectedGrowPlanDuration", 
+                        class="seamless-input no-disable", 
+                        value="expectedGrowPlanDuration",
+                        ng-model="expectedGrowPlanDuration")
+                  span Days
+                //- span days and I am on day  
+                //- input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
+              
+              //- div.phase-sliders
+              section.separator-top
+                h5.question-title Phases
                 ul(class="phase-tabs")
-                  li(ng-repeat="phase in selectedGrowPlan.phases") {{phase.name}}
-                    div(class="remove icon btn")
-                      | <i class="icon-glyph icon-x" aria-hidden="true"></i>
-                  li() Add New Phase
-                    div(class="add icon btn")
-                      | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+                  li(ng-repeat="phase in selectedGrowPlan.phases", 
+                      class="btn inverse-btn", 
+                      ng-class="{selected: selected.selectedGrowPlanPhase == $index}", 
+                      ng-click="setCurrentPhaseTab($index)") {{ phase.name || 'New Phase' }}
+                    div(class="remove icon", ng-click="removePhase($index)")
+                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  li(class="btn inverse-btn", ng-click="addPhase()") Add New Phase
+                    div(class="add icon")
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                  div(ng-repeat="phase in selectedGrowPlan.phases", class="phase-slider")
-                    div(class="phase-slider-info")
-                      span(class="date-range") x
-                      input(class="date-duration no-disable", name="date-duration", value="0", type="number", ng-model="phase.expectedNumberOfDays") 
-                      span  days
-                    div(class="phase-slider-slider")
-                      input(type="range", name="phase_slider_{{$index}}", id="phase_slider_{{$index}}", class="phase-slider-input", value="0", min="0", max="{{expectedGrowPlanDuration}}", ng-model="phase.expectedNumberOfDays")
+                div(ng-repeat="phase in selectedGrowPlan.phases", ng-show="selected.selectedGrowPlanPhase == $index", class="phase-slider")
+                  h4(class="page-heading-large seamless-input-wrap")
+                    span {{ phase.name || 'New Phase' }} lasts for
+                    input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
+                          name="expectedNumberOfDays", 
+                          value="1", 
+                          type="number", 
+                          ng-model="phase.expectedNumberOfDays", 
+                          ng-change="setExpectedGrowPlanDuration()",
+                          min="1")
+                    span days
+                  //- div(class="phase-slider-slider")
+                  //-   input(type="range", name="phase_slider_{{$index}}", id="phase_slider_{{$index}}", class="phase-slider-input", value="0", min="0", max="{{expectedGrowPlanDuration}}", ng-model="phase.expectedNumberOfDays")
 
-                    section
-                      div.phaseName
-                        label Phase Name
-                        input(type="text", placeholder="Give this phase a name...", ng-model="phase.name")
+                  section
+                    div.phaseName
+                      label Phase Name
+                      input(type="text", placeholder="Give this phase a name...", ng-model="phase.name")
 
-                      div.phaseDescription
-                        label Phase Description
-                        textarea(placeholder="Write a phase description...", ng-model="phase.description")
+                    div.phaseDescription
+                      label Phase Description
+                      textarea(placeholder="Write a phase description...", ng-model="phase.description")
 
-                      div.growSystem
-                        //select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
-                        h6 Grow System
+                    ul(class="phase-tabs separator-top")
+                      li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
+                          class="btn inverse-btn", 
+                          ng-class="{selected: selected.selectedGrowPlanPhaseSection == $index}", 
+                          ng-click="setCurrentPhaseSectionTab($index)") {{ phaseSection }}
+
+                    div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
+                      //select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
+                      div.question
+                        a(href, ng-click="toggleOverlay('showGrowSystemOverlay', phase.growSystem)")
+                          | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                          | Choose a different grow system
+                        h4(class="page-heading-large separator-top") System
                         label Name
                         input(type="text", ng-model="phase.growSystem.name")
                         label Description
@@ -225,10 +236,28 @@ block content
                         input(type="text", placeholder="W", ng-model="phase.growSystem.overallSize.w")
                         input(type="text", placeholder="H", ng-model="phase.growSystem.overallSize.h")
                         input(type="text", placeholder="D", ng-model="phase.growSystem.overallSize.d")
-                      
-                      div.light
-                        h6 Light
-                        h7 Fixture
+
+                      div(class="growMedium question")
+                        h4(class="page-heading-large separator-top") Grow Medium
+                        input(type='text', ng-model="phase.growMedium")
+
+                      div(class="nutrients question")
+                        a(href, ng-click="toggleOverlay('showNutrientOverlay', phase.nutrients)")
+                          | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                          | Choose a different nutrient
+                        h4(class="page-heading-large separator-top") Nutrients
+                        ul.grid
+                          li(ng-repeat="nutrient in phase.nutrients")
+                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
+                            label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
+                    
+                    div(class="light", ng-show="selected.selectedGrowPlanPhaseSection == 1")
+                      //- h6 Light
+                      div.question
+                        h4(class="page-heading-large separator-top") Fixture
+                        a(href, ng-click="toggleOverlay('showFixtureOverlay', phase.light.fixture)")
+                          | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                          | Choose a different fixture
                         label Brand
                         input(type="text", ng-model="phase.light.fixture.brand")
                         label Name
@@ -241,7 +270,11 @@ block content
                         input(type="text", ng-model="phase.light.fixture.bulbCapacity")
                         label # of fixtures
                         input(type="text", ng-model="phase.light.fixtureQuantity")
-                        h7 Bulbs
+                      div.question
+                        h4(class="page-heading-large separator-top") Bulbs
+                        a(href, ng-click="toggleOverlay('showBulbOverlay', phase.light.bulb)") 
+                          | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                          | Choose a different bulb
                         label Brand
                         input(type="text", ng-model="phase.light.bulb.brand")
                         label Name
@@ -250,181 +283,438 @@ block content
                         input(type="text", ng-model="phase.light.bulb.type")
                         label Watts
                         input(type="text", ng-model="phase.light.bulb.watts")
-  
-                      div.growMedium
-                        label Grow Medium
-                        input(type='text', ng-model="phase.growMedium")
-                      
-                      div.nutrients
-                        label Nutrients
-                        ul.grid
-                          li(ng-repeat="nutrient in phase.nutrients")
-                            input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
-                            label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
 
-                      
-                      div.idealRanges
-                        //- Assuming Phases would be h5
-                        h6 Ideal Sensor Ranges
-                        p Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
-                          | we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
-                          | that the ideal range should apply.
-                        ul
-                          li.add
-                            div(class="add icon btn", ng-click="addIdealRange(this)")
-                              | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
-                              
-                          li.closed(ng-repeat="idealRange in phase.idealRanges")
-                            div(class="sensor-type icon {{idealRange.sCode}}")
-                              | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
-                              div.screen-reader-text {{idealRange.sCode}}
-                            
-                            label {{sensors[idealRange.sCode].name}}
-                              select(ng-model="idealRange.sCode", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name")
-                                option(value="") Select Sensor
-                            
-                            label Trigger the following accessory (optional):
-                              select(ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
-                                option(value="") None
-                            
-                            div.lo
-                              label Low
-                                input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
-                              span {{sensors[idealRange.sCode].unit}}
-                              textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                              div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
+                    div(class="idealRanges", ng-show="selected.selectedGrowPlanPhaseSection == 2")
+                      //- Assuming Phases would be h5
+                      h4(class="page-heading-large separator-top") Ideal Sensor Ranges
+                      p Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
+                        | we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
+                        | that the ideal range should apply.
+                      ul
+                        li
+                          label(class="add btn", ng-click="addIdealRange(this);") 
+                            | Add
+                            | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                            div.hi
-                              label High
-                                input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
-                              span {{sensors[idealRange.sCode].unit}}
-                              textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                              div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
-
-                            div
-                              | What time of day should the ideal range apply?
-                              label All Day
-                                input(class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
-
-                              div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
-                                // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
-                                label.idealRangeStartTime Start Time
-                                  select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
-
-                                label.idealRangeEndTime End Time
-                                  select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
-
-
-                      div.actions
-                        h6 Actions
-                        p Here's where you set schedules for actions to take throughout the phase. You can create on/off cycles for accessories or just schedule simple notifications
-                          | for yourself. If you specify an accessory and have it connected to your Bitponics device, we'll simply trigger its cycles automatically. 
-                          | If you don't have a specified accessory connected to your device, instead we'll send you an email notification whenever an action should take place.
-                        
-                        ul
-                          li.add
-                            div(class="add icon btn", ng-click="addAction(this)")
-                              | <i class="icon-glyph icon-plus" aria-hidden="true"></i>
+                        li(class="question", ng-repeat="idealRange in phase.idealRanges")
+                          //- div(class="sensor-type icon {{idealRange.sCode}}")
+                          //-   | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
+                          //-   div.screen-reader-text {{idealRange.sCode}}
                           
-                          li(ng-repeat="action in phase.actionsViewModel") Action
-                            
-                            label Description
-                              textarea(placeholder="Describe the action.", ng-model="action.description")
-
+                          div
+                            //label {{sensors[idealRange.sCode].name}}
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="idealRange.sCode", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name")
+                                option(value="") Select Sensor
+                              div(class="dblarrow")
+                                i
+                          
+                          div.separator-top
                             label Trigger the following accessory (optional):
-                              select(class="no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
                                 option(value="") None
+                              div(class="dblarrow")
+                                i
 
-                            div Scheduling. Trigger this action:
-                              label 
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
-                                | Once at the start of the phase
+                          div(class="hi separator-top")
+                            label High
+                            input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
+                            span {{sensors[idealRange.sCode].unit}}
+                            textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
 
-                              label
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
-                                | Once at the end of the phase
-
-                              label 
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
-                                | Repeat throughout the phase
-
-                            div(ng-show="action.scheduleType != 'repeat'")
-
+                          div(class="lo separator-top")
+                            label Low
+                            input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
+                            span {{sensors[idealRange.sCode].unit}}
+                            textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                            div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
 
 
-                            div(ng-show="action.scheduleType == 'repeat'")
-                              
+                          div.separator-top
+                            label What time of day should the ideal range apply?
+                            label All Day
+                              input(class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
 
-                              div(ng-show="action.control")
-                                label Daily
-                                  input(type="checkbox", ng-model="action.isDailyControlCycle")
+                            div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
+                              // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
+                              label.idealRangeStartTime Start Time
+                                select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                                div(ng-show="action.isDailyControlCycle")
-                                  label Turn {{action.control.name}} on at 
-                                    select(ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              label.idealRangeEndTime End Time
+                                select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                                  label Turn {{action.control.name}} off at 
-                                    select(ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                    div(class="actions", ng-show="selected.selectedGrowPlanPhaseSection == 3")
+                      h4(class="page-heading-large separator-top") Actions
+                      p Here's where you set schedules for actions to take throughout the phase. You can create on/off cycles for accessories or just schedule simple notifications
+                        | for yourself. If you specify an accessory and have it connected to your Bitponics device, we'll simply trigger its cycles automatically. 
+                        | If you don't have a specified accessory connected to your device, instead we'll send you an email notification whenever an action should take place.
+                      
+                      ul
+                        li.add
+                          label(class="add btn", ng-click="addAction(this);") 
+                            | Add
+                            | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                                div(ng-show="!action.isDailyControlCycle")
-                                  div Repeating actions have alternating on/off states.
+                        li(class="question", ng-repeat="action in phase.actionsViewModel")
+                          
+                          div.separator-top
+                            label Description
+                            textarea(placeholder="Describe the action.", ng-model="action.description")
+
+                          div.separator-top
+                            label Trigger the following accessory (optional):
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                                option(value="") None
+                              div(class="dblarrow")
+                                i
+
+                          div.separator-top
+                            label Is the action repeating?
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="action.scheduleType")
+                                option(value="") Select
+                                option(value="phaseStart") Once at the start of the phase
+                                option(value="phaseEnd") Once at the end of the phase
+                                option(value="repeat") Repeat throughout the phase
+                              div(class="dblarrow")
+                                i
+
+                          //- label Scheduling. Trigger this action:
+                          //-   label 
+                          //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
+                          //-     | Once at the start of the phase
+
+                          //-   label
+                          //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
+                          //-     | Once at the end of the phase
+
+                          //-   label 
+                          //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
+                          //-     | Repeat throughout the phase
+
+
+                          div(ng-show="action.scheduleType != 'repeat'")
+
+
+                          div(ng-show="action.scheduleType == 'repeat'")
+                            
+
+                            div(ng-show="action.control")
+                              label.separator-top Daily
+                                input(type="checkbox", ng-model="action.isDailyControlCycle")
+
+                              div(class="separator-top", ng-show="action.isDailyControlCycle")
+                                label Turn {{action.control.name}} on at 
+                                div.custom-dropdown-wrap
+                                  select(class="custom-dropdown", ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                                  div(class="dblarrow")
+                                    i
+
+                                label Turn {{action.control.name}} off at 
+                                div.custom-dropdown-wrap
+                                  select(class="custom-dropdown", ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                                  div(class="dblarrow")
+                                    i
+
+                              div(class="separator-top", ng-show="!action.isDailyControlCycle")
+                                div Repeating actions have alternating on/off states.
+                                
+                                div First, turn {{action.control.name}}
+                                  label 
+                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
+                                    | On
+
+                                  label
+                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
+                                    | Off
+
+                                  div for
+                                    input(type="number", ng-model="action.cycle.states[0].duration", value="1")
+                                    div.custom-dropdown-wrap
+                                      select(class="custom-dropdown", ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                      div(class="dblarrow")
+                                        i
                                   
-                                  div First, turn {{action.control.name}}
-                                    label 
-                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
-                                      | On
+                                div Then turn {{action.control.name}}
+                                  label 
+                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
+                                    | On
 
-                                    label
-                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
-                                      | Off
+                                  label
+                                    input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
+                                    | Off
 
-                                    div for
-                                      input(type="number", ng-model="action.cycle.states[0].duration", value="1")
-                                      select(ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
-                                    
-                                  div Then turn {{action.control.name}}
-                                    label 
-                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
-                                      | On
+                                  div for 
+                                    input(type="number", ng-model="action.cycle.states[1].duration", value="1")
+                                    div.custom-dropdown-wrap
+                                      select(class="custom-dropdown", ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                      div(class="dblarrow")
+                                        i
 
-                                    label
-                                      input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
-                                      | Off
+                            div(ng-show="!action.control")
+                              div.separator-top 
+                                label Every:
+                                input(type="number", ng-model="action.overallDuration", value="1")
+                                select(ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
 
-                                    div for 
-                                      input(type="number", ng-model="action.cycle.states[1].duration", value="1")
-                                      select(ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
-                                    
+                              div(ng-show="action.overallDurationType == 'days'")
+                                label At 
+                                select(ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
 
-                              div(ng-show="!action.control")
-                                div Every:
-                                  input(type="number", ng-model="action.overallDuration", value="1")
-                                  select(ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+                              label.separator-top Send me the following message:
+                                textarea(ng-model="action.message", placeholder="It's time to...")
 
-                                div(ng-show="action.overallDurationType == 'days'")
-                                  label At 
-                                  select(ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+                        //- end Action UI
+                            
+                      div(class="phaseEndDescription separator-top")
+                        label Phase End Description
+                        textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="This phase is over when...", ng-model="phase.phaseEndDescription")
+                    
+                    div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
+                      h4(class="page-heading-large separator-top") Device
+                      p Here's where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
+                      ul(class="grid devicelist")
+                        li(ng-repeat="device in userOwnedDevices")
+                          input(id="device_{{device._id}}", type='radio', name="device", value="{{device._id}}", ng-model="selected.selectedDevice[device._id]")
+                          label(for="device_{{device._id}}", class="device") {{device.name}}
 
-                                label Send me the following message:
-                                  textarea(ng-model="action.message", placeholder="It's time to...")
+          div(class="step-footer separator-top")
+            input(id="growplans_activate", type="submit", value="Activate Grow Plan")     
 
-                          //- end Action UI
-                              
-                        div.phaseEndDescription
-                          label Phase End Description
-                          textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="This phase is over when...", ng-model="phase.phaseEndDescription")
-                  
-          if (userOwnedDevices.length > 0)
-            div.device 
-              h5 Device
-              p Here's where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
-            ul(class="grid devicelist")
-              each device in userOwnedDevices
-                li
-                  input(id="device_#{device._id}", type='radio', name="device", value="#{device._id}")
-                  label(for="device_#{device._id}", class="device") #{device.name}
+        
+        //- Overlay Templates
 
-          input(id="growplans_activate", type="submit", value="Activate Grow Plan")     
+        div(ng-hide="!showPlantOverlay", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay('showPlantOverlay')")
+            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+          h3.page-heading Add a Plant
+          div(ng-controller="overlayCtrl")
+            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+            div(ng-hide="filteredItems.length") 
+              label(href="#", class="add btn", ng-click="addPlant(this)")
+                | Add New Plant
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+            ul(class="grid plantlist")
+              //- li(ng-repeat="plant in filteredPlantList | orderBy:name")
+              li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
+                dl
+                  dt Type:
+                  dd {{plant.name}}
+                input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()", checked="selected.plant[plant._id]")
+                label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
+                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+
+        div(ng-hide="!showFixtureOverlay", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay('showFixtureOverlay')")
+            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+          h3.page-heading Choose a Fixture
+          div(ng-controller="overlayCtrl")
+            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+            div(ng-hide="filteredItems.length") 
+              label(href="#", class="add btn", ng-click="addFixture(this)")
+                | Add New Fixture
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+            ul(class="grid plantlist")
+              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
+              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                dl
+                  dt Brand:
+                  dd {{item.brand || '--'}}
+                  dt Name:
+                  dd {{item.name}}
+                  dt Type:
+                  dd {{item.type}}
+                  dt Watts:
+                  dd {{item.watts}}
+                  dt # of bulbs per fixture:
+                  dd {{item.bulbCapacity}}
+
+                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightFixture[item._id]", ng-change="updateSelected['lightFixture']()", checked="selected.lightFixture[item._id]")
+                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
+                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
+                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+
+        div(ng-hide="!showBulbOverlay", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay('showBulbOverlay')")
+            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+          h3.page-heading Choose a Bulb
+          div(ng-controller="overlayCtrl")
+            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+            div(ng-hide="filteredItems.length") 
+              label(href="#", class="add btn", ng-click="addBulb(this)")
+                | Add New Bulb
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+            ul(class="grid plantlist")
+              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
+              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                dl
+                  dt Brand:
+                  dd {{item.brand || '--'}}
+                  dt Name:
+                  dd {{item.name}}
+                  dt Type:
+                  dd {{item.type}}
+                  dt Watts:
+                  dd {{item.watts}}
+
+                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightBulb[item._id]", ng-change="updateSelected['lightBulb']()", checked="selected.lightBulb[item._id]")
+                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
+                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
+                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+
+        div(ng-hide="!showGrowSystemOverlay", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay('showGrowSystemOverlay')")
+            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+          h3.page-heading Choose a Grow System
+          div(ng-controller="overlayCtrl")
+            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+            div(ng-hide="filteredItems.length") 
+              label(href="#", class="add btn", ng-click="addGrowSystem(this)")
+                | Add New Grow System
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+            ul(class="grid plantlist")
+              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
+              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                dl
+                  dt Brand:
+                  dd {{item.brand || '--'}}
+                  dt Name:
+                  dd {{item.name}}
+                  dt Type:
+                  dd {{item.type}}
+                  dt Watts:
+                  dd {{item.watts}}
+
+                input(id="search_{{item._id}}", 
+                  type='radio', 
+                  name="{{overlayItemKey}}", 
+                  value="{{item}}", 
+                  ng-model="selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem",
+                  ng-change="updateSelected['growSystem'](this)")
+                  //- ng-model="selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem"
+                  //- checked="item._id == selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem._id"
+                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
+                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
+                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+      
+        div(ng-hide="!showNutrientsOverlay", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay('showNutrientsOverlay')")
+            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+          h3.page-heading Choose a Nutrient
+          div(ng-controller="overlayCtrl")
+            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+            div(ng-hide="filteredItems.length") 
+              label(href="#", class="add btn", ng-click="addGrowSystem(this)")
+                | Add New Nutrient
+                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+            ul(class="grid plantlist")
+              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
+              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                dl
+                  dt Name:
+                  dd {{item.name}}
+                  dt Type:
+                  dd {{item.type}}
+
+                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.nutrients[item._id]", ng-change="updateSelected['nutrients']()", checked="selected.nutrients[item._id]")
+                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
+                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
+                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
+            ul.pagination
+              li(ng-class="{disabled: currentPage == 0}")
+                a(href, ng-click="prevPage()") « Prev
+              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                a(href, ng-click="setPage()", ng-bind="n + 1") 1
+              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                a(href, ng-click="nextPage()") Next »
+
+        //- End Overlay Templates
+        
         
 
 block footer-scripts
@@ -437,17 +727,9 @@ block footer-scripts
     bpn.controls = !{JSON.stringify(controls)};
     bpn.sensors = !{JSON.stringify(sensors)};
     bpn.plants = !{JSON.stringify(plants)};
+    bpn.userOwnedDevices = !{JSON.stringify(userOwnedDevices)};
+    bpn.lights = !{JSON.stringify(lights)};
+    bpn.lightFixtures = !{JSON.stringify(lightFixtures)};
+    bpn.lightBulbs = !{JSON.stringify(lightBulbs)};
+    bpn.nutrients = !{JSON.stringify(nutrients)};
     bpn.growPlanDefault = !{JSON.stringify(growPlanDefault)};
-  
-  //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
-  //script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
-  //script(src='/assets/js/libs/jquery/jquery-mobile-angular-adapter-1.1.1.js')
-  //script(src='/assets/js/libs/es5-shim.min.js')
-  //script(src='/assets/js/libs/Steps.js')
-  //script(src='/assets/js/libs/list/src/list.js')
-  //script(src='/assets/js/libs/list/plugins/fuzzy/list.fuzzySearch.js')
-  //- script(src='/assets/js/libs/list/list.min.js')
-  //script(src='/assets/js/libs/moment.min.js')
-  //- script(src='/assets/js/growplans.js')
-  //script(src='/assets/js/utils.js')
-
