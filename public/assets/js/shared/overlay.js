@@ -1,4 +1,4 @@
-function overlayCtrl($scope, $filter) {
+function overlayCtrl($scope, $filter, $compile) {
     // init
     $scope.sortingOrder = 'name';
     $scope.reverse = false;
@@ -86,23 +86,26 @@ function overlayCtrl($scope, $filter) {
 
         $scope.sortingOrder = newSortingOrder;
 
-        // icon setup
-        $('th i').each(function(){
-            // icon reset
-            $(this).removeClass().addClass('icon-sort');
-        });
-        if ($scope.reverse)
-            $('th.'+new_sorting_order+' i').removeClass().addClass('icon-chevron-up');
-        else
-            $('th.'+new_sorting_order+' i').removeClass().addClass('icon-chevron-down');
+        // // icon setup
+        // $('th i').each(function(){
+        //     // icon reset
+        //     $(this).removeClass().addClass('icon-sort');
+        // });
+        // if ($scope.reverse)
+        //     $('th.'+new_sorting_order+' i').removeClass().addClass('icon-chevron-up');
+        // else
+        //     $('th.'+new_sorting_order+' i').removeClass().addClass('icon-chevron-down');
     };
 
     //refresh the data for new overlay
     $scope.$on('newOverlay', function(event, args){
-        // var itemKey = args[0],
-        //     items = args[1];
+        // var overlayId = args[0],
+        //     overlayEl = $('#'+overlayId);
+        // if(overlayEl.length){
+        //     //$compile(overlayEl.contents())($scope);
+        // }
         $scope.search();
     });
 
 };
-overlayCtrl.$inject = ['$scope', '$filter'];
+overlayCtrl.$inject = ['$scope', '$filter', '$compile'];

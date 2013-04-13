@@ -49,19 +49,22 @@ function(viewModels){
             $scope.selectedPlants = [];
             $scope.plantQuery = '';
             $scope.growSystems = bpn.growSystems;
-            $scope.growSystemSelections = {};
+            $scope.selectedGrowSystem = undefined;
             $scope.currentGrowPlanDay = 0;
             $scope.growPlans = bpn.growPlans;
             $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
             $scope.timesOfDayList = bpn.utils.generateTimesOfDayArray();
             $scope.actionDurationTypeOptions = bpn.utils.DURATION_TYPES,
             $scope.actionWithNoAccessoryDurationTypeOptions = ['days','weeks','months'];
-            $scope.showPlantOverlay = false;
-            $scope.showFixtureOverlay = false;
-            $scope.showGrowSystemOverlay = false;
-            $scope.showGrowMediumOverlay = false;
-            $scope.showNutrientOverlay = false;
-            $scope.overlayItems = [];
+            $scope.overlayItems = []; //used by Overlay Ctrl
+            $scope.overlayMetaData = {}; //pass additional config to overlay
+            $scope.overlayStates = { //manage open state
+                'plant': false,
+                'fixture': false,
+                'growSystemOverlay': false,
+                'growMediumOverlay': false,
+                'nutrient': false
+            }
             $scope.growPlanPhaseSectionUITabs = ['Grow System','Light','Sensor Ranges','Actions'];
             // $scope.UI.suggestions = {
             //     lightFixtures: bpn.utils.suggestions.lightFixtures,
@@ -75,7 +78,7 @@ function(viewModels){
             //Wrapping our ng-model vars {}
             //This is necessary so ng-change always fires, due to: https://github.com/angular/angular.js/issues/1100
             $scope.selected = {
-                growSystem: undefined,
+                // growSystem: undefined,
                 growPlan: undefined,
                 plant: {},
                 selectedGrowPlanPhase: 0,
@@ -84,7 +87,7 @@ function(viewModels){
                 lightFixture: undefined,
                 lightBulb: undefined,
                 growMedium: undefined,
-                nutrients: undefined
+                nutrient: {}
             };
 
             var GrowPlanModel = $resource(
@@ -129,7 +132,7 @@ function(viewModels){
             };
 
             $scope.updateSelectedGrowSystem = function(){
-                $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
+                // $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
                 if($scope.selectedPlants && $scope.selectedPlants.length){
                     $scope.updatefilteredGrowPlans();
                 }
@@ -182,24 +185,32 @@ function(viewModels){
                     }
                 },
 
-                'lightFixtures': function(){
-                    console.log('lightFixture')
+                'lightFixture': function(data, phase){
+                    $scope.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.fixture = data.item;
                 },
 
-                'lightBulbs': function(){
-                    console.log('lightBulb')
+                'lightBulb': function(data, phase){
+                    $scope.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.bulb = data.item;
                 },
 
-                'growSystem': function(gs){
-                    console.log('growSystem: '+gs)
+                'growSystem': function(data, phase){
+                    $scope.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].growSystem = data.item;
                 },
 
-                'growMedium': function(){
+                'growMedium': function(data, phase){
                     console.log('growMedium')
                 },
 
-                'nutrients': function(){
-                    console.log('nutrients')
+                'nutrients': function(data, phase){
+                    var nutrients = [];
+                    for (var i = $scope.nutrients.length; i--;) {
+                        Object.keys($scope.selected.nutrient[phase]).forEach(function(_id) {
+                            if ($scope.selected.nutrient[phase][_id] && $scope.nutrients[i]._id == _id) {
+                                nutrients.push($scope.nutrients[i]);
+                            }
+                        });
+                    }
+                    $scope.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].nutrients = nutrients;
                 }
 
             };
@@ -231,7 +242,8 @@ function(viewModels){
                 //hit API with params to filter grow plans
                 $scope.filteredGrowPlanList = GrowPlanModel.query({
                     plants: selectedPlantIds,
-                    growSystem: $scope.selectedGrowSystem._id
+                    growSystem: $scope.selectedGrowSystem
+                    // growSystem: $scope.selectedGrowSystem._id
                 }, function(){
                     //add default to end of filtered grow plan array
                     $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
@@ -293,42 +305,41 @@ function(viewModels){
                 phase.actions.unshift(newAction);
             };
 
-            $scope.toggleOverlay = function(overlayType, overlayModel){
-                $scope.overlayModel = overlayModel;
-                switch(overlayType){
-                    case 'showPlantOverlay':
+            $scope.toggleOverlay = function(overlayMetaData){
+                $scope.overlayMetaData = overlayMetaData;
+                switch(overlayMetaData.type){
+                    case 'plant':
                         $scope.overlayItems = $scope.filteredPlantList;
-                        $scope.overlayItemKey = "plants";
+                        // $scope.overlayItemKey = "plants";
                         break;
-                    case 'showFixtureOverlay':
+                    case 'fixture':
                         $scope.overlayItems = $scope.lightFixtures;
-                        $scope.overlayItemKey = "lightFixture";
+                        // $scope.overlayItemKey = "lightFixture";
                         break;
-                    case 'showBulbOverlay':
+                    case 'bulb':
                         $scope.overlayItems = $scope.lightBulbs;
-                        $scope.overlayItemKey = "lightBulb";
+                        // $scope.overlayItemKey = "lightBulb";
                         break;
-                    case 'showGrowSystemOverlay':
+                    case 'growSystem':
                         $scope.overlayItems = $scope.growSystems;
-                        $scope.overlayItemKey = "growSystem";
+                        // $scope.overlayItemKey = "growSystem";
                         break;
-                    case 'showNutrientsOverlay':
+                    case 'nutrient':
                         $scope.overlayItems = $scope.nutrients;
-                        $scope.overlayItemKey = "nutrients";
+                        // $scope.overlayItemKey = "nutrients";
                         break;
                     default:
                         $scope.overlayItems = [];
-                        $scope.overlayItemKey = '';
+                        // $scope.overlayItemKey = '';
                         break;
                 }
-                if($scope[overlayType]){
+                if($scope.overlayStates[$scope.overlayMetaData.type]){
                     $scope.overlayItems = [];
-                    $scope.overlayItemKey = '';
-                    $scope[overlayType] = false;
+                    $scope.overlayStates[$scope.overlayMetaData.type] = false;
                 }else{
                     // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
                     $scope.$broadcast('newOverlay');
-                    $scope[overlayType] = true;
+                    $scope.overlayStates[$scope.overlayMetaData.type] = true;
                 }
             };
 

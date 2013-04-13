@@ -271,7 +271,7 @@ input[type=checkbox] {
   width: 2.35em;
   display: inline;
   padding: 0.25em 0;
-  margin: 0;
+  margin: 0 0.25em 0 0;
 }
 .seamless-input::-webkit-outer-spin-button,
 .seamless-input::-webkit-inner-spin-button {
@@ -369,10 +369,11 @@ input[type=checkbox] {
   -webkit-border-radius: 0px;
   outline: none;
   margin-right: 15px;
-  font-size: 1.4em;
+  font-size: 1.25em;
   display: inline-block;
 /*Important*/
-  padding: 0.25em 1.25em 0.25em 0.25em;
+  padding: 0.45em 1.25em 0.45em 0.45em;
+  font-weight: lighter;
 }
 .wufoo {
   background-color: #c1c2c4 !important;

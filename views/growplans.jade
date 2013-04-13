@@ -47,13 +47,20 @@ block content
           div.separator-top
             div.question
               h5.question-title What kind of hydroponic system are you using?
-              div.dropdown-wrap
-                ul(class="dropdown initial")
-                  li.select
-                    label Select
-                  li(ng-repeat="system in growSystems | orderBy:name")
-                    input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
-                    label(for="{{system._id}}") {{system.name}}
+              
+              div.custom-dropdown-wrap
+                select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in growSystems | orderBy:name")
+                  option(value="") Select
+                div(class="dblarrow")
+                  i
+
+              //- div.dropdown-wrap
+              //-   ul(class="dropdown initial")
+              //-     li.select
+              //-       label Select
+              //-     li(ng-repeat="system in growSystems | orderBy:name")
+              //-       input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
+              //-       label(for="{{system._id}}") {{system.name}}
 
             div(class="question-wrap-right")
               div.question
@@ -73,12 +80,12 @@ block content
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="plant in selectedPlants | orderBy:name")
-                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
                     label(for="{{plant._id}}", class="plant btn") 
                       {{plant.name}}
                       | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-                label(class="add btn", ng-click="toggleOverlay('showPlantOverlay');") 
+                label(class="add btn", ng-click="toggleOverlay({ type: 'plant' });") 
                   | Add
                   | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
           
@@ -131,12 +138,12 @@ block content
                 ul(class="grid plantlist")
                   //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
                   li(ng-repeat="plant in selectedGrowPlan.plants | orderBy:name")
-                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+                    input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
                     label(for="{{plant._id}}", class="plant btn") 
                       {{plant.name}}
                       | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-                label(class="add btn", ng-click="toggleOverlay('showPlantOverlay')") 
+                label(class="add btn", ng-click="toggleOverlay({ type: 'plant' })") 
                   | Add
                   | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
@@ -156,7 +163,7 @@ block content
           input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="selectedGrowPlan._id") 
 
           div.Phases
-            div.phaseRangeSlider
+            div
               section.separator-top
                 h5.question-title Total grow plan duration  
                 //- input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182", ng-model="expectedGrowPlanDuration", ng-change="updatePhaseDurations()") 
@@ -218,34 +225,34 @@ block content
                     div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
                       //select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
                       div.question
-                        a(href, ng-click="toggleOverlay('showGrowSystemOverlay', phase.growSystem)")
+                        h4(class="page-heading-large separator-top") System
+                        a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'growSystem', phase: $index })")
                           | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                           | Choose a different grow system
-                        h4(class="page-heading-large separator-top") System
                         label Name
-                        input(type="text", ng-model="phase.growSystem.name")
+                        input(type="text", ng-model="phase.growSystem.name", value="phase.growSystem.name")
                         label Description
-                        input(type="text", ng-model="phase.growSystem.description")
+                        input(type="text", ng-model="phase.growSystem.description", value="phase.growSystem.description")
                         label Type
                         input(type="text", ng-model="phase.growSystem.type")
                         label Reservoir Size
-                        input(type="text", ng-model="phase.growSystem.reservoirSize")
+                        input(type="text", ng-model="phase.growSystem.reservoirSize", value="phase.growSystem.reservoirSize")
                         label Plant Capacity
-                        input(type="text", ng-model="phase.growSystem.plantCapacity")
+                        input(type="text", ng-model="phase.growSystem.plantCapacity", value="phase.growSystem.plantCapacity")
                         h7 Size
-                        input(type="text", placeholder="W", ng-model="phase.growSystem.overallSize.w")
-                        input(type="text", placeholder="H", ng-model="phase.growSystem.overallSize.h")
-                        input(type="text", placeholder="D", ng-model="phase.growSystem.overallSize.d")
+                        input(type="text", placeholder="W", ng-model="phase.growSystem.overallSize.w", value="phase.growSystem.overallSize.w")
+                        input(type="text", placeholder="H", ng-model="phase.growSystem.overallSize.h", value="phase.growSystem.overallSize.h")
+                        input(type="text", placeholder="D", ng-model="phase.growSystem.overallSize.d", value="phase.growSystem.overallSize.d")
 
                       div(class="growMedium question")
                         h4(class="page-heading-large separator-top") Grow Medium
                         input(type='text', ng-model="phase.growMedium")
 
                       div(class="nutrients question")
-                        a(href, ng-click="toggleOverlay('showNutrientOverlay', phase.nutrients)")
+                        h4(class="page-heading-large separator-top") Nutrients
+                        a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'nutrient', phase: $index })")
                           | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                           | Choose a different nutrient
-                        h4(class="page-heading-large separator-top") Nutrients
                         ul.grid
                           li(ng-repeat="nutrient in phase.nutrients")
                             input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
@@ -255,34 +262,34 @@ block content
                       //- h6 Light
                       div.question
                         h4(class="page-heading-large separator-top") Fixture
-                        a(href, ng-click="toggleOverlay('showFixtureOverlay', phase.light.fixture)")
+                        a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'fixture', phase: $index })")
                           | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                           | Choose a different fixture
                         label Brand
-                        input(type="text", ng-model="phase.light.fixture.brand")
+                        input(type="text", ng-model="phase.light.fixture.brand", value="phase.light.fixture.brand")
                         label Name
-                        input(type="text", ng-model="phase.light.fixture.name")
+                        input(type="text", ng-model="phase.light.fixture.name", value="phase.light.fixture.name")
                         label Type
-                        input(type="text", ng-model="phase.light.fixture.type")
+                        input(type="text", ng-model="phase.light.fixture.type", value="phase.light.fixture.type")
                         label Watts
-                        input(type="text", ng-model="phase.light.fixture.watts")
+                        input(type="text", ng-model="phase.light.fixture.watts", value="phase.light.fixture.watts")
                         label # of bulbs per fixture
-                        input(type="text", ng-model="phase.light.fixture.bulbCapacity")
+                        input(type="text", ng-model="phase.light.fixture.bulbCapacity", value="phase.light.fixture.bulbCapacity")
                         label # of fixtures
-                        input(type="text", ng-model="phase.light.fixtureQuantity")
+                        input(type="text", ng-model="phase.light.fixtureQuantity", value="phase.light.fixtureQuantity")
                       div.question
                         h4(class="page-heading-large separator-top") Bulbs
-                        a(href, ng-click="toggleOverlay('showBulbOverlay', phase.light.bulb)") 
+                        a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'bulb', phase: $index })") 
                           | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                           | Choose a different bulb
                         label Brand
-                        input(type="text", ng-model="phase.light.bulb.brand")
+                        input(type="text", ng-model="phase.light.bulb.brand", value="phase.light.bulb.brand")
                         label Name
-                        input(type="text", ng-model="phase.light.bulb.name")
+                        input(type="text", ng-model="phase.light.bulb.name", value="phase.light.bulb.name")
                         label Type
-                        input(type="text", ng-model="phase.light.bulb.type")
+                        input(type="text", ng-model="phase.light.bulb.type", value="phase.light.bulb.type")
                         label Watts
-                        input(type="text", ng-model="phase.light.bulb.watts")
+                        input(type="text", ng-model="phase.light.bulb.watts", value="phase.light.bulb.watts")
 
                     div(class="idealRanges", ng-show="selected.selectedGrowPlanPhaseSection == 2")
                       //- Assuming Phases would be h5
@@ -487,8 +494,8 @@ block content
         
         //- Overlay Templates
 
-        div(ng-hide="!showPlantOverlay", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay('showPlantOverlay')")
+        div(id="plant-overlay", ng-hide="!overlayStates.plant", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay({ type: 'plant' })")
             | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
           h3.page-heading Add a Plant
           div(ng-controller="overlayCtrl")
@@ -525,8 +532,8 @@ block content
                 a(href, ng-click="nextPage()") Next »
 
 
-        div(ng-hide="!showFixtureOverlay", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay('showFixtureOverlay')")
+        div(id="fixture-overlay", ng-hide="!overlayStates.fixture", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay({ type: 'fixture' })")
             | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
           h3.page-heading Choose a Fixture
           div(ng-controller="overlayCtrl")
@@ -559,10 +566,14 @@ block content
                   dt # of bulbs per fixture:
                   dd {{item.bulbCapacity}}
 
-                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightFixture[item._id]", ng-change="updateSelected['lightFixture']()", checked="selected.lightFixture[item._id]")
-                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
-                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
-                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                input(id="fixture_{{item._id}}", 
+                  type='radio', 
+                  name="lightFixture", 
+                  value="{{item._id}}", 
+                  ng-model="item._id",
+                  checked="item._id == selectedGrowPlan.phases[overlayMetaData.phase].light.fixture._id",
+                  ng-click="updateSelected['lightFixture'](this)")
+                label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
             
             ul.pagination
               li(ng-class="{disabled: currentPage == 0}")
@@ -573,8 +584,8 @@ block content
                 a(href, ng-click="nextPage()") Next »
 
 
-        div(ng-hide="!showBulbOverlay", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay('showBulbOverlay')")
+        div(id="bulb-overlay", ng-hide="!overlayStates.bulb", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay({ type: 'bulb' })")
             | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
           h3.page-heading Choose a Bulb
           div(ng-controller="overlayCtrl")
@@ -605,10 +616,15 @@ block content
                   dt Watts:
                   dd {{item.watts}}
 
-                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightBulb[item._id]", ng-change="updateSelected['lightBulb']()", checked="selected.lightBulb[item._id]")
-                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
-                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
-                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                //- input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightBulb[item._id]", ng-change="updateSelected['lightBulb']()", checked="selected.lightBulb[item._id]")
+                input(id="bulb_{{item._id}}", 
+                  type='radio', 
+                  name="lightBulb", 
+                  value="{{item._id}}", 
+                  ng-model="item._id",
+                  checked="item._id == selectedGrowPlan.phases[overlayMetaData.phase].light.bulb._id",
+                  ng-click="updateSelected['lightBulb'](this)")
+                label(for="bulb_{{item._id}}", class="item btn next-step-btn") Select
             
             ul.pagination
               li(ng-class="{disabled: currentPage == 0}")
@@ -619,8 +635,8 @@ block content
                 a(href, ng-click="nextPage()") Next »
 
 
-        div(ng-hide="!showGrowSystemOverlay", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay('showGrowSystemOverlay')")
+        div(id="growsystem-overlay", ng-hide="!overlayStates.growSystem", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay({ type: 'growSystem' })")
             | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
           h3.page-heading Choose a Grow System
           div(ng-controller="overlayCtrl")
@@ -651,16 +667,23 @@ block content
                   dt Watts:
                   dd {{item.watts}}
 
-                input(id="search_{{item._id}}", 
+                div Phase index: {{overlayMetaData.phase}}
+                div {{selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
+                div {{item._id}}
+                div {{item._id == selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
+
+                input(id="growsystem_{{item._id}}", 
                   type='radio', 
-                  name="{{overlayItemKey}}", 
-                  value="{{item}}", 
-                  ng-model="selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem",
-                  ng-change="updateSelected['growSystem'](this)")
+                  name="growSystem", 
+                  value="{{item._id}}", 
+                  ng-model="item._id",
+                  checked="item._id === selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
+                  ng-click="updateSelected['growSystem'](this)")
+                //- checked="item._id === selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
                   //- ng-model="selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem"
                   //- checked="item._id == selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem._id"
                   //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
-                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
+                label(for="growsystem_{{item._id}}", class="item btn next-step-btn") Select
                   //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
             
             ul.pagination
@@ -672,8 +695,8 @@ block content
                 a(href, ng-click="nextPage()") Next »
 
       
-        div(ng-hide="!showNutrientsOverlay", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay('showNutrientsOverlay')")
+        div(id="nutrient-overlay", ng-hide="!overlayStates.nutrient", class="overlay")
+          div(class="close btn", ng-click="toggleOverlay({ type: 'nutrient' })")
             | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
           h3.page-heading Choose a Nutrient
           div(ng-controller="overlayCtrl")
@@ -695,15 +718,13 @@ block content
               li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
                 img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
                 dl
+                  dt Brand:
+                  dd {{item.brand}}
                   dt Name:
                   dd {{item.name}}
-                  dt Type:
-                  dd {{item.type}}
 
-                input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.nutrients[item._id]", ng-change="updateSelected['nutrients']()", checked="selected.nutrients[item._id]")
-                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
-                label(for="search_{{item._id}}", class="item btn next-step-btn") Select
-                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                input(id="nutrient_{{item._id}}", type='checkbox', name="nutrients", value="{{item._id}}", ng-model="selected.nutrient[overlayMetaData.phase][item._id]", ng-change="updateSelected['nutrients']()", checked="selected.nutrient[overlayMetaData.phase][item._id]")
+                label(for="nutrient_{{item._id}}", class="nutrient btn next-step-btn") Select
             
             ul.pagination
               li(ng-class="{disabled: currentPage == 0}")
