@@ -6,7 +6,9 @@ var mongoose = require('mongoose'),
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  async = require('async'),
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var PlantSchema = new Schema({
 	name: { type: String, required: true },
@@ -36,7 +38,7 @@ PlantSchema.plugin(useTimestamps);
  * @return {boolean} True if source and other are equivalent, false if not
  */
 PlantSchema.static('isEquivalentTo', function(source, other){
-  return source.name === other.name;
+  return (source.name === other.name);
 });
 
 
@@ -53,25 +55,43 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
   var submittedPlant = options.plant,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       PlantModel = this;
 
-    PlantModel.findById(submittedPlant._id, function(err, plantResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getPlantIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedPlant._id)){
+            return PlantModel.findOne({ name : submittedPlant.name }, innerCallback);
+          } 
 
-      if (plantResult && PlantModel.isEquivalentTo(submittedPlant, plantResult)){
-        return callback(null, plantResult);
+          PlantModel
+          .findOne()
+          .or([{_id : submittedPlant._id }, { name : submittedPlant.name}])
+          .exec(innerCallback);
+        },
+        function (matchedPlant, innerCallback){
+          console.log('MATCHED', matchedPlant, submittedPlant);
+          if (matchedPlant && PlantModel.isEquivalentTo(submittedPlant, matchedPlant)){
+            return innerCallback(null, matchedPlant);
+          }
+          
+          // If we've gotten here, either there was no matchedPlant
+          // or the item wasn't equivalent
+          submittedPlant._id = new ObjectId();
+          submittedPlant.createdBy = user;
+          submittedPlant.visibility = visibility;
+
+          PlantModel.create(submittedPlant, innerCallback);
+        }
+      ],
+      function(err, validatedPlant){
+        if (silentValidationFail){
+          return callback(null, validatedPlant);
+        }
+        return callback(err, validatedPlant);
       }
-      
-      // If we've gotten here, either there was no plantResult
-      // or the item wasn't equivalent
-      submittedPlant._id = new ObjectId();
-      submittedPlant.createdBy = user;
-      submittedPlant.visibility = visibility;
-
-      PlantModel.create(submittedPlant, function(err, createdPlant){
-        return callback(err, createdPlant);
-      });  
-    });
+    )
   } 
 );
 
@@ -81,4 +101,4 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
 PlantSchema.path('name').index({ unique: true });
 
 exports.schema = PlantSchema;
-exports.model = mongoose.model('Plant', PlantSchema);
+exports.model = mongooseConnection.model('Plant', PlantSchema);

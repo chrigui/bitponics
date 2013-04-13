@@ -5,12 +5,14 @@ var mongoose = require('mongoose'),
   useTimestamps = mongoosePlugins.useTimestamps,
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
+  async = require('async'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var LightFixtureSchema = new Schema({
 	brand : { type : String },
-	name : { type : String, required: true},
+	name : { type : String },
 	type : { type : String },
 	watts : { type : Number },
 	/**
@@ -70,31 +72,46 @@ LightFixtureSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.lightFixture
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
  */
 LightFixtureSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedLightFixture = options.lightFixture,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       LightFixtureModel = this;
 
-    LightFixtureModel.findById(submittedLightFixture._id, function(err, lightFixtureResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedLightFixture._id)){
+            return innerCallback(null, null);
+          } 
+          
+          LightFixtureModel.findById(submittedLightFixture._id, innerCallback);
+        },
+        function (matchedLightFixture, innerCallback){
+          if (matchedLightFixture && LightFixtureModel.isEquivalentTo(submittedLightFixture, matchedLightFixture)){
+            return callback(null, matchedLightFixture);
+          }
+          
+          // If we've gotten here, either there was no matchedLightFixture
+          // or the item wasn't equivalent
+          submittedLightFixture._id = new ObjectId();
+          submittedLightFixture.createdBy = user;
+          submittedLightFixture.visibility = visibility;
 
-      if (lightFixtureResult && LightFixtureModel.isEquivalentTo(submittedLightFixture, lightFixtureResult)){
-        return callback(null, lightFixtureResult);
+          LightFixtureModel.create(submittedLightFixture, innerCallback);
+        }
+      ],
+      function(err, validatedLightFixture){
+        if (silentValidationFail){
+          return callback(null, validatedLightFixture);
+        }
+        return callback(err, validatedLightFixture);
       }
-      
-      // If we've gotten here, either there was no lightFixtureResult
-      // or the item wasn't equivalent
-      submittedLightFixture._id = new ObjectId();
-      submittedLightFixture.createdBy = user;
-      submittedLightFixture.visibility = visibility;
-
-      LightFixtureModel.create(submittedLightFixture, function(err, createdLightFixture){
-        return callback(err, createdLightFixture);
-      });  
-    });
+    );
   } 
 );
 
@@ -102,4 +119,4 @@ LightFixtureSchema.static('createNewIfUserDefinedPropertiesModified', function(o
 
 
 exports.schema = LightFixtureSchema;
-exports.model = mongoose.model('LightFixture', LightFixtureSchema);
+exports.model = mongooseConnection.model('LightFixture', LightFixtureSchema);

@@ -122,6 +122,10 @@ $(function(){
 			timeout: 2000,
 			success: function(data){
 				console.log(data);
+        if (typeof data === 'string'){
+          data = JSON.parse(data);
+        }
+
 				// Data will be in the following form:
 				/*
 				//  row count, Security Mode, SSID

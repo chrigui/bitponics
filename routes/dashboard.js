@@ -87,12 +87,12 @@ module.exports = function(app){
 							// get the actions that have a corresponding control in the associated device
 							activeActions.forEach(function(activeAction){
 								if (!activeAction.control){ return; }
-								var controlMapEntry = currentGrowPlanInstance.device.controlMap.filter(
-									function(controlMapEntry){
-										return (controlMapEntry.control.equals(activeAction.control));
+								var outputMapEntry = currentGrowPlanInstance.device.outputMap.filter(
+									function(outputMapEntry){
+										return (outputMapEntry.control.equals(activeAction.control));
 									});
-								controlMapEntry = (controlMapEntry.length > 0 ? controlMapEntry[0] : undefined);
-								if (controlMapEntry){
+								outputMapEntry = (outputMapEntry.length > 0 ? outputMapEntry[0] : undefined);
+								if (outputMapEntry){
 									activeControlActions.push(activeAction);
 								}
 							});

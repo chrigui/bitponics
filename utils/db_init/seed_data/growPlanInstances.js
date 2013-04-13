@@ -2,6 +2,16 @@ var ObjectIdSchema = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{
+      _id : '514fe0c0658ae4f3f325e5b8',
+      users : [
+        "506de30a8eebf7524342cb6c"//,
+      ],
+      owner : "506de30a8eebf7524342cb6c", // Amit
+      growPlan : "506de2ff8eebf7524342cb3a",
+      device : "506de2fe8eebf7524342cb34", // mac 0006667211cf
+      active: true,
+    },
+    {
 			_id : '506de2fe8eebf7524342cb38',
 			users : [
 				"506de30a8eebf7524342cb6c"//,
@@ -12,9 +22,9 @@ module.exports = [
 				//"506de30a8eebf7524342cb6a",
 				//"506de30a8eebf7524342cb6b"
 			],
-			owner : "506de30a8eebf7524342cb6c",
+			owner : "506de30a8eebf7524342cb6c", // Amit
 			growPlan : "506de2ff8eebf7524342cb3a",
-			device : "506de2fe8eebf7524342cb34",
+			device : "5118232537d976f7050f6186", // mac 000666721fc1
 			active: true,
 		},
 		{
@@ -46,6 +56,17 @@ module.exports = [
       growPlan : "506de2ff8eebf7524342cb3b",
       device : "513e37cd66e5c0dfc41e101d",
       active: true
-    }
+    },
 
+    // Chris's GPI with device 2947
+    {
+      _id : '514fde5e658ae4f3f325e5b7',
+      users : [
+        "506de3098eebf7524342cb67"
+      ],
+      owner : "506de3098eebf7524342cb67",
+      growPlan : "506de2ff8eebf7524342cb3b",
+      device : "514fb64a658ae4f3f325e5b6",
+      active: true
+    },
 	];

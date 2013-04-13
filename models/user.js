@@ -12,7 +12,8 @@ var mongoose = require('mongoose'),
 	winston = require('winston'),
 	timezone = require('timezone/loaded'),	
 	verificationEmailDomain = 'bitponics.com',
-	EmailConfig = require('../config/email-config');
+	EmailConfig = require('../config/email-config'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -417,7 +418,7 @@ UserSchema.index({ 'apiKey.public': 1 });
 /***************** END INDEXES ********************************/
 
 
-User = mongoose.model('User', UserSchema);
+User = mongooseConnection.model('User', UserSchema);
 
 module.exports.setVerificationEmailDomain = function(domain){
 	verificationEmailDomain = domain;

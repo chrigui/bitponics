@@ -180,9 +180,6 @@ margin 0,
   outline: none;
   border: none;
 }
-.separator-top {
-  border-top: 1px solid #cccdcc;
-}
 .content-module {
   float: left;
 }
@@ -202,7 +199,7 @@ margin 0,
 }
 section.header,
 section#main,
-section.footer {
+section#footer {
   padding: 1em;
 }
 #logo,
@@ -260,16 +257,16 @@ section.footer {
     width: 100%;
     margin: 0.125em 0;
   }
-  section.footer {
+  section#footer {
     width: 100%;
   }
-  section.footer .content-module {
+  section#footer .content-module {
     margin: 0;
   }
-  section.footer #date {
+  section#footer #date {
     float: left;
   }
-  section.footer #notifications {
+  section#footer #notifications {
     float: right;
     text-align: right;
   }
@@ -297,7 +294,6 @@ section.footer {
 }
 .idealRanges li {
   zoom: 1;
-  max-width: 15em;
 }
 .idealRanges li:before,
 .idealRanges li:after {
@@ -306,6 +302,14 @@ section.footer {
 }
 .idealRanges li:after {
   clear: both;
+}
+.idealRanges .hi,
+.idealRanges .lo {
+  width: 50%;
+  float: left;
+}
+.idealRanges .lo {
+  float: right;
 }
 /*
  * Home Page
@@ -317,7 +321,7 @@ section.footer {
 .landing-page .content-module {
   min-height: 800px;
 }
-.landing-page .footer {
+.landing-page #footer {
   background-position: 45% 100%;
   background-image: url("/assets/img/home/footer.jpg");
   min-height: 1323px;
@@ -327,7 +331,7 @@ section.footer {
   background-repeat: no-repeat;
   position: relative;
 }
-.landing-page .footer div {
+.landing-page #footer div {
   position: absolute;
   bottom: 1em;
   left: 2.5%;
@@ -479,7 +483,7 @@ section.footer {
 }
 .landing-page .featured-press {
   clear: both;
-  min-height: 25em;
+  min-height: 24em;
 }
 .landing-page .featured-press li {
   position: relative;
@@ -514,19 +518,15 @@ section.footer {
 .landing-page .page-heading {
   line-height: 2em;
 }
-.landing-page #main #about,
-.landing-page #main #gallery,
-.landing-page #main #contact,
-.landing-page #main #how-it-works,
-.landing-page #main #press,
-.landing-page #main #buy,
-.landing-page #main #pricing,
-.landing-page #main #team,
+.landing-page #main .content-module,
 .landing-page #main #details {
   padding-top: 3.5em;
 }
+.landing-page #main .content-module#home,
+.landing-page #main #details#home {
+  padding-top: 0;
+}
 .landing-page .flexslider img {
-  min-height: 100%;
   min-width: 1440px;
   position: relative;
   left: 50%;
@@ -648,14 +648,11 @@ section.footer {
 /*
  * Single landing page overrides
  */
-.single-page .content-module {
-  min-height: 600px;
-}
 .single-page .icon-glyphlogo-new {
   display: none !important;
 }
 .single-page #main,
-.single-page .footer {
+.single-page #footer {
   max-width: 60em;
   margin: 0 auto;
   width: 95%;
@@ -663,14 +660,17 @@ section.footer {
 .single-page #main {
   margin: 3em auto !important;
 }
-.single-page .footer {
+.single-page .content-module {
+  padding-top: 1.5em;
+}
+.single-page #footer {
   background: none;
   height: auto;
   min-height: auto;
   padding: 0;
   font-size: 1em;
 }
-.single-page .footer div {
+.single-page #footer div {
   position: static;
 }
 .single-page .page-content,
@@ -699,6 +699,15 @@ section.footer {
   color: #999b9a;
   border-color: #999b9a;
 }
+.single-page #contact .wufoo * {
+  background-color: #fff;
+  color: #999b9a;
+}
+@media screen and (min-width: 40em) {
+  #main .content-module {
+    padding-top: 1em !important;
+  }
+}
 /*
  * App page overrides
  */
@@ -712,9 +721,6 @@ section.footer {
 .app-page .header h1.logo a,
 .app-page .header h1.logo span {
   color: #00e36c;
-}
-.app-page .footer {
-  min-height: 0;
 }
 .app-page .label {
   font-size: 0.75em;
@@ -751,11 +757,8 @@ section.footer {
 }
 .question-wrap-right {
   float: right;
-  width: 55%;
+  width: 60%;
 }
 .question-wrap-right .question {
-  width: 80%;
-}
-.overlay {
-  padding: 1em 2em 1em;
+  width: 60%;
 }

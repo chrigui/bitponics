@@ -6,7 +6,8 @@ var mongoose = require('mongoose'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
 	ObjectIdSchema = Schema.ObjectId,
-  ObjectId = mongoose.Types.ObjectId;
+  ObjectId = mongoose.Types.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var NotificationSentLogSchema = new Schema({ 
@@ -247,4 +248,4 @@ NotificationSchema.index({ 'tts gpi' : -1} , { sparse : true } );
 
 
 exports.schema = NotificationSchema;
-exports.model = mongoose.model('Notification', NotificationSchema);
+exports.model = mongooseConnection.model('Notification', NotificationSchema);

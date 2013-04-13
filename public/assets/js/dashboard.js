@@ -1,9 +1,10 @@
+
 bpn.pages.dashboard = {
     getPhaseFillColor : function(data, index){
         var num = data.data;
 
         if (num == 0) { 
-            return '#46f121'
+            return '#46f121';
         } else if (num == 2){
             return '#24d321';
         } else if (num < 1){
@@ -27,6 +28,7 @@ bpn.pages.dashboard = {
             colorScale = d3.scale.category20c(),
             equalPie = d3.layout.pie();
 
+
         // disable data sorting & force all slices to be the same size
         equalPie
         .sort(null)
@@ -35,19 +37,22 @@ bpn.pages.dashboard = {
         });
 
         var svg = d3.select('#phases-graph')
-                        .append('svg:svg')
-                            .attr('width', width)
-                            .attr('height', height);
+            .append('svg:svg')
+                .attr('width', width)
+                .attr('height', height);
+
+        //$('#phases-graph').append($('.barberPolePattern'));
 
         $.each(phases, function(index, phase){
             var arc = d3.svg.arc(),
                 className = 'phase' + index,
                 phaseGroup;
 
+            ghettoHackVar = className;
+
             var phaseDaySummaries = [];
             for (var i = 0; i < phase.phase.expectedNumberOfDays; i++){
                 var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
-                //console.log('colorval ' + colorVal);
                 phaseDaySummaries.push(colorVal);
             }
 
@@ -58,15 +63,102 @@ bpn.pages.dashboard = {
                 .classed(className, true)
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
 
-            phaseGroup.selectAll('path')
-            .data(equalPie(phaseDaySummaries))
-            .enter()
-                .append('svg:path')
-                .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+            /*var maskSel = phaseGroup.selectAll('defs')
+                .data(equalPie(phaseDaySummaries))
+                .enter();
+                
+                maskSel.append('svg:mask')
+                    .append('svg:path')
+                    .attr('d', arc)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    //.attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+                    //.attr('style', 'background: #ff00ff')
+                    .attr('fill', 'black')
+                    .attr('id', function(d,i){
+                        return 'phase'+i;}+phase._id)*/
+
+           /* var sel = phaseGroup.selectAll('path')
+                .data(equalPie(phaseDaySummaries))
+                //.attr('class',)
+                .enter()
+                    .append('svg:path')
+                    .attr('d', arc)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    .attr('fill', bpn.pages.dashboard.getPhaseFillColor)
+                    .append("svg:text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + arc.centroid(d) + ")"; 
+                        })
+                        .attr("dy", ".35em")
+                        .attr("text-anchor", "middle")
+                        .text(function(d, i) { return "TEST " + i });*/
+
+            var allArcs = phaseGroup.selectAll('path')
+                .data(equalPie(phaseDaySummaries));
+
+            allArcs
+                .enter()
+                    .append('svg:g')
+                        .attr('id', function(d, i) {
+                            return ghettoHackVar+'-arc'+i;
+                        } )
+                        .append('svg:path')
+                            .attr('d', arc)
+                            .attr('stroke', '#fff')
+                            .attr('stroke-width', 1)
+                            .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
+            allArcs
+                .on('click', function(d, i) {
+                    var barberPoleCont = $('.barberPoleCont');
+                    var barberPolePattern = $('.barberPolePattern');
+                    var angle = d.startAngle + ((d.endAngle - d.startAngle)/2);
+                    var centroidX = arc.centroid(d)[0] + width/2;
+                    var centroidY = arc.centroid(d)[1] + width/2;
+
+                    barberPolePattern.attr('transform', 'rotate(' + (Math.degrees(angle) + 45) + ')');
+
+                    //barberPole.attr('transform', 'translate(' + centroidX + ',' + centroidY + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+                    barberPoleCont.css('mask', 'url(#mask-'+$(this).attr('id')+')');
+                    barberPoleCont.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+
+                    console.log("WIDTH " + width);
+
+                    //barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+
+                    
+                });
+
+            var maskGroup = svg.append('defs').append('g')
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+            var allMasks = maskGroup.selectAll('mask')
+                .data(equalPie(phaseDaySummaries))
+            
+            allMasks
+                .enter()
+                    .append('svg:mask')
+                        .attr('id', function(d, i) {
+                            return 'mask-'+ghettoHackVar+'-arc'+i;
+                        } )
+                        .append('svg:path')
+                            .attr('d', arc)
+                            .attr('stroke', '#fff')
+                            .attr('stroke-width', 1)
+                            .attr('fill', bpn.pages.dashboard.getPhaseFillColor);
         });
+        
+
+        /*var arcGen = d3.svg.arc(),
+            curTime = new Date(Date.now()),
+            timeIntoDay = (curTime.getHours() * 3600000) +  (curTime.getMinutes() * 60000) + (curTime.getSeconds() * 1000)+ curTime.getMilliseconds(),
+            millisInDay = 86400000,
+            timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
+            timerLocDeg = 360 * (timeIntoDay / millisInDay);
+
+        console.log("TIMER LOC RAD " + timerLocDeg);*/
     },
     getControlFillColor : function(data, index){
         var num = parseInt(data.data.value, 10);
@@ -139,10 +231,18 @@ bpn.pages.dashboard = {
             .data(pie(cycleGraphData))
             .enter()
                 .append('svg:path')
-                .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', bpn.pages.dashboard.getControlFillColor);
+                    .attr('d', arc)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 1)
+                    .attr('fill', bpn.pages.dashboard.getControlFillColor)
+                    /*.append("svg:text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + arc.centroid(d) + ")"; 
+                        })
+                        .attr("dy", ".35em")
+                        .attr("text-anchor", "middle")
+                        .text(function(d, i) { return "TEST " + i });*/
+
         });
     },
     initEventHandlers : function(){
@@ -209,128 +309,233 @@ bpn.pages.dashboard = {
             }
             
         });
+    },
+    drawSparkGraph : function (svgCont, setData, idealLow, idealHigh, belowResolution) {
+        var width = 400;
+        var height = 100;
+
+        var yExtent = d3.extent(setData, function(d) { return d.value; });
+
+        var xScale = d3.scale.linear()
+            .domain(d3.extent(setData, function(d) { 
+                return d.time; }))
+            xScale.range([0, width]);
+            //.nice();      
+
+        var yScale = d3.scale.linear()
+            .domain(d3.extent(setData, function(d) { return d.value; }))
+            .range([height, 0]);
+
+        var yColorScale = d3.scale.linear()
+            .domain([yExtent[0], idealLow, idealLow, idealHigh, idealHigh, yExtent[1]])
+            .range(['red', 'red', 'green', 'green', 'red', 'red']);
+
+        var line = d3.svg.line()
+            .x(function(d) { 
+                return xScale(d.time); })
+            .y(function(d) { 
+                return yScale(d.value); });
+
+        var sparkGraph = d3.select(svgCont)
+            .append('svg:svg')
+                .attr('width', width)
+                .attr('height', height);
+        
+        var arraySections = [];
+        var curArr = [];
+
+        var crossTime = '';
+        var crossPercent = '';
+        var crossPoint = '';
+
+        var testScale = d3.scale.linear()
+            .domain([yExtent[0], idealLow-belowResolution, idealLow, idealHigh, idealHigh+belowResolution, yExtent[1]])
+            .range(['low', 'low', 'normal', 'normal', 'high', 'high']);
+
+        for(var i=0; i<setData.length; i++) {
+            if(curArr.length == 0) {
+                curArr.push(setData[i]);
+            } else {
+                if(testScale(setData[i-1].value) != testScale(setData[i].value)) {
+                    if( (testScale(setData[i-1].value) == 'low' || testScale(setData[i-1].value) == 'normal') && (testScale(setData[i].value) == 'low' || testScale(setData[i].value) == 'normal') ){
+                        crossPercent = Math.abs(idealLow - setData[i-1].value) / Math.abs (setData[i].value - setData[i-1].value)
+                        crossTime = ((setData[i].time - setData[i-1].time) * crossPercent ) + setData[i-1].time;
+
+                        crossPoint = {'time': crossTime, 'value': idealLow-belowResolution};
+                    } else if( (testScale(setData[i-1].value) == 'high' || testScale(setData[i-1].value) == 'normal') && (testScale(setData[i].value) == 'high' || testScale(setData[i].value) == 'normal') ){
+                        crossPercent = Math.abs(idealHigh - setData[i-1].value) / Math.abs(setData[i].value - setData[i-1].value)
+                        crossTime = ((setData[i].time - setData[i-1].time) * crossPercent ) + setData[i-1].time;
+
+                        crossPoint = {'time': crossTime, 'value': idealHigh+belowResolution};
+                    } else {
+                        console.log("NOT SUPPOSED TO!! i-1 " + testScale(setData[i-1].value) + " i " + testScale(setData[i-1].value) );
+                    }
+                    
+                    curArr.push(crossPoint); 
+                    arraySections.push(curArr);
+                    curArr = [];
+                    curArr.push(crossPoint);
+                    curArr.push(setData[i]);
+                } else {
+                    curArr.push(setData[i]);
+                }
+            }
+        }
+
+        arraySections.push(curArr);
+        
+        sparkGraph
+            .append('line')
+                .attr('x1', 0)
+                .attr('y1', yScale(idealLow))
+                .attr('x2', width)
+                .attr('y2', yScale(idealLow))
+                .attr('stroke-width', 1)
+                .attr('stroke', 'black');
+
+        sparkGraph
+            .append('line')
+                .attr('x1', 0)
+                .attr('y1', yScale(idealHigh))
+                .attr('x2', width)
+                .attr('y2', yScale(idealHigh))
+                .attr('stroke-width', 1)
+                .attr('stroke', 'black');
+
+
+        sparkGraph.selectAll('path')
+                .data(arraySections)
+            .enter().append("path")
+                    .attr('stroke', function(d,i){
+                        return yColorScale(d[1].value);})
+                    .attr('fill', 'none')
+                    .attr('stroke-width', '1')
+                    .attr("d", line);
+
+        /*sparkGraph.append("path")
+            .datum(setData)
+            //.attr("class", "line")
+            .attr('stroke', 'red')
+            .attr('fill', 'none')
+            .attr('stroke-width', '1')
+            .attr("d", line);*/
+    },
+    makeDayProgressClock : function (svg, radius, triangleSize) {
+        var triHeight = Math.cos(Math.PI / 6) * triangleSize,
+            width = svg.clientWidth,
+            height = svg.clientHeight;
+
+        var circleCont = d3.select(svg)
+            .append('svg:g')
+                .attr('class', 'timeProgressThumb')
+                .attr('width', width)
+                .attr('height', height)
+                //.attr("transform", "rotate(90, 250, 250)")
+                .append("svg:polygon")
+                    .attr('stroke', 'black')
+                    .attr("points", width/2+","+radius+" "+((width/2)+(triangleSize/2))+","+(triHeight+radius)+" "+((width/2)-(triangleSize/2))+","+(triHeight+radius));
+
+        if(!GlobalThumbTimer) {
+            //GlobalThumbTimer = setInterval(globalThumbFunc, 60000);
+            GlobalThumbTimer = setInterval(globalThumbFunc, 1000);
+        }
+    },
+    drawBarSet : function (target, barWidth, barLength, barSpacing, numBars){
+        var svg,
+            startLoc = 0,
+            totalHeight = ((barWidth*numBars)+(barSpacing*(numBars-1))),
+            //startLoc = ((barWidth*numBars) + (barSpacing*numBars))/-2,
+            bar,
+            barGroup;
+
+        svg = d3.select(target).append('svg:g').attr('class', 'barberPoleCont');
+
+        barGroup = svg
+            .attr('width', barLength)
+            .attr('height', ((barWidth*numBars)+(barSpacing*(numBars-1))))
+                .append('svg:g')
+                .attr('class', 'barberPolePattern');
+
+        for (var i = 0; i<numBars; i++) {
+            barGroup
+                .append("svg:rect")
+                    .attr('x', (barLength / -2))
+                    .attr('y', ((startLoc + (barWidth*i) + (barSpacing*i)) + (totalHeight / -2)  ) )
+                    .attr('width', barLength)
+                    .attr('height', barWidth);
+        }
     }
 };
+
+
+var dataSet = [];
+var GlobalThumbTimer;
+
+var globalThumbFunc = function () {
+    /*var curTime = new Date(Date.now()),
+        timeIntoDay = (curTime.getHours() * 3600000) +  (curTime.getMinutes() * 60000) + (curTime.getSeconds() * 1000)+ curTime.getMilliseconds(),
+        millisInDay = 86400000,
+        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
+        timerLocDeg = 360 * (timeIntoDay / millisInDay);
+
+    $(".timeProgressThumb").each(function(index, ele){
+        ele.attr("tranform", "rotate("+timeLoc/deg+" "+ele.width+" "+ele.height+")");
+    })*/
+
+    var curTime = new Date(Date.now()),
+        timeIntoDay = (curTime.getSeconds() * 1000) + curTime.getMilliseconds(),
+        millisInDay = 60000,
+        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
+        timerLocDeg = 360 * (timeIntoDay / millisInDay);
+
+    var allClocks = $(".timeProgressThumb");
+    var curClock;
+
+    for (var i = 0; i<allClocks.length; i++) {
+        curClock = $(allClocks[i]);
+        curClock.attr("transform", "rotate("+timerLocDeg+" "+(curClock.attr('width')/2)+" "+(curClock.attr('height')/2)+")");
+    }
+}
+
+//dataSet.push({'time': 300000, 'value': 16});
+//dataSet.push({'time': 600000, 'value': 36});
+//dataSet.push({'time': 900000, 'value': 36});
+
+/*dataSet.push({'time': 300000, 'value': 20});
+dataSet.push({'time': 600000, 'value': 30});
+dataSet.push({'time': 900000, 'value': 40});
+dataSet.push({'time': 1200000, 'value': 45});
+dataSet.push({'time': 1500000, 'value': 50});
+
+dataSet.push({'time': 1800000, 'value': 60});
+dataSet.push({'time': 2100000, 'value': 60});
+dataSet.push({'time': 2400000, 'value': 60});
+dataSet.push({'time': 2700000, 'value': 50});
+dataSet.push({'time': 3000000, 'value': 40});*/
+
+for(var i=0; i<100; i++){
+    dataSet[i] = {
+        'time': (300000 * i),
+        'value': Math.round(( Math.round((Math.random() * 50) + 20) + ((i != 0) ? dataSet[i-1].value : 0))/2)
+    };
+}
+
+Math.radians = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+ 
+Math.degrees = function(radians) {
+  return radians * 180 / Math.PI;
+};
+
 
 $(function () {
     bpn.pages.dashboard.drawPhaseGraphs();
     bpn.pages.dashboard.drawControlGraphs();
     bpn.pages.dashboard.initEventHandlers();
+    bpn.pages.dashboard.drawSparkGraph($('#footer').get(0), dataSet, 35, 55, 0.1);
+    bpn.pages.dashboard.makeDayProgressClock($('#phases-graph svg').get(0), 200, 10);
+    bpn.pages.dashboard.drawBarSet($('#phases-graph svg').get(0), 20, 2000, 15, 30);
 });
 
 
-
-/*
-
-var sampleData = {
-    phases : [
-        {
-            name : 'Vegetative',
-            numberExpectedDays : 30,
-            dayData : [ // will be randomly populated by code
-
-            ]
-        },
-        {
-            name : 'Flowering',
-            numberExpectedDays : 40,
-            dayData : [ // will be randomly populated by code
-
-            ]
-        }
-    ]
-};
-
-$(function () {
-    var i = 0,
-        phase1 = sampleData.phases[0],
-        phase2 = sampleData.phases[1];
-
-    for (i = 0; i < (phase1.numberExpectedDays); i++){
-        if ( i < (phase1.numberExpectedDays / 2 ) ){
-            phase1.dayData.push(i);
-        } else {
-            phase1.dayData.push(-1);
-        }
-    }
-
-    for (i = 0; i < (phase2.numberExpectedDays); i++){
-        phase2.dayData.push(-1);
-    }
-    
-    var width,
-        height = width = 600,
-        radius = width / 2,
-        colorScale = d3.scale.category20c(),
-        equalPie = d3.layout.pie(),
-        arcSpan = 100,
-        arcMargin = 0,
-        innerArc = d3.svg.arc(),
-        outerArc = d3.svg.arc();
-    
-    // disable data sorting & force all slices to be the same size
-    equalPie.sort(null)
-        .value(function(d){
-            return 1;
-        });
-
-
-    outerArc.outerRadius(radius)
-            .innerRadius(radius - arcSpan);
-    
-    innerArc.outerRadius(radius - arcSpan - arcMargin)
-            .innerRadius(radius - (arcSpan * 2) - arcMargin);
-
-
-    var svg = d3.select('#phases-graph')
-                    .append('svg:svg')
-                        .attr('width', width)
-                        .attr('height', height);
-
-    
-    var phase1G = svg.append('svg:g')
-                    .classed('phase1', true)
-                    .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-    var phase2G = svg.append('svg:g')
-                    .classed('phase2', true)
-                    .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-    
-    var getFillColor = function(data, index){
-        var num = parseInt(data.data);
-
-        if (num < 0 ) { 
-            return '#aaa';
-        } else if (num < 10){
-            return '#ccc'
-        } else {
-            return '#eee'
-        }
-    }
-
-    phase1G.selectAll('path')
-        .data(equalPie(phase1.dayData))
-        .enter()
-            .append('svg:path')
-            .attr('d', innerArc)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
-            .attr('fill', getFillColor);
-    
-    phase2G.selectAll('path')
-        .data(equalPie(phase2.dayData))
-        .enter()
-            .append('svg:path')
-            .attr('d', outerArc)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1)
-            .attr('fill', '#aaa');
-
-    var phase1GRotate = 0;
-    setInterval(function(){
-        phase1G.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ') rotate(' + phase1GRotate + ')');
-        phase1GRotate += .5;
-        if (phase1GRotate == 360){ phase1GRotate = 0; }
-    }, 30)
-});
-*/

@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
-	ObjectIdSchema = Schema.ObjectId;
+	ObjectIdSchema = Schema.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var ControlSchema = new Schema({
 	name: { type: String, required: true },
@@ -16,4 +17,4 @@ var ControlSchema = new Schema({
 ControlSchema.plugin(useTimestamps);
 
 exports.schema = ControlSchema;
-exports.model = mongoose.model('Control', ControlSchema);
+exports.model = mongooseConnection.model('Control', ControlSchema);

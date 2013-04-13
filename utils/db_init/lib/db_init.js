@@ -28,8 +28,7 @@
 
 var mongoose   = require('mongoose'),
   async = require('async'),
-  models = require('../../../models'),
-  mongoUrls = require('../../../config/mongo-config').urls,
+  mongoUrls = require('../../../config/mongoose-connection').urls,
   db_url = process.argv.slice(2)[0], //gets first cmd line arg
   clear = process.argv.slice(2)[1], //gets second cmd line arg
   data = require('../seed_data'),
@@ -52,32 +51,35 @@ var mongoose   = require('mongoose'),
     growPlanInstances: {},
     users: {},
     sensorLogs: {}
-  };
+  },
+  mongooseConnection;
 
 switch(db_url){
   case 'local':
-    db_url = mongoUrls.local;
+    mongooseConnection = require('../../../config/mongoose-connection').open("local");
     appDomain = appDomains.local;
     break;
   case 'dev':
-    db_url = mongoUrls.development;
+    mongooseConnection = require('../../../config/mongoose-connection').open("development");
     appDomain = appDomains.development;
     break;
   case 'staging':
-    db_url = mongoUrls.staging;
+    mongooseConnection = require('../../../config/mongoose-connection').open("staging");
     appDomain = appDomains.staging;
     break;
   case 'test':
-    db_url = mongoUrls.test;
+    mongooseConnection = require('../../../config/mongoose-connection').open("test");
+  // don't support 'production' as a shortcut. force use to do that explicitly
   default:
   // if not one of those, assume it was a mongodb:// url, so leave it alone
 }
 
-console.log(db_url);
 console.log(clear);
 // console.log(data);
 
-mongoose.connect(db_url);
+
+
+var models = require('../../../models');
 
 /**
  * Run data operations in series using async lib
@@ -88,50 +90,75 @@ async.series([
      * clear old data in parallel if clear option
      */
     if(clear) {
+
       async.parallel([
         function(innerCallback){
-          if (!mongoose.connection.collections['users']){ return innerCallback();}
-          mongoose.connection.collections['users'].drop( function(err) {
+          if (!mongooseConnection.collections['users']){ return innerCallback();}
+          mongooseConnection.collections['users'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('users collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['sensors']){ return innerCallback();}
-          mongoose.connection.collections['sensors'].drop( function(err) {
+          if (!mongooseConnection.collections['plants']){ return innerCallback();}
+          mongooseConnection.collections['plants'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('plants collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongooseConnection.collections['harvestlogs']){ return innerCallback();}
+          mongooseConnection.collections['harvestlogs'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('harvestlogs collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongooseConnection.collections['calibrationlogs']){ return innerCallback();}
+          mongooseConnection.collections['calibrationlogs'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('calibrationlogs collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongooseConnection.collections['sensors']){ return innerCallback();}
+          mongooseConnection.collections['sensors'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('sensors collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['nutrients']){ return innerCallback();}
-          mongoose.connection.collections['nutrients'].drop( function(err) {
+          if (!mongooseConnection.collections['nutrients']){ return innerCallback();}
+          mongooseConnection.collections['nutrients'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('nutrients collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['devicetypes']){ return innerCallback();}
-          mongoose.connection.collections['devicetypes'].drop( function(err) {
+          if (!mongooseConnection.collections['devicetypes']){ return innerCallback();}
+          mongooseConnection.collections['devicetypes'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('devicetypes collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['devices']){ return innerCallback();}
-          mongoose.connection.collections['devices'].drop( function(err) {
+          if (!mongooseConnection.collections['devices']){ return innerCallback();}
+          mongooseConnection.collections['devices'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('devices collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['lightbulbs']){ return innerCallback();}
-          mongoose.connection.collections['lightbulbs'].drop( function(err) {
+          if (!mongooseConnection.collections['lightbulbs']){ return innerCallback();}
+          mongooseConnection.collections['lightbulbs'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('lightbulbs collection dropped');
             innerCallback();
@@ -139,8 +166,8 @@ async.series([
 
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['lightfixtures']){ return innerCallback();}
-          mongoose.connection.collections['lightfixtures'].drop( function(err) {
+          if (!mongooseConnection.collections['lightfixtures']){ return innerCallback();}
+          mongooseConnection.collections['lightfixtures'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('lightfixtures collection dropped');
             innerCallback();
@@ -148,16 +175,16 @@ async.series([
 
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['lights']){ return innerCallback();}
-          mongoose.connection.collections['lights'].drop( function(err) {
+          if (!mongooseConnection.collections['lights']){ return innerCallback();}
+          mongooseConnection.collections['lights'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('lights collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['growsystems']){ return innerCallback();}
-          mongoose.connection.collections['growsystems'].drop( function(err) {
+          if (!mongooseConnection.collections['growsystems']){ return innerCallback();}
+          mongooseConnection.collections['growsystems'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('growsystems collection dropped');
             innerCallback();
@@ -165,56 +192,56 @@ async.series([
 
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['controls']){ return innerCallback();}
-          mongoose.connection.collections['controls'].drop( function(err) {
+          if (!mongooseConnection.collections['controls']){ return innerCallback();}
+          mongooseConnection.collections['controls'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('controls collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['actions']){ return innerCallback();}
-          mongoose.connection.collections['actions'].drop( function(err) {
+          if (!mongooseConnection.collections['actions']){ return innerCallback();}
+          mongooseConnection.collections['actions'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('actions collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['growplans']){ return innerCallback();}
-          mongoose.connection.collections['growplans'].drop( function(err) {
+          if (!mongooseConnection.collections['growplans']){ return innerCallback();}
+          mongooseConnection.collections['growplans'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('growplans collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['growplaninstances']){ return innerCallback();}
-          mongoose.connection.collections['growplaninstances'].drop( function(err) {
+          if (!mongooseConnection.collections['growplaninstances']){ return innerCallback();}
+          mongooseConnection.collections['growplaninstances'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('growplaninstances collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['sensorlogs']){ return innerCallback();}
-          mongoose.connection.collections['sensorlogs'].drop( function(err) {
+          if (!mongooseConnection.collections['sensorlogs']){ return innerCallback();}
+          mongooseConnection.collections['sensorlogs'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('sensorlogs collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['notifications']){ return innerCallback();}
-          mongoose.connection.collections['notifications'].drop( function(err) {
+          if (!mongooseConnection.collections['notifications']){ return innerCallback();}
+          mongooseConnection.collections['notifications'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('notifications collection dropped');
             innerCallback();
           });
         },
         function(innerCallback){
-          if (!mongoose.connection.collections['immediateactions']){ return innerCallback();}
-          mongoose.connection.collections['immediateactions'].drop( function(err) {
+          if (!mongooseConnection.collections['immediateactions']){ return innerCallback();}
+          mongooseConnection.collections['immediateactions'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('immediateactions collection dropped');
             innerCallback();
@@ -423,7 +450,7 @@ async.series([
             firmwareVersion: _data.firmwareVersion,
             microprocessor: _data.microprocessor,
             sensorMap: _data.sensorMap,
-            controlMap : _data.controlMap
+            outputMap : _data.outputMap
           });
 
           dataObj.save(function (err, doc) {
@@ -468,7 +495,7 @@ async.series([
             owner: _data.owner,
             users : _data.users,
             sensorMap : _data.sensorMap,
-            controlMap : _data.controlMap,
+            outputMap : _data.outputMap,
             recentSensorLogs: _data.recentSensorLogs,
             activeGrowPlanInstance : _data.activeGrowPlanInstance
           });
@@ -586,13 +613,13 @@ async.series([
         } else {
           var dataObj = new models.light({
             _id : _data._id,
-            fixture : data.fixture,
-            fixtureQuantity : data.fixtureQuantity,
-            bulb : data.bulb
+            fixture : _data.fixture,
+            fixtureQuantity : _data.fixtureQuantity,
+            bulb : _data.bulb
           });
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
-            savedObjectIds[dataType][_data.name] = doc._id;
+            savedObjectIds[dataType][_data._id] = doc._id;
             console.log("created light");
             decrementData();
           });

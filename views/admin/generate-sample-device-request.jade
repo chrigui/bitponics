@@ -8,15 +8,16 @@ block content
       | Authorization: BPN_DEVICE {{publicKey}}:{{hash}} <br/>  
       | X-Bpn-Fert: {{randomValue}}
 
-  div(style="margin:2em 0;")
-    | Amit's owned device:
-    | macAddress : 0006667211cf
-    | deviceId : "506de2fe8eebf7524342cb34",
-    | publicKey : "dedf72f732cd6f66",
-    | privateKey : "7f27ad4bf71ae693"
-    | randomValue : 1.123089
+  //-
+    div(style="margin:2em 0;")
+      | Amit's owned device:
+      | macAddress : 0006667211cf
+      | deviceId : "506de2fe8eebf7524342cb34",
+      | publicKey : "dedf72f732cd6f66",
+      | privateKey : "7f27ad4bf71ae693"
+      | randomValue : 1.123089
 
-    button#use-amits-device(style="display:block ") Use
+      button#use-amits-device(style="display:block ") Use
 
   form#request-form
     h1 Your values
@@ -42,41 +43,67 @@ block content
       textarea(id="request-body", placeholder="request body")
         | {"mode":"ph_4","status":"success"}
 
-    button(type="submit") Submit
+    button(type="submit") Generate Request
 
   h1 Generated sample request
   textarea#generated-request(style="height:300px")
 
   h1 Do it! 
-  button (TBD)
+  button#do-it Execute request
+
+  h1 Response Status
+  textarea#response-status()  
+
+  h1 Response Body
+  textarea#response-bodt(style="height:300px")  
 
   script(src="/assets/js/libs/sha256.js")
   script
+
     $(function(){
       //$("input:text").focus(function() { $(this).select(); } );
 
+      var apiRequest = {
+        headers : {
+          "Accept" : "application/vnd.bitponics.v1.deviceText",
+          "Content-Type" : "application/vnd.bitponics.v1.deviceText",
+          "Authorization" : "",
+          "X-Bpn-Fert" : ""
+        },
+        body : ""
+      }
       $('#request-form').submit(function(e){
         e.preventDefault();
 
-        var template = "{method} {url} HTTP/1.1{body}{salt}";
-        var populatedTemplate = template
+        var shaTemplate = "{method} {url} HTTP/1.1{body}{salt}";
+        var populatedShaTemplate = shaTemplate
           .replace('{method}', $('#method').val())
           .replace('{url}', $('#url').val())
           .replace('{body}', $('#request-body').val())
           .replace('{salt}', $('#salt').val());
 
-          console.log(populatedTemplate);
+          //console.log(populatedShaTemplate);
 
 
-        var shaObj = new jsSHA(populatedTemplate, "TEXT");
+        var shaObj = new jsSHA(populatedShaTemplate, "TEXT");
         var hash = shaObj.getHash("SHA-256", "HEX");
         var hmac = shaObj.getHMAC($('#private-key').val(), "TEXT", "SHA-256", "HEX");
 
         var resultTemplate = "{method} {url} HTTP/1.1\r\n" + 
           "Accept: application/vnd.bitponics.v1.deviceText\r\n" + 
-          "Authorization: BPN_DEVICE {publicKey}:{hmac}\r\n"+
+          ($('#request-body').val() ? "Content-Type: application/vnd.bitponics.v1.deviceText\r\n" : "") + 
+          "Authorization: BPN_DEVICE {publicKey}:{hmac}\r\n" +
           "X-Bpn-Fert: {salt}\r\n\r\n" +
           "{body}";
+
+        apiRequest.headers["Authorization"] = "BPN_DEVICE " + $('#public-key').val() + ":" + hmac;
+        apiRequest.headers["X-Bpn-Fert"] = $('#salt').val();
+
+        if ($('#request-body').val()){
+          apiRequest.headers["Content-Type"] = "application/vnd.bitponics.v1.deviceText";
+        } else {
+          delete apiRequest.headers["Content-Type"];
+        }
 
         var populatedResult = resultTemplate
         .replace("{method}", $('#method').val())
@@ -86,7 +113,35 @@ block content
         .replace('{salt}', $('#salt').val())
         .replace('{hmac}', hmac);
 
+
+
         $('#generated-request').html(populatedResult).focus().select();
 
+
       });
+
+      $('#do-it').click(function(e){
+        $.ajax({
+          type:$('#method').val(),
+          beforeSend: function (request)
+          {
+              for (var headerKey in apiRequest.headers){
+                if (apiRequest.headers.hasOwnProperty(headerKey)){
+                  request.setRequestHeader(headerKey, apiRequest.headers[headerKey]);    
+                }
+              }
+          },
+          url: $("#url").val(),
+          data: $('#request-body').val(),
+          processData: false,
+          success: function(msg) {
+              $("#response-body").html(msg);
+          },
+          complete: function(jqXHR, textStatus){
+            $('#response-status').html(JSON.stringify(jqXHR.statusCode()) + " " + textStatus);
+            console.log(textStatus, jqXHR.responseText);
+          }
+        });
+      });
+
     });

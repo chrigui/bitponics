@@ -1,4 +1,5 @@
-var mongoose = require('mongoose'),
+var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
 Models = require('../../models'),
 GrowPlanInstance = require('../../models/growPlanInstance').model,
@@ -6,7 +7,9 @@ GrowPlan = require('../../models/growPlan').growPlan.model,
 Device = require('../../models/device').model,
 should = require('should'),
 sampleGrowPlanInstances = require('../../utils/db_init/seed_data/growPlanInstances'),
-async = require('async');
+async = require('async'),
+requirejs = require('../../lib/requirejs-wrapper'),
+feBeUtils = requirejs('fe-be-utils');
 
 
 /*
@@ -220,7 +223,7 @@ async = require('async');
         },
         function(err, gpi){
           should.not.exist(err);
-          should.exist(gpi);
+          should.exist(gpi, 'gpi should be returned from create');
           gpi.should.be.an.instanceof(GrowPlanInstance);
           should.exist(gpi.active);
           should.exist(gpi.device);
@@ -252,10 +255,110 @@ async = require('async');
 
     describe('#activate', function(){
       
-    });
+    }); // /#activate
     
 
     describe('#activatePhase', function(){
       
-    });
+    }); // /#activatePhase
+
+
+    describe('#getPhaseDay', function(){
+      it('retrieves expected day of a growPlanInstance phase, offset by phase.startedOnDay', function(done){
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
+          owner : '506de30a8eebf7524342cb6c',
+          active : true,
+          activePhaseId : '506de3048eebf7524342cb4f', // Vegetative phase
+          activePhaseDay : 3
+        },
+        function(err, gpi){
+          should.not.exist(err);
+          should.exist(gpi);
+          gpi.should.be.an.instanceof(GrowPlanInstance);
+          should.exist(gpi.active);
+        
+          var today = new Date(),
+              todayDateString = today.toDateString(),
+              foundActivePhase = false;
+        
+          var gpiPhase = gpi.getPhaseByGrowPlanPhaseId("506de3048eebf7524342cb4f");
+
+          // since we started on day 3 of the phase, getting phaseDay with today
+          // as a target date should return 3
+          gpi.getPhaseDay(gpiPhase, today).should.equal(3);
+
+          return done();
+        });
+      });
+    }); // /#getPhaseDay
+
+
+    describe('#mergePhaseDaySummary', function(){
+      it('adds specified phaseDaySummary to the phase data at the index corresponding to phase day', function(done){
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
+          owner : '506de30a8eebf7524342cb6c',
+          active : true,
+          activePhaseId : '506de3048eebf7524342cb4f', // Vegetative phase
+          activePhaseDay : 3
+        },
+        function(err, gpi){
+          should.not.exist(err);
+          should.exist(gpi);
+          gpi.should.be.an.instanceof(GrowPlanInstance);
+          should.exist(gpi.active);
+        
+          var today = new Date(),
+              todayDateString = today.toDateString(),
+              foundActivePhase = false;
+        
+          var gpiPhase = gpi.getPhaseByGrowPlanPhaseId("506de3048eebf7524342cb4f");
+
+          // since we started on day 3 of the phase, getting phaseDay with today
+          // as a target date should return 3
+          var phaseDaySummary = {
+            status : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD,
+            sensorSummaries : {
+              'ph' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD,
+              'ec' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD,
+              'air' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+              'water' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+              'hum' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+              'lux' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD
+            }
+          };
+
+          var phaseDay = gpi.getPhaseDay(gpiPhase, today);
+
+          gpi.mergePhaseDaySummary(
+          {
+            growPlanInstancePhase : gpiPhase,
+            date : today,
+            daySummary : phaseDaySummary
+          },
+          function(err, updatedGrowPlanInstance){
+            should.not.exist(err);
+            should.exist(updatedGrowPlanInstance);
+            gpi.should.be.an.instanceof(GrowPlanInstance);
+
+            var retrievedGpiPhase = updatedGrowPlanInstance.getPhaseByGrowPlanPhaseId("506de3048eebf7524342cb4f"),
+                retrievedPhaseDaySummary = retrievedGpiPhase.daySummaries[phaseDay];
+            
+            should.exist(retrievedPhaseDaySummary, "phaseDaySummary for phaseDay should exist");
+
+            retrievedPhaseDaySummary.status.should.equal(phaseDaySummary.status);
+            retrievedPhaseDaySummary.sensorSummaries['ph'].should.equal(phaseDaySummary.sensorSummaries['ph']);
+            retrievedPhaseDaySummary.sensorSummaries['ec'].should.equal(phaseDaySummary.sensorSummaries['ec']);
+            retrievedPhaseDaySummary.sensorSummaries['air'].should.equal(phaseDaySummary.sensorSummaries['air']);
+            retrievedPhaseDaySummary.sensorSummaries['water'].should.equal(phaseDaySummary.sensorSummaries['water']);
+            retrievedPhaseDaySummary.sensorSummaries['hum'].should.equal(phaseDaySummary.sensorSummaries['hum']);
+            retrievedPhaseDaySummary.sensorSummaries['lux'].should.equal(phaseDaySummary.sensorSummaries['lux']);
+
+            done();
+          });
+
+        });
+      });
+    }); // /#getPhaseDay
 });

@@ -13,7 +13,36 @@ var mongoose = require('mongoose'),
   DeviceModel = require('./device').model,
   getObjectId = require('./utils').getObjectId,
   SensorLogSchema = require('./sensorLog').schema,
-  i18nKeys = require('../i18n/keys');
+  i18nKeys = require('../i18n/keys'),
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+
+
+var PhaseDaySummarySchema = new Schema({
+  
+  status : { 
+  
+    type: String, 
+  
+    enum: [
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD
+    ],
+  
+    default: feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD
+  },
+  
+  /**
+   * sensorSummaries is a hash, 
+   * Keys are Sensor.sCode
+   * Values are feBeUtils.PHASE_DAY_SUMMARY_STATUSES
+   */
+  sensorSummaries : Schema.Types.Mixed
+}, 
+{ id : false, _id : false });
+
+
 
 /**
  * GrowPlanInstance 
@@ -28,23 +57,57 @@ var GrowPlanInstanceSchema = new Schema({
 	
 	device : { type : ObjectIdSchema, ref : 'Device', required: false }, //the bitponics device
 	
-	startDate: { type: Date },
+	name : { type : String },
+
+  startDate: { type: Date },
 
 	endDate: { type: Date },
 
   active: { type: Boolean },
 
-	phases: [{
-		phase: Schema.Types.ObjectId, // ObjectId of GrowPlan.Phase
-		startDate: { type: Date }, // actual date the phase was started. null/undefined if not yet started
-		endDate: { type: Date }, // actual date the phase was ended. null/undefined if not yet ended
-		/**
-		 * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
-		 * used by the worker process to query & notify of impending phase advancement
-		 */
-		expectedEndDate : { type : Date }, 
-		active: { type: Boolean }
-	}],
+  phases: [{
+    /**
+     * ObjectId of GrowPlan.Phase
+     */
+    phase: Schema.Types.ObjectId,
+
+
+    /**
+     * actual date the phase was started. null/undefined if not yet started
+     */
+    startDate: { type: Date },
+
+    /**
+     * Day of the GrowPlan phase on which this GPI Phase started.
+     * 0-based.
+     * Allows for saying "I started on day 5 of this phase"
+     */
+    startedOnDay : { type : Number, default : 0 },
+
+    /**
+     * actual date the phase was ended. null/undefined if not yet ended
+     */
+    endDate: { type: Date },
+
+    /**
+     * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
+     * used by the worker process to query & notify of impending phase advancement
+     */
+    expectedEndDate : { type : Date },
+
+    /**
+     * Whether the phase is currently active. Should be max 1 phase active at a time.
+     */
+    active: { type: Boolean },
+
+    
+    /**
+     * Summary of each day that's passed in this GPI Phase.
+     * Used in Dashboard display.
+     */
+    daySummaries : [ PhaseDaySummarySchema ]
+  }],
+
 
 	// not in use yet, but this will be how a user configures the view on their Dashboard
 	settings : {
@@ -77,6 +140,8 @@ var GrowPlanInstanceSchema = new Schema({
 			tags: { type : [String]}
 		}]
 	}],
+
+
 	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
 },
 { id : false });
@@ -111,7 +176,8 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
 GrowPlanInstanceSchema.static('create', function(options, callback) {
   var gpiInitData = {
     owner : options.owner,
-    users : options.users || [options.owner]
+    users : options.users || [options.owner],
+    device : options.device
   };
   if (options._id){
     gpiInitData._id = options._id;
@@ -122,8 +188,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
   var gpi = new GrowPlanInstanceModel(gpiInitData);
  
-  async.parallel([
-      function (innerCallback){
+  async.series([
+      function initGrowPlanData (innerCallback){
         GrowPlanModel.findById(options.growPlan, function(err, growPlan){
           if (err) { return innerCallback(err); }
           if (!growPlan) { return innerCallback(new Error('Invalid grow plan id')); }
@@ -133,30 +199,24 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           growPlan.phases.forEach(function(phase){
             gpi.phases.push({ phase : phase._id});
           });
+
           return innerCallback();
         });
-      },
-      function (innerCallback){
-        if (!options.device) { return innerCallback(); }
-
-        gpi.pairWithDevice({
-          deviceId : getObjectId(options.device),
-          saveGrowPlanInstance : false
-        }, innerCallback);
       }
     ],
     function(err, results){
       if (err) { return callback(err); }
 
-      gpi.save(function(err){
+      gpi.save(function(err, createdGrowPlan){
         if (err) { return callback(err); }
 
-        winston.info('Created new gpi for user ' + options.owner + ' gpi id ' + gpi._id);
+        winston.info('Created new gpi for user ' + createdGrowPlan.owner + ' gpi id ' + createdGrowPlan._id);
+       
         if (!options.active){
-          return callback(err, gpi);
+          return callback(err, createdGrowPlan);
         }
          
-        return gpi.activate({ 
+        return createdGrowPlan.activate({ 
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
@@ -173,6 +233,88 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
 
 /************** INSTANCE METHODS ********************/
+
+
+/**
+ * Given a target date, get the number of days elapsed since phase start.
+ * Since phase starts are always normalized to the localized 00:00 of the user's timezone,
+ * we can be sure we're getting a useful number here.
+ *
+ * @param {GrowPlanInstancePhase} growPlanInstancePhase
+ * @param {Date|Number} targetDate
+ *
+ */
+GrowPlanInstanceSchema.method('getPhaseDay', function(growPlanInstancePhase, targetDate){
+    var moment = require('moment'),
+        phaseStart = moment(growPlanInstancePhase.startDate).subtract('days', growPlanInstancePhase.startedOnDay),
+        target = moment(targetDate);
+
+    return target.diff(phaseStart, 'days');
+});
+
+
+/**
+ * Given the id of a GrowPlan Phase, return the GrowPlanInstance phase object
+ * 
+ * @param {ObjectId} growPlanPhaseId
+ * @return {GrowPlanInstancePhase}
+ */
+GrowPlanInstanceSchema.method('getPhaseByGrowPlanPhaseId', function(growPlanPhaseId) {
+    for (var i = this.phases.length; i--;){
+      if (this.phases[i].phase.equals(growPlanPhaseId)){
+        return this.phases[i];
+      }
+    }
+});
+
+
+/**
+ * Add a phaseDaySummary to the specified GPI Phase, merging if a summary already exists.
+ * Day summary statuses are by default good and can only turn from good to bad.
+ * 
+ * Saves the GrowPlanInstance.
+ *
+ * @param {GrowPlanInstancePhase} settings.growPlanInstancePhase
+ * @param {Date} settings.date
+ * @param {PhaseDaySummary} settings.daySummary
+ * @param {function(err, GrowPlanInstance)} callback : function called after GPI has been modified and saved
+ */
+GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callback) {
+  var gpi = this,
+      growPlanInstancePhase = settings.growPlanInstancePhase,
+      date = settings.date,
+      submittedPhaseDaySummary = settings.daySummary,
+      phaseDay = gpi.getPhaseDay(growPlanInstancePhase, date),
+      daySummary = growPlanInstancePhase.daySummaries[phaseDay],
+      sensorKey;
+
+  if (daySummary){
+    if (submittedPhaseDaySummary.status === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD){
+      daySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+    }
+    
+    for (sensorKey in submittedPhaseDaySummary.sensorSummaries){
+      if (submittedPhaseDaySummary.sensorSummaries.hasOwnProperty(sensorKey)) {
+
+        if (
+            (submittedPhaseDaySummary.sensorSummaries[sensorKey] === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD) 
+            || 
+            (!daySummary.sensorSummaries[sensorKey])
+           ){
+          daySummary.sensorSummaries[sensorKey] = submittedPhaseDaySummary.sensorSummaries[sensorKey];
+        }    
+      }
+    }
+  } else {
+    daySummary = submittedPhaseDaySummary;
+  }
+
+  // http://mongoosejs.com/docs/faq.html
+  growPlanInstancePhase.daySummaries.set(phaseDay, daySummary);
+
+  gpi.save(callback);
+});
+
 
 /**
  * Pair a device with this grow plan instance.
@@ -191,8 +333,8 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
     
     if (!deviceResult){ return callback(new Error(i18nKeys.get('no device', options.deviceId))); }
     
-    if (!deviceResult.owner.equals(getObjectId(gpi.owner))){
-      return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden'))); 
+    if (deviceResult.owner && !getObjectId(deviceResult.owner).equals(getObjectId(gpi.owner))){
+      return callback(new Error(i18nKeys.get('Only device owner can assign a device to their garden')));
     }
     
     DeviceModel.update(
@@ -206,23 +348,17 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
           [
             function(innerCallback){
               deviceResult.activeGrowPlanInstance = gpi;
-              
-              deviceResult.save(innerCallback);
+              deviceResult.refreshStatus(innerCallback);
             },
             function(innerCallback){
               gpi.device = deviceResult._id;
-
-              if (options.saveGrowPlanInstance){
-                gpi.save(innerCallback)
-              } else {
-                innerCallback(null, [gpi]);
-              }
+              gpi.save(innerCallback);
             }
           ],
           function(err, results){
             if (err) { return callback(err); }
             var data = {
-              device : results[0][0],
+              device : results[0],
               growPlanInstance : results[1][0]
             };
             return callback(null, data);
@@ -254,7 +390,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
     gpi.save(function (err){
       if (err) { return callback(err);}
 
-      async.parallel([
+      async.waterfall([
         function (innerCallback){
           gpi.activatePhase({
             phaseId : activePhaseId,
@@ -263,18 +399,17 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           },
           innerCallback);
         },
-        function (innerCallback){
-          if (!gpi.device){ return innerCallback();}
+        function (gpiWithActivePhase, innerCallback){
+          if (!gpiWithActivePhase.device){ return innerCallback(null, gpiWithActivePhase); }
 
-          gpi.pairWithDevice({
-            deviceId : getObjectId(gpi.device),
-            saveGrowPlanInstance : false
+          gpiWithActivePhase.pairWithDevice({
+            deviceId : getObjectId(gpiWithActivePhase.device)
           },
           innerCallback);
         }
       ],
-      function(err, results){
-        return callback(err, gpi);
+      function(err, activatedGPI){
+        return callback(err, activatedGPI);
       }
     );
   });
@@ -336,7 +471,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           growPlanInstance.phases.forEach(function(phase){
             if (phase.phase.equals(phaseId)){
               phase.active = true;
-              phase.startDate = now; 
+              phase.startDate = now;
+              phase.startedOnDay = phaseDay;
               phase.expectedEndDate = now.valueOf() + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
             } else {
               if (phase.active == true){
@@ -359,7 +495,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           device = deviceResult;
           actionsWithDeviceControl = growPlanPhase.actions.filter(
             function(item){ 
-              return (item.control && device.controlMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
+              return (item.control && device.outputMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
             }
           );
           
@@ -403,13 +539,12 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             });
           },
           
-          // Force refresh of device actions
+          // Force refresh of device status on next request
           function (innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
-            device.activeActions.expires = now - 1000;
-            device.activeImmediateActions.expires = now - 1000;
-
+            device.status.expires = now;
+            
             device.save(innerParallelCallback);
           },
           
@@ -538,7 +673,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
                       repeat : {
                         type : states[0].durationType,
                         duration : states[0].duration,
@@ -552,7 +687,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
                       repeat : {
                         type : states[1].durationType,
                         duration : states[1].duration,
@@ -566,7 +701,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(1, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
@@ -579,7 +714,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.getStateMessage(0, action.control ? action.control.name : '') + '"',
+                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
@@ -610,8 +745,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       }
     ],
     function(err, results){
-      if (err) { return callback(err);}
-      return callback();
+      return callback(err, growPlanInstance);
     }
   );
 });
@@ -654,6 +788,6 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 
 /***************** END MIDDLEWARE **********************/
 
-GrowPlanInstanceModel = mongoose.model('GrowPlanInstance', GrowPlanInstanceSchema);
+GrowPlanInstanceModel = mongooseConnection.model('GrowPlanInstance', GrowPlanInstanceSchema);
 exports.schema = GrowPlanInstanceSchema;
 exports.model = GrowPlanInstanceModel;

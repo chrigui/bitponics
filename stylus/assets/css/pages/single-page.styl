@@ -1,7 +1,5 @@
 .single-page
-  .content-module
-    min-height 600px
-    
+  
   .icon-glyphlogo-new
     display none!important //hide big logo
 
@@ -12,6 +10,9 @@
 
   #main
     margin 3em auto!important
+
+		.content-module
+			padding-top 1.5em
 
   .footer
     background none
@@ -42,6 +43,11 @@
       border-color: color-text-gray
 
   #contact
-    // .wufoo *
-    //   background-color white!important
-    //   color color-text-gray!important
+     .wufoo *
+       background-color white
+       color color-text-gray
+
+@media screen and (min-width: 40em)
+	#main
+		.content-module
+			padding-top 1em!important

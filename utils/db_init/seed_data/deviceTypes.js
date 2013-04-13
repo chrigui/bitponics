@@ -43,7 +43,7 @@ module.exports = [
 					sensor: "506de3098eebf7524342cb64"
 				}
 			],
-			controlMap : [
+			outputMap : [
 				{
 					outputId: "1",
 					control: "506de2fd8eebf7524342cb32"

@@ -16,7 +16,7 @@ module.exports = [
 				"506de30a8eebf7524342cb6b"
 			 ],
 			owner: "506de30a8eebf7524342cb6c",
-			controlMap : [ 
+			outputMap : [ 
 			  {
 			    control : "506de2fd8eebf7524342cb32",
 			    outputId : "1"
@@ -48,7 +48,7 @@ module.exports = [
 				"506de30a8eebf7524342cb6c"
 			 ],
 			owner: "506de30a8eebf7524342cb6c",
-			controlMap : [ 
+			outputMap : [ 
 			  {
 			    control : "506de2fd8eebf7524342cb32",
 			    outputId : "1"
@@ -86,7 +86,7 @@ module.exports = [
 				"506de30a8eebf7524342cb6b"
 			 ],
 			owner: "506de3098eebf7524342cb68",
-			controlMap : [ 
+			outputMap : [ 
 			  {
 			    control : "506de2fd8eebf7524342cb32",
 			    outputId : "1"
@@ -113,9 +113,10 @@ module.exports = [
 			_id : '5118232537d976f7050f6186',
 			macAddress: "000666721fc1",
 			deviceType: "506de2fe8eebf7524342cb37",
-			name : "Michael's Prototype Bitponics Device 1",
+			name : "Amit's Prototype Bitponics Device 1",
 			users : [],
-			controlMap : [ 
+      owner: "506de30a8eebf7524342cb6c",
+			outputMap : [ 
 			  {
 			    control : "506de2fd8eebf7524342cb32",
 			    outputId : "1"
@@ -135,7 +136,26 @@ module.exports = [
       owner: "506de3098eebf7524342cb68",
       users : [],
       activeGrowPlanInstance: "513fee362bc4e204932a467a",
-      controlMap : [ 
+      outputMap : [ 
+        {
+          control : "506de2fd8eebf7524342cb32",
+          outputId : "1"
+        },
+        {
+          control : "506de2fc8eebf7524342cb2d",
+          outputId : "2"
+        }
+      ],
+      recentSensorLogs : []
+    },
+		{
+      _id : '514fb64a658ae4f3f325e5b6',
+      macAddress: "000666809ecf",
+      deviceType: "506de2fe8eebf7524342cb37",
+      name : "Chris's Prototype Bitponics Device 1",
+      users : [],
+      owner: "506de3098eebf7524342cb67", // Chris P
+      outputMap : [ 
         {
           control : "506de2fd8eebf7524342cb32",
           outputId : "1"
@@ -147,5 +167,4 @@ module.exports = [
       ],
       recentSensorLogs : []
     }
-		
 	];

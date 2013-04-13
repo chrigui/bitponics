@@ -38,13 +38,42 @@ define(['moment'], function(moment){
 
 
   /**
-   * 
+   * Visibility for various user-generated models
    */
   utils.VISIBILITY_OPTIONS = {
     PRIVATE : "private",
     PUBLIC : "public"
   };
 
+
+  /**
+   * Used during device sensor calibration
+   */
+  utils.CALIB_MODES = {
+    "PH_4" : "ph_4",
+    "PH_7" : "ph_7",
+    "PH_10" : "ph_10",
+    "EC_LO" : "ec_lo",
+    "EC_HI" : "ec_hi"
+  };
+  
+  
+  /**
+   * Used during device sensor calibration
+   */
+  utils.CALIB_STATUSES = {
+    "SUCCESS" : "success",
+    "ERROR" : "error"
+  };
+
+
+  /**
+   * Used during device sensor calibration
+   */
+  utils.PHASE_DAY_SUMMARY_STATUSES = {
+    "GOOD" : "good",
+    "BAD" : "bad"
+  };
 
   /**
    * Suggestions for auto-complete in UI
@@ -62,6 +91,20 @@ define(['moment'], function(moment){
       'Deep Water Culture (DWC)',
       'Aquaponic'
     ]
+  };
+
+  
+  /**
+   * Checks whether the provided string matches the ObjectId format.
+   * Used when checking user-generated _id's, to avoid parse exceptions when passing them to 
+   * MongooseModel.findById
+   * 
+   * @param {string|ObjectId} str. String or object to test for parsability.
+   * @return {bool}
+   */
+  utils.canParseAsObjectId = function(str){
+    if (!str) { return false; }
+    return /^[0-9a-fA-F]{24}$/.test(str.toString());
   };
 
   /**
@@ -156,6 +199,16 @@ define(['moment'], function(moment){
       duration : transformedDuration,
       durationType : 'seconds'
     }
+  };
+
+
+  utils.getOrdinal = function(number){
+    var b = number % 10;
+    var output = (~~ (number % 100 / 10) === 1) ? 'th' :
+        (b === 1) ? 'st' :
+        (b === 2) ? 'nd' :
+        (b === 3) ? 'rd' : 'th';
+    return number + output;
   };
 
   return utils;

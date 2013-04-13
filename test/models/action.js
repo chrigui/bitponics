@@ -198,7 +198,7 @@ describe('Action', function(){
   }); // /virtual overallCycleTimespan property
 
 
-  describe('#getStateMessage', function(){
+  describe('state message validation', function(){
     it('simply echoes messages when there\'s no control', function(done){
       var mockMessage = 'test message',
         action = new Action.model({
@@ -216,14 +216,13 @@ describe('Action', function(){
 
       action.save(function(err){
         should.not.exist(err);
-        action.getStateMessage(0).should.equal(mockMessage);
+        action.cycle.states[0].message.should.equal(mockMessage);
         done();
       });
     });
 
     it('generates a friendly ON message with duration when there\'s a control, non-zero controlValue & duration', function(done){
-      var mockControlName = 'testControlName',
-        action = new Action.model({
+      var action = new Action.model({
           description : 'test action',
           control : '506de2fc8eebf7524342cb2d', // water pump
           cycle : {
@@ -239,14 +238,13 @@ describe('Action', function(){
 
       action.save(function(err){
         should.not.exist(err);
-        action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' on for 10 hours');
+        action.cycle.states[0].message.should.equal('Turn Water Pump on for 10 hours');
         done();
       });
     });
 
     it('generates a friendly ON message when there\'s a control, non-zero controlValue & no duration', function(done){
-      var mockControlName = 'testControlName',
-        action = new Action.model({
+      var action = new Action.model({
           description : 'test action',
           control : '506de2fc8eebf7524342cb2d', // water pump
           cycle : {
@@ -260,14 +258,13 @@ describe('Action', function(){
 
       action.save(function(err){
         should.not.exist(err);
-        action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' on');
+        action.cycle.states[0].message.should.equal('Turn Water Pump on');
         done();
       });
     });
 
     it('generates a friendly OFF message with duration when there\'s a control, zero controlValue & duration', function(done){
-      var mockControlName = 'testControlName',
-        action = new Action.model({
+      var action = new Action.model({
           description : 'test action',
           control : '506de2fc8eebf7524342cb2d', // water pump
           cycle : {
@@ -283,14 +280,13 @@ describe('Action', function(){
 
       action.save(function(err){
         should.not.exist(err);
-        action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' off for 10 hours');
+        action.cycle.states[0].message.should.equal('Turn Water Pump off for 10 hours');
         done();
       });
     });
 
     it('generates a friendly OFF message when there\'s a control, zero controlValue & no duration', function(done){
-      var mockControlName = 'testControlName',
-        action = new Action.model({
+      var action = new Action.model({
           description : 'test action',
           control : '506de2fc8eebf7524342cb2d', // water pump
           cycle : {
@@ -304,7 +300,7 @@ describe('Action', function(){
 
       action.save(function(err){
         should.not.exist(err);
-        action.getStateMessage(0, mockControlName).should.equal('Turn ' + mockControlName + ' off');
+        action.cycle.states[0].message.should.equal('Turn Water Pump off');
         done();
       });
     });
@@ -840,7 +836,7 @@ describe('Action', function(){
   }); // /pre-save validation
 
 
-  describe('convertDurationToMilliseconds', function(){
+  describe('.convertDurationToMilliseconds', function(){
 
     it('handles durations for seconds', function(done){
       Action.model.convertDurationToMilliseconds(1, 'seconds').should.equal(1000);
@@ -879,7 +875,7 @@ describe('Action', function(){
   }); // /convertDurationToMilliseconds
 
 
-  describe('getCycleRemainder', function(){
+  describe('.getCycleRemainder', function(){
 
     it('returns remainder of a repeating cycle in milliseconds, assuming cycle started at phase start and factoring in timezone, with a fromDate within the first cycle iteration', function(done){
       var userTimezone = "America/Los_Angeles",
@@ -985,7 +981,7 @@ describe('Action', function(){
   }); // /getCycleRemainder
 
 
-  describe('getDeviceCycleFormat', function(){
+  describe('.getDeviceCycleFormat', function(){
 
     it('handles a no-state cycle', function(done){
       var action = new Action.model({
@@ -1189,7 +1185,7 @@ describe('Action', function(){
   }); // /getDeviceCycleFormat
 
 
-  describe('updateCycleTemplateWithStates', function(){
+  describe('.updateCycleTemplateWithStates', function(){
 
     it('interpolates device-formatted cycle values into a string template', function(done){
       var cycleTemplate = '{offset},{value1},{duration1},{value2},{duration2}',
@@ -1246,4 +1242,99 @@ describe('Action', function(){
     });
 
   }); // /updateCycleTemplateWithStates
+
+
+  describe(".createNewIfUserDefinedPropertiesModified", function(){
+
+    it("creates a new Action if _id isn't a valid ObjectId", function(done){
+      var submittedAction = {
+        _id : "nonsense",
+        description : "do something"
+      };
+
+      Action.model.createNewIfUserDefinedPropertiesModified(
+        {
+          action : submittedAction
+
+        },
+        function(err, validatedAction){
+          should.not.exist(err);
+          should.exist(validatedAction);
+
+          validatedAction.description.should.equal(submittedAction.description);
+
+          done();
+        }
+      )
+    });
+
+    it("creates a new Action if _id matches an existing Action but rest of properties don't match", function(done){
+      var submittedAction = {
+        _id : "506de2fb8eebf7524342cb28",
+        description : "do something"
+      };
+
+      Action.model.createNewIfUserDefinedPropertiesModified(
+        {
+          action : submittedAction
+
+        },
+        function(err, validatedAction){
+          should.not.exist(err);
+          should.exist(validatedAction);
+
+          validatedAction._id.toString().should.not.equal(submittedAction._id);
+          validatedAction.description.should.equal(submittedAction.description);
+
+          done();
+        }
+      )
+    });
+
+    it("returns the pre-existing Action if _id and all other properties match", function(done){
+      var submittedAction = {
+        _id : "506de2fb8eebf7524342cb28",
+        description: "Turn lights on",
+        control: "506de2fd8eebf7524342cb32",
+        cycle: {
+          states: [
+            {
+              controlValue: '1'
+            }
+          ]
+        }
+      };
+
+      Action.model.createNewIfUserDefinedPropertiesModified(
+        {
+          action : submittedAction
+        },
+        function(err, validatedAction){
+          should.not.exist(err);
+          should.exist(validatedAction);
+
+          
+          Action.model.findById(validatedAction._id)
+          .exec(function(err, originalAction){
+            should.not.exist(err);
+            should.exist(originalAction);
+
+            validatedAction._id.toString().should.equal(originalAction._id.toString());
+            validatedAction.description.should.equal(originalAction.description);
+            validatedAction.control.toString().should.equal(originalAction.control.toString());
+            //validatedAction.cycle.should.eql(originalAction.cycle, "cycle should be equal");
+            validatedAction.cycle.states.forEach(function(state, index){
+              should.equal(state.message, originalAction.cycle.states[index].message, "each cycle state message should be equal");
+              should.equal(state.controlValue, originalAction.cycle.states[index].controlValue, "each cycle state controlValue should be equal");
+              should.equal(state.duration, originalAction.cycle.states[index].duration, "each cycle state duration should be equal");
+              should.equal(state.durationType, originalAction.cycle.states[index].durationType, "each cycle state durationType should be equal");
+            });
+            done();
+          });
+        }
+      )
+    });
+  }); // /.createNewIfUserDefinedPropertiesModified
+
+
 });

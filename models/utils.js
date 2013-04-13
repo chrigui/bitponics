@@ -11,7 +11,9 @@
 function logSensorLog(options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
-      SensorLogModel = require('./sensorLog').model;
+      SensorLogModel = require('./sensorLog').model,
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils');
 
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
@@ -23,23 +25,34 @@ function logSensorLog(options, callback){
   if (growPlanInstance){
     activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
     pendingSensorLog.gpi = growPlanInstance._id;
-  } 
+  }
+
+  if (!(pendingSensorLog instanceof SensorLogModel)) {
+    pendingSensorLog = new SensorLogModel(pendingSensorLog);
+  }
+
+  if (!pendingSensorLog.ts){
+    pendingSensorLog.ts = new Date();
+  }
   
   async.parallel(
     [
     function parallel1(innerCallback){
       if (!device){ return innerCallback(); }
-      device.recentSensorLogs.unshift(pendingSensorLog);
+      // for some goddamn mysterious reason, unshift is causing pendingSensorLog.logs to 
+      // be an empty array when persisted to device.recentSensorLogs. 
+      // Only push is getting the whole thing in. Gotta
+      // abandon desc-sorted recentSensorLogs for now because of that
+      device.recentSensorLogs.push(pendingSensorLog);
       device.save(innerCallback);
     },
     function parallel2(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
-      growPlanInstance.recentSensorLogs.unshift(pendingSensorLog);          
+      growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
       growPlanInstance.save(innerCallback);
     },
     function parallel3(innerCallback){
-      var sensorLog = new SensorLogModel(pendingSensorLog);
-      sensorLog.save(innerCallback);
+      pendingSensorLog.save(innerCallback);
     },
     function parallel4(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
@@ -53,19 +66,34 @@ function logSensorLog(options, callback){
         if (!phase){ return new Error('Active phase not found for this grow plan instance'); }
         if (!phase.idealRanges){ return innerCallback();}
         
+
+        var phaseDaySummary = {
+          status : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
+          sensorSummaries : {}
+        };
+
+
         async.forEach(
           pendingSensorLog.logs, 
           function(log, iteratorCallback){
             var idealRange = phase.idealRanges.filter(function(idealRange){ return idealRange.sCode == log.sCode})[0],
                 valueRange,
                 message = '';
+
+            phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
+
             if (!idealRange){ return iteratorCallback(); }
             valueRange = idealRange.valueRange;
+            
             if (log.val < valueRange.min) {
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               
+              phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
+              
               triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
@@ -81,7 +109,12 @@ function logSensorLog(options, callback){
               );
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
+              
+              phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
+              
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
+              
               triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
@@ -99,7 +132,18 @@ function logSensorLog(options, callback){
               return iteratorCallback(); 
             }
           },
-          innerCallback
+          function(err){
+            if (err) { return innerCallback(err);}
+
+            growPlanInstance.mergePhaseDaySummary(
+              {
+                growPlanInstancePhase : activeGrowPlanInstancePhase,
+                date : pendingSensorLog.ts,
+                daySummary : phaseDaySummary
+              },
+              innerCallback
+            );
+          }
         );
       });
     }
@@ -162,7 +206,8 @@ function triggerImmediateAction(options, callback){
 
     // calculate when the immediateAction should expire.
     var now = new Date(),
-        expires = now + (365 * 24 * 60 * 60 * 1000),
+        nowAsMilliseconds = now.valueOf(),
+        expires = nowAsMilliseconds + (365 * 24 * 60 * 60 * 1000),
         actionHasDeviceControl = false;
 
     async.series(
@@ -173,25 +218,26 @@ function triggerImmediateAction(options, callback){
           // If we're here, action does have a control
 
           if (device){
-            // get any other actions that exist for the same control.
+            // get any other phase actions that exist for the same control.
             var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
             
-            actionHasDeviceControl = device.controlMap.some(
-              function(controlMapItem){
-                return getObjectId(controlMapItem.control).equals(getObjectId(action.control));
+            actionHasDeviceControl = device.outputMap.some(
+              function(outputMapItem){
+                return getObjectId(outputMapItem.control).equals(getObjectId(action.control));
               }
             );
         
+            // Expire the immediateAction on the next cycle of a baseline phase action
             ActionModel.findOne()
             .where('_id')
-            .in(device.activeActions.actions)
+            .in(device.status.actions)
             .where('control')
             .equals(action.control)
             .exec(function(err, actionResult){
               if (err) { return innerCallback(err);}
               if (!actionResult){ return innerCallback(); }
               var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-              expires = now.valueOf() + cycleRemainder;
+              expires = nowAsMilliseconds + cycleRemainder;
               return innerCallback();  
             });
 
@@ -211,7 +257,7 @@ function triggerImmediateAction(options, callback){
                   if (err) { return innerCallback(err);}
                   if (!actionResult){ return innerCallback(); }
                   var cycleRemainder = ActionModel.getCycleRemainder(now, growPlanInstancePhase, actionResult, timezone);
-                  expires = now.valueOf() + cycleRemainder;
+                  expires = nowAsMilliseconds + cycleRemainder;
                   return innerCallback();  
                 });
               }
@@ -267,8 +313,8 @@ function triggerImmediateAction(options, callback){
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
-                winston.info('Calling refreshActiveImmediateActions for device : ' + device._id.toString());
-                return device.refreshActiveImmediateActions(innerCallback);
+                winston.info('Calling refreshStatus for device : ' + device._id.toString());
+                return device.refreshStatus(innerCallback);
               } 
               return innerCallback();
             }
@@ -295,7 +341,8 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
       winston = require('winston');
 
   var now = new Date(),
-      tomorrow = new Date(now + (24 * 60 * 60 * 1000));
+      nowAsMilliseconds = now.valueOf(),
+      tomorrow = new Date(nowAsMilliseconds + (24 * 60 * 60 * 1000));
 
     GrowPlanInstanceModel
     .find()
@@ -367,7 +414,8 @@ function clearPendingNotifications (NotificationModel, callback){
       async = require('async'),
       winston = require('winston');
 
-  var now = new Date();
+  var now = new Date(),
+      nowAsMilliseconds = now.valueOf();
   NotificationModel
   .find()
   .where('tts')
@@ -528,10 +576,10 @@ function getFullyPopulatedGrowPlan(query, callback){
           growPlan.phases.forEach(function(phase) {
             if (phase.light){
               if (phase.light.fixture){
-                lightFixtureIds.push(phase.light.fixture);
+                lightFixtureIds.push(getObjectId(phase.light.fixture));
               }
               if (phase.light.bulb){
-                lightBulbIds.push(phase.light.bulb);
+                lightBulbIds.push(getObjectId(phase.light.bulb));
               }
             }
           });

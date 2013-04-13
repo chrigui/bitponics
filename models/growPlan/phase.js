@@ -14,14 +14,14 @@ var mongoose = require('mongoose'),
 
 var PhaseSchema = new Schema({
 	
-	name: { type: String, required: true },
+	name: { type: String, required: false },
 	
 	description: { type: String },
 
 	/**
 	 * expectedNumberOfDays. undefined means infinite.
 	 */
-	expectedNumberOfDays: { type: Number, required: false },
+	expectedNumberOfDays: { type: Number },
 	
 	/**
 	 * Light definition. Optional. Defines fixtures, bulbs, and quantities.
@@ -32,15 +32,15 @@ var PhaseSchema = new Schema({
 	
 	growMedium: { type: String },
 
-	actions: [{ type: ObjectIdSchema, ref: 'Action', required: true }],
+	actions: [{ type: ObjectIdSchema, ref: 'Action' }],
 	
-	phaseEndActions : [{ type: ObjectIdSchema, ref: 'Action', required: true }],
+	phaseEndActions : [{ type: ObjectIdSchema, ref: 'Action'}],
 
 	phaseEndDescription : { type : String },
 
 	idealRanges: [IdealRangeSchema],
 
-	nutrients : [{ type: ObjectIdSchema, ref: 'Nutrient', required: false }],
+	nutrients : [{ type: ObjectIdSchema, ref: 'Nutrient' }],
 },
 { id : false });
 
@@ -324,12 +324,14 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
  * @param {object} options.phase
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Phase)} callback
  */
 PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedPhase = options.phase,
       user = options.user,
-      visibility = options.visibility;
+      visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail;
 
   async.parallel(
     [
@@ -341,18 +343,22 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
             ActionModel.createNewIfUserDefinedPropertiesModified({
               action : action,
               user : user,
-              visibility : visibility
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
             },
             function(err, validatedAction){
-              if (err) { return actionCallback(err); }
-              validatedActions.push(validatedAction._id);
-              return actionCallback();
+              if (validatedAction){
+                validatedActions.push(validatedAction._id);
+              }
+              if (silentValidationFail){
+                return actionCallback();  
+              }
+              return actionCallback(err);
             });
           },
           function actionLoopEnd(err){
-            if (err) { return innerCallback(err); }
             submittedPhase.actions = validatedActions;
-            return innerCallback();
+            return innerCallback(err);
           }
         );
       },
@@ -364,18 +370,22 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
             ActionModel.createNewIfUserDefinedPropertiesModified({
               action : action,
               user : user,
-              visibility : visibility
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
             },
             function(err, validatedAction){
-              if (err) { return actionCallback(err); }
-              validatedActions.push(validatedAction._id);
-              return actionCallback();
+              if (validatedAction){
+                validatedActions.push(validatedAction._id);  
+              }
+              if (silentValidationFail){
+                return actionCallback();  
+              }
+              return actionCallback(err);
             });
           },
           function actionLoopEnd(err){
-            if (err) { return innerCallback(err); }
             submittedPhase.phaseEndActions = validatedActions;
-            return innerCallback();
+            return innerCallback(err);
           }
         );
       },
@@ -386,12 +396,17 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
           {
             growSystem : submittedPhase.growSystem,
             user : user,
-            visibility : visibility
+            visibility : visibility,
+            silentValidationFail : silentValidationFail
           },
           function(err, validatedGrowSystem){
-            if (err) { return innerCallback(err); }
-            submittedPhase.growSystem = validatedGrowSystem._id;
-            return innerCallback(); 
+            if (validatedGrowSystem){
+              submittedPhase.growSystem = validatedGrowSystem._id;  
+            }
+            if (silentValidationFail){
+              return innerCallback();   
+            }
+            return innerCallback(err);
           }
         );
       },
@@ -405,18 +420,22 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
             NutrientModel.createNewIfUserDefinedPropertiesModified({
               nutrient : nutrient,
               user : user,
-              visibility : visibility
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
             },
             function(err, validatedNutrient){
-              if (err) { return nutrientCallback(err); }
-              validatedNutrients.push(validatedNutrient._id);
-              return nutrientCallback();
+              if (validatedNutrient){
+                validatedNutrients.push(validatedNutrient._id);
+              }
+              if (silentValidationFail){
+                return nutrientCallback();  
+              }
+              return nutrientCallback(err);
             });
           },
           function nutrientLoopEnd(err){
-            if (err) { return innerCallback(err); }
             submittedPhase.nutrients = validatedNutrients;
-            return innerCallback();
+            return innerCallback(err);
           }
         );
       },
@@ -427,31 +446,46 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
           {
             light : submittedPhase.light,
             user : user,
-            visibility : visibility
+            visibility : visibility,
+            silentValidationFail : silentValidationFail
           },
-          function(err, light){
-            if (err) { return innerCallback(err); }
-            submittedPhase.light = light._id;
-            return innerCallback();
+          function(err, validatedLight){
+            if (validatedLight){
+              submittedPhase.light = validatedLight._id;  
+            }
+            if (silentValidationFail){
+              return innerCallback();  
+            }
+            return innerCallback(err);
           }
         );
       },
       function validateIdealRanges(innerCallback){
+        var validatedIdealRanges = [];
+
         async.forEach(submittedPhase.idealRanges, 
           function (idealRange, idealRangeCallback){
             IdealRangeSchema.statics.createNewIfUserDefinedPropertiesModified(
               {
                 idealRange : idealRange,
                 user : user,
-                visibility : visibility
+                visibility : visibility,
+                silentValidationFail : silentValidationFail
               }, 
               function(err, validatedIdealRange){
-                return idealRangeCallback();  
+                if (validatedIdealRange){
+                  validatedIdealRanges.push(validatedIdealRange);
+                }
+                if (silentValidationFail){
+                  return idealRangeCallback();
+                }
+                return idealRangeCallback(err);  
               }
             );            
           },
           function idealRangeLoopEnd(err){
-            return innerCallback();
+            submittedPhase.idealRanges = validatedIdealRanges;
+            return innerCallback(err);
           }
         );  
       },
@@ -459,6 +493,9 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
     function parallelEnd(err, results){
       // force mongoose to create a new _id
       delete submittedPhase._id;
+      if (silentValidationFail && err){
+        return (null, null);
+      }
       return callback(err, submittedPhase);
     }
   );

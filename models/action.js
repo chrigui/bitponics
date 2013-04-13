@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
   feBeUtils = requirejs('fe-be-utils'),
   i18nKeys = require('../i18n/keys'),
   winston = require('winston'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
   ActionModel,
   ActionSchema;
 
@@ -206,31 +207,46 @@ ActionSchema.static('isEquivalentTo', function(source, other){
  * @param {object} options.action
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
  */
 ActionSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedAction = options.action,
       user = options.user,
       visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail,
       ActionModel = this;
 
-    ActionModel.findById(submittedAction._id, function(err, actionResult){
-      if (err) { return callback(err); }
+    async.waterfall(
+      [
+        function getActionIdMatch(innerCallback){
+          if (!feBeUtils.canParseAsObjectId(submittedAction._id)){
+            return innerCallback(null, null);
+          } 
+          
+          ActionModel.findById(submittedAction._id, innerCallback);
+        },
+        function (matchedAction, innerCallback){
+          if (matchedAction && ActionModel.isEquivalentTo(submittedAction, matchedAction)){
+            return innerCallback(null, matchedAction);
+          }
 
-      if (actionResult && ActionModel.isEquivalentTo(submittedAction, actionResult)){
-        return callback(null, actionResult);
+          // If we've gotten here, either there was no matchedAction
+          // or the item wasn't equivalent
+          submittedAction._id = new ObjectId();
+          submittedAction.createdBy = user;
+          submittedAction.visibility = visibility;
+
+          ActionModel.create(submittedAction, innerCallback);
+        }
+      ],
+      function(err, validatedAction){
+        if (silentValidationFail){
+          return callback(null, validatedAction);
+        }
+        return callback(err, validatedAction);
       }
-      
-      // If we've gotten here, either there was no actionResult
-      // or the item wasn't equivalent
-      submittedAction._id = new ObjectId();
-      submittedAction.createdBy = user;
-      submittedAction.visibility = visibility;
-
-      ActionModel.create(submittedAction, function(err, createdAction){
-        return callback(err, createdAction);
-      });  
-    });
+    )
   } 
 );
 
@@ -271,11 +287,12 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
   // get the localized 00:00:00 of the phase start date (phase could have started later in the day, we need the day's start time)
   // get time elapsed from localized phase start
   // divide time elapsed by overall timespan. remainder is a component of the offset
-  var phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
+  var fromDateAsMilliseconds = (fromDate instanceof Date) ? fromDate.valueOf() : fromDate,
+      phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
   // get the midnight of the start date
-    phaseStartDate = growPlanInstancePhase.startDate - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+    phaseStartDate = growPlanInstancePhase.startDate.valueOf() - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
     overallCycleTimespan = action.overallCycleTimespan,
-    phaseTimeElapsed = fromDate - phaseStartDate,
+    phaseTimeElapsed = fromDateAsMilliseconds - phaseStartDate,
     cycleRemainder = overallCycleTimespan - (phaseTimeElapsed % overallCycleTimespan);
 
   return cycleRemainder;
@@ -298,7 +315,8 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
  *
  *
  * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
- *                Otherwise it's just written straight to the template.
+ *                Otherwise it's just written straight to the template. 
+ *                For single-state cycles, this is ignored and offset is set to 0.
  *
  * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
  */
@@ -317,7 +335,7 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
   switch(states.length){
     case 1:
       var infiniteStateControlValue = parseInt(states[0].controlValue, 10);
-      result.offset = offset;
+      result.offset = 0;
       result.value1 = infiniteStateControlValue;
       result.duration1 = 1;
       result.value2 = infiniteStateControlValue;
@@ -400,6 +418,7 @@ ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, act
 
 /************************** MIDDLEWARE ***************************/
 
+
 /**
  *  Validate cycle states
  *
@@ -475,6 +494,106 @@ ActionSchema.pre('save', function(next){
   return next();
 });
 
+
+
+/**
+ *  Validate cycle state messages
+ */
+ActionSchema.pre('save', function(next){
+  var Control = require('./control'),
+      ControlSchema = Control.schema,
+      ControlModel = Control.model,
+      action = this;
+
+  
+  async.waterfall([
+      function getControlName(innerCallback){
+        if (!action.control){
+          return innerCallback(null, '');
+        }
+        if (action.control.schema === ControlSchema){
+          return innerCallback(null, action.control.name);
+        } else {
+          ControlModel.findById(action.control)
+          .exec(function(err, controlResult){
+            if (err) { return innerCallback(err);}
+            return innerCallback(null, controlResult.name);
+          });
+        }
+      },
+      function (controlName, innerCallback){
+        action.cycle.states.forEach(function(state){
+          if (!state.message){
+            if (controlName && state.controlValue){
+              state.message = "Turn " + controlName + " " + (state.controlValue === '0' ? "off" : "on");
+            } else {
+              // no control, no message. Hopefully there's a duration. It's a waiting state!
+              state.message = "Wait";
+            }
+
+            if (state.duration){
+              state.message += " for " + state.duration + " " + state.durationType; 
+            }
+          } 
+        });
+        return innerCallback();
+      }
+    ],
+    function(err){
+      return next(err);
+    }
+  );
+});
+
+/**
+ *  Validate description
+ */
+ActionSchema.pre('save', function(next){
+  var Control = require('./control'),
+      ControlSchema = Control.schema,
+      ControlModel = Control.model,
+      action = this;
+
+  if (this.description){
+    return next();
+  }
+    
+  async.waterfall(
+    [
+      function getControlName(innerCallback){
+        if (!action.control){
+          return innerCallback();
+        }
+
+        if (action.control.schema === ControlSchema){
+          return innerCallback(null, action.control.name);
+        } else {
+          ControlModel.findById(action.control)
+          .exec(function(err, controlResult){
+            if (err) { return innerCallback(err);}
+            return innerCallback(controlResult.name);
+          });
+        }
+      },
+      function (controlName, innerCallback){
+        if (controlName && action.cycle.states.length > 1){
+          action.description = controlName + " cycle";
+        }
+
+        if (!action.description){
+          action.description = action.states[0].message || (action.states[1] ? action.states[1].message : '') || "No action description";  
+        }
+        
+        return next();
+      }
+    ],
+    function(err, results){
+      return next(err);
+    }
+  );
+});
+
+
 /************************** END MIDDLEWARE ***************************/
 
 
@@ -484,7 +603,7 @@ ActionSchema.pre('save', function(next){
   // Want a sparse index on control (since it's an optional field)
 ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
-ActionModel = mongoose.model('Action', ActionSchema);
+ActionModel = mongooseConnection.model('Action', ActionSchema);
 
 
 exports.schema = ActionSchema;

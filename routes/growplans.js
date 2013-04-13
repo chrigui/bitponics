@@ -208,8 +208,9 @@ module.exports = function(app){
       {
         growPlan : submittedGrowPlan,
         user : user,
-        visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC
-      }, 
+        visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
+        silentValidationFail : true
+      },
       function(err, validatedGrowPlan){
         if (err) { 
           result.status = 'error';

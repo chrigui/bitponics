@@ -9,15 +9,7 @@ module.exports = function(app){
 	 */
 	app.all('/admin*', 
 		routeUtils.middleware.ensureSecure, 
-		routeUtils.middleware.ensureUserIsAdmin, 
-		function (req, res, next) {
-		  if (req.user.admin) {
-		    next();
-		  } else {
-		    res.redirect('/login?redirect=' + req.url);
-		  }
-		}
-	);
+		routeUtils.middleware.ensureUserIsAdmin);
 
 	/* 
 	 * Admin landing
