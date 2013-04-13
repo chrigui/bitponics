@@ -110,23 +110,29 @@ module.exports = function(app){
     // }
 
 
-    mongoose.connect(app.config.mongoUrl);
+    require('./mongoose-connection').open(app.settings.env, function(mongooseConnection){
+	    console.log("MONGOOSE", mongooseConnection);
 
-    app.config.session = {
-      secret : 'somethingrandom',
-      key : 'express.sid',
-      store : new MongoStore({
-        mongoose_connection : mongoose.connection
-      })
-    };
+	    app.config.mongooseConnection = mongooseConnection;
 
-    // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
-    app.use(express.cookieParser());
-    app.use(express.session(app.config.session));
+	    app.config.session = {
+	      secret : 'somethingrandom',
+	      key : 'express.sid',
+	      store : new MongoStore({
+	        mongoose_connection : app.config.mongooseConnection
+	      })
+	    };	
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+	    // cookieParser and session handling are needed for everyauth (inside mongooseAuth) to work  (https://github.com/bnoguchi/everyauth/issues/27)
+	    app.use(express.cookieParser());
+	    app.use(express.session(app.config.session));
 
+	    app.use(passport.initialize());
+	    app.use(passport.session());
+
+    });
+
+    
 
     //flash messages are separate as of express 3
     app.use(flash());
@@ -237,7 +243,17 @@ module.exports = function(app){
             }
           }
           // For local, dev, & staging, want to put the whole site behind basic auth
-          return connect.basicAuth('bitponics', '8bitpass')(req, res, next);
+          return connect.basicAuth(
+          	function(basicAuthUsername, basicAuthPassword){
+          		switch (basicAuthUsername) {
+          			case "bitponics":
+          				return basicAuthPassword === "8bitpass";
+        				case "braintree":
+        					return basicAuthPassword === "dendrite";
+          		}
+          		return false;
+          	}
+          )(req, res, next);
         }
       });
       break;

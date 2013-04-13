@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var GrowSystemSchema = new Schema({
 	
@@ -162,4 +163,4 @@ GrowSystemSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
 /*********************** END STATIC METHODS ******************************/
 
 exports.schema = GrowSystemSchema;
-exports.model = mongoose.model('GrowSystem', GrowSystemSchema);
+exports.model = mongooseConnection.model('GrowSystem', GrowSystemSchema);

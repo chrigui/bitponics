@@ -68,7 +68,7 @@ describe('Plant', function(){
 
     it("returns the pre-existing Plant if _id and all other properties match", function(done){
       var submittedPlant = {
-        _id : '50749839ab364e2a9fffd4ef',
+        _id : '50749839ab364e2a9fffd4ef', // Lemon
         name: "Lemon"
       },
       originalSubmittedPlant = JSON.parse(JSON.stringify(submittedPlant));

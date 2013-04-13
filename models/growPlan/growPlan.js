@@ -13,7 +13,8 @@ var mongoose = require('mongoose'),
   requirejs = require('../../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
   PlantModel = require('../plant').model,
-  i18nKeys = require('../../i18n/keys');
+  i18nKeys = require('../../i18n/keys'),
+  mongooseConnection = require('../../config/mongoose-connection').defaultConnection;
   
 
 var GrowPlanModel,
@@ -378,6 +379,6 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
 
 /************************** END STATIC METHODS  ***************************/
 
-GrowPlanModel = mongoose.model('GrowPlan', GrowPlanSchema);
+GrowPlanModel = mongooseConnection.model('GrowPlan', GrowPlanSchema);
 exports.schema = GrowPlanSchema;
 exports.model = GrowPlanModel;

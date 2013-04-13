@@ -3,15 +3,16 @@ var cronJob = require('cron').CronJob,
 	winston = require('winston'),
 	mongoose = require('mongoose'),
 	async = require('async'),
-	mongoUrls = require('./config/mongo-config').urls;
+	mongooseConnection = require('./config/mongoose-connection');
+	
 
 var environments = ['local','dev','staging','prod'];
 
 var connections = {
-	local : mongoose.createConnection(mongoUrls.local),
-	dev : mongoose.createConnection(mongoUrls.development),
-	staging : mongoose.createConnection(mongoUrls.staging),
-	prod : mongoose.createConnection(mongoUrls.production)
+	local : mongooseConnection.open('local'),
+	dev : mongooseConnection.open('development'),
+	staging : mongooseConnection.open('staging'),
+	prod : mongooseConnection.open('production'),
 };
 
 var notificationModels = {

@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var LightBulbSchema = new Schema({
 	type: { type : String },
@@ -109,4 +110,4 @@ LightBulbSchema.static('createNewIfUserDefinedPropertiesModified', function(opti
 /*********************** END STATIC METHODS **************************/
 
 exports.schema = LightBulbSchema;
-exports.model = mongoose.model('LightBulb', LightBulbSchema);
+exports.model = mongooseConnection.model('LightBulb', LightBulbSchema);

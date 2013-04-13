@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
   useTimestamps = mongoosePlugins.useTimestamps,
   ObjectIdSchema = Schema.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var CalibrationLogSchema = new Schema({
@@ -104,4 +105,4 @@ CalibrationLogSchema.set('toJSON', {
 CalibrationLogSchema.index({ 'd ts': -1 });
 
 exports.schema = CalibrationLogSchema;
-exports.model = mongoose.model('CalibrationLog', CalibrationLogSchema);
+exports.model = mongooseConnection.model('CalibrationLog', CalibrationLogSchema);

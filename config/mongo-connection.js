@@ -49,11 +49,6 @@ var self = {
 			return connection;
 		}
 
-		// support arbitrary connection strings. For testing and whatnot
-		if (!self.urls[environment]){
-			self.urls[environment] = environment;
-		}
-
 		connection = mongoose.createConnection(
 			self.urls[environment], 
 			self.connectionOptions,
@@ -66,13 +61,13 @@ var self = {
 
 		// mongoose internally queues up DB commands before a connection is opened, so we don't 
 		// need to wait for the callback to set these properties and make them available
-
-		console.log('assigning default connection');
 		if (!self.defaultConnection) {
 			self.defaultConnection = connection;
 		}
 
 		self.connections[environment] = connection;
+
+		return connection;
 	}
 };
 

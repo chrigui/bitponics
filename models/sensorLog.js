@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
-	SensorLogModel;
+	SensorLogModel,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 /**
@@ -108,4 +109,4 @@ SensorLogSchema.set('toJSON', {
 SensorLogSchema.index({ 'gpi ts': -1 }, { sparse: true });
 
 exports.schema = SensorLogSchema;
-exports.model = mongoose.model('SensorLog', SensorLogSchema);
+exports.model = mongooseConnection.model('SensorLog', SensorLogSchema);

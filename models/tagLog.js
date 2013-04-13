@@ -1,8 +1,8 @@
 var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
-	ObjectIdSchema = Schema.ObjectId;
-
+	ObjectIdSchema = Schema.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var TagReadingSchema = new Schema({
@@ -102,4 +102,4 @@ TagLogSchema.set('toJSON', {
 TagLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = TagLogSchema;
-exports.model = mongoose.model('TagLog', TagLogSchema);
+exports.model = mongooseConnection.model('TagLog', TagLogSchema);

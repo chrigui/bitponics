@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   ObjectId = mongoose.Types.ObjectId,
   async = require('async'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var LightFixtureSchema = new Schema({
 	brand : { type : String },
@@ -118,4 +119,4 @@ LightFixtureSchema.static('createNewIfUserDefinedPropertiesModified', function(o
 
 
 exports.schema = LightFixtureSchema;
-exports.model = mongoose.model('LightFixture', LightFixtureSchema);
+exports.model = mongooseConnection.model('LightFixture', LightFixtureSchema);

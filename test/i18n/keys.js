@@ -1,7 +1,4 @@
-var mongoose = require('mongoose'),
-User = require('../../models/user').model,
-should = require('should'),
-i18nKeys = require('../../i18n/keys');
+
 
 
 /**
@@ -15,6 +12,10 @@ i18nKeys = require('../../i18n/keys');
  * your code should be done executing so Mocha runs to test properly.
  */
 describe('i18n keys', function(){
+	var User = require('../../models/user').model,
+	should = require('should'),
+	i18nKeys = require('../../i18n/keys');
+	
   describe('get', function(){
     it('returns an error string if an invalid key is provided', function(){
       var expected = "Invalid i18n key",

@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
-  ObjectIdSchema = Schema.ObjectId;
+  ObjectIdSchema = Schema.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var SensorSchema = new Schema({
     name: { type: String, required: true },
@@ -30,4 +31,4 @@ var SensorSchema = new Schema({
 SensorSchema.plugin(useTimestamps);
 
 exports.schema = SensorSchema;
-exports.model = mongoose.model('Sensor', SensorSchema);
+exports.model = mongooseConnection.model('Sensor', SensorSchema);

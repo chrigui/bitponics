@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   ObjectId = mongoose.Types.ObjectId,
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var PlantSchema = new Schema({
 	name: { type: String, required: true },
@@ -100,4 +101,4 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
 PlantSchema.path('name').index({ unique: true });
 
 exports.schema = PlantSchema;
-exports.model = mongoose.model('Plant', PlantSchema);
+exports.model = mongooseConnection.model('Plant', PlantSchema);

@@ -15,7 +15,8 @@ var mongoose = require('mongoose'),
   SensorLogSchema = require('./sensorLog').schema,
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var PhaseDaySummarySchema = new Schema({
@@ -787,6 +788,6 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 
 /***************** END MIDDLEWARE **********************/
 
-GrowPlanInstanceModel = mongoose.model('GrowPlanInstance', GrowPlanInstanceSchema);
+GrowPlanInstanceModel = mongooseConnection.model('GrowPlanInstance', GrowPlanInstanceSchema);
 exports.schema = GrowPlanInstanceSchema;
 exports.model = GrowPlanInstanceModel;

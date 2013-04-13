@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
-  ObjectIdSchema = Schema.ObjectId;
+  ObjectIdSchema = Schema.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 /**
  * ImmediateAction
@@ -146,4 +147,4 @@ ImmediateActionSchema.set('toJSON', {
 ImmediateActionSchema.index({ 'gpi e ts': -1 });
 
 exports.schema = ImmediateActionSchema;
-exports.model = mongoose.model('ImmediateAction', ImmediateActionSchema);
+exports.model = mongooseConnection.model('ImmediateAction', ImmediateActionSchema);

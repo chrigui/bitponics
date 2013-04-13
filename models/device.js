@@ -12,7 +12,8 @@ var mongoose = require('mongoose'),
   winston = require('winston'),
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');;
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 /***************** UTILS **********************/
@@ -561,5 +562,5 @@ DeviceSchema.pre('save', function(next){
 
 
 exports.schema = DeviceSchema;
-exports.model = mongoose.model('Device', DeviceSchema);
+exports.model = mongooseConnection.model('Device', DeviceSchema);
 exports.utils = DeviceUtils;

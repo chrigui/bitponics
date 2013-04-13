@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
     mongooseTypes = require('mongoose-types'),
     Schema = mongoose.Schema,
-    ObjectIdSchema = Schema.ObjectId;
+    ObjectIdSchema = Schema.ObjectId,
+  	mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var HarvestReadingSchema = new Schema({
@@ -107,4 +108,4 @@ HarvestLogSchema.set('toJSON', {
 HarvestLogSchema.index({ 'gpi ts': -1 });
 
 exports.schema = HarvestLogSchema;
-exports.model = mongoose.model('HarvestLog', HarvestLogSchema);
+exports.model = mongooseConnection.model('HarvestLog', HarvestLogSchema);

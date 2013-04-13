@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
   feBeUtils = requirejs('fe-be-utils'),
   i18nKeys = require('../i18n/keys'),
   winston = require('winston'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
   ActionModel,
   ActionSchema;
 
@@ -602,7 +603,7 @@ ActionSchema.pre('save', function(next){
   // Want a sparse index on control (since it's an optional field)
 ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
 
-ActionModel = mongoose.model('Action', ActionSchema);
+ActionModel = mongooseConnection.model('Action', ActionSchema);
 
 
 exports.schema = ActionSchema;

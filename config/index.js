@@ -1,6 +1,5 @@
 var winston = require('winston'),
     winstonConfig = require('./winston-config')(),
-    mongoConfig = require('./mongo-config'),
     appDomains = require('./app-domain-config');
 
 /**
@@ -8,29 +7,28 @@ var winston = require('winston'),
  * 
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
-module.exports = function(app) {
+module.exports = function(app, callback) {
   //var // on local machine, routing bitponics.com to localhost in order to have external oauth's (goog, fb) route back without complaining 
       //PORT = process.env.PORT || 80, // run node as sudo to use port 80
       //HOST = process.env.HOST || 'bitponics.com', // update host file with the line "127.0.0.1 bitponics.com"
 
   winston.info('NODE_ENV ');
 
-  var mongoUrl = process.env.MONGOLAB_URI,
-      mongoUrls = mongoConfig.urls,
-      appDomain = process.env.BITPONICS_APP_DOMAIN,
+  var appDomain = process.env.BITPONICS_APP_DOMAIN,
       appUrl;
 
   // TODO: app.settings.env automatically reads from process.env.NODE_ENV & defaults to 'development'.
   //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
   //       Setting it manually for now, but figure out what's going on
   app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
+  winston.info(app.settings.env);
+
+  winston.info('Connecting to mongoose');
+	require('./mongoose-connection').open(app.settings.env, callback);
 
   winstonConfig.setupLoggly(app.settings.env);
 
-  winston.info(app.settings.env);
-  
   appDomain = appDomain || appDomains[app.settings.env];
-  mongoUrl = mongoUrl || mongoUrls[app.settings.env];
   
   appUrl = 'http://' + appDomain;
 
@@ -41,11 +39,9 @@ module.exports = function(app) {
     //auth : require('./auth-config'),
     css : require('./css-config'),
     appUrl : appUrl,
-    js : require('./js-config'),
-    mongoUrl : mongoUrl
+    js : require('./js-config')
   };
 
-  require('../models/user').setVerificationEmailDomain(appDomain);
 
   // locals are passed down to the views
   app.locals({
@@ -76,6 +72,9 @@ module.exports = function(app) {
 
   require('./auth-config')(app);
   require('./app-config')(app);
-  
+
+
+	// This has to occur after the connection has been set up
+	require('../models/user').setVerificationEmailDomain(appDomain);	
 };
 

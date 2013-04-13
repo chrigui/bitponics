@@ -1,11 +1,9 @@
 var cronJob = require('cron').CronJob,
 	winston = require('winston'),
 	mongoose = require('mongoose'),
-	async = require('async'),
-	mongoUrls = require('./config/mongo-config').urls;
+	async = require('async');
 
-//mongoose.connect(mongoUrls.local);
-mongoose.connect(mongoUrls.test);
+require('./config/mongoose-connection').open('test');
 
 var Models = require('./models'),
 	ModelUtils = Models.utils;

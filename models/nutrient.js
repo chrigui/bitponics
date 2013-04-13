@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   ObjectId = mongoose.Types.ObjectId,
   async = require('async'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 var NutrientSchema = new Schema({
 	brand: { type: String },
@@ -101,4 +102,4 @@ NutrientSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
 /*********************** END STATIC METHODS **************************/
 
 exports.schema = NutrientSchema;
-exports.model = mongoose.model('Nutrient', NutrientSchema);
+exports.model = mongooseConnection.model('Nutrient', NutrientSchema);

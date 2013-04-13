@@ -2,8 +2,8 @@ var mongoose = require('mongoose'),
 	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
-  ObjectId = mongoose.Types.ObjectId;
-
+  ObjectId = mongoose.Types.ObjectId,
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 var PhotoReadingSchema = new Schema({
@@ -106,4 +106,4 @@ PhotoLogSchema.set('toJSON', {
 PhotoLogSchema.index({ 'gpi ts l.t': -1 });
 
 exports.schema = PhotoLogSchema;
-exports.model = mongoose.model('PhotoLog', PhotoLogSchema);
+exports.model = mongooseConnection.model('PhotoLog', PhotoLogSchema);

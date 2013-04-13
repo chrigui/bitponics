@@ -6,11 +6,9 @@
  *
  * http://visionmedia.github.com/mocha/, search for '“root” level hooks'
  */
-
- var mongoose = require('mongoose'),
- mongoUrl = require('../config/mongo-config').urls.test,
- exec = require('child_process').exec,
- winston = require('winston');
+var mongooseConnection = require('../config/mongoose-connection').open('test'),
+	  exec = require('child_process').exec,
+ 	  winston = require('winston');
 
 /*
  * before Method
@@ -20,8 +18,7 @@
  */
  before(function(done){
   	// Connecting to a local test database or creating it on the fly
-  	mongoose.connect(mongoUrl);
-  	exec('db_init ' + mongoUrl + ' clear', 
+  	exec('db_init test clear', 
   		function (error, stdout, stderr){
   			if (error) { console.log(error); return done(new Error(error));}
   			if (stderr) { console.log(stderr); return done(new Error(stderr));}
@@ -38,6 +35,6 @@
  * running its queue.
  */
  after(function(done){
- 	mongoose.connection.close();
+ 	mongooseConnection.close();
  	done();
  });
