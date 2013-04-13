@@ -15,27 +15,33 @@ block content
         
         div.page-content-inner-wrapper 
 
-          p.development-status
+          //-p.development-status
             | Bitponics is still in development and will launch later this spring. 
             | The Base Station will be $499, and further details about web service pricing will be posted soon. 
             | To be notified when preorders are available,
 
-          //-div.price.base-station-price
+          h2.price-category.first Base Station
+          div.price.base-station-price
             span.price-number 
               span.price-currency $
               | 499
             span.price-type
-            span.price-per Base Station
+            span.price-per Ships within 1 week
 
-          div.base-station-preorder
+            
+
+
+          //-div.base-station-preorder
             br
             a(href="#contact", class="btn")
                 | Sign up for our mailing list 
                 | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
           
-          //-div.clearfix
+          div.clearfix
           
-          //-ul.list-grid-wrapper
+          
+          h2.price-category Bitponics Cloud Web Service
+          ul.list-grid-wrapper
             li
               ul.feature-icons.grid-list
                 li.first.space
@@ -106,7 +112,7 @@ block content
                   li
                     span Unlimited grow history storage
                   li
-                    span Option to keep garden data private
+                    span Optionally keep garden data private
                   li.space
                   li.space
                   li.last.price 
@@ -131,7 +137,7 @@ block content
                   li
                     span Unlimited grow history storage
                   li
-                    span Option to keep garden data private
+                    span Optionally keep garden data private
                   li
                     span Premium Support Services
                   li
@@ -143,15 +149,17 @@ block content
                     span.price-type /mo 
                     span.price-per per garden
 
-          //-div(class="center clearfix")
-            | To get notified when preorders are available,
-            br
-            a(href="#contact", class="btn")
+          div.center.clearfix
+            a(href="/get-started", class="btn")
+              | Get Started
+              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            //-
+              | To get notified when preorders are available,
+            //-br
+            //-a(href="#contact", class="btn")
               | Sign up for our mailing list 
               | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-            //- a(href="/get-started", class="btn")
-              | Get Started For Free
-              | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+            
 
 
   section#footer

@@ -1351,14 +1351,25 @@ section#footer .content-module {
   min-height: auto;
   height: auto;
 }
-#pricing .development-status {
+#pricing .development-status // TEMP while we're only showing dev-status messaging {
   color: #00fa8b;
   font-size: 1.5em;
   margin-bottom: 0;
 }
-#pricing .base-station-preorder .btn {
+#pricing .base-station-preorder // TEMP .btn {
   margin-top: 0;
   margin-left: 0;
+}
+#pricing h2.price-category {
+  color: #00fa8b;
+  border-top: 1px solid #00fa8b;
+  line-height: 2em;
+  margin-top: 3em;
+  margin-bottom: 1em;
+}
+#pricing h2.price-category.first {
+  margin: 0;
+  border-top: none;
 }
 #pricing .price {
   padding-left: 1em;
