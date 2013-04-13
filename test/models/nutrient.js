@@ -1,4 +1,5 @@
-var mongoose = require('mongoose'),
+var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+	mongoose = require('mongoose'),
   Nutrient = require('../../models/nutrient'),
   should = require('should'),
   moment = require('moment'),

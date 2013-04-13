@@ -12,7 +12,8 @@
  * your code should be done executing so Mocha runs to test properly.
  */
 describe('i18n keys', function(){
-	var User = require('../../models/user').model,
+	var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+	User = require('../../models/user').model,
 	should = require('should'),
 	i18nKeys = require('../../i18n/keys');
 	

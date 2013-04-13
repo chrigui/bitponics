@@ -1,4 +1,5 @@
-var mongoose = require('mongoose'),
+var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
   PhotoLog = require('../../models/photoLog'),
   should = require('should');
