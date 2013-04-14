@@ -161,13 +161,27 @@
 		}
 
 		.question {
-			margin: 0 8% 1em 0;
+			margin: 0 1em 1em 0;
+			border: 1px solid color-text-gray-sep;
+			padding: 2em 1em 1em; 
+			position: relative;
 		}
 
 		.btn {
 			margin-left 0
 			margin-top 0
+
+			&.close {
+				position: absolute;
+				top: 0;
+				right: -.25em;
+				cursor: pointer;
+				background: #fff;
+				color: color-text-graydark;
+			}
+
 		}
+
 		input[type=checkbox] {
 			opacity: 1;
 			height: auto;

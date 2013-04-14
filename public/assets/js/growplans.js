@@ -278,7 +278,6 @@ function(viewModels){
             };
 
             $scope.removePhase = function(index){
-                var existingPhaseLength = $scope.selectedGrowPlan.phases.length;
                 $scope.selectedGrowPlan.phases.splice(index, 1);
                 $scope.setCurrentPhaseTab(0);
             };
@@ -303,6 +302,14 @@ function(viewModels){
                     };
                 // Unshift to make it show up first
                 phase.actions.unshift(newAction);
+            };
+            
+            $scope.removeIdealRange = function(phaseIndex, idealRangeIndex){
+                $scope.selectedGrowPlan.phases[phaseIndex].idealRanges.splice(idealRangeIndex, 1);
+            };
+
+            $scope.removeAction = function(phaseIndex, actionIndex){
+                $scope.selectedGrowPlan.phases[phaseIndex].actions.splice(actionIndex, 1);
             };
 
             $scope.toggleOverlay = function(overlayMetaData){

@@ -1075,14 +1075,14 @@ section.footer .content-module {
   right: 0;
   cursor: pointer;
   background: #fff;
-  color: #000;
+  color: #333;
 }
 .overlay .page-heading {
   text-align: center;
   border: 0 none !important;
 }
 .overlay dd {
-  color: #000;
+  color: #333;
 }
 .overlay .pagination {
   text-align: center;
@@ -1794,12 +1794,24 @@ li
 }
 .landing-page.growplans .idealRanges .question,
 .landing-page.growplans .actions .question {
-  margin: 0 8% 1em 0;
+  margin: 0 1em 1em 0;
+  border: 1px solid #cccdcc;
+  padding: 2em 1em 1em;
+  position: relative;
 }
 .landing-page.growplans .idealRanges .btn,
 .landing-page.growplans .actions .btn {
   margin-left: 0;
   margin-top: 0;
+}
+.landing-page.growplans .idealRanges .btn.close,
+.landing-page.growplans .actions .btn.close {
+  position: absolute;
+  top: 0;
+  right: -0.25em;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
 }
 .landing-page.growplans .idealRanges input[type=checkbox],
 .landing-page.growplans .actions input[type=checkbox] {

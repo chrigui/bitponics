@@ -304,6 +304,10 @@ block content
                             | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
                         li(class="question", ng-repeat="idealRange in phase.idealRanges")
+                          div(class="close btn", ng-click="removeIdealRange($parent.$index, $index);")
+                            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+
                           //- div(class="sensor-type icon {{idealRange.sCode}}")
                           //-   | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
                           //-   div.screen-reader-text {{idealRange.sCode}}
@@ -365,7 +369,9 @@ block content
                             | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
                         li(class="question", ng-repeat="action in phase.actionsViewModel")
-                          
+                          div(class="close btn", ng-click="removeAction($parent.$index, $index);")
+                            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
                           div.separator-top
                             label Description
                             textarea(placeholder="Describe the action.", ng-model="action.description")
