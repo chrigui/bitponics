@@ -10,12 +10,15 @@ var SensorModel = require('../../models/sensor').model,
 module.exports = function(app) {
 
    //List sensors
-  app.get('/api/sensors', function (req, res, next){
-    return SensorModel.find(function (err, sensors) {
-      if (err) { return next(err); }
-      return res.send(sensors);
-    });
-  });
+  app.get('/api/sensors', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return SensorModel.find(function (err, sensors) {
+	      if (err) { return next(err); }
+	      return res.send(sensors);
+	    });
+	  }
+  );
 
   /*
    * Create single sensor
@@ -29,21 +32,25 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/sensors', function (req, res, next){
-    var sensor;
-    winston.log("POST: ");
-    winston.log(req.body);
-    sensor = new SensorModel({
-      name: req.body.name,
-      abbrev: req.body.abbrev,
-      unit: req.body.unit
-    });
-    sensor.save(function (err) {
-      if (err) { return next(err); }
-      winston.log("created sensor");
-      return res.send(sensor);
-    });
-  });
+  app.post('/api/sensors', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    var sensor;
+	    winston.log("POST: ");
+	    winston.log(req.body);
+	    sensor = new SensorModel({
+	      name: req.body.name,
+	      abbrev: req.body.abbrev,
+	      unit: req.body.unit
+	    });
+	    sensor.save(function (err) {
+	      if (err) { return next(err); }
+	      winston.log("created sensor");
+	      return res.send(sensor);
+	    });
+	  }
+  );
 
   /*
    * Read a sensor
@@ -56,12 +63,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/sensors/:id', function (req, res, next){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
-      if (err) { return next(err); }
-      return res.send(sensor);
-    });
-  });
+  app.get('/api/sensors/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return SensorModel.findById(req.params.id, function (err, sensor) {
+	      if (err) { return next(err); }
+	      return res.send(sensor);
+	    });
+	  }
+  );
 
   /*
    * Update a sensor
@@ -81,17 +91,21 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/sensors/:id', function (req, res, next){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
-      if (err) { return next(err); }
-      sensor.actionBelowMin = req.body.actionBelowMin;
-      return sensor.save(function (err) {
-        if (err) { return next(err); }
-        winston.log("updated sensor");
-        return res.send(sensor);
-      });
-    });
-  });
+  app.put('/api/sensors/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return SensorModel.findById(req.params.id, function (err, sensor) {
+	      if (err) { return next(err); }
+	      sensor.actionBelowMin = req.body.actionBelowMin;
+	      return sensor.save(function (err) {
+	        if (err) { return next(err); }
+	        winston.log("updated sensor");
+	        return res.send(sensor);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete a sensor
@@ -108,14 +122,18 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/sensors/:id', function (req, res, next){
-    return SensorModel.findById(req.params.id, function (err, sensor) {
-      if (err) { return next(err); }
-      return sensor.remove(function (err) {
-        if (err) { return next(err); }
-        winston.log("removed sensor");
-        return res.send('');
-      });
-    });
-  });
+  app.delete('/api/sensors/:id', 
+		routeUtils.middleware.ensureLoggedIn,
+		routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return SensorModel.findById(req.params.id, function (err, sensor) {
+	      if (err) { return next(err); }
+	      return sensor.remove(function (err) {
+	        if (err) { return next(err); }
+	        winston.log("removed sensor");
+	        return res.send('');
+	      });
+	    });
+	  }
+  );
 };

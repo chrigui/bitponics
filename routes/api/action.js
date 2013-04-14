@@ -11,8 +11,7 @@ module.exports = function(app) {
 
    //List actions
   app.get('/api/actions', 
-    routeUtils.middleware.ensureSecure, 
-    routeUtils.middleware.ensureUserIsAdmin, 
+    routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
       var query = ActionModel.find();
 
@@ -57,24 +56,27 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/actions', function (req, res, next){
-    var action;
-    winston.info("POST: ");
-    winsotn.info(req.body);
-    action = new ActionModel({
-      description: req.body.description,
-      control: req.body.control,
-      cycle: req.body.cycle
-    });
-    action.save(function (err) {
-      if (err) { return next(err); }
+  app.post('/api/actions', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    var action;
+	    winston.info("POST: ");
+	    winsotn.info(req.body);
+	    action = new ActionModel({
+	      description: req.body.description,
+	      control: req.body.control,
+	      cycle: req.body.cycle
+	    });
+	    action.save(function (err) {
+	      if (err) { return next(err); }
 
-      return winston.info("created action");
-      
-    });
-    // TODO: send this response in the callback of save
-    return res.send(action);
-  });
+	      return winston.info("created action");
+	      
+	    });
+	    // TODO: send this response in the callback of save
+	    return res.send(action);
+	  }
+  );
 
   /*
    * Read an action
@@ -87,13 +89,16 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/actions/:id', function (req, res, next){
-    return ActionModel.findById(req.params.id, function (err, action) {
-      if (err) { return next(err); }
+  app.get('/api/actions/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return ActionModel.findById(req.params.id, function (err, action) {
+	      if (err) { return next(err); }
 
-      return res.send(action);
-    });
-  });
+	      return res.send(action);
+	    });
+	  }
+  );
 
   /*
    * Update an action
@@ -113,17 +118,20 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/actions/:id', function (req, res, next){
-    return ActionModel.findById(req.params.id, function (err, action) {
-      action.description = req.body.description;
-      return action.save(function (err) {
-        if (err) { return next(err); }
-        
-        winston.info("updated action");
-        return res.send(action);
-      });
-    });
-  });
+  app.put('/api/actions/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return ActionModel.findById(req.params.id, function (err, action) {
+	      action.description = req.body.description;
+	      return action.save(function (err) {
+	        if (err) { return next(err); }
+	        
+	        winston.info("updated action");
+	        return res.send(action);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete an action
@@ -140,14 +148,18 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/actions/:id', function (req, res, next){
-    return ActionModel.findById(req.params.id, function (err, action) {
-      return action.remove(function (err) {
-        if (err) { return next(err); }
+  app.delete('/api/actions/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return ActionModel.findById(req.params.id, function (err, action) {
+	      return action.remove(function (err) {
+	        if (err) { return next(err); }
 
-        winston.info("removed");
-        return res.send('');
-      });
-    });
-  });
+	        winston.info("removed");
+	        return res.send('');
+	      });
+	    });
+	  }
+  );
 };

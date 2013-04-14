@@ -6,7 +6,8 @@ var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
     ModelUtils = require('../../../models/utils'),
     winston = require('winston'),
     allPurposeGrowPlanId = '506de30c8eebf7524342cb70',
-    async = require('async');
+    async = require('async'),
+    routeUtils = require('../../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -30,7 +31,7 @@ module.exports = function(app) {
    *  If id param, match on grow plan and return compact data
    *  If plants and growSystem params, filter on all grow plans (except All-Purpose) and return compact data
    */
-  app.get('/api/grow_plans', function (req, res, next){
+  app.get('/api/grow-plans', function (req, res, next){
     var filter = false,
         full = false,
         id = req.query.id,
@@ -47,9 +48,9 @@ module.exports = function(app) {
 
     if(!filter && !full) { //return all grow plans
       
-      return GrowPlanModel.find(function (err, grow_plans) {
+      return GrowPlanModel.find(function (err, growPlans) {
         if (err) { return next(err); }
-        return res.send(grow_plans);
+        return res.send(growPlans);
       });
 
     } else if (filter) { //filter on plants and growsystem
@@ -76,14 +77,14 @@ module.exports = function(app) {
             'phases.expectedNumberOfDays': 1,
             'createdBy': 1
           }
-        ).exec(function (err, grow_plans) {
+        ).exec(function (err, growPlans) {
           if (err) { return next(err); }
           
           var userIds = [],
               gpObjects = [],
               overallTimeSpan = 0;
 
-          grow_plans.forEach(function(gp){
+          growPlans.forEach(function(gp){
             var gpo = gp.toObject();
             userIds.push(gp.createdBy);
             gpo.overallTimeSpan = gpo.phases.reduce(function(prev, curr){
@@ -131,7 +132,7 @@ module.exports = function(app) {
    * Create single grow plan
    *
    *  Test with:
-   *  jQuery.post("/api/grow_plans", {
+   *  jQuery.post("/api/grow-plans", {
    *    "parentGrowPlanId": "growplanid",
    *    "createdBy": "userid",
    *    "name": "Jack's Grow Plan",
@@ -144,7 +145,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plans', function (req, res, next){
+  app.post('/api/grow-plans', function (req, res, next){
     var grow_plan;
     winston.info("POST: ");
     winston.info(req.body);
@@ -166,14 +167,14 @@ module.exports = function(app) {
    * Read a grow plan
    *
    * To test:
-   * jQuery.get("/api/grow_plans/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/grow-plans/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plans/:id', function (req, res, next){
+  app.get('/api/grow-plans/:id', function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       if (err) { return next(err); }
       return res.send(grow_plan);
@@ -185,7 +186,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plans/${id}",
+   *     url: "/api/grow-plans/${id}",
    *     type: "PUT",
    *     data: {
    *       "title": "New Grow Plan Title"
@@ -198,7 +199,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plans/:id', function (req, res, next){
+  app.put('/api/grow-plans/:id', function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       if (err) { return next(err); }
 
@@ -215,7 +216,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow_plans/${id}", 
+   *     url: "/api/grow-plans/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -225,7 +226,10 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plans/:id', function (req, res, next){
+  app.delete('/api/grow-plans/:id',
+		routeUtils.middleware.ensureSecure, 
+		routeUtils.middleware.ensureUserIsAdmin,
+		function (req, res, next){
     return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
       if (err) { return next(err); }
 

@@ -1,0 +1,28 @@
+extends ../layout
+
+
+block css
+
+block content
+  section#header
+    header#logo(role="banner") 
+      img(src="/assets/img/b-133w.png", width="15%")
+      
+    div#setup.select-block
+      h2.main-heading 
+
+block footer-scripts
+  - if (typeof(sensorLogs) == 'undefined')
+    sensorLogs = '[]'
+
+  script
+    bpn.pageData = {
+      growPlanInstance : !{JSON.stringify(growPlanInstance)},
+      sensors : !{JSON.stringify(sensors)},
+      controls : !{JSON.stringify(controls)},
+      sensorLogs : !{JSON.stringify(sensorLogs)}
+    };
+    
+  script(src='/assets/js/libs/d3.v2.js')
+  script(src='/assets/js/libs/jquery/jquery.qtip.min.js')
+  script(src='/assets/js/libs/mustache.js')

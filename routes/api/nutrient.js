@@ -10,12 +10,15 @@ var NutrientModel = require('../../models/nutrient').model,
 module.exports = function(app) {
 
    //List nutrients
-  app.get('/api/nutrients', function (req, res, next){
-    return NutrientModel.find(function (err, nutrients) {
-      if (err) { return next(err); }
-      return res.send(nutrients);
-    });
-  });
+  app.get('/api/nutrients',
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return NutrientModel.find(function (err, nutrients) {
+	      if (err) { return next(err); }
+	      return res.send(nutrients);
+	    });
+	  }
+  );
 
   /*
    * Create single nutrient
@@ -29,19 +32,22 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/nutrients', function (req, res, next){
-    var nutrient;
-    winston.info("POST: ");
-    winston.info(req.body);
-    nutrient = new NutrientModel({
-      brand : req.body.brand,
-      name : req.body.name
-    });
-    nutrient.save(function (err) {
-      if (err) { return next(err); }
-      return res.send(nutrient);
-    });
-  });
+  app.post('/api/nutrients', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    var nutrient;
+	    winston.info("POST: ");
+	    winston.info(req.body);
+	    nutrient = new NutrientModel({
+	      brand : req.body.brand,
+	      name : req.body.name
+	    });
+	    nutrient.save(function (err) {
+	      if (err) { return next(err); }
+	      return res.send(nutrient);
+	    });
+	  }
+  );
 
   /*
    * Read an nutrient
@@ -54,12 +60,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/nutrients/:id', function (req, res, next){
-    return NutrientModel.findById(req.params.id, function (err, nutrient) {
-      if (err) { return next(err); }
-      return res.send(nutrient);
-    });
-  });
+  app.get('/api/nutrients/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return NutrientModel.findById(req.params.id, function (err, nutrient) {
+	      if (err) { return next(err); }
+	      return res.send(nutrient);
+	    });
+	  }
+  );
 
   /*
    * Update an nutrient
@@ -79,16 +88,19 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/nutrients/:id', function (req, res, next){
-    return NutrientModel.findById(req.params.id, function (err, nutrient) {
-      if (err) { return next(err); }
-      nutrient.actionBelowMin = req.body.actionBelowMin;
-      return nutrient.save(function (err) {
-        if (err) { return next(err); }
-        return res.send(nutrient);
-      });
-    });
-  });
+  app.put('/api/nutrients/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return NutrientModel.findById(req.params.id, function (err, nutrient) {
+	      if (err) { return next(err); }
+	      nutrient.actionBelowMin = req.body.actionBelowMin;
+	      return nutrient.save(function (err) {
+	        if (err) { return next(err); }
+	        return res.send(nutrient);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete an nutrient
@@ -105,13 +117,17 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/nutrients/:id', function (req, res, next){
-    return NutrientModel.findById(req.params.id, function (err, nutrient) {
-      if (err) { return next(err); }
-      return nutrient.remove(function (err) {
-        if (err) { return next(err); }
-        return res.send('');
-      });
-    });
-  });
+  app.delete('/api/nutrients/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return NutrientModel.findById(req.params.id, function (err, nutrient) {
+	      if (err) { return next(err); }
+	      return nutrient.remove(function (err) {
+	        if (err) { return next(err); }
+	        return res.send('');
+	      });
+	    });
+	  }
+  );
 };

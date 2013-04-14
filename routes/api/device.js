@@ -171,7 +171,7 @@ module.exports = function(app) {
    * @param {string} req.id. mac address of device
    * @param {Array.<SensorLog>} req.body. JSON.
    */
-  app.put('/api/devices/:id/sensor_logs', 
+  app.put('/api/devices/:id/sensor-logs',
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,''),

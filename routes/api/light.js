@@ -10,44 +10,54 @@ var LightModel = require('../../models/light').model,
 module.exports = function(app) {
 
    //List lights
-  app.get('/api/lights', function (req, res, next){
-    console.log('stuff')
-    return LightModel.find(function (err, lights) {
-      console.log(lights);
-      if (err) { return next(err); }
-      return res.send(lights);
-    });
-  });
+  app.get('/api/lights', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return LightModel.find(function (err, lights) {
+	      if (err) { return next(err); }
+	      return res.send(lights);
+	    });
+	  }
+  );
 
   /*
    * Create single light
    *
    */
-  app.post('/api/lights', function (req, res, next){
-    var light;
-    light = LightModel.create(req.body, function (err, lightResult) {
-      if (err) { return next(err); }
-      return res.send(lightResult);
-    });
-  });
+  app.post('/api/lights', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    var light;
+	    light = LightModel.create(req.body, function (err, lightResult) {
+	      if (err) { return next(err); }
+	      return res.send(lightResult);
+	    });
+	  }
+  );
 
   /*
    * Read a light
    *
    */
-  app.get('/api/lights/:id', function (req, res, next){
-    return LightModel.findById(req.params.id, function (err, light) {
-      if (err) { return next(err); }
-      return res.send(light);
-    });
-  });
+  app.get('/api/lights/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return LightModel.findById(req.params.id, function (err, light) {
+	      if (err) { return next(err); }
+	      return res.send(light);
+	    });
+	  }
+  );
 
   /*
    * Update a light
    */
-  app.put('/api/lights/:id', function (req, res, next){
-    return res.send('NOT IMPLEMENTED');
-  });
+  app.put('/api/lights/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return res.send('NOT IMPLEMENTED');
+	  }
+  );
 
   /*
    * Delete a light
@@ -64,7 +74,11 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/lights/:id', function (req, res, next){
-    return res.send('NOT IMPLEMENTED');
-  });
+  app.delete('/api/lights/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return res.send('NOT IMPLEMENTED');
+	  }
+  );
 };

@@ -7,7 +7,7 @@ module.exports = function(app){
 	 * Admin
 	 * Require authenticated user with property admin=true
 	 */
-	app.all('/admin*', 
+	app.all('/admin*',
 		routeUtils.middleware.ensureSecure, 
 		routeUtils.middleware.ensureUserIsAdmin);
 

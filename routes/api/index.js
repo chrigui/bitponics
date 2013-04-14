@@ -1,3 +1,5 @@
+var routeUtils = require('../route-utils');
+
 module.exports = function(app){
 	require('./action')(app);
 	require('./control')(app);

@@ -273,7 +273,7 @@ bpn.pages.dashboard = {
                                 
                                 $.ajax({
                                     type: 'POST',
-                                    url: '/api/grow_plan_instances/' + bpn.user.currentGrowPlanInstance.id + '/action_override_logs',
+                                    url: '/api/grow-plan-instances/' + bpn.user.currentGrowPlanInstance.id + '/action_override_logs',
                                     data: { actionId: actionId },
                                     success: function(data){
                                         $this.find('.loader').remove();

@@ -25,7 +25,6 @@ module.exports = function(app){
 		    title: 'Express',
 		    locals : { temp: 1 }
 		  });
-
 		}
 	);
 
@@ -319,6 +318,7 @@ module.exports = function(app){
 	require('./api')(app);
 	require('./dashboard')(app);
   require('./demo')(app);
+  require('./gardens')(app);
   require('./growplans')(app);
 	require('./guides')(app);
 	require('./reset')(app);

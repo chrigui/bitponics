@@ -10,12 +10,15 @@ var GrowSystemModel = require('../../models/growSystem').model,
 module.exports = function(app) {
 
    //List grow_systems
-  app.get('/api/grow_systems', function (req, res, next){
-    return GrowSystemModel.find(function (err, growSystems) {
-      if (err) { return next(err); }
-      return res.send(growSystems);
-    });
-  });
+  app.get('/api/grow_systems', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return GrowSystemModel.find(function (err, growSystems) {
+	      if (err) { return next(err); }
+	      return res.send(growSystems);
+	    });
+	  }
+  );
 
   /*
    * Create single growSystem
@@ -31,23 +34,26 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_systems', function (req, res, next){
-    var growSystem;
-    winston.info("POST: ");
-    winston.info(req.body);
-    growSystem = new GrowSystemModel({
-      name: req.body.name,
-      description: req.body.description,
-      type: req.body.type,
-      reservoirSize: req.body.reservoirSize,
-      numberOfPlants: req.body.numberOfPlants,
-    });
-    growSystem.save(function (err) {
-      if (err) { return next(err); }
-      return res.send(growSystem);  
-    });
-    
-  });
+  app.post('/api/grow_systems',
+  	routeUtils.middleware.ensureLoggedIn, 
+  	function (req, res, next){
+	    var growSystem;
+	    winston.info("POST: ");
+	    winston.info(req.body);
+	    growSystem = new GrowSystemModel({
+	      name: req.body.name,
+	      description: req.body.description,
+	      type: req.body.type,
+	      reservoirSize: req.body.reservoirSize,
+	      numberOfPlants: req.body.numberOfPlants,
+	    });
+	    growSystem.save(function (err) {
+	      if (err) { return next(err); }
+	      return res.send(growSystem);  
+	    });
+	    
+	  }
+  );
 
   /*
    * Read an growSystem
@@ -60,12 +66,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_systems/:id', function (req, res, next){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      if (err) { return next(err); }
-      return res.send(growSystem);
-    });
-  });
+  app.get('/api/grow_systems/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+	      if (err) { return next(err); }
+	      return res.send(growSystem);
+	    });
+	  }
+  );
 
   /*
    * Update an growSystem
@@ -85,16 +94,19 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_systems/:id', function (req, res, next){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      if (err) { return next(err); }
-      growSystem.description = req.body.description;
-      return growSystem.save(function (err) {
-        if (err) { return next(err); }
-        return res.send(growSystem);
-      });
-    });
-  });
+  app.put('/api/grow_systems/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+	      if (err) { return next(err); }
+	      growSystem.description = req.body.description;
+	      return growSystem.save(function (err) {
+	        if (err) { return next(err); }
+	        return res.send(growSystem);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete an growSystem
@@ -111,13 +123,17 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_systems/:id', function (req, res, next){
-    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
-      if (err) { return next(err); }
-      return growSystem.remove(function (err) {
-        if (err) { return next(err); }
-        return res.send('');
-      });
-    });
-  });
+  app.delete('/api/grow_systems/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
+	      if (err) { return next(err); }
+	      return growSystem.remove(function (err) {
+	        if (err) { return next(err); }
+	        return res.send('');
+	      });
+	    });
+	  }
+  );
 };
