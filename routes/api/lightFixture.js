@@ -10,18 +10,21 @@ var LightFixtureModel = require('../../models/lightFixture').model,
 module.exports = function(app) {
 
    //List lights
-  app.get('/api/light_fixtures', function (req, res, next){
-    return LightFixtureModel.find(function (err, lights) {
-      if (err) { return next(err); }
-      return res.send(lights);
-      });
-  });
+  app.get('/api/light-fixtures', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return LightFixtureModel.find(function (err, lights) {
+	      if (err) { return next(err); }
+	      return res.send(lights);
+	      });
+	  }
+  );
 
   /*
    * Create single light
    *
    *  Test with:
-   *  jQuery.post("/api/light_fixtures", {
+   *  jQuery.post("/api/light-fixtures", {
    *    "type": "light type",
    *    "watts": "60",
    *    "brand" : "light brand",
@@ -31,39 +34,45 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/light_fixtures', function (req, res, next){
-    var light;
-    winston.info("POST: ");
-    winston.info(req.body);
-    light = new LightFixtureModel({
-      type: req.body.type,
-      watts: req.body.watts,
-      brand : req.body.brand,
-      name : req.body.name
-    });
-    light.save(function (err) {
-      if (err) { return next(err); }
-      return res.send(light);
-    });
-  });
+  app.post('/api/light-fixtures',
+	  routeUtils.middleware.ensureLoggedIn,
+	  function (req, res, next){
+	    var light;
+	    winston.info("POST: ");
+	    winston.info(req.body);
+	    light = new LightFixtureModel({
+	      type: req.body.type,
+	      watts: req.body.watts,
+	      brand : req.body.brand,
+	      name : req.body.name
+	    });
+	    light.save(function (err) {
+	      if (err) { return next(err); }
+	      return res.send(light);
+	    });
+	  }
+  );
 
   /*
    * Read an light
    *
    * To test:
-   * jQuery.get("/api/light_fixtures/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/light-fixtures/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/light_fixtures/:id', function (req, res, next){
-    return LightFixtureModel.findById(req.params.id, function (err, light) {
-      if (err) { return next(err); }
-      return res.send(light);
-    });
-  });
+  app.get('/api/light-fixtures/:id',
+  	routeUtils.middleware.ensureLoggedIn, 
+  	function (req, res, next){
+	    return LightFixtureModel.findById(req.params.id, function (err, light) {
+	      if (err) { return next(err); }
+	      return res.send(light);
+	    });
+	  }
+  );
 
   /*
    * Update a light
@@ -82,15 +91,18 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/light_fixtures/:id', function (req, res, next){
-    return LightFixtureModel.findById(req.params.id, function (err, light) {
-      if (err) { return next(err); }
-      return light.save(function (err) {
-        if (err) { return next(err); }
-        return res.send(light);
-      });
-    });
-  });
+  app.put('/api/light-fixtures/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return LightFixtureModel.findById(req.params.id, function (err, light) {
+	      if (err) { return next(err); }
+	      return light.save(function (err) {
+	        if (err) { return next(err); }
+	        return res.send(light);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete a light
@@ -107,13 +119,17 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/light_fixtures/:id', function (req, res, next){
-    return LightFixtureModel.findById(req.params.id, function (err, light) {
-      if (err) { return next(err); }
-      return light.remove(function (err) {
-        if (err) { return next(err); }
-        return res.send('');
-      });
-    });
-  });
+  app.delete('/api/light_fixtures/:id',
+  	routeUtils.middleware.ensureLoggedIn,
+  	routeUtils.middleware.ensureUserIsAdmin,
+  	function (req, res, next){
+	    return LightFixtureModel.findById(req.params.id, function (err, light) {
+	      if (err) { return next(err); }
+	      return light.remove(function (err) {
+	        if (err) { return next(err); }
+	        return res.send('');
+	      });
+	    });
+	  }
+  );
 };

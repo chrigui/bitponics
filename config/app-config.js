@@ -111,7 +111,6 @@ module.exports = function(app){
 
 
     require('./mongoose-connection').open(app.settings.env, function(mongooseConnection){
-	    console.log("MONGOOSE", mongooseConnection);
 
 	    app.config.mongooseConnection = mongooseConnection;
 

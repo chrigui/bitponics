@@ -1,5 +1,5 @@
-var //PhaseModel = require('../../../models/growPlan').phase.model,
-    winston = require('winston');
+var winston = require('winston'),
+		routeUtils = require('../../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -9,7 +9,7 @@ var //PhaseModel = require('../../../models/growPlan').phase.model,
 module.exports = function(app) {
 
    //List phases
-  app.get('/api/grow_plans/:growPlanId/phases', function (req, res, next){
+  app.get('/api/grow-plans/:growPlanId/phases', function (req, res, next){
     /*
     return PhaseModel.find(function (err, phases) {
       if (err) { return next(err); }
@@ -32,7 +32,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plans/:growPlanId/phases', function (req, res, next){
+  app.post('/api/grow-plans/:growPlanId/phases', function (req, res, next){
     /*
     var phase;
     winston.info("POST: ");
@@ -65,7 +65,7 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+  app.get('/api/grow-plans/:growPlanId/phases/:id', function (req, res, next){
     /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }
@@ -92,7 +92,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+  app.put('/api/grow-plans/:growPlanId/phases/:id', function (req, res, next){
     /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }
@@ -120,7 +120,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plans/:growPlanId/phases/:id', function (req, res, next){
+  app.delete('/api/grow-plans/:growPlanId/phases/:id', function (req, res, next){
     /*
     return PhaseModel.findById(req.params.id, function (err, phase) {
       if (err) { return next(err); }

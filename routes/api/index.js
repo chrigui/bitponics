@@ -1,4 +1,16 @@
+var routeUtils = require('../route-utils');
+
 module.exports = function(app){
+	/*
+   * API overview page
+   */
+  app.get('/api', function (req, res) {
+    res.render('api', {
+      title: "Bitponics API",
+      appUrl : app.config.appUrl
+    });
+  });
+
 	require('./action')(app);
 	require('./control')(app);
 	require('./device')(app);

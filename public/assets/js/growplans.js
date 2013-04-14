@@ -91,7 +91,7 @@ function(viewModels){
             };
 
             var GrowPlanModel = $resource(
-                '/api/grow_plans/',
+                '/api/grow-plans/',
                 {},
                 {
                     'query':  { method: 'GET', isArray: true }

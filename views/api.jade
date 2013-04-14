@@ -2,12 +2,30 @@ extends layout
 
 block content
   ul
-     li
+    li
       ul
         li 
           h3 Grow Plan
-        li.endpoint List: HTTP GET bitponics.com/api/grow_plan/
-        li.endpoint Create: HTTP POST bitponics.com/api/grow_plan/
-        li.endpoint Read: HTTP GET bitponics.com/api/grow_plan/:id
-        li.endpoint Update: HTTP PUT bitponics.com/api/grow_plan/:id
-        li.endpoint Delete: HTTP DELETE bitponics.com/api/grow_plan/:id
+        li.endpoint List: HTTP GET bitponics.com/api/grow-plans/
+        li.endpoint Create: HTTP POST bitponics.com/api/grow-plans/
+        li.endpoint Read: HTTP GET bitponics.com/api/grow-plans/:id
+        li.endpoint Update: HTTP PUT bitponics.com/api/grow-plans/:id
+        li.endpoint Delete: HTTP DELETE bitponics.com/api/grow-plans/:id
+        
+      ul
+        li 
+          h3 Grow Plan Instances (aka Gardens)
+        li.endpoint List: HTTP GET bitponics.com/api/grow-plan-instances/
+        li.endpoint Create: HTTP POST bitponics.com/api/grow-plan-instances/
+        li.endpoint Read: HTTP GET bitponics.com/api/grow-plan-instances/:id
+        li.endpoint Update: HTTP PUT bitponics.com/api/grow-plan-instances/:id
+        li.endpoint Delete: HTTP DELETE bitponics.com/api/grow-plan-instances/:id
+        li
+          ul
+            li 
+               h3 Grow Plan Instance Sensor Logs
+             li.endpoint Get: HTTP GET bitponics.com/api/grow-plan-instances/:growPlanInstanceId/sensor-logs/
+             p Querystring parameters
+               ul 
+                 li start-date
+                 li end-date

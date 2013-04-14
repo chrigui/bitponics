@@ -10,10 +10,13 @@ var SensorLogModel = require('../../models/sensorLog').model,
 module.exports = function(app) {
 
    //List sensors
-  app.get('/api/sensor_logs', function (req, res, next){
-    return SensorLogModel.find(function (err, logs) {
-      if (err) { return next(err); }
-      return res.send(logs);
-    });
-  });
+  app.get('/api/sensor-logs', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return SensorLogModel.find(function (err, logs) {
+	      if (err) { return next(err); }
+	      return res.send(logs);
+	    });
+	  }
+  );
 };

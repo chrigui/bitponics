@@ -1,5 +1,5 @@
-var //IdealRangeModel = require('../../../models/growPlan').idealRange.model,
-    winston = require('winston');
+var winston = require('winston'),
+		routeUtils = require('../../route-utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -9,7 +9,7 @@ var //IdealRangeModel = require('../../../models/growPlan').idealRange.model,
 module.exports = function(app) {
 
    //List ideal_ranges
-  app.get('/api/grow_plans/:growPlanId/ideal_ranges', function (req, res, next){
+  app.get('/api/grow-plans/:growPlanId/phases/:phaseId/ideal-ranges', function (req, res, next){
     /*
     return IdealRangeModel.find(function (err, idealRanges) {
       if (err){ next(err); }
@@ -36,7 +36,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_plans/:growPlanId/ideal_ranges', function (req, res, next){
+  app.post('/api/grow-plans/:growPlanId/phases/:phaseId/ideal-ranges', function (req, res, next){
   /*
     var idealRange;
     winston.info("POST: ");
@@ -67,7 +67,7 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+  app.get('/api/grow-plans/:growPlanId/phases/:phaseId/ideal-ranges/:id', function (req, res, next){
     /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
@@ -94,7 +94,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+  app.put('/api/grow-plans/:growPlanId/phases/:phaseId/ideal-ranges/:id', function (req, res, next){
     /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
@@ -122,7 +122,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_plans/:growPlanId/ideal_ranges/:id', function (req, res, next){
+  app.delete('/api/grow-plans/:growPlanId/phases/:phaseId/ideal-ranges/:id', function (req, res, next){
     /*
     return IdealRangeModel.findById(req.params.id, function (err, idealRange) {
       if (err) { return next(err); }
