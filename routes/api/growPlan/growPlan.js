@@ -16,22 +16,14 @@ var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
  */
 module.exports = function(app) {
   /*
-   * API overview page
-   */
-  app.get('/api', function (req, res) {
-    res.render('api', {
-      title: "Bitponics API",
-      appUrl : app.config.appUrl
-    });
-  });
-
-  /*
    * List all grow plans
    *  If no params, list all in db
    *  If id param, match on grow plan and return compact data
    *  If plants and growSystem params, filter on all grow plans (except All-Purpose) and return compact data
    */
-  app.get('/api/grow-plans', function (req, res, next){
+  app.get('/api/grow-plans', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
     var filter = false,
         full = false,
         id = req.query.id,
@@ -145,23 +137,26 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow-plans', function (req, res, next){
-    var grow_plan;
-    winston.info("POST: ");
-    winston.info(req.body);
-    grow_plan = new GrowPlanModel({
-      parentGrowPlanId: req.body.parentGrowPlanId,
-      createdBy: req.body.createdBy,
-      name: req.body.name,
-      description: req.body.description,
-      plants: req.body.plants,
-      phases: req.body.phases
-    });
-    grow_plan.save(function (err) {
-      if (err) { return next(err); }
-      return res.send(grow_plan);
-    });
-  });
+  app.post('/api/grow-plans', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    var grow_plan;
+	    winston.info("POST: ");
+	    winston.info(req.body);
+	    grow_plan = new GrowPlanModel({
+	      parentGrowPlanId: req.body.parentGrowPlanId,
+	      createdBy: req.body.createdBy,
+	      name: req.body.name,
+	      description: req.body.description,
+	      plants: req.body.plants,
+	      phases: req.body.phases
+	    });
+	    grow_plan.save(function (err) {
+	      if (err) { return next(err); }
+	      return res.send(grow_plan);
+	    });
+	  }
+  );
 
   /*
    * Read a grow plan
@@ -174,12 +169,15 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow-plans/:id', function (req, res, next){
-    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
-      if (err) { return next(err); }
-      return res.send(grow_plan);
-    });
-  });
+  app.get('/api/grow-plans/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+	      if (err) { return next(err); }
+	      return res.send(grow_plan);
+	    });
+	  }
+  );
 
   /*
    * Update a grow plan
@@ -199,17 +197,20 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow-plans/:id', function (req, res, next){
-    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
-      if (err) { return next(err); }
+  app.put('/api/grow-plans/:id', 
+  	routeUtils.middleware.ensureLoggedIn,
+  	function (req, res, next){
+	    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+	      if (err) { return next(err); }
 
-      grow_plan.title = req.body.title;
-      return grow_plan.save(function (err) {
-        if (err) { return next(err); }
-        return res.send(grow_plan);
-      });
-    });
-  });
+	      grow_plan.title = req.body.title;
+	      return grow_plan.save(function (err) {
+	        if (err) { return next(err); }
+	        return res.send(grow_plan);
+	      });
+	    });
+	  }
+  );
 
   /*
    * Delete a grow plan
