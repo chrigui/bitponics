@@ -1,4 +1,4 @@
-.landing-page #main,
+.landing-page .main,
 .landing-page .header {
   padding: 0;
 }
@@ -50,7 +50,7 @@
     width: 85%;
   }
 }
-.landing-page.getstarted #main {
+.landing-page.getstarted .main {
   width: 60%;
   padding-left: 4%;
 }

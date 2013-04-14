@@ -252,8 +252,33 @@ input, label
 	display inline-block
 	div,a
 		text-transform lowercase
-	
 
+/*
+ * Default list style
+ */
+.list-style {
+ 	list-style-position inside
+ 	margin 0
+ 	padding 0
+ 	ul {
+		list-style-type circle
+		list-style-position inside
+		padding-left 1em
+	}
+	ol {
+		list-style-type lower-latin
+		list-style-position inside
+		padding-left 1em
+	}
+}
+ul.list-style
+	list-style-type disc
+ol.list-style
+	list-style-type decimal
+
+/*
+ * Generic Button Style
+ */
 .btn
 	@extends .display-ib
 	padding 1em

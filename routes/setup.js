@@ -15,7 +15,8 @@ module.exports = function(app){
       req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
         var locals = {
           title: 'Bitponics Device Setup',
-          className : 'setup',
+          className : 'landing-page single-page app-page setup',
+          pageType: "app-page",
           availableDeviceKey : availableDeviceKey
         };
 

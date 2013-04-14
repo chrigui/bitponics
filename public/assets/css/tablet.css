@@ -201,7 +201,7 @@ margin 0,
   text-align: left;
 }
 section.header,
-section#main,
+section.main,
 section.footer {
   padding: 1em;
 }
@@ -236,17 +236,17 @@ section.footer {
 .dashboard section#header .sub-heading a {
   color: #00f717;
 }
-.dashboard section#main {
+.dashboard section.main {
   padding: 6em 1em 1em;
 }
-.dashboard section#main #visualizer div.circle {
+.dashboard section.main #visualizer div.circle {
   top: 1.5em;
   left: 1.5em;
   bottom: 1.5em;
   right: 1.5em;
 }
-.dashboard section#main #controls,
-.dashboard section#main #reminders {
+.dashboard section.main #controls,
+.dashboard section.main #reminders {
   float: right;
 }
 @media screen and (min-width: 60em) {
@@ -310,7 +310,7 @@ section.footer {
 /*
  * Home Page
  */
-.landing-page #main,
+.landing-page .main,
 .landing-page .header {
   padding: 0;
 }
@@ -514,12 +514,12 @@ section.footer {
 .landing-page .page-heading {
   line-height: 2em;
 }
-.landing-page #main .content-module,
-.landing-page #main #details {
+.landing-page .main .content-module,
+.landing-page .main #details {
   padding-top: 3.5em;
 }
-.landing-page #main .content-module#home,
-.landing-page #main #details#home {
+.landing-page .main .content-module#home,
+.landing-page .main #details#home {
   padding-top: 0;
 }
 .landing-page .flexslider img {
@@ -647,13 +647,13 @@ section.footer {
 .single-page .icon-glyphlogo-new {
   display: none !important;
 }
-.single-page #main,
+.single-page .main,
 .single-page .footer {
   max-width: 60em;
   margin: 0 auto;
   width: 95%;
 }
-.single-page #main {
+.single-page .main {
   margin: 3em auto !important;
 }
 .single-page .content-module {
@@ -700,15 +700,15 @@ section.footer {
   color: #999b9a;
 }
 @media screen and (min-width: 40em) {
-  #main .content-module {
+  .main .content-module {
     padding-top: 1em !important;
   }
 }
 /*
  * App page overrides
  */
-.app-page .header .nav-section {
-  display: none;
+.app-page {
+  color: #333;
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.social-icons {
@@ -728,10 +728,52 @@ section.footer {
   font-size: 1.5em;
   color: #333;
 }
+.app-page .page-heading {
+  color: #333;
+  font-size: 3.25em;
+  font-weight: bold;
+  line-height: 1.25em;
+  margin: 0 0 0.25em 0;
+}
+.app-page .page-heading-large {
+  font-size: 2em;
+  line-height: 1.25em;
+  margin: 0;
+  color: #333;
+  border-width: 0;
+  font-weight: bold;
+}
+.app-page .page-heading-large span,
+.app-page .page-heading-large input,
+.app-page .page-heading-large div {
+  color: #333;
+}
+.app-page .page-heading-small {
+  line-height: 1.25em;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.app-page .separator-top {
+  border-width: 1px 0 0;
+  padding-top: 0.25em;
+  margin-top: 0.25em;
+}
+.app-page .dropdown {
+  margin: 1em auto;
+}
+.app-page .app-user {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+}
+.app-page .app-user a {
+  color: #00e36c !important;
+}
 /*
  * get-started/thankyou
  */
-.landing-page.get-started #main {
+.landing-page.get-started .main {
   margin: 10em auto 0 auto;
   width: 95%;
 }
@@ -739,7 +781,7 @@ section.footer {
   width: 100%;
   font-size: 3.5em;
 }
-.landing-page.register #main .preorder-price {
+.landing-page.register .main .preorder-price {
   margin-top: -1.5em;
 }
 .member {

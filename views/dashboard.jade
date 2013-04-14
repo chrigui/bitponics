@@ -27,7 +27,7 @@ block content
            | #{user.name.full}
           else
            | #{user.email}
-  section#main(role="main")
+  section#main(role="main", class="main")
     div#sensors.content-module.side
       h2.main-heading Sensors
       - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)

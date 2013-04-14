@@ -1,7 +1,9 @@
 .app-page
+	color color-text-graydark
+
 	.header
 		.nav-section
-			display none
+			// display none
 
 			&.first, &.social-icons
 				display block
@@ -19,3 +21,43 @@
 		font-size 1.5em
 		color color-text-graydark
 
+	.page-heading
+		color color-text-graydark
+		font-size 3.25em
+		font-weight bold
+		line-height 1.25em
+		margin 0 0 .25em 0
+
+	.page-heading-large
+		// @extends .page-heading
+		font-size 2em
+		line-height 1.25em
+		margin 0
+		color #333
+		border-width 0
+		font-weight bold
+		span, input, div
+			color #333
+	
+	.page-heading-small
+		// @extends .page-heading
+		line-height 1.25em
+		font-size: 1.5em;
+		font-weight: bold;
+		
+	.separator-top
+		border-width 1px 0 0
+		padding-top .25em
+		margin-top .25em
+
+	.dropdown
+		margin 1em auto
+
+	.app-user
+		position absolute
+		top 0
+		right 0
+		width 50%
+		
+		a
+			color color-hot-green!important

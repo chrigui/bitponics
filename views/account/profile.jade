@@ -17,7 +17,7 @@ block content
           else
            | #{user.email}
 
-  section#main(role="main")
+  section#main(role="main", class="main")
     div#profile.content-module.middle
       form(id="profile-form", method="POST", action="/profile")
         input(type="hidden", name="_method", value="PUT")

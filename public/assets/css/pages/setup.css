@@ -184,6 +184,22 @@ a {
 a:hover {
   text-decoration: underline;
 }
+.setup * {
+  color: #333;
+}
+.setup .content-module.middle {
+  padding: 3.5em 0 0 !important;
+}
+.setup .page-heading-small {
+  font-size: 1em;
+  margin: 0.35em 0;
+}
+.setup .list-style {
+  font-size: 2em;
+}
+.setup .list-style p {
+  font-size: 0.5em;
+}
 .setup .led-indicator {
   -webkit-animation-duration: 1s;
   -webkit-animation-name: led-indicator;
@@ -192,6 +208,7 @@ a:hover {
   height: 20px;
   border-radius: 5px;
   border: 1px solid #ccc;
+  display: block;
 }
 .setup .led-indicator.scan {
   background: #ff0;

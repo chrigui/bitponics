@@ -39,7 +39,7 @@ block content
   //-         else
   //-          | #{user.email}
 
-  section(ng-cloak="")#main(role="main")
+  section(ng-cloak="")#main(role="main", class="main")
     div.content-module.middle
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.pages.growplans.GrowPlanController", novalidate)
         section(id="step1", class="step", data-required="1")

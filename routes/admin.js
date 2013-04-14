@@ -16,7 +16,8 @@ module.exports = function(app){
 	 */
 	app.get('/admin', function (req, res) {
 	  res.render('admin', {
-	    title: 'Bitponics Admin'
+	    title: 'Bitponics Admin',
+    	pageType: "app-page"
 	  })
 	});
 

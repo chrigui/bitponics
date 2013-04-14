@@ -9,7 +9,8 @@ module.exports = function(app){
     function (req, res, next){
       res.render('account', {
         title : 'Account',
-        className : 'account'
+        className : 'app-page account',
+        pageType: "app-page"
       });
     }
   );

@@ -114,7 +114,9 @@ module.exports = function(app){
 							}),
 						sensors: {},
 						controls: {},
-						sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis']
+						sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis'],
+    				className: "app-page dashboard",
+    				pageType: "app-page"
 					};
 
 

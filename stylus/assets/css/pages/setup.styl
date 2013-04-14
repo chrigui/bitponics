@@ -1,3 +1,4 @@
+@import "../global/colors"
 @import "../helpers"
 @import "../typography"
 
@@ -13,6 +14,24 @@
 }
 
 .setup {
+  * {
+    color: color-text-graydark
+  }
+
+  .content-module.middle {
+    padding 3.5em 0 0!important
+  }
+  .page-heading-small {
+    font-size 1em
+    margin .35em 0
+  }
+  .list-style {
+    font-size 2em
+
+    p {
+      font-size .5em
+    }
+  }
 	.led-indicator {
 		  -webkit-animation-duration: 1s;
   		-webkit-animation-name: led-indicator;
@@ -22,6 +41,7 @@
   		height:20px;
   		border-radius: 5px;
       border: 1px solid #ccc;
+      display: block;
 
       &.scan {
         background: yellow;

@@ -923,6 +923,33 @@ label {
 .icon a {
   text-transform: lowercase;
 }
+/*
+ * Default list style
+ */
+.list-style {
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+.list-style ul {
+  list-style-type: circle;
+  list-style-position: inside;
+  padding-left: 1em;
+}
+.list-style ol {
+  list-style-type: lower-latin;
+  list-style-position: inside;
+  padding-left: 1em;
+}
+ul.list-style {
+  list-style-type: disc;
+}
+ol.list-style {
+  list-style-type: decimal;
+}
+/*
+ * Generic Button Style
+ */
 .btn {
   padding: 1em;
   margin: 1em;
@@ -1175,7 +1202,7 @@ section.footer .content-module {
   background-position: 35% -13em;
   background-repeat: no-repeat;
 }
-.landing-page #main > div,
+.landing-page .main > div,
 .landing-page header {
   margin: 0;
   z-index: 2;
@@ -1494,13 +1521,13 @@ section.footer .content-module {
 .single-page .icon-glyphlogo-new {
   display: none !important;
 }
-.single-page #main,
+.single-page .main,
 .single-page .footer {
   max-width: 60em;
   margin: 0 auto;
   width: 95%;
 }
-.single-page #main {
+.single-page .main {
   margin: 3em auto !important;
 }
 .single-page .content-module {
@@ -1547,7 +1574,7 @@ section.footer .content-module {
   color: #999b9a;
 }
 @media screen and (min-width: 40em) {
-  #main .content-module {
+  .main .content-module {
     padding-top: 1em !important;
   }
 }
@@ -1612,8 +1639,8 @@ li
 /*
  * App Page
  */
-.app-page .header .nav-section {
-  display: none;
+.app-page {
+  color: #333;
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.social-icons {
@@ -1633,17 +1660,14 @@ li
   font-size: 1.5em;
   color: #333;
 }
-/*
- * Grow Plans Page
- */
-.landing-page.growplans .page-heading {
+.app-page .page-heading {
   color: #333;
   font-size: 3.25em;
   font-weight: bold;
   line-height: 1.25em;
   margin: 0 0 0.25em 0;
 }
-.landing-page.growplans .page-heading-large {
+.app-page .page-heading-large {
   font-size: 2em;
   line-height: 1.25em;
   margin: 0;
@@ -1651,19 +1675,36 @@ li
   border-width: 0;
   font-weight: bold;
 }
-.landing-page.growplans .page-heading-large span,
-.landing-page.growplans .page-heading-large input,
-.landing-page.growplans .page-heading-large div {
+.app-page .page-heading-large span,
+.app-page .page-heading-large input,
+.app-page .page-heading-large div {
   color: #333;
 }
-.landing-page.growplans .separator-top {
+.app-page .page-heading-small {
+  line-height: 1.25em;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.app-page .separator-top {
   border-width: 1px 0 0;
   padding-top: 0.25em;
   margin-top: 0.25em;
 }
-.landing-page.growplans .dropdown {
+.app-page .dropdown {
   margin: 1em auto;
 }
+.app-page .app-user {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+}
+.app-page .app-user a {
+  color: #00e36c !important;
+}
+/*
+ * Grow Plans Page
+ */
 .landing-page.growplans .plantlist {
   padding: 1em 0 0;
 }
