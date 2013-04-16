@@ -5,6 +5,11 @@ mixin requirejs(datamain)
   script
     require.config({
       paths: {
+        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js',
+        'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js',
+        'd3' : '/assets/js/libs/d3.v2',
+        'domReady': '/assets/js/libs/requirejs/domReady',
+        'jquery' : '',
         'view-models': '/assets/js/fe-be/view-models',
         'es5shim': '/assets/js/libs/es5-shim.min',
         'steps': '/assets/js/libs/Steps',
@@ -16,6 +21,18 @@ mixin requirejs(datamain)
         'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
         'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
         'overlay': '/assets/js/shared/overlay'
+      },
+      shim: { 
+        angular: { 
+          deps: [ 'jquery' ], 
+          exports: 'angular' 
+        }, 
+        angularResource: { 
+          deps: [ 'angular' ] 
+        },
+        d3 : {
+          exports : 'd3'
+        }
       }
     });
 

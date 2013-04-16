@@ -1,5 +1,7 @@
 extends layout
 
+block head
+  mixin requirejs("/assets/js/dashboard")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/jquery.qtip.css')
@@ -131,7 +133,3 @@ block footer-scripts
         phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
       }
     }
-  script(src='/assets/js/libs/d3.v2.js')
-  script(src='/assets/js/libs/jquery/jquery.qtip.min.js')
-  script(src='/assets/js/libs/mustache.js')
-  script(src='/assets/js/dashboard.js') 
