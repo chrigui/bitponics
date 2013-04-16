@@ -46,7 +46,6 @@ module.exports = function(app, callback) {
   // locals are passed down to the views
   app.locals({
     title : 'Bitponics',
-    appUrl: app.config.appUrl,
     className: undefined
   });
 

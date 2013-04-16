@@ -5,11 +5,16 @@ mixin requirejs(datamain)
   script
     require.config({
       paths: {
-        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js',
-        'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js',
+        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular',
+        'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min',
+        'angular-bootstrap' : '/assets/js/core/angular-bootstrap',
+        'bpnApp' : '/assets/js/core/bpn',
+        'controllers' : '/assets/js/core/controllers',
+        'directives' : '/assets/js/core/directives',
+        'services' : '/assets/js/core/services',
         'd3' : '/assets/js/libs/d3.v2',
         'domReady': '/assets/js/libs/requirejs/domReady',
-        'jquery' : '',
+        'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
         'view-models': '/assets/js/fe-be/view-models',
         'es5shim': '/assets/js/libs/es5-shim.min',
         'steps': '/assets/js/libs/Steps',
@@ -32,7 +37,10 @@ mixin requirejs(datamain)
         },
         d3 : {
           exports : 'd3'
-        }
+        },
+        jquery: { 
+          exports : '$'
+        },
       }
     });
 

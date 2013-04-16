@@ -1,5 +1,6 @@
-define([
-    'domReady',
+require([
+    'bpnApp',
+    'angular-bootstrap',
     'd3',
     'view-models',
     'es5shim',
@@ -9,6 +10,10 @@ define([
     'overlay'
     ],
 function(){
+	'use strict';
+
+	window.ghettoHackVar = undefined;
+
 	bpn.pages.dashboard = {
     getPhaseFillColor : function(data, index){
         var num = data.data;

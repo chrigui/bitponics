@@ -1,7 +1,7 @@
 extends layout
 
 block head
-  mixin requirejs("/assets/js/dashboard")
+  mixin requirejs("/assets/js/pages/dashboard")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/jquery.qtip.css')
@@ -98,7 +98,7 @@ block content
       div.sub-heading.notification Notification #2
 
   section#templates(style="display:none")
-    textarea#control-tooltip-template
+    //-textarea#control-tooltip-template
       |  <div class="control-tooltip">
       |    <h3>Available actions to trigger on your {{name}}:</h3>
       |    {{#actions}}
