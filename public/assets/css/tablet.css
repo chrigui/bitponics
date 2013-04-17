@@ -528,6 +528,7 @@ section#footer {
 }
 .landing-page .flexslider img {
   min-width: 1440px;
+  max-width: 1460px;
   position: relative;
   left: 50%;
   margin-left: -720px;
