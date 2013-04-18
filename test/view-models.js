@@ -1,4 +1,5 @@
-var should = require('should'),
+var mongooseConnection = require('../config/mongoose-connection').open('test'),
+	should = require('should'),
   requirejs = require('../lib/requirejs-wrapper'),
   Models = require('../models'),
   sampleGrowPlans = require('../utils/db_init/seed_data/growPlans'),

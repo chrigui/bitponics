@@ -1,5 +1,20 @@
+require([
+    'bpnApp',
+    'angular-bootstrap',
+    'd3',
+    'view-models',
+    'es5shim',
+    'steps',
+    'moment',
+    'fe-be-utils',
+    'overlay'
+    ],
+function(){
+	'use strict';
 
-bpn.pages.dashboard = {
+	window.ghettoHackVar = undefined;
+
+	bpn.pages.dashboard = {
     getPhaseFillColor : function(data, index){
         var num = data.data;
 
@@ -464,78 +479,78 @@ bpn.pages.dashboard = {
                     .attr('width', barLength)
                     .attr('height', barWidth);
         }
-    }
-};
+	    }
+	};
 
 
-var dataSet = [];
-var GlobalThumbTimer;
+	var dataSet = [];
+	var GlobalThumbTimer;
 
-var globalThumbFunc = function () {
-    /*var curTime = new Date(Date.now()),
-        timeIntoDay = (curTime.getHours() * 3600000) +  (curTime.getMinutes() * 60000) + (curTime.getSeconds() * 1000)+ curTime.getMilliseconds(),
-        millisInDay = 86400000,
-        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
-        timerLocDeg = 360 * (timeIntoDay / millisInDay);
+	var globalThumbFunc = function () {
+	    /*var curTime = new Date(Date.now()),
+	        timeIntoDay = (curTime.getHours() * 3600000) +  (curTime.getMinutes() * 60000) + (curTime.getSeconds() * 1000)+ curTime.getMilliseconds(),
+	        millisInDay = 86400000,
+	        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
+	        timerLocDeg = 360 * (timeIntoDay / millisInDay);
 
-    $(".timeProgressThumb").each(function(index, ele){
-        ele.attr("tranform", "rotate("+timeLoc/deg+" "+ele.width+" "+ele.height+")");
-    })*/
+	    $(".timeProgressThumb").each(function(index, ele){
+	        ele.attr("tranform", "rotate("+timeLoc/deg+" "+ele.width+" "+ele.height+")");
+	    })*/
 
-    var curTime = new Date(Date.now()),
-        timeIntoDay = (curTime.getSeconds() * 1000) + curTime.getMilliseconds(),
-        millisInDay = 60000,
-        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
-        timerLocDeg = 360 * (timeIntoDay / millisInDay);
+	    var curTime = new Date(Date.now()),
+	        timeIntoDay = (curTime.getSeconds() * 1000) + curTime.getMilliseconds(),
+	        millisInDay = 60000,
+	        timerLocRad = (Math.PI * 2) * (timeIntoDay / millisInDay),
+	        timerLocDeg = 360 * (timeIntoDay / millisInDay);
 
-    var allClocks = $(".timeProgressThumb");
-    var curClock;
+	    var allClocks = $(".timeProgressThumb");
+	    var curClock;
 
-    for (var i = 0; i<allClocks.length; i++) {
-        curClock = $(allClocks[i]);
-        curClock.attr("transform", "rotate("+timerLocDeg+" "+(curClock.attr('width')/2)+" "+(curClock.attr('height')/2)+")");
-    }
-}
+	    for (var i = 0; i<allClocks.length; i++) {
+	        curClock = $(allClocks[i]);
+	        curClock.attr("transform", "rotate("+timerLocDeg+" "+(curClock.attr('width')/2)+" "+(curClock.attr('height')/2)+")");
+	    }
+	}
 
-//dataSet.push({'time': 300000, 'value': 16});
-//dataSet.push({'time': 600000, 'value': 36});
-//dataSet.push({'time': 900000, 'value': 36});
+	//dataSet.push({'time': 300000, 'value': 16});
+	//dataSet.push({'time': 600000, 'value': 36});
+	//dataSet.push({'time': 900000, 'value': 36});
 
-/*dataSet.push({'time': 300000, 'value': 20});
-dataSet.push({'time': 600000, 'value': 30});
-dataSet.push({'time': 900000, 'value': 40});
-dataSet.push({'time': 1200000, 'value': 45});
-dataSet.push({'time': 1500000, 'value': 50});
+	/*dataSet.push({'time': 300000, 'value': 20});
+	dataSet.push({'time': 600000, 'value': 30});
+	dataSet.push({'time': 900000, 'value': 40});
+	dataSet.push({'time': 1200000, 'value': 45});
+	dataSet.push({'time': 1500000, 'value': 50});
 
-dataSet.push({'time': 1800000, 'value': 60});
-dataSet.push({'time': 2100000, 'value': 60});
-dataSet.push({'time': 2400000, 'value': 60});
-dataSet.push({'time': 2700000, 'value': 50});
-dataSet.push({'time': 3000000, 'value': 40});*/
+	dataSet.push({'time': 1800000, 'value': 60});
+	dataSet.push({'time': 2100000, 'value': 60});
+	dataSet.push({'time': 2400000, 'value': 60});
+	dataSet.push({'time': 2700000, 'value': 50});
+	dataSet.push({'time': 3000000, 'value': 40});*/
 
-for(var i=0; i<100; i++){
-    dataSet[i] = {
-        'time': (300000 * i),
-        'value': Math.round(( Math.round((Math.random() * 50) + 20) + ((i != 0) ? dataSet[i-1].value : 0))/2)
-    };
-}
+	for(var i=0; i<100; i++){
+	    dataSet[i] = {
+	        'time': (300000 * i),
+	        'value': Math.round(( Math.round((Math.random() * 50) + 20) + ((i != 0) ? dataSet[i-1].value : 0))/2)
+	    };
+	}
 
-Math.radians = function(degrees) {
-  return degrees * Math.PI / 180;
-};
- 
-Math.degrees = function(radians) {
-  return radians * 180 / Math.PI;
-};
+	Math.radians = function(degrees) {
+	  return degrees * Math.PI / 180;
+	};
+	 
+	Math.degrees = function(radians) {
+	  return radians * 180 / Math.PI;
+	};
 
 
-$(function () {
-    bpn.pages.dashboard.drawPhaseGraphs();
-    bpn.pages.dashboard.drawControlGraphs();
-    bpn.pages.dashboard.initEventHandlers();
-    bpn.pages.dashboard.drawSparkGraph($('#footer').get(0), dataSet, 35, 55, 0.1);
-    bpn.pages.dashboard.makeDayProgressClock($('#phases-graph svg').get(0), 200, 10);
-    bpn.pages.dashboard.drawBarSet($('#phases-graph svg').get(0), 20, 2000, 15, 30);
+	$(function () {
+	    bpn.pages.dashboard.drawPhaseGraphs();
+	    bpn.pages.dashboard.drawControlGraphs();
+	    bpn.pages.dashboard.initEventHandlers();
+	    bpn.pages.dashboard.drawSparkGraph($('#footer').get(0), dataSet, 35, 55, 0.1);
+	    bpn.pages.dashboard.makeDayProgressClock($('#phases-graph svg').get(0), 200, 10);
+	    bpn.pages.dashboard.drawBarSet($('#phases-graph svg').get(0), 20, 2000, 15, 30);
+	});
+
 });
-
-

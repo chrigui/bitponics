@@ -1,5 +1,7 @@
 extends layout
 
+block head
+  mixin requirejs("/assets/js/pages/dashboard")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/jquery.qtip.css')
@@ -96,7 +98,7 @@ block content
       div.sub-heading.notification Notification #2
 
   section#templates(style="display:none")
-    textarea#control-tooltip-template
+    //-textarea#control-tooltip-template
       |  <div class="control-tooltip">
       |    <h3>Available actions to trigger on your {{name}}:</h3>
       |    {{#actions}}
@@ -131,7 +133,3 @@ block footer-scripts
         phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
       }
     }
-  script(src='/assets/js/libs/d3.v2.js')
-  script(src='/assets/js/libs/jquery/jquery.qtip.min.js')
-  script(src='/assets/js/libs/mustache.js')
-  script(src='/assets/js/dashboard.js') 
