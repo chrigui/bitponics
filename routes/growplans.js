@@ -30,6 +30,7 @@ module.exports = function(app){
 			var locals = {
 				title : 'Grow Plans',
 				className : 'app-page landing-page single-page growplans',
+        pageType: 'app-page',
 				//message : req.flash('info') //TODO: this isn't coming thru
 				growSystems: {},
 				plants: {},
