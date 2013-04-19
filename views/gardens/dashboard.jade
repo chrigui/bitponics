@@ -1,0 +1,67 @@
+extends ../layout
+
+block head
+  mixin requirejs("/assets/js/pages/dashboard")
+
+block css
+  
+
+block content
+  div(ng-controller="bpn.controllers.dashboard.Main")
+  
+    section.header
+      header
+        include ../includes/nav/main
+        
+     div#setup.select-block
+       h2.main-heading
+        | {{growPlanInstance.name}}
+
+    section#main(role="main", class="main")
+      div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
+        div.date.main-heading {{activeDate.date | date:'longDate'}}
+        div.time.sub-heading {{activeDate.date | date:'shortTime'}}
+
+
+        //-div(ng-repeat="sensor in sensors", ng-class="{sensor:1, 'data-module':1, {{sensor.code}}, warning:0}")
+            h3.main-heading
+              | {{sensor.abbrev}}
+            div.sensor-data
+              div.sensor-value {{latestSensorLog[sensor.sCode]sensor.logs[0] ? sensor.logs[0].value : '----'}}
+            div(class="sensor-type icon {{sensor.code}}")
+              | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
+              div.screen-reader-text {{sensor.code}}
+            //div.message #{warning ? 'Check' : 'OK'}
+            div(class="settings icon")
+              | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
+              div.screen-reader-text Settings
+
+      div#visualizer.content-module.middle(ng-controller="bpn.controllers.dashboard.PhasesGraph")
+        div#phases-graph.circle.centered
+    
+      div#controls.content-module.side(ng-controller="bpn.controllers.dashboard.Controls")
+        h2.main-heading Accessories
+          div(ng-repeat="control in activePhase.deviceControls", class="control {{control.className} icon-glyph icon-{{control.className}", data-control-key="{{control.name}}") {{control.name}}
+
+      div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
+        h2.main-heading Reminders
+    
+    section#templates(style="display:none")
+      //-textarea#control-tooltip-template
+        |  <div class="control-tooltip">
+        |    <h3>Available actions to trigger on your {{name}}:</h3>
+        |    {{#actions}}
+        |      <div>
+        |        <a class="action-trigger-link" data-action-id="{{_id}}">{{description}}</a>
+        |      </div>
+        |    {{/actions}}
+        |  </div>
+
+block footer-scripts
+
+  script
+    bpn.pageData.growPlanInstance = !{JSON.stringify(growPlanInstance)};
+    bpn.pageData.sensors = !{JSON.stringify(sensors)};
+    bpn.pageData.controls = !{JSON.stringify(controls)};
+    bpn.pageData.latestSensorLogs = !{JSON.stringify(latestSensorLogs)};
+    

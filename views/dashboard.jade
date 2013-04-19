@@ -1,17 +1,26 @@
 extends layout
 
 block head
-  mixin requirejs("/assets/js/pages/dashboard")
+  mixin requirejs("/assets/js/pages/dashboard-legacy")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/jquery.qtip.css')
 
 block content
+  - if (typeof(sensors) == 'undefined')
+    sensors = '[]'
+  - if (typeof(controls) == 'undefined')
+    controls = '[]'
+  - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
+    currentGrowPlanInstancePhases = '[]'
+  - if (typeof(currentGrowPlanInstance) == 'undefined')
+    currentGrowPlanInstance = { "_id": null, "name" : "Set up a new Grow Plan" }
+
   section#header
     header#logo(role="banner") 
       img(src="/assets/img/b-133w.png", width="15%")
       
-    div#setup.select-block
+    //-div#setup.select-block
       h2.main-heading Grow Plans
       h3.sub-heading
         - if (typeof(activeGrowPlanInstances) != 'undefined')
@@ -21,6 +30,9 @@ block content
             option Create New Grow Plan
         - else
           option Create New Grow Plan
+    div#setup.select-block
+      h2.main-heading
+        | #{currentGrowPlanInstance.name}
     div#user.select-block
       h2.main-heading User
       h3.sub-heading
@@ -29,8 +41,10 @@ block content
            | #{user.name.full}
           else
            | #{user.email}
+  
   section#main(role="main", class="main")
-    div#sensors.content-module.side
+    
+    div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
       h2.main-heading Sensors
       - if (typeof(sensors) != 'undefined' && Object.keys(sensors).length)
         - var sensorStyle = ''
@@ -74,26 +88,27 @@ block content
               | <i aria-hidden="true" data-icon="&#x2e"></i>
               div.screen-reader-text Settings
 
-    div#visualizer.content-module.middle
+    div#visualizer.content-module.middle(ng-controller="bpn.controllers.dashboard.PhasesGraph")
       div#phases-graph.circle.centered
     
-    div#controls.content-module.side
+    div#controls.content-module.side(ng-controller="bpn.controllers.dashboard.Controls")
       h2.main-heading Controls
       - if (typeof(controls) != 'undefined')
         each item in controls
           div(class="control #{item.className} icon-glyph icon-#{item.className}", data-control-key="#{item.name}") #{item.name}
       - else
           div(class="sub-heading notification")
-            | No active controls
+            | No active accessories
             //a(href="/", class="") Settings
-    div#reminders.content-module.side
+    
+    div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
       h2.main-heading Reminders
   
   section#footer
     div#date.content-module.side
       div.date.main-heading October 17, 2012
       div.time.sub-heading 3:23 PM
-    div#notifications.content-module.side
+    //-div#notifications.content-module.side
       div.sub-heading.notification Notification #1
       div.sub-heading.notification Notification #2
 
@@ -110,26 +125,17 @@ block content
 
 block footer-scripts
 
-  - if (typeof(sensors) == 'undefined')
-    sensors = '[]'
-  - if (typeof(controls) == 'undefined')
-    controls = '[]'
-  - if (typeof(currentGrowPlanInstancePhases) == 'undefined')
-    currentGrowPlanInstancePhases = '[]'
-  - if (typeof(currentGrowPlanInstance) == 'undefined')
-    currentGrowPlanInstance = { "_id": null }
-
   script
-    bpn.user = {
-      currentGrowPlanInstance : {
-        /**
-         *  Mashup of Sensor objects GPI's current Phase's IdealRanges.
-         *  abbrev, unit of measurement, code, name, idealRange.
-         *  Hash keyed by Sensor.code.
-         */
-        id : !{JSON.stringify(currentGrowPlanInstance._id)},
-        sensors : !{JSON.stringify(sensors)},
-        controls : !{JSON.stringify(controls)},
-        phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
-      }
-    }
+    bpn.pageData.growPlanInstance = !{JSON.stringify(currentGrowPlanInstance)};
+    bpn.pageData.currentGrowPlanInstance = {
+      /**
+       *  Mashup of Sensor objects GPI's current Phase's IdealRanges.
+       *  abbrev, unit of measurement, code, name, idealRange.
+       *  Hash keyed by Sensor.code.
+       */
+      id : !{JSON.stringify(currentGrowPlanInstance._id)},
+      sensors : !{JSON.stringify(sensors)},
+      controls : !{JSON.stringify(controls)},
+      phases : !{JSON.stringify(currentGrowPlanInstancePhases)}
+    };
+    

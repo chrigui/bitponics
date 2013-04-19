@@ -502,7 +502,7 @@ function getObjectId (object){
  * into virtuals soon (they'll simply be compiled views of all the sensors & controls used across all phases)
  * 
  * @param query {Object} Mongoose query parameters.
- * @param callback {function} Function with the signature function(err, growPlan){}. "growPlan" param is a POJO GrowPlan.
+ * @param callback {function} Function with the signature function(err, [GrowPlan]){}. "GrowPlan" param is an array of POJO GrowPlans.
  */
 function getFullyPopulatedGrowPlan(query, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
@@ -517,7 +517,7 @@ function getFullyPopulatedGrowPlan(query, callback){
       
   async.series(
     [
-      function (innerCallback) {
+      function getGrowPlan(innerCallback) {
         GrowPlanModel.find(query)
         .populate('plants')
         .populate('phases.nutrients')
@@ -526,12 +526,11 @@ function getFullyPopulatedGrowPlan(query, callback){
         .populate('phases.phaseEndActions')
         .populate('phases.light')
         .exec(function(err, growPlanResults){
-          console.dir(growPlanResults);
           growPlans = growPlanResults.map(function(growPlanResult){ return growPlanResult.toObject(); });
           innerCallback();
         });
       },
-      function (innerCallback) {
+      function populateActions(innerCallback) {
         var actionIds = [];
         growPlans.forEach(function(growPlan) {
           growPlan.phases.forEach(function(phase) {

@@ -42,16 +42,36 @@ var DeviceKeySchema = new Schema({
 
 
 UserSchema = new Schema({
+  
+  /**
+   * Organizations will be treated as "standard users plus XYZ".
+   */
+  isOrganization : { type : Boolean },
+
+  /**
+   * Organization-only property
+   */
+  orgUsers : [
+		{
+			user : { type : ObjectIdSchema, ref: "User"},
+			roles : [{ type : String, enum : [ "admin", "member" ]}]
+		}  	
+  ],
+
+
   name : {
 	    first: String
 	  , last: String
 	},
+  
   email : { 
   	type : mongoose.SchemaTypes.Email, 
   	required : true, 
   	unique: true 
   },
+  
   phone : { type : String },
+  
   address : {
   	line1 : String,
   	line2 : String,
@@ -60,23 +80,35 @@ UserSchema = new Schema({
   	zip : String,
   	country : { type: String, default: 'United States'}
   },
+  
   salt: { type: String, required: true },
+  
   hash: { type: String, required: true },
+  
   locale: { 
   	lang: { type: String, default : 'en' },
   	territory : { type : String, default: 'US'}
   },
+  
   timezone: { type : String, default : 'America/New_York' }, 
+  
   active : { type : Boolean, default : false },
+  
   admin :  { type : Boolean, default : false },
+  
   activationToken : { type : String, default : '' },
+  
   resetToken : { type : String, default : '' },
+  
   sentEmail : { type: Boolean, default: false },
+  
   notificationPreferences: {
   	email: { type: Boolean, default: true },
   	sms: { type: Boolean, default: false }
   },
+  
   deviceKeys : [ DeviceKeySchema ],
+  
   apiKey : {
   	/**
   	 * Public API key is a 16-char random hex string
@@ -87,6 +119,7 @@ UserSchema = new Schema({
   	 */
   	private: String
   },
+  
   plans : [
   	{
   		type : { type: String, enum: [
@@ -94,14 +127,16 @@ UserSchema = new Schema({
 			'serious',
 			'industrial'
 		]},
-		device : { type: ObjectIdSchema, ref : 'Device'},
+		//device : { type: ObjectIdSchema, ref : 'Device'},
+		growPlanInstance : { type : ObjectIdSchema, ref : 'GrowPlanInstance' },
 		createdAt : { type : Date, default : Date.now },
 		payments : [
 			{
 				ts : { type : Date },
 				amount : { type : Number }
 			}
-		]
+		],
+		active : { type : Boolean, default: true }
   	}
   ]
 },

@@ -64,28 +64,23 @@ GrowPlanSchema.plugin(useTimestamps);
 /************************** VIRTUALS ***************************/
 
 
-/***********
- * the 'sensors' and 'controls' virtuals can really only operate with fully-populated GrowPlans
- * Maybe they should be refactored to be "getSensors", "getControls" static utility methods instead (like isEquivalentTo)
- */
-
 /**
  * Sensors is a read-only view of all the sensors used by the GrowPlan.
  * Checks phases.idealRanges.sCode
-
+ *
 GrowPlanSchema.virtual('sensors')
-    .get(function () {
-        var sensors = [];
-        this.phases.each(function(phase){
-            phase.idealRanges.each(function(idealRange){
-                if (sensors.indexOf(idealRange.sCode) < 0){
-                    sensors.push();
-                }
-            });
+.get(function () {
+    var sensors = [];
+    this.phases.each(function(phase){
+        phase.idealRanges.each(function(idealRange){
+            if (sensors.indexOf(idealRange.sCode) < 0){
+                sensors.push(idealRange.sCode);
+            }
         });
-
-        return sensors.sort();
     });
+
+    return sensors.sort();
+});
 
 /**
  * Controls is a read-only view of all the controls used by the GrowPlan.

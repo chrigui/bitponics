@@ -3,8 +3,10 @@ GrowPlanModel = require('../models/growPlan').growPlan.model,
 GrowPlanInstanceModel = require('../models/growPlanInstance').model,
 SensorModel = require('../models/sensor').model,
 SensorLogModel = require('../models/sensorLog').model,
+ControlModel = require('../models/control').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
+ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
 async = require('async'); 
@@ -18,8 +20,20 @@ module.exports = function(app){
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
-			// TODO. Show all public gardens
-			res.send("Coming soon...");
+			var locals = {
+				userGrowPlanInstances : [],
+				communityGrowPlanInstances : []
+			};
+
+			GrowPlanInstanceModel
+			.find({ 'users': req.user })
+			.populate('device')
+			.sort('-startDate')
+			.exec(function(err, growPlanInstanceResults){
+				if (err) { return next(err); }
+				locals.userGrowPlanInstances = growPlanInstanceResults.map(function(gpi) { return gpi.toObject(); })
+				res.render('gardens', locals);
+			});
 		}
 	);
 
@@ -34,8 +48,57 @@ module.exports = function(app){
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
-			// TODO
-			res.send("Coming soon...");
+			var locals = {
+				title : 'Bitponics - Dashboard',
+				user : req.user,
+				growPlanInstance : undefined,
+				growPlan : undefined,
+				sensors : undefined,
+				controls : undefined,
+				sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis'],
+				className: "app-page dashboard",
+				pageType: "app-page"
+			};
+
+			async.parallel(
+				[
+					function getSensors(innerCallback){
+						SensorModel.find({visible : true}).exec(innerCallback);
+					},
+					function getControls(innerCallback){
+						ControlModel.find().exec(innerCallback);
+					},
+					function getGPI(innerCallback){
+						GrowPlanInstanceModel
+						.findById(req.params.growPlanInstanceId)
+						.populate('device')
+						.sort('-startDate')
+						.exec(innerCallback);
+					},
+					function getGrowPlan(innerCallback){
+						ModelUtils.getFullyPopulatedGrowPlan(innerCallback)
+					},
+					function getSensorLogs(innerCallback){
+						// get last day's sensor logs 
+						SensorLogModel
+						.find({gpi : req.params.growPlanInstanceId})
+						.where('ts').gte(Date.now() - (24 * 60 * 60 * 1000))
+						.exec(innerCallback);
+					}
+				],
+				function(err, results){
+						if (err) { return next(err); }
+						locals.sensors = results[0];
+						locals.controls = results[1];
+						locals.growPlanInstance = results[2];
+						locals.growPlan = results[3];
+						locals.latestSensorLogs = results[4] || [];
+
+						res.render('gardens/dashboard', locals);
+				}
+			);
+
+			
 		}
 	);
 

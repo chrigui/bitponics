@@ -195,6 +195,11 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           if (!growPlan) { return innerCallback(new Error('Invalid grow plan id')); }
           gpi.growPlan = growPlan;
 
+          // set the name
+          if (!options.name){
+          	gpi.name = growPlan.name + " Garden";
+          }
+
           // add the phases
           growPlan.phases.forEach(function(phase){
             gpi.phases.push({ phase : phase._id});

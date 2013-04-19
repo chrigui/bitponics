@@ -5,6 +5,14 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   /**
    * Adds/calculates properties necessary for UI presentation
    */
+  viewModels.initControlViewModel = function (control){
+    control.className = control.name.replace(/\s/g,'').toLowerCase();
+    return control;
+  };
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   */
   viewModels.initGrowPlanViewModel = function (growPlan){
     var initActionViewModel = viewModels.initActionViewModel;
 
@@ -24,7 +32,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       });
     });
     return growPlan;
-  }
+  };
 
 
   /**
