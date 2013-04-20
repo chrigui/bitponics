@@ -98,7 +98,7 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 			'$scope', 
 			'$filter',
 			function($scope, $filter){
-					
+				// TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 			}
 		]
 	);
@@ -109,7 +109,11 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 			'$scope', 
 			'$filter',
 			function($scope, $filter){
-								
+				// TODO: Add functions to handle interactions on the phase graph. 
+
+				// TODO : function to set $scope.activeDate (will be called based on clicks or mouseovers on sections of the phaseGraph). 
+				// Since $scope is inherited from parent, this'll set Main controller's $scope.activeDate, 
+				// which in turn will update the DayOverview sidebar
 			}
 		]
 	);
@@ -121,7 +125,7 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 			'$scope', 
 			'$filter',
 			function($scope, $filter){
-				
+				// TODO: Add functions to handle interactions with control widgets. Launch control overlay.
 			}
 		]
 	);
@@ -136,9 +140,6 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 			}
 		]
 	);
-
-
-	// TODO : figure out how to communicate between controllers (passing activeDay from phase graph to DayOverview)
 
 	domReady(function(){
 		angular.bootstrap( document, ['bpn.apps.dashboard']);
