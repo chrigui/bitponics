@@ -23,20 +23,47 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 			'$scope', 
 			'$filter',
 			function($scope, $filter){
+					
 					// First, transform the data into viewModel-friendly formats
 					bpn.pageData.controls.forEach(function(control){
 						viewModels.initControlViewModel(control);
 					});
 
+					viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance);
+
+					// Raise sensorLog readings to be hashes keyed by sensor code
 					bpn.pageData.latestSensorLogs.forEach(function(sensorLog){
 						sensorLog.logs.forEach(function(log){
 							sensorLog[log.sCode] = log.val;
 						});
+						// delete array to save memory, since we're not going to use it anymore
+						delete sensorLog.logs;
 					});
+
+					$scope.getLatestSensorLogsByDate = function(sensorLogs, date){
+						// since sensorLog array is in desc date order, decrement through the array,
+						// stopping if we've found the date or if we've found a date less than date
+						var dateMoment = moment(date),
+								dateDiff;
+
+						for (var i = sensorLogs.length; i--;){
+							dateDiff = dateMoment.diff(sensorLogs[i].timestamp, 'days')
+							if (dateDiff == 0){
+								return sensorLogs[i]
+							} else if (dateDiff > 0) {
+								return undefined;
+							}
+						}
+					};
 					
 					// Set up functions and watchers
-					$scope.refreshSensorsAndControls = function (){
+					
 
+					/**
+					 * Based on activeDte, refresh the latest sensor logs & control actions
+					 */
+					$scope.refreshSensorsAndControls = function (){
+						$scope.activeDate.latestSensorLogs = $scope.getLatestSensorLogsByDate($scope.latestSensorLogs, $scope.activeDate.date);
 					};
 
 					$scope.$watch('activeDate.date', function(){
@@ -54,11 +81,13 @@ function(angular, domReady, moment, feBeUtils, viewModels){
 					$scope.controls = bpn.pageData.controls;
 					$scope.sensors = bpn.pageData.sensors;
 					$scope.growPlanInstance = bpn.pageData.growPlanInstance;
+					$scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
 					$scope.activeDate = {
 						date : new Date(),
 						daySummary : {},
 						latestSensorLogs : {}
 					};
+					$scope.refreshSensorsAndControls();
 			}
 		]
 	);

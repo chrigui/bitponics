@@ -4,7 +4,6 @@ block head
   mixin requirejs("/assets/js/pages/dashboard")
 
 block css
-  
 
 block content
   div(ng-controller="bpn.controllers.dashboard.Main")
@@ -14,27 +13,27 @@ block content
         include ../includes/nav/main
         
      div#setup.select-block
-       h2.main-heading
+       h2.main-heading(ng-cloak)
         | {{growPlanInstance.name}}
 
-    section#main(role="main", class="main")
+    section#main(role="main", class="main", ng-cloak)
       div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
         div.date.main-heading {{activeDate.date | date:'longDate'}}
         div.time.sub-heading {{activeDate.date | date:'shortTime'}}
 
 
-        //-div(ng-repeat="sensor in sensors", ng-class="{sensor:1, 'data-module':1, {{sensor.code}}, warning:0}")
-            h3.main-heading
-              | {{sensor.abbrev}}
-            div.sensor-data
-              div.sensor-value {{latestSensorLog[sensor.sCode]sensor.logs[0] ? sensor.logs[0].value : '----'}}
-            div(class="sensor-type icon {{sensor.code}}")
-              | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
-              div.screen-reader-text {{sensor.code}}
-            //div.message #{warning ? 'Check' : 'OK'}
-            div(class="settings icon")
-              | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
-              div.screen-reader-text Settings
+        div(ng-repeat="sensor in sensors", ng-class="{'sensor':1, 'data-module':1, {{sensor.code}}:1, warning:0}")
+          h3.main-heading
+            | {{sensor.abbrev}}
+          div.sensor-data
+            div.sensor-value {{activeDate.latestSensorLogs[sensor.code]}}
+          div(class="sensor-type icon {{sensor.code}}")
+            | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
+            div.sensorcreen-reader-text {{sensor.code}}
+          //div.message #{warning ? 'Check' : 'OK'}
+          div(class="settings icon")
+            | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
+            div.screen-reader-text Settings
 
       div#visualizer.content-module.middle(ng-controller="bpn.controllers.dashboard.PhasesGraph")
         div#phases-graph.circle.centered

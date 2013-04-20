@@ -21,6 +21,8 @@ var mongoose = require('mongoose'),
 
 var PhaseDaySummarySchema = new Schema({
   
+  //ts : { type : Date, default: Date.now },
+
   status : { 
   
     type: String, 
