@@ -3,11 +3,16 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
-  	growPlanInstance.phases.forEach(function(growPlanInstancePhase){
+  	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var startDate = growPlanInstancePhase.startDate;
   		growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
   			daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
   		});
+
+  		if (growPlanInstance.growPlan.phases){
+  			growPlanInstancePhase.phase = growPlanInstance.growPlan.phases[phaseIndex];	
+  		}
+  		
   	});
 
   	return growPlanInstance;

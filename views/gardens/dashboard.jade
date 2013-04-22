@@ -22,11 +22,12 @@ block content
         div.time.sub-heading {{activeDate.date | date:'shortTime'}}
 
 
-        div(ng-repeat="sensor in sensors", ng-class="{'sensor':1, 'data-module':1, {{sensor.code}}:1, warning:0}")
+        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(this)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value {{activeDate.latestSensorLogs[sensor.code]}}
+            div.sensor-value(ng-show="activeDate.latestSensorLogs[sensor.code]") {{activeDate.latestSensorLogs[sensor.code]}}
+            div.sensor-value(ng-hide="activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensorcreen-reader-text {{sensor.code}}
@@ -59,6 +60,7 @@ block content
 block footer-scripts
 
   script
+    // GPI is a GPI with a fully-populated GP for "growPlan" property
     bpn.pageData.growPlanInstance = !{JSON.stringify(growPlanInstance)};
     bpn.pageData.sensors = !{JSON.stringify(sensors)};
     bpn.pageData.controls = !{JSON.stringify(controls)};

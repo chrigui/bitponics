@@ -72,11 +72,14 @@ module.exports = function(app){
 						GrowPlanInstanceModel
 						.findById(req.params.growPlanInstanceId)
 						.populate('device')
-						.sort('-startDate')
-						.exec(innerCallback);
-					},
-					function getGrowPlan(innerCallback){
-						ModelUtils.getFullyPopulatedGrowPlan(innerCallback)
+						.exec(function(err, growPlanInstanceResult){
+							ModelUtils.getFullyPopulatedGrowPlan({_id: growPlanInstanceResult.growPlan}, function(err, growPlanResult){
+								if (err) { return innerCallback(err); }
+								growPlanInstanceResult = growPlanInstanceResult.toObject();
+								growPlanInstanceResult.growPlan = growPlanResult[0];
+								return innerCallback(null, growPlanInstanceResult);
+							});
+						});
 					},
 					function getSensorLogs(innerCallback){
 						// get last day's sensor logs 
@@ -91,8 +94,8 @@ module.exports = function(app){
 						locals.sensors = results[0];
 						locals.controls = results[1];
 						locals.growPlanInstance = results[2];
-						locals.growPlan = results[3];
-						locals.latestSensorLogs = results[4] || [];
+						//locals.growPlanInstance.growPlan = results[3][0];
+						locals.latestSensorLogs = results[3] || [];
 
 						res.render('gardens/dashboard', locals);
 				}
