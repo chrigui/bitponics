@@ -46,13 +46,15 @@ $(function(){
 	$wifiManualSecurityMode.append('<option value="' + securityModeOptions['NONE'] + '">None</option>');	
 
 	var postToDevice = function(){
+		// Clean up data so that device can parse it
+		// spaces must be replaced with '$'
+		selectedWifiNetwork.ssid = selectedWifiNetwork.ssid.replace(/ /g, '$');
+		
 		var postDataStringPlainText = 'SSID=' + selectedWifiNetwork.ssid + '\n' +
 			'PASS=' + $wifiPass.val() + '\n' +
 			'MODE=' + selectedWifiNetwork.securityMode + '\n' +
 			'SKEY=' + bpn.currentUser.privateDeviceKey + '\n' +
 			'PKEY=' + bpn.currentUser.publicDeviceKey;
-
-		console.log('Posting to device', postDataStringPlainText);
 
 		console.log('Posting to device', postDataStringPlainText);
 
