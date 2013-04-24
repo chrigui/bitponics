@@ -76,6 +76,7 @@ $(function(){
 			complete: function(jqXHR, textStatus){
 				console.log('complete ', textStatus);
 				console.log(jqXHR);
+				$wifiDataSubmitted.show();
 			}
 		});	
 	};
@@ -99,9 +100,25 @@ $(function(){
 				// TODO retry a certain number of times
 			}
 		});
-	})
+	});
 
 	$wifiForm.submit(function(e){
+		e.preventDefault();
+		selectedWifiNetwork = $.grep(scannedWifiNetworks, function(item, index){
+			return item.ssid === $wifiSsid.val();
+		})[0];
+		if (!selectedWifiNetwork){
+			selectedWifiNetwork = {
+				ssid : $wifiManualSsid.val(),
+				securityMode : $wifiManualSecurityMode.val()
+			}
+		}
+		// TODO : validate
+
+		postToDevice();
+	});
+
+	$('#submit-wifi-form').click(function(e){
 		e.preventDefault();
 		selectedWifiNetwork = $.grep(scannedWifiNetworks, function(item, index){
 			return item.ssid === $wifiSsid.val();
@@ -166,10 +183,11 @@ $(function(){
 			},
 			error: function(jqXHR, textStatus, error){
 				// TODO retry a certain number of times
+
+				$enterWifiData.show();
+
 				console.log('error', jqXHR, textStatus, error);
 			}
 		});
 	});
-
-
 });

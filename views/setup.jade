@@ -2,7 +2,7 @@ extends layout
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/setup.css')
-  link(rel='stylesheet', href='/assets/css/libs/steps.css')
+  //-link(rel='stylesheet', href='/assets/css/libs/steps.css')
 
 block content
   section.header
@@ -11,7 +11,7 @@ block content
   
   section()#main(role="main", class="main")
     div.content-module.middle
-      form(id="setup-form", name="setup", class='steps', data-ajax="false", novalidate)
+      form(id="setup-form", name="setup", data-ajax="false", novalidate)
         h1.page-heading Setting up your Bitponics Base Station
         div(class="step separator-top")
           ol.list-style
@@ -33,30 +33,31 @@ block content
             a(class="btn next-step-btn", id="connect-to-device", href="javascript:void(0);") Connect to Base Station 
             //- a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to Base Station
         
-        div(class="step hide separator-top")
+        div(class="separator-top")
           ol.list-style
             li#enter-wifi-data
               div Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
-                form#wifi-form(action='')
-                  ul 
-                    li
-                      div(style="float:left;width=50%")
-                        | Select from the scanned Wifi networks:
-                        label(for='wifi-ssid') 
-                          select#wifi-ssid(name='wifi-ssid')
-                      div(style="width:50%")
-                        | Or enter your Wifi network information manually:
-                        label(for='wifi-manual-ssid') Network Name:
-                          input#wifi-manual-ssid(name='wifi-manual-ssid')  
-                        label(for='wifi-manual-security-mode') Security Mode:
-                          select#wifi-manual-security-mode(name='wifi-manual-security-mode')
-                    li
-                      label(for='wifi-pass') PASS
-                        input#wifi-pass(name='wifi-pass')
-                    li
-                      button#submit-wifi-form(type='submit') Go
+                div
+                  form#wifi-form(action='')
+                    ul 
+                      li
+                        div(style="float:left;width=50%")
+                          | Select from the scanned Wifi networks:
+                          label(for='wifi-ssid') 
+                            select#wifi-ssid(name='wifi-ssid')
+                        div(style="width:50%")
+                          | Or enter your Wifi network information manually:
+                          label(for='wifi-manual-ssid') Network Name:
+                            input#wifi-manual-ssid(name='wifi-manual-ssid')  
+                          label(for='wifi-manual-security-mode') Security Mode:
+                            select#wifi-manual-security-mode(name='wifi-manual-security-mode')
+                      li
+                        label(for='wifi-pass') PASS
+                          input#wifi-pass(name='wifi-pass')
+                      li
+                        button#submit-wifi-form(type='submit') Go
         
-        div(class="step hide separator-top")
+        div(class="separator-top")
           ol.list-style
             li#wifi-data-submitted
               p Great! The Bitponics device is now connecting to the&nbsp; 
@@ -84,4 +85,4 @@ block footer-scripts
       };
 
   script(src='/assets/js/setup.js')
-  script(src='/assets/js/libs/Steps.js')
+  //-script(src='/assets/js/libs/Steps.js')
