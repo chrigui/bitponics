@@ -117,7 +117,8 @@ $(function(){
 		postToDevice();
 	});
 
-	$connectToDevice.click(function(){
+	$connectToDevice.click(function(e){
+		e.preventDefault();
 		$.ajax({
 			url : deviceUrl,
 			type: 'GET',
