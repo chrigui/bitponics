@@ -7,41 +7,21 @@ block head
       $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
       $.mobile.ajaxLinksEnabled = false;
     });
-  //script(src='/assets/js/libs/jquery/jquery.mobile-1.2.0.js')
-  //- script(src='/assets/js/libs/jquery.mobile.custom/jquery.mobile.custom.js')
   
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
   mixin requirejs("/assets/js/growplans")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
-  //link(rel='stylesheet', href='/assets/css/libs/jquery.mobile-1.2.0.css')
 
 block content
   
   section.header
       header
         include /includes/nav/main
-  //- section#header
-  //-   header#logo(role="banner") 
-  //-     img(src="/assets/img/leaf-new-green.png", width="15%")
-
-  //-   div#setup.select-block
-  //-     h2.main-heading #{title}
-  //-     h3.sub-heading Selection
-  //-     //h3.sub-heading
-  //-   div#user.select-block
-  //-     h2.main-heading User
-  //-     h3.sub-heading
-  //-         if user.name.full != ''
-  //-          | #{user.name.full}
-  //-         else
-  //-          | #{user.email}
-
-  section(ng-cloak="")#main(role="main", class="main")
+  
+  section#main(role="main", class="main", ng-cloak)
     div.content-module.middle
-      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.pages.growplans.GrowPlanController", novalidate)
+      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.controllers.setup.growPlan.Main", novalidate)
         section(id="step1", class="step", data-required="1")
           h4.page-heading Ready to set up your grow plan?
           div.separator-top

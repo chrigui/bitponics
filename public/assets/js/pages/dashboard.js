@@ -6,9 +6,7 @@ require([
   'view-models',
   'angularResource',
   'd3',
-
   'es5shim',
-  'steps',
   'overlay'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
