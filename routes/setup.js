@@ -30,8 +30,10 @@ module.exports = function(app){
   app.get('/setup',
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
-    function (req, res){
+    function (req, res, next){
       req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+        if (err) { return next(err); }
+
         var locals = {
           title: 'Bitponics Device Setup',
           className : 'landing-page single-page app-page setup',
@@ -90,7 +92,7 @@ module.exports = function(app){
 	app.get('/setup/grow-plan', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
-		function (req, res){
+		function (req, res, next){
 			var locals = {
 				title : 'Grow Plans',
 				className : 'app-page landing-page single-page growplans',
@@ -246,7 +248,7 @@ module.exports = function(app){
 	app.post('/setup/grow-plan', 
 		routeUtils.middleware.ensureSecure, 
 		routeUtils.middleware.ensureLoggedIn,
-		function (req, res) {
+		function (req, res, next) {
 			var user = req.user,
 				submittedGrowPlan = req.body.submittedGrowPlan,
         sourceGrowPlanId = req.body.submittedGrowPlan._id,
@@ -314,4 +316,24 @@ module.exports = function(app){
 		}
 	); // /app.post('/grow-plans'
 
+
+	app.get('/setup/grow-plan/filter',
+		function (req, res, next){
+			return res.redirect('/setup/grow-plan/#!/filter');
+		}
+	);
+
+	app.get('/setup/grow-plan/browse',
+		function (req, res, next){
+			return res.redirect('/setup/grow-plan/#!/browse');
+		}
+	);
+
+	app.get('/setup/grow-plan/customize*',
+		function (req, res, next){
+			return res.redirect('/setup/grow-plan/');
+		}
+	);
+
+	
 };

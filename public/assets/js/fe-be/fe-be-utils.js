@@ -1,5 +1,5 @@
 define(['moment'], function(moment){
-  this.bpn = this.bpn|| {};
+  this.bpn = this.bpn || {};
   var utils = (this.bpn.utils = this.bpn.utils || {});
 
 
