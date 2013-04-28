@@ -333,8 +333,7 @@ module.exports = function(app){
 	require('./dashboard')(app);
   require('./demo')(app);
   require('./gardens')(app);
-  require('./growplans')(app);
-	require('./guides')(app);
+  require('./guides')(app);
 	require('./reset')(app);
   require('./setup')(app);
   require('./sockets')(app);

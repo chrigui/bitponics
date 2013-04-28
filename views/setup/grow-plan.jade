@@ -1,4 +1,4 @@
-extends layout
+extends ../layout
 
 block head
   script
@@ -8,7 +8,7 @@ block head
       $.mobile.ajaxLinksEnabled = false;
     });
   
-  mixin requirejs("/assets/js/growplans")
+  mixin requirejs("/assets/js/pages/setup/grow-plan")
 
 block css
   link(rel='stylesheet', href='/assets/css/libs/steps.css')
@@ -17,7 +17,7 @@ block content
   
   section.header
       header
-        include /includes/nav/main
+        include ../includes/nav/main
   
   section#main(role="main", class="main", ng-cloak)
     div.content-module.middle

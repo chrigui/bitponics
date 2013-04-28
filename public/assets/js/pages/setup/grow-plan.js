@@ -5,7 +5,6 @@ require([
   'moment',
   'fe-be-utils',
   '/assets/js/services/grow-plan.js',
-  'angularResource',
   'es5shim',
   'steps',
   'overlay'
@@ -13,7 +12,7 @@ require([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngResource', 'bpn.services']);
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['bpn.services']);
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.setup.growPlan']);
@@ -23,9 +22,8 @@ require([
       [
         '$scope',
         '$filter',
-        '$resource',
         'GrowPlanModel',
-        function ($scope, $filter, $resource, GrowPlanModel) {
+        function ($scope, $filter, GrowPlanModel) {
           $scope.plants = bpn.plants;
           $scope.lights = bpn.lights;
           $scope.lightFixtures = bpn.lightFixtures;
@@ -348,7 +346,7 @@ require([
 
               // TODO : show spinner
               $.ajax({
-                url:'/grow-plans',
+                url:'/setup/grow-plan',
                 type:'POST',
                 contentType:'application/json; charset=utf-8',
                 dataType:'json',
