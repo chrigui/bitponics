@@ -15,6 +15,20 @@ block head
   script(type='text/ng-template', id='filter.html')
     h4.page-heading Ready to set up your grow plan?
     .separator-top
+
+      //-
+        a(ng-click="sharedDataService.showTestModal=true") Show modal
+        div(modal="sharedDataService.showTestModal", opts="sharedDataService.modalOptions", close="sharedDataService.showTestModal = false")
+          .modal-header
+            h4
+              | header
+          .modal-body
+            div
+              | body
+          .modal-footer
+            div
+              | footer
+
       .question
         h5.question-title What kind of hydroponic system are you using?
         

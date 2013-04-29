@@ -6,13 +6,15 @@ require([
   'fe-be-utils',
   '/assets/js/services/grow-plan.js',
   'es5shim',
+  'angularUI',
+  'angularUIBootstrap',
   'steps',
   'overlay'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['bpn.services']);
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['bpn.services', 'ui', 'ui.bootstrap']);
 
 		growPlanApp.config(
 			[
@@ -53,10 +55,20 @@ require([
 
 		growPlanApp.factory('sharedDataService', function(){
 			return {
-				selectedGrowPlan : {}
+				selectedGrowPlan : {},
+				showPlantOverlay : false,
+				modalOptions : {
+			    backdropFade: true,
+			    dialogFade: true
+			  }
 			};
 		});
 
+		growPlanApp.factory('overlayService', function(){
+			return {
+				showPlantOverlay : false
+			};
+		});
 
 		growPlanApp.factory('GrowPlanLoader', 
 			[
