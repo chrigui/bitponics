@@ -51,35 +51,56 @@ require([
 		);
 
 
+		growPlanApp.factory('sharedDataService', function(){
+			return {
+				selectedGrowPlan : {}
+			};
+		});
+
+
 		growPlanApp.factory('GrowPlanLoader', 
 			[
 				'GrowPlanModel', 
+				'sharedDataService',
 				'$route', 
 				'$q',
-		    function(GrowPlanModel, $route, $q) {
+		    function(GrowPlanModel, sharedDataService, $route, $q) {
 		  		return function() {
-		    		var delay = $q.defer();
-		    		console.log('growPlanLoader doin its thing', $route.current.params.growPlanId)
-		    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
-		    			function (growPlan) {
-		    				viewModels.initGrowPlanViewModel(growPlan);
-		      			delay.resolve(growPlan);
-		    			}, 
-		    			function() {
-		      			delay.reject('Unable to fetch grow plan '  + $route.current.params.growPlanId );
-		    			}
-	    			);
-		    		return delay.promise;
+		  			var selectedGrowPlanId = $route.current.params.growPlanId;
+
+		  			if ((sharedDataService.selectedGrowPlan instanceof GrowPlanModel)
+		  					&& 
+		  					(sharedDataService.selectedGrowPlan._id.toString() === selectedGrowPlanId)) {
+		  				console.log('returning existing selectedGrowPlan');
+		  				return sharedDataService.selectedGrowPlan;
+		  			} else {
+		  				var delay = $q.defer();
+			    		console.log('growPlanLoader doin its thing', $route.current.params.growPlanId)
+			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
+			    			function (growPlan) {
+			    				viewModels.initGrowPlanViewModel(growPlan);
+			    				sharedDataService.selectedGrowPlan = growPlan;
+			      			delay.resolve(sharedDataService.selectedGrowPlan);
+			    			}, 
+			    			function() {
+			      			delay.reject('Unable to fetch grow plan '  + $route.current.params.growPlanId );
+			    			}
+		    			);
+			    		return delay.promise;	
+		  			}
 		  		};
 				}
 			]
 		);
 
+		
+
     growPlanApp.controller('bpn.controllers.setup.growPlan.Filter',
     	[
     		'$scope',
-    		function($scope){
-
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
     		}
     	]
   	);
@@ -87,8 +108,9 @@ require([
     growPlanApp.controller('bpn.controllers.setup.growPlan.Browse',
     	[
     		'$scope',
-    		function($scope){
-
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
     		}
     	]
   	);
@@ -97,8 +119,9 @@ require([
     	[
     		'$scope',
     		'growPlan',
-    		function($scope, growPlan){
-    			$scope.selected.growPlan = growPlan;
+    		'sharedDataService',
+    		function($scope, growPlan, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
 					
           $scope.updateSelectedGrowPlanPlants(true);
         }
@@ -108,18 +131,19 @@ require([
   	growPlanApp.controller('bpn.controllers.setup.growPlan.CustomizeDetails',
     	[
     		'$scope',
-    		function($scope){
-    			console.log("in details", $scope.selectedGrowPlan);
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
 
     			$scope.init = function(){
-    				//$scope.expectedGrowPlanDuration = $scope.selected.growPlan.phases.reduce(function (prev, cur) { return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
+    				//$scope.expectedGrowPlanDuration = $scope.sharedDataService.selectedGrowPlan.phases.reduce(function (prev, cur) { return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
   					$scope.setExpectedGrowPlanDuration();
           	$scope.setCurrentPhaseTab(0);
   				};
 
     			$scope.setExpectedGrowPlanDuration = function () {
             var currentExpectedPlanDuration = 0;
-            $scope.selected.growPlan.phases.forEach(function (phase) {
+            $scope.sharedDataService.selectedGrowPlan.phases.forEach(function (phase) {
               currentExpectedPlanDuration += phase.expectedNumberOfDays;
             });
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
@@ -134,18 +158,18 @@ require([
           };
 
           $scope.addPhase = function () {
-            var existingPhaseLength = $scope.selected.growPlan.phases.length,
+            var existingPhaseLength = $scope.sharedDataService.selectedGrowPlan.phases.length,
               phase = {
                 _id:existingPhaseLength.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
                 actionsViewModel:[],
                 idealRanges:[]
               };
-            $scope.selected.growPlan.phases.push(phase);
+            $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
             $scope.setCurrentPhaseTab(existingPhaseLength);
           };
 
           $scope.removePhase = function (index) {
-            $scope.selected.growPlan.phases.splice(index, 1);
+            $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
             $scope.setCurrentPhaseTab(0);
           };
 
@@ -172,11 +196,11 @@ require([
           };
 
           $scope.removeIdealRange = function (phaseIndex, idealRangeIndex) {
-            $scope.selected.growPlan.phases[phaseIndex].idealRanges.splice(idealRangeIndex, 1);
+            $scope.sharedDataService.selectedGrowPlan.phases[phaseIndex].idealRanges.splice(idealRangeIndex, 1);
           };
 
           $scope.removeAction = function (phaseIndex, actionIndex) {
-            $scope.selected.growPlan.phases[phaseIndex].actions.splice(actionIndex, 1);
+            $scope.sharedDataService.selectedGrowPlan.phases[phaseIndex].actions.splice(actionIndex, 1);
           };
 
     			$scope.init();
@@ -190,7 +214,9 @@ require([
         '$scope',
         '$filter',
         'GrowPlanModel',
-        function ($scope, $filter, GrowPlanModel) {
+        'sharedDataService',
+        function ($scope, $filter, GrowPlanModel, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
           $scope.plants = bpn.plants;
           $scope.lights = bpn.lights;
           $scope.lightFixtures = bpn.lightFixtures;
@@ -309,15 +335,15 @@ require([
             },
 
             'lightFixture':function (data, phase) {
-              $scope.selected.growPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.fixture = data.item;
+              $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.fixture = data.item;
             },
 
             'lightBulb':function (data, phase) {
-              $scope.selected.growPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.bulb = data.item;
+              $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.bulb = data.item;
             },
 
             'growSystem':function (data, phase) {
-              $scope.selected.growPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].growSystem = data.item;
+              $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].growSystem = data.item;
             },
 
             'growMedium':function (data, phase) {
@@ -333,7 +359,7 @@ require([
                   }
                 });
               }
-              $scope.selected.growPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].nutrients = nutrients;
+              $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].nutrients = nutrients;
             }
 
           };
@@ -342,19 +368,19 @@ require([
             //add any selected plants that arent in grow plan, only once when grow plan requested
             if (initial) {
               $scope.selectedPlants.forEach(function (plant, index) {
-                if (0 === $.grep($scope.selected.growPlan.plants,function (gpPlant) { return gpPlant.name == plant.name; }).length) {
+                if (0 === $.grep($scope.sharedDataService.selectedGrowPlan.plants,function (gpPlant) { return gpPlant.name == plant.name; }).length) {
                   //only add if not already in grow plan's plant list
-                  $scope.selected.growPlan.plants.push(plant);
+                  $scope.sharedDataService.selectedGrowPlan.plants.push(plant);
                 }
               });
               //also set any grow plan plants selected
-              $scope.selected.growPlan.plants.forEach(function (plant, index) {
+              $scope.sharedDataService.selectedGrowPlan.plants.forEach(function (plant, index) {
                 $scope.selected.plant[plant._id] = true;
               });
             } else if (typeof $scope.selectedGrowPlan != 'undefined') {
               //else just add selected to grow plan plant list if its already defined (meaning we already requested it)
-              $scope.selected.growPlan.plants = $scope.selectedPlants;
-              $scope.selected.growPlan.plants.sort(function (a, b) { return a.name < b.name; });
+              $scope.sharedDataService.selectedGrowPlan.plants = $scope.selectedPlants;
+              $scope.sharedDataService.selectedGrowPlan.plants.sort(function (a, b) { return a.name < b.name; });
             }
           };
 

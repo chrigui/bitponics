@@ -89,7 +89,7 @@ block head
 
         //- div.info
         //-   div(class="gplist_description") {{growPlan.description}}
-        //-input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="selected.growPlan", ng-change="setSelectedGrowPlan()")
+        //-input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="sharedDataService.selectedGrowPlan", ng-change="setSelectedGrowPlan()")
         //-label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         a.btn(href="customize/{{growPlan._id}}") Select
@@ -99,14 +99,14 @@ block head
     div.separator-top
       div.question
         label(for="gpedit_name", class="question-title") Name
-        input(id="gpedit_name", type='text', name="gpedit_name", ng-model="selected.growPlan.name")
+        input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
       
       div(class="question-wrap-right")
         div.question
           label.question-title Plants
           ul(class="grid plantlist")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-            li(ng-repeat="plant in selected.growPlan.plants | orderBy:name")
+            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
               input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
@@ -118,10 +118,10 @@ block head
 
       div(class="question clear-l")
         label(for="gpedit_description", class="question-title") Description
-        textarea(id="gpedit_description", name="gpedit_description", ng-model="selected.growPlan.description", rows="8")
+        textarea(id="gpedit_description", name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
     
     div(class="step-footer separator-top")
-      a(class="btn next-step-btn", href="customize/{{selected.growPlan._id}}/details") Next Step
+      a(class="btn next-step-btn", href="customize/{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
         | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
   
@@ -129,7 +129,7 @@ block head
       h4.page-heading Your grow plan
 
       //set as default grow plan, will change dynamically based on previous step selection
-      input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="selected.growPlan._id") 
+      input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="sharedDataService.selectedGrowPlan._id") 
 
       div.Phases
         div
@@ -152,7 +152,7 @@ block head
           section.separator-top
             h5.question-title Phases
             ul(class="phase-tabs")
-              li(ng-repeat="phase in selected.growPlan.phases", 
+              li(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", 
                   class="btn inverse-btn", 
                   ng-class="{selected: selected.selectedGrowPlanPhase == $index}", 
                   ng-click="setCurrentPhaseTab($index)") {{ phase.name || 'New Phase' }}
@@ -162,7 +162,7 @@ block head
                 div(class="add icon")
                   | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-            div(ng-repeat="phase in selected.growPlan.phases", ng-show="selected.selectedGrowPlanPhase == $index", class="phase-slider")
+            div(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", ng-show="selected.selectedGrowPlanPhase == $index", class="phase-slider")
               h4(class="page-heading-large seamless-input-wrap")
                 span {{ phase.name || 'New Phase' }} lasts for
                 input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
@@ -573,7 +573,7 @@ block content
                   name="lightFixture", 
                   value="{{item._id}}", 
                   ng-model="item._id",
-                  checked="item._id == selected.growPlan.phases[overlayMetaData.phase].light.fixture._id",
+                  checked="item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].light.fixture._id",
                   ng-click="updateSelected['lightFixture'](this)")
                 label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
             
@@ -624,7 +624,7 @@ block content
                   name="lightBulb", 
                   value="{{item._id}}", 
                   ng-model="item._id",
-                  checked="item._id == selected.growPlan.phases[overlayMetaData.phase].light.bulb._id",
+                  checked="item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].light.bulb._id",
                   ng-click="updateSelected['lightBulb'](this)")
                 label(for="bulb_{{item._id}}", class="item btn next-step-btn") Select
             
@@ -670,20 +670,20 @@ block content
                   dd {{item.watts}}
 
                 div Phase index: {{overlayMetaData.phase}}
-                div {{selected.growPlan.phases[overlayMetaData.phase].growSystem._id}}
+                div {{sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
                 div {{item._id}}
-                div {{item._id == selected.growPlan.phases[overlayMetaData.phase].growSystem._id}}
+                div {{item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
 
                 input(id="growsystem_{{item._id}}", 
                   type='radio', 
                   name="growSystem", 
                   value="{{item._id}}", 
                   ng-model="item._id",
-                  checked="item._id === selected.growPlan.phases[overlayMetaData.phase].growSystem._id",
+                  checked="item._id === sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
                   ng-click="updateSelected['growSystem'](this)")
-                //- checked="item._id === selected.growPlan.phases[overlayMetaData.phase].growSystem._id",
-                  //- ng-model="selected.growPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem"
-                  //- checked="item._id == selected.growPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem._id"
+                //- checked="item._id === sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
+                  //- ng-model="sharedDataService.selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem"
+                  //- checked="item._id == sharedDataService.selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem._id"
                   //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
                 label(for="growsystem_{{item._id}}", class="item btn next-step-btn") Select
                   //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
