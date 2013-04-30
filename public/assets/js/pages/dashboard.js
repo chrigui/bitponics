@@ -551,6 +551,7 @@ require([
               })
               .attr('fill', 'none')
               .attr('stroke-width', '1')
+
               .attr("d", line);
 
             /*sparkGraph.append("path")

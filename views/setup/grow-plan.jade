@@ -15,20 +15,7 @@ block head
   script(type='text/ng-template', id='filter.html')
     h4.page-heading Ready to set up your grow plan?
     .separator-top
-
-      //-
-        a(ng-click="sharedDataService.showTestModal=true") Show modal
-        div(modal="sharedDataService.showTestModal", opts="sharedDataService.modalOptions", close="sharedDataService.showTestModal = false")
-          .modal-header
-            h4
-              | header
-          .modal-body
-            div
-              | body
-          .modal-footer
-            div
-              | footer
-
+        
       .question
         h5.question-title What kind of hydroponic system are you using?
         
@@ -58,18 +45,18 @@ block head
           //-     li.select
           //-       label Select
           //-     li(ng-repeat="plant in filteredPlantList | orderBy:name")
-          //-       input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelectedPlants()")
+          //-       input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelectedPlants()")
           //-       label(for="{{plant._id}}", class="plant") {{plant.name}}
           
           
           ul(class="grid plantlist")
-            li(ng-repeat="plant in selectedPlants | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-          label(class="add btn", ng-click="toggleOverlay({ type: 'plant' });") 
+          label(class="add btn", ng-click="sharedDataService.activeOverlay = 'PlantOverlay'") 
             | Add
             | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
     
@@ -121,7 +108,7 @@ block head
           ul(class="grid plantlist")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
             li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
@@ -495,57 +482,47 @@ block content
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.controllers.setup.growPlan.Main", novalidate)
         
         section(ng-view)
-
-        section(id="step1", class="step", data-required="1")
-          
-        //- section(id="plant_selection", class="step")
-          
-
-        section(id="growplan_results", class="step update-panel hide", data-required="1")
-          
-
-        section(id="growplan_customize", class="step hide")
-          
-
         
         //- Overlay Templates
 
-        div(id="plant-overlay", ng-hide="!overlayStates.plant", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay({ type: 'plant' })")
-            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-          h3.page-heading Add a Plant
-          div(ng-controller="overlayCtrl")
-            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
-            div(ng-hide="filteredItems.length") 
-              label(href="#", class="add btn", ng-click="addPlant(this)")
-                | Add New Plant
-                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+        div
+          div(id="plant-overlay", ng-controller="bpn.controllers.setup.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Add a Plant
+              div
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addPlant(this)")
+                    | Add New Plant
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
-            ul(class="grid plantlist")
-              //- li(ng-repeat="plant in filteredPlantList | orderBy:name")
-              li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
-                dl
-                  dt Type:
-                  dd {{plant.name}}
-                input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="selected.plant[plant._id]", ng-change="updateSelected['plants']()", checked="selected.plant[plant._id]")
-                label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
-                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-            
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+                ul(class="grid plantlist")
+                  //- li(ng-repeat="plant in filteredPlantList | orderBy:name")
+                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
+                    dl
+                      dt Type:
+                      dd {{plant.name}}
+                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()", checked="sharedDataService.selected.plants[plant._id]")
+                    label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
+                      //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
 
         div(id="fixture-overlay", ng-hide="!overlayStates.fixture", class="overlay")

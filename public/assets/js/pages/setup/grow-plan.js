@@ -8,13 +8,13 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  'steps',
+  '/assets/js/controllers/selection-overlay.js',
   'overlay'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['bpn.services', 'ui', 'ui.bootstrap']);
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']);
 
 		growPlanApp.config(
 			[
@@ -56,17 +56,26 @@ require([
 		growPlanApp.factory('sharedDataService', function(){
 			return {
 				selectedGrowPlan : {},
-				showPlantOverlay : false,
+				plants : bpn.plants,
+				filteredPlantList : angular.copy(bpn.plants),
+				selectedPlants : [],
+				activeOverlay : undefined,
+				selected: {
+					plants : {}
+				},
 				modalOptions : {
 			    backdropFade: true,
-			    dialogFade: true
+			    dialogFade: true,
+			    dialogClass : 'overlay'
 			  }
 			};
 		});
 
 		growPlanApp.factory('overlayService', function(){
+			
 			return {
-				showPlantOverlay : false
+				showPlantOverlay : false,
+				
 			};
 		});
 
@@ -105,7 +114,29 @@ require([
 			]
 		);
 
-		
+	
+
+		growPlanApp.controller('bpn.controllers.setup.growPlan.PlantOverlay',
+    	[
+    		'$scope',
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
+    			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
+    			//$scope.showOverlay = false;
+
+    			/*
+    			$scope.$watch('sharedDataService.activeOverlay', function(newValue, oldValue){
+    				console.log('activeOverlay changed', newValue, oldValue);
+    			});
+    			// */
+
+    			$scope.close = function(){
+						$scope.sharedDataService.activeOverlay = undefined;
+    			};
+    		}
+    	]
+  	);
 
     growPlanApp.controller('bpn.controllers.setup.growPlan.Filter',
     	[
@@ -229,17 +260,15 @@ require([
         'sharedDataService',
         function ($scope, $filter, GrowPlanModel, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
-          $scope.plants = bpn.plants;
+          
           $scope.lights = bpn.lights;
           $scope.lightFixtures = bpn.lightFixtures;
           $scope.lightBulbs = bpn.lightBulbs;
           $scope.nutrients = bpn.nutrients;
-          $scope.filteredPlantList = angular.copy($scope.plants);
           $scope.controls = bpn.controls;
           $scope.sensors = bpn.sensors;
           $scope.userOwnedDevices = bpn.userOwnedDevices;
           $scope.plantSelections = {};
-          $scope.selectedPlants = [];
           $scope.plantQuery = '';
           $scope.growSystems = bpn.growSystems;
           //$scope.selectedGrowPlan = {}; 
@@ -253,7 +282,7 @@ require([
           $scope.overlayItems = []; //used by Overlay Ctrl
           $scope.overlayMetaData = {}; //pass additional config to overlay
           $scope.overlayStates = { //manage open state
-            'plant':false,
+            //'plant':false,
             'fixture':false,
             'growSystemOverlay':false,
             'growMediumOverlay':false,
@@ -274,7 +303,7 @@ require([
           $scope.selected = {
             // growSystem: undefined,
             growPlan : undefined,
-            plant:{},
+            //plant:{},
             selectedGrowPlanPhase:0,
             selectedGrowPlanPhaseSection:0,
             selectedDevice:undefined,
@@ -294,16 +323,16 @@ require([
 
           $scope.updateSelectedGrowSystem = function () {
             // $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
-            if ($scope.selectedPlants && $scope.selectedPlants.length) {
+            if ($scope.sharedDataService.selectedPlants && $scope.sharedDataService.selectedPlants.length) {
               $scope.updatefilteredGrowPlans();
             }
           };
 
           $scope.addPlant = function (obj) {
             var newPlant = {_id:obj.query || $scope.query, name:obj.query || $scope.query };
-            $scope.filteredPlantList.push(newPlant);
-            $scope.selectedPlants.push(newPlant);
-            $scope.selected.plant[newPlant._id] = true;
+            $scope.sharedDataService.filteredPlantList.push(newPlant);
+            $scope.sharedDataService.selectedPlants.push(newPlant);
+            $scope.sharedDataService.selected.plants[newPlant._id] = true;
             $scope.query = "";
             $scope.$$childHead.query = "";
             $scope.$$childHead.search();
@@ -311,11 +340,11 @@ require([
           };
 
           // $scope.updateSelectedPlants = function(){
-          //     $scope.selectedPlants = [];
-          //     for (var i = $scope.plants.length; i--;) {
-          //         Object.keys($scope.selected.plant).forEach(function(_id) {
-          //             if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
-          //                 $scope.selectedPlants.push($scope.plants[i]);
+          //     $scope.sharedDataService.selectedPlants = [];
+          //     for (var i = $scope.sharedDataService.plants.length; i--;) {
+          //         Object.keys($scope.sharedDataService.selected.plants).forEach(function(_id) {
+          //             if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
+          //                 $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
           //             }
           //         });
           //     }
@@ -330,11 +359,11 @@ require([
           $scope.updateSelected = {
 
             'plants':function () {
-              $scope.selectedPlants = [];
-              for (var i = $scope.plants.length; i--;) {
-                Object.keys($scope.selected.plant).forEach(function (_id) {
-                  if ($scope.selected.plant[_id] && $scope.plants[i]._id == _id) {
-                    $scope.selectedPlants.push($scope.plants[i]);
+              $scope.sharedDataService.selectedPlants = [];
+              for (var i = $scope.sharedDataService.plants.length; i--;) {
+                Object.keys($scope.sharedDataService.selected.plants).forEach(function (_id) {
+                  if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
+                    $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
                   }
                 });
               }
@@ -379,7 +408,7 @@ require([
           $scope.updateSelectedGrowPlanPlants = function (initial) {
             //add any selected plants that arent in grow plan, only once when grow plan requested
             if (initial) {
-              $scope.selectedPlants.forEach(function (plant, index) {
+              $scope.sharedDataService.selectedPlants.forEach(function (plant, index) {
                 if (0 === $.grep($scope.sharedDataService.selectedGrowPlan.plants,function (gpPlant) { return gpPlant.name == plant.name; }).length) {
                   //only add if not already in grow plan's plant list
                   $scope.sharedDataService.selectedGrowPlan.plants.push(plant);
@@ -387,17 +416,17 @@ require([
               });
               //also set any grow plan plants selected
               $scope.sharedDataService.selectedGrowPlan.plants.forEach(function (plant, index) {
-                $scope.selected.plant[plant._id] = true;
+                $scope.sharedDataService.selected.plants[plant._id] = true;
               });
             } else if (typeof $scope.selectedGrowPlan != 'undefined') {
               //else just add selected to grow plan plant list if its already defined (meaning we already requested it)
-              $scope.sharedDataService.selectedGrowPlan.plants = $scope.selectedPlants;
+              $scope.sharedDataService.selectedGrowPlan.plants = $scope.sharedDataService.selectedPlants;
               $scope.sharedDataService.selectedGrowPlan.plants.sort(function (a, b) { return a.name < b.name; });
             }
           };
 
           $scope.updatefilteredGrowPlans = function () {
-            var selectedPlantIds = $scope.selectedPlants.map(function (plant) { return plant._id }),
+            var selectedPlantIds = $scope.sharedDataService.selectedPlants.map(function (plant) { return plant._id }),
               growPlanDefault = new GrowPlanModel(bpn.growPlanDefault);
 
             //hit API with params to filter grow plans
@@ -412,14 +441,13 @@ require([
           };
 
           
-
           $scope.toggleOverlay = function (overlayMetaData) {
             $scope.overlayMetaData = overlayMetaData;
             switch (overlayMetaData.type) {
-              case 'plant':
-                $scope.overlayItems = $scope.filteredPlantList;
+              //case 'plant':
+                //$scope.overlayItems = $scope.filteredPlantList;
                 // $scope.overlayItemKey = "plants";
-                break;
+                //break;
               case 'fixture':
                 $scope.overlayItems = $scope.lightFixtures;
                 // $scope.overlayItemKey = "lightFixture";

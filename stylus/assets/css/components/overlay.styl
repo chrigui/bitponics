@@ -7,9 +7,15 @@
 	border 3px solid color-text-gray-sep
 	width 80%
 	right 10%
-	z-index 5
+	z-index 1050
 	overflow hidden
 	padding 1em 2em 1em
+
+	&.fade
+		//top -5em
+		transition opacity 0.1s ease-out
+		&.in
+			//top 5em
 
 	.close
 		position absolute
