@@ -119,7 +119,7 @@ block head
 
       div(class="question clear-l")
         label(for="gpedit_description", class="question-title") Description
-        textarea(id="gpedit_description", name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
+        textarea(name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
     
     div(class="step-footer separator-top")
       a(class="btn next-step-btn", href="customize/{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
@@ -128,9 +128,6 @@ block head
   
   script(type='text/ng-template', id='customize-details.html')
       h4.page-heading Your grow plan
-
-      //set as default grow plan, will change dynamically based on previous step selection
-      input(id="gpedit__id", type="hidden", name="parentGrowPlan", ng-model="sharedDataService.selectedGrowPlan._id") 
 
       div.Phases
         div
@@ -155,22 +152,22 @@ block head
             ul(class="phase-tabs")
               li(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", 
                   class="btn inverse-btn", 
-                  ng-class="{selected: selected.selectedGrowPlanPhase == $index}", 
-                  ng-click="setCurrentPhaseTab($index)") {{ phase.name || 'New Phase' }}
+                  ng-class="{selected: sharedDataService.selectedGrowPlan.currentVisiblePhase == phase}", 
+                  ng-click="setCurrentVisiblePhase(phase)") {{ phase.name || 'New Phase' }}
                 div(class="remove icon", ng-click="removePhase($index)")
                   | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
               li(class="btn inverse-btn", ng-click="addPhase()") Add New Phase
                 div(class="add icon")
                   | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-            div(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", ng-show="selected.selectedGrowPlanPhase == $index", class="phase-slider")
+            div(class="phase-slider")
               h4(class="page-heading-large seamless-input-wrap")
-                span {{ phase.name || 'New Phase' }} lasts for
+                span {{ sharedDataService.selectedGrowPlan.currentVisiblePhase.name || 'New Phase' }} lasts for
                 input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
                       name="expectedNumberOfDays", 
                       value="1", 
                       type="number", 
-                      ng-model="phase.expectedNumberOfDays", 
+                      ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.expectedNumberOfDays", 
                       ng-change="setExpectedGrowPlanDuration()",
                       min="1")
                 span days
@@ -180,11 +177,11 @@ block head
               section
                 div.phaseName
                   label Phase Name
-                  input(type="text", placeholder="Give this phase a name...", ng-model="phase.name")
+                  input(type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.name")
 
                 div.phaseDescription
                   label Phase Description
-                  textarea(placeholder="Write a phase description...", ng-model="phase.description")
+                  textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.description")
 
                 ul(class="phase-tabs separator-top")
                   li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
@@ -193,30 +190,30 @@ block head
                       ng-click="setCurrentPhaseSectionTab($index)") {{ phaseSection }}
 
                 div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
-                  //select(ng-model="phase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
+                  //select(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
                   div.question
                     h4(class="page-heading-large separator-top") System
                     a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'growSystem', phase: $index })")
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different grow system
                     label Name
-                    input(type="text", ng-model="phase.growSystem.name", value="phase.growSystem.name")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name")
                     label Description
-                    input(type="text", ng-model="phase.growSystem.description", value="phase.growSystem.description")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
                     label Type
-                    input(type="text", ng-model="phase.growSystem.type")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type")
                     label Reservoir Size
-                    input(type="text", ng-model="phase.growSystem.reservoirSize", value="phase.growSystem.reservoirSize")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize")
                     label Plant Capacity
-                    input(type="text", ng-model="phase.growSystem.plantCapacity", value="phase.growSystem.plantCapacity")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity")
                     h7 Size
-                    input(type="text", placeholder="W", ng-model="phase.growSystem.overallSize.w", value="phase.growSystem.overallSize.w")
-                    input(type="text", placeholder="H", ng-model="phase.growSystem.overallSize.h", value="phase.growSystem.overallSize.h")
-                    input(type="text", placeholder="D", ng-model="phase.growSystem.overallSize.d", value="phase.growSystem.overallSize.d")
+                    input(type="text", placeholder="W", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w")
+                    input(type="text", placeholder="H", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h")
+                    input(type="text", placeholder="D", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d")
 
                   div(class="growMedium question")
                     h4(class="page-heading-large separator-top") Grow Medium
-                    input(type='text', ng-model="phase.growMedium")
+                    input(type='text', ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growMedium")
 
                   div(class="nutrients question")
                     h4(class="page-heading-large separator-top") Nutrients
@@ -224,42 +221,42 @@ block head
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different nutrient
                     ul.grid
-                      li(ng-repeat="nutrient in phase.nutrients")
-                        input(id="gpedit_{{phase._id}}_nutrients", type='checkbox', name="gpedit_{{phase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
-                        label(for="gpedit_{{phase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
+                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrients")
+                        input(id="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", type='checkbox', name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
+                        label(for="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
                 
                 div(class="light", ng-show="selected.selectedGrowPlanPhaseSection == 1")
                   //- h6 Light
                   div.question
                     h4(class="page-heading-large separator-top") Fixture
-                    a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'fixture', phase: $index })")
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'FixtureOverlay'")
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different fixture
                     label Brand
-                    input(type="text", ng-model="phase.light.fixture.brand", value="phase.light.fixture.brand")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand")
                     label Name
-                    input(type="text", ng-model="phase.light.fixture.name", value="phase.light.fixture.name")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name")
                     label Type
-                    input(type="text", ng-model="phase.light.fixture.type", value="phase.light.fixture.type")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type")
                     label Watts
-                    input(type="text", ng-model="phase.light.fixture.watts", value="phase.light.fixture.watts")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts")
                     label # of bulbs per fixture
-                    input(type="text", ng-model="phase.light.fixture.bulbCapacity", value="phase.light.fixture.bulbCapacity")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity")
                     label # of fixtures
-                    input(type="text", ng-model="phase.light.fixtureQuantity", value="phase.light.fixtureQuantity")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity")
                   div.question
                     h4(class="page-heading-large separator-top") Bulbs
                     a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'bulb', phase: $index })") 
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different bulb
                     label Brand
-                    input(type="text", ng-model="phase.light.bulb.brand", value="phase.light.bulb.brand")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand")
                     label Name
-                    input(type="text", ng-model="phase.light.bulb.name", value="phase.light.bulb.name")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name")
                     label Type
-                    input(type="text", ng-model="phase.light.bulb.type", value="phase.light.bulb.type")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type")
                     label Watts
-                    input(type="text", ng-model="phase.light.bulb.watts", value="phase.light.bulb.watts")
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts")
 
                 div(class="idealRanges", ng-show="selected.selectedGrowPlanPhaseSection == 2")
                   //- Assuming Phases would be h5
@@ -273,7 +270,7 @@ block head
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                    li(class="question", ng-repeat="idealRange in phase.idealRanges")
+                    li(class="question", ng-repeat="idealRange in sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges")
                       div(class="close btn", ng-click="removeIdealRange($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
@@ -338,7 +335,7 @@ block head
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                    li(class="question", ng-repeat="action in phase.actionsViewModel")
+                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhaseactionsViewModel")
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
@@ -367,15 +364,15 @@ block head
 
                       //- label Scheduling. Trigger this action:
                       //-   label 
-                      //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
                       //-     | Once at the start of the phase
 
                       //-   label
-                      //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
                       //-     | Once at the end of the phase
 
                       //-   label 
-                      //-     input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
                       //-     | Repeat throughout the phase
 
 
@@ -407,11 +404,11 @@ block head
                             
                             div First, turn {{action.control.name}}
                               label 
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="1", ng-model="action.cycle.states[0].controlValue")
+                                input(type="radio", value="1", ng-model="action.cycle.states[0].controlValue")
                                 | On
 
                               label
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state0_controlValue", value="0", ng-model="action.cycle.states[0].controlValue")
+                                input(type="radio", value="0", ng-model="action.cycle.states[0].controlValue")
                                 | Off
 
                               div for
@@ -423,11 +420,11 @@ block head
                               
                             div Then turn {{action.control.name}}
                               label 
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="1", ng-model="action.cycle.states[1].controlValue")
+                                input(type="radio", value="1", ng-model="action.cycle.states[1].controlValue")
                                 | On
 
                               label
-                                input(type="radio", name="gpedit_{{phase._id}}_action_{{action._id}}_state1_controlValue", value="0", ng-model="action.cycle.states[1].controlValue")
+                                input(type="radio", value="0", ng-model="action.cycle.states[1].controlValue")
                                 | Off
 
                               div for 
@@ -454,15 +451,17 @@ block head
                         
                   div(class="phaseEndDescription separator-top")
                     label Phase End Description
-                    textarea(id="gpedit_{{phase._id}}_enddescription", name="gpedit_{{phase._id}}_enddescription", placeholder="This phase is over when...", ng-model="phase.phaseEndDescription")
+                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
                 
                 div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
                   h4(class="page-heading-large separator-top") Device
                   p Here is where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
                   ul(class="grid devicelist")
                     li(ng-repeat="device in userOwnedDevices")
-                      input(id="device_{{device._id}}", type='radio', name="device", value="{{device._id}}", ng-model="selected.selectedDevice[device._id]")
-                      label(for="device_{{device._id}}", class="device") {{device.name}}
+                      label
+                        input(type='radio', name="device", value="{{device._id}}", ng-model="selected.selectedDevice[device._id]")
+                        | {{device.name}}
+
       div(class="step-footer separator-top")
         input(id="growplans_activate", type="submit", value="Activate Grow Plan")
 
@@ -524,57 +523,58 @@ block content
                   li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
                     a(href, ng-click="nextPage()") Next »
 
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.FixtureOverlay", modal="sharedDataService.activeOverlay=='FixtureOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Fixture
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addFixture(this)")
+                    | Add New Fixture
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
-        div(id="fixture-overlay", ng-hide="!overlayStates.fixture", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay({ type: 'fixture' })")
-            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-          h3.page-heading Choose a Fixture
-          div(ng-controller="overlayCtrl")
-            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
-            div(ng-hide="filteredItems.length") 
-              label(href="#", class="add btn", ng-click="addFixture(this)")
-                | Add New Fixture
-                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+                ul(class="grid plantlist")
+                  //- li(ng-repeat="item in filteredPlantList | orderBy:name")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Brand:
+                      dd {{item.brand || '--'}}
+                      dt Name:
+                      dd {{item.name}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Watts:
+                      dd {{item.watts}}
+                      dt # of bulbs per fixture:
+                      dd {{item.bulbCapacity}}
 
-            ul(class="grid plantlist")
-              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
-              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
-                dl
-                  dt Brand:
-                  dd {{item.brand || '--'}}
-                  dt Name:
-                  dd {{item.name}}
-                  dt Type:
-                  dd {{item.type}}
-                  dt Watts:
-                  dd {{item.watts}}
-                  dt # of bulbs per fixture:
-                  dd {{item.bulbCapacity}}
-
-                input(id="fixture_{{item._id}}", 
-                  type='radio', 
-                  name="lightFixture", 
-                  value="{{item._id}}", 
-                  ng-model="item._id",
-                  checked="item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].light.fixture._id",
-                  ng-click="updateSelected['lightFixture'](this)")
-                label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
-            
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+                    input(id="fixture_{{item._id}}", 
+                      type='radio', 
+                      name="lightFixture", 
+                      value="{{item._id}}", 
+                      ng-model="item._id",
+                      checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture._id",
+                      ng-click="updateSelected['lightFixture'](this)")
+                    label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
 
         div(id="bulb-overlay", ng-hide="!overlayStates.bulb", class="overlay")

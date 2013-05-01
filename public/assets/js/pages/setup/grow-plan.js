@@ -138,6 +138,29 @@ require([
     	]
   	);
 
+
+		growPlanApp.controller('bpn.controllers.setup.growPlan.FixtureOverlay',
+    	[
+    		'$scope',
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
+    			//$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
+    			//$scope.showOverlay = false;
+
+    			/*
+    			$scope.$watch('sharedDataService.activeOverlay', function(newValue, oldValue){
+    				console.log('activeOverlay changed', newValue, oldValue);
+    			});
+    			// */
+
+    			$scope.close = function(){
+						$scope.sharedDataService.activeOverlay = undefined;
+    			};
+    		}
+    	]
+  	);  	
+
     growPlanApp.controller('bpn.controllers.setup.growPlan.Filter',
     	[
     		'$scope',
@@ -181,7 +204,7 @@ require([
     			$scope.init = function(){
     				//$scope.expectedGrowPlanDuration = $scope.sharedDataService.selectedGrowPlan.phases.reduce(function (prev, cur) { return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
   					$scope.setExpectedGrowPlanDuration();
-          	$scope.setCurrentPhaseTab(0);
+          	//$scope.setCurrentPhaseTab(0);
   				};
 
     			$scope.setExpectedGrowPlanDuration = function () {
@@ -192,8 +215,8 @@ require([
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
           };
 
-          $scope.setCurrentPhaseTab = function (index) {
-            $scope.selected.selectedGrowPlanPhase = index;
+          $scope.setCurrentVisiblePhase = function (phase) {
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
           };
 
           $scope.setCurrentPhaseSectionTab = function (index) {
@@ -208,12 +231,12 @@ require([
                 idealRanges:[]
               };
             $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
-            $scope.setCurrentPhaseTab(existingPhaseLength);
+            $scope.setCurrentVisiblePhase(phase);
           };
 
           $scope.removePhase = function (index) {
             $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
-            $scope.setCurrentPhaseTab(0);
+            $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
           };
 
           $scope.addIdealRange = function (e) {

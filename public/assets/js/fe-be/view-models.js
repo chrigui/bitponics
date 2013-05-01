@@ -47,6 +47,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         phase.actionsViewModel.push(initActionViewModel(action, 'phaseEnd'));
       });
     });
+
+    growPlan.currentVisiblePhase = growPlan.phases[0];
+    
     return growPlan;
   };
 
@@ -183,6 +186,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
       delete phase.actionsViewModel;
     });
+
+    growPlan.currentVisiblePhase = undefined;
+
     return growPlan;
   };
 
