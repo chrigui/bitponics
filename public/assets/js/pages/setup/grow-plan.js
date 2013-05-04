@@ -59,6 +59,11 @@ require([
 				plants : bpn.plants,
 				lightFixtures : bpn.lightFixtures,
 				lightBulbs : bpn.lightBulbs,
+				growSystems : bpn.growSystems,
+				nutrients : bpn.nutrients,
+				controls : bpn.controls,
+        sensors : bpn.sensors,
+        userOwnedDevices : bpn.userOwnedDevices,
 				filteredPlantList : angular.copy(bpn.plants),
 				selectedPlants : [],
 				activeOverlay : undefined,
@@ -172,6 +177,27 @@ require([
     			$scope.overlayItems = $scope.sharedDataService.lightBulbs;
     			
     			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb',
+    				function(newValue, oldValue){
+    					$scope.close();
+    				}
+  				);
+
+    			$scope.close = function(){
+						$scope.sharedDataService.activeOverlay = undefined;
+    			};
+    		}
+    	]
+  	);
+
+  	growPlanApp.controller('bpn.controllers.setup.growPlan.GrowSystemOverlay',
+    	[
+    		'$scope',
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
+    			$scope.overlayItems = $scope.sharedDataService.growSystems;
+    			
+    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem',
     				function(newValue, oldValue){
     					$scope.close();
     				}
@@ -308,16 +334,16 @@ require([
         function ($scope, $filter, GrowPlanModel, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
           
-          $scope.lights = bpn.lights;
+          //$scope.lights = bpn.lights;
           //$scope.lightFixtures = bpn.lightFixtures;
           //$scope.lightBulbs = bpn.lightBulbs;
-          $scope.nutrients = bpn.nutrients;
+          //$scope.nutrients = bpn.nutrients;
           $scope.controls = bpn.controls;
           $scope.sensors = bpn.sensors;
           $scope.userOwnedDevices = bpn.userOwnedDevices;
           $scope.plantSelections = {};
           $scope.plantQuery = '';
-          $scope.growSystems = bpn.growSystems;
+          //$scope.growSystems = bpn.growSystems;
           //$scope.selectedGrowPlan = {}; 
           $scope.selectedGrowSystem = undefined;
           $scope.currentGrowPlanDay = 0;

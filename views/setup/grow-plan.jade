@@ -20,7 +20,7 @@ block head
         h5.question-title What kind of hydroponic system are you using?
         
         .custom-dropdown-wrap
-          select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in growSystems | orderBy:name")
+          select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in sharedDataService.growSystems | orderBy:name")
             option(value="") Select
           .dblarrow
             i
@@ -193,13 +193,13 @@ block head
                   //select(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
                   div.question
                     h4(class="page-heading-large separator-top") System
-                    a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'growSystem', phase: $index })")
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'GrowSystemOverlay'")
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different grow system
                     label Name
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name")
                     label Description
-                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
+                    textarea(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
                     label Type
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type")
                     label Reservoir Size
@@ -259,7 +259,6 @@ block head
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts")
 
                 div(class="idealRanges", ng-show="selected.selectedGrowPlanPhaseSection == 2")
-                  //- Assuming Phases would be h5
                   h4(class="page-heading-large separator-top") Ideal Sensor Ranges
                   p Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
                     | we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
@@ -485,7 +484,7 @@ block content
         //- Overlay Templates
 
         div
-          div(id="plant-overlay", ng-controller="bpn.controllers.setup.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.setup.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
@@ -626,64 +625,62 @@ block content
                     a(href, ng-click="nextPage()") Next »
 
 
-        div(id="growsystem-overlay", ng-hide="!overlayStates.growSystem", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay({ type: 'growSystem' })")
-            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-          h3.page-heading Choose a Grow System
-          div(ng-controller="overlayCtrl")
-            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
-            div(ng-hide="filteredItems.length") 
-              label(href="#", class="add btn", ng-click="addGrowSystem(this)")
-                | Add New Grow System
-                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.GrowSystemOverlay", modal="sharedDataService.activeOverlay=='GrowSystemOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Grow System
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addGrowSystem(this)")
+                    | Add New Grow System
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
-            ul(class="grid plantlist")
-              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
-              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
-                dl
-                  dt Brand:
-                  dd {{item.brand || '--'}}
-                  dt Name:
-                  dd {{item.name}}
-                  dt Type:
-                  dd {{item.type}}
-                  dt Watts:
-                  dd {{item.watts}}
+                ul(class="grid plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Name:
+                      dd {{item.name}}
+                      dt Description:
+                      dd {{item.description}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Plant Capacity:
+                      dd {{item.plantCapacity}}
+                      dt Size:
+                      dd
+                        div(ng-show="item.overallSize.w && item.overallSize.h && item.overallSize.d") 
+                          | {{item.overallSize.w}} wide x {{item.overallSize.h}} high x {{item.overallSize.d}} deep
+                        div(ng-hide="item.overallSize.w && item.overallSize.h && item.overallSize.d") 
+                          | -
 
-                div Phase index: {{overlayMetaData.phase}}
-                div {{sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
-                div {{item._id}}
-                div {{item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id}}
-
-                input(id="growsystem_{{item._id}}", 
-                  type='radio', 
-                  name="growSystem", 
-                  value="{{item._id}}", 
-                  ng-model="item._id",
-                  checked="item._id === sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
-                  ng-click="updateSelected['growSystem'](this)")
-                //- checked="item._id === sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].growSystem._id",
-                  //- ng-model="sharedDataService.selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem"
-                  //- checked="item._id == sharedDataService.selectedGrowPlan.phases[selected.selectedGrowPlanPhaseSection].growSystem._id"
-                  //- , ng-change="updateSelected[overlayItemKey]()", checked="selected[overlayItemKey] == item._id")
-                label(for="growsystem_{{item._id}}", class="item btn next-step-btn") Select
-                  //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-            
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+                    input(id="growsystem_{{item._id}}", 
+                      type='radio', 
+                      name="growSystem", 
+                      value="{{item._id}}", 
+                      ng-model="item._id",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem = item")
+                    label(for="growsystem_{{item._id}}", class="item btn next-step-btn") Select
+                      //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
       
         div(id="nutrient-overlay", ng-hide="!overlayStates.nutrient", class="overlay")
