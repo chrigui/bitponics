@@ -113,7 +113,7 @@ block head
                 {{plant.name}}
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-          label(class="add btn", ng-click="toggleOverlay({ type: 'plant' })") 
+          label(class="add btn", ng-click="sharedDataService.activeOverlay = 'PlantOverlay'") 
             | Add
             | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
@@ -246,7 +246,7 @@ block head
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity")
                   div.question
                     h4(class="page-heading-large separator-top") Bulbs
-                    a(href, class="edit-btn", ng-click="toggleOverlay({ type: 'bulb', phase: $index })") 
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'BulbOverlay'") 
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Choose a different bulb
                     label Brand
@@ -505,7 +505,6 @@ block content
                     a(href, ng-click="nextPage()") Next »
 
                 ul(class="grid plantlist")
-                  //- li(ng-repeat="plant in filteredPlantList | orderBy:name")
                   li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
                     img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
                     dl
@@ -544,7 +543,6 @@ block content
                     a(href, ng-click="nextPage()") Next »
 
                 ul(class="grid plantlist")
-                  //- li(ng-repeat="item in filteredPlantList | orderBy:name")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
                     img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
                     dl
@@ -560,12 +558,12 @@ block content
                       dd {{item.bulbCapacity}}
 
                     input(id="fixture_{{item._id}}", 
-                      type='radio', 
-                      name="lightFixture", 
+                      type='radio',
+                      name="lightFixtureOverlaySelection", 
                       value="{{item._id}}", 
-                      ng-model="item._id",
-                      checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture._id",
-                      ng-click="updateSelected['lightFixture'](this)")
+                      ng-model="item",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture = item")
                     label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
                 
                 ul.pagination
@@ -577,55 +575,55 @@ block content
                     a(href, ng-click="nextPage()") Next »
 
 
-        div(id="bulb-overlay", ng-hide="!overlayStates.bulb", class="overlay")
-          div(class="close btn", ng-click="toggleOverlay({ type: 'bulb' })")
-            | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-          h3.page-heading Choose a Bulb
-          div(ng-controller="overlayCtrl")
-            input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
-            div(ng-hide="filteredItems.length") 
-              label(href="#", class="add btn", ng-click="addBulb(this)")
-                | Add New Bulb
-                | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.BulbOverlay", modal="sharedDataService.activeOverlay=='BulbOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Bulb
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addBulb(this)")
+                    | Add New Bulb
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
-            ul(class="grid plantlist")
-              //- li(ng-repeat="item in filteredPlantList | orderBy:name")
-              li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
-                dl
-                  dt Brand:
-                  dd {{item.brand || '--'}}
-                  dt Name:
-                  dd {{item.name}}
-                  dt Type:
-                  dd {{item.type}}
-                  dt Watts:
-                  dd {{item.watts}}
+                ul(class="grid plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Brand:
+                      dd {{item.brand || '--'}}
+                      dt Name:
+                      dd {{item.name}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Watts:
+                      dd {{item.watts}}
 
-                //- input(id="search_{{item._id}}", type='radio', name="{{overlayItemKey}}", value="{{item._id}}", ng-model="selected.lightBulb[item._id]", ng-change="updateSelected['lightBulb']()", checked="selected.lightBulb[item._id]")
-                input(id="bulb_{{item._id}}", 
-                  type='radio', 
-                  name="lightBulb", 
-                  value="{{item._id}}", 
-                  ng-model="item._id",
-                  checked="item._id == sharedDataService.selectedGrowPlan.phases[overlayMetaData.phase].light.bulb._id",
-                  ng-click="updateSelected['lightBulb'](this)")
-                label(for="bulb_{{item._id}}", class="item btn next-step-btn") Select
-            
-            ul.pagination
-              li(ng-class="{disabled: currentPage == 0}")
-                a(href, ng-click="prevPage()") « Prev
-              li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
-                a(href, ng-click="setPage()", ng-bind="n + 1") 1
-              li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
-                a(href, ng-click="nextPage()") Next »
+                    input(id="bulb_{{item._id}}", 
+                      type='radio', 
+                      name="lightBulb", 
+                      value="{{item._id}}", 
+                      ng-model="item._id",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb = item")
+                    label(for="bulb_{{item._id}}", class="item btn next-step-btn") Select
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
 
 
         div(id="growsystem-overlay", ng-hide="!overlayStates.growSystem", class="overlay")

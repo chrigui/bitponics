@@ -57,6 +57,8 @@ require([
 			return {
 				selectedGrowPlan : {},
 				plants : bpn.plants,
+				lightFixtures : bpn.lightFixtures,
+				lightBulbs : bpn.lightBulbs,
 				filteredPlantList : angular.copy(bpn.plants),
 				selectedPlants : [],
 				activeOverlay : undefined,
@@ -123,15 +125,15 @@ require([
     		function($scope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
-    			//$scope.showOverlay = false;
-
-    			/*
-    			$scope.$watch('sharedDataService.activeOverlay', function(newValue, oldValue){
-    				console.log('activeOverlay changed', newValue, oldValue);
-    			});
-    			// */
+    			
+    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.plants',
+    				function(newValue, oldValue){
+    					$scope.close();
+    				}
+  				);
 
     			$scope.close = function(){
+    				// TODO : update the growPlan's from sharedDataService.selected.plants
 						$scope.sharedDataService.activeOverlay = undefined;
     			};
     		}
@@ -145,21 +147,43 @@ require([
     		'sharedDataService',
     		function($scope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
-    			//$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
-    			//$scope.showOverlay = false;
-
-    			/*
-    			$scope.$watch('sharedDataService.activeOverlay', function(newValue, oldValue){
-    				console.log('activeOverlay changed', newValue, oldValue);
-    			});
-    			// */
+    			$scope.overlayItems = $scope.sharedDataService.lightFixtures;
+    			
+    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture',
+    				function(newValue, oldValue){
+    					$scope.close();
+    				}
+  				);
 
     			$scope.close = function(){
 						$scope.sharedDataService.activeOverlay = undefined;
     			};
     		}
     	]
-  	);  	
+  	);
+
+
+		growPlanApp.controller('bpn.controllers.setup.growPlan.BulbOverlay',
+    	[
+    		'$scope',
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
+    			$scope.overlayItems = $scope.sharedDataService.lightBulbs;
+    			
+    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb',
+    				function(newValue, oldValue){
+    					$scope.close();
+    				}
+  				);
+
+    			$scope.close = function(){
+						$scope.sharedDataService.activeOverlay = undefined;
+    			};
+    		}
+    	]
+  	);
+
 
     growPlanApp.controller('bpn.controllers.setup.growPlan.Filter',
     	[
@@ -285,8 +309,8 @@ require([
           $scope.sharedDataService = sharedDataService;
           
           $scope.lights = bpn.lights;
-          $scope.lightFixtures = bpn.lightFixtures;
-          $scope.lightBulbs = bpn.lightBulbs;
+          //$scope.lightFixtures = bpn.lightFixtures;
+          //$scope.lightBulbs = bpn.lightBulbs;
           $scope.nutrients = bpn.nutrients;
           $scope.controls = bpn.controls;
           $scope.sensors = bpn.sensors;
@@ -471,14 +495,14 @@ require([
                 //$scope.overlayItems = $scope.filteredPlantList;
                 // $scope.overlayItemKey = "plants";
                 //break;
-              case 'fixture':
-                $scope.overlayItems = $scope.lightFixtures;
+              //case 'fixture':
+                //$scope.overlayItems = $scope.lightFixtures;
                 // $scope.overlayItemKey = "lightFixture";
-                break;
-              case 'bulb':
-                $scope.overlayItems = $scope.lightBulbs;
+                //break;
+              //case 'bulb':
+                //$scope.overlayItems = $scope.lightBulbs;
                 // $scope.overlayItemKey = "lightBulb";
-                break;
+                //break;
               case 'growSystem':
                 $scope.overlayItems = $scope.growSystems;
                 // $scope.overlayItemKey = "growSystem";
