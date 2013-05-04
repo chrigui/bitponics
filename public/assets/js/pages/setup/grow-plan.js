@@ -189,6 +189,7 @@ require([
     	]
   	);
 
+  	
   	growPlanApp.controller('bpn.controllers.setup.growPlan.GrowSystemOverlay',
     	[
     		'$scope',
@@ -202,6 +203,37 @@ require([
     					$scope.close();
     				}
   				);
+
+    			$scope.close = function(){
+						$scope.sharedDataService.activeOverlay = undefined;
+    			};
+    		}
+    	]
+  	);
+
+
+  	growPlanApp.controller('bpn.controllers.setup.growPlan.NutrientOverlay',
+    	[
+    		'$scope',
+    		'sharedDataService',
+    		function($scope, sharedDataService){
+    			$scope.sharedDataService = sharedDataService;
+    			$scope.overlayItems = $scope.sharedDataService.nutrients;
+    			
+    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel',
+    				function(newValue, oldValue){
+    					$scope.close();
+    				}
+  				);
+
+    			$scope.toggleItemSelection = function(nutrient, input){
+    				if (nutrient.selected) {
+    					sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id] = nutrient;
+    				} else {
+    					sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id] = undefined;
+    				}
+
+    			};
 
     			$scope.close = function(){
 						$scope.sharedDataService.activeOverlay = undefined;
