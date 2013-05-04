@@ -5,8 +5,10 @@ mixin requirejs(datamain)
   script
     require.config({
       paths: {
-        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular',
-        'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min',
+        //'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min',
+        //'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min',
+        'angular': '/assets/js/libs//angular.min',
+        'angularResource' : '/assets/js/libs/angular-resource.min',
         'angularUI' : '/assets/js/libs/angular-ui.min',
         'angularUIBootstrap' : '/assets/js/libs/ui-bootstrap-0.2.0.min',
         'bpnApp' : '/assets/js/core/bpn',
@@ -15,7 +17,8 @@ mixin requirejs(datamain)
         'services' : '/assets/js/core/services',
         'd3' : '/assets/js/libs/d3.v2',
         'domReady': '/assets/js/libs/requirejs/domReady',
-        'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
+        //'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
+        'jquery' : '/assets/js/libs/jquery-1.8.2.min',
         'view-models': '/assets/js/fe-be/view-models',
         'es5shim': '/assets/js/libs/es5-shim.min',
         'steps': '/assets/js/libs/Steps',

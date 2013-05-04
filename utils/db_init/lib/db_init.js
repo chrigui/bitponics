@@ -59,6 +59,10 @@ switch(db_url){
     mongooseConnection = require('../../../config/mongoose-connection').open("local");
     appDomain = appDomains.local;
     break;
+  case 'localLocal':
+    mongooseConnection = require('../../../config/mongoose-connection').open("localLocal");
+    appDomain = appDomains.local;
+    break;
   case 'dev':
     mongooseConnection = require('../../../config/mongoose-connection').open("development");
     appDomain = appDomains.development;
