@@ -68,21 +68,14 @@ require([
 				selectedPlants : [],
 				activeOverlay : undefined,
 				selected: {
-					plants : {}
+					plants : {},
+					deviceId : undefined
 				},
 				modalOptions : {
 			    backdropFade: true,
 			    dialogFade: true,
 			    dialogClass : 'overlay'
 			  }
-			};
-		});
-
-		growPlanApp.factory('overlayService', function(){
-			
-			return {
-				showPlantOverlay : false,
-				
 			};
 		});
 
@@ -230,9 +223,10 @@ require([
     				if (nutrient.selected) {
     					sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id] = nutrient;
     				} else {
-    					sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id] = undefined;
+    					delete sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id];
     				}
 
+    				$scope.close();
     			};
 
     			$scope.close = function(){
@@ -287,6 +281,15 @@ require([
     				//$scope.expectedGrowPlanDuration = $scope.sharedDataService.selectedGrowPlan.phases.reduce(function (prev, cur) { return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
   					$scope.setExpectedGrowPlanDuration();
           	//$scope.setCurrentPhaseTab(0);
+
+          	if ($scope.sharedDataService.userOwnedDevices.length === 1){
+          		$scope.sharedDataService.selected.device = $scope.sharedDataService.userOwnedDevices[0];
+          	}
+  				};
+
+  				$scope.toggleDevice = function(device){
+  					console.log(device);
+  					console.log('selected', $scope.sharedDataService.selected.deviceId);
   				};
 
     			$scope.setExpectedGrowPlanDuration = function () {
@@ -587,13 +590,13 @@ require([
           $scope.submit = function (e) {
             //e.preventDefault();
 
-            if ($scope.selectedGrowPlan) {
+            if ($scope.sharedDataService.selectedGrowPlan) {
               var dataToSubmit = {
-                submittedGrowPlan:viewModels.compileGrowPlanViewModelToServerModel($scope.selectedGrowPlan),
+                submittedGrowPlan:viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan),
                 growPlanInstance:{
                   currentGrowPlanDay:1 // TODO
                 },
-                deviceId:"" // TODO
+                deviceId: $scope.sharedDataService.selected.deviceId
               };
 
               console.log(dataToSubmit);

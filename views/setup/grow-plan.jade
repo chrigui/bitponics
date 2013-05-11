@@ -456,10 +456,13 @@ block head
                   h4(class="page-heading-large separator-top") Device
                   p Here is where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
                   ul(class="grid devicelist")
-                    li(ng-repeat="device in userOwnedDevices")
+                    li(ng-repeat="device in sharedDataService.userOwnedDevices")
                       label
-                        input(type='radio', name="device", value="{{device._id}}", ng-model="selected.selectedDevice[device._id]")
+                        input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId", ng-change="toggleDevice(device)")
                         | {{device.name}}
+                        div(ng-show="sharedDataService.selected.deviceId == device._id", style="font-style:italic")
+                          | Selected
+
 
       div(class="step-footer separator-top")
         input(id="growplans_activate", type="submit", value="Activate Grow Plan")

@@ -251,7 +251,7 @@ module.exports = function(app) {
 
 
   /**
-   * Get the current cycle data for the device. 
+   * Get the current cycle data & mode for the device. 
    * Pulls from the active GrowPlanInstance that's paired with the device.
    *
    * For now, only responds with device CSV. 

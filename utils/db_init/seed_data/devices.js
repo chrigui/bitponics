@@ -166,5 +166,10 @@ module.exports = [
         }
       ],
       recentSensorLogs : []
-    }
+    },
+    {
+			macAddress: "000666809da0", //mac address
+			deviceType: "506de2fe8eebf7524342cb37",
+			name : "Michael's device added on 2013-05-10"
+		}
 	];
