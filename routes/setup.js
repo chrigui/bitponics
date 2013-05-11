@@ -294,7 +294,7 @@ module.exports = function(app){
             active : true,
             activePhaseId : startingPhaseData.phaseId,
             activePhaseDay : startingPhaseData.day,
-            device : req.body.device
+            device : req.body.deviceId
           },
           function(err, createdGrowPlanInstance){
             if (err) { 
