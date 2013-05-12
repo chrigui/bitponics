@@ -171,17 +171,16 @@ module.exports = function(app) {
    * @param {string} req.id. mac address of device
    * @param {Array.<SensorLog>} req.body. JSON.
    */
-  app.post('/api/devices/:id/sensor-logs',
+  app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,''),
           pendingSensorLog = { ts : Date.now(), logs : []},
           pendingDeviceLogs,
-          sensors,
           device,
           growPlanInstance;
 
-      winston.info('sensor_logs req.body');
+      winston.info('status POST req.body');
       winston.info(JSON.stringify(req.body));
 
       // For now, only accept requests that use the device content-type
@@ -197,10 +196,7 @@ module.exports = function(app) {
       // In parallel, get the Device and all Sensors
       async.parallel(
         [
-          function parallel1(callback){
-            SensorModel.find().exec(callback);
-          },
-          function parallel2(callback){
+          function getDevice(callback){
             DeviceModel
             .findOne({ macAddress: macAddress })
             .populate('activeGrowPlanInstance')
@@ -210,8 +206,8 @@ module.exports = function(app) {
         function parallelFinal(err, results){
           if (err) { return next(err);}
         
-          sensors = results[0];
-          device = results[1];
+          device = results[0];
+          
           if (!device){ 
             return next(new Error('Attempted to log to a nonexistent device'));
           }
@@ -235,13 +231,7 @@ module.exports = function(app) {
             },
             function(err){
               if (err) { return next(err); }
-              
-              return sendDeviceResponse({
-                req : req,
-                res : res,
-                resourceName : "sensor_logs",
-                responseBody : '{"status":"success"}'
-              });
+              return sendDeviceStatusResponse(req, res, macAddress, device);
             }
           );
         }
@@ -260,40 +250,7 @@ module.exports = function(app) {
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,'');
-      
-      async.series([
-        function (innerCallback){
-          DeviceModel
-          .findOne({ macAddress: macAddress })
-          .exec(function(err, deviceResult){
-            if (err) { return next(err); }
-            if (!deviceResult){ 
-              return callback(new Error('No device found for id ' + req.params.id));
-            }
-              
-            var now = Date.now();
-            if (deviceResult.status.expires > now){
-              return deviceResult.getStatusResponse(innerCallback);
-            }
-
-            deviceResult.refreshStatus(function(err, updatedDevice){
-             return updatedDevice.getStatusResponse(innerCallback);
-           });
-          });  
-        }
-      ],
-      function(err, results){
-        if (err) { return next(err); }
-
-        var statusResponseBody = results[0];
-
-        return sendDeviceResponse({
-          req : req,
-          res : res,
-          resourceName : "status",
-          responseBody : statusResponseBody
-        });
-      });
+      sendDeviceStatusResponse(req, res, macAddress);
     }
   );
 
@@ -340,6 +297,45 @@ module.exports = function(app) {
       });
     }
   );
+
+
+  var sendDeviceStatusResponse = function(req, res, macAddress, deviceModel){
+    async.waterfall([
+      function getDevice(innerCallback){
+        if (deviceModel){
+          return innerCallback(null, deviceModel);
+        }
+
+        DeviceModel
+        .findOne({ macAddress: macAddress })
+        .exec(innerCallback);
+      },
+      function getStatus(device, innerCallback){
+        if (!device){ 
+          return callback(new Error('No device found for id ' + req.params.id));
+        }
+        var now = Date.now();
+        if (device.status.expires > now){
+          return device.getStatusResponse(innerCallback);
+        }
+
+        device.refreshStatus(function(err, updatedDevice){
+          return updatedDevice.getStatusResponse(innerCallback);
+        });
+      }
+    ],
+    function(err, deviceStatusResponse){
+      if (err) { return next(err); }
+
+      return sendDeviceResponse({
+        req : req,
+        res : res,
+        resourceName : "status",
+        responseBody : deviceStatusResponse
+      });
+    });
+  };
+
 
   /**
    *

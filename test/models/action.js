@@ -305,7 +305,7 @@ describe('Action', function(){
         done();
       });
     });
-  }); // /getStateMessage
+  }); // /state message validation
 
 
   describe('#isEquivalentTo', function(){

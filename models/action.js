@@ -114,6 +114,9 @@ ActionSchema.virtual('overallCycleTimespan')
 /************************** INSTANCE METHODS ***************************/
 
 /**
+ * NOTE: Not in use anywhere in the code right now...instead we're
+ * creating a message on the fly during save that mimics this, obviating the need for this method.
+ * 
  * Get the message for the specified cycle state.
  *
  * Used primarily to generate a message for a control trigger when there
@@ -123,6 +126,7 @@ ActionSchema.virtual('overallCycleTimespan')
  * @param controlName {String} optional. If no explicit message is defined, and there is a control defined, this param
  * 		  will be interpolated into the message. Needs to be passed in because we can't assume a populated Control object
  */
+/*
 ActionSchema.method('getStateMessage', function(stateIndex, controlName){
   var state = this.cycle.states[stateIndex];
 
@@ -136,7 +140,7 @@ ActionSchema.method('getStateMessage', function(stateIndex, controlName){
   }
   return '';
 });
-
+*/
 
 /************************** END INSTANCE METHODS ***************************/
 
@@ -472,13 +476,13 @@ ActionSchema.pre('save', function(next){
       }
       break;
     case 3:
-      // if a cycle has 3 states, the 1st and 3rd must have the same control value & message
+      // if a cycle has 3 states, the 1st and 3rd must have the same control value
       if (states[0].controlValue !== states[2].controlValue){
         return next(new Error(i18nKeys.get('First and last control values must be equal')));
       }
-      if (states[0].message !== states[2].message){
-        return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
-      }
+      //if (states[0].message !== states[2].message){
+        //return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
+      //}
       // and at least the 1st & 3rd states must have durations defined
       if (!(
         (states[0].durationType && states[0].duration) &&
