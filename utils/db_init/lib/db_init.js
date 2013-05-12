@@ -496,6 +496,7 @@ async.series([
             macAddress: _data.macAddress,
             deviceType: _data.deviceType,
             name : _data.name,
+            serial : _data.serial,
             owner: _data.owner,
             users : _data.users,
             sensorMap : _data.sensorMap,

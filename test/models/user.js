@@ -75,40 +75,20 @@ describe('User', function(){
   });
 
 
-  it('upon creation, gives a user an available device key', function(done){
-    User.findOne({email : 'unittest@bitponics.com'},
-      function(err, user){
-        should.not.exist(err);
-        should.exist(user);
-        should.exist(user.availableDeviceKey);
-        done();
-      });
-  });
-
-
-  it('ensures an available deviceKey exists, creating one if not', function(done){
-    User.findOne({email : 'unittest@bitponics.com'},
-      function(err, user){
-        should.not.exist(err);
-        should.exist(user);
-        user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
-          should.not.exist(err);
-          should.exist(user.availableDeviceKey);
-          user.availableDeviceKey.should.equal(availableDeviceKey);
-          done();
-        });
-      });
-  });
-
+  
   it('gets a user by device key', function(done){
     User.findOne({email : 'unittest@bitponics.com'},
       function(err, user){
         should.not.exist(err);
         should.exist(user);
-        user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+
+        var serial = "TS-301-AAAA";
+
+        user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
           should.not.exist(err);
           should.exist(user.availableDeviceKey);
           user.availableDeviceKey.should.equal(availableDeviceKey);
+          availableDeviceKey.serial.should.equal(serial);
 
           User.getByPublicDeviceKey(user.deviceKeys[0].public, function(err, nestedUser){
             should.not.exist(err);
@@ -137,4 +117,24 @@ describe('User', function(){
       });
   });
 
+
+  describe('User', function(){
+    it('ensures an available deviceKey exists, creating one if not', function(done){
+      User.findOne({email : 'unittest@bitponics.com'},
+        function(err, user){
+          should.not.exist(err);
+          should.exist(user);
+          var serial = "TS-301-AAAN";
+
+          user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
+            should.not.exist(err);
+            should.exist(user.availableDeviceKey);
+            user.availableDeviceKey.should.equal(availableDeviceKey);
+            availableDeviceKey.serial.should.equal(serial);
+            done();
+          });
+        }
+      );
+    });
+  });
 });

@@ -13,7 +13,8 @@ var mongoose = require('mongoose'),
 	timezone = require('timezone/loaded'),	
 	verificationEmailDomain = 'bitponics.com',
 	EmailConfig = require('../config/email-config'),
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  async = require('async');
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -28,6 +29,11 @@ var DeviceKeySchema = new Schema({
    * for use during the setup process
    */
   deviceId : { type: ObjectIdSchema, ref : 'Device'},
+
+  serial : { type : String },
+
+  verified : { type : Boolean, default : false },
+
   /**
    * Public device key is a 16-char random hex string
    */
@@ -307,9 +313,10 @@ UserSchema.method('toPublicJSON', function() {
 /**
  * Make sure User has an unassigned deviceKey
  *
- * @param {function(err, object )} done : Passed the available deviceKey object ({ deviceId : undefined, public : string, private : string })
+ * @param {string} serial. THe serial number that the user entered that will be assigned to this device key
+ * @param {function(err, object )} done : Passed the available deviceKey object (DeviceKeySchema)
  */
-UserSchema.method('ensureAvailableDeviceKey', function(done){
+UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 	var user = this,
 		availableDeviceKey,
 		i,
@@ -324,26 +331,43 @@ UserSchema.method('ensureAvailableDeviceKey', function(done){
 			break;
 		}
 	};
-	if (availableDeviceKey){
-		return done(null, availableDeviceKey);
-	} else {
-		crypto.randomBytes(32, function(ex, buf) {
-			if (ex) { return done(ex); }
-		  	var keysSource = buf.toString('hex'),
-		  		publicKey = keysSource.substr(0, 16),
-		  		privateKey = keysSource.substr(16, 16);
-		  	
-		  	availableDeviceKey = {
-		  		'public' : publicKey,
-		  		'private' : privateKey
-		  	};
-		  	user.deviceKeys.push(availableDeviceKey);
-		  	user.save(function(err){
-		  		if (err) { return done(err);}
-		  		return done(null, availableDeviceKey);
-		  	})
-		});	
-	}
+	
+
+	//console.log("OIJOIJOIJ");
+
+	async.waterfall(
+		[
+			function updateAvailableDeviceKey(innerCallback){
+				if (availableDeviceKey){
+					availableDeviceKey.serial = serial;	
+					return innerCallback(null);
+				} else {
+					crypto.randomBytes(32, function(ex, buf) {
+						if (ex) { return innerCallback(ex); }
+					  	var keysSource = buf.toString('hex'),
+					  		publicKey = keysSource.substr(0, 16),
+					  		privateKey = keysSource.substr(16, 16);
+					  	
+					  	availableDeviceKey = {
+					  		'public' : publicKey,
+					  		'private' : privateKey,
+					  		'serial' : serial
+					  	};
+					  	user.deviceKeys.push(availableDeviceKey);
+					  	return innerCallback(null);
+					});	
+				}
+			},
+			function saveUser(innerCallback){
+				user.save(function(err){
+					return innerCallback(err);
+				});
+			}
+		],
+		function (err, result){
+			return done(err, user.availableDeviceKey);
+		}
+	);
 });
 
 /************** END INSTANCE METHODS ********************/
@@ -353,19 +377,6 @@ UserSchema.method('ensureAvailableDeviceKey', function(done){
 
 /***************** MIDDLEWARE **********************/
 
-
-
-/**
- * TODO 
- * Make sure there's a max of 1 "available" deviceKey at a time
- */
-UserSchema.pre('save', true, function(next, done){
-	var user = this;
-	
-	next();
-	
-	user.ensureAvailableDeviceKey(done);
-});
 
 /**
  *  Give user API keys if needed. Can be done in parallel with other pre save hooks. 

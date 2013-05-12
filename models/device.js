@@ -46,6 +46,8 @@ var OutputMapSchema = new Schema({
 var DeviceSchema = new Schema({
     
     macAddress: { type: String, required: true, unique: true }, //mac address
+
+    serial: { type : String, required: true, unique: true},
     
     deviceType: { type: ObjectIdSchema, ref: 'DeviceType', required: false },
     
