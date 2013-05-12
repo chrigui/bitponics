@@ -78,6 +78,9 @@ margin 0,
 .right-0 {
   right: 0;
 }
+.no-margin-bottom {
+  margin-bottom: 0;
+}
 .uppercase {
   text-transform: uppercase;
 }

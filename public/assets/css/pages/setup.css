@@ -72,6 +72,9 @@
 .right-0 {
   right: 0;
 }
+.no-margin-bottom {
+  margin-bottom: 0;
+}
 .uppercase {
   text-transform: uppercase;
 }
@@ -194,11 +197,25 @@ a:hover {
   font-size: 1em;
   margin: 0.35em 0;
 }
-.setup .list-style {
-  font-size: 2em;
+.setup .list-style > li {
+  font-size: 2.25em;
 }
-.setup .list-style p {
+.setup .list-style p,
+.setup .list-style label,
+.setup .list-style button {
   font-size: 0.5em;
+}
+.setup .list-style p,
+.setup .list-style label {
+  color: #999b9a;
+}
+.setup .btn {
+  margin-left: 0;
+}
+.setup .custom-dropdown-wrap select.custom-dropdown {
+  margin-top: 0;
+  width: 100%;
+  max-width: 20em;
 }
 .setup .led-indicator {
   -webkit-animation-duration: 1s;

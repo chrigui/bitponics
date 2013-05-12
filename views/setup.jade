@@ -1,19 +1,24 @@
 extends layout
 
+block head
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  // script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
+  mixin requirejs("/assets/js/pages/setup")
+
 block css 
   link(rel='stylesheet', href='/assets/css/pages/setup.css')
-  link(rel='stylesheet', href='/assets/css/libs/steps.css')
+  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
 
 block content
   section.header
     header
       include /includes/nav/main
   
-  section(ng-cloak="")#main(role="main", class="main")
+  section(ng-cloak="")#main(role="main", class="main", ng-controller="bpn.controllers.setup.Main")
     div.content-module.middle
-      form(id="setup-form", name="setup", class='steps', data-ajax="false", novalidate)
+      form(id="setup-form", name="setup", data-ajax="false", novalidate)
         h1.page-heading Setting up your Bitponics Base Station
-        div(class="step separator-top")
+        div(class="separator-top")
           ol.list-style
             li
               h4.page-heading-small Power your Base Station
@@ -32,33 +37,69 @@ block content
           div(class="step-footer")
             a(class="btn next-step-btn", id="connect-to-device", href) Connect to Base Station 
             //- a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to Base Station
-        
-        div(class="step hide separator-top")
-          ol.list-style
-            li#enter-wifi-data
-              div Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
+
+        //- div
+        //-   form#wifi-form(action='')
+        //-     ul 
+        //-       li
+        //-         div(style="float:left;width=50%")
+        //-           | Select from the scanned Wifi networks:
+        //-           label(for='wifi-ssid') 
+        //-             select#wifi-ssid(name='wifi-ssid')
+        //-         div(style="width:50%")
+        //-           | Or enter your Wifi network information manually:
+        //-           label(for='wifi-manual-ssid') Network Name:
+        //-             input#wifi-manual-ssid(name='wifi-manual-ssid')  
+        //-           label(for='wifi-manual-security-mode') Security Mode:
+        //-             select#wifi-manual-security-mode(name='wifi-manual-security-mode')
+        //-       li
+        //-         label(for='wifi-pass') PASS
+        //-           input#wifi-pass(name='wifi-pass')
+        //-       li
+        //-         button#submit-wifi-form(type='submit') Go
+
+
+
+        div(class="separator-top")
+          ol(class="list-style")
+            li(id="enter-wifi-data", value="4")
+                h4.page-heading-small Wifi Settings
+                p Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
                 form#wifi-form(action='')
                   ul 
                     li
-                      div(style="float:left;width=50%")
-                        | Select from the scanned Wifi networks:
-                        label(for='wifi-ssid') 
-                          select#wifi-ssid(name='wifi-ssid')
-                      div(style="width:50%")
-                        | Or enter your Wifi network information manually:
+                      div
+                        p.no-margin-bottom Select from the scanned Wifi networks:
+                        //- label(for='wifi-ssid') 
+                          //- select#wifi-ssid(name='wifi-ssid')
+                        div.custom-dropdown-wrap(id="wifi-ssid")
+                          select(class="custom-dropdown", ng-model="selectedWifiNetwork", ng-options="wifi.ssid as wifi.ssid for wifi in scannedWifiNetworks")
+                            option(value="")  Select
+                          div(class="dblarrow")
+                            i
+
+                      div
+                        p Or enter your Wifi network information manually:
                         label(for='wifi-manual-ssid') Network Name:
                           input#wifi-manual-ssid(name='wifi-manual-ssid')  
-                        label(for='wifi-manual-security-mode') Security Mode:
-                          select#wifi-manual-security-mode(name='wifi-manual-security-mode')
+                        p.no-margin-bottom Security Mode:
+                        //- label(for='wifi-manual-security-mode') Security Mode:
+                          //- select#wifi-manual-security-mode(name='wifi-manual-security-mode')
+                        div.custom-dropdown-wrap(id="wifi-manual-security-mode")
+                          select(class="custom-dropdown", ng-model="securityMode", ng-options="mode as mode for mode in securityModeOptions")
+                            option(value="")  Select
+                          div(class="dblarrow")
+                            i
                     li
-                      label(for='wifi-pass') PASS
+                      label(for='wifi-pass') Password:
                         input#wifi-pass(name='wifi-pass')
                     li
-                      button#submit-wifi-form(type='submit') Go
+                      button#submit-wifi-form(type='submit', class="btn next-step-btn") Connect To Network
         
-        div(class="step hide separator-top")
-          ol.list-style
-            li#wifi-data-submitted
+        div(class="separator-top")
+          ol(class="list-style")
+            li(id="wifi-data-submitted", value="5")
+              h4.page-heading-small Disconnect and Reconnect
               p Great! The Bitponics device is now connecting to the&nbsp; 
                 span.selectedNetworkSsid
                 | network. 
@@ -68,7 +109,7 @@ block content
               p After you're back on the  
                 span.selectedNetworkSsid
                 |  network,
-                a(id="submit-device-info", href="javascript:void(0);", style="color:blue;") click here so that we can pair your device to your Bitponics account.
+                a(id="submit-device-info", href="javascript:void(0);", class="btn") click here so that we can pair your device to your Bitponics account.
             li#pairing-complete
               p Great, your device is now connected to your account. Let's take a look at the data we're getting:
 
@@ -83,5 +124,3 @@ block footer-scripts
         privateDeviceKey: '!{availableDeviceKey.private}'
       };
 
-  script(src='/assets/js/setup.js')
-  script(src='/assets/js/libs/Steps.js')

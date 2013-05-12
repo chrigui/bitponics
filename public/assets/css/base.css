@@ -549,6 +549,9 @@ td {
 .right-0 {
   right: 0;
 }
+.no-margin-bottom {
+  margin-bottom: 0;
+}
 .uppercase {
   text-transform: uppercase;
 }
@@ -955,6 +958,12 @@ ul.list-style {
 ol.list-style {
   list-style-type: decimal;
 }
+.list-continue-3 {
+  counter-reset: 3;
+}
+.list-continue-4 {
+  counter-reset: 4;
+}
 /*
  * Generic Button Style
  */
@@ -986,14 +995,19 @@ ol.list-style {
   float: right;
   margin: 0;
 }
-a.btn {
+a.btn,
+button.btn {
   display: inline-block;
   background: #fff !important;
   color: #00f717 !important;
   border: 3px solid #00f717;
 }
-a.btn i {
+a.btn i,
+button.btn i {
   margin: 0 0 0 0.5em;
+}
+button.btn:hover {
+  text-decoration: underline;
 }
 .step {
   padding: 3em 0 0;

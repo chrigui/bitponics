@@ -26,12 +26,30 @@
     margin .35em 0
   }
   .list-style {
-    font-size 2em
-
-    p {
+    & > li {
+      font-size 2.25em
+    }
+    p, label, button {
       font-size .5em
     }
+    p, label {
+      color color-text-gray
+    }
   }
+  
+  .btn {
+    margin-left 0
+  }
+
+  .custom-dropdown-wrap {
+    select.custom-dropdown {
+      // font-size .65em //23px
+      margin-top 0
+      width 100%
+      max-width 20em
+    }
+  }
+
 	.led-indicator {
 		  -webkit-animation-duration: 1s;
   		-webkit-animation-name: led-indicator;
