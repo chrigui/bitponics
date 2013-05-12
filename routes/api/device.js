@@ -207,7 +207,7 @@ module.exports = function(app) {
           if (err) { return next(err);}
         
           device = results[0];
-          
+
           if (!device){ 
             return next(new Error('Attempted to log to a nonexistent device'));
           }
@@ -315,9 +315,11 @@ module.exports = function(app) {
           return callback(new Error('No device found for id ' + req.params.id));
         }
         var now = Date.now();
-        if (device.status.expires > now){
+        if (device.status.expires > now && !req.params['forceRefresh']){
           return device.getStatusResponse(innerCallback);
         }
+
+        console.log('forceRefreshParam', req.params['forceRefresh']);
 
         device.refreshStatus(function(err, updatedDevice){
           return updatedDevice.getStatusResponse(innerCallback);
