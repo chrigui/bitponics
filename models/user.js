@@ -262,10 +262,10 @@ UserSchema.static('getByPublicDeviceKey', function(key, done) {
   User.findOne({ 'deviceKeys.public': key }, function(err, user) {
 	  if (err) { return done(err); }
       if (!user) { return done(new Error('No such device key'), false); }
-      var matchingPrivateKey = user.deviceKeys.filter(function(deviceKey){
+      var matchingKey = user.deviceKeys.filter(function(deviceKey){
       	return deviceKey.public === key;
-      })[0].private;
-      return done(null, user, matchingPrivateKey);
+      })[0];
+      return done(null, user, matchingKey);
   });
 });
 
@@ -274,7 +274,7 @@ UserSchema.static('getByPublicApiKey', function(key, done) {
       if (err) { return done(err); }
       if (!user) { return done(new Error('No such API key'), false); }
 
-      return done(null, user, user.apiKey.private);
+      return done(null, user, user.apiKey);
   });
 });
 /************************** END STATIC METHODS  ***************************/

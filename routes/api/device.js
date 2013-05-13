@@ -173,6 +173,7 @@ module.exports = function(app) {
    */
   app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
+    routeUtils.ensureDeviceKeyVerified,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,''),
           pendingSensorLog = { ts : Date.now(), logs : []},
@@ -248,6 +249,7 @@ module.exports = function(app) {
    */
   app.get('/api/devices/:id/status', 
     routeUtils.middleware.ensureDeviceLoggedIn,
+    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,'');
       sendDeviceStatusResponse(req, res, macAddress);
@@ -315,11 +317,14 @@ module.exports = function(app) {
           return callback(new Error('No device found for id ' + req.params.id));
         }
         var now = Date.now();
+
+        console.log('forceRefreshParam', req.params['forceRefresh']);
+        
         if (device.status.expires > now && !req.params['forceRefresh']){
           return device.getStatusResponse(innerCallback);
         }
 
-        console.log('forceRefreshParam', req.params['forceRefresh']);
+
 
         device.refreshStatus(function(err, updatedDevice){
           return updatedDevice.getStatusResponse(innerCallback);

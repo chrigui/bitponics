@@ -90,9 +90,11 @@ describe('User', function(){
           user.availableDeviceKey.should.equal(availableDeviceKey);
           availableDeviceKey.serial.should.equal(serial);
 
-          User.getByPublicDeviceKey(user.deviceKeys[0].public, function(err, nestedUser){
+          User.getByPublicDeviceKey(user.deviceKeys[0].public, function(err, nestedUser, matchingKey){
             should.not.exist(err);
             should.exist(nestedUser);
+            should.exist(matchingKey);
+            matchingKey.public.should.equal(user.deviceKeys[0].public);
             (nestedUser._id.equals(user._id)).should.be.ok;
             done();
           });
@@ -108,7 +110,7 @@ describe('User', function(){
       function(err, user){
         should.not.exist(err);
         should.exist(user);
-        User.getByPublicApiKey(user.apiKey.public, function(err, nestedUser){
+        User.getByPublicApiKey(user.apiKey.public, function(err, nestedUser, matchingKey){
           should.not.exist(err);
           should.exist(nestedUser);
           (nestedUser._id.equals(user._id)).should.be.ok;
