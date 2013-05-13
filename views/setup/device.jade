@@ -39,8 +39,8 @@ block head
             form#wifi-form(action='')
               ul 
                 li
-                  label(for='wifi-pass') Key:
-                    input#key(ng-model="key", name='key')
+                  label(for='key') Key:
+                    input#key(ng-model="bothKeys", name='key')
                 li
                   div
                     p.no-margin-bottom Select from the scanned Wifi networks:
@@ -79,6 +79,9 @@ block head
     div(class="separator-top")
       ol(class="list-style")
         li(id="wifi-data-submitted", value="5")
+
+          {{selectedWifiNetwork.ssid}}
+          
           h4.page-heading-small Disconnect and Reconnect
           p Great! The Bitponics device is now connecting to the 
             span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}

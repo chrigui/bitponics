@@ -31,7 +31,7 @@ module.exports = function(app){
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
-      req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+      req.user.ensureAvailableDeviceKey(null, function(err, availableDeviceKey){
         if (err) { return next(err); }
 
         var locals = {
@@ -60,14 +60,14 @@ module.exports = function(app){
       winston.info('req.body');
       winston.info(req.body);
       
-      var serial = req.body.serial,
-          key;
+      var serial = req.body.serial;
+
       if (!serial){
         return res.json(400, { success : false, error : 'Request requires serial parameter'});
       }
 
       //TODO: remove this and run ensureAvailableDeviceKey
-      return res.json(200, { 'private': '1123', 'public': '42142' });
+      // return res.json(200, { 'private': '1123', 'public': '42142' });
 
       req.user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
         if (err) { return next(err); }
@@ -97,12 +97,12 @@ module.exports = function(app){
     // routeUtils.middleware.ensureSecure,
     // routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
-      var rawDeviceMacAddress = req.param('deviceMacAddress'),
+      var rawDeviceMacAddress = req.body('deviceMacAddress'),
         cleanDeviceMacAddress,
         device,
         now = Date.now();
 
-      winston.info('/setup');
+      winston.info('/setup/device');
       winston.info('req.params');
       winston.info(req.params);
       winston.info('req.body');
