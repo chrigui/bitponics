@@ -248,6 +248,7 @@ describe('Model Utils', function(){
             var device = new DeviceModel({
               macAddress : "123456654321",
               deviceType : "506de2fe8eebf7524342cb37",
+              serial : "SOMETHING RANDOM",
               owner : self.user
             });
             device.save(function(err, deviceResult){
@@ -387,7 +388,8 @@ describe('Model Utils', function(){
           },
           function(innerCallback){
             var device = new DeviceModel({
-              macAddress : '123456123456'
+              macAddress : '123456123456',
+              serial : "SOMETHING RANDOM 2",
             });
             device.save(function(err, deviceResult){
               self.device = device;
@@ -396,7 +398,7 @@ describe('Model Utils', function(){
           }
         ],
         function(err, results){
-          return done(err);
+          self.user.ensureAvailableDeviceKey(null, done);
         }
       );
       
@@ -514,6 +516,7 @@ describe('Model Utils', function(){
             var device = new DeviceModel({
               macAddress : "123456654322",
               deviceType : "506de2fe8eebf7524342cb37",
+              serial : "SOMETHING RANDOM 3",
               owner : self.user
             });
             device.save(function(err, deviceResult){

@@ -58,9 +58,11 @@ should = require('should');
       beforeEach(function(done){
         var self = this;
         self.macAddress = "101010101010";
+        self.serial = "SOMETHING RANDOM DEVICE";
 
         DeviceModel.create({
-          macAddress: self.macAddress
+          macAddress: self.macAddress,
+          serial : self.serial
         }, 
         function(err, createdDevice){
           self.device = createdDevice;

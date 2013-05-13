@@ -54,7 +54,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	sentEmail : true,
 		  	deviceKey : {
 		  		"public" : "a5834ada441a1c88",
-		  		"private" : "e16b30b49b9a19aa"
+		  		"private" : "e16b30b49b9a19aa",
 		  	}
 		},
 		{
@@ -135,8 +135,10 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		    },
 		    "deviceKeys": [{
 		        "deviceId" : "506de2fe8eebf7524342cb34",
+		        "serial" : "AA-301-AAAA",
             "public": "dedf72f732cd6f66",
-		        "private": "7f27ad4bf71ae693"
+		        "private": "7f27ad4bf71ae693",
+		        "verified": true,
 		    }]
 		}
 	];
