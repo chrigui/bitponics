@@ -207,7 +207,8 @@ function (angular, domReady) {
           '06' : $scope.securityModeOptions['WPA'],
           '08' : $scope.securityModeOptions['WPA']
         };
-        $scope.deviceUrl = 'https://bitponics.com/device-mock'; //to work locally on https without device
+        //$scope.deviceUrl = 'https://bitponics.com/device-mock'; //to work locally on https without device
+        $scope.deviceUrl = 'http://169.254.1.1/';
         $scope.devicePostFormat = 'SSID={{SSID}}\nPASS={{PASS}}\nMODE={{MODE}}\nSKEY={{SKEY}}\nPKEY={{PKEY}}';
         $scope.dataToPostAfterSuccess = {
           deviceMacAddress : ''
