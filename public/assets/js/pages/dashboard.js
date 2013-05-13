@@ -6,9 +6,7 @@ require([
   'view-models',
   'angularResource',
   'd3',
-
   'es5shim',
-  'steps',
   'overlay'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
@@ -553,6 +551,7 @@ require([
               })
               .attr('fill', 'none')
               .attr('stroke-width', '1')
+
               .attr("d", line);
 
             /*sparkGraph.append("path")

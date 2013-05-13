@@ -305,7 +305,7 @@ describe('Action', function(){
         done();
       });
     });
-  }); // /getStateMessage
+  }); // /state message validation
 
 
   describe('#isEquivalentTo', function(){
@@ -774,6 +774,7 @@ describe('Action', function(){
     });
 
 
+    /*
     it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
       var action = new Action.model({
         description : "desc",
@@ -804,7 +805,7 @@ describe('Action', function(){
         done();
       });
     });
-
+    */
 
     it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
       var action = new Action.model({
@@ -980,6 +981,49 @@ describe('Action', function(){
     });
 
   }); // /getCycleRemainder
+
+
+  
+  describe('.getCurrentControlValue', function(){
+
+    it('returns current controlValue a repeating cycle, assuming cycle started at phase start and factoring in timezone, with a fromDate within the first cycle iteration', function(done){
+      var userTimezone = "America/Los_Angeles",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-01-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration : 10,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 8,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+}); // /.getCurrentControlValue
 
 
   describe('.getDeviceCycleFormat', function(){

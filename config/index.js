@@ -24,8 +24,9 @@ module.exports = function(app, callback) {
   winston.info(app.settings.env);
 
   winston.info('Connecting to mongoose');
-	require('./mongoose-connection').open(app.settings.env, callback);
-
+	winston.info(app.settings.env);
+  require('./mongoose-connection').open(app.settings.env, callback);
+  winston.info('dff');
   winstonConfig.setupLoggly(app.settings.env);
 
   appDomain = appDomain || appDomains[app.settings.env];

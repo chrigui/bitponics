@@ -32,6 +32,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   viewModels.initGrowPlanViewModel = function (growPlan){
     var initActionViewModel = viewModels.initActionViewModel;
 
+		growPlan.plantsViewModel = {};
+		growPlan.plants.forEach(function(plant){
+			growPlan.plantsViewModel[plant._id] = plant;
+		});
+
     growPlan.phases.forEach(function(phase, index){
       phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
         if (!idealRange.applicableTimeSpan){
@@ -46,7 +51,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       phase.phaseEndActions.forEach(function(action){
         phase.actionsViewModel.push(initActionViewModel(action, 'phaseEnd'));
       });
+
+      phase.nutrientsViewModel = {};
+      phase.nutrients.forEach(function(nutrient){
+      	phase.nutrientsViewModel[nutrient._id] = nutrient;
+      });
+
     });
+
+
+    growPlan.currentVisiblePhase = growPlan.phases[0];
+
     return growPlan;
   };
 
@@ -159,6 +174,15 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * Convert GrowPlan ViewModel back to server model
    */
   viewModels.compileGrowPlanViewModelToServerModel = function(growPlan){
+    var key;
+    growPlan.plants = [];
+    for (key in growPlan.plantsViewModel){
+    	if (growPlan.plantsViewModel.hasOwnProperty(key)){
+    		growPlan.plants.push(growPlan.plantsViewModel[key]);
+    	}
+    }
+    delete growPlan.plantsViewModel;
+
     growPlan.phases.forEach(function(phase, index){
       phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
         if (idealRange.noApplicableTimespan){
@@ -182,7 +206,19 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       });
 
       delete phase.actionsViewModel;
+
+
+      phase.nutrients = [];
+	    for (key in phase.nutrientsViewModel){
+	    	if (phase.nutrientsViewModel.hasOwnProperty(key)){
+	    		phase.nutrients.push(phase.nutrientsViewModel[key]);
+	    	}
+	    }
+	    delete phase.nutrientsViewModel;
     });
+
+    growPlan.currentVisiblePhase = undefined;
+
     return growPlan;
   };
 

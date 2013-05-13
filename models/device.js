@@ -18,7 +18,8 @@ var mongoose = require('mongoose'),
 
 /***************** UTILS **********************/
 var DeviceUtils = {
-  cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};',
+  //cycleTemplate : '{outputId},{override},{offset},{value1},{duration1},{value2},{duration2};',
+  stateTemplate : '{outputId},{value};',
   ROLES : {
     OWNER : 'owner',
     MEMBER : 'member'
@@ -334,7 +335,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
 
 
 /**
- * Get the compiled device status response, to be send to the device when requested at /status
+ * Get the compiled device status response, to be sent to the device when requested at /status
  *
  * @param {function(err, statusResponse)} callback
  *
@@ -349,7 +350,7 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       now = new Date(),
       nowAsMilliseconds = now.valueOf(),
       deviceOwner,
-      cyclesResponseBody = ''
+      statesResponseBody = ''
       statusResponseBody = '';
 
   async.waterfall(
@@ -375,41 +376,33 @@ DeviceSchema.method('getStatusResponse', function(callback) {
         });
       },
       function compileStatusBody(innerCallback){
-        var cycleTemplate = DeviceUtils.cycleTemplate,
+        var stateTemplate = DeviceUtils.stateTemplate,
             activeGrowPlanInstancePhase = device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
-            cyclesResponseBody = '';
+            statesResponseBody = '';
 
 
         device.outputMap.forEach(
           function(controlOutputPair){
             
-            var controlCycleString = cycleTemplate.replace(/{outputId}/,controlOutputPair.outputId),
+            var controlStateString = stateTemplate.replace(/{outputId}/, controlOutputPair.outputId),
                 controlAction = device.status.activeActions.filter(
                   function(action){ 
                     return getObjectId(action.control).equals(controlOutputPair.control);
                   }
-                )[0],
-                cycleRemainder;
+                )[0];
 
             // Need an entry for every output, even if there's no associated cycle
             if (!controlAction){
               // if no action, just 0 everything out
-              controlCycleString = controlCycleString.replace(/{override}/, '0');
-              controlCycleString = controlCycleString.replace(/{offset}/, '0');
-              controlCycleString = controlCycleString.replace(/{value1}/, '0');
-              controlCycleString = controlCycleString.replace(/{duration1}/, '0');
-              controlCycleString = controlCycleString.replace(/{value2}/, '0');
-              controlCycleString = controlCycleString.replace(/{duration2}/, '0');
+              controlStateString = controlStateString.replace(/{value}/, '0');
             } else {
-              controlCycleString = controlCycleString.replace(/{override}/, '1');
-              cycleRemainder = ActionModel.getCycleRemainder(now, activeGrowPlanInstancePhase, controlAction, deviceOwner.timezone);
-              controlCycleString = ActionModel.updateCycleTemplateWithStates(controlCycleString, controlAction.cycle.states, cycleRemainder).cycleString;
+              controlStateString = controlStateString.replace(/{value}/, ActionModel.getCurrentControlValue(now, activeGrowPlanInstancePhase, controlAction, deviceOwner.timezone));
             }
-            cyclesResponseBody += controlCycleString;
+            statesResponseBody += controlStateString;
           }
         );
 
-        statusResponseBody += "CYCLES=" + cyclesResponseBody;
+        statusResponseBody += "STATES=" + statesResponseBody;
         
         if (device.status.calibrationMode){
           statusResponseBody += "\nCALIB_MODE=" + device.status.calibrationMode;

@@ -71,7 +71,6 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
           .exec(innerCallback);
         },
         function (matchedPlant, innerCallback){
-          console.log('MATCHED', matchedPlant, submittedPlant);
           if (matchedPlant && PlantModel.isEquivalentTo(submittedPlant, matchedPlant)){
             return innerCallback(null, matchedPlant);
           }

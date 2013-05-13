@@ -5,16 +5,20 @@ mixin requirejs(datamain)
   script
     require.config({
       paths: {
-        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular',
-        'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min',
-        'angular-bootstrap' : '/assets/js/core/angular-bootstrap',
+        //'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min',
+        //'angularResource' : '//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min',
+        'angular': '/assets/js/libs//angular.min',
+        'angularResource' : '/assets/js/libs/angular-resource.min',
+        'angularUI' : '/assets/js/libs/angular-ui.min',
+        'angularUIBootstrap' : '/assets/js/libs/ui-bootstrap-0.2.0.min',
         'bpnApp' : '/assets/js/core/bpn',
         'controllers' : '/assets/js/core/controllers',
         'directives' : '/assets/js/core/directives',
         'services' : '/assets/js/core/services',
         'd3' : '/assets/js/libs/d3.v2',
         'domReady': '/assets/js/libs/requirejs/domReady',
-        'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
+        //'jquery' : '//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min',
+        'jquery' : '/assets/js/libs/jquery-1.8.2.min',
         'view-models': '/assets/js/fe-be/view-models',
         'es5shim': '/assets/js/libs/es5-shim.min',
         'steps': '/assets/js/libs/Steps',
@@ -22,6 +26,7 @@ mixin requirejs(datamain)
         'utils': '/assets/js/shared/utils',
         'fe-be-utils': '/assets/js/fe-be/fe-be-utils',
         'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
+        'socket.io' : '/socket.io/socket.io',
         'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
         'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
         'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
@@ -35,14 +40,24 @@ mixin requirejs(datamain)
         angularResource: { 
           deps: [ 'angular' ] 
         },
+        angularUI: { 
+          deps: [ 'angular' ] 
+        },
+        angularUIBootstrap: { 
+          deps: [ 'angular' ] 
+        },
         d3 : {
           exports : 'd3'
         },
         jquery: { 
           exports : '$'
         },
+        'socket.io': {
+          exports: 'io'
+        },
       }
     });
+
 
 //TODO: work in progress, not used yet
 mixin overlayTemplate(toggleVarName, itemsArray, headingText, itemText, classNames)

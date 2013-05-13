@@ -237,11 +237,6 @@ a:hover {
 .setup .selectedNetworkSsid {
   font-style: italic;
 }
-.setup #enter-wifi-data,
-.setup #wifi-data-submitted,
-.setup #pairing-complete {
-  display: none;
-}
 @-moz-keyframes led-indicator {
   0%, 100% {
     opacity: 0;

@@ -42,6 +42,7 @@ module.exports = function(app){
     );
 
     app.set('view engine', 'jade');
+    app.locals({ basedir: path.join(__dirname, '/../views') });
 
     app.use(express.logger(':method :url :status'));
 

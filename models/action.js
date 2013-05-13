@@ -72,6 +72,8 @@ ActionSchema.plugin(useTimestamps);
  * Used by the notification engine to set when actions should expire in
  * order to recalculate current actions.
  *
+ * Single-state actions get a timespan of 1 year.
+ *
  * @return Number. Cycle timespan in milliseconds.
  */
 ActionSchema.virtual('overallCycleTimespan')
@@ -114,6 +116,9 @@ ActionSchema.virtual('overallCycleTimespan')
 /************************** INSTANCE METHODS ***************************/
 
 /**
+ * NOTE: Not in use anywhere in the code right now...instead we're
+ * creating a message on the fly during save that mimics this, obviating the need for this method.
+ * 
  * Get the message for the specified cycle state.
  *
  * Used primarily to generate a message for a control trigger when there
@@ -123,6 +128,7 @@ ActionSchema.virtual('overallCycleTimespan')
  * @param controlName {String} optional. If no explicit message is defined, and there is a control defined, this param
  * 		  will be interpolated into the message. Needs to be passed in because we can't assume a populated Control object
  */
+/*
 ActionSchema.method('getStateMessage', function(stateIndex, controlName){
   var state = this.cycle.states[stateIndex];
 
@@ -136,7 +142,7 @@ ActionSchema.method('getStateMessage', function(stateIndex, controlName){
   }
   return '';
 });
-
+*/
 
 /************************** END INSTANCE METHODS ***************************/
 
@@ -298,6 +304,57 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
   return cycleRemainder;
 });
 
+
+/**
+ * Returns what the current controlValue should be, factoring in elapsed time in the phase and timezone
+ *
+ * @param fromDate {Date} Date from which to calculate cycle remainder
+ * @param growPlanInstancePhase {object}
+ * @param action {Action}
+ * @param userTimezone {String}
+ *
+ * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
+ */
+ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstancePhase, action, userTimezone){
+  
+  var fromDateAsMilliseconds = (fromDate instanceof Date) ? fromDate.valueOf() : fromDate,
+      phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
+      // get the midnight of the start date
+      phaseStartDate = growPlanInstancePhase.startDate.valueOf() - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+      phaseTimeElapsed = fromDateAsMilliseconds - phaseStartDate,
+      cycleTimeElapsed,
+      overallCycleTimespan,
+      cycle = action.cycle,
+      states,
+      stateDurationsInMilliseconds = [];
+
+    if (! action.control || !cycle || !cycle.states.length){ return 0; }
+
+    states = cycle.states;
+
+    switch(states.length){
+      case 1:
+        return parseInt(states[0].controlValue, 10);
+        break;
+      case 2:
+      case 3:
+        overallCycleTimespan = 0;
+        states.forEach(function(state, index){
+          stateDurationsInMilliseconds[index] = ActionSchema.statics.convertDurationToMilliseconds(state.duration, state.durationType);
+          overallCycleTimespan += stateDurationsInMilliseconds[index];
+        });
+        cycleTimeElapsed = (phaseTimeElapsed % overallCycleTimespan);
+
+        if (cycleTimeElapsed < stateDurationsInMilliseconds[0]){
+          return parseInt(states[0].controlValue, 10);
+        } else if (cycleTimeElapsed < (stateDurationsInMilliseconds[0] + stateDurationsInMilliseconds[1])){
+          return parseInt(states[1].controlValue, 10);
+        } else {
+          return parseInt(states[0].controlValue, 10);
+        }
+        break;
+    }
+});
 
 
 /**
@@ -472,13 +529,13 @@ ActionSchema.pre('save', function(next){
       }
       break;
     case 3:
-      // if a cycle has 3 states, the 1st and 3rd must have the same control value & message
+      // if a cycle has 3 states, the 1st and 3rd must have the same control value
       if (states[0].controlValue !== states[2].controlValue){
         return next(new Error(i18nKeys.get('First and last control values must be equal')));
       }
-      if (states[0].message !== states[2].message){
-        return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
-      }
+      //if (states[0].message !== states[2].message){
+        //return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
+      //}
       // and at least the 1st & 3rd states must have durations defined
       if (!(
         (states[0].durationType && states[0].duration) &&

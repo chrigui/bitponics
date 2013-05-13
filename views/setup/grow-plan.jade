@@ -1,0 +1,754 @@
+extends ../layout
+
+block head
+  base(href="/setup/grow-plan/")
+
+  script
+    $(document).bind("mobileinit", function(){
+      //$.mobile.autoInitializePage = false;
+      $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
+      $.mobile.ajaxLinksEnabled = false;
+    });
+  
+  mixin requirejs("/assets/js/pages/setup/grow-plan")
+
+  script(type='text/ng-template', id='filter.html')
+    h4.page-heading Ready to set up your grow plan?
+    .separator-top
+        
+      .question
+        h5.question-title What kind of hydroponic system are you using?
+        
+        .custom-dropdown-wrap
+          select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in sharedDataService.growSystems | orderBy:name")
+            option(value="") Select
+          .dblarrow
+            i
+
+        //- div.dropdown-wrap
+        //-   ul(class="dropdown initial")
+        //-     li.select
+        //-       label Select
+        //-     li(ng-repeat="system in growSystems | orderBy:name")
+        //-       input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
+        //-       label(for="{{system._id}}") {{system.name}}
+
+      .question-wrap-right
+        .question
+          h5.question-title What are you going to be growing?
+          //- input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
+          //- div(ng-hide="filteredPlantList.length") 
+          //-   label(href="#", class="add btn", ng-click="addPlant()") Add
+          
+          //- div.dropdown-wrap
+          //-   ul(id="plant_list", class="dropdown initial sortlist", ng-class="{open: focused}")
+          //-     li.select
+          //-       label Select
+          //-     li(ng-repeat="plant in filteredPlantList | orderBy:name")
+          //-       input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelectedPlants()")
+          //-       label(for="{{plant._id}}", class="plant") {{plant.name}}
+          
+          
+          ul(class="grid plantlist")
+            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
+              label(for="{{plant._id}}", class="plant btn") 
+                {{plant.name}}
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+          label(class="add btn", ng-click="sharedDataService.activeOverlay = 'PlantOverlay'") 
+            | Add
+            | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+    
+    .step-footer.separator-top
+      a(class="btn next-step-btn", href="browse") Next Step
+        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+
+  script(type='text/ng-template', id='browse.html')
+    h4.page-heading Select a Grow Plan
+    ul(class="grid sortlist photos separator-top")
+      //- each growPlan, i in growPlans
+      li(ng-repeat="growPlan in filteredGrowPlanList")
+        div.img-wrapper
+          img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest {{growPlan.name}} photo")
+        div.first
+          h5.label Name
+          div.value {{growPlan.name}}
+        div
+          h5.label Number of Phases
+          div.value {{growPlan.phases.length}}
+        div
+          h5.label Overall Time Span
+          div.value {{growPlan.overallTimeSpan || 'Open ended'}}
+        //- div
+        //-   h5.label In use by
+        //-   div.value *TODO*
+        div.last
+          h5.label Created by
+          div(class="value", ng-show="growPlan.createdBy[0].name.first") {{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}
+          div(class="value", ng-show="!growPlan.createdBy[0].name.first") Bitponics
+
+        //- div.info
+        //-   div(class="gplist_description") {{growPlan.description}}
+        //-input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="sharedDataService.selectedGrowPlan", ng-change="setSelectedGrowPlan()")
+        //-label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
+        //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+        a.btn(href="customize/{{growPlan._id}}") Select
+  
+  script(type='text/ng-template', id='customize-overview.html')
+    h4.page-heading Customize your grow plan
+    div.separator-top
+      div.question
+        label(for="gpedit_name", class="question-title") Name
+        input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
+      
+      div(class="question-wrap-right")
+        div.question
+          label.question-title Plants
+          ul(class="grid plantlist")
+            //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
+              label(for="{{plant._id}}", class="plant btn") 
+                {{plant.name}}
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+          label(class="add btn", ng-click="sharedDataService.activeOverlay = 'PlantOverlay'") 
+            | Add
+            | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+
+      div(class="question clear-l")
+        label(for="gpedit_description", class="question-title") Description
+        textarea(name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
+    
+    div(class="step-footer separator-top")
+      a(class="btn next-step-btn", href="customize/{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
+        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+
+  
+  script(type='text/ng-template', id='customize-details.html')
+      h4.page-heading Your grow plan
+
+      div.Phases
+        div
+          section.separator-top
+            h5.question-title Total grow plan duration  
+            //- input(type="number", name="phase_slider_duration", id="phase_slider_duration", class="no-disable", value="182", ng-model="expectedGrowPlanDuration", ng-change="updatePhaseDurations()") 
+            h4(class="page-heading-large seamless-input-wrap")
+              input(type="number", 
+                    readonly,
+                    name="expectedGrowPlanDuration", 
+                    id="expectedGrowPlanDuration", 
+                    class="seamless-input no-disable", 
+                    value="expectedGrowPlanDuration",
+                    ng-model="expectedGrowPlanDuration")
+              span Days
+            //- span days and I am on day  
+            //- input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
+          
+          //- div.phase-sliders
+          section.separator-top
+            h5.question-title Phases
+            ul(class="phase-tabs")
+              li(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", 
+                  class="btn inverse-btn", 
+                  ng-class="{selected: sharedDataService.selectedGrowPlan.currentVisiblePhase == phase}", 
+                  ng-click="setCurrentVisiblePhase(phase)") {{ phase.name || 'New Phase' }}
+                div(class="remove icon", ng-click="removePhase($index)")
+                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              li(class="btn inverse-btn", ng-click="addPhase()") Add New Phase
+                div(class="add icon")
+                  | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+
+            div(class="phase-slider")
+              h4(class="page-heading-large seamless-input-wrap")
+                span {{ sharedDataService.selectedGrowPlan.currentVisiblePhase.name || 'New Phase' }} lasts for
+                input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
+                      name="expectedNumberOfDays", 
+                      value="1", 
+                      type="number", 
+                      ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.expectedNumberOfDays", 
+                      ng-change="setExpectedGrowPlanDuration()",
+                      min="1")
+                span days
+              //- div(class="phase-slider-slider")
+              //-   input(type="range", name="phase_slider_{{$index}}", id="phase_slider_{{$index}}", class="phase-slider-input", value="0", min="0", max="{{expectedGrowPlanDuration}}", ng-model="phase.expectedNumberOfDays")
+
+              section
+                div.phaseName
+                  label Phase Name
+                  input(type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.name")
+
+                div.phaseDescription
+                  label Phase Description
+                  textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.description")
+
+                ul(class="phase-tabs separator-top")
+                  li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
+                      class="btn inverse-btn", 
+                      ng-class="{selected: selected.selectedGrowPlanPhaseSection == $index}", 
+                      ng-click="setCurrentPhaseSectionTab($index)") {{ phaseSection }}
+
+                div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
+                  //select(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")
+                  div.question
+                    h4(class="page-heading-large separator-top") System
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'GrowSystemOverlay'")
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | Choose a different grow system
+                    label Name
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name")
+                    label Description
+                    textarea(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
+                    label Type
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type")
+                    label Reservoir Size
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize")
+                    label Plant Capacity
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity")
+                    h7 Size
+                    input(type="text", placeholder="W", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w")
+                    input(type="text", placeholder="H", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h")
+                    input(type="text", placeholder="D", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d")
+
+                  div(class="growMedium question")
+                    h4(class="page-heading-large separator-top") Grow Medium
+                    input(type='text', ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growMedium")
+
+                  div(class="nutrients question")
+                    h4(class="page-heading-large separator-top") Nutrients
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'NutrientOverlay'")
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | Add a nutrient
+                    ul.grid
+                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel")
+                        input(id="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", type='checkbox', name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
+                        label(for="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
+                
+                div(class="light", ng-show="selected.selectedGrowPlanPhaseSection == 1")
+                  //- h6 Light
+                  div.question
+                    h4(class="page-heading-large separator-top") Fixture
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'FixtureOverlay'")
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | Choose a different fixture
+                    label Brand
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand")
+                    label Name
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name")
+                    label Type
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type")
+                    label Watts
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts")
+                    label # of bulbs per fixture
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity")
+                    label # of fixtures
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity")
+                  div.question
+                    h4(class="page-heading-large separator-top") Bulbs
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'BulbOverlay'") 
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | Choose a different bulb
+                    label Brand
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand")
+                    label Name
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name")
+                    label Type
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type")
+                    label Watts
+                    input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts")
+
+                div(class="idealRanges", ng-show="selected.selectedGrowPlanPhaseSection == 2")
+                  h4(class="page-heading-large separator-top") Ideal Sensor Ranges
+                  p Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
+                    | we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
+                    | that the ideal range should apply.
+                  ul
+                    li
+                      label(class="add btn", ng-click="addIdealRange(this);") 
+                        | Add
+                        | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+
+                    li(class="question", ng-repeat="idealRange in sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges")
+                      div(class="close btn", ng-click="removeIdealRange($parent.$index, $index);")
+                        | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+
+                      //- div(class="sensor-type icon {{idealRange.sCode}}")
+                      //-   | <i class="icon-glyph icon-{{idealRange.sCode}}" aria-hidden="true"></i>
+                      //-   div.screen-reader-text {{idealRange.sCode}}
+                      
+                      div
+                        //label {{sensors[idealRange.sCode].name}}
+                        div.custom-dropdown-wrap
+                          select(class="custom-dropdown", ng-model="idealRange.sCode", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name")
+                            option(value="") Select Sensor
+                          div(class="dblarrow")
+                            i
+                      
+                      div.separator-top
+                        label Trigger the following accessory (optional):
+                        div.custom-dropdown-wrap
+                          select(class="custom-dropdown", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            option(value="") None
+                          div(class="dblarrow")
+                            i
+
+                      div(class="hi separator-top")
+                        label High
+                        input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
+                        span {{sensors[idealRange.sCode].unit}}
+                        textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                        div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
+
+                      div(class="lo separator-top")
+                        label Low
+                        input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
+                        span {{sensors[idealRange.sCode].unit}}
+                        textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
+                        div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
+
+
+                      div.separator-top
+                        label What time of day should the ideal range apply?
+                        label All Day
+                          input(class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
+
+                        div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
+                          // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
+                          label.idealRangeStartTime Start Time
+                            select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                          label.idealRangeEndTime End Time
+                            select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                div(class="actions", ng-show="selected.selectedGrowPlanPhaseSection == 3")
+                  h4(class="page-heading-large separator-top") Actions
+                  p Here's where you set schedules for actions to take throughout the phase. You can create on/off cycles for accessories or just schedule simple notifications
+                    | for yourself. If you specify an accessory and have it connected to your Bitponics device, we'll simply trigger its cycles automatically. 
+                    | If you don't have a specified accessory connected to your device, instead we'll send you an email notification whenever an action should take place.
+                  
+                  ul
+                    li.add
+                      label(class="add btn", ng-click="addAction(this);") 
+                        | Add
+                        | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+
+                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhaseactionsViewModel")
+                      div(class="close btn", ng-click="removeAction($parent.$index, $index);")
+                        | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+                      div.separator-top
+                        label Description
+                        textarea(placeholder="Describe the action.", ng-model="action.description")
+
+                      div.separator-top
+                        label Trigger the following accessory (optional):
+                        div.custom-dropdown-wrap
+                          select(class="custom-dropdown no-disable", ng-model="action.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                            option(value="") None
+                          div(class="dblarrow")
+                            i
+
+                      div.separator-top
+                        label Is the action repeating?
+                        div.custom-dropdown-wrap
+                          select(class="custom-dropdown", ng-model="action.scheduleType")
+                            option(value="") Select
+                            option(value="phaseStart") Once at the start of the phase
+                            option(value="phaseEnd") Once at the end of the phase
+                            option(value="repeat") Repeat throughout the phase
+                          div(class="dblarrow")
+                            i
+
+                      //- label Scheduling. Trigger this action:
+                      //-   label 
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
+                      //-     | Once at the start of the phase
+
+                      //-   label
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
+                      //-     | Once at the end of the phase
+
+                      //-   label 
+                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
+                      //-     | Repeat throughout the phase
+
+
+                      div(ng-show="action.scheduleType != 'repeat'")
+
+
+                      div(ng-show="action.scheduleType == 'repeat'")
+                        
+
+                        div(ng-show="action.control")
+                          label.separator-top Daily
+                            input(type="checkbox", ng-model="action.isDailyControlCycle")
+
+                          div(class="separator-top", ng-show="action.isDailyControlCycle")
+                            label Turn {{action.control.name}} on at 
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              div(class="dblarrow")
+                                i
+
+                            label Turn {{action.control.name}} off at 
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              div(class="dblarrow")
+                                i
+
+                          div(class="separator-top", ng-show="!action.isDailyControlCycle")
+                            div Repeating actions have alternating on/off states.
+                            
+                            div First, turn {{action.control.name}}
+                              label 
+                                input(type="radio", value="1", ng-model="action.cycle.states[0].controlValue")
+                                | On
+
+                              label
+                                input(type="radio", value="0", ng-model="action.cycle.states[0].controlValue")
+                                | Off
+
+                              div for
+                                input(type="number", ng-model="action.cycle.states[0].duration", value="1")
+                                div.custom-dropdown-wrap
+                                  select(class="custom-dropdown", ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                  div(class="dblarrow")
+                                    i
+                              
+                            div Then turn {{action.control.name}}
+                              label 
+                                input(type="radio", value="1", ng-model="action.cycle.states[1].controlValue")
+                                | On
+
+                              label
+                                input(type="radio", value="0", ng-model="action.cycle.states[1].controlValue")
+                                | Off
+
+                              div for 
+                                input(type="number", ng-model="action.cycle.states[1].duration", value="1")
+                                div.custom-dropdown-wrap
+                                  select(class="custom-dropdown", ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                  div(class="dblarrow")
+                                    i
+
+                        div(ng-show="!action.control")
+                          div.separator-top 
+                            label Every:
+                            input(type="number", ng-model="action.overallDuration", value="1")
+                            select(ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+
+                          div(ng-show="action.overallDurationType == 'days'")
+                            label At 
+                            select(ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+
+                          label.separator-top Send me the following message:
+                            textarea(ng-model="action.message", placeholder="It's time to...")
+
+                    //- end Action UI
+                        
+                  div(class="phaseEndDescription separator-top")
+                    label Phase End Description
+                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
+                
+                div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
+                  h4(class="page-heading-large separator-top") Device
+                  p Here is where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
+                  ul(class="grid devicelist")
+                    li(ng-repeat="device in sharedDataService.userOwnedDevices")
+                      label
+                        input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId", ng-change="toggleDevice(device)")
+                        | {{device.name}}
+                        div(ng-show="sharedDataService.selected.deviceId == device._id", style="font-style:italic")
+                          | Selected
+
+
+      div(class="step-footer separator-top")
+        input(id="growplans_activate", type="submit", value="Activate Grow Plan")
+
+
+
+block css
+  link(rel='stylesheet', href='/assets/css/libs/steps.css')
+
+block content
+  
+  section.header
+      header
+        include ../includes/nav/main
+  
+  section#main(role="main", class="main", ng-cloak)
+    div.content-module.middle
+      form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.controllers.setup.growPlan.Main", novalidate)
+        
+        section(ng-view)
+        
+        //- Overlay Templates
+
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Add a Plant
+              div
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addPlant(this)")
+                    | Add New Plant
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+                ul(class="grid plantlist")
+                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
+                    dl
+                      dt Type:
+                      dd {{plant.name}}
+                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()", checked="sharedDataService.selected.plants[plant._id]")
+                    label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
+                      //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.FixtureOverlay", modal="sharedDataService.activeOverlay=='FixtureOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Fixture
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addFixture(this)")
+                    | Add New Fixture
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+                ul(class="grid plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Brand:
+                      dd {{item.brand || '--'}}
+                      dt Name:
+                      dd {{item.name}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Watts:
+                      dd {{item.watts}}
+                      dt # of bulbs per fixture:
+                      dd {{item.bulbCapacity}}
+
+                    input(id="fixture_{{item._id}}", 
+                      type='radio',
+                      name="lightFixtureOverlaySelection", 
+                      value="{{item._id}}", 
+                      ng-model="item",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture = item")
+                    label(for="fixture_{{item._id}}", class="item btn next-step-btn") Select
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.BulbOverlay", modal="sharedDataService.activeOverlay=='BulbOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Bulb
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addBulb(this)")
+                    | Add New Bulb
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+                ul(class="grid plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Brand:
+                      dd {{item.brand || '--'}}
+                      dt Name:
+                      dd {{item.name}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Watts:
+                      dd {{item.watts}}
+
+                    input(id="bulb_{{item._id}}", 
+                      type='radio', 
+                      name="lightBulb", 
+                      value="{{item._id}}", 
+                      ng-model="item._id",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb = item")
+                    label(for="bulb_{{item._id}}", class="item btn next-step-btn") Select
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.GrowSystemOverlay", modal="sharedDataService.activeOverlay=='GrowSystemOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3.page-heading Choose a Grow System
+              div(ng-controller="overlayCtrl")
+                input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                div(ng-hide="filteredItems.length") 
+                  label(href="#", class="add btn", ng-click="addGrowSystem(this)")
+                    | Add New Grow System
+                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+                ul(class="grid plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    dl
+                      dt Name:
+                      dd {{item.name}}
+                      dt Description:
+                      dd {{item.description}}
+                      dt Type:
+                      dd {{item.type}}
+                      dt Plant Capacity:
+                      dd {{item.plantCapacity}}
+                      dt Size:
+                      dd
+                        div(ng-show="item.overallSize.w && item.overallSize.h && item.overallSize.d") 
+                          | {{item.overallSize.w}} wide x {{item.overallSize.h}} high x {{item.overallSize.d}} deep
+                        div(ng-hide="item.overallSize.w && item.overallSize.h && item.overallSize.d") 
+                          | -
+
+                    input(id="growsystem_{{item._id}}", 
+                      type='radio', 
+                      name="growSystem", 
+                      value="{{item._id}}", 
+                      ng-model="item._id",
+                      ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id",
+                      ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem = item")
+                    label(for="growsystem_{{item._id}}", class="item btn next-step-btn") Select
+                      //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                
+                ul.pagination
+                  li(ng-class="{disabled: currentPage == 0}")
+                    a(href, ng-click="prevPage()") « Prev
+                  li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                    a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                  li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                    a(href, ng-click="nextPage()") Next »
+
+      
+        div
+          div(ng-controller="bpn.controllers.setup.growPlan.NutrientOverlay", modal="sharedDataService.activeOverlay=='NutrientOverlay'", close="close()", options="sharedDataService.modalOptions")
+              div(ng-controller="bpn.controllers.SelectionOverlay")
+                div(class="close btn", ng-click="close()")
+                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                h3.page-heading Choose a Nutrient
+                div(ng-controller="overlayCtrl")
+                  input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
+                  div(ng-hide="filteredItems.length") 
+                    label(href="#", class="add btn", ng-click="addGrowSystem(this)")
+                      | Add New Nutrient
+                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  ul.pagination
+                    li(ng-class="{disabled: currentPage == 0}")
+                      a(href, ng-click="prevPage()") « Prev
+                    li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                      a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                    li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                      a(href, ng-click="nextPage()") Next »
+
+                  ul(class="grid plantlist")
+                    li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                      img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                      dl
+                        dt Brand:
+                        dd {{item.brand}}
+                        dt Name:
+                        dd {{item.name}}
+
+                      input(id="nutrient_{{item._id}}", 
+                        type='checkbox', 
+                        name="nutrientsOverlaySelections", 
+                        value="{{item._id}}", 
+                        ng-model="item.selected", 
+                        ng-change="toggleItemSelection(item, this)", 
+                        ng-checked="sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[item._id]")
+                      label(for="nutrient_{{item._id}}", class="nutrient btn next-step-btn") Select
+                  
+                  ul.pagination
+                    li(ng-class="{disabled: currentPage == 0}")
+                      a(href, ng-click="prevPage()") « Prev
+                    li(ng-repeat="n in range(pagedItems.length)", ng-class="{active: n == currentPage}")
+                      a(href, ng-click="setPage()", ng-bind="n + 1") 1
+                    li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
+                      a(href, ng-click="nextPage()") Next »
+
+        //- End Overlay Templates
+        
+        
+
+block footer-scripts
+
+  script
+    bpn.user = !{JSON.stringify(user.toPublicJSON())};
+    bpn.growPlans = !{JSON.stringify(growPlans)};
+    bpn.growSystems = !{JSON.stringify(growSystems)};
+    bpn.actions = !{JSON.stringify(actions)};
+    bpn.controls = !{JSON.stringify(controls)};
+    bpn.sensors = !{JSON.stringify(sensors)};
+    bpn.plants = !{JSON.stringify(plants)};
+    bpn.userOwnedDevices = !{JSON.stringify(userOwnedDevices)};
+    bpn.lights = !{JSON.stringify(lights)};
+    bpn.lightFixtures = !{JSON.stringify(lightFixtures)};
+    bpn.lightBulbs = !{JSON.stringify(lightBulbs)};
+    bpn.nutrients = !{JSON.stringify(nutrients)};
+    bpn.growPlanDefault = !{JSON.stringify(growPlanDefault)};

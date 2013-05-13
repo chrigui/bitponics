@@ -9,6 +9,16 @@ winston = require('winston'),
 async = require('async'); 
 
 module.exports = function(app){
+		
+	// TEMP : redirect /dashboard to /gardens until we refactor /dashboard
+	// to use the updated angularized dashboard code (reuse templates/js at /gardens/:growPlanInstanceId)
+	app.get('/dashboard', 
+		function(req, res, next){
+			res.redirect('/gardens');
+		}
+	);
+
+	/*
 	app.get('/dashboard', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
@@ -195,5 +205,7 @@ module.exports = function(app){
 			);
 		}
 	);
+
+*/
 };	
 
