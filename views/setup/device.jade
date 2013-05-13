@@ -1,0 +1,121 @@
+
+extends ../layout
+
+block head
+  base(href="/setup/device/")
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js')
+  // script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js')
+  mixin requirejs("/assets/js/pages/setup/device")
+
+  script(type='text/ng-template', id='connect.html')
+
+    div(class="separator-top")
+      ol.list-style
+        li
+          h4.page-heading-small Power your Base Station
+          p 
+            | Plug your Base Station into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:
+            span.led-indicator.scan
+          p
+            | This indicates that it's scanning the available WiFi networks. Once it starts a slower green blinking, you're ready for the next step:
+            span.led-indicator.adhoc
+        li
+          h4.page-heading-small Connect to "BITPONICS"
+          p Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it.
+        li
+          h4.page-heading-small Link Base Station
+          p Once you're connected, click the button below to link your Base Station.
+      div(class="step-footer")
+        a(class="btn next-step-btn", id="connect-to-device", href, ng-click="connect()") Connect to Base Station 
+        //- a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to Base Station
+
+  script(type='text/ng-template', id='wifi.html')
+
+    div(class="separator-top")
+      ol(class="list-style")
+        li(id="enter-wifi-data", value="4")
+            h4.page-heading-small Wifi Settings
+            p Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
+            form#wifi-form(action='')
+              ul 
+                li
+                  label(for='key') Key:
+                    input#key(ng-model="bothKeys", name='key')
+                li
+                  div
+                    p.no-margin-bottom Select from the scanned Wifi networks:
+                    //- label(for='wifi-ssid') 
+                      //- select#wifi-ssid(name='wifi-ssid')
+                    div.custom-dropdown-wrap(id="wifi-ssid")
+                      select(class="custom-dropdown", ng-model="selectedWifiNetwork", ng-options="wifi.ssid for wifi in scannedWifiNetworks")
+                        option(value="")  Select
+                      div(class="dblarrow")
+                        i
+
+                  div(ng-show="selectedWifiNetwork.isOtherNetwork")
+                    p Enter your Wifi network information manually:
+                    label(for='wifi-manual-ssid') Network Name:
+                      input#wifi-manual-ssid(ng-model="manualWifiNetworkSSID", name="wifi-manual-ssid")  
+                    p.no-margin-bottom Security Mode:
+                    //- label(for='wifi-manual-security-mode') Security Mode:
+                      //- select#wifi-manual-security-mode(name='wifi-manual-security-mode')
+                    div.custom-dropdown-wrap(id="wifi-manual-security-mode")
+                      select(class="custom-dropdown", ng-model="manualWifiNetworkSecurityMode")
+                        option(value="")  Select
+                        option(value="WPA_MODE") WPA 
+                        option(value="WEP_MODE") WEP
+                        option(value="NONE") NONE
+                      div(class="dblarrow")
+                        i
+                li
+                  label(for='wifi-pass') Password:
+                    input#wifi-pass(ng-model="wifiPass", name='wifi-pass')
+
+                li
+                  button#submit-wifi-form(type='submit', class="btn next-step-btn", ng-click="wifiForm()") Connect To Network
+  
+  script(type='text/ng-template', id='pair.html')
+
+    div(class="separator-top")
+      ol(class="list-style")
+        li(id="wifi-data-submitted", value="5")
+
+          {{selectedWifiNetwork.ssid}}
+          
+          h4.page-heading-small Disconnect and Reconnect
+          p Great! The Bitponics device is now connecting to the 
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
+            | network. 
+          p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
+            |.
+          p After you're back on the 
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network, 
+            a(id="submit-device-info", href, class="btn", ng-click="submitDeviceInfo()") Connect
+        li#pairing-complete(ng-show="pairingComplete")
+          h4.page-heading-small You're All Set!
+          p Great, your device is now connected to your account. Let's take a look at the data we're getting.
+          a(id="submit-device-info", href="../dashboard", class="btn") Let's Go!
+
+
+block css 
+  link(rel='stylesheet', href='/assets/css/pages/setup.css')
+  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
+
+block content
+  section.header
+    header
+      include /includes/nav/main
+  
+  section(ng-cloak="")#main(role="main", class="main")
+    div.content-module.middle
+      form(id="setup-form", name="setup", data-ajax="false", ng-controller="bpn.controllers.setup.device.Main", novalidate)
+        h1.page-heading Setting up your Bitponics Base Station
+        section(ng-view)
+
+
+        
+
+               
+
+block footer-scripts

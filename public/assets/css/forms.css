@@ -72,6 +72,9 @@
 .right-0 {
   right: 0;
 }
+.no-margin-bottom {
+  margin-bottom: 0;
+}
 .uppercase {
   text-transform: uppercase;
 }
@@ -345,10 +348,12 @@ input[type=checkbox] {
 .custom-dropdown-wrap {
   position: relative;
   white-space: nowrap;
+  font-size: 24px;
 }
 .custom-dropdown-wrap .dblarrow {
   margin-left: -2em;
   display: inline-block;
+  font-size: 24px;
 }
 .custom-dropdown-wrap .dblarrow i {
   width: 0;
@@ -362,14 +367,17 @@ input[type=checkbox] {
 .custom-dropdown-wrap select.custom-dropdown option {
   background: #00e36c;
   color: #fff;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .custom-dropdown-wrap select.custom-dropdown {
+  font-size: 24px;
   border: none;
   -webkit-appearance: none;
   -webkit-border-radius: 0px;
   outline: none;
   margin-right: 15px;
-  font-size: 1.25em;
   display: inline-block;
 /*Important*/
   padding: 0.45em 1.25em 0.45em 0.45em;

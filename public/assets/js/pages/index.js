@@ -23,7 +23,7 @@ function(){
           screenHeight;
 
       //bring in separate pages
-      bpn.utils.setupPages($('nav ul > li li:not([data-name="get-started"]) a:not([data-page-include="false"])'), function(){
+      bpn.utils.setupPages($('nav ul > li a:not([data-page-include="false"])'), function(){
         
         //match section height to window
         //create fixed nav

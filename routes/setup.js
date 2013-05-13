@@ -31,13 +31,14 @@ module.exports = function(app){
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
-      req.user.ensureAvailableDeviceKey(function(err, availableDeviceKey){
+      req.user.ensureAvailableDeviceKey(null, function(err, availableDeviceKey){
         if (err) { return next(err); }
 
         var locals = {
           title: 'Bitponics Device Setup',
           className : 'landing-page single-page app-page setup',
           pageType: "app-page",
+          nextUrl: req.headers.host + '/setup/device',
           availableDeviceKey : availableDeviceKey
         };
 
@@ -46,22 +47,62 @@ module.exports = function(app){
     }
   );
 
+
+  /*
+   * Send serial key entered by user
+   *
+   **/
+  app.post('/setup',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      winston.info('post to /setup');
+      winston.info('req.body');
+      winston.info(req.body);
+      
+      var serial = req.body.serial;
+
+      if (!serial){
+        return res.json(400, { success : false, error : 'Request requires serial parameter'});
+      }
+
+      //TODO: remove this and run ensureAvailableDeviceKey
+      // return res.json(200, { 'private': '1123', 'public': '42142' });
+
+      req.user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
+        if (err) { return next(err); }
+
+        return res.json(200, availableDeviceKey);
+      });
+    }
+  )
+
+  app.get('/setup/device',
+    function (req, res, next){
+        var locals = {
+          title: 'Bitponics Device Setup',
+          className : 'landing-page single-page app-page setup',
+          pageType: "app-page"
+        };
+        res.render('setup/device', locals);
+    }
+  );
   /**
    * Posts to /setup should specify a device MAC address, and should
    * be an authenenticated user. We then assign the device to the user
    * 
    * Required params : "deviceMacAddress", "publicDeviceKey"
    */
-  app.post('/setup',
-    routeUtils.middleware.ensureSecure,
-    routeUtils.middleware.ensureLoggedIn,
+  app.post('/setup/device',
+    // routeUtils.middleware.ensureSecure,
+    // routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
-      var rawDeviceMacAddress = req.param('deviceMacAddress'),
+      var rawDeviceMacAddress = req.body('deviceMacAddress'),
         cleanDeviceMacAddress,
         device,
         now = Date.now();
 
-      winston.info('/setup');
+      winston.info('/setup/device');
       winston.info('req.params');
       winston.info(req.params);
       winston.info('req.body');
@@ -317,7 +358,7 @@ module.exports = function(app){
 	); // /app.post('/grow-plans'
 
 
-	app.get('/setup/grow-plan/filter',
+	app.get('/setup/grow-plan/filter', 
 		function (req, res, next){
 			return res.redirect('/setup/grow-plan/#!/filter');
 		}
