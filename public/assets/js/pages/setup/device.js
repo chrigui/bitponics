@@ -98,7 +98,7 @@ function (angular, domReady) {
               });
 
               $location.path("/wifi");
-              $scope.apply();
+              $scope.$apply();
             }
           }); 
         };
