@@ -9,7 +9,6 @@ module.exports = {
     ensureDeviceKeyVerified : function(req, res, next){
     	var async = require('async'),
     			DeviceModel = require('../models/device').model;
-    	//console.log(req.deviceKey);
     	// get the key on the req.user. check whether it has a deviceId and is verified.
     	// if not verified, use the macAddress on the request to retrieve
     	// the device. check whether device.serial matches the serial that we have
@@ -19,15 +18,14 @@ module.exports = {
     	if (!deviceKey) { return next(); }
 
     	if (deviceKey.deviceId && deviceKey.verified){ return next(); }
-console.log("DOIN THE DITTY");
-    	// if we've reached here, we have an unverified deviceKey
-    	var macAddress = req.params.id.replace(/:/g,'');
+			
+			var macAddress = req.params.id.replace(/:/g,'');
     	DeviceModel
       .findOne({ macAddress: macAddress })
       .exec(function(err, device){
       	if (err) { return next(err); }	
       	if (device.serial === deviceKey.serial){
-      		// get the
+      
       		var dKeys = req.user.deviceKeys,
       				dKey,
       				found = false,
@@ -40,7 +38,6 @@ console.log("DOIN THE DITTY");
     				}
     			}
 
-    			console.log("DOIN THE DITTY FOUND", found, dKey);
     			if (found){
     				dKey.deviceId = device._id;
     				dKey.verified = true;
