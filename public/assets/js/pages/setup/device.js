@@ -134,8 +134,8 @@ function (angular, domReady) {
           var postDataStringPlainText = 'SSID=' + $scope.selectedWifiNetwork.ssid + '\n' +
             'PASS=' + $scope.wifiPass + '\n' +
             'MODE=' + $scope.selectedWifiNetwork.securityMode + '\n' +
-            'SKEY=' + bpn.currentUser.privateDeviceKey + '\n' +
-            'PKEY=' + bpn.currentUser.publicDeviceKey;
+            'SKEY=' + $scope.bothKeys.split('|')[1] + '\n' +
+            'PKEY=' + $scope.bothKeys.split('|')[0];
 
           console.log('Posting to device', postDataStringPlainText);
 
@@ -210,8 +210,7 @@ function (angular, domReady) {
         $scope.deviceUrl = 'https://bitponics.com/device-mock'; //to work locally on https without device
         $scope.devicePostFormat = 'SSID={{SSID}}\nPASS={{PASS}}\nMODE={{MODE}}\nSKEY={{SKEY}}\nPKEY={{PKEY}}';
         $scope.dataToPostAfterSuccess = {
-          deviceMacAddress : '',
-          publicDeviceKey : bpn.currentUser.publicDeviceKey
+          deviceMacAddress : ''
         };
         $scope.scannedWifiNetworks = [];
         /**
