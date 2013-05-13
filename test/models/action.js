@@ -126,7 +126,7 @@ describe('Action', function(){
       });
     });
 
-    it('returns an accurate timespan for a 3-state (aka "offset"), no-control cycle', function(done){
+    it('returns an accurate timespan for an offset 2-state, no-control cycle', function(done){
       var overallCycleTimespan,
         overallCycleTimespanAsHours,
         action = new Action.model({
@@ -134,17 +134,17 @@ describe('Action', function(){
           cycle : {
             states : [
               {
-                durationType: 'hours',
-                duration: 8
-              },
-              {
                 message: "Check water level in seed tray. Make sure there's a thin layer at the bottom of the tray to last the seedlings through the day."
               },
               {
                 durationType : 'hours',
-                duration: 16
+                duration: 24
               }
             ],
+            offset : {
+              durationType: 'hours',
+              duration: 8
+            },
             repeat : true
           }
         });
@@ -159,7 +159,7 @@ describe('Action', function(){
       });
     });
 
-    it('returns an accurate timespan for a 3-state (aka "offset"), has-control cycle', function(done){
+    it('returns an accurate timespan for an offset 2-state, has-control cycle', function(done){
       var overallCycleTimespan,
         overallCycleTimespanAsHours,
         action = new Action.model({
@@ -169,21 +169,19 @@ describe('Action', function(){
             states : [
               {
                 durationType: 'hours',
-                duration: 4,
-                controlValue : '0'
-              },
-              {
-                durationType: 'hours',
                 duration: 10,
                 controlValue : '1'
               },
               {
                 durationType : 'hours',
-                duration: 10,
+                duration: 14,
                 controlValue : '0'
-
               }
             ],
+            offset : {
+              durationType: 'hours',
+              duration: 4
+            },
             repeat : true
           }
         });
@@ -198,7 +196,7 @@ describe('Action', function(){
 
   }); // /virtual overallCycleTimespan property
 
-
+/*
   describe('state message validation', function(){
     it('simply echoes messages when there\'s no control', function(done){
       var mockMessage = 'test message',
@@ -306,7 +304,7 @@ describe('Action', function(){
       });
     });
   }); // /state message validation
-
+*/
 
   describe('#isEquivalentTo', function(){
 
@@ -650,7 +648,7 @@ describe('Action', function(){
 
   describe('pre-save validation', function(){
 
-    it('returns an error if greater than 3 cycle states', function(done){
+    it('returns an error if greater than 2 cycle states', function(done){
       var action = new Action.model({
         description : "attempted 2+3 week cycle",
         cycle: {
@@ -665,9 +663,6 @@ describe('Action', function(){
             {
               duration: 3,
               durationType : 'weeks'
-            },
-            {
-              message: "do this thing 3 weeks after that first thing"
             }
           ]
         }
@@ -736,102 +731,6 @@ describe('Action', function(){
       action.save(function(err){
         should.exist(err);
         err.message.should.equal(i18nKeys.get('In a 2-state cycle, at least one state must have a duration defined'));
-        done();
-      });
-    });
-
-
-    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with control, but durations don\'t correctly describe an offset duration', function(done){
-      var action = new Action.model({
-        description : "desc",
-        control : "506de2fc8eebf7524342cb2e", // humidifier
-        cycle: {
-          states : [
-            {
-              controlValue : "1",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              controlValue : "0",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              controlValue : "0",
-              duration : 1,
-              durationType : "hours"
-            }
-          ]
-        }
-      });
-
-      action.save(function(err){
-        should.exist(err);
-        err.message.should.equal(i18nKeys.get('First and last control values must be equal'));
-        done();
-      });
-    });
-
-
-    /*
-    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
-      var action = new Action.model({
-        description : "desc",
-        cycle: {
-          states : [
-            {
-              message : "msg1",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              message : "msg2",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              message : "msg3",
-              duration : 1,
-              durationType : "hours"
-            }
-          ]
-        }
-      });
-
-      action.save(function(err){
-        should.exist(err);
-        err.message.should.equal(i18nKeys.get('First and last state\'s messages must be equal'));
-        done();
-      });
-    });
-    */
-
-    it('returns an error if attempting to save an offset alternating-state cycle (with 3 states), with no control, but durations don\'t correctly describe an offset duration', function(done){
-      var action = new Action.model({
-        description : "desc",
-        cycle: {
-          states : [
-            {
-              message : "msg1",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              message : "msg2",
-              duration : 1,
-              durationType : "hours"
-            },
-            {
-              message : "msg1"
-            }
-          ]
-        }
-      });
-
-      action.save(function(err){
-        should.exist(err);
-        err.message.should.equal(i18nKeys.get('In a 3-state cycle, at least the 1st and 3rd states must have durations defined'));
         done();
       });
     });
@@ -1043,7 +942,7 @@ describe('Action', function(){
           duration2 : 0
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle).should.include(expectedResult);
       done();
     });
 
@@ -1067,7 +966,7 @@ describe('Action', function(){
           duration2 : 1
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle).should.include(expectedResult);
       done();
     });
 
@@ -1099,7 +998,7 @@ describe('Action', function(){
           duration2 : (60 * 60 * 1000)
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle).should.include(expectedResult);
       done();
     });
 
@@ -1133,97 +1032,93 @@ describe('Action', function(){
           duration2 : (60 * 60 * 1000)
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states, offset).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle, offset).should.include(expectedResult);
       done();
     });
 
 
-    it('handles an offset alternating (3-state) cycle', function(done){
+    it('handles an offset alternating 2-state cycle', function(done){
       var action = new Action.model({
           description : "Turn something on. And then off. Repeat. Foreverrrrr",
           control : "506de2fc8eebf7524342cb2e", // humidifier
           cycle : {
             states : [
               {
-                duration: 1,
-                durationType : 'hours',
-                controlValue : '1'
-              },
-              {
                 duration: 2,
                 durationType : 'hours',
                 controlValue : '0'
               },
               {
-                duration: 4,
+                duration: 5,
                 durationType : 'hours',
                 controlValue : '1'
               }
             ],
+            offset : {
+              durationType : 'hours',
+              duration : 1
+            },
             repeat : true
           }
         }),
 
-      // Expected result is that we have a 5-hour total duration for state1 and 2-hour for state2,
-      // and that we tell the firmware to start the cycle so that there's only 1 hour left in
-      // its first iteration on state1.
-      // Basically we want it to obey the Action by doing 1 hour at state1, then 2 hours at state2, and then from there on out
-      // doing a (5-hour state1, 2-hour state2) cycle
+      
+      // Basically we want it to obey the Action by doing starting states[0] at a 1-hour
+      // offset, meaning we start with 1 hour of states[1], then begin a standard cycle loop
 
         expectedResult = {
-          offset : (action.cycle.states[2].duration * 60 * 60 * 1000),
-          value1 : 1,
-          duration1 : (5 * 60 * 60 * 1000), // 5 hours
-          value2 : 0,
-          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+          offset : (1 * 60 * 60 * 1000), // 1 hour
+          value1 : 0,
+          duration1 : (2 * 60 * 60 * 1000), // 2 hours
+          value2 : 1,
+          duration2 : (5 * 60 * 60 * 1000) // 5 hours
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle).should.include(expectedResult);
       done();
     });
 
 
-    it('handles an offset alternating (3-state) cycle, with an additional offset', function(done){
+    it('handles an offset alternating 2-state cycle, with an additional offset', function(done){
       var action = new Action.model({
           description : "Turn something on. And then off. Repeat. Foreverrrrr",
           control : "506de2fc8eebf7524342cb2e", // humidifier
           cycle : {
             states : [
               {
-                duration: 1,
-                durationType : 'hours',
-                controlValue : '1'
-              },
-              {
                 duration: 2,
                 durationType : 'hours',
                 controlValue : '0'
               },
               {
-                duration: 4,
+                duration: 5,
                 durationType : 'hours',
                 controlValue : '1'
               }
             ],
+            offset : {
+              duration: 1,
+              durationType : 'hours'
+            },
             repeat : true
           }
         }),
 
-      // Expected result is that we have a 5-hour total duration for state1 and 2-hour for state2,
-      // and that we tell the firmware to start the cycle so that there's only 1 hour left in
-      // its first iteration on state1.
-      // Basically we want it to obey the Action by doing 1 hour at state1, then 2 hours at state2, and then from there on out
-      // doing a (5-hour state1, 2-hour state2) cycle
+
+        // Basically we want it to obey the Action by doing starting states[0] at a 1-hour
+        // offset, meaning we start with 1 hour of states[1], then begin a standard cycle loop
+        // And it should be augmented by the offset we pass in
+
         offset = 100,
         expectedResult = {
-          offset : (action.cycle.states[2].duration * 60 * 60 * 1000) + offset,
-          value1 : 1,
-          duration1 : (5 * 60 * 60 * 1000), // 5 hours
-          value2 : 0,
-          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+          offset : (action.cycle.offset.duration * 60 * 60 * 1000) + offset,
+          value1 : 0,
+          duration1 : (2 * 60 * 60 * 1000), // 2 hours
+          value2 : 1,
+          duration2 : (5 * 60 * 60 * 1000), // 5 hours
         };
 
-      Action.model.getDeviceCycleFormat(action.cycle.states, offset).should.include(expectedResult);
+      Action.model.getDeviceCycleFormat(action.cycle, offset).should.include(expectedResult);
       done();
     });
 
@@ -1240,21 +1135,20 @@ describe('Action', function(){
           cycle : {
             states : [
               {
-                duration: 1,
-                durationType : 'hours',
-                controlValue : '1'
-              },
-              {
                 duration: 2,
                 durationType : 'hours',
                 controlValue : '0'
               },
               {
-                duration: 4,
+                duration: 5,
                 durationType : 'hours',
                 controlValue : '1'
               }
             ],
+            offset : {
+              duration: 1,
+              durationType : 'hours',
+            },
             repeat : true
           }
         }),
@@ -1266,11 +1160,11 @@ describe('Action', function(){
       // doing a (5-hour state1, 2-hour state2) cycle
         offset = 100,
         expectedResult = {
-          offset : (action.cycle.states[2].duration * 60 * 60 * 1000) + offset,
-          value1 : 1,
-          duration1 : (5 * 60 * 60 * 1000), // 5 hours
-          value2 : 0,
-          duration2 : (2 * 60 * 60 * 1000) // 2 hours
+          offset : (action.cycle.offset.duration * 60 * 60 * 1000) + offset,
+          value1 : 0,
+          duration1 : (2 * 60 * 60 * 1000), // 2 hours
+          value2 : 1,
+          duration2 : (5 * 60 * 60 * 1000), // 5 hours
         };
 
       expectedResult.cycleString =
@@ -1280,7 +1174,7 @@ describe('Action', function(){
         expectedResult.value2 + ',' +
         expectedResult.duration2;
 
-      var result = Action.model.updateCycleTemplateWithStates(cycleTemplate, action.cycle.states, offset);
+      var result = Action.model.updateCycleTemplateWithStates(cycleTemplate, action.cycle, offset);
       result.should.include(expectedResult);
 
       done();

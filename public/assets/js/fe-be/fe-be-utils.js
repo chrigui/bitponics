@@ -212,5 +212,36 @@ define(['moment'], function(moment){
   };
 
 
+  /**
+   * Get the message for the specified cycle state.
+   *
+   * Used to ensure we have a friendly message for a state even if one wasn't explicitly defined.
+   *
+   * @param stateIndex {Number} Required.
+   */
+  utils.getActionCycleStateMessage = function(action, stateIndex){
+    var state = action.cycle.states[stateIndex],
+        control = action.control,
+        controlName = (control ? control.name : '') || 'accessory',
+        result;
+
+    if (state.message) {
+      return state.message;
+    }
+
+    if (state.controlValue){
+      result = "Turn " + controlName + " " + (state.controlValue === '0' ? "off" : "on");
+    } else {
+      // no control, no message. Hopefully there's a duration. It's a waiting state!
+      result = "Wait";
+    }
+
+    if (state.duration){
+      result += " for " + state.duration + " " + state.durationType; 
+    }
+    
+    return result;
+  };
+
   return utils;
 });

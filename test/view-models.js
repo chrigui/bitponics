@@ -29,7 +29,7 @@ describe('ViewModels', function(){
     });
   });
 
-  it('converts a tri-state (offset dual-state) Action server model to a viewmodel and back to an equivalent Action server model', function(done){
+  it('converts an offset dual-state Action server model to a viewmodel and back to an equivalent Action server model', function(done){
     Action.findById('506de2f18eebf7524342cb27', function(err, actionResult){
       should.exist(actionResult);
       var actionViewModel = viewModels.initActionViewModel(actionResult),

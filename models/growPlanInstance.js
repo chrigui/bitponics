@@ -669,9 +669,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
                 if (action.cycle.repeat){
                   actionNotification.message += " This action has a repeating cycle associated with it. We'll notify you whenever an action is required.";
-                  // cycles with repeat=true are required to have 2 or 3 states (through validation rules)
-                  // since a 3-state cycle is just an offset 2-state cycle,
-                  // the logic for them ends up being the same here
+                  // cycles with repeat=true are required to have 2 states (through validation rules)
                   var states = action.cycle.states;
                   
                   if (states[0].durationType && !states[1].durationType){
