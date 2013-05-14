@@ -69,7 +69,7 @@ var DeviceSchema = new Schema({
     
     outputMap : [ OutputMapSchema ],
     
-    recentSensorLogs : [ SensorLogSchema ],
+    //recentSensorLogs : [ SensorLogSchema ],
   
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
@@ -435,7 +435,7 @@ DeviceSchema.method('getStatusResponse', function(callback) {
 /**
  * Log a CalibrationLog for the device. Used by the device API
  * 
- * @param {string} settings.macAddress
+ * @param {Device} settings.device
  * @param {CalibrationLog|object} settings.calibrationLog. "device" property shouldn't be set; we'll set it after we grab the device through macAddress
  * @param {CalibrationUtils.CALIB_MODES} settings.calibrationLog.mode
  * @param {CalibrationUtils.CALIB_STATUSES} settings.calibrationLog.status
@@ -444,30 +444,11 @@ DeviceSchema.method('getStatusResponse', function(callback) {
  */
 DeviceSchema.static('logCalibration', function(settings, callback) {
   var DeviceModel = this,
-      CalibrationLogModel = require('./calibrationLog').model,
-      macAddress = settings.macAddress;
+    CalibrationLogModel = require('./calibrationLog').model;
 
-  async.waterfall(
-    [
-      function (innerCallback){
-        DeviceModel.findOne({ macAddress: macAddress })
-        .select("_id")
-        .exec(innerCallback);
-      },
-      function (device, innerCallback){
-        if (!device){ 
-          return innerCallback(new Error('No device found for macAddress ' + macAddress));
-        }
-        
-        settings.calibrationLog.device = device._id;
+  settings.calibrationLog.device = settings.device._id;
 
-        CalibrationLogModel.create(settings.calibrationLog, innerCallback);
-      }  
-    ],
-    function(err, calibrationLogResult){
-      return callback(err, calibrationLogResult);
-    }
-  );
+  CalibrationLogModel.create(settings.calibrationLog, callback);
 });
 /**************** END STATIC METHODS ****************************/
 
@@ -526,7 +507,7 @@ DeviceSchema.pre('save', function(next){
 
 /**
  * Remove old recentSensorLogs
- */
+ *
 DeviceSchema.pre('save', function(next){
   var device = this,
     now = Date.now(),
@@ -540,7 +521,7 @@ DeviceSchema.pre('save', function(next){
    while (device.recentSensorLogs.length > cap){
    device.recentSensorLogs.pop();
    }
-   */
+   *
   
   device.recentSensorLogs.forEach(function(log){
     if (log.ts.valueOf() < cutoff) { logsToRemove.push(log); }
@@ -552,6 +533,7 @@ DeviceSchema.pre('save', function(next){
 
   next();
 });
+*/
 
 /***************** END MIDDLEWARE **********************/
 

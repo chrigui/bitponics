@@ -83,7 +83,7 @@ should = require('should');
 
         DeviceModel.logCalibration(
         {
-          macAddress : self.device.macAddress,
+          device : self.device,
           calibrationLog : {
             mode : "ph_4",
             status : "success",
