@@ -13,6 +13,7 @@ function (angular, domReady) {
   var setupApp = angular.module('bpn.apps.setup', ['ui.mask', 'ngResource', 'bpn.services']);
 
 
+  // http://stackoverflow.com/a/15253892/117331
   setupApp.directive('uppercase', function() {
      return {
        priority: 200, // give it higher priority than the input mask
@@ -44,9 +45,14 @@ function (angular, domReady) {
         $scope.key = undefined;
         $scope.socket = socket;
         $scope.serialMask = "**-***-****";
+        $scope.maskedSerial;
+
+        $scope.$watch('serial', function(){
+          $scope.maskedSerial = $('#serial')[0].value;
+        })
 
         $scope.sendSerialToServer = function() {
-          $http.post("/setup", { 'serial': $scope.serial })
+          $http.post("/setup", { 'serial': $scope.maskedSerial })
             .success(function (data) {
               console.log(data);
               if (typeof data === 'string'){
@@ -59,16 +65,23 @@ function (angular, domReady) {
         $scope.openWifiPairingPage = function() {
           window.open('http://' + bpn.pageData.nextUrl, "device");
 
+          $scope.pairingPending = true;
+
           $scope.socket.connect('/setup');
-          $scope.socket.on('device_calibration_response', function (data) {
+          $scope.socket.on('connect', function(){
+            $scope.socket.emit('ready', { "serial" : $scope.serial } );
+          })
+          $scope.socket.on('keys', function (keys) {
+            console.log(keys);
+            keys.forEach(function(key){
+              if (key.serial === $scope.maskedSerial && key.verified){
+                $scope.pairingComplete = true;
+              }
+            })
           });
-          $scope.socket.emit('ready');
+          
         }
 
-        $scope.$watch('serial', function(oldValue, newValue){
-          //console.log($filter('uppercase')($scope.serial));
-          //$scope.serial = $scope.serial.toUpperCase();
-        });
       }
     ]
   );

@@ -1,5 +1,6 @@
 var DeviceModel = require('../models/device').model,
-    CalibrationLogModel = require('../models/calibrationLog').model;
+    CalibrationLogModel = require('../models/calibrationLog').model,
+    UserModel = require('../models/user').model;
 
 module.exports = function(app){
   
@@ -10,7 +11,7 @@ module.exports = function(app){
     .on('connection', function(socket){
       var session = socket.handshake.session,
           userId = session.passport.user,
-          checkIntervalId
+          checkIntervalId;
 
       socket.on('disconnect', function () {
         clearInterval(checkIntervalId);
@@ -45,6 +46,43 @@ module.exports = function(app){
           });
         }, 5 * 1000);
       });
-    });  
+    }); // /./calibrate
+
+    
+    io
+    .of('/setup')
+    .on('connection', function(socket){
+      console.log("connected");
+      var session = socket.handshake.session,
+          userId = session.passport.user,
+          checkIntervalId;
+
+      socket.on('disconnect', function () {
+        clearInterval(checkIntervalId);
+      });
+
+      socket.on('ready', function (data) {
+        console.log("ready");
+        var serial = data.serial,
+            started = Date.now();
+
+        if (!serial) { return; }
+
+        clearInterval(checkIntervalId);
+        
+        checkIntervalId = setInterval(function(){
+          
+          UserModel.findById(userId)
+          .exec(function (err, user){
+            if (err || !user) { return; }
+            socket.emit(
+              'keys', 
+              user.deviceKeys
+            );
+          });
+        }, 5 * 1000);
+      });
+    }); // /./setup    
+
   });
 };

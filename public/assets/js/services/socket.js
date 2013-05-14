@@ -8,6 +8,7 @@ define([
 		return bpnServices.factory('bpn.services.socket', function ($rootScope) {
 		  var socket;
 
+
 		  return {
 		  	connect : function(path){
 		  		socket = io.connect(path);

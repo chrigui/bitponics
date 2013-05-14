@@ -66,9 +66,6 @@ module.exports = function(app){
         return res.json(400, { success : false, error : 'Request requires serial parameter'});
       }
 
-      //TODO: remove this and run ensureAvailableDeviceKey
-      // return res.json(200, { 'private': '1123', 'public': '42142' });
-
       req.user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
         if (err) { return next(err); }
 
