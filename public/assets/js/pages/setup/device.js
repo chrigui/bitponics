@@ -42,11 +42,16 @@ function (angular, domReady) {
             // },
             templateUrl:'pair.html'
           })
-          .otherwise({redirectTo:'/'}
-        );
+          .otherwise({redirectTo:'/'});
       }
     ]
   );
+
+  setupApp.factory('sharedDataService', function(){
+      return {
+        selectedWifiNetwork : {}
+      }
+  });
   
   setupApp.controller('bpn.controllers.setup.device.Connect',
     [
@@ -111,8 +116,16 @@ function (angular, domReady) {
       '$scope',
       '$location',
       '$http',
-      function($scope, $location, $http){
+      'sharedDataService',
+      function($scope, $location, $http, sharedDataService){
         $scope.wifiForm = function() {
+          var keys = $scope.bothKeys.split('|');
+          
+          // $scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
+          sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
+          $scope.privateDeviceKey = keys[0],
+          $scope.publicDeviceKey = keys[1];
+
           //if manual entry, update $scope.selectedWifiNetwork with manual values
           if($scope.selectedWifiNetwork.isOtherNetwork) {
             $scope.selectedWifiNetwork = {
@@ -121,9 +134,11 @@ function (angular, domReady) {
             }
           }
 
-          // TODO : validate
+          // TODO : validate more
 
-          $scope.postToDevice();
+          if(keys.length == 2 && $scope.privateDeviceKey.length && $scope.publicDeviceKey.length) {
+            $scope.postToDevice();
+          }
         };
 
         $scope.postToDevice = function() {
@@ -134,15 +149,14 @@ function (angular, domReady) {
           var postDataStringPlainText = 'SSID=' + $scope.selectedWifiNetwork.ssid + '\n' +
             'PASS=' + $scope.wifiPass + '\n' +
             'MODE=' + $scope.selectedWifiNetwork.securityMode + '\n' +
-            'SKEY=' + bpn.currentUser.privateDeviceKey + '\n' +
-            'PKEY=' + bpn.currentUser.publicDeviceKey;
+            'SKEY=' + $scope.privateDeviceKey + '\n' +
+            'PKEY=' + $scope.publicDeviceKey;
 
           console.log('Posting to device', postDataStringPlainText);
 
           $http.post($scope.deviceUrl, postDataStringPlainText)
             .success(function (data) {
               console.log(data);
-              // $('.selectedNetworkSsid').text($scope.selectedWifiNetwork.ssid);
               $location.path("/pair");
             })
             .error(function(jqXHR, textStatus, error){
@@ -158,26 +172,39 @@ function (angular, domReady) {
   setupApp.controller('bpn.controllers.setup.device.Pair',
     [
       '$scope',
-      function($scope){
-        $scope.submitDeviceInfo = function(e){
-          e.preventDefault();
+      '$location',
+      '$http',
+      'sharedDataService',
+      function($scope, $location, $http, sharedDataService){
+        $scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
+        $scope.submitDeviceInfo = function(){
+          // e.preventDefault();
           // TODO : show spinner
-          $.ajax({
-            url: '/setup/device',
-            type: 'POST',
-            contentType : 'application/json; charset=utf-8',
-            dataType: 'json',
-            data: JSON.stringify($scope.dataToPostAfterSuccess),
-            processData : false,
-            success: function(data){
+          // $.ajax({
+          //   url: '/setup',
+          //   type: 'POST',
+          //   contentType : 'application/json; charset=utf-8',
+          //   dataType: 'json',
+          //   data: JSON.stringify($scope.dataToPostAfterSuccess),
+          //   processData : false,
+          //   success: function(data){
+          //     console.log(data);
+          //     $scope.pairingComplete = true;
+          //   },
+          //   error: function(jqXHR, textStatus, error){
+          //     console.log('error', jqXHR, textStatus, error);
+          //     // TODO retry a certain number of times
+          //   }
+          // });
+          $http.post('/setup/device', JSON.stringify($scope.dataToPostAfterSuccess))
+            .success(function (data) {
               console.log(data);
               $scope.pairingComplete = true;
-            },
-            error: function(jqXHR, textStatus, error){
+            })
+            .error(function(jqXHR, textStatus, error){
               console.log('error', jqXHR, textStatus, error);
               // TODO retry a certain number of times
-            }
-          });
+            })
         };
       }
     ]
@@ -187,7 +214,15 @@ function (angular, domReady) {
     [
       '$scope',
       '$filter',
-      function ($scope, $filter) {
+      'sharedDataService',
+      function ($scope, $filter, sharedDataService) {
+        $scope.publicDeviceKey = undefined;
+        $scope.privateDeviceKey = undefined;
+        $scope.bothKeys = undefined;
+        /**
+         * Format for wifi network objects:
+         * { ssid : string, securityMode : string }
+         */
         $scope.selectedWifiNetwork = undefined;
         $scope.wifiPass = undefined;
         $scope.manualWifiNetworkSSID = undefined;
@@ -207,18 +242,13 @@ function (angular, domReady) {
           '06' : $scope.securityModeOptions['WPA'],
           '08' : $scope.securityModeOptions['WPA']
         };
-        $scope.deviceUrl = 'https://bitponics.com/device-mock'; //to work locally on https without device
+        $scope.deviceUrl = 'http://169.254.1.1/';
         $scope.devicePostFormat = 'SSID={{SSID}}\nPASS={{PASS}}\nMODE={{MODE}}\nSKEY={{SKEY}}\nPKEY={{PKEY}}';
         $scope.dataToPostAfterSuccess = {
           deviceMacAddress : '',
-          publicDeviceKey : bpn.currentUser.publicDeviceKey
+          publicDeviceKey : $scope.publicDeviceKey
         };
         $scope.scannedWifiNetworks = [];
-        /**
-         * Format for wifi network objects:
-         * { ssid : string, securityMode : string }
-         */
-        $scope.selectedWifiNetwork = {};
         $scope.connectToDeviceRetryTimer = 60000;
       }
     ]
@@ -227,5 +257,7 @@ function (angular, domReady) {
   domReady(function () {
     angular.bootstrap(document, ['bpn.apps.setup.device']);
   });
+
+  
 
 });

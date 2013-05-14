@@ -39,7 +39,7 @@ block head
             form#wifi-form(action='')
               ul 
                 li
-                  label(for='key') Key:
+                  label(for='key') Key (from previous page):
                     input#key(ng-model="bothKeys", name='key')
                 li
                   div
@@ -79,16 +79,11 @@ block head
     div(class="separator-top")
       ol(class="list-style")
         li(id="wifi-data-submitted", value="5")
-
-          {{selectedWifiNetwork.ssid}}
-          
           h4.page-heading-small Disconnect and Reconnect
           p Great! The Bitponics device is now connecting to the 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
-            | network. 
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network.
           p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
-            |.
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}.
           p After you're back on the 
             span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network, 
             a(id="submit-device-info", href, class="btn", ng-click="submitDeviceInfo()") Connect
