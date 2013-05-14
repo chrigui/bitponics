@@ -229,20 +229,20 @@ module.exports = function(app){
         var authorization = req.headers.authorization,
           scheme;
 
-        if (req.user){
+
+        if (authorization){
+          scheme = authorization.split(' ')[0];
+          switch(scheme){
+            case 'BPN_DEVICE':
+              return passport.authenticate('device', {session: false})(req, res, next);
+            case 'BPN_API':
+              return passport.authenticate('api', {session: false})(req, res, next);
+            // no default. just let it flow down to the connect.basicAuth
+          }
+        }
+        else if (req.user){
           return next();
         } else {
-          if (authorization){
-            scheme = authorization.split(' ')[0];
-            switch(scheme){
-              case 'BPN_DEVICE':
-                return passport.authenticate('device', {session: false})(req, res, next);
-              case 'BPN_API':
-                return passport.authenticate('api', {session: false})(req, res, next);
-              // no default. just let it flow down to the connect.basicAuth
-            }
-          }
-          // For local, dev, & staging, want to put the whole site behind basic auth
           return connect.basicAuth(
           	function(basicAuthUsername, basicAuthPassword){
           		switch (basicAuthUsername) {
@@ -264,20 +264,19 @@ module.exports = function(app){
         var authorization = req.headers.authorization,
           scheme;
 
-        if (req.user){
-          return next();
-        } else {
-          if (authorization){
-            scheme = authorization.split(' ')[0];
-            switch(scheme){
-              case 'BPN_DEVICE':
-                return passport.authenticate('device', {session: false})(req, res, next);
-              case 'BPN_API':
-                return passport.authenticate('api', {session: false})(req, res, next);
-              // no default. just let it flow down to the connect.basicAuth
-            }
+        if (authorization){
+          scheme = authorization.split(' ')[0];
+          switch(scheme){
+            case 'BPN_DEVICE':
+              return passport.authenticate('device', {session: false})(req, res, next);
+            case 'BPN_API':
+              return passport.authenticate('api', {session: false})(req, res, next);
+            // no default. just let it flow down to the connect.basicAuth
           }
+        } else if (req.user){
+          return next();
         }
+        
         return next();
       });
 
