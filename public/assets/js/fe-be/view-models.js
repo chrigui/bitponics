@@ -228,6 +228,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       ACCESSORY_OFF = utils.ACCESSORY_VALUES.OFF,
       dailyOnTimeAsMilliseconds,
       dailyOffTimeAssMilliseconds;
+
     if (action.scheduleType === 'repeat'){
       action.cycle.repeat = true;
       if (action.control) {
@@ -271,22 +272,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       } else {
         // action does not have a control
         action.cycle.states = [];
-        var overallDurationAsMoment = moment.duration(action.overallDuration, action.overallDurationType),
-          lastStateDurationType = action.overallDurationType,
-          lastStateDuration = action.overallDuration,
-          lastStateDurationAsMilliseconds,
-          lastStateDurationObject;
-
         if (action.overallDurationType === 'days' && action.offsetTimeOfDay){
           action.cycle.offset = {
             durationType : 'hours',
             duration: moment.duration(action.offsetTimeOfDay).asHours()
           };
-
-          lastStateDurationAsMilliseconds = (moment.duration(lastStateDuration, lastStateDurationType).asMilliseconds() - moment.duration(action.offsetTimeOfDay).asMilliseconds());
-          lastStateDurationObject = utils.getLargestWholeNumberDurationObject(lastStateDurationAsMilliseconds);
-          lastStateDurationType = lastStateDurationObject.durationType;
-          lastStateDuration = lastStateDurationObject.duration;
         } else {
           action.cycle.offset = {
             duration: 0
@@ -298,8 +288,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         });
 
         action.cycle.states.push({
-          durationType : lastStateDurationType,
-          duration : lastStateDuration
+          durationType : action.overallDurationType,
+          duration : action.overallDuration
         });
       }
     }
@@ -312,6 +302,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     delete action.offsetTimeOfDay;
     delete action.overallDuration;
     delete action.overallDurationType;
+
 
     return action;
   };

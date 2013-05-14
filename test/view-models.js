@@ -55,7 +55,6 @@ describe('ViewModels', function(){
     });
   });
 
-  /*
   it('converts a Grow Plan server model to a viewmodel and back to an equivalent Grow Plan server model', function(done){
     ModelUtils.getFullyPopulatedGrowPlan({_id: '506de30c8eebf7524342cb70'}, function(err, growPlans){
       should.exist(growPlans[0]);
@@ -64,15 +63,11 @@ describe('ViewModels', function(){
         viewModel = viewModels.initGrowPlanViewModel(growPlan),
         viewModelConvertedToServerModel = viewModels.compileGrowPlanViewModelToServerModel(viewModel);
 
-        console.log(JSON.stringify(originalGrowPlan));
-        console.log(JSON.stringify(viewModelConvertedToServerModel));
-
-
       Models.growPlan.isEquivalentTo(originalGrowPlan, viewModelConvertedToServerModel, function(err, isEquivalent){
         isEquivalent.should.be.true;
         done();
       });
     });
   });
-*/
+
 });

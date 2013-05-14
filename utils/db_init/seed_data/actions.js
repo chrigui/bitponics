@@ -187,8 +187,8 @@ module.exports = [
 						message: "Check water level in seed tray. Make sure there's a thin layer at the bottom of the tray to last the seedlings through the day."
 					},
 					{ 
-						durationType : 'hours',
-						duration: 24
+						durationType : 'days',
+						duration: 1
 					}
 				],
 				offset : {
