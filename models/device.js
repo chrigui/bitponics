@@ -171,7 +171,14 @@ DeviceSchema.method('refreshStatus', function(callback) {
       
 
   if (!device.activeGrowPlanInstance) { 
-    return callback(new Error(i18nKeys.get("No active grow plan instance found for device"))); 
+    //return callback(new Error(i18nKeys.get("No active grow plan instance found for device"))); 
+    device.status.expires = Date.now();
+    device.status.actions = [];
+    device.status.immediateActions = [];
+    device.status.activeActions = [];
+    device.status.lastSent = undefined;
+    device.save(callback);
+    return;
   }
 
   async.waterfall(
@@ -358,6 +365,10 @@ DeviceSchema.method('getStatusResponse', function(callback) {
   async.waterfall(
     [
       function getDeviceOwner(innerCallback){
+        if (!device.owner) { 
+          deviceOwner = undefined;
+          return innerCallback();
+        }
         if (device.owner.schema === UserSchema){
           deviceOwner = device.owner;
           return innerCallback();
@@ -379,9 +390,8 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       },
       function compileStatusBody(innerCallback){
         var stateTemplate = DeviceUtils.stateTemplate,
-            activeGrowPlanInstancePhase = device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0];
+            activeGrowPlanInstancePhase = device.activeGrowPlanInstance ? device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0] : null;
             statesResponseBody = '';
-
 
         device.outputMap.forEach(
           function(controlOutputPair){
@@ -398,12 +408,12 @@ DeviceSchema.method('getStatusResponse', function(callback) {
               // if no action, just 0 everything out
               controlStateString = controlStateString.replace(/{value}/, '0');
             } else {
-              controlStateString = controlStateString.replace(/{value}/, ActionModel.getCurrentControlValue(now, activeGrowPlanInstancePhase, controlAction, deviceOwner.timezone));
+              controlStateString = controlStateString.replace(/{value}/, ActionModel.getCurrentControlValue(now, activeGrowPlanInstancePhase, controlAction, deviceOwner ? deviceOwner.timezone : ''));
             }
             statesResponseBody += controlStateString;
           }
         );
-
+        
         statusResponseBody += "STATES=" + statesResponseBody;
         
         if (device.status.calibrationMode){

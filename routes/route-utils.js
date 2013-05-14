@@ -32,7 +32,7 @@ module.exports = {
       				i = dKeys.length;
     			for (; i--;){
     				dKey = dKeys[i];
-    				if (device._id.equals(dKey.deviceId)){
+    				if ((deviceKey.serial === dKey.serial) && (dKey.public === deviceKey.public)){
     					found = true;
     					break;
     				}

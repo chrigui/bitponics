@@ -302,7 +302,10 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
  * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
  */
 ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstancePhase, action, userTimezone){
-  
+  if (!growPlanInstancePhase){
+    return 0;
+  }
+
   var fromDateAsMilliseconds = (fromDate instanceof Date) ? fromDate.valueOf() : fromDate,
       phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
       // get the midnight of the start date

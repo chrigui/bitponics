@@ -25,7 +25,7 @@ block content
       input(type="text", id="method", placeholder="HTTP method", value="POST")  
 
     label Relative Url
-      input(type="text", id="url", placeholder="relative url", value="/api/devices/0006667211cf/calibrate")  
+      input(type="text", id="url", placeholder="relative url", value="/api/devices/0006667211cf/status")  
 
     label MAC Address
       input(type="text", id="mac-address", placeholder="MAC Address", value="0006667211cf")  
@@ -41,7 +41,7 @@ block content
 
     label Request Body
       textarea(id="request-body", placeholder="request body")
-        | {"mode":"ph_4","status":"success"}
+        | {"sensors":{"air":30.2}}
 
     button(type="submit") Generate Request
 
