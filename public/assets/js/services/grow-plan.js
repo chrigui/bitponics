@@ -1,5 +1,5 @@
 define([
-	'services'
+	'bpn.services'
 	], 
 	function (bpnServices) {
 		'use strict';
