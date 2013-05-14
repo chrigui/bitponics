@@ -18,16 +18,16 @@ block content
     div.content-module.middle
       form(id="setup-form", name="setup", data-ajax="false", ng-controller="bpn.controllers.setup.Main", novalidate)
         h1.page-heading Setting up your Bitponics Base Station
-        div(ng-show="key == undefined")
+        div(ng-show="key == undefined", class="separator-top")
           h4.page-heading-small Device Serial
           label(for='wifi-manual-ssid') Enter the serial number from the sticker on your BITPONICS Base Station
           input#serial(ng-model="serial", name="serial")  
           a(href, type='submit', class="btn next-step-btn", ng-click="sendSerialToServer()") Send
 
-        div(ng-show="key")
-          h4.page-heading-small Keys
-          p This is your key. For the next step, a new browser window will open. You will be asked to paste this key, so keep this window open.
-          input#serial(ng-model="key", name="key", readonly)
+        div(ng-show="key", class="separator-top")
+          h4.page-heading-small Your Key
+          p For the next step, a new browser window will open. You will be asked to paste this key, so keep this window open.
+          input#serial(ng-model="key", name="key", readonly, select-on-click)
           a(href, type='submit', class="btn next-step-btn", ng-click="openWifiPairingPage()") Open the device pairing page.
 
 

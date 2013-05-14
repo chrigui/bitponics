@@ -120,8 +120,6 @@ function (angular, domReady) {
       function($scope, $location, $http, sharedDataService){
         $scope.wifiForm = function() {
           var keys = $scope.bothKeys.split('|');
-          
-          // $scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
           sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
           $scope.privateDeviceKey = keys[0],
           $scope.publicDeviceKey = keys[1];
@@ -182,35 +180,37 @@ function (angular, domReady) {
       'sharedDataService',
       function($scope, $location, $http, sharedDataService){
         $scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
-        $scope.submitDeviceInfo = function(){
-          // e.preventDefault();
-          // TODO : show spinner
-          // $.ajax({
-          //   url: '/setup',
-          //   type: 'POST',
-          //   contentType : 'application/json; charset=utf-8',
-          //   dataType: 'json',
-          //   data: JSON.stringify($scope.dataToPostAfterSuccess),
-          //   processData : false,
-          //   success: function(data){
-          //     console.log(data);
-          //     $scope.pairingComplete = true;
-          //   },
-          //   error: function(jqXHR, textStatus, error){
-          //     console.log('error', jqXHR, textStatus, error);
-          //     // TODO retry a certain number of times
-          //   }
-          // });
-          $http.post('/setup/device', JSON.stringify($scope.dataToPostAfterSuccess))
-            .success(function (data) {
-              console.log(data);
-              $scope.pairingComplete = true;
-            })
-            .error(function(jqXHR, textStatus, error){
-              console.log('error', jqXHR, textStatus, error);
-              // TODO retry a certain number of times
-            })
-        };
+        
+        // Not needed now?
+        // $scope.submitDeviceInfo = function(){
+        //   // e.preventDefault();
+        //   // TODO : show spinner
+        //   // $.ajax({
+        //   //   url: '/setup',
+        //   //   type: 'POST',
+        //   //   contentType : 'application/json; charset=utf-8',
+        //   //   dataType: 'json',
+        //   //   data: JSON.stringify($scope.dataToPostAfterSuccess),
+        //   //   processData : false,
+        //   //   success: function(data){
+        //   //     console.log(data);
+        //   //     $scope.pairingComplete = true;
+        //   //   },
+        //   //   error: function(jqXHR, textStatus, error){
+        //   //     console.log('error', jqXHR, textStatus, error);
+        //   //     // TODO retry a certain number of times
+        //   //   }
+        //   // });
+        //   $http.post('/setup/device', JSON.stringify($scope.dataToPostAfterSuccess))
+        //     .success(function (data) {
+        //       console.log(data);
+        //       $scope.pairingComplete = true;
+        //     })
+        //     .error(function(jqXHR, textStatus, error){
+        //       console.log('error', jqXHR, textStatus, error);
+        //       // TODO retry a certain number of times
+        //     })
+        // };
       }
     ]
   );

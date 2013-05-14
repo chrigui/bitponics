@@ -47,6 +47,9 @@
       margin-top 0
       width 100%
       max-width 20em
+      &:focus {
+        border 1px solid white
+      }
     }
   }
 
@@ -73,6 +76,14 @@
 
   .selectedNetworkSsid {
     font-style:italic;
+  }
+
+  input[readonly] {
+    border 2px inset
+
+    &:focus {
+      background color-bg-gray
+    }
   }
 
   

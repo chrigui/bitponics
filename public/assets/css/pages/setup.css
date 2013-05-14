@@ -217,6 +217,9 @@ a:hover {
   width: 100%;
   max-width: 20em;
 }
+.setup .custom-dropdown-wrap select.custom-dropdown:focus {
+  border: 1px solid #fff;
+}
 .setup .led-indicator {
   -webkit-animation-duration: 1s;
   -webkit-animation-name: led-indicator;
@@ -236,6 +239,12 @@ a:hover {
 }
 .setup .selectedNetworkSsid {
   font-style: italic;
+}
+.setup input[readonly] {
+  border: 2px inset;
+}
+.setup input[readonly]:focus {
+  background: #f5f5f5;
 }
 @-moz-keyframes led-indicator {
   0%, 100% {
