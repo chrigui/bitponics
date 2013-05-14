@@ -122,7 +122,7 @@ function (angular, domReady) {
           var keys = $scope.bothKeys.split('|');
           sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
           $scope.publicDeviceKey = keys[0];
-          $scope.privateDeviceKey = keys[1],
+          $scope.privateDeviceKey = keys[1];
           
 
           //if manual entry, update $scope.selectedWifiNetwork with manual values
