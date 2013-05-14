@@ -298,7 +298,8 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       if (err) { return callback(err); }
 
       if (isEquivalent) { 
-        return callback(null, growPlanResult); 
+        // need to return a model object
+        return GrowPlanModel.findById(growPlanResult._id, callback);
       } 
       
       // if not equivalent, branch the  source GrowPlan

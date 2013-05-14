@@ -25,7 +25,7 @@ block content
       input(type="text", id="method", placeholder="HTTP method", value="POST")  
 
     label Relative Url
-      input(type="text", id="url", placeholder="relative url", value="/api/devices/0006667211cf/calibrate")  
+      input(type="text", id="url", placeholder="relative url", value="/api/devices/0006667211cf/status")  
 
     label MAC Address
       input(type="text", id="mac-address", placeholder="MAC Address", value="0006667211cf")  
@@ -41,7 +41,7 @@ block content
 
     label Request Body
       textarea(id="request-body", placeholder="request body")
-        | {"mode":"ph_4","status":"success"}
+        | {"sensors":{"air":30.2}}
 
     button(type="submit") Generate Request
 
@@ -91,7 +91,7 @@ block content
 
         var resultTemplate = "{method} {url} HTTP/1.1\r\n" + 
           "Accept: application/vnd.bitponics.v1.deviceText\r\n" + 
-          ($('#request-body').val() ? "Content-Type: application/vnd.bitponics.v1.deviceText\r\n" : "") + 
+          ($('#method').val() != "GET" ? "Content-Type: application/vnd.bitponics.v1.deviceText\r\n" : "") + 
           "Authorization: BPN_DEVICE {publicKey}:{hmac}\r\n" +
           "X-Bpn-Fert: {salt}\r\n\r\n" +
           "{body}";
@@ -99,7 +99,7 @@ block content
         apiRequest.headers["Authorization"] = "BPN_DEVICE " + $('#public-key').val() + ":" + hmac;
         apiRequest.headers["X-Bpn-Fert"] = $('#salt').val();
 
-        if ($('#request-body').val()){
+        if ($('#method').val() != "GET"){
           apiRequest.headers["Content-Type"] = "application/vnd.bitponics.v1.deviceText";
         } else {
           delete apiRequest.headers["Content-Type"];

@@ -2,7 +2,7 @@ define([
 	'angular',
 	'angularResource',
 	'controllers',
-	'services',
+	'bpn.services',
 	'directives'
 	], 
 	function (angular) {
@@ -10,7 +10,7 @@ define([
 
 		return angular.module(
 			'bpnApp', 
-			['ngResource', 'controllers', 'services', 'directives']
+			['ngResource', 'controllers', 'bpn.services', 'directives']
 		);
 	}
 );

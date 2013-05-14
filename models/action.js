@@ -58,7 +58,21 @@ ActionSchema = new Schema({
    * The cycle itself is also optional. If undefined, the Action is considered a simple "reminder"
    */
   cycle: {
+    
     states: [ActionStateSchema],
+
+    /**
+     * Optional. 
+     * Offset the starting point of the cycle by this amount.
+     * 
+     * Imagine cycle is a dial, with the beginning indicated by a line pointing straight up. 
+     * The offset turns the dial so that states[0] starts [offset] later than it would. 
+     * Which means that states[1] fills in the time from start until offset.
+     */
+    offset : { 
+      durationType: { type: String, enum: feBeUtils.DURATION_TYPES },
+      duration: { type: Number, default : 0 }
+    },
 
     repeat: { type: Boolean }
   }
@@ -115,34 +129,6 @@ ActionSchema.virtual('overallCycleTimespan')
 
 /************************** INSTANCE METHODS ***************************/
 
-/**
- * NOTE: Not in use anywhere in the code right now...instead we're
- * creating a message on the fly during save that mimics this, obviating the need for this method.
- * 
- * Get the message for the specified cycle state.
- *
- * Used primarily to generate a message for a control trigger when there
- * is no explicit message defined.
- *
- * @param stateIndex {Number} Required.
- * @param controlName {String} optional. If no explicit message is defined, and there is a control defined, this param
- * 		  will be interpolated into the message. Needs to be passed in because we can't assume a populated Control object
- */
-/*
-ActionSchema.method('getStateMessage', function(stateIndex, controlName){
-  var state = this.cycle.states[stateIndex];
-
-  if (state.message) {
-    return state.message;
-  }
-  if (state.controlValue){
-    return 'Turn ' + (controlName ? (controlName + ' ') : '') +
-           (state.controlValue == '0' ? 'off' : 'on') +
-           (state.duration ? (' for ' + state.duration + ' ' + state.durationType) : '');
-  }
-  return '';
-});
-*/
 
 /************************** END INSTANCE METHODS ***************************/
 
@@ -316,7 +302,10 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
  * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
  */
 ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstancePhase, action, userTimezone){
-  
+  if (!growPlanInstancePhase){
+    return 0;
+  }
+
   var fromDateAsMilliseconds = (fromDate instanceof Date) ? fromDate.valueOf() : fromDate,
       phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
       // get the midnight of the start date
@@ -377,10 +366,11 @@ ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstanc
  *
  * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
  */
-ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
-  var states = actionCycleStates,
+ActionSchema.static('getDeviceCycleFormat', function(actionCycle, offset){
+  var states = actionCycle.states,
+    actionOffset = actionCycle.offset || {},
     convertDurationToMilliseconds = ActionSchema.statics.convertDurationToMilliseconds,
-    offset = offset || 0,
+    offset = (offset || 0) + convertDurationToMilliseconds(actionOffset.duration, actionOffset.durationType),
     result = {
       offset : 0,
       value1 : 0,
@@ -408,26 +398,8 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
       result.value2 = parseInt(state1.controlValue, 10);
       result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
       break;
-    case 3:
-      // If a 3-state cycle, the 1st and 3rd are assumed to be contiguous (have the same controlValue)
-
-      var state0 = states[0],
-        state1 = states[1],
-        state2 = states[2],
-        firstDuration = convertDurationToMilliseconds(state0.duration, state0.durationType),
-        thirdDuration = convertDurationToMilliseconds(state2.duration, state2.durationType),
-        totalFirstDuration = firstDuration + thirdDuration;
-
-      // for a 3-state cycle, offset should effectively subtract 3rd state from the totalFirstDuration
-      // and if we got an offset passed in, add that
-      result.offset = offset + thirdDuration;
-      result.value1 = parseInt(state0.controlValue, 10);
-      result.duration1 = totalFirstDuration;
-      result.value2 = parseInt(state1.controlValue, 10);
-      result.duration2 = convertDurationToMilliseconds(state1.duration, state1.durationType);
-      break;
     default:
-      winston.info('Serializing a blank actionCycleState');
+      winston.info('Serializing a blank actionCycle');
       result.offset = 0;
       result.value1 = 0;
       result.duration1 = 0;
@@ -456,8 +428,8 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycleStates, offset){
  *    duration2 : Number
  *  }
  */
-ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycleStates, offset){
-  var result = ActionSchema.statics.getDeviceCycleFormat(actionCycleStates, offset),
+ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycle, offset){
+  var result = ActionSchema.statics.getDeviceCycleFormat(actionCycle, offset),
     resultCycleString = cycleTemplate;
 
   resultCycleString = resultCycleString.replace(/{offset}/, result.offset);
@@ -504,7 +476,7 @@ ActionSchema.pre('save', function(next){
 
   states = cycle.states;
 
-  if ((states.length > 3)){
+  if ((states.length > 2)){
     return next(new Error(i18nKeys.get('Invalid number of cycle states')));
   }
 
@@ -528,23 +500,6 @@ ActionSchema.pre('save', function(next){
         return next(new Error(i18nKeys.get('In a 2-state cycle, at least one state must have a duration defined')));
       }
       break;
-    case 3:
-      // if a cycle has 3 states, the 1st and 3rd must have the same control value
-      if (states[0].controlValue !== states[2].controlValue){
-        return next(new Error(i18nKeys.get('First and last control values must be equal')));
-      }
-      //if (states[0].message !== states[2].message){
-        //return next(new Error(i18nKeys.get('First and last state\'s messages must be equal')));
-      //}
-      // and at least the 1st & 3rd states must have durations defined
-      if (!(
-        (states[0].durationType && states[0].duration) &&
-        (states[2].durationType && states[2].duration)
-        )
-        ){
-        return next(new Error(i18nKeys.get('In a 3-state cycle, at least the 1st and 3rd states must have durations defined')));
-      }
-      break;
     // no default; we've enforced that we have one of these values already
   }
 
@@ -555,7 +510,7 @@ ActionSchema.pre('save', function(next){
 
 /**
  *  Validate cycle state messages
- */
+ *
 ActionSchema.pre('save', function(next){
   var Control = require('./control'),
       ControlSchema = Control.schema,

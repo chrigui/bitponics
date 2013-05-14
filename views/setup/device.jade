@@ -84,14 +84,17 @@ block head
             span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network.
           p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
             span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}.
-          p After you're back on the 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network, 
-            a(id="submit-device-info", href, class="btn", ng-click="submitDeviceInfo()") Connect
-        li#pairing-complete(ng-show="pairingComplete")
-          h4.page-heading-small You're All Set!
-          p Great, your device is now connected to your account. Let's take a look at the data we're getting.
-          a(id="submit-device-info", href="../dashboard", class="btn") Let's Go!
+          
+          p After you're back on your old wifi network, close this page and check back on the previous tab.
+            | That page will notify you once your device is paired with your account. You can also check the status of all 
+            | devices paired with your account at 
+            a(target="_self", href="/account/devices") /account/devices
+            |.
 
+        //- li#pairing-complete(ng-show="pairingComplete")
+        //-   h4.page-heading-small You're All Set!
+        //-   p Great, your device is now connected to your account. Let's take a look at the data we're getting.
+        //-   a(id="submit-device-info", href="../dashboard", class="btn") Let's Go!
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/setup.css')

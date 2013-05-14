@@ -63,8 +63,10 @@ function (angular, domReady) {
 
         $scope.connect = function(){
           
-          $http.get($scope.deviceUrl)
-            .success(function (data) {
+          $.ajax({
+            url : $scope.deviceUrl,
+            timeout : 5000,
+            success : function (data) {
               console.log(data);
               if (typeof data === 'string'){
                 data = JSON.parse(data);
@@ -101,12 +103,10 @@ function (angular, domReady) {
               });
 
               $location.path("/wifi");
-
-            }); 
-
-          
-        }
-
+              $scope.$apply();
+            }
+          }); 
+        };
       }
     ]
   );
@@ -154,16 +154,21 @@ function (angular, domReady) {
 
           console.log('Posting to device', postDataStringPlainText);
 
-          $http.post($scope.deviceUrl, postDataStringPlainText)
-            .success(function (data) {
+          $.ajax({
+            type : "POST",
+            url : $scope.deviceUrl,
+            processData : false,
+            data : postDataStringPlainText,
+            success : function(data){
               console.log(data);
               $location.path("/pair");
-            })
-            .error(function(jqXHR, textStatus, error){
-              // console.log('error', jqXHR, textStatus, error);
-              // TODO retry a certain number of times
-              $location.path("/pair");
-            })
+              $scope.$apply();
+            },
+            error: function(jqXHR, textStatus, error){
+              console.log('error', jqXHR, textStatus, error);
+              $scope.$apply();
+            }
+          });
         };
       }
     ]
@@ -242,6 +247,7 @@ function (angular, domReady) {
           '06' : $scope.securityModeOptions['WPA'],
           '08' : $scope.securityModeOptions['WPA']
         };
+
         $scope.deviceUrl = 'http://169.254.1.1/';
         $scope.devicePostFormat = 'SSID={{SSID}}\nPASS={{PASS}}\nMODE={{MODE}}\nSKEY={{SKEY}}\nPKEY={{PKEY}}';
         $scope.dataToPostAfterSuccess = {

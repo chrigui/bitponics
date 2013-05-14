@@ -69,7 +69,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   /**
    * Adds/calculates properties necessary for UI presentation
    * Properties for control vs no-control presentation,
-   * daily vs non-daily cycles. Makes changes in-plase on the provided Action.
+   * daily vs non-daily cycles. Makes changes in-place on the provided Action.
    *
    * Adds the following properties:
    * action.scheduleType (string) : 'phaseStart' || 'phaseEnd' || 'repeat'
@@ -88,12 +88,15 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initActionViewModel = function(action, source){
     var overallDuration = 0,
+      offsetDurationInMilliseconds = moment.duration(action.cycle.offset.duration, action.cycle.offset.durationType).asMilliseconds(),
       asMonths,
       asWeeks,
       asDays,
       asHours,
       asMinutes,
-      asSeconds;
+      asSeconds,
+      firstTime,
+      secondTime;
 
     // Set scheduleType
     if (source === 'phaseStart'){
@@ -122,39 +125,22 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       // on/off times
       if (action.control){
         action.isDailyControlCycle = true;
-        if (action.cycle.states[0].controlValue === '0'){
-          if (action.cycle.states.length === 3){
-            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-            // if first state is off, then OFF trigger time is actually later in the day than ON time.
-            // Add ON duration to ON trigger time to get OFF trigger time
-            // ON is state[1]
-            action.dailyOffTime = action.dailyOnTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
-          } else {
-            action.dailyOffTime = 0;
-            action.dailyOnTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-          }
+        
+        firstTime = offsetDurationInMilliseconds;
+        secondTime = offsetDurationInMilliseconds + moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
+
+        if (parseInt(action.cycle.states[0].controlValue, 10) === 0){
+          action.dailyOffTime = firstTime;
+          action.dailyOnTime = secondTime;
         } else {
-          // else first state of ON cycle
-          if (action.cycle.states.length === 3){
-            // Through server-side validation, we're guaranteed that state[0] and state[3] have the same controlValue
-            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-            // if first state is ON, then ON trigger time is actually later in the day than OFF time.
-            // Add OFF duration to OFF trigger time to get ON trigger time
-            // OFF is state[1]
-            action.dailyOnTime = action.dailyOffTime + moment.duration(action.cycle.states[1].duration, action.cycle.states[1].durationType).asMilliseconds();
-          } else {
-            action.dailyOnTime = 0;
-            action.dailyOffTime = moment.duration(action.cycle.states[0].duration, action.cycle.states[0].durationType).asMilliseconds();
-          }
+          action.dailyOnTime = firstTime;
+          action.dailyOffTime = secondTime;
         }
       }
     }
 
-    if (action.cycle.states.length === 3){
-      action.offsetTimeOfDay = moment.duration(action.cycle.states[0].duration || 0, action.cycle.states[0].durationType || '').asMilliseconds();
-    }
-
+    action.offsetTimeOfDay = offsetDurationInMilliseconds;
+    
     // If no control, then this is just a repeating notification.
     // Get the message from the state that has a message
     if (!action.control && action.cycle && action.cycle.states.length){
@@ -242,6 +228,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       ACCESSORY_OFF = utils.ACCESSORY_VALUES.OFF,
       dailyOnTimeAsMilliseconds,
       dailyOffTimeAssMilliseconds;
+
     if (action.scheduleType === 'repeat'){
       action.cycle.repeat = true;
       if (action.control) {
@@ -249,12 +236,12 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         // sets the correct properties straight-away
         if (action.isDailyControlCycle) {
           action.cycle.states = [];
+          
           if (action.dailyOnTime < action.dailyOffTime){
-            action.cycle.states.push({
-              controlValue : ACCESSORY_OFF,
+            action.cycle.offset = {
               durationType : 'hours',
               duration : moment.duration(action.dailyOnTime).asHours()
-            });
+            };
             action.cycle.states.push({
               controlValue : ACCESSORY_ON,
               durationType : 'hours',
@@ -263,14 +250,13 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
             action.cycle.states.push({
               controlValue : ACCESSORY_OFF,
               durationType : 'hours',
-              duration : (24 - moment.duration(action.dailyOffTime).asHours())
+              duration : (24 - moment.duration(action.dailyOffTime - action.dailyOnTime).asHours())
             });
           } else {
-            action.cycle.states.push({
-              controlValue : ACCESSORY_ON,
+            action.cycle.offset = {
               durationType : 'hours',
               duration : moment.duration(action.dailyOffTime).asHours()
-            });
+            };
             action.cycle.states.push({
               controlValue : ACCESSORY_OFF,
               durationType : 'hours',
@@ -279,39 +265,31 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
             action.cycle.states.push({
               controlValue : ACCESSORY_ON,
               durationType : 'hours',
-              duration : (24 - moment.duration(action.dailyOnTime).asHours())
+              duration : (24 - moment.duration(action.dailyOnTime - action.dailyOffTime).asHours())
             });
           }
         }
       } else {
         // action does not have a control
         action.cycle.states = [];
-        var overallDurationAsMoment = moment.duration(action.overallDuration, action.overallDurationType),
-          lastStateDurationType = action.overallDurationType,
-          lastStateDuration = action.overallDuration,
-          lastStateDurationAsMilliseconds,
-          lastStateDurationObject;
-
         if (action.overallDurationType === 'days' && action.offsetTimeOfDay){
-          action.cycle.states.push({
+          action.cycle.offset = {
             durationType : 'hours',
             duration: moment.duration(action.offsetTimeOfDay).asHours()
-          });
-
-          lastStateDurationAsMilliseconds = (moment.duration(lastStateDuration, lastStateDurationType).asMilliseconds() - moment.duration(action.offsetTimeOfDay).asMilliseconds());
-          lastStateDurationObject = utils.getLargestWholeNumberDurationObject(lastStateDurationAsMilliseconds);
-          lastStateDurationType = lastStateDurationObject.durationType;
-          lastStateDuration = lastStateDurationObject.duration;
+          };
+        } else {
+          action.cycle.offset = {
+            duration: 0
+          };          
         }
 
         action.cycle.states.push({
           message: action.message
         });
 
-        overallDurationAsMoment
         action.cycle.states.push({
-          durationType : lastStateDurationType,
-          duration : lastStateDuration
+          durationType : action.overallDurationType,
+          duration : action.overallDuration
         });
       }
     }
@@ -324,6 +302,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     delete action.offsetTimeOfDay;
     delete action.overallDuration;
     delete action.overallDurationType;
+
 
     return action;
   };

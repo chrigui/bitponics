@@ -37,24 +37,25 @@ function logSensorLog(options, callback){
   
   async.parallel(
     [
-    function parallel1(innerCallback){
-      if (!device){ return innerCallback(); }
+    function saveToDevice(innerCallback){
+      //if (!device){ return innerCallback(); }
       // for some goddamn mysterious reason, unshift is causing pendingSensorLog.logs to 
       // be an empty array when persisted to device.recentSensorLogs. 
       // Only push is getting the whole thing in. Gotta
       // abandon desc-sorted recentSensorLogs for now because of that
-      device.recentSensorLogs.push(pendingSensorLog);
-      device.save(innerCallback);
+      //device.recentSensorLogs.push(pendingSensorLog);
+      //device.save(innerCallback);
+      innerCallback();
     },
-    function parallel2(innerCallback){
+    function saveToGPI(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
       growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
       growPlanInstance.save(innerCallback);
     },
-    function parallel3(innerCallback){
+    function saveSensorLog(innerCallback){
       pendingSensorLog.save(innerCallback);
     },
-    function parallel4(innerCallback){
+    function checkIdealRanges(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
       GrowPlanModel
       .findById(growPlanInstance.growPlan)

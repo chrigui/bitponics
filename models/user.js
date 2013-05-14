@@ -332,9 +332,6 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 		}
 	};
 	
-
-	//console.log("OIJOIJOIJ");
-
 	async.waterfall(
 		[
 			function updateAvailableDeviceKey(innerCallback){

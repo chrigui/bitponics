@@ -609,6 +609,7 @@ describe('Model Utils', function(){
                   innerCallback();
                 })
               },
+              /*
               function checkDevice(innerCallback){
                 DeviceModel.findById(self.device._id)
                 .exec(function(err, updatedDevice){
@@ -623,7 +624,7 @@ describe('Model Utils', function(){
                   innerCallback();
                 });
                 
-              },
+              },*/
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){
@@ -703,6 +704,7 @@ describe('Model Utils', function(){
                   innerCallback();
                 })
               },
+              /*
               function checkDevice(innerCallback){
                 DeviceModel.findById(self.device._id)
                 .exec(function(err, updatedDevice){
@@ -718,6 +720,7 @@ describe('Model Utils', function(){
                 });
                 
               },
+              */
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){

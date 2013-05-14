@@ -184,17 +184,17 @@ module.exports = [
 			cycle : {
 				states : [
 					{
-						durationType: 'hours',
-						duration: 8
-					},
-					{
 						message: "Check water level in seed tray. Make sure there's a thin layer at the bottom of the tray to last the seedlings through the day."
 					},
 					{ 
-						durationType : 'hours',
-						duration: 16
+						durationType : 'days',
+						duration: 1
 					}
 				],
+				offset : {
+					durationType: 'hours',
+					duration: 8
+				},
 				repeat : true
 			}
 		},
@@ -240,12 +240,6 @@ module.exports = [
 			control: "506de2fd8eebf7524342cb32",
 			cycle: {
 				states: [
-					// start the day with 6 hours off
-					{
-						controlValue: '0',
-						durationType: 'hours',
-						duration: 6
-					},
 					{
 						controlValue: '1',
 						durationType: 'hours',
@@ -255,9 +249,14 @@ module.exports = [
 					{
 						controlValue: '0',
 						durationType: 'hours',
-						duration: 2
+						duration: 8
 					}
 				],
+				// start the day with 6 hours off
+				offset : {
+					durationType: 'hours',
+					duration: 6
+				},
 				repeat: true
 			}
 		},

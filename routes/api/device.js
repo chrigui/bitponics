@@ -166,79 +166,7 @@ module.exports = function(app) {
     }
   );
 
-  /*
-   * Log a SensorLog for this Device
-   * @param {string} req.id. mac address of device
-   * @param {Array.<SensorLog>} req.body. JSON.
-   */
-  app.post('/api/devices/:id/status',
-    routeUtils.middleware.ensureDeviceLoggedIn,
-    routeUtils.ensureDeviceKeyVerified,
-    function (req, res, next){
-      var macAddress = req.params.id.replace(/:/g,''),
-          pendingSensorLog = { ts : Date.now(), logs : []},
-          pendingDeviceLogs,
-          device,
-          growPlanInstance;
-
-      winston.info('status POST req.body');
-      winston.info(JSON.stringify(req.body));
-
-      // For now, only accept requests that use the device content-type
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
-        return next(new Error('Invalid Content-Type'));
-      }
-
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
-        // we get req.rawBody created for all requests that come from a device
-        pendingDeviceLogs = JSON.parse(req.rawBody);
-      }
-
-      // In parallel, get the Device and all Sensors
-      async.parallel(
-        [
-          function getDevice(callback){
-            DeviceModel
-            .findOne({ macAddress: macAddress })
-            .populate('activeGrowPlanInstance')
-            .exec(callback);
-          }
-        ],
-        function parallelFinal(err, results){
-          if (err) { return next(err);}
-        
-          device = results[0];
-
-          if (!device){ 
-            return next(new Error('Attempted to log to a nonexistent device'));
-          }
-
-          Object.keys(pendingDeviceLogs).forEach(function(key){
-            pendingSensorLog.logs.push({
-              sCode : key,
-              val : pendingDeviceLogs[key]
-            });
-          });
-          
-          winston.info('pendingSensorLog');
-          winston.info(JSON.stringify(pendingSensorLog));
-
-          ModelUtils.logSensorLog(
-            {
-              pendingSensorLog : pendingSensorLog, 
-              growPlanInstance : device.activeGrowPlanInstance, 
-              device : device, 
-              user : req.user 
-            },
-            function(err){
-              if (err) { return next(err); }
-              return sendDeviceStatusResponse(req, res, macAddress, device);
-            }
-          );
-        }
-      );
-    }
-  );
+  
 
 
   /**
@@ -247,7 +175,7 @@ module.exports = function(app) {
    *
    * For now, only responds with device CSV. 
    */
-  app.get('/api/devices/:id/status', 
+  app.get('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
     routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
@@ -256,51 +184,116 @@ module.exports = function(app) {
     }
   );
 
-    
+
   /**
-   * required request parameters:
-   *
-   * @param req.body.calibrationLog
-   * @param req.body.calibrationLog.mode
-   * @param req.body.calibrationLog.status
-   * @param req.body.calibrationLog.message
+   * Post status for this Device. sensor logs & calibration mode.
+   * 
+   * @param {string} req.id. mac address of device
+   * @param {Object.<SensorLog>} req.body.sensors. JSON.
+   * @param req.body.calib
+   * @param req.body.calib.mode
+   * @param req.body.calib.status
+   * @param req.body.calib.message
    */
-  app.post('/api/devices/:id/calibrate', 
+  app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
+    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
       var macAddress = req.params.id.replace(/:/g,''),
-          calibrationLog;
+          reqBody = {},
+          pendingSensorLog = { ts : Date.now(), logs : []},
+          pendingDeviceLogs,
+          calibrationLog,
+          device,
+          growPlanInstance;
 
-      winston.info('In /devices/:id/calibrate');
-      winston.info(JSON.stringify(req.headers));  
-      
+      winston.info('/status POST headers');
+      winston.info(req.headers);
+      winston.info('/status POST req.rawBody');
+      winston.info(JSON.stringify(req.rawBody));
+
       // For now, only accept requests that use the device content-type
       if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
         return next(new Error('Invalid Content-Type'));
       }
 
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1){
-        calibrationLog = JSON.parse(req.rawBody);
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1 && req.rawBody){
+        // we get req.rawBody created for all requests that come from a device
+        reqBody = JSON.parse(req.rawBody);
+        pendingDeviceLogs = reqBody["sensors"];
+        calibrationLog = reqBody["calib"];
       }
 
-      calibrationLog.timestamp = calibrationLog.timestamp || Date.now();
+      async.waterfall(
+        [
+          function getDevice(callback){
+            DeviceModel
+            .findOne({ macAddress: macAddress })
+            .populate('activeGrowPlanInstance')
+            .exec(function(err, device){
+              if (!device){ 
+                return next(new Error('Attempted to log to a nonexistent device'));
+              }
+              return callback(err, device);
+            });
+          },
+          function logLogs(device, callback){
+            async.parallel(
+              [
+                function logSensorLogs(innerCallback){
+                  if (!pendingDeviceLogs){
+                    return innerCallback();
+                  }
+                  
+                  Object.keys(pendingDeviceLogs).forEach(function(key){
+                    pendingSensorLog.logs.push({
+                      sCode : key,
+                      val : pendingDeviceLogs[key]
+                    });
+                  });
+                  
+                  winston.info('pendingSensorLog');
+                  winston.info(JSON.stringify(pendingSensorLog));
 
-      DeviceModel.logCalibration({
-        macAddress : macAddress,
-        calibrationLog : calibrationLog
-      },
-      function(err){
-        if (err) { return next(err);}
-        return sendDeviceResponse({
-          req : req,
-          res : res,
-          resourceName : "calibrate"
-        });
-      });
+                  ModelUtils.logSensorLog(
+                    {
+                      pendingSensorLog : pendingSensorLog, 
+                      growPlanInstance : device.activeGrowPlanInstance, 
+                      device : device, 
+                      user : req.user 
+                    },
+                    innerCallback
+                  );
+                },
+                function logCalibrationLog(innerCallback){
+                  if (!calibrationLog){
+                    return innerCallback();
+                  }
+                  calibrationLog.timestamp = calibrationLog.timestamp || Date.now();
+
+                  DeviceModel.logCalibration({
+                    device : device,
+                    calibrationLog : calibrationLog
+                  },
+                  innerCallback
+                  );
+                }
+              ],
+              function parallelFinal(err, results){
+                return callback(err)
+              }
+            );
+          }
+        ],
+        function waterfallFinal(err){
+          if (err) { return next(err); }
+          return sendDeviceStatusResponse(req, res, macAddress, device);
+        }
+      );
     }
   );
 
-
+  
   var sendDeviceStatusResponse = function(req, res, macAddress, deviceModel){
     async.waterfall([
       function getDevice(innerCallback){
