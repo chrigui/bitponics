@@ -128,6 +128,12 @@ module.exports = function(app){
     }
   );
 
+  app.get('/setup/device/*',
+    function (req, res, next){
+      return res.redirect('/setup/device/');
+    }
+  );
+
 
 
 	app.get('/setup/grow-plan', 

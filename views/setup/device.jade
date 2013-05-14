@@ -39,7 +39,7 @@ block head
             form#wifi-form(action='')
               ul 
                 li
-                  label(for='key') Key:
+                  label(for='key') Key (from previous page):
                     input#key(ng-model="bothKeys", name='key')
                 li
                   div
@@ -79,21 +79,23 @@ block head
     div(class="separator-top")
       ol(class="list-style")
         li(id="wifi-data-submitted", value="5")
-
-          {{selectedWifiNetwork.ssid}}
-          
           h4.page-heading-small Disconnect and Reconnect
           p Great! The Bitponics device is now connecting to the 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
-            | network. 
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network.
           p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}
-            |.
+            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}.
+          
           p After you're back on your old wifi network, close this page and check back on the previous tab.
             | That page will notify you once your device is paired with your account. You can also check the status of all 
             | devices paired with your account at 
-            a(ng-click="window.location = /account/devices") /account/devices
-        
+            a(target="_self", href="/account/devices") /account/devices
+            |.
+
+        //- li#pairing-complete(ng-show="pairingComplete")
+        //-   h4.page-heading-small You're All Set!
+        //-   p Great, your device is now connected to your account. Let's take a look at the data we're getting.
+        //-   a(id="submit-device-info", href="../dashboard", class="btn") Let's Go!
+
 block css 
   link(rel='stylesheet', href='/assets/css/pages/setup.css')
   //- link(rel='stylesheet', href='/assets/css/libs/steps.css')

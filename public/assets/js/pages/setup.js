@@ -73,6 +73,14 @@ function (angular, domReady) {
     ]
   );
 
+  setupApp.directive('selectOnClick', function () {
+    return function (scope, element, attrs) {
+        element.click(function () {
+            element.select();
+        });
+    };
+  });
+
   domReady(function () {
     angular.bootstrap(document, ['bpn.apps.setup']);
   });
