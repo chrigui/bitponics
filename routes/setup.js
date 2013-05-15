@@ -62,6 +62,11 @@ module.exports = function(app){
       
       var serial = req.body.serial;
 
+      // clean up the serial
+      serial = serial.replace(/[_\W]/g, '');
+      serial = serial.toUpperCase();
+      serial = (serial.slice(0,2) + "-" + serial.slice(2,5) + "-" + serial.slice(5,9));
+
       if (!serial){
         return res.json(400, { success : false, error : 'Request requires serial parameter'});
       }
