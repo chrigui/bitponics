@@ -39,11 +39,14 @@ module.exports = {
     			}
 
     			if (found){
-    				dKey.deviceId = device._id;
-    				dKey.verified = true;
-    				req.user.save(function(err){
-    					return next(err);
-    				});
+    				ModelUtils.assignDeviceToUser({
+              user : req.user,
+              deviceKey : dKey,
+              device : device
+            },
+            function(err){
+              return next(err);
+            });
     			} else {
     				return next(new Error("Could not verify device for the serial number " + deviceKey.serial));
     			}

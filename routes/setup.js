@@ -48,10 +48,10 @@ module.exports = function(app){
   );
 
 
-  /*
-   * Send serial key entered by user
+  /**
+   * Process serial key entered by user
    *
-   **/
+   */
   app.post('/setup',
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,

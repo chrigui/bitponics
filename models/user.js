@@ -34,6 +34,10 @@ var DeviceKeySchema = new Schema({
 
   verified : { type : Boolean, default : false },
 
+  verifiedDate : { type : Date },
+
+  createdAt : { type : Date, default: Date.now },
+
   /**
    * Public device key is a 16-char random hex string
    */
@@ -194,25 +198,6 @@ UserSchema.virtual('timezoneOffset')
 		return timezoneoffset;
 	});
 
-/**
- *  Get the available device key, if exists
- */
-UserSchema.virtual('availableDeviceKey')
-	.get(function(){
-		var user = this,
-			i,
-			currentDeviceKey;
-
-		if (!user.deviceKeys) { return; }
-		
-		for (i = user.deviceKeys.length - 1; i >= 0; i--) {
-			currentDeviceKey = user.deviceKeys[i];
-			if (!currentDeviceKey.deviceId){
-				return currentDeviceKey;
-			}
-		};
-	});
-
 /************************** STATIC METHODS  ***************************/
 
 
@@ -311,6 +296,69 @@ UserSchema.method('toPublicJSON', function() {
 
 
 /**
+ * Get the first available device key
+ *
+ * @param {string=} options.serial. optional.
+ */
+UserSchema.method('getAvailableDeviceKey', function(options) {
+  var user = this,
+  		serial,
+			i,
+			currentDeviceKey,
+			deviceKeys = user.deviceKeys || [],
+			length = deviceKeys.length;;
+
+		if (options){
+			serial = options.serial;			
+		}
+
+		for (i = 0; i < length; i++) {
+			currentDeviceKey = deviceKeys[i];
+			if (!currentDeviceKey.deviceId){
+				if (serial){
+					if (currentDeviceKey.serial === serial){
+						return currentDeviceKey;
+					}
+				} else {
+					return currentDeviceKey;	
+				}
+			}
+		};
+});
+
+
+/**
+ * Get the device key matching the device id
+ *
+ * @param {string=} options.serial. optional.
+ */
+UserSchema.method('getAvailableDeviceKey', function(options) {
+  var user = this,
+  		serial,
+			i,
+			currentDeviceKey,
+			deviceKeys = user.deviceKeys || [],
+			length = deviceKeys.length;;
+
+		if (options){
+			serial = options.serial;			
+		}
+
+		for (i = 0; i < length; i++) {
+			currentDeviceKey = deviceKeys[i];
+			if (!currentDeviceKey.deviceId){
+				if (serial){
+					if (currentDeviceKey.serial === serial){
+						return currentDeviceKey;
+					}
+				} else {
+					return currentDeviceKey;	
+				}
+			}
+		};
+});
+
+/**
  * Make sure User has an unassigned deviceKey
  *
  * @param {string} serial. THe serial number that the user entered that will be assigned to this device key
@@ -324,7 +372,7 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 
 	user.deviceKeys = user.deviceKeys || [];
 
-	for (i = user.deviceKeys.length - 1; i >= 0; i--) {
+	for (i = user.deviceKeys.length; i--;) {
 		currentDeviceKey = user.deviceKeys[i];
 		if (!currentDeviceKey.deviceId){
 			availableDeviceKey = currentDeviceKey;
@@ -337,32 +385,31 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 			function updateAvailableDeviceKey(innerCallback){
 				if (availableDeviceKey){
 					availableDeviceKey.serial = serial;	
-					return innerCallback(null);
+					return innerCallback();
 				} else {
-					crypto.randomBytes(32, function(ex, buf) {
-						if (ex) { return innerCallback(ex); }
-					  	var keysSource = buf.toString('hex'),
-					  		publicKey = keysSource.substr(0, 16),
-					  		privateKey = keysSource.substr(16, 16);
-					  	
-					  	availableDeviceKey = {
-					  		'public' : publicKey,
-					  		'private' : privateKey,
-					  		'serial' : serial
-					  	};
-					  	user.deviceKeys.push(availableDeviceKey);
-					  	return innerCallback(null);
+					crypto.randomBytes(32, function(err, buf) {
+						if (err) { return innerCallback(err); }
+				  	var keysSource = buf.toString('hex'),
+				  		publicKey = keysSource.substr(0, 16),
+				  		privateKey = keysSource.substr(16, 16);
+				  	
+				  	availableDeviceKey = {
+				  		'public' : publicKey,
+				  		'private' : privateKey,
+				  		'serial' : serial
+				  	};
+				  	user.deviceKeys.push(availableDeviceKey);
+				  	return innerCallback();
 					});	
 				}
 			},
 			function saveUser(innerCallback){
-				user.save(function(err){
-					return innerCallback(err);
-				});
+				user.save(innerCallback);
 			}
 		],
-		function (err, result){
-			return done(err, user.availableDeviceKey);
+		function (err, updatedUser){
+			if (err) { return done(err); }
+			return done(null, updatedUser.getAvailableDeviceKey({serial : serial}), updatedUser);
 		}
 	);
 });

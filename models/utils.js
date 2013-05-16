@@ -656,9 +656,9 @@ function getFullyPopulatedGrowPlan(query, callback){
  * that was created or retrieved on pageload of /setup
  * 
  * @param {object} settings
- * @param {string} settings.deviceMacAddress - macAddress as sent by the device.
- * @param {string} settings.publicDeviceKey : User.deviceKeys.public string to use to select which key to assign to the device.
- * @param {User} settings.user
+ * @param {string} settings.user
+ * @param {DeviceKeySchema} settings.deviceKey : Instance from User.deviceKeys
+ * @param {User} settings.device
  * @param {function(err, {device: Device, user: User})} callback 
  */
 function assignDeviceToUser(settings, callback){
@@ -668,52 +668,29 @@ function assignDeviceToUser(settings, callback){
       async = require('async'),
       winston = require('winston'),
       UserModel = require('./user').model,
-      deviceMacAddress = settings.deviceMacAddress,
-      publicDeviceKey = settings.publicDeviceKey,
+      device = settings.device,
+      deviceKey = settings.deviceKey,
       user = settings.user,
-      i18nKeys = require('../i18n/keys'),
       device;
 
   async.series(
     [
       function deviceStep(innerCallback){
-        DeviceModel.findOne({ macAddress: deviceMacAddress },
-          function(err, deviceResult){
-            if (err) { return callback(err);}
-            if (deviceResult){
-              device = deviceResult;
-            } else {
-              // TODO : this scenario shouldn't occur in production; we should create Device model instances
-              // at production time.
-              device = new DeviceModel({
-                macAddrress : deviceMacAddress
-                // will get a default deviceType based on Device middleware
-              });
-            }
+        device.userAssignmentLogs = device.userAssignmentLogs || [];
+        device.userAssignmentLogs.push({
+          ts: new Date(),
+          user : user,
+          assignmentType : DeviceUtils.ROLES.OWNER
+        });
+        device.owner = user;
 
-            device.userAssignmentLogs = device.userAssignmentLogs || [];
-            device.userAssignmentLogs.push({
-              ts: new Date(),
-              user : user,
-              assignmentType : DeviceUtils.ROLES.OWNER
-            });
-            device.owner = user;
-
-            device.save(innerCallback)
-          }
-        );
+        device.save(innerCallback)
       },
       function userStep(innerCallback){
-        var deviceKey = user.deviceKeys.filter(function(deviceKey){
-          return deviceKey.public === publicDeviceKey;
-        })[0];
-        if (!deviceKey || deviceKey.deviceId){ 
-          return innerCallback(
-            new Error(i18nKeys.get("unavailable device key", publicDeviceKey))
-          );
-        }
-
         deviceKey.deviceId = device._id;
+        deviceKey.serial = device.serial;
+        deviceKey.verified = true;
+        deviceKey.verifiedDate = Date.now();
 
         user.save(innerCallback);
       }

@@ -63,7 +63,7 @@ function (angular, domReady) {
         }
 
         $scope.openWifiPairingPage = function() {
-          window.open('http://' + bpn.pageData.nextUrl, "device");
+          window.open('http://' + bpn.pageData.nextUrl, "_blank");
 
           $scope.pairingPending = true;
 
