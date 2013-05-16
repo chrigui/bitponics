@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
   DeviceTypeModel = require('./deviceType').model,
   ActionModel = require('./action').model,
   ImmediateActionModel = require('./immediateAction').model,
-  SensorLogSchema = require('./sensorLog').schema,
+  //SensorLogSchema = require('./sensorLog').schema,
   async = require('async'),
   winston = require('winston'),
   i18nKeys = require('../i18n/keys'),
@@ -29,6 +29,12 @@ var DeviceUtils = {
 
 
 
+
+
+
+
+
+
 var SensorMapSchema = new Schema({
   sensor : { type: ObjectIdSchema, ref: 'Sensor' },
   inputId : { type: String }
@@ -45,7 +51,14 @@ var OutputMapSchema = new Schema({
 
 var DeviceSchema = new Schema({
     
-    macAddress: { type: String, required: true, unique: true }, //mac address
+    _id : {
+      type : String,
+      match: /^([a-z0-9_-]){12}$/,
+      required : true,
+      unique : true
+    },
+    
+    //macAddress: { type: String, required: true, unique: true }, //mac address
 
     serial: { type : String, required: true, unique: true},
     
@@ -125,11 +138,11 @@ DeviceSchema.plugin(useTimestamps);
 DeviceSchema.set('toObject', {
   getters : true,
   transform : function(doc, ret, options){
-    if (doc.schema === SensorLogSchema){
-      return SensorLogSchema.options.toObject.transform(doc, ret, options);
-    } else {
+    //if (doc.schema === SensorLogSchema){
+      //return SensorLogSchema.options.toObject.transform(doc, ret, options);
+    //} else {
       // else we're operating on the parent doc (the Device doc)
-    }
+    //}
   }
 });
 DeviceSchema.set('toJSON', {
@@ -355,7 +368,9 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       UserSchema = User.schema,
       UserModel = User.model,
       DeviceModel = this.model(this.constructor.modelName),
-      getObjectId = require('./utils').getObjectId,
+      utils = require('./utils'),
+      getObjectId = utils.getObjectId,
+      getDocumentIdString = utils.getDocumentIdString,
       now = new Date(),
       nowAsMilliseconds = now.valueOf(),
       deviceOwner,
@@ -380,12 +395,12 @@ DeviceSchema.method('getStatusResponse', function(callback) {
         });
       },
       function getPopulatedDevice(innerCallback){
-        DeviceModel.findById(device)
+        DeviceModel.findById(device._id)
         .populate('activeGrowPlanInstance')
         .populate('status.activeActions')
         .exec(function(err, deviceResult){
           device = deviceResult;
-          innerCallback();
+          innerCallback(err);
         });
       },
       function compileStatusBody(innerCallback){
@@ -533,8 +548,11 @@ DeviceSchema.pre('save', function(next){
    }
    *
   
-  device.recentSensorLogs.forEach(function(log){
-    if (log.ts.valueOf() < cutoff) { logsToRemove.push(log); }
+  device.recentSensorLogs.forEach(function(log, index){
+    //if (log.ts.valueOf() < cutoff) { logsToRemove.push(log); }
+    if (index > 9){
+      logsToRemove.push(log);
+    }
   });
 
   logsToRemove.forEach(function(log){

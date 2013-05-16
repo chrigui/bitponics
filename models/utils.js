@@ -43,14 +43,16 @@ function logSensorLog(options, callback){
       // be an empty array when persisted to device.recentSensorLogs. 
       // Only push is getting the whole thing in. Gotta
       // abandon desc-sorted recentSensorLogs for now because of that
-      //device.recentSensorLogs.push(pendingSensorLog);
-      //device.save(innerCallback);
-      innerCallback();
+      console.log(pendingSensorLog);
+      device.recentSensorLogs.unshift(pendingSensorLog.toObject());
+      device.save(innerCallback);
+      //innerCallback();
     },
     function saveToGPI(innerCallback){
-      if (!growPlanInstance) { return innerCallback();}
-      growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
-      growPlanInstance.save(innerCallback);
+      //if (!growPlanInstance) { return innerCallback();}
+      //growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
+      //growPlanInstance.save(innerCallback);
+      innerCallback();
     },
     function saveSensorLog(innerCallback){
       pendingSensorLog.save(innerCallback);
@@ -482,6 +484,11 @@ function getObjectId (object){
 }
 
 
+function getDocumentIdString (object){
+  if (object._id){ return object._id.toString(); }
+  return object.toString();
+}
+
 /**
  * Retrieves a GrowPlan and populates all of its nested objects:
  * plants
@@ -650,7 +657,7 @@ function getFullyPopulatedGrowPlan(query, callback){
 
 /**
  * Assigns a User to a Device as an owner.
- * Pairs by assigning user to device.owner and assigning deviceId to a User.deviceKey
+ * Pairs by assigning user to device.owner and assigning device to a User.deviceKey
  *
  * Designed to be called by /setup route. Assumes that the setup page echoed the available deviceKey
  * that was created or retrieved on pageload of /setup
@@ -687,7 +694,7 @@ function assignDeviceToUser(settings, callback){
         device.save(innerCallback)
       },
       function userStep(innerCallback){
-        deviceKey.deviceId = device._id;
+        deviceKey.device = device._id;
         deviceKey.serial = device.serial;
         deviceKey.verified = true;
         deviceKey.verifiedDate = Date.now();
@@ -714,5 +721,6 @@ module.exports = {
   clearPendingNotifications : clearPendingNotifications,
   getObjectId : getObjectId,
   getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan,
-  assignDeviceToUser : assignDeviceToUser
+  assignDeviceToUser : assignDeviceToUser,
+  getDocumentIdString : getDocumentIdString
 };

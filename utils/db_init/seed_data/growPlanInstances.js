@@ -8,7 +8,7 @@ module.exports = [
       ],
       owner : "506de30a8eebf7524342cb6c", // Amit
       growPlan : "506de2ff8eebf7524342cb3a",
-      device : "506de2fe8eebf7524342cb34", // mac 0006667211cf
+      device : "0006667211cf", 
       active: true,
     },
     {
@@ -24,7 +24,7 @@ module.exports = [
 			],
 			owner : "506de30a8eebf7524342cb6c", // Amit
 			growPlan : "506de2ff8eebf7524342cb3a",
-			device : "5118232537d976f7050f6186", // mac 000666721fc1
+			device : "000666721fc1", 
 			active: true,
 		},
 		{
@@ -54,7 +54,7 @@ module.exports = [
       ],
       owner : "506de3098eebf7524342cb68",
       growPlan : "506de2ff8eebf7524342cb3b",
-      device : "513e37cd66e5c0dfc41e101d",
+      device : "000666722947",
       active: true
     },
 
@@ -66,7 +66,7 @@ module.exports = [
       ],
       owner : "506de3098eebf7524342cb67",
       growPlan : "506de2ff8eebf7524342cb3b",
-      device : "514fb64a658ae4f3f325e5b6",
+      device : "000666809ecf",
       active: true
     },
 	];

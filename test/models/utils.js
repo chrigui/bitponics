@@ -246,7 +246,7 @@ describe('Model Utils', function(){
           // Pair the GPI to a device
           function(innerCallback){
             var device = new DeviceModel({
-              macAddress : "123456654321",
+              _id : "123456654321",
               deviceType : "506de2fe8eebf7524342cb37",
               serial : "SOMETHING RANDOM",
               owner : self.user
@@ -388,7 +388,7 @@ describe('Model Utils', function(){
           },
           function(innerCallback){
             var device = new DeviceModel({
-              macAddress : '123456123456',
+              _id : '123456123456',
               serial : "SOMETHING RANDOM 2",
             });
             device.save(function(err, deviceResult){
@@ -440,7 +440,7 @@ describe('Model Utils', function(){
             
             user.deviceKeys.some(
               function(deviceKey) { 
-                return deviceKey.deviceId.equals(result.device._id);
+                return deviceKey.device === result.device._id;
               }
             ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
 
@@ -513,7 +513,7 @@ describe('Model Utils', function(){
           },
           function createDeviceAndPairToGpi(innerCallback){
             var device = new DeviceModel({
-              macAddress : "123456654322",
+              _id : "123456654322",
               deviceType : "506de2fe8eebf7524342cb37",
               serial : "SOMETHING RANDOM 3",
               owner : self.user
@@ -624,6 +624,7 @@ describe('Model Utils', function(){
                 });
                 
               },*/
+              /*
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){
@@ -644,7 +645,8 @@ describe('Model Utils', function(){
                   
                   innerCallback();
                 });
-              }
+
+              }*/
             ],
             function(err, results){
               done();  
@@ -719,7 +721,7 @@ describe('Model Utils', function(){
                 });
                 
               },
-              */
+              *//*
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){
@@ -740,7 +742,7 @@ describe('Model Utils', function(){
                   
                   innerCallback();
                 });
-              }
+              }*/
             ],
             function(err, results){
               done();  

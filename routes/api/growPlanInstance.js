@@ -46,7 +46,7 @@ module.exports = function(app) {
    *  jQuery.post("/api/grow-plan-instances", {
    *    users : [{ type: ObjectId, ref: 'User'}],
    *    growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
-   *    device : { type : ObjectId, ref : 'Device', required: false },
+   *    device : { type : String , ref : 'Device', required: false },
    *    startDate: { type: Date, required: true },
    *    phases: [{
    *      phase: { type: ObjectId, ref: 'Phase' },

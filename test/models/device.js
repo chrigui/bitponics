@@ -57,11 +57,11 @@ should = require('should');
       
       beforeEach(function(done){
         var self = this;
-        self.macAddress = "101010101010";
+        self._id = "101010101010";
         self.serial = "SOMETHING RANDOM DEVICE";
 
         DeviceModel.create({
-          macAddress: self.macAddress,
+          _id: self._id,
           serial : self.serial
         }, 
         function(err, createdDevice){
@@ -71,7 +71,7 @@ should = require('should');
       });
 
       afterEach(function(done){
-        DeviceModel.remove({macAddress: this.macAddress}, done);
+        DeviceModel.remove({_id: this._id}, done);
       });
       
       it('logs a calibration log, with the current timestamp', function(done){
@@ -79,7 +79,7 @@ should = require('should');
             now = Date.now();
 
         should.exist(self.device);
-        self.device.macAddress.should.equal(self.macAddress);
+        self.device._id.should.equal(self._id);
 
         DeviceModel.logCalibration(
         {

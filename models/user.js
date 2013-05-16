@@ -28,7 +28,7 @@ var DeviceKeySchema = new Schema({
    * deviceId not required. We temporarily create & save unassociated deviceKeys
    * for use during the setup process
    */
-  deviceId : { type: ObjectIdSchema, ref : 'Device'},
+  device : { type: String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required : false },
 
   serial : { type : String },
 
@@ -137,7 +137,6 @@ UserSchema = new Schema({
 			'serious',
 			'industrial'
 		]},
-		//device : { type: ObjectIdSchema, ref : 'Device'},
 		growPlanInstance : { type : ObjectIdSchema, ref : 'GrowPlanInstance' },
 		createdAt : { type : Date, default : Date.now },
 		payments : [
@@ -244,7 +243,8 @@ UserSchema.static('authenticate', function(email, password, done) {
  * Used by Passport BPN_DEVICE strategy
  */
 UserSchema.static('getByPublicDeviceKey', function(key, done) {
-  User.findOne({ 'deviceKeys.public': key }, function(err, user) {
+  User.findOne({ 'deviceKeys.public': key })
+  .exec(function(err, user) {
 	  if (err) { return done(err); }
       if (!user) { return done(new Error('No such device key'), false); }
       var matchingKey = user.deviceKeys.filter(function(deviceKey){
@@ -285,7 +285,7 @@ UserSchema.method('toPublicJSON', function() {
   	notificationPreferences: this.notificationPreferences,
   	deviceKeys : this.deviceKeys.map(
   		function(el){ 
-  			return { deviceId : el.deviceId, 'public' : el.public};
+  			return { device : el.device, 'public' : el.public};
   		}
 	),
   	apiKey : {
@@ -346,7 +346,7 @@ UserSchema.method('getAvailableDeviceKey', function(options) {
 
 		for (i = 0; i < length; i++) {
 			currentDeviceKey = deviceKeys[i];
-			if (!currentDeviceKey.deviceId){
+			if (!currentDeviceKey.device){
 				if (serial){
 					if (currentDeviceKey.serial === serial){
 						return currentDeviceKey;
@@ -374,7 +374,7 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 
 	for (i = user.deviceKeys.length; i--;) {
 		currentDeviceKey = user.deviceKeys[i];
-		if (!currentDeviceKey.deviceId){
+		if (!currentDeviceKey.device){
 			availableDeviceKey = currentDeviceKey;
 			break;
 		}

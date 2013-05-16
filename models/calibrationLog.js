@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
 
 
 var CalibrationLogSchema = new Schema({
-  d : { type : ObjectIdSchema, ref : 'Device', required : true },
+  d : { type : String, ref : 'Device', required : true },
   ts : { type : Date, default: Date.now, required : true},
   m : { 
     type : String, 
