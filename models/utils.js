@@ -43,10 +43,10 @@ function logSensorLog(options, callback){
       // be an empty array when persisted to device.recentSensorLogs. 
       // Only push is getting the whole thing in. Gotta
       // abandon desc-sorted recentSensorLogs for now because of that
-      console.log(pendingSensorLog);
-      device.recentSensorLogs.unshift(pendingSensorLog.toObject());
-      device.save(innerCallback);
-      //innerCallback();
+      //console.log(pendingSensorLog);
+      //device.recentSensorLogs.unshift(pendingSensorLog.toObject());
+      //device.save(innerCallback);
+      innerCallback();
     },
     function saveToGPI(innerCallback){
       //if (!growPlanInstance) { return innerCallback();}
