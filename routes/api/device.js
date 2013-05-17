@@ -177,7 +177,6 @@ module.exports = function(app) {
    */
   app.get('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
-    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
       var id = req.params.id.replace(/:/g,'');
       sendDeviceStatusResponse(req, res, id);
@@ -197,7 +196,6 @@ module.exports = function(app) {
    */
   app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
-    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
       var id = req.params.id.replace(/:/g,''),
           reqBody = {},

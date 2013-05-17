@@ -6,6 +6,7 @@ module.exports = {
 			}
 			next();
 		},
+/*
     ensureDeviceKeyVerified : function(req, res, next){
     	var async = require('async'),
     			DeviceModel = require('../models/device').model;
@@ -49,10 +50,9 @@ module.exports = {
             });
     			} else {
     				return next(new Error("Could not verify device for the serial number " + deviceKey.serial));
-    			}
-      	}
-      });
+
     },
+    */
     ensureDeviceLoggedIn : function(req, res, next){
       if( !(req.user && req.user._id)){
         var error = new Error("Invalid device request auth");
