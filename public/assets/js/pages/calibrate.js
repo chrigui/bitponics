@@ -25,12 +25,12 @@ function (angular, domReady, moment, feBeUtils) {
 
         $routeProvider
           .when('/', {
-            controller: 'bpn.controllers.calibrate.PH4',
-            templateUrl: 'ph4.html'
-          })
-          .when('/ph7', {
             controller: 'bpn.controllers.calibrate.PH7',
             templateUrl: 'ph7.html'
+          })
+          .when('/ph4', {
+            controller: 'bpn.controllers.calibrate.PH4',
+            templateUrl: 'ph4.html'
           })
           .when('/ph10', {
             controller: 'bpn.controllers.calibrate.PH10',
@@ -148,11 +148,12 @@ function (angular, domReady, moment, feBeUtils) {
         $scope.socket.on('device_calibration_response', function (data) {
           console.log('device_calibration_response', data);
           switch(data.mode){
-            case bpn.utils.CALIB_MODES.PH_4:
-              $scope.$overlay.hide();
-              $location.path('/ph7');
-              break;
+            // 7, then 4, then 10
             case bpn.utils.CALIB_MODES.PH_7:
+              $scope.$overlay.hide();
+              $location.path('/ph4');
+              break;
+            case bpn.utils.CALIB_MODES.PH_4:
               $scope.$overlay.hide();
               $location.path('/ph10');
               break;
