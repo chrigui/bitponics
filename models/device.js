@@ -458,22 +458,23 @@ DeviceSchema.method('getStatusResponse', function(callback) {
 /**************** STATIC METHODS ****************************/
 
 /**
- * Log a CalibrationLog for the device. Used by the device API
+ * Log a CalibrationStatusLog for the device. 
+ * For now used only in the device API when device posts to /status
  * 
  * @param {Device} settings.device
- * @param {CalibrationLog|object} settings.calibrationLog. "device" property shouldn't be set; we'll set it after we grab the device through macAddress
- * @param {CalibrationUtils.CALIB_MODES} settings.calibrationLog.mode
- * @param {CalibrationUtils.CALIB_STATUSES} settings.calibrationLog.status
- * @param {string=} settings.calibrationLog.message. optional.
- * @param {function(err, CalibrationLog)} callback
+ * @param {CalibrationStatusLog|object} settings.calibrationStatusLog. "device" property shouldn't be set; we'll set it after we grab the device through macAddress
+ * @param {CalibrationUtils.CALIB_MODES} settings.calibrationStatusLog.mode
+ * @param {CalibrationUtils.CALIB_STATUSES} settings.calibrationStatusLog.status
+ * @param {string=} settings.calibrationStatusLog.message. optional.
+ * @param {function(err, CalibrationStatusLog)} callback
  */
 DeviceSchema.static('logCalibration', function(settings, callback) {
   var DeviceModel = this,
-    CalibrationLogModel = require('./calibrationLog').model;
+    CalibrationStatusLogModel = require('./calibrationStatusLog').model;
 
-  settings.calibrationLog.device = settings.device._id;
+  settings.calibrationStatusLog.device = settings.device._id;
 
-  CalibrationLogModel.create(settings.calibrationLog, callback);
+  CalibrationStatusLogModel.create(settings.calibrationStatusLog, callback);
 });
 /**************** END STATIC METHODS ****************************/
 

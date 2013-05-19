@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
-var CalibrationLogSchema = new Schema({
+var CalibrationStatusLogSchema = new Schema({
   d : { type : String, ref : 'Device', required : true },
   ts : { type : Date, default: Date.now, required : true},
   m : { 
@@ -37,7 +37,7 @@ var CalibrationLogSchema = new Schema({
 );
 
 
-CalibrationLogSchema.virtual('device')
+CalibrationStatusLogSchema.virtual('device')
   .get(function () {
     return this.d;
   })
@@ -45,7 +45,7 @@ CalibrationLogSchema.virtual('device')
     this.d = device;
   });
 
-CalibrationLogSchema.virtual('timestamp')
+CalibrationStatusLogSchema.virtual('timestamp')
   .get(function () {
     return this.ts;
   })
@@ -53,7 +53,7 @@ CalibrationLogSchema.virtual('timestamp')
     this.ts = timestamp;
   });
 
-CalibrationLogSchema.virtual('mode')
+CalibrationStatusLogSchema.virtual('mode')
   .get(function () {
     return this.m;
   })
@@ -61,7 +61,7 @@ CalibrationLogSchema.virtual('mode')
     this.m = mode;
   });
 
-CalibrationLogSchema.virtual('status')
+CalibrationStatusLogSchema.virtual('status')
   .get(function () {
     return this.s;
   })
@@ -69,7 +69,7 @@ CalibrationLogSchema.virtual('status')
     this.s = status;
   });
 
-CalibrationLogSchema.virtual('message')
+CalibrationStatusLogSchema.virtual('message')
   .get(function () {
     return this.msg;
   })
@@ -86,7 +86,7 @@ CalibrationLogSchema.virtual('message')
  * "Transforms are applied to the document and each of its sub-documents"
  * http://mongoosejs.com/docs/api.html#document_Document-toObject
  */
-CalibrationLogSchema.set('toObject', {
+CalibrationStatusLogSchema.set('toObject', {
   getters : true,
   transform : function(doc, ret, options){
     delete ret.ts;
@@ -95,14 +95,14 @@ CalibrationLogSchema.set('toObject', {
     delete ret.msg;
   }
 });
-CalibrationLogSchema.set('toJSON', {
+CalibrationStatusLogSchema.set('toJSON', {
   getters : true,
-  transform : CalibrationLogSchema.options.toObject.transform
+  transform : CalibrationStatusLogSchema.options.toObject.transform
 });
 /*************** END SERIALIZATION *************************/
 
 
-CalibrationLogSchema.index({ 'd ts': -1 });
+CalibrationStatusLogSchema.index({ 'd ts': -1 });
 
-exports.schema = CalibrationLogSchema;
-exports.model = mongooseConnection.model('CalibrationLog', CalibrationLogSchema);
+exports.schema = CalibrationStatusLogSchema;
+exports.model = mongooseConnection.model('CalibrationStatusLog', CalibrationStatusLogSchema);

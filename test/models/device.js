@@ -84,20 +84,20 @@ should = require('should');
         DeviceModel.logCalibration(
         {
           device : self.device,
-          calibrationLog : {
+          calibrationStatusLog : {
             mode : "ph_4",
             status : "success",
             message : "calibration message"
           }
         },
-        function(err, calibrationLog){
+        function(err, calibrationStatusLog){
           should.not.exist(err);
-          should.exist(calibrationLog);
+          should.exist(calibrationStatusLog);
           
-          calibrationLog.mode.should.equal("ph_4");
-          calibrationLog.status.should.equal("success");
-          calibrationLog.message.should.equal("calibration message");
-          calibrationLog.timestamp.valueOf().should.be.above(now);
+          calibrationStatusLog.mode.should.equal("ph_4");
+          calibrationStatusLog.status.should.equal("success");
+          calibrationStatusLog.message.should.equal("calibration message");
+          calibrationStatusLog.timestamp.valueOf().should.be.above(now);
           
           done();
         });

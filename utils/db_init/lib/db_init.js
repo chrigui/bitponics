@@ -121,10 +121,10 @@ async.series([
           });
         },
         function(innerCallback){
-          if (!mongooseConnection.collections['calibrationlogs']){ return innerCallback();}
-          mongooseConnection.collections['calibrationlogs'].drop( function(err) {
+          if (!mongooseConnection.collections['calibrationstatuslogs']){ return innerCallback();}
+          mongooseConnection.collections['calibrationstatuslogs'].drop( function(err) {
             if (err){ return innerCallback(err);}
-            console.log('calibrationlogs collection dropped');
+            console.log('calibrationstatuslogs collection dropped');
             innerCallback();
           });
         },

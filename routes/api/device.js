@@ -201,7 +201,7 @@ module.exports = function(app) {
           reqBody = {},
           pendingSensorLog = { ts : Date.now(), logs : []},
           pendingDeviceLogs,
-          calibrationLog,
+          calibrationStatusLog,
           device,
           growPlanInstance;
 
@@ -219,7 +219,7 @@ module.exports = function(app) {
         // we get req.rawBody created for all requests that come from a device
         reqBody = JSON.parse(req.rawBody);
         pendingDeviceLogs = reqBody["sensors"];
-        calibrationLog = reqBody["calib"];
+        calibrationStatusLog = reqBody["calib"];
       }
 
       async.waterfall(
@@ -263,15 +263,15 @@ module.exports = function(app) {
                     innerCallback
                   );
                 },
-                function logCalibrationLog(innerCallback){
-                  if (!calibrationLog){
+                function logCalibrationStatusLog(innerCallback){
+                  if (!calibrationStatusLog){
                     return innerCallback();
                   }
-                  calibrationLog.timestamp = calibrationLog.timestamp || Date.now();
+                  calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();
 
                   DeviceModel.logCalibration({
                     device : device,
-                    calibrationLog : calibrationLog
+                    calibrationStatusLog : calibrationStatusLog
                   },
                   innerCallback
                   );

@@ -1,5 +1,5 @@
 var DeviceModel = require('../models/device').model,
-    CalibrationLogModel = require('../models/calibrationLog').model,
+    CalibrationStatusLogModel = require('../models/calibrationStatusLog').model,
     UserModel = require('../models/user').model;
 
 module.exports = function(app){
@@ -30,18 +30,18 @@ module.exports = function(app){
         
         checkIntervalId = setInterval(function(){
           
-          CalibrationLogModel.find({
+          CalibrationStatusLogModel.find({
             d : deviceId,
             ts : { $gt : started },
             m : mode
           })
           .sort('-ts')
-          .exec(function (err, calibrationLogResults){
-            if (err || (!(calibrationLogResults && calibrationLogResults.length))) { return; }
-            console.log('recent calib logs', calibrationLogResults);
+          .exec(function (err, calibrationStatusLogResults){
+            if (err || (!(calibrationStatusLogResults && calibrationStatusLogResults.length))) { return; }
+            console.log('recent calib logs', calibrationStatusLogResults);
             socket.emit(
               'device_calibration_response', 
-              calibrationLogResults[0]
+              calibrationStatusLogResults[0]
             );
           });
         }, 5 * 1000);

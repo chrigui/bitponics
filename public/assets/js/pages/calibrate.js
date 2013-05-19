@@ -118,7 +118,8 @@ function (angular, domReady, moment, feBeUtils) {
       function($scope, sharedDataService, socket){
         $scope.sharedDataService = sharedDataService;
         
-        
+        $scope.sharedDataService.waitingOn = ;
+        socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
       }
     ]
   );
