@@ -86,9 +86,13 @@ describe('User', function(){
 
         user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
           should.not.exist(err);
-          should.exist(user.availableDeviceKey);
-          user.availableDeviceKey.should.equal(availableDeviceKey);
+          
+          var keyFromUser = user.getAvailableDeviceKey({serial : serial});
+
+          should.exist(keyFromUser);
+          keyFromUser.should.equal(availableDeviceKey);
           availableDeviceKey.serial.should.equal(serial);
+          keyFromUser.serial.should.equal(serial);
 
           User.getByPublicDeviceKey(user.deviceKeys[0].public, function(err, nestedUser, matchingKey){
             should.not.exist(err);
@@ -130,8 +134,11 @@ describe('User', function(){
 
           user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
             should.not.exist(err);
-            should.exist(user.availableDeviceKey);
-            user.availableDeviceKey.should.equal(availableDeviceKey);
+
+            var keyFromUser = user.getAvailableDeviceKey({serial : serial});
+            should.exist(keyFromUser);
+            keyFromUser.should.equal(availableDeviceKey);
+            keyFromUser.serial.should.equal(serial);
             availableDeviceKey.serial.should.equal(serial);
             done();
           });

@@ -6,22 +6,23 @@ module.exports = {
 			}
 			next();
 		},
+/*
     ensureDeviceKeyVerified : function(req, res, next){
     	var async = require('async'),
     			DeviceModel = require('../models/device').model;
-    	// get the key on the req.user. check whether it has a deviceId and is verified.
-    	// if not verified, use the macAddress on the request to retrieve
+    	// get the key on the req.user. check whether it has a device and is verified.
+    	// if not verified, use the id on the request to retrieve
     	// the device. check whether device.serial matches the serial that we have
-    	// on the req.deviceKey. If so, set the deviceId & set verified & save the user
+    	// on the req.deviceKey. If so, set the device & set verified & save the user
     	var deviceKey = req.deviceKey;
 
     	if (!deviceKey) { return next(); }
 
-    	if (deviceKey.deviceId && deviceKey.verified){ return next(); }
+    	if (deviceKey.device && deviceKey.verified){ return next(); }
 			
-			var macAddress = req.params.id.replace(/:/g,'');
+			var id = req.params.id.replace(/:/g,'');
     	DeviceModel
-      .findOne({ macAddress: macAddress })
+      .findOne({ _id: id })
       .exec(function(err, device){
       	if (err) { return next(err); }	
       	if (device.serial === deviceKey.serial){
@@ -39,17 +40,19 @@ module.exports = {
     			}
 
     			if (found){
-    				dKey.deviceId = device._id;
-    				dKey.verified = true;
-    				req.user.save(function(err){
-    					return next(err);
-    				});
+    				ModelUtils.assignDeviceToUser({
+              user : req.user,
+              deviceKey : dKey,
+              device : device
+            },
+            function(err){
+              return next(err);
+            });
     			} else {
     				return next(new Error("Could not verify device for the serial number " + deviceKey.serial));
-    			}
-      	}
-      });
+
     },
+    */
     ensureDeviceLoggedIn : function(req, res, next){
       if( !(req.user && req.user._id)){
         var error = new Error("Invalid device request auth");

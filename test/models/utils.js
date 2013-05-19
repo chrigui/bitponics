@@ -246,7 +246,7 @@ describe('Model Utils', function(){
           // Pair the GPI to a device
           function(innerCallback){
             var device = new DeviceModel({
-              macAddress : "123456654321",
+              _id : "123456654321",
               deviceType : "506de2fe8eebf7524342cb37",
               serial : "SOMETHING RANDOM",
               owner : self.user
@@ -388,7 +388,7 @@ describe('Model Utils', function(){
           },
           function(innerCallback){
             var device = new DeviceModel({
-              macAddress : '123456123456',
+              _id : '123456123456',
               serial : "SOMETHING RANDOM 2",
             });
             device.save(function(err, deviceResult){
@@ -416,49 +416,48 @@ describe('Model Utils', function(){
     });
 
 
-    it('assigns a device to a user and a user to the device', function(done){
+    it('assigns a device to a user and a user to the device, assuming there is an available device key', function(done){
       var self = this,
           user = self.user,
-          device = self.device,
-          deviceMacAddress = device.macAddress,
-          availableDeviceKey = user.availableDeviceKey,
-          publicDeviceKey = availableDeviceKey.public,
-          device;
+          device = self.device;
 
-      
+      user.ensureAvailableDeviceKey(null, function(err, key, updatedUser){
+        should.not.exist(err);
+        should.exist(key);
 
-      ModelUtils.assignDeviceToUser(
-        { 
-          deviceMacAddress : deviceMacAddress, 
-          user : user,
-          publicDeviceKey : publicDeviceKey
-        },
-        function(err, result){
-          should.not.exist(err);
-          should.exist(result.user);
-          should.exist(result.device);
+        var availableDeviceKey = updatedUser.getAvailableDeviceKey();
           
-          user.deviceKeys.some(
-            function(deviceKey) { 
-              return deviceKey.deviceId.equals(result.device._id);
-            }
-          ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
+        ModelUtils.assignDeviceToUser(
+          { 
+            device : device, 
+            user : user,
+            deviceKey : availableDeviceKey
+          },
+          function(err, result){
+            should.not.exist(err);
+            should.exist(result.user);
+            should.exist(result.device);
+            
+            user.deviceKeys.some(
+              function(deviceKey) { 
+                return deviceKey.device === result.device._id;
+              }
+            ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
 
-          result.device.owner.equals(result.user._id).should.equal(true, "device owner is user");   
-          
-          var now = new Date();
-          
-          result.device.userAssignmentLogs.some(
-            function(userAssignment) { 
-              return ((userAssignment.ts < now) && userAssignment.user.equals(result.user._id) && (userAssignment.assignmentType === DeviceUtils.ROLES.OWNER));
-            }
-          ).should.equal(true, "device.userAssignmentLogs contains a record of assigning the user as owner");
+            result.device.owner.equals(result.user._id).should.equal(true, "device owner is user");   
+            
+            var now = new Date();
+            
+            result.device.userAssignmentLogs.some(
+              function(userAssignment) { 
+                return ((userAssignment.ts < now) && userAssignment.user.equals(result.user._id) && (userAssignment.assignmentType === DeviceUtils.ROLES.OWNER));
+              }
+            ).should.equal(true, "device.userAssignmentLogs contains a record of assigning the user as owner");
 
-          done();
-        }
-      );
-
-
+            done();
+          }
+        );    
+      });
     });
   });
   /* /assignDeviceToUser */
@@ -514,7 +513,7 @@ describe('Model Utils', function(){
           },
           function createDeviceAndPairToGpi(innerCallback){
             var device = new DeviceModel({
-              macAddress : "123456654322",
+              _id : "123456654322",
               deviceType : "506de2fe8eebf7524342cb37",
               serial : "SOMETHING RANDOM 3",
               owner : self.user
@@ -625,6 +624,7 @@ describe('Model Utils', function(){
                 });
                 
               },*/
+              /*
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){
@@ -645,7 +645,8 @@ describe('Model Utils', function(){
                   
                   innerCallback();
                 });
-              }
+
+              }*/
             ],
             function(err, results){
               done();  
@@ -720,7 +721,7 @@ describe('Model Utils', function(){
                 });
                 
               },
-              */
+              *//*
               function checkGpi(innerCallback){
                 GrowPlanInstance.findById(self.gpi._id)
                 .exec(function(err, updatedGrowPlanInstance){
@@ -741,7 +742,7 @@ describe('Model Utils', function(){
                   
                   innerCallback();
                 });
-              }
+              }*/
             ],
             function(err, results){
               done();  

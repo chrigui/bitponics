@@ -25,42 +25,44 @@ block content
   div#overlay.overlay
 
 block footer-scripts
-  script(type='text/ng-template', id='ph4.html')
-    h1 Calibrate your pH probe
+  
+  
+  script(type="text/ng-template", id="ph7.html")
+    h1 Calibrating your pH probe
     p 
-      | Calibrating pH is a 3-step process. You'll calibrate your probe to pH 4, pH 7, and finally pH 10. And then you'll be all set!
-    ol
-      li.step.active
-        div 
-          h2 Step 1
-          p 
-            | We'll start with pH 4. 
-          ul 
-            li Unscrew the cap on your pH probe. 
-            li Rinse the tip of the probe under tap water. 
-            li You should have a bottle labeled "pH 4 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
-            li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
-              button(ng-click="showOverlay()") Calibrate ph 4
+      | Calibrating pH is a 3-step process. You'll calibrate your probe to pH 7, then pH 4, and finally pH 10. And then you'll be all set!
 
-  script(type='text/ng-template', id='ph7.html')
-    h2 Step 2
-      p Great! ph 4 is done, onto pH 7.
+    h2 Step 1
+      p We'll start with pH 7. 
       ul
         li Rinse the tip of the probe under tap water. 
         li You should have a bottle labeled "pH 7 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
-        li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
+        li Place the probe into the solution, then click the button below. Once you click, the calibrating process will begin, and we'll notifiy you when the step is complete. Calibrating may take several minutes. 
           button(ng-click="showOverlay()") Calibrate ph 7
 
-  script(type='text/ng-template', id='ph10.html')
+  script(type="text/ng-template", id="ph4.html")
+    
+    h2 Step 2
+      p 
+        | Great! ph 7 is done, onto pH 4.
+      ul 
+        li Unscrew the cap on your pH probe. 
+        li Rinse the tip of the probe under tap water. 
+        li You should have a bottle labeled "pH 4 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
+        li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
+          button(ng-click="showOverlay()") Calibrate ph 4
+
+  script(type="text/ng-template", id="ph10.html")
     h2 Last Step
-      p Great! ph 7 is done, onto pH 10.
+      p Great! ph 7 and ph 4 are done, onto pH 10.
       ul
         li Rinse the tip of the probe under tap water. 
         li You should have a bottle labeled "pH 10 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
         li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
       button(ng-click="showOverlay()") Calibrate ph 10
 
-  script(type='text/ng-template', id='done.html')
+  
+  script(type="text/ng-template", id="done.html")
     div
       h2 Cool beans! Now you can check out your latest probe readings on your 
         a(href="/account/devices") devices page, 

@@ -218,7 +218,7 @@ feBeUtils = requirejs('fe-be-utils');
         GrowPlanInstance.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
-          device : '506de2fe8eebf7524342cb35',
+          device : '0006667288ae',
           active : true
         },
         function(err, gpi){
@@ -242,7 +242,7 @@ feBeUtils = requirejs('fe-be-utils');
         GrowPlanInstance.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
-          device : '506de2fe8eebf7524342cb36',
+          device : '0006668033ae',
           active : true
         },
         function(err, gpi){

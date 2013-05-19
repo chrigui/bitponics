@@ -2,8 +2,7 @@ var ObjectIdSchema = require('mongoose').Schema.ObjectId;
 
 module.exports = [
 		{
-			_id : '506de2fe8eebf7524342cb34',
-			macAddress: "0006667211cf", //mac address
+			_id: "0006667211cf", //mac address
 			serial: "AA-301-AAAA",
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 1",
@@ -41,8 +40,8 @@ module.exports = [
 			]
 		},
 		{
-			_id : '506de2fe8eebf7524342cb35',
-			macAddress: "0006667288ae", //mac address
+			//_id : '506de2fe8eebf7524342cb35',
+			_id: "0006667288ae", //mac address
 			serial: "AA-301-AAAB",
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 2",
@@ -74,8 +73,7 @@ module.exports = [
 			]
 		},
 		{
-			_id : '506de2fe8eebf7524342cb36',
-			macAddress: "0006668033ae", //mac address
+			_id: "0006668033ae", //mac address
 			serial: "AA-301-AAAC",
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Bitponics Device 3",
@@ -113,8 +111,7 @@ module.exports = [
 
 		},
 		{
-			_id : '5118232537d976f7050f6186',
-			macAddress: "000666721fc1",
+			_id: "000666721fc1",
 			serial: "AA-301-AAAD",
 			deviceType: "506de2fe8eebf7524342cb37",
 			name : "Amit's Prototype Bitponics Device 1",
@@ -133,8 +130,7 @@ module.exports = [
 			recentSensorLogs : []
 		},
     {
-      _id : '513e37cd66e5c0dfc41e101d',
-      macAddress: "000666722947", //mac address
+      _id: "000666722947", //mac address
       serial: "AA-301-AAAE",
       deviceType: "506de2fe8eebf7524342cb37",
       name : "Michael's Prototype Bitponics Device 2",
@@ -154,8 +150,7 @@ module.exports = [
       recentSensorLogs : []
     },
 		{
-      _id : '514fb64a658ae4f3f325e5b6',
-      macAddress: "000666809ecf",
+      _id: "000666809ecf",
       serial: "AA-301-AAAF",
       deviceType: "506de2fe8eebf7524342cb37",
       name : "Chris's Prototype Bitponics Device 1",
@@ -174,7 +169,7 @@ module.exports = [
       recentSensorLogs : []
     },
     {
-			macAddress: "000666809da0", //mac address
+			_id: "000666809da0", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "AA-301-AAAG",
 			name : "Michael's device added on 2013-05-10"

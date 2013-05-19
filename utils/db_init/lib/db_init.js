@@ -121,10 +121,10 @@ async.series([
           });
         },
         function(innerCallback){
-          if (!mongooseConnection.collections['calibrationlogs']){ return innerCallback();}
-          mongooseConnection.collections['calibrationlogs'].drop( function(err) {
+          if (!mongooseConnection.collections['calibrationstatuslogs']){ return innerCallback();}
+          mongooseConnection.collections['calibrationstatuslogs'].drop( function(err) {
             if (err){ return innerCallback(err);}
-            console.log('calibrationlogs collection dropped');
+            console.log('calibrationstatuslogs collection dropped');
             innerCallback();
           });
         },
@@ -493,7 +493,6 @@ async.series([
         } else {
           var dataObj = new models.device({
             _id : _data._id,
-            macAddress: _data.macAddress,
             deviceType: _data.deviceType,
             name : _data.name,
             serial : _data.serial,
@@ -507,7 +506,7 @@ async.series([
 
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
-            savedObjectIds[dataType][_data.macAddress] = doc._id;
+            savedObjectIds[dataType][_data._id] = doc._id;
             console.log("created: " + dataType);
             decrementData();
           });

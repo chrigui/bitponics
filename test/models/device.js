@@ -57,11 +57,11 @@ should = require('should');
       
       beforeEach(function(done){
         var self = this;
-        self.macAddress = "101010101010";
+        self._id = "101010101010";
         self.serial = "SOMETHING RANDOM DEVICE";
 
         DeviceModel.create({
-          macAddress: self.macAddress,
+          _id: self._id,
           serial : self.serial
         }, 
         function(err, createdDevice){
@@ -71,7 +71,7 @@ should = require('should');
       });
 
       afterEach(function(done){
-        DeviceModel.remove({macAddress: this.macAddress}, done);
+        DeviceModel.remove({_id: this._id}, done);
       });
       
       it('logs a calibration log, with the current timestamp', function(done){
@@ -79,25 +79,25 @@ should = require('should');
             now = Date.now();
 
         should.exist(self.device);
-        self.device.macAddress.should.equal(self.macAddress);
+        self.device._id.should.equal(self._id);
 
         DeviceModel.logCalibration(
         {
           device : self.device,
-          calibrationLog : {
+          calibrationStatusLog : {
             mode : "ph_4",
             status : "success",
             message : "calibration message"
           }
         },
-        function(err, calibrationLog){
+        function(err, calibrationStatusLog){
           should.not.exist(err);
-          should.exist(calibrationLog);
+          should.exist(calibrationStatusLog);
           
-          calibrationLog.mode.should.equal("ph_4");
-          calibrationLog.status.should.equal("success");
-          calibrationLog.message.should.equal("calibration message");
-          calibrationLog.timestamp.valueOf().should.be.above(now);
+          calibrationStatusLog.mode.should.equal("ph_4");
+          calibrationStatusLog.status.should.equal("success");
+          calibrationStatusLog.message.should.equal("calibration message");
+          calibrationStatusLog.timestamp.valueOf().should.be.above(now);
           
           done();
         });

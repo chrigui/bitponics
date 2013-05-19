@@ -24,6 +24,9 @@ module.exports = function(app){
             .populate('outputMap.control')
             .exec(function(err, deviceResults){
               if (err) { return innerCallback(err); }
+              
+              // TODO : send the user's device keys to the page too, so that the user can see them.
+              
               locals.userOwnedDevices = deviceResults;
               return innerCallback();
             });

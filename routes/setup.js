@@ -48,10 +48,10 @@ module.exports = function(app){
   );
 
 
-  /*
-   * Send serial key entered by user
+  /**
+   * Process serial key entered by user
    *
-   **/
+   */
   app.post('/setup',
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
@@ -62,12 +62,14 @@ module.exports = function(app){
       
       var serial = req.body.serial;
 
+      // clean up the serial
+      serial = serial.replace(/[_\W]/g, '');
+      serial = serial.toUpperCase();
+      serial = (serial.slice(0,2) + "-" + serial.slice(2,5) + "-" + serial.slice(5,9));
+
       if (!serial){
         return res.json(400, { success : false, error : 'Request requires serial parameter'});
       }
-
-      //TODO: remove this and run ensureAvailableDeviceKey
-      // return res.json(200, { 'private': '1123', 'public': '42142' });
 
       req.user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
         if (err) { return next(err); }
@@ -87,46 +89,8 @@ module.exports = function(app){
         res.render('setup/device', locals);
     }
   );
-  /**
-   * Posts to /setup should specify a device MAC address, and should
-   * be an authenenticated user. We then assign the device to the user
-   * 
-   * Required params : "deviceMacAddress", "publicDeviceKey"
-   */
-  app.post('/setup/device',
-    // routeUtils.middleware.ensureSecure,
-    // routeUtils.middleware.ensureLoggedIn,
-    function (req, res, next){
-      var rawDeviceMacAddress = req.body('deviceMacAddress'),
-        cleanDeviceMacAddress,
-        device,
-        now = Date.now();
 
-      winston.info('/setup/device');
-      winston.info('req.params');
-      winston.info(req.params);
-      winston.info('req.body');
-      winston.info(req.body);
-      winston.info('req.user');
-      winston.info(req.user);
 
-      if (!rawDeviceMacAddress){
-        return res.json(400, { success : false, error : 'Request requires deviceMacAddress parameter'});
-      }
-      if (!req.param('publicDeviceKey')) { return res.json(400, { success : false, error : 'Request requires publicDeviceKey parameter'});}
-
-      cleanDeviceMacAddress = rawDeviceMacAddress.replace(/:/g,'')
-
-      ModelUtils.assignDeviceToUser({
-        deviceMacAddress : cleanDeviceMacAddress,
-        publicDeviceKey : req.param('publicDeviceKey'),
-        user : req.user
-      }, function(err, result){
-        if (err){ return next(err); }
-        return res.json(200, {success: true});
-      });
-    }
-  );
 
   app.get('/setup/device/*',
     function (req, res, next){

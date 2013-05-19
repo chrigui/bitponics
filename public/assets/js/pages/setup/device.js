@@ -121,8 +121,9 @@ function (angular, domReady) {
         $scope.wifiForm = function() {
           var keys = $scope.bothKeys.split('|');
           sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
-          $scope.privateDeviceKey = keys[0],
-          $scope.publicDeviceKey = keys[1];
+          $scope.publicDeviceKey = keys[0];
+          $scope.privateDeviceKey = keys[1];
+          
 
           //if manual entry, update $scope.selectedWifiNetwork with manual values
           if($scope.selectedWifiNetwork.isOtherNetwork) {

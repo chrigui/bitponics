@@ -28,11 +28,15 @@ var DeviceKeySchema = new Schema({
    * deviceId not required. We temporarily create & save unassociated deviceKeys
    * for use during the setup process
    */
-  deviceId : { type: ObjectIdSchema, ref : 'Device'},
+  device : { type: String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required : false },
 
   serial : { type : String },
 
   verified : { type : Boolean, default : false },
+
+  verifiedDate : { type : Date },
+
+  createdAt : { type : Date, default: Date.now },
 
   /**
    * Public device key is a 16-char random hex string
@@ -133,7 +137,6 @@ UserSchema = new Schema({
 			'serious',
 			'industrial'
 		]},
-		//device : { type: ObjectIdSchema, ref : 'Device'},
 		growPlanInstance : { type : ObjectIdSchema, ref : 'GrowPlanInstance' },
 		createdAt : { type : Date, default : Date.now },
 		payments : [
@@ -194,25 +197,6 @@ UserSchema.virtual('timezoneOffset')
 		return timezoneoffset;
 	});
 
-/**
- *  Get the available device key, if exists
- */
-UserSchema.virtual('availableDeviceKey')
-	.get(function(){
-		var user = this,
-			i,
-			currentDeviceKey;
-
-		if (!user.deviceKeys) { return; }
-		
-		for (i = user.deviceKeys.length - 1; i >= 0; i--) {
-			currentDeviceKey = user.deviceKeys[i];
-			if (!currentDeviceKey.deviceId){
-				return currentDeviceKey;
-			}
-		};
-	});
-
 /************************** STATIC METHODS  ***************************/
 
 
@@ -259,7 +243,8 @@ UserSchema.static('authenticate', function(email, password, done) {
  * Used by Passport BPN_DEVICE strategy
  */
 UserSchema.static('getByPublicDeviceKey', function(key, done) {
-  User.findOne({ 'deviceKeys.public': key }, function(err, user) {
+  User.findOne({ 'deviceKeys.public': key })
+  .exec(function(err, user) {
 	  if (err) { return done(err); }
       if (!user) { return done(new Error('No such device key'), false); }
       var matchingKey = user.deviceKeys.filter(function(deviceKey){
@@ -300,7 +285,7 @@ UserSchema.method('toPublicJSON', function() {
   	notificationPreferences: this.notificationPreferences,
   	deviceKeys : this.deviceKeys.map(
   		function(el){ 
-  			return { deviceId : el.deviceId, 'public' : el.public};
+  			return { device : el.device, 'public' : el.public};
   		}
 	),
   	apiKey : {
@@ -309,6 +294,69 @@ UserSchema.method('toPublicJSON', function() {
   };
 });
 
+
+/**
+ * Get the first available device key
+ *
+ * @param {string=} options.serial. optional.
+ */
+UserSchema.method('getAvailableDeviceKey', function(options) {
+  var user = this,
+  		serial,
+			i,
+			currentDeviceKey,
+			deviceKeys = user.deviceKeys || [],
+			length = deviceKeys.length;;
+
+		if (options){
+			serial = options.serial;			
+		}
+
+		for (i = 0; i < length; i++) {
+			currentDeviceKey = deviceKeys[i];
+			if (!currentDeviceKey.deviceId){
+				if (serial){
+					if (currentDeviceKey.serial === serial){
+						return currentDeviceKey;
+					}
+				} else {
+					return currentDeviceKey;	
+				}
+			}
+		};
+});
+
+
+/**
+ * Get the device key matching the device id
+ *
+ * @param {string=} options.serial. optional.
+ */
+UserSchema.method('getAvailableDeviceKey', function(options) {
+  var user = this,
+  		serial,
+			i,
+			currentDeviceKey,
+			deviceKeys = user.deviceKeys || [],
+			length = deviceKeys.length;;
+
+		if (options){
+			serial = options.serial;			
+		}
+
+		for (i = 0; i < length; i++) {
+			currentDeviceKey = deviceKeys[i];
+			if (!currentDeviceKey.device){
+				if (serial){
+					if (currentDeviceKey.serial === serial){
+						return currentDeviceKey;
+					}
+				} else {
+					return currentDeviceKey;	
+				}
+			}
+		};
+});
 
 /**
  * Make sure User has an unassigned deviceKey
@@ -324,9 +372,9 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 
 	user.deviceKeys = user.deviceKeys || [];
 
-	for (i = user.deviceKeys.length - 1; i >= 0; i--) {
+	for (i = user.deviceKeys.length; i--;) {
 		currentDeviceKey = user.deviceKeys[i];
-		if (!currentDeviceKey.deviceId){
+		if (!currentDeviceKey.device){
 			availableDeviceKey = currentDeviceKey;
 			break;
 		}
@@ -337,32 +385,31 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 			function updateAvailableDeviceKey(innerCallback){
 				if (availableDeviceKey){
 					availableDeviceKey.serial = serial;	
-					return innerCallback(null);
+					return innerCallback();
 				} else {
-					crypto.randomBytes(32, function(ex, buf) {
-						if (ex) { return innerCallback(ex); }
-					  	var keysSource = buf.toString('hex'),
-					  		publicKey = keysSource.substr(0, 16),
-					  		privateKey = keysSource.substr(16, 16);
-					  	
-					  	availableDeviceKey = {
-					  		'public' : publicKey,
-					  		'private' : privateKey,
-					  		'serial' : serial
-					  	};
-					  	user.deviceKeys.push(availableDeviceKey);
-					  	return innerCallback(null);
+					crypto.randomBytes(32, function(err, buf) {
+						if (err) { return innerCallback(err); }
+				  	var keysSource = buf.toString('hex'),
+				  		publicKey = keysSource.substr(0, 16),
+				  		privateKey = keysSource.substr(16, 16);
+				  	
+				  	availableDeviceKey = {
+				  		'public' : publicKey,
+				  		'private' : privateKey,
+				  		'serial' : serial
+				  	};
+				  	user.deviceKeys.push(availableDeviceKey);
+				  	return innerCallback();
 					});	
 				}
 			},
 			function saveUser(innerCallback){
-				user.save(function(err){
-					return innerCallback(err);
-				});
+				user.save(innerCallback);
 			}
 		],
-		function (err, result){
-			return done(err, user.availableDeviceKey);
+		function (err, updatedUser){
+			if (err) { return done(err); }
+			return done(null, updatedUser.getAvailableDeviceKey({serial : serial}), updatedUser);
 		}
 	);
 });

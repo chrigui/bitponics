@@ -38,7 +38,7 @@ module.exports = function(app) {
    *
    *  Test with:
    *  jQuery.post("/api/devices", {
-   *    "id": "macaddress"
+   *    "id": "_id"
    *    "name": "pump",
    *    "owner": "userid",
    *    "users": ["userid", "userid1", "userid2"],
@@ -95,7 +95,7 @@ module.exports = function(app) {
     routeUtils.middleware.ensureSecure, 
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
+      return DeviceModel.findOne({ _id: req.params.id }, function (err, device) {
         if (err) { return next(err); }
         return res.send(device);
       });
@@ -121,10 +121,10 @@ module.exports = function(app) {
    * });
    */
   app.put('/api/devices/:id', 
-    routeUtils.middleware.ensureSecure, 
+    routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
+      return DeviceModel.findOne({ _id: req.params.id }, function (err, device) {
         if (err) { return next(err); }
         device.title = req.body.title;
         return device.save(function (err) {
@@ -155,7 +155,7 @@ module.exports = function(app) {
     routeUtils.middleware.ensureSecure, 
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      return DeviceModel.findOne({ macAddress: req.params.id }, function (err, device) {
+      return DeviceModel.findOne({ _id: req.params.id }, function (err, device) {
         if (err) { return next(err); }
         return device.remove(function (err) {
           if (err) { return next(err); }  
@@ -177,10 +177,9 @@ module.exports = function(app) {
    */
   app.get('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
-    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
-      var macAddress = req.params.id.replace(/:/g,'');
-      sendDeviceStatusResponse(req, res, macAddress);
+      var id = req.params.id.replace(/:/g,'');
+      sendDeviceStatusResponse(req, res, id);
     }
   );
 
@@ -197,13 +196,12 @@ module.exports = function(app) {
    */
   app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
-    routeUtils.middleware.ensureDeviceKeyVerified,
     function (req, res, next){
-      var macAddress = req.params.id.replace(/:/g,''),
+      var id = req.params.id.replace(/:/g,''),
           reqBody = {},
           pendingSensorLog = { ts : Date.now(), logs : []},
           pendingDeviceLogs,
-          calibrationLog,
+          calibrationStatusLog,
           device,
           growPlanInstance;
 
@@ -221,14 +219,14 @@ module.exports = function(app) {
         // we get req.rawBody created for all requests that come from a device
         reqBody = JSON.parse(req.rawBody);
         pendingDeviceLogs = reqBody["sensors"];
-        calibrationLog = reqBody["calib"];
+        calibrationStatusLog = reqBody["calib"];
       }
 
       async.waterfall(
         [
           function getDevice(callback){
             DeviceModel
-            .findOne({ macAddress: macAddress })
+            .findOne({ _id: id })
             .populate('activeGrowPlanInstance')
             .exec(function(err, device){
               if (!device){ 
@@ -265,15 +263,15 @@ module.exports = function(app) {
                     innerCallback
                   );
                 },
-                function logCalibrationLog(innerCallback){
-                  if (!calibrationLog){
+                function logCalibrationStatusLog(innerCallback){
+                  if (!calibrationStatusLog){
                     return innerCallback();
                   }
-                  calibrationLog.timestamp = calibrationLog.timestamp || Date.now();
+                  calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();
 
                   DeviceModel.logCalibration({
                     device : device,
-                    calibrationLog : calibrationLog
+                    calibrationStatusLog : calibrationStatusLog
                   },
                   innerCallback
                   );
@@ -287,14 +285,14 @@ module.exports = function(app) {
         ],
         function waterfallFinal(err){
           if (err) { return next(err); }
-          return sendDeviceStatusResponse(req, res, macAddress, device);
+          return sendDeviceStatusResponse(req, res, id, device);
         }
       );
     }
   );
 
   
-  var sendDeviceStatusResponse = function(req, res, macAddress, deviceModel){
+  var sendDeviceStatusResponse = function(req, res, id, deviceModel){
     async.waterfall([
       function getDevice(innerCallback){
         if (deviceModel){
@@ -302,7 +300,7 @@ module.exports = function(app) {
         }
 
         DeviceModel
-        .findOne({ macAddress: macAddress })
+        .findOne({ _id: id })
         .exec(innerCallback);
       },
       function getStatus(device, innerCallback){

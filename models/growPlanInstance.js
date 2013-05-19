@@ -11,7 +11,9 @@ var mongoose = require('mongoose'),
   winston = require('winston'),
   tz = require('timezone/loaded'),
   DeviceModel = require('./device').model,
-  getObjectId = require('./utils').getObjectId,
+  utils = require('./utils'),
+  getObjectId = utils.getObjectId,
+  getDocumentIdString = utils.getDocumentIdString,
   SensorLogSchema = require('./sensorLog').schema,
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
@@ -57,7 +59,7 @@ var GrowPlanInstanceSchema = new Schema({
 
 	growPlan : { type : ObjectIdSchema, ref : 'GrowPlan', required: true },
 	
-	device : { type : ObjectIdSchema, ref : 'Device', required: false }, //the bitponics device
+	device : { type : String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required: false }, //the bitponics device
 	
 	name : { type : String },
 
@@ -410,7 +412,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           if (!gpiWithActivePhase.device){ return innerCallback(null, gpiWithActivePhase); }
 
           gpiWithActivePhase.pairWithDevice({
-            deviceId : getObjectId(gpiWithActivePhase.device)
+            deviceId : getDocumentIdString(gpiWithActivePhase.device)
           },
           innerCallback);
         }
@@ -496,7 +498,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       function (innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
-        DeviceModel.findById(growPlanInstance.device, function (err, deviceResult){
+        DeviceModel.findById(getDocumentIdString(growPlanInstance.device), function (err, deviceResult){
           if (err) {  return innerCallback(err); }
 
           device = deviceResult;
