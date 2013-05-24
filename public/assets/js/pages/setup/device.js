@@ -143,9 +143,9 @@ function (angular, domReady) {
         $scope.postToDevice = function() {
           // Clean up data so that device can parse it
           // spaces must be replaced with '$'
-          $scope.selectedWifiNetwork.ssid = $scope.selectedWifiNetwork.ssid.replace(/ /g, '$');
-          
-          var postDataStringPlainText = 'SSID=' + $scope.selectedWifiNetwork.ssid + '\n' +
+          $scope.selectedWifiNetwork.deviceFriendlySsid = $scope.selectedWifiNetwork.ssid.replace(/ /g, '$');
+
+          var postDataStringPlainText = 'SSID=' + $scope.selectedWifiNetwork.deviceFriendlySsid + '\n' +
             'PASS=' + $scope.wifiPass + '\n' +
             'MODE=' + $scope.selectedWifiNetwork.securityMode + '\n' +
             'SKEY=' + $scope.privateDeviceKey + '\n' +
@@ -257,6 +257,7 @@ function (angular, domReady) {
         };
         $scope.scannedWifiNetworks = [];
         $scope.connectToDeviceRetryTimer = 60000;
+
       }
     ]
   );
