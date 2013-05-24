@@ -14,7 +14,13 @@ var NotificationSentLogSchema = new Schema({
   /**
    * timestamp
    */
-  ts : { type : Date } 
+  ts : { type : Date },
+
+  /**
+   * checked
+   * User can "check" a notification log to hide it/mark completed
+   */
+  c : { type : Boolean }
 },
 { _id : false, id : false });
 
@@ -24,6 +30,14 @@ NotificationSentLogSchema.virtual('timestamp')
 })
 .set(function(timestamp){
   this.ts = timestamp;
+})
+
+NotificationSentLogSchema.virtual('checked')
+.get(function(){
+  return this.c;
+})
+.set(function(checked){
+  this.c = checked;
 })
 
 /**
@@ -223,6 +237,7 @@ NotificationSchema.set('toObject', {
   transform : function(doc, ret, options){
     if (doc.schema === NotificationSentLogSchema){
       delete ret.ts;
+      delete ret.c;
     } else {
       // else we're operating on the parent doc (the NotificationSchema doc)
       delete ret.u;
