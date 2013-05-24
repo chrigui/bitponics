@@ -25,20 +25,40 @@ function (angular, domReady, moment, feBeUtils) {
 
         $routeProvider
           .when('/', {
-            controller: 'bpn.controllers.calibrate.PH7',
-            templateUrl: 'ph7.html'
+            controller: 'bpn.controllers.calibrate.Select',
+            templateUrl: 'select.html'
           })
-          .when('/ph4', {
-            controller: 'bpn.controllers.calibrate.PH4',
-            templateUrl: 'ph4.html'
+          .when('/ph', {
+            controller: 'bpn.controllers.calibrate.PH_7',
+            templateUrl: 'ph-7.html'
           })
-          .when('/ph10', {
-            controller: 'bpn.controllers.calibrate.PH10',
-            templateUrl: 'ph10.html'
+          .when('/ph-4', {
+            controller: 'bpn.controllers.calibrate.PH_4',
+            templateUrl: 'ph-4.html'
           })
-          .when('/done', {
-            controller: 'bpn.controllers.calibrate.Done',
-            templateUrl: 'done.html'
+          .when('/ph-10', {
+            controller: 'bpn.controllers.calibrate.PH_10',
+            templateUrl: 'ph-10.html'
+          })
+          .when('/ph-done', {
+            controller: 'bpn.controllers.calibrate.Ph_Done',
+            templateUrl: 'ph-done.html'
+          })
+          .when('/ec', {
+            controller: 'bpn.controllers.calibrate.EC_DRY',
+            templateUrl: 'ec-dry.html'
+          })
+          .when('/ec-hi', {
+            controller: 'bpn.controllers.calibrate.EC_HI',
+            templateUrl: 'ec-hi.html'
+          })
+          .when('/ec-lo', {
+            controller: 'bpn.controllers.calibrate.EC_LO',
+            templateUrl: 'ec-lo.html'
+          })
+          .when('/ec-done', {
+            controller: 'bpn.controllers.calibrate.EC_Done',
+            templateUrl: 'ec-done.html'
           })
           .otherwise({redirectTo:'/'}
         );
@@ -56,25 +76,8 @@ function (angular, domReady, moment, feBeUtils) {
   );
 
 
-  calibrateApp.controller('bpn.controllers.calibrate.PH4',
-    [
-      '$scope',
-      'sharedDataService',
-      'bpn.services.socket',
-      function($scope, sharedDataService, socket){
-        $scope.sharedDataService = sharedDataService;
-        
-        $scope.showOverlay = function(){
-          $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_4;
-          socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating pH 4...</h1>").show();
-        };
-      }
-    ]
-  );
 
-
-  calibrateApp.controller('bpn.controllers.calibrate.PH7',
+  calibrateApp.controller('bpn.controllers.calibrate.PH_7',
     [
       '$scope',
       'sharedDataService',
@@ -92,7 +95,25 @@ function (angular, domReady, moment, feBeUtils) {
   );
 
 
-  calibrateApp.controller('bpn.controllers.calibrate.PH10',
+  calibrateApp.controller('bpn.controllers.calibrate.PH_4',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+        
+        $scope.showOverlay = function(){
+          $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_4;
+          socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
+          $scope.$overlay.html("<h1>Calibrating pH 4...</h1>").show();
+        };
+      }
+    ]
+  );
+
+
+  calibrateApp.controller('bpn.controllers.calibrate.PH_10',
     [
       '$scope',
       'sharedDataService',
@@ -110,7 +131,7 @@ function (angular, domReady, moment, feBeUtils) {
   );
 
 
-  calibrateApp.controller('bpn.controllers.calibrate.Done',
+  calibrateApp.controller('bpn.controllers.calibrate.Ph_Done',
     [
       '$scope',
       'sharedDataService',
@@ -118,13 +139,95 @@ function (angular, domReady, moment, feBeUtils) {
       function($scope, sharedDataService, socket){
         $scope.sharedDataService = sharedDataService;
         
-        $scope.sharedDataService.waitingOn = ;
+        $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_DONE;
         socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
       }
     ]
   );
 
   
+
+  calibrateApp.controller('bpn.controllers.calibrate.EC_DRY',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+        
+        $scope.showOverlay = function(){
+          $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_DRY;
+          socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
+          $scope.$overlay.html("<h1>Calibrating EC-Dry...</h1>").show();
+        };
+      }
+    ]
+  );
+
+
+  calibrateApp.controller('bpn.controllers.calibrate.EC_HI',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+        
+        $scope.showOverlay = function(){
+          $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_HI;
+          socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
+          $scope.$overlay.html("<h1>Calibrating EC-3000&#956;s...</h1>").show();
+        };
+      }
+    ]
+  );
+
+
+  calibrateApp.controller('bpn.controllers.calibrate.EC_LO',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+        
+        $scope.showOverlay = function(){
+          $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_LO;
+          socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
+          $scope.$overlay.html("<h1>Calibrating EC-200&#956;s...</h1>").show();
+        };
+      }
+    ]
+  );
+
+
+  calibrateApp.controller('bpn.controllers.calibrate.EC_Done',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+        
+        $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_DONE;
+        socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
+      }
+    ]
+  );
+
+
+  calibrateApp.controller('bpn.controllers.calibrate.Select',
+    [
+      '$scope',
+      'sharedDataService',
+      'bpn.services.socket',
+      function($scope, sharedDataService, socket){
+        $scope.sharedDataService = sharedDataService;
+      }
+    ]
+  );
+  
+
   calibrateApp.controller('bpn.controllers.calibrate.Main',
     [
       '$scope',
@@ -149,18 +252,31 @@ function (angular, domReady, moment, feBeUtils) {
         $scope.socket.on('device_calibration_response', function (data) {
           console.log('device_calibration_response', data);
           switch(data.mode){
-            // 7, then 4, then 10
+            // ph: 7, then 4, then 10
             case bpn.utils.CALIB_MODES.PH_7:
               $scope.$overlay.hide();
-              $location.path('/ph4');
+              $location.path('/ph-4');
               break;
             case bpn.utils.CALIB_MODES.PH_4:
               $scope.$overlay.hide();
-              $location.path('/ph10');
+              $location.path('/ph-10');
               break;
             case bpn.utils.CALIB_MODES.PH_10:
               $scope.$overlay.hide();
-              $location.path('/done');
+              $location.path('/ph-done');
+              break;
+            // ec: dry, then hi, then lo
+            case bpn.utils.CALIB_MODES.EC_DRY:
+              $scope.$overlay.hide();
+              $location.path('/ec-hi');
+              break;
+            case bpn.utils.CALIB_MODES.EC_HI:
+              $scope.$overlay.hide();
+              $location.path('/ec-lo');
+              break;
+            case bpn.utils.CALIB_MODES.EC_LO:
+              $scope.$overlay.hide();
+              $location.path('/ec-done');
               break;
           }
         });

@@ -468,7 +468,7 @@ DeviceSchema.method('getStatusResponse', function(callback) {
  * @param {string=} settings.calibrationStatusLog.message. optional.
  * @param {function(err, CalibrationStatusLog)} callback
  */
-DeviceSchema.static('logCalibration', function(settings, callback) {
+DeviceSchema.static('logCalibrationStatus', function(settings, callback) {
   var DeviceModel = this,
     CalibrationStatusLogModel = require('./calibrationStatusLog').model;
 

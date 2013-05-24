@@ -269,7 +269,7 @@ module.exports = function(app) {
                   }
                   calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();
 
-                  DeviceModel.logCalibration({
+                  DeviceModel.logCalibrationStatus({
                     device : device,
                     calibrationStatusLog : calibrationStatusLog
                   },

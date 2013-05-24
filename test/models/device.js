@@ -53,7 +53,7 @@ should = require('should');
     });
 
 
-    describe('.logCalibration', function(){
+    describe('.logCalibrationStatus', function(){
       
       beforeEach(function(done){
         var self = this;
@@ -81,7 +81,7 @@ should = require('should');
         should.exist(self.device);
         self.device._id.should.equal(self._id);
 
-        DeviceModel.logCalibration(
+        DeviceModel.logCalibrationStatus(
         {
           device : self.device,
           calibrationStatusLog : {
