@@ -108,6 +108,7 @@ var DeviceSchema = new Schema({
           feBeUtils.CALIB_MODES.PH_4,
           feBeUtils.CALIB_MODES.PH_7,
           feBeUtils.CALIB_MODES.PH_10,
+          feBeUtils.CALIB_MODES.EC_DRY,
           feBeUtils.CALIB_MODES.EC_LO,
           feBeUtils.CALIB_MODES.EC_HI
         ]
