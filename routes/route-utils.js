@@ -18,7 +18,7 @@ module.exports = {
 
     	if (!deviceKey) { return next(); }
 
-    	if (deviceKey.device && deviceKey.verified){ return next(); }
+    	if (deviceKey.deviceId && deviceKey.verified){ return next(); }
 			
 			var id = req.params.id.replace(/:/g,'');
     	DeviceModel

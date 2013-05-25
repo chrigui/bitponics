@@ -30,7 +30,7 @@ var DeviceKeySchema = new Schema({
    * deviceId not required. We temporarily create & save unassociated deviceKeys
    * for use during the setup process
    */
-  device : { type: String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required : false },
+  deviceId : { type: String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required : false },
 
   serial : { type : String },
 
@@ -324,7 +324,7 @@ UserSchema.method('getDeviceKey', function(options) {
 			currentDeviceKey = deviceKeys[i];
 			if (serial && (currentDeviceKey.serial === serial)) {
 					return currentDeviceKey;
-			} else if (!currentDeviceKey.device){
+			} else if (!currentDeviceKey.deviceId){
 				return currentDeviceKey;		
 			}
 		};
@@ -350,7 +350,7 @@ UserSchema.method('ensureDeviceKey', function(serial, done){
 
 	for (i = user.deviceKeys.length; i--;) {
 		currentDeviceKey = user.deviceKeys[i];
-		if (!currentDeviceKey.device){
+		if (!currentDeviceKey.deviceId){
 			availableDeviceKey = currentDeviceKey;
 		}
 		if(currentDeviceKey.serial === serial){

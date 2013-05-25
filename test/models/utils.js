@@ -440,7 +440,7 @@ describe('Model Utils', function(){
             
             user.deviceKeys.some(
               function(deviceKey) { 
-                return deviceKey.device === result.device._id;
+                return deviceKey.deviceId === result.device._id;
               }
             ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
 

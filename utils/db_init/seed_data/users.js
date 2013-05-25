@@ -70,7 +70,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	activationToken : "12345678900",
 		  	sentEmail : true/*,
 		  	"deviceKeys": [{
-		        "device" : "000666809da0",
+		        "deviceId" : "000666809da0",
 		        "serial" : "AA-301-AAAG",
             "public": "2b8aa505151c9284",
 		        "private": "38f93d2b174f0fd7",
@@ -141,7 +141,7 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		        "private": "7f163018dae9b388170c2c2d5d7bad01"
 		    },
 		    "deviceKeys": [{
-		        "device" : "0006667211cf",
+		        "deviceId" : "0006667211cf",
 		        "serial" : "AA-301-AAAA",
             "public": "dedf72f732cd6f66",
 		        "private": "7f27ad4bf71ae693",

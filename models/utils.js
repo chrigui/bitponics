@@ -694,7 +694,7 @@ function assignDeviceToUser(settings, callback){
         device.save(innerCallback)
       },
       function userStep(innerCallback){
-        deviceKey.device = device._id;
+        deviceKey.deviceId = device._id;
         deviceKey.serial = device.serial;
         deviceKey.verified = true;
         deviceKey.verifiedDate = Date.now();
