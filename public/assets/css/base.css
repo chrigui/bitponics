@@ -999,8 +999,8 @@ a.btn,
 button.btn {
   display: inline-block;
   background: #fff !important;
-  color: #00f717 !important;
-  border: 3px solid #00f717;
+  color: #00e36c;
+  border: 3px solid #00e36c;
 }
 a.btn i,
 button.btn i {
@@ -1203,7 +1203,7 @@ section.footer .content-module {
   color: #00fa8b;
 }
 .landing-page .content-module .nav-section {
-  border-top: 1px solid #00f717;
+  border-top: 1px solid #00e36c;
 }
 .landing-page .content-module.inverted-color {
   background-color: #00e36c;
@@ -1452,8 +1452,11 @@ section.footer .content-module {
   font-size: 1.5em;
   margin-bottom: 0;
 }
-#pricing .base-station-preorder // TEMP .btn {
-  margin-top: 0;
+#pricing .btn {
+  color: #00fa8b;
+  border-color: #00fa8b;
+}
+#pricing .base-station-preorder .btn {
   margin-left: 0;
 }
 #pricing h2.price-category {
