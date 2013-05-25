@@ -47,17 +47,30 @@ define(['moment'], function(moment){
 
 
   /**
-   * Used during device sensor calibration
+   * Used by the device sensor calibration page
    */
   utils.CALIB_MODES = {
     "PH_4" : "ph_4",
     "PH_7" : "ph_7",
     "PH_10" : "ph_10",
+    "PH_DONE" : "ph_done",
+    "EC_DRY" : "ec_dr",
     "EC_LO" : "ec_lo",
-    "EC_HI" : "ec_hi"
+    "EC_HI" : "ec_hi",
+    "EC_DONE" : "ec_done"
   };
   
   
+  /**
+   * Used to log CalibrationLogs, after a calibration has been
+   * completed
+   */
+  utils.CALIB_LOG_TYPES = {
+    "PH" : "ph",
+    "EC" : "ec"
+  };
+
+
   /**
    * Used during device sensor calibration
    */
@@ -74,6 +87,9 @@ define(['moment'], function(moment){
     "GOOD" : "good",
     "BAD" : "bad"
   };
+
+
+  utils.COMBINED_DEVICE_KEY_SPLITTER = "|";
 
   /**
    * Suggestions for auto-complete in UI

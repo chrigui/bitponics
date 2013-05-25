@@ -398,7 +398,7 @@ describe('Model Utils', function(){
           }
         ],
         function(err, results){
-          self.user.ensureAvailableDeviceKey(null, done);
+          self.user.ensureDeviceKey(null, done);
         }
       );
       
@@ -421,11 +421,11 @@ describe('Model Utils', function(){
           user = self.user,
           device = self.device;
 
-      user.ensureAvailableDeviceKey(null, function(err, key, updatedUser){
+      user.ensureDeviceKey(null, function(err, key, updatedUser){
         should.not.exist(err);
         should.exist(key);
 
-        var availableDeviceKey = updatedUser.getAvailableDeviceKey();
+        var availableDeviceKey = updatedUser.getDeviceKey();
           
         ModelUtils.assignDeviceToUser(
           { 
@@ -440,7 +440,7 @@ describe('Model Utils', function(){
             
             user.deviceKeys.some(
               function(deviceKey) { 
-                return deviceKey.device === result.device._id;
+                return deviceKey.deviceId === result.device._id;
               }
             ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
 

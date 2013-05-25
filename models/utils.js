@@ -38,7 +38,7 @@ function logSensorLog(options, callback){
   async.parallel(
     [
     function saveToDevice(innerCallback){
-      //if (!device){ return innerCallback(); }
+      if (!device){ return innerCallback(); }
       // for some goddamn mysterious reason, unshift is causing pendingSensorLog.logs to 
       // be an empty array when persisted to device.recentSensorLogs. 
       // Only push is getting the whole thing in. Gotta
@@ -49,7 +49,7 @@ function logSensorLog(options, callback){
       innerCallback();
     },
     function saveToGPI(innerCallback){
-      //if (!growPlanInstance) { return innerCallback();}
+      if (!growPlanInstance) { return innerCallback();}
       //growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
       //growPlanInstance.save(innerCallback);
       innerCallback();
@@ -694,7 +694,7 @@ function assignDeviceToUser(settings, callback){
         device.save(innerCallback)
       },
       function userStep(innerCallback){
-        deviceKey.device = device._id;
+        deviceKey.deviceId = device._id;
         deviceKey.serial = device.serial;
         deviceKey.verified = true;
         deviceKey.verifiedDate = Date.now();

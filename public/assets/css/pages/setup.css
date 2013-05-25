@@ -246,6 +246,9 @@ a:hover {
 .setup input[readonly]:focus {
   background: #f5f5f5;
 }
+.setup .serial {
+  width: 20em;
+}
 @-moz-keyframes led-indicator {
   0%, 100% {
     opacity: 0;

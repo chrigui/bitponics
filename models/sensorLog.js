@@ -51,6 +51,12 @@ var SensorLogSchema = new Schema({
      */
     gpi : { type : ObjectIdSchema, ref: 'GrowPlanInstance'},
     
+  
+  	/**
+  	 * Device ID. Since it's not an ObjectId we don't get the free "populate" behavior of Mongoose, 
+  	 * so we need to explicitly pass it ID for storage
+  	 */
+    d : { type : String, ref : 'Device'},
     /**
      * timestamp
      */
@@ -69,6 +75,14 @@ SensorLogSchema.virtual('logs')
 	.set(function(logs){
 		this.l = logs;
 	});
+
+SensorLogSchema.virtual('deviceId')
+  .get(function () {
+    return this.d;
+  })
+  .set(function(deviceId){
+    this.d = deviceId;
+  });
 
 SensorLogSchema.virtual('timestamp')
   .get(function () {
@@ -96,6 +110,7 @@ SensorLogSchema.set('toObject', {
       // else we're operating on the parent doc (the SensorLog doc)
       delete ret.l;
       delete ret.ts;
+      delete ret.d;
     }
   }
 });

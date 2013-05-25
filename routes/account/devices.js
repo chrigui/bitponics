@@ -13,7 +13,8 @@ module.exports = function(app){
     function (req, res, next){
       var locals = {
         title : 'Devices',
-        className : 'account-devices'
+        className : 'account-devices',
+        appUrl: app.config.appUrl
       };
 
       async.parallel(
@@ -26,14 +27,22 @@ module.exports = function(app){
               if (err) { return innerCallback(err); }
               
               // TODO : send the user's device keys to the page too, so that the user can see them.
-              
-              locals.userOwnedDevices = deviceResults;
+              locals.userOwnedDevices = deviceResults.map(function(device) { return device.toObject(); });
+
+              req.user.deviceKeys.forEach(function(deviceKey){
+                locals.userOwnedDevices.forEach(function(device){
+                  if (device._id.toString() === deviceKey.deviceId){
+                    device.combinedKey = deviceKey.combinedKey;
+                    return false;
+                  }
+                })                  
+              });
               return innerCallback();
             });
           }
         ],
         function(err, results){
-
+          if (err) { return next(err); }
           res.render('account/devices', locals);
         }
       );

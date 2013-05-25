@@ -15,30 +15,30 @@ block content
       include /includes/nav/main
   
   section(ng-cloak="")#main(role="main", class="main")
-    div.content-module.middle
-      form(id="setup-form", name="setup", data-ajax="false", ng-controller="bpn.controllers.setup.Main", novalidate)
+    div.content-module.middle(ng-controller="bpn.controllers.setup.Main")
+      form(id="serial-form", name="setup", data-ajax="false", novalidate, ng-submit="sendSerialToServer()")
         h1.page-heading Setting up your Bitponics Base Station
         div(ng-show="key == undefined", class="separator-top")
           h4.page-heading-small Device Serial
           label(for='wifi-manual-ssid') Enter the serial number from the sticker on your BITPONICS Base Station
-          input#serial(ng-model="serial", name="serial", uppercase, ui-mask="{{serialMask}}")  
-          a(href, type='submit', class="btn next-step-btn", ng-click="sendSerialToServer()") Send
+          input#serial(autofocus="autofocus", ng-model="serial", name="serial", uppercase, ui-mask="{{serialMask}}")  
+          button(type='submit', class="btn next-step-btn", ng-click="sendSerialToServer()") Send
 
-        div(ng-show="key && !pairingComplete", class="separator-top")
-          h4.page-heading-small Your Device Key
-          p For the next step, a new browser window will open. You will be asked to copy/paste this key, so keep this window open.
-          input#serial(ng-model="key", name="key", readonly, select-on-click)
-          a(href, type='submit', class="btn next-step-btn", ng-click="openWifiPairingPage()") Open the device pairing page.
+      div(ng-show="key && !pairingComplete", class="separator-top")
+        h4.page-heading-small Your Device Key
+        p For the next step, a new browser window will open. You will be asked to copy/paste this key, so keep this window open.
+        input#serial.serial(ng-model="key", name="key", readonly, select-on-click)
+        a(href, type='submit', class="btn next-step-btn", ng-click="openWifiPairingPage()") Open the device pairing page.
 
-        div(ng-show="pairingPending && !pairingComplete")
-          | Waiting for device pairing to be complete...
+      div(ng-show="pairingPending && !pairingComplete")
+        | Waiting for device pairing to be complete...
 
-        div(ng-show="pairingComplete")
-          | Device pairing complete! Now you can check out device status on 
-          a(href="/account/devices/{{pairedDeviceId}}") your device page 
-          | or 
-          a(href="/setup/grow-plan") dive right into setting up a Grow Plan 
-          | for your garden.
+      div(ng-show="pairingComplete")
+        | Device pairing complete! Now you can check out device status on 
+        a(href="/account/devices/{{pairedDeviceId}}") your device page 
+        | or 
+        a(href="/setup/grow-plan") dive right into setting up a Grow Plan 
+        | for your garden.
 
 
 block footer-scripts

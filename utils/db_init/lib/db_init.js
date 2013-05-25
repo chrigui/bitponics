@@ -129,6 +129,14 @@ async.series([
           });
         },
         function(innerCallback){
+          if (!mongooseConnection.collections['calibrationlogs']){ return innerCallback();}
+          mongooseConnection.collections['calibrationlogs'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('calibrationlogs collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
           if (!mongooseConnection.collections['sensors']){ return innerCallback();}
           mongooseConnection.collections['sensors'].drop( function(err) {
             if (err){ return innerCallback(err);}

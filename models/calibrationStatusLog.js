@@ -18,7 +18,8 @@ var CalibrationStatusLogSchema = new Schema({
       feBeUtils.CALIB_MODES.PH_4, 
       feBeUtils.CALIB_MODES.PH_7,
       feBeUtils.CALIB_MODES.PH_10,
-      feBeUtils.CALIB_MODES.EC_LO, 
+      feBeUtils.CALIB_MODES.EC_DRY,
+      feBeUtils.CALIB_MODES.EC_LO,
       feBeUtils.CALIB_MODES.EC_HI
     ],
     required : true
@@ -29,6 +30,7 @@ var CalibrationStatusLogSchema = new Schema({
       feBeUtils.CALIB_STATUSES.SUCCESS, 
       feBeUtils.CALIB_STATUSES.ERROR
     ],
+    default : feBeUtils.CALIB_STATUSES.SUCCESS,
     required : true
   },
   msg : { type : String }

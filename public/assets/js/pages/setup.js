@@ -48,17 +48,16 @@ function (angular, domReady) {
         $scope.maskedSerial;
 
         $scope.$watch('serial', function(){
-          $scope.maskedSerial = $('#serial')[0].value;
+          $scope.maskedSerial = $('#serial')[0].value.substring(0, 11);
         })
 
         $scope.sendSerialToServer = function() {
           $http.post("/setup", { 'serial': $scope.maskedSerial })
             .success(function (data) {
-              console.log(data);
               if (typeof data === 'string'){
                 data = JSON.parse(data);
               }
-              $scope.key = data.public + '|' + data.private;
+              $scope.key = data.combinedKey;
             });
         }
 
@@ -72,10 +71,10 @@ function (angular, domReady) {
             $scope.socket.emit('ready', { "serial" : $scope.serial } );
           })
           $scope.socket.on('keys', function (keys) {
-            console.log(keys);
             keys.forEach(function(key){
               if (key.serial === $scope.maskedSerial && key.verified){
                 $scope.pairingComplete = true;
+                $scope.socket.disconnect();
               }
             })
           });

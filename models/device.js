@@ -108,6 +108,7 @@ var DeviceSchema = new Schema({
           feBeUtils.CALIB_MODES.PH_4,
           feBeUtils.CALIB_MODES.PH_7,
           feBeUtils.CALIB_MODES.PH_10,
+          feBeUtils.CALIB_MODES.EC_DRY,
           feBeUtils.CALIB_MODES.EC_LO,
           feBeUtils.CALIB_MODES.EC_HI
         ]
@@ -184,7 +185,6 @@ DeviceSchema.method('refreshStatus', function(callback) {
       
 
   if (!device.activeGrowPlanInstance) { 
-    //return callback(new Error(i18nKeys.get("No active grow plan instance found for device"))); 
     device.status.expires = Date.now();
     device.status.actions = [];
     device.status.immediateActions = [];
@@ -468,7 +468,7 @@ DeviceSchema.method('getStatusResponse', function(callback) {
  * @param {string=} settings.calibrationStatusLog.message. optional.
  * @param {function(err, CalibrationStatusLog)} callback
  */
-DeviceSchema.static('logCalibration', function(settings, callback) {
+DeviceSchema.static('logCalibrationStatus', function(settings, callback) {
   var DeviceModel = this,
     CalibrationStatusLogModel = require('./calibrationStatusLog').model;
 

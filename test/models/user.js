@@ -84,10 +84,10 @@ describe('User', function(){
 
         var serial = "TS-301-AAAA";
 
-        user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
+        user.ensureDeviceKey(serial, function(err, availableDeviceKey){
           should.not.exist(err);
           
-          var keyFromUser = user.getAvailableDeviceKey({serial : serial});
+          var keyFromUser = user.getDeviceKey({serial : serial});
 
           should.exist(keyFromUser);
           keyFromUser.should.equal(availableDeviceKey);
@@ -132,10 +132,10 @@ describe('User', function(){
           should.exist(user);
           var serial = "TS-301-AAAN";
 
-          user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
+          user.ensureDeviceKey(serial, function(err, availableDeviceKey){
             should.not.exist(err);
 
-            var keyFromUser = user.getAvailableDeviceKey({serial : serial});
+            var keyFromUser = user.getDeviceKey({serial : serial});
             should.exist(keyFromUser);
             keyFromUser.should.equal(availableDeviceKey);
             keyFromUser.serial.should.equal(serial);
