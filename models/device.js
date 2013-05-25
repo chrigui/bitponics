@@ -184,7 +184,6 @@ DeviceSchema.method('refreshStatus', function(callback) {
       
 
   if (!device.activeGrowPlanInstance) { 
-    //return callback(new Error(i18nKeys.get("No active grow plan instance found for device"))); 
     device.status.expires = Date.now();
     device.status.actions = [];
     device.status.immediateActions = [];

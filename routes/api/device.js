@@ -232,7 +232,7 @@ module.exports = function(app) {
               if (!device){ 
                 return next(new Error('Attempted to log to a nonexistent device'));
               }
-              pendingSensorLog.device = device;
+              pendingSensorLog.deviceId = id;
               return callback(err, device);
             });
           },
@@ -314,15 +314,14 @@ module.exports = function(app) {
         }
         var now = Date.now();
 
-        console.log('forceRefreshParam', req.params['forceRefresh']);
+        //console.log('forceRefreshParam', req.params['forceRefresh']);
         
         if (device.status.expires > now && !req.params['forceRefresh']){
           return device.getStatusResponse(innerCallback);
         }
 
-
-
         device.refreshStatus(function(err, updatedDevice){
+          if (err){ return innerCallback(err); }
           return updatedDevice.getStatusResponse(innerCallback);
         });
       }
