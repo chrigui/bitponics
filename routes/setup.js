@@ -31,7 +31,7 @@ module.exports = function(app){
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
-      req.user.ensureAvailableDeviceKey(null, function(err, availableDeviceKey){
+      req.user.ensureDeviceKey(null, function(err, availableDeviceKey){
         if (err) { return next(err); }
 
         var locals = {
@@ -71,7 +71,7 @@ module.exports = function(app){
         return res.json(400, { success : false, error : 'Request requires serial parameter'});
       }
 
-      req.user.ensureAvailableDeviceKey(serial, function(err, availableDeviceKey){
+      req.user.ensureDeviceKey(serial, function(err, availableDeviceKey){
         if (err) { return next(err); }
 
         return res.json(200, availableDeviceKey);

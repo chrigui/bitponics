@@ -13,6 +13,11 @@ define([
 		  	connect : function(path){
 		  		socket = io.connect(path);
 		  	},
+		  	disconnect : function(){
+		  		if (socket){
+		  			socket.disconnect();	
+		  		}
+		  	},
 		    on: function (eventName, callback) {
 		      socket.on(eventName, function () {
 		        var args = arguments;

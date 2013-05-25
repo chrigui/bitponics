@@ -296,11 +296,12 @@ UserSchema.method('toPublicJSON', function() {
 
 
 /**
- * Get the first available device key
+ * Get the first key matching provided options, 
+ * or if options are empty, first available device key
  *
  * @param {string=} options.serial. optional.
  */
-UserSchema.method('getAvailableDeviceKey', function(options) {
+UserSchema.method('getDeviceKey', function(options) {
   var user = this,
   		serial,
 			i,
@@ -314,49 +315,16 @@ UserSchema.method('getAvailableDeviceKey', function(options) {
 
 		for (i = 0; i < length; i++) {
 			currentDeviceKey = deviceKeys[i];
-			if (!currentDeviceKey.deviceId){
-				if (serial){
-					if (currentDeviceKey.serial === serial){
-						return currentDeviceKey;
-					}
-				} else {
-					return currentDeviceKey;	
-				}
+			if (serial && (currentDeviceKey.serial === serial)) {
+					return currentDeviceKey;
+			} else if (!currentDeviceKey.device){
+				return currentDeviceKey;		
 			}
 		};
 });
 
 
-/**
- * Get the device key matching the device id
- *
- * @param {string=} options.serial. optional.
- */
-UserSchema.method('getAvailableDeviceKey', function(options) {
-  var user = this,
-  		serial,
-			i,
-			currentDeviceKey,
-			deviceKeys = user.deviceKeys || [],
-			length = deviceKeys.length;;
 
-		if (options){
-			serial = options.serial;			
-		}
-
-		for (i = 0; i < length; i++) {
-			currentDeviceKey = deviceKeys[i];
-			if (!currentDeviceKey.device){
-				if (serial){
-					if (currentDeviceKey.serial === serial){
-						return currentDeviceKey;
-					}
-				} else {
-					return currentDeviceKey;	
-				}
-			}
-		};
-});
 
 /**
  * Make sure User has an unassigned deviceKey
@@ -364,11 +332,12 @@ UserSchema.method('getAvailableDeviceKey', function(options) {
  * @param {string} serial. THe serial number that the user entered that will be assigned to this device key
  * @param {function(err, object )} done : Passed the available deviceKey object (DeviceKeySchema)
  */
-UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
+UserSchema.method('ensureDeviceKey', function(serial, done){
 	var user = this,
 		availableDeviceKey,
 		i,
-		currentDeviceKey;
+		currentDeviceKey,
+		matchingDeviceKey;
 
 	user.deviceKeys = user.deviceKeys || [];
 
@@ -376,13 +345,18 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 		currentDeviceKey = user.deviceKeys[i];
 		if (!currentDeviceKey.device){
 			availableDeviceKey = currentDeviceKey;
-			break;
+		}
+		if(currentDeviceKey.serial === serial){
+			matchingDeviceKey = currentDeviceKey;
 		}
 	};
 	
 	async.waterfall(
 		[
 			function updateAvailableDeviceKey(innerCallback){
+				if (matchingDeviceKey){
+					return innerCallback();
+				}
 				if (availableDeviceKey){
 					availableDeviceKey.serial = serial;	
 					return innerCallback();
@@ -409,7 +383,7 @@ UserSchema.method('ensureAvailableDeviceKey', function(serial, done){
 		],
 		function (err, updatedUser){
 			if (err) { return done(err); }
-			return done(null, updatedUser.getAvailableDeviceKey({serial : serial}), updatedUser);
+			return done(null, updatedUser.getDeviceKey({serial : serial}), updatedUser);
 		}
 	);
 });

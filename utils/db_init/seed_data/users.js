@@ -68,7 +68,14 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		  	active : true,
 		  	admin :  true,
 		  	activationToken : "12345678900",
-		  	sentEmail : true
+		  	sentEmail : true/*,
+		  	"deviceKeys": [{
+		        "device" : "000666809da0",
+		        "serial" : "AA-301-AAAG",
+            "public": "2b8aa505151c9284",
+		        "private": "38f93d2b174f0fd7",
+		        "verified": true,
+		    }]*/
 		},
 		{
 			_id : '506de30a8eebf7524342cb69',
