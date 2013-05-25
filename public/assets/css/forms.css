@@ -180,7 +180,7 @@
   border: none;
 }
 .separator-top {
-  border-top: 1px solid #cccdcc;
+  border-top: 1px solid #d8d8d8;
 }
 /*
  * Forms
@@ -204,16 +204,16 @@ input.inline {
 input,
 textarea {
   margin-top: 0;
-  background-color: #f5f5f5;
+  background-color: #c1c2c4;
   border: none;
   padding: 0.75em;
-  color: #999b9a;
+  color: #999;
 }
 input:valid,
 textarea:valid,
 input:invalid,
 textarea:invalid {
-  background-color: #f5f5f5;
+  background-color: #c1c2c4;
 }
 input:focus,
 textarea:focus {

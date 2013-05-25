@@ -1,14 +1,16 @@
 .overlay
-	position absolute
-	// position fixed
-	top 5em
-	left 10%
+	// position absolute
+	position fixed
+	top 5%
+	left 5%
+	right 5%
 	background white
-	border 3px solid color-text-gray-sep
-	width 80%
-	right 10%
+	border 3px solid color-border-gray
+	width 90%
+	height 90%
+	min-height 720px
 	z-index 1050
-	overflow hidden
+	overflow scroll
 	padding 1em 2em 1em
 
 	&.fade
@@ -18,9 +20,9 @@
 			//top 5em
 
 	.close
-		position absolute
-		top 0
-		right 0
+		position fixed
+		top 5%
+		right 5%
 		cursor pointer
 		background white
 		color color-text-graydark
@@ -49,4 +51,4 @@
 	input[type='radio']:checked + label,
 	input[type='checkbox']:checked + label
 		color white!important
-		background color-hot-green!important
+		background color-logo-green!important
