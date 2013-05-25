@@ -27,7 +27,8 @@ module.exports = function(app){
               
               // TODO : send the user's device keys to the page too, so that the user can see them.
               
-              locals.userOwnedDevices = deviceResults;
+
+              locals.userOwnedDevices = deviceResults.map(function(device) { return device.toObject(); });
               return innerCallback();
             });
           }

@@ -51,6 +51,8 @@ var SensorLogSchema = new Schema({
      */
     gpi : { type : ObjectIdSchema, ref: 'GrowPlanInstance'},
     
+  
+    d : { type : String, ref : 'Device'},
     /**
      * timestamp
      */
@@ -69,6 +71,14 @@ SensorLogSchema.virtual('logs')
 	.set(function(logs){
 		this.l = logs;
 	});
+
+SensorLogSchema.virtual('device')
+  .get(function () {
+    return this.d;
+  })
+  .set(function(device){
+    this.d = device;
+  });
 
 SensorLogSchema.virtual('timestamp')
   .get(function () {
@@ -96,6 +106,7 @@ SensorLogSchema.set('toObject', {
       // else we're operating on the parent doc (the SensorLog doc)
       delete ret.l;
       delete ret.ts;
+      delete ret.d;
     }
   }
 });

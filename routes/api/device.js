@@ -179,7 +179,7 @@ module.exports = function(app) {
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
       var id = req.params.id.replace(/:/g,'');
-      sendDeviceStatusResponse(req, res, id);
+      sendDeviceStatusResponse(req, res, next, id);
     }
   );
 
@@ -232,6 +232,7 @@ module.exports = function(app) {
               if (!device){ 
                 return next(new Error('Attempted to log to a nonexistent device'));
               }
+              pendingSensorLog.device = device;
               return callback(err, device);
             });
           },
@@ -250,7 +251,7 @@ module.exports = function(app) {
                     });
                   });
                   
-                  winston.info('pendingSensorLog');
+                  winston.info('/status pendingSensorLog');
                   winston.info(JSON.stringify(pendingSensorLog));
 
                   ModelUtils.logSensorLog(
@@ -265,6 +266,7 @@ module.exports = function(app) {
                 },
                 function logCalibrationStatusLog(innerCallback){
                   if (!calibrationStatusLog){
+                    winston.info('/status no calibration status log');
                     return innerCallback();
                   }
                   calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();
@@ -278,21 +280,24 @@ module.exports = function(app) {
                 }
               ],
               function parallelFinal(err, results){
-                return callback(err)
+                winston.info('/status parallelFinal', err);
+                return callback(err);
               }
             );
           }
         ],
         function waterfallFinal(err){
+          winston.info('/status waterfallFinal', err);
           if (err) { return next(err); }
-          return sendDeviceStatusResponse(req, res, id, device);
+          winston.info('/status waterfallFinal sending device status response');
+          return sendDeviceStatusResponse(req, res, next, id, device);
         }
       );
     }
   );
 
   
-  var sendDeviceStatusResponse = function(req, res, id, deviceModel){
+  var sendDeviceStatusResponse = function(req, res, next, id, deviceModel){
     async.waterfall([
       function getDevice(innerCallback){
         if (deviceModel){
@@ -305,7 +310,7 @@ module.exports = function(app) {
       },
       function getStatus(device, innerCallback){
         if (!device){ 
-          return callback(new Error('No device found for id ' + req.params.id));
+          return innerCallback(new Error('No device found for id ' + req.params.id));
         }
         var now = Date.now();
 
@@ -328,6 +333,7 @@ module.exports = function(app) {
       return sendDeviceResponse({
         req : req,
         res : res,
+        next : next,
         resourceName : "status",
         responseBody : deviceStatusResponse
       });
