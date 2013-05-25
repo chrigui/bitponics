@@ -54,7 +54,6 @@ function (angular, domReady) {
         $scope.sendSerialToServer = function() {
           $http.post("/setup", { 'serial': $scope.maskedSerial })
             .success(function (data) {
-              console.log(data);
               if (typeof data === 'string'){
                 data = JSON.parse(data);
               }

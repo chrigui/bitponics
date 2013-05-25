@@ -26,9 +26,17 @@ module.exports = function(app){
               if (err) { return innerCallback(err); }
               
               // TODO : send the user's device keys to the page too, so that the user can see them.
-              
-
               locals.userOwnedDevices = deviceResults.map(function(device) { return device.toObject(); });
+
+              req.user.deviceKeys.forEach(function(deviceKey){
+                locals.userOwnedDevices.forEach(function(device){
+                  console.log(device._id, deviceKey.toObject());
+                  if (device._id.toString() === deviceKey.deviceId){
+                    device.combinedKey = deviceKey.combinedKey;
+                    return false;
+                  }
+                })                  
+              });
               return innerCallback();
             });
           }
