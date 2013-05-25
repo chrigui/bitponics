@@ -54,9 +54,12 @@ block content
 
 
           div
-            a.calibrate-device-item(href="/account/devices/calibrate/#{device._id}") 
+            a.btn.calibrate-device-item(href="/account/devices/calibrate/#{device._id}") 
               | Calibrate 
-            
+          
+          div
+            a.btn(href="#", href="#{appUrl}/setup", target="_blank") 
+              | Pair to a Wifi network
 
 
   a(href="/setup") Set up a new Bitponics Device

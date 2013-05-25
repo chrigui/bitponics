@@ -13,7 +13,8 @@ module.exports = function(app){
     function (req, res, next){
       var locals = {
         title : 'Devices',
-        className : 'account-devices'
+        className : 'account-devices',
+        appUrl: app.config.appUrl
       };
 
       async.parallel(
@@ -30,7 +31,6 @@ module.exports = function(app){
 
               req.user.deviceKeys.forEach(function(deviceKey){
                 locals.userOwnedDevices.forEach(function(device){
-                  console.log(device._id, deviceKey.toObject());
                   if (device._id.toString() === deviceKey.deviceId){
                     device.combinedKey = deviceKey.combinedKey;
                     return false;
@@ -42,7 +42,7 @@ module.exports = function(app){
           }
         ],
         function(err, results){
-
+          if (err) { return next(err); }
           res.render('account/devices', locals);
         }
       );
