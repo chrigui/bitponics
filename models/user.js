@@ -14,7 +14,9 @@ var mongoose = require('mongoose'),
 	verificationEmailDomain = 'bitponics.com',
 	EmailConfig = require('../config/email-config'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
-  async = require('async');
+  async = require('async'),
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
 mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
@@ -48,7 +50,12 @@ var DeviceKeySchema = new Schema({
   private : String
 
 }, 
-{ _id : false, id : false });
+{ _id : false, id : false, toObject : { virtuals: true }, toJSON : { virtuals : true } });
+
+DeviceKeySchema.virtual('combinedKey')
+.get(function(){
+	return this.public + feBeUtils.COMBINED_DEVICE_KEY_SPLITTER + this.private;
+});
 
 
 UserSchema = new Schema({

@@ -1,17 +1,12 @@
 require([
   'angular',
   'domReady',
-  // 'moment',
-  // 'fe-be-utils',
-  // 'view-models',
+  'fe-be-utils',
   'angularResource',
-  // 'd3',
   'es5shim',
-  // 'steps',
   // 'overlay'
 ],
-// function (angular, domReady, moment, feBeUtils, viewModels) {
-function (angular, domReady) {
+function (angular, domReady, feBeUtils) {
   'use strict';
 
   var setupApp = angular.module('bpn.apps.setup.device', ['ngResource']);
@@ -119,7 +114,7 @@ function (angular, domReady) {
       'sharedDataService',
       function($scope, $location, $http, sharedDataService){
         $scope.wifiForm = function() {
-          var keys = $scope.bothKeys.split('|');
+          var keys = $scope.bothKeys.split(feBeUtils.COMBINED_DEVICE_KEY_SPLITTER);
           sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
           $scope.publicDeviceKey = keys[0];
           $scope.privateDeviceKey = keys[1];

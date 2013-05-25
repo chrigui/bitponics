@@ -88,6 +88,9 @@ define(['moment'], function(moment){
     "BAD" : "bad"
   };
 
+
+  utils.COMBINED_DEVICE_KEY_SPLITTER = "|";
+
   /**
    * Suggestions for auto-complete in UI
    */

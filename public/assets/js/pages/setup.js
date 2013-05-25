@@ -58,7 +58,7 @@ function (angular, domReady) {
               if (typeof data === 'string'){
                 data = JSON.parse(data);
               }
-              $scope.key = data.public + '|' + data.private;
+              $scope.key = data.combinedKey;
             });
         }
 
