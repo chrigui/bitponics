@@ -184,7 +184,7 @@ margin 0,
   border: none;
 }
 .separator-top {
-  border-top: 1px solid #cccdcc;
+  border-top: 1px solid #d8d8d8;
 }
 .content-module {
   float: left;
@@ -237,7 +237,7 @@ section.footer {
   height: 1em;
 }
 .dashboard section#header .sub-heading a {
-  color: #00f717;
+  color: #00e36c;
 }
 .dashboard section.main {
   padding: 6em 1em 1em;
@@ -329,11 +329,11 @@ section.footer {
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
+  overflow: hidden;
 }
 .landing-page .footer div {
   position: absolute;
   bottom: 1em;
-  left: 2.5%;
 }
 .landing-page .header {
   position: absolute;
@@ -344,7 +344,7 @@ section.footer {
   padding: 2em 0;
   height: 3em;
   background: #fff;
-  color: #999b9a;
+  color: #999;
   padding: 0;
 }
 .landing-page .header .icon-glyphlogo-new {
@@ -378,12 +378,12 @@ section.footer {
   padding: 0.45em 0 0 0;
 }
 .landing-page .header a {
-  color: #999b9a;
+  color: #999;
   line-height: 3em;
   font-size: 0.85em;
 }
 .landing-page .header a.active {
-  color: #00fa8b;
+  color: #00e36c;
 }
 .landing-page .header h1.logo a {
   font-size: inherit;
@@ -410,7 +410,7 @@ section.footer {
   height: auto;
 }
 .landing-page .header .nav-section li.active a {
-  color: #00fa8b;
+  color: #00e36c;
 }
 .landing-page .header .nav-section.elevated-item li {
   line-height: 3em;
@@ -420,8 +420,8 @@ section.footer {
   padding: 0.5em;
   text-align: center;
   line-height: 1em;
-  color: #999b9a;
-  border-color: #999b9a;
+  color: #999;
+  border-color: #999;
   background: none;
 }
 .landing-page .header .social-icons {
@@ -436,7 +436,7 @@ section.footer {
 .landing-page .header .social-icons li {
   margin: 0.5em 0 0 0.2em;
   color: #fff;
-  background: #999b9a;
+  background: #999;
   position: relative;
 }
 .landing-page .header .social-icons a {
@@ -474,7 +474,7 @@ section.footer {
   float: left;
   width: 20%;
   margin: 0 2.8%;
-  border-top: 1px solid #999b9a;
+  border-top: 1px solid #999;
 }
 .landing-page .featured-press li.last,
 .landing-page .additional-press li.last {
@@ -584,7 +584,7 @@ section.footer {
 }
 .list-grid-wrapper .grid-list li {
   text-align: center;
-  border-top: 1px solid #cbcbcb;
+  border-top: 1px solid #d8d8d8;
   min-height: 8em;
   width: 100%;
 }
@@ -619,7 +619,7 @@ section.footer {
   top: 0;
   margin-top: 0;
   font-size: 3em;
-  color: #00f717;
+  color: #00e36c;
 }
 .list-grid-wrapper .grid-list.feature-icons .first {
   min-height: 4em;
@@ -686,7 +686,7 @@ section.footer {
 .single-page #team,
 .single-page #contact {
   background: #fff;
-  color: #999b9a;
+  color: #999;
 }
 .single-page #team div,
 .single-page #contact div,
@@ -696,12 +696,12 @@ section.footer {
 .single-page #contact a,
 .single-page #team h3,
 .single-page #contact h3 {
-  color: #999b9a;
-  border-color: #999b9a;
+  color: #999;
+  border-color: #999;
 }
 .single-page #contact .wufoo * {
   background-color: #fff;
-  color: #999b9a;
+  color: #999;
 }
 @media screen and (min-width: 40em) {
   .main .content-module {
@@ -712,7 +712,7 @@ section.footer {
  * App page overrides
  */
 .app-page {
-  color: #333;
+  color: #999;
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.social-icons {
@@ -730,10 +730,10 @@ section.footer {
 }
 .app-page .value {
   font-size: 1.5em;
-  color: #333;
+  color: #999;
 }
 .app-page .page-heading {
-  color: #333;
+  color: #999;
   font-size: 3.25em;
   font-weight: bold;
   line-height: 1.25em;
@@ -743,14 +743,14 @@ section.footer {
   font-size: 2em;
   line-height: 1.25em;
   margin: 0;
-  color: #333;
+  color: #999;
   border-width: 0;
   font-weight: bold;
 }
 .app-page .page-heading-large span,
 .app-page .page-heading-large input,
 .app-page .page-heading-large div {
-  color: #333;
+  color: #999;
 }
 .app-page .page-heading-small {
   line-height: 1.25em;
