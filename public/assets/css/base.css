@@ -1511,15 +1511,15 @@ section.footer .content-module {
 }
 .list-grid-wrapper .grid-list.tier1 h2 span,
 .list-grid-wrapper .grid-list.tier1 .price span {
-  color: color-light-green2;
+  color: #92ed00;
 }
 .list-grid-wrapper .grid-list.tier2 h2 span,
 .list-grid-wrapper .grid-list.tier2 .price span {
-  color: color-logo-green2;
+  color: #00e36c;
 }
 .list-grid-wrapper .grid-list.tier3 h2 span,
 .list-grid-wrapper .grid-list.tier3 .price span {
-  color: color-blue-green;
+  color: #00f5a3;
 }
 .member {
   clear: both;

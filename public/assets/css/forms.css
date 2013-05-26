@@ -204,7 +204,7 @@ input.inline {
 input,
 textarea {
   margin-top: 0;
-  background-color: #c1c2c4;
+  background-color: #eaeaea;
   border: none;
   padding: 0.75em;
   color: #999;
@@ -213,7 +213,7 @@ input:valid,
 textarea:valid,
 input:invalid,
 textarea:invalid {
-  background-color: #c1c2c4;
+  background-color: #eaeaea;
 }
 input:focus,
 textarea:focus {

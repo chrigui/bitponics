@@ -183,11 +183,11 @@ section.footer
 		background-size cover
 		background-repeat no-repeat
 		position relative
+		overflow hidden
 
 		div
 			position absolute
 			bottom 1em
-			left 2.5%
 	
 	.header
 		position absolute
@@ -239,14 +239,14 @@ section.footer
 				padding: 0.45em 0 0 0;
 
 		h1 div, h1 span
-			//color color-another-green
+			//color color-logo-green
 		a 
 			color color-text-gray
 			line-height: 3em;
 			font-size .85em
 
 			&.active
-				color color-another-green
+				color color-logo-green
 
 		h1 
 			&.logo a
@@ -275,7 +275,7 @@ section.footer
 					height auto
 					
 					a
-						color color-another-green
+						color color-logo-green
 			&.elevated-item
 				li
 					line-height 3em
@@ -285,9 +285,9 @@ section.footer
 					text-align center
 					line-height 1em
 					color color-text-gray
-					// color color-hot-green
+					// color color-logo-green
 					border-color color-text-gray
-					// border-color color-hot-green
+					// border-color color-logo-green
 					background none
 
 		.social-icons
@@ -428,7 +428,7 @@ section.footer
 			float left
 			margin 0 2%
 			width: 29%;
-			border-top: 1px solid color-hot-green;
+			border-top: 1px solid color-logo-green;
 			padding: 1em 0 0 0;
 
 		#details
@@ -465,7 +465,7 @@ section.footer
 		margin 0
 		li
 			text-align center
-			border-top 1px solid color-light-gray
+			border-top 1px solid color-border-gray
 			min-height 8em
 			//display: table;
 			width: 100%;
