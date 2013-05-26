@@ -115,11 +115,12 @@ module.exports = function(app){
 
 	    app.config.mongooseConnection = mongooseConnection;
 
-	    app.config.session = {
+      app.config.session = {
 	      secret : 'somethingrandom',
 	      key : 'express.sid',
 	      store : new MongoStore({
-	        mongoose_connection : app.config.mongooseConnection
+	        //mongoose_connection : app.config.mongooseConnection
+          db : app.config.mongooseConnection.db
 	      })
 	    };	
 
@@ -129,7 +130,7 @@ module.exports = function(app){
 
 	    app.use(passport.initialize());
 	    app.use(passport.session());
-
+      
     });
 
     
