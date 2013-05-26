@@ -237,7 +237,7 @@ section.footer {
   height: 1em;
 }
 .dashboard section#header .sub-heading a {
-  color: #00e36c;
+  color: color-medium-green;
 }
 .dashboard section.main {
   padding: 6em 1em 1em;
@@ -383,7 +383,7 @@ section.footer {
   font-size: 0.85em;
 }
 .landing-page .header a.active {
-  color: #00e36c;
+  color: color-another-green;
 }
 .landing-page .header h1.logo a {
   font-size: inherit;
@@ -410,7 +410,7 @@ section.footer {
   height: auto;
 }
 .landing-page .header .nav-section li.active a {
-  color: #00e36c;
+  color: color-another-green;
 }
 .landing-page .header .nav-section.elevated-item li {
   line-height: 3em;
@@ -474,7 +474,7 @@ section.footer {
   float: left;
   width: 20%;
   margin: 0 2.8%;
-  border-top: 1px solid #d8d8d8;
+  border-top: 1px solid #999;
 }
 .landing-page .featured-press li.last,
 .landing-page .additional-press li.last {
@@ -552,7 +552,7 @@ section.footer {
   float: left;
   margin: 0 2%;
   width: 29%;
-  border-top: 1px solid #00e36c;
+  border-top: 1px solid color-hot-green;
   padding: 1em 0 0 0;
 }
 .landing-page #how-it-works #details .detail-block {
@@ -584,7 +584,7 @@ section.footer {
 }
 .list-grid-wrapper .grid-list li {
   text-align: center;
-  border-top: 1px solid #d8d8d8;
+  border-top: 1px solid color-light-gray;
   min-height: 8em;
   width: 100%;
 }
@@ -619,7 +619,7 @@ section.footer {
   top: 0;
   margin-top: 0;
   font-size: 3em;
-  color: #00e36c;
+  color: color-medium-green;
 }
 .list-grid-wrapper .grid-list.feature-icons .first {
   min-height: 4em;
