@@ -237,7 +237,7 @@ section.footer {
   height: 1em;
 }
 .dashboard section#header .sub-heading a {
-  color: color-medium-green;
+  color: #00e36c;
 }
 .dashboard section.main {
   padding: 6em 1em 1em;
@@ -383,7 +383,7 @@ section.footer {
   font-size: 0.85em;
 }
 .landing-page .header a.active {
-  color: color-another-green;
+  color: #00e36c;
 }
 .landing-page .header h1.logo a {
   font-size: inherit;
@@ -410,7 +410,7 @@ section.footer {
   height: auto;
 }
 .landing-page .header .nav-section li.active a {
-  color: color-another-green;
+  color: #00e36c;
 }
 .landing-page .header .nav-section.elevated-item li {
   line-height: 3em;
@@ -552,7 +552,7 @@ section.footer {
   float: left;
   margin: 0 2%;
   width: 29%;
-  border-top: 1px solid color-hot-green;
+  border-top: 1px solid #00e36c;
   padding: 1em 0 0 0;
 }
 .landing-page #how-it-works #details .detail-block {
@@ -619,7 +619,7 @@ section.footer {
   top: 0;
   margin-top: 0;
   font-size: 3em;
-  color: color-medium-green;
+  color: #00e36c;
 }
 .list-grid-wrapper .grid-list.feature-icons .first {
   min-height: 4em;
@@ -712,7 +712,7 @@ section.footer {
  * App page overrides
  */
 .app-page {
-  color: color-text-graydark;
+  color: #999;
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.social-icons {
@@ -730,10 +730,10 @@ section.footer {
 }
 .app-page .value {
   font-size: 1.5em;
-  color: color-text-graydark;
+  color: #999;
 }
 .app-page .page-heading {
-  color: color-text-graydark;
+  color: #999;
   font-size: 3.25em;
   font-weight: bold;
   line-height: 1.25em;
