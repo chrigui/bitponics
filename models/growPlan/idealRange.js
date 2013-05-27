@@ -13,13 +13,25 @@ var IdealRangeSchema = new Schema({
 	sCode: { type: String, ref: 'Sensor', required: true },
 
 	valueRange: {
-		min: { type: Number, required: true },
-		max: { type: Number, required: true }
+		/**
+     * Minimum end of the ideal range of values for this sensor
+     */
+    min: { type: Number, required: true },
+		
+    /**
+     * Maximum end of the ideal range of values for this sensor
+     */
+    max: { type: Number, required: true },
+
+    /**
+     * Optimum value
+     */
+    opt : { type : Number, required : false }
 	},
 
-	actionBelowMin: { type: ObjectId, ref: 'Action', required: true },
+	actionBelowMin: { type: ObjectId, ref: 'Action', required: false },
 
-	actionAboveMax: { type: ObjectId, ref: 'Action', required: true },
+	actionAboveMax: { type: ObjectId, ref: 'Action', required: false },
 
 	/**
 	 * applicableTimeSpan. optional. Describes the portion of a 24-hour day
@@ -34,7 +46,17 @@ var IdealRangeSchema = new Schema({
 	applicableTimeSpan: {
 		startTime: { type: Number },
 		endTime: { type: Number }
-	}
+	},
+
+
+  /**
+   * Source of information for this IdealRange. 
+   */
+  reference : { 
+    name : { type : String, required : false },
+    page : { type : Number, required : false },
+    url : { type : String, required : false }
+  }
 },
 { id : false });
 
