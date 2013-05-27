@@ -734,8 +734,7 @@ section.footer {
 }
 .app-page .page-heading {
   color: #999;
-  font-size: 3.25em;
-  font-weight: bold;
+  font-size: 1.25em;
   line-height: 1.25em;
   margin: 0 0 0.25em 0;
 }
@@ -745,7 +744,6 @@ section.footer {
   margin: 0;
   color: #999;
   border-width: 0;
-  font-weight: bold;
 }
 .app-page .page-heading-large span,
 .app-page .page-heading-large input,
@@ -755,7 +753,6 @@ section.footer {
 .app-page .page-heading-small {
   line-height: 1.25em;
   font-size: 1.5em;
-  font-weight: bold;
 }
 .app-page .separator-top {
   border-width: 1px 0 0;
@@ -773,6 +770,9 @@ section.footer {
 }
 .app-page .app-user a {
   color: #00e36c !important;
+}
+.app-page .page-heading {
+  font-size: 2em;
 }
 /*
  * get-started/thankyou

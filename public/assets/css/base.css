@@ -687,9 +687,6 @@ h6 {
   font-weight: normal;
   -webkit-font-smoothing: antialiased;
 }
-h1 {
-  font-weight: bold;
-}
 abbr[title] {
   border: none;
 }
@@ -1115,7 +1112,6 @@ section.footer .content-module {
   border: 3px solid #d8d8d8;
   width: 90%;
   height: 90%;
-  min-height: 720px;
   z-index: 1050;
   overflow: scroll;
   padding: 1em 2em 1em;
@@ -1135,8 +1131,11 @@ section.footer .content-module {
   text-align: center;
   border: 0 none !important;
 }
-.overlay dd {
-  color: #999;
+.overlay .search {
+  margin: 1em 0 0;
+}
+.overlay .btn {
+  margin: 1em;
 }
 .overlay .pagination {
   text-align: center;
@@ -1692,8 +1691,7 @@ li
 }
 .app-page .page-heading {
   color: #999;
-  font-size: 3.25em;
-  font-weight: bold;
+  font-size: 1.25em;
   line-height: 1.25em;
   margin: 0 0 0.25em 0;
 }
@@ -1703,7 +1701,6 @@ li
   margin: 0;
   color: #999;
   border-width: 0;
-  font-weight: bold;
 }
 .app-page .page-heading-large span,
 .app-page .page-heading-large input,
@@ -1713,7 +1710,6 @@ li
 .app-page .page-heading-small {
   line-height: 1.25em;
   font-size: 1.5em;
-  font-weight: bold;
 }
 .app-page .separator-top {
   border-width: 1px 0 0;
@@ -2794,6 +2790,7 @@ button.close {
 }
 .landing-page.growplans .plantlist {
   padding: 1em 0 0;
+  float: left;
 }
 .landing-page.growplans .btn {
   padding: 0.5em;
@@ -2810,7 +2807,15 @@ button.close {
   left: 0;
 }
 .landing-page.growplans .grid li {
-  margin: 1em 1em 0 1em;
+  margin: 1em 1em 0 0;
+}
+.landing-page.growplans .grid li .btn {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+.landing-page.growplans .grid img {
+  width: 100%;
 }
 .landing-page.growplans .grid .label {
   margin: 0;
@@ -2842,14 +2847,13 @@ button.close {
   width: auto;
 }
 .landing-page.growplans .question .grid li .btn {
-  margin-left: 0;
-  margin-top: 0;
+  margin: 1em 1em 0 0;
+  width: auto;
 }
 .landing-page.growplans .question .add {
   float: left;
   clear: left;
   margin-left: 0;
-  margin-top: 0;
 }
 .landing-page.growplans .icon-glyph-new {
   height: 1em;

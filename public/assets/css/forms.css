@@ -214,11 +214,13 @@ textarea:valid,
 input:invalid,
 textarea:invalid {
   background-color: #eaeaea;
+  border: 1px solid #fff;
 }
 input:focus,
 textarea:focus {
   background-color: #fff;
   color: #000;
+  border: 1px solid #eaeaea;
 }
 input[type=submit] {
   background: #fff;
