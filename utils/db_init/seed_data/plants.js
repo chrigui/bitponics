@@ -172,5 +172,9 @@ module.exports = [
 	{
 		_id : "50a016f8eb1164c6b88e3038",
 		name : "Swiss Chard"
+	},
+	{
+		_id : "51a388c7a8162dbabd583f3c",
+		name : "Pepper"
 	}
 ];

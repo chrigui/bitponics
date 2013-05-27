@@ -75,7 +75,9 @@ switch(db_url){
     mongooseConnection = require('../../../config/mongoose-connection').open("test");
   // don't support 'production' as a shortcut. force use to do that explicitly
   default:
-  // if not one of those, assume it was a mongodb:// url, so leave it alone
+    // if not one of those, assume it was a mongodb:// url, so leave it alone
+    mongooseConnection = require('../../../config/mongoose-connection').open(db_url);
+  
 }
 
 console.log(clear);
