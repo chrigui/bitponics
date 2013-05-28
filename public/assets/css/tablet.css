@@ -5,7 +5,7 @@
   height: 100%;
 }
 .fixed,
-.landing-page .header.fixed {
+.header.fixed {
   position: fixed;
 }
 .position-r {
@@ -174,11 +174,6 @@
   width: 100%;
   margin: 2em 0 0 0;
 }
-section.header,
-section.main,
-section.footer {
-  padding: 1em;
-}
 /*
  * Dashboard Page
  */
@@ -203,13 +198,144 @@ section.footer {
 .idealRanges li:after {
   clear: both;
 }
+.main,
+.header {
+  padding: 0;
+}
+.header {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  padding: 2em 0;
+  height: 3em;
+  background: #fff;
+  color: #999;
+  padding: 0;
+}
+.header .icon-glyphlogo-new {
+  display: block;
+  font-size: 2.8em;
+  position: relative;
+  top: 0.35em;
+}
+.header.header-fixed {
+  display: block;
+}
+.header.header-fixed .icon-glyphlogo-new {
+  display: none;
+}
+.header > header {
+  margin: 0 auto;
+  width: 95%;
+  max-width: 60em;
+}
+.header.fixed {
+  top: 0;
+  z-index: 1;
+}
+.header li {
+  padding: 0;
+  margin: 0.25em 0.75em 0 0;
+}
+.header li.first {
+  min-height: auto;
+  width: 19.3%;
+  margin: 0 3% 0 0;
+  padding: 0.45em 0 0 0;
+}
+.header a {
+  color: #999;
+  line-height: 3em;
+  font-size: 0.85em;
+}
+.header a.active {
+  color: #00e36c;
+}
+.header h1.logo a {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+.header h1.logo a:hover {
+  text-decoration: none;
+}
+.header h1 i {
+  color: #fff;
+}
+.header .nav-section {
+  float: left;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  display: block;
+}
+.header .nav-section li {
+  display: inline-block;
+}
+.header .nav-section li.active {
+  float: none;
+  height: auto;
+}
+.header .nav-section li.active a {
+  color: #00e36c;
+}
+.header .nav-section.elevated-item li {
+  line-height: 3em;
+}
+.header .nav-section.elevated-item .btn {
+  margin: 0;
+  padding: 0.5em;
+  text-align: center;
+  line-height: 1em;
+  color: #999;
+  border-color: #999;
+  background: none;
+}
+.header .social-icons {
+  position: absolute;
+  margin: 0;
+  width: auto;
+  clear: right;
+}
+.header .social-icons div {
+  text-indent: 100%;
+}
+.header .social-icons li {
+  margin: 0.5em 0 0 0.2em;
+  color: #fff;
+  background: #999;
+  position: relative;
+}
+.header .social-icons a {
+  position: absolute;
+  top: -0.5em;
+  left: 0;
+  font-size: 1.25em;
+  color: #fff;
+}
+.header .social-icons a i {
+  width: 1em;
+  height: 1em;
+}
+.header .social-icons a i .icon-glyphmail {
+  left: -0.105em;
+  top: -0.025em;
+}
+.header .elevated-item li {
+  background: transparent;
+  line-height: 1em;
+  margin: 0;
+}
+.header .social-icons,
+.header .elevated-item {
+  position: static;
+  float: right;
+  background: transparent;
+}
 /*
  * Home Page
  */
-.landing-page .main,
-.landing-page .header {
-  padding: 0;
-}
 .landing-page .content-module {
   min-height: 800px;
 }
@@ -227,136 +353,6 @@ section.footer {
 .landing-page .footer div {
   position: absolute;
   bottom: 1em;
-}
-.landing-page .header {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 4;
-  padding: 2em 0;
-  height: 3em;
-  background: #fff;
-  color: #999;
-  padding: 0;
-}
-.landing-page .header .icon-glyphlogo-new {
-  display: block;
-  font-size: 2.8em;
-  position: relative;
-  top: 0.35em;
-}
-.landing-page .header.header-fixed {
-  display: block;
-}
-.landing-page .header.header-fixed .icon-glyphlogo-new {
-  display: none;
-}
-.landing-page .header > header {
-  margin: 0 auto;
-  width: 95%;
-}
-.landing-page .header.fixed {
-  top: 0;
-  z-index: 1;
-}
-.landing-page .header li {
-  padding: 0;
-  margin: 0.25em 0.75em 0 0;
-}
-.landing-page .header li.first {
-  min-height: auto;
-  width: 19.3%;
-  margin: 0 3% 0 0;
-  padding: 0.45em 0 0 0;
-}
-.landing-page .header a {
-  color: #999;
-  line-height: 3em;
-  font-size: 0.85em;
-}
-.landing-page .header a.active {
-  color: #00e36c;
-}
-.landing-page .header h1.logo a {
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
-}
-.landing-page .header h1.logo a:hover {
-  text-decoration: none;
-}
-.landing-page .header h1 i {
-  color: #fff;
-}
-.landing-page .header .nav-section {
-  float: left;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-  display: block;
-}
-.landing-page .header .nav-section li {
-  display: inline-block;
-}
-.landing-page .header .nav-section li.active {
-  float: none;
-  height: auto;
-}
-.landing-page .header .nav-section li.active a {
-  color: #00e36c;
-}
-.landing-page .header .nav-section.elevated-item li {
-  line-height: 3em;
-}
-.landing-page .header .nav-section.elevated-item .btn {
-  margin: 0;
-  padding: 0.5em;
-  text-align: center;
-  line-height: 1em;
-  color: #999;
-  border-color: #999;
-  background: none;
-}
-.landing-page .header .social-icons {
-  position: absolute;
-  margin: 0;
-  width: auto;
-  clear: right;
-}
-.landing-page .header .social-icons div {
-  text-indent: 100%;
-}
-.landing-page .header .social-icons li {
-  margin: 0.5em 0 0 0.2em;
-  color: #fff;
-  background: #999;
-  position: relative;
-}
-.landing-page .header .social-icons a {
-  position: absolute;
-  top: -0.5em;
-  left: 0;
-  font-size: 1.25em;
-  color: #fff;
-}
-.landing-page .header .social-icons a i {
-  width: 1em;
-  height: 1em;
-}
-.landing-page .header .social-icons a i .icon-glyphmail {
-  left: -0.105em;
-  top: -0.025em;
-}
-.landing-page .header .elevated-item li {
-  background: transparent;
-  line-height: 1em;
-  margin: 0;
-}
-.landing-page .header .social-icons,
-.landing-page .header .elevated-item {
-  position: static;
-  float: right;
-  background: transparent;
 }
 .landing-page .featured-press,
 .landing-page .additional-press {
@@ -550,110 +546,9 @@ section.footer {
 /*
  * Single landing page overrides
  */
-.single-page .icon-glyphlogo-new {
-  display: none !important;
-}
-.single-page .main,
-.single-page .footer {
-  max-width: 60em;
-  margin: 0 auto;
-  width: 95%;
-}
-.single-page .main {
-  margin: 3em auto !important;
-}
-.single-page .content-module {
-  padding-top: 1.5em;
-}
-.single-page .footer {
-  background: none;
-  height: auto;
-  min-height: auto;
-  padding: 0;
-  font-size: 1em;
-}
-.single-page .footer div {
-  position: static;
-}
-.single-page .page-content,
-.single-page .page-heading {
-  width: 100%;
-}
 /*
  * App page overrides
  */
-.app-page {
-  color: #999;
-}
-.app-page .header {
-  position: static;
-}
-.app-page .header .nav-section.first,
-.app-page .header .nav-section.app-user {
-  display: block;
-}
-.app-page .header h1.logo a,
-.app-page .header h1.logo span {
-  color: #00e36c;
-}
-.app-page .header .icon-glyphlogo-new {
-  display: none;
-}
-.app-page .header,
-.app-page .main {
-  max-width: 60em;
-  margin: 0 auto;
-}
-.app-page .footer {
-  min-height: 0;
-  background: #fff;
-}
-.app-page .label {
-  font-size: 0.75em;
-}
-.app-page .value {
-  font-size: 1.5em;
-  color: #999;
-}
-.app-page .page-heading {
-  color: #999;
-  font-size: 1.25em;
-  line-height: 1.25em;
-  margin: 0 0 0.25em 0;
-}
-.app-page .page-heading-large {
-  font-size: 2em;
-  line-height: 1.25em;
-  margin: 0;
-  color: #999;
-  border-width: 0;
-}
-.app-page .page-heading-large span,
-.app-page .page-heading-large input,
-.app-page .page-heading-large div {
-  color: #999;
-}
-.app-page .page-heading-small {
-  line-height: 1.25em;
-  font-size: 1.5em;
-}
-.app-page .separator-top {
-  border-width: 1px 0 0;
-  padding-top: 0.25em;
-  margin-top: 0.25em;
-}
-.app-page .dropdown {
-  margin: 1em auto;
-}
-.app-page .app-user {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50%;
-}
-.app-page .app-user a {
-  color: #00e36c !important;
-}
 .app-page .page-heading {
   font-size: 3.25em;
 }

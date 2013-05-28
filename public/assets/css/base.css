@@ -496,11 +496,11 @@ td {
 .featured-press a,
 .additional-press a,
 .dashboard .content-module,
-.landing-page.growplans .edit-btn,
-.landing-page.growplans .idealRanges .hi input[type=number],
-.landing-page.growplans .actions .hi input[type=number],
-.landing-page.growplans .idealRanges .lo input[type=number],
-.landing-page.growplans .actions .lo input[type=number] {
+.growplans .edit-btn,
+.growplans .idealRanges .hi input[type=number],
+.growplans .actions .hi input[type=number],
+.growplans .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -1571,6 +1571,10 @@ li
 }
 .app-page .header {
   position: static;
+  padding: 0.45em 0;
+}
+.app-page .header .nav-section {
+  padding: 0;
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.app-user {
@@ -1583,7 +1587,6 @@ li
 .app-page .header .icon-glyphlogo-new {
   display: none;
 }
-.app-page .header,
 .app-page .main {
   max-width: 60em;
   margin: 0 auto;
@@ -2698,48 +2701,48 @@ button.close {
 .affix {
   position: fixed;
 }
-.landing-page.growplans .plantlist {
+.growplans .plantlist {
   padding: 1em 0 0;
   float: left;
 }
-.landing-page.growplans .btn {
+.growplans .btn {
   padding: 0.5em;
 }
-.landing-page.growplans .edit-btn {
+.growplans .edit-btn {
   height: 1em;
   padding-left: 1em;
   position: relative;
   margin: 0 0 1em;
 }
-.landing-page.growplans .edit-btn i {
+.growplans .edit-btn i {
   position: absolute;
   top: 0;
   left: 0;
 }
-.landing-page.growplans .grid li {
+.growplans .grid li {
   margin: 1em 1em 0 0;
 }
-.landing-page.growplans .grid li .btn {
+.growplans .grid li .btn {
   margin: 0;
   width: 100%;
   text-align: center;
 }
-.landing-page.growplans .grid img {
+.growplans .grid img {
   width: 100%;
 }
-.landing-page.growplans .grid .label {
+.growplans .grid .label {
   margin: 0;
   padding: 0.45em 0 0;
   border-top: 1px solid #999;
 }
-.landing-page.growplans .grid .first .label {
+.growplans .grid .first .label {
   border: 0 none;
 }
-.landing-page.growplans .grid .value {
+.growplans .grid .value {
   margin: 0 0 1em;
 }
-.landing-page.growplans .next-step-btn,
-.landing-page.growplans .phase-tabs .btn {
+.growplans .next-step-btn,
+.growplans .phase-tabs .btn {
   background: #fff !important;
   color: #00e36c !important;
   border: 3px solid #00e36c;
@@ -2748,106 +2751,106 @@ button.close {
   text-align: center;
   width: 15em;
 }
-.landing-page.growplans .next-step-btn .icon-glyph-new,
-.landing-page.growplans .phase-tabs .btn .icon-glyph-new {
+.growplans .next-step-btn .icon-glyph-new,
+.growplans .phase-tabs .btn .icon-glyph-new {
   color: #00e36c;
 }
-.landing-page.growplans .question .grid li {
+.growplans .question .grid li {
   margin: 0;
   width: auto;
 }
-.landing-page.growplans .question .grid li .btn {
+.growplans .question .grid li .btn {
   margin: 1em 1em 0 0;
   width: auto;
 }
-.landing-page.growplans .question .add {
+.growplans .question .add {
   float: left;
   clear: left;
   margin-left: 0;
 }
-.landing-page.growplans .icon-glyph-new {
+.growplans .icon-glyph-new {
   height: 1em;
   font-size: 0.75em;
   position: relative;
   top: -0.25em;
 }
-.landing-page.growplans #growplans_activate {
+.growplans #growplans_activate {
   clear: both;
 }
-.landing-page.growplans .phaseDescription {
+.growplans .phaseDescription {
   margin: 0 0 2em 0;
 }
-.landing-page.growplans .phase-tabs {
+.growplans .phase-tabs {
   list-style: none;
   clear: both;
   overflow: hidden;
 }
-.landing-page.growplans .phase-tabs .btn {
+.growplans .phase-tabs .btn {
   width: auto;
 }
-.landing-page.growplans .phase-tabs .selected {
+.growplans .phase-tabs .selected {
   background: #00e36c !important;
   color: #fff !important;
 }
-.landing-page.growplans .phase-tabs .selected .icon-glyph-new {
+.growplans .phase-tabs .selected .icon-glyph-new {
   color: #fff !important;
 }
-.landing-page.growplans .phase-tabs li {
+.growplans .phase-tabs li {
   position: relative;
   width: auto;
   float: left;
   padding: 0.25em 0.5em;
   margin: 1em 0.25em 1em 0;
 }
-.landing-page.growplans .phase-tabs li.focused {
+.growplans .phase-tabs li.focused {
   text-decoration: underline;
 }
-.landing-page.growplans .phase-tabs li.inactive {
+.growplans .phase-tabs li.inactive {
   display: block;
   opacity: 1;
   -ms-filter: none;
   filter: none;
   background-color: rgba(36,211,33,0.6);
 }
-.landing-page.growplans .phase-tabs li .toggle {
+.growplans .phase-tabs li .toggle {
   text-decoration: none;
 }
-.landing-page.growplans .idealRanges,
-.landing-page.growplans .actions {
+.growplans .idealRanges,
+.growplans .actions {
   position: relative;
   zoom: 1;
 }
-.landing-page.growplans .idealRanges:before,
-.landing-page.growplans .actions:before,
-.landing-page.growplans .idealRanges:after,
-.landing-page.growplans .actions:after {
+.growplans .idealRanges:before,
+.growplans .actions:before,
+.growplans .idealRanges:after,
+.growplans .actions:after {
   content: "";
   display: table;
 }
-.landing-page.growplans .idealRanges:after,
-.landing-page.growplans .actions:after {
+.growplans .idealRanges:after,
+.growplans .actions:after {
   clear: both;
 }
-.landing-page.growplans .idealRanges ul,
-.landing-page.growplans .actions ul {
+.growplans .idealRanges ul,
+.growplans .actions ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.landing-page.growplans .idealRanges .question,
-.landing-page.growplans .actions .question {
+.growplans .idealRanges .question,
+.growplans .actions .question {
   margin: 0 1em 1em 0;
   border: 1px solid #d8d8d8;
   padding: 2em 1em 1em;
   position: relative;
 }
-.landing-page.growplans .idealRanges .btn,
-.landing-page.growplans .actions .btn {
+.growplans .idealRanges .btn,
+.growplans .actions .btn {
   margin-left: 0;
   margin-top: 0;
 }
-.landing-page.growplans .idealRanges .btn.close,
-.landing-page.growplans .actions .btn.close {
+.growplans .idealRanges .btn.close,
+.growplans .actions .btn.close {
   position: absolute;
   top: 0;
   right: -0.25em;
@@ -2855,8 +2858,8 @@ button.close {
   background: #fff;
   color: #999;
 }
-.landing-page.growplans .idealRanges input[type=checkbox],
-.landing-page.growplans .actions input[type=checkbox] {
+.growplans .idealRanges input[type=checkbox],
+.growplans .actions input[type=checkbox] {
   opacity: 1;
   -ms-filter: none;
   filter: none;
@@ -2865,29 +2868,29 @@ button.close {
   margin: auto;
   display: inline;
 }
-.landing-page.growplans .idealRanges .separator-top,
-.landing-page.growplans .actions .separator-top {
+.growplans .idealRanges .separator-top,
+.growplans .actions .separator-top {
   margin-top: 1em;
 }
-.landing-page.growplans .idealRanges .hi label,
-.landing-page.growplans .actions .hi label,
-.landing-page.growplans .idealRanges .lo label,
-.landing-page.growplans .actions .lo label,
-.landing-page.growplans .idealRanges .hi textarea,
-.landing-page.growplans .actions .hi textarea,
-.landing-page.growplans .idealRanges .lo textarea,
-.landing-page.growplans .actions .lo textarea {
+.growplans .idealRanges .hi label,
+.growplans .actions .hi label,
+.growplans .idealRanges .lo label,
+.growplans .actions .lo label,
+.growplans .idealRanges .hi textarea,
+.growplans .actions .hi textarea,
+.growplans .idealRanges .lo textarea,
+.growplans .actions .lo textarea {
   display: block;
   width: 100%;
 }
-.landing-page.growplans .idealRanges .hi input[type=number],
-.landing-page.growplans .actions .hi input[type=number],
-.landing-page.growplans .idealRanges .lo input[type=number],
-.landing-page.growplans .actions .lo input[type=number] {
+.growplans .idealRanges .hi input[type=number],
+.growplans .actions .hi input[type=number],
+.growplans .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number] {
   width: 6em;
   margin-right: 1em;
 }
-.landing-page.growplans .phaseEndDescription {
+.growplans .phaseEndDescription {
   margin: 2em 0 2em;
   clear: both;
 }

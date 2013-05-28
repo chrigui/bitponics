@@ -106,7 +106,7 @@ module.exports = function(app){
 		function (req, res, next){
 			var locals = {
 				title : 'Grow Plans',
-				className : 'app-page landing-page single-page growplans',
+				className : 'app-page growplans',
         pageType: 'app-page',
 				//message : req.flash('info') //TODO: this isn't coming thru
 				growSystems: {},
