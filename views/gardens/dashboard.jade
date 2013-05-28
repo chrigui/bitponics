@@ -39,9 +39,13 @@ block content
       div#visualizer.content-module.middle(ng-controller="bpn.controllers.dashboard.PhasesGraph")
         div#phases-graph.circle.centered
     
-      div#controls.content-module.side(ng-controller="bpn.controllers.dashboard.Controls")
+      div#controls.controls.content-module.side(ng-controller="bpn.controllers.dashboard.Controls")
         h2.main-heading Accessories
-          div(ng-repeat="control in activePhase.deviceControls", class="control {{control.className} icon-glyph icon-{{control.className}", data-control-key="{{control.name}}") {{control.name}}
+          div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+            h3 {{controlAction.control.name}}
+            
+            a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
+            a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
       div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
         h2.main-heading Reminders

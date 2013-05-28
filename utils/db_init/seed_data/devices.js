@@ -173,5 +173,11 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "AA-301-AAAG",
 			name : "Michael's device added on 2013-05-10"
+		},
+		{
+			_id: "000666809f5b", //mac address
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-HYAT",
+			name : "Hyatt Device"
 		}
 	];
