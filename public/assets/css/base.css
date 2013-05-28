@@ -1574,7 +1574,7 @@ li
   position: static;
 }
 .app-page .header .nav-section.first,
-.app-page .header .nav-section.social-icons {
+.app-page .header .nav-section.app-user {
   display: block;
 }
 .app-page .header h1.logo a,
@@ -1591,6 +1591,7 @@ li
 }
 .app-page .footer {
   min-height: 0;
+  background: #fff;
 }
 .app-page .label {
   font-size: 0.75em;

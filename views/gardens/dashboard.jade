@@ -16,8 +16,8 @@ block content
         | {{growPlanInstance.name}}
 
       div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
-        div.date.main-heading {{activeDate.date | date:'longDate'}}
-        div.time.sub-heading {{activeDate.date | date:'shortTime'}}
+        div.date.page-heading-small {{activeDate.date | date:'longDate'}}
+        //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
         div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(this)")

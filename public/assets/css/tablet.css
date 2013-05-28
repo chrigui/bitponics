@@ -24,7 +24,6 @@
   display: inline;
 }
 .display-ib,
-.data-module,
 .idealRanges .hi label,
 .idealRanges .lo label {
   display: -moz-inline-stack;
@@ -174,10 +173,6 @@
 .content-module.side {
   width: 100%;
   margin: 2em 0 0 0;
-}
-.data-module {
-  width: 50%;
-  margin: 0.125em -2px;
 }
 section.header,
 section.main,
@@ -594,7 +589,7 @@ section.footer {
   position: static;
 }
 .app-page .header .nav-section.first,
-.app-page .header .nav-section.social-icons {
+.app-page .header .nav-section.app-user {
   display: block;
 }
 .app-page .header h1.logo a,
@@ -611,6 +606,7 @@ section.footer {
 }
 .app-page .footer {
   min-height: 0;
+  background: #fff;
 }
 .app-page .label {
   font-size: 0.75em;
