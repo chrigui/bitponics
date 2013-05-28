@@ -969,7 +969,6 @@ button.btn:hover {
   font-size: 1.5em;
 }
 .control svg {
-  position: absolute;
   top: 2em;
   left: 0;
 }

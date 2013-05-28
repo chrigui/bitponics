@@ -37,6 +37,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     if (growPlanInstance.device){
       if (growPlanInstance.device.status.activeActions){
         growPlanInstance.device.status.activeActions.forEach(function(activeAction){
+          activeAction = viewModels.initActionViewModel(activeAction);
           activeAction.control = viewModels.initControlViewModel(activeAction.control);
           activeAction.outputId = growPlanInstance.device.outputMap.filter(function(outputMapping){
             return outputMapping.control === activeAction.control._id;
@@ -48,16 +49,28 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   	return growPlanInstance;
   };
 
+
   /**
    * Adds/calculates properties necessary for UI presentation
+   *
+   * Adds the following properties:
+   * className
    */
   viewModels.initControlViewModel = function (control){
     control.className = control.name.replace(/\s/g,'').toLowerCase();
     return control;
   };
 
+
   /**
    * Adds/calculates properties necessary for UI presentation
+   *
+   * Sets the following properties:
+   * plantsViewModel
+   * phases[].idealRanges[].noApplicableTimeSpan
+   * phases[].actionsViewModel
+   * phases[].nutrientsViewModel
+   * currentVisiblePhase
    */
   viewModels.initGrowPlanViewModel = function (growPlan){
     var initActionViewModel = viewModels.initActionViewModel;
@@ -108,7 +121,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * action.dailyOffTime (set if isDailyControlCycle)
    * action.message (set if a no-control action)
    * action.offsetTimeOfDay (set if a repeating action with an offset)
-   * action.overallDuration
+   * action.overallDurationInMilliseconds
+   * action.overallDuration (an integer duration of action.overallDurationType)
    * action.overallDurationType (months||weeks||days||hours||minutes||seconds)
    *
    * @param action
@@ -145,6 +159,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     action.cycle.states.forEach(function(state){
       overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
     });
+    action.overallDurationInMilliseconds = overallDuration;
+    
     overallDuration = utils.getLargestWholeNumberDurationObject(overallDuration);
 
     action.overallDuration = overallDuration.duration;
