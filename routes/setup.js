@@ -80,6 +80,7 @@ module.exports = function(app){
   )
 
   app.get('/setup/device',
+    routeUtils.middleware.ensureInsecure,
     function (req, res, next){
         var locals = {
           title: 'Bitponics Device Setup',
