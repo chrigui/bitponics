@@ -22,7 +22,9 @@ module.exports = function(app){
 		function (req, res, next) {
 			var locals = {
 				userGrowPlanInstances : [],
-				communityGrowPlanInstances : []
+				communityGrowPlanInstances : [],
+				className: "app-page dashboard",
+				pageType: "app-page"
 			};
 
 			GrowPlanInstanceModel
@@ -96,7 +98,8 @@ module.exports = function(app){
 						locals.growPlanInstance = results[2];
 						//locals.growPlanInstance.growPlan = results[3][0];
 						locals.latestSensorLogs = results[3] || [];
-
+						console.log('locals.className');
+						console.log(locals.className);
 						res.render('gardens/dashboard', locals);
 				}
 			);

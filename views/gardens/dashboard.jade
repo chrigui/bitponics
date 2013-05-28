@@ -6,17 +6,15 @@ block head
 block css
 
 block content
-  div(ng-controller="bpn.controllers.dashboard.Main")
-  
-    section.header
+  section.header
       header
         include ../includes/nav/main
-        
-     div#setup.select-block
-       h2.main-heading(ng-cloak)
+  
+  section#main(role="main", class="main", ng-cloak)
+    div(ng-controller="bpn.controllers.dashboard.Main")
+      h2.page-heading(ng-cloak)
         | {{growPlanInstance.name}}
 
-    section#main(role="main", class="main", ng-cloak)
       div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
         div.date.main-heading {{activeDate.date | date:'longDate'}}
         div.time.sub-heading {{activeDate.date | date:'shortTime'}}

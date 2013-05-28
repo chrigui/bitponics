@@ -178,7 +178,7 @@
   border: none;
 }
 .separator-top {
-  border-top: 1px solid #cccdcc;
+  border-top: 1px solid #d8d8d8;
 }
 a {
   color: #333;
@@ -188,7 +188,7 @@ a:hover {
   text-decoration: underline;
 }
 .setup * {
-  color: #333;
+  color: #999;
 }
 .setup .content-module.middle {
   padding: 3.5em 0 0 !important;
@@ -207,7 +207,7 @@ a:hover {
 }
 .setup .list-style p,
 .setup .list-style label {
-  color: #999b9a;
+  color: #999;
 }
 .setup .btn {
   margin-left: 0;
@@ -244,7 +244,7 @@ a:hover {
   border: 2px inset;
 }
 .setup input[readonly]:focus {
-  background: #f5f5f5;
+  background: #c1c2c4;
 }
 .setup .serial {
   width: 20em;

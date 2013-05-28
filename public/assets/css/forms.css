@@ -163,22 +163,6 @@
   vertical-align: middle;
   margin-right: -0.25em;
 }
-.select-block {
-  overflow: hidden;
-}
-.select-block select {
-  cursor: pointer;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  color: inherit;
-  border: 0 none;
-  width: 120%;
-  font-weight: bold;
-}
-.select-block select:focus {
-  outline: none;
-  border: none;
-}
 .separator-top {
   border-top: 1px solid #d8d8d8;
 }

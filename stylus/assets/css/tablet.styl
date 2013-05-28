@@ -9,17 +9,17 @@
 		margin 2em 0 0 0
 	&.middle
 		//
-body
- margin 0
+// body
+// 	margin 0
  
 .data-module
 	@extends .display-ib
 	width 50%
 	margin 0.125em -2px //TODO: might need to be more flexible
 
-.select-block
-	padding 0 .83em
-	text-align left
+// .select-block
+// 	padding 0 .83em
+// 	text-align left
 
 section.header,
 section.main,
@@ -27,48 +27,48 @@ section.footer
 	padding 1em
 			
 
-#logo,
-#setup,
-#user
-	float left
-	width 25%
-#setup
-	width 35%
-	margin-right 10%
-#user
-	padding 0
+// #logo,
+// #setup,
+// #user
+// 	float left
+// 	width 25%
+// #setup
+// 	width 35%
+// 	margin-right 10%
+// #user
+// 	padding 0
 
-#logo
-	position static
+// #logo
+// 	position static
 	
 
 /*
  * Dashboard Page
  */
-.dashboard
-	.content-module
-		&.middle
-			width 100%
-			padding 100% 0 0 0 //must match container width
-			border 0 none
-			clear: both
-	section#header
-		height 1em
-		.sub-heading a
-			color color-logo-green
-	section.main
-		padding 6em 1em 1em
+// .dashboard
+// 	.content-module
+// 		&.middle
+// 			width 100%
+// 			padding 100% 0 0 0 //must match container width
+// 			border 0 none
+// 			clear: both
+// 	section#header
+// 		height 1em
+// 		.sub-heading a
+// 			color color-logo-green
+// 	section.main
+// 		padding 6em 1em 1em
 
-		#visualizer
-			div.circle
-				top 1.5em
-				left 1.5em
-				bottom 1.5em
-				right 1.5em
+// 		#visualizer
+// 			div.circle
+// 				top 1.5em
+// 				left 1.5em
+// 				bottom 1.5em
+// 				right 1.5em
 				
 
-		#controls, #reminders
-			float right
+// 		#controls, #reminders
+// 			float right
 
 
 @media screen and (min-width: 60em)
@@ -76,52 +76,52 @@ section.footer
 		&:after
 			content 'large-tablet-layout'*/
 
-	.content-module
-		float left
-		&.side
-			width 20%
-		&.middle
-			//
+	// .content-module
+	// 	float left
+	// 	&.side
+	// 		width 20%
+	// 	&.middle
+	// 		//
 
-	.data-module
-		width 100%
-		margin 0.125em 0
+	// .data-module
+	// 	width 100%
+	// 	margin 0.125em 0
 
 
-	/*
-	 * Footer
-	 */
-	section.footer
-		//position fixed
-		//bottom 0
-		width 100%
+	// /*
+	//  * Footer
+	//  */
+	// section.footer
+	// 	//position fixed
+	// 	//bottom 0
+	// 	width 100%
 		
 
-		.content-module
-			margin 0
+	// 	.content-module
+	// 		margin 0
 
-		#date
-			float left
+	// 	#date
+	// 		float left
 
-		#notifications
-			float right
-			text-align right
+	// 	#notifications
+	// 		float right
+	// 		text-align right
 
 
-	#logo,
-	#setup,
-	#user
-		width 20%
-	#setup
-		width 30%
-		margin-right 30%
+	// #logo,
+	// #setup,
+	// #user
+	// 	width 20%
+	// #setup
+	// 	width 30%
+	// 	margin-right 30%
 
-	.dashboard
-		.content-module
-			&.middle
-				width 60%
-				padding 60% 0 0 0 //must match container width
-				clear none
+	// .dashboard
+	// 	.content-module
+	// 		&.middle
+	// 			width 60%
+	// 			padding 60% 0 0 0 //must match container width
+	// 			clear none
 
 
 /*
@@ -375,6 +375,7 @@ section.footer
 		position relative
 		height 4em
 		line-height: 1.25;
+		text-align: left;
 
 	.last
 		margin 0
@@ -395,12 +396,13 @@ section.footer
 				padding-top 0
 
 	.flexslider
+		li
+			text-align center
 		img
 			min-width 1440px
-			max-width 1460px
-			position: relative;
-			left: 50%;
-			margin-left: -720px;
+			// max-width 1460px
+			position static
+			margin 0
 			
 	.flex-direction-nav
 		position absolute
@@ -440,6 +442,12 @@ section.footer
 			float left
 			width: 40%;
 			margin: 1em 10% 0 0;
+
+@media screen and (max-width: 1024px)
+	.landing-page .flexslider img
+		position: relative;
+		left: 50%;
+		margin-left: -720px;
 
 
 //Pricing Page
@@ -542,7 +550,7 @@ section.footer
 
 .app-page
 	.page-heading
-		font-size 2em
+		font-size 3.25em
 
 
 
