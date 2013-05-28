@@ -119,8 +119,8 @@ module.exports = function(app){
 	      secret : 'somethingrandom',
 	      key : 'express.sid',
 	      store : new MongoStore({
-	        mongoose_connection : app.config.mongooseConnection
-          // db : app.config.mongooseConnection.db
+	        //mongoose_connection : app.config.mongooseConnection
+          db : app.config.mongooseConnection.db
 	      })
 	    };	
 
