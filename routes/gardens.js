@@ -6,6 +6,7 @@ SensorLogModel = require('../models/sensorLog').model,
 ControlModel = require('../models/control').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
+DeviceModel = require('../models/device').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
@@ -22,9 +23,7 @@ module.exports = function(app){
 		function (req, res, next) {
 			var locals = {
 				userGrowPlanInstances : [],
-				communityGrowPlanInstances : [],
-				className: "app-page dashboard",
-				pageType: "app-page"
+				communityGrowPlanInstances : []
 			};
 
 			GrowPlanInstanceModel
@@ -54,7 +53,6 @@ module.exports = function(app){
 				title : 'Bitponics - Dashboard',
 				user : req.user,
 				growPlanInstance : undefined,
-				growPlan : undefined,
 				sensors : undefined,
 				controls : undefined,
 				sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis'],
@@ -68,18 +66,47 @@ module.exports = function(app){
 						SensorModel.find({visible : true}).exec(innerCallback);
 					},
 					function getControls(innerCallback){
-						ControlModel.find().exec(innerCallback);
+						ControlModel.find()
+						.populate('onAction')
+						.populate('offAction')
+						.exec(innerCallback);
 					},
-					function getGPI(innerCallback){
+					function getGpi(innerCallback){
 						GrowPlanInstanceModel
 						.findById(req.params.growPlanInstanceId)
-						.populate('device')
+						//.populate('device')
 						.exec(function(err, growPlanInstanceResult){
-							ModelUtils.getFullyPopulatedGrowPlan({_id: growPlanInstanceResult.growPlan}, function(err, growPlanResult){
-								if (err) { return innerCallback(err); }
-								growPlanInstanceResult = growPlanInstanceResult.toObject();
-								growPlanInstanceResult.growPlan = growPlanResult[0];
-								return innerCallback(null, growPlanInstanceResult);
+							if (err) { return innerCallback(err); }
+
+							growPlanInstanceResult = growPlanInstanceResult.toObject();
+
+							async.parallel(
+							[
+								function getDevice(innerInnerCallback){
+									if (!growPlanInstanceResult.device){
+										return innerInnerCallback();
+									}
+
+									DeviceModel.findById(growPlanInstanceResult.device)
+									.populate('status.actions')
+									.populate('status.activeActions')
+									.exec(function(err, deviceResult){
+										if (err) { return innerInnerCallback(err); }
+										growPlanInstanceResult.device = deviceResult.toObject();
+										return innerInnerCallback();
+									})
+								},
+								function getGrowPlan(innerInnerCallback){
+									ModelUtils.getFullyPopulatedGrowPlan({ _id: growPlanInstanceResult.growPlan }, function(err, growPlanResult){
+										if (err) { return innerCallback(err); }
+										
+										growPlanInstanceResult.growPlan = growPlanResult[0];
+										return innerInnerCallback();
+									});		
+								}
+							],
+							function gpiParallelFinal(err){
+								return innerCallback(err, growPlanInstanceResult);
 							});
 						});
 					},
@@ -96,10 +123,18 @@ module.exports = function(app){
 						locals.sensors = results[0];
 						locals.controls = results[1];
 						locals.growPlanInstance = results[2];
-						//locals.growPlanInstance.growPlan = results[3][0];
 						locals.latestSensorLogs = results[3] || [];
-						console.log('locals.className');
-						console.log(locals.className);
+
+						if (locals.growPlanInstance.device){
+							if (locals.growPlanInstance.device.status.activeActions){
+								locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
+									activeAction.control = locals.controls.filter(function(control){
+										return control._id.equals(activeAction.control);
+									})[0];
+								});
+							}
+						}
+
 						res.render('gardens/dashboard', locals);
 				}
 			);

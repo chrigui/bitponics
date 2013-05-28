@@ -2,6 +2,7 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
     SensorLogModel = require('../../models/sensorLog').model,
+    ImmediateActionModel = require('../../models/immediateAction').model,
     moment = require('moment'),
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
@@ -256,22 +257,15 @@ module.exports = function(app) {
   });
   
  
-  /*
-   * Add an entry to actionLogs nested resource.
-   *
-   * @param {ObjectId|string} actionId
-   * @param {string=} message (optional)
-   *
-   * jQuery.post("/api/grow-plan-instances/505d551472b1680000000069/immediate-action", 
-   * { 
-   *   actionId: "505d551372b1680000000059",
-   *   message: "Manually triggered from web dashboard"
-   * }, 
-   * function (data, textStatus, jqXHR) {
-   *   console.log("Post response:"); console.dir(data); console.log(textStatus);                                        
-   * });
+  /**
+   * Add an ImmediateAction to the GPI
+   * 
+   * Posting to this results in a triggering of the immediate action.
+   * 
+   * @param {ObjectIdString} req.body.actionId
+   * @param {String=} req.body.message : optional. Message to include with the immediateAction log.
    */
-  app.post('/api/grow-plan-instances/:id/immediate-action', function (req, res, next){
+  app.post('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
     GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
@@ -279,7 +273,7 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
-      if ( !growPlanInstance.owner.equals(req.user._id)){
+      if ( !growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
       	return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
@@ -297,6 +291,30 @@ module.exports = function(app) {
           return res.send('success');
         }
       );
+    });
+  });
+
+
+  app.get('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
+    GrowPlanInstanceModel
+    .findById(req.params.id)
+    .exec(function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      
+      if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE)){
+        if (!growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+          return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
+        }
+      }
+
+      ImmediateActionModel.find({gpi : growPlanInstance._id})
+      .exec(function(err, immediateActionResults){
+        if (err) { return next(err); }
+        return res.send({
+          data : immediateActionResults
+        });
+      });
     });
   });
 };

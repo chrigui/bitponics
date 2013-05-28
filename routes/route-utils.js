@@ -94,5 +94,8 @@ module.exports = {
 				}
 			}
 		}())
-	}
+	},
+  sendJSONResponse : function(res, data){
+    
+  }
 };

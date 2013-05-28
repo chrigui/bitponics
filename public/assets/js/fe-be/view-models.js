@@ -2,6 +2,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   var viewModels = {};
 
 
+  
+  /**
+   * Populate GrowPlanInstance viewModel properties
+   * Assumes growPlanInstance.growPlan is a fully-populated GP
+   * 
+   * phases[].daySummaries[].date
+   * phases[].phase
+   * activePhase
+   * device.status.activeActions[].control
+   * device.status.activeActions[].outputId
+   */
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
   	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var startDate = growPlanInstancePhase.startDate;
@@ -10,10 +21,29 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   		});
 
   		if (growPlanInstance.growPlan.phases){
-  			growPlanInstancePhase.phase = growPlanInstance.growPlan.phases[phaseIndex];	
+  			growPlanInstancePhase.phase = growPlanInstance.growPlan.phases.filter(
+          function(growPlanPhase){
+            return growPlanPhase._id === growPlanInstancePhase.phase;
+          }
+        )[0];
   		}
   		
+      if (growPlanInstancePhase.active){
+        growPlanInstance.activePhase = growPlanInstancePhase;
+      }
   	});
+
+    
+    if (growPlanInstance.device){
+      if (growPlanInstance.device.status.activeActions){
+        growPlanInstance.device.status.activeActions.forEach(function(activeAction){
+          activeAction.control = viewModels.initControlViewModel(activeAction.control);
+          activeAction.outputId = growPlanInstance.device.outputMap.filter(function(outputMapping){
+            return outputMapping.control === activeAction.control._id;
+          })[0].outputId;
+        });
+      }
+    }
 
   	return growPlanInstance;
   };

@@ -20,14 +20,15 @@ require([
       [
         '$scope',
         '$filter',
-        function ($scope, $filter) {
+        '$http',
+        function ($scope, $filter, $http) {
 
           // First, transform the data into viewModel-friendly formats
           bpn.pageData.controls.forEach(function (control) {
             viewModels.initControlViewModel(control);
           });
 
-          viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance);
+          viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance, bpn.pageData.controls);
 
 
           // Raise sensorLog readings to be hashes keyed by sensor code
@@ -54,6 +55,27 @@ require([
               }
             }
           };
+
+       
+          $scope.triggerImmediateAction = function(actionId){
+            $http.post(
+              '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/immediate-actions',
+              {
+                actionId : actionId,
+                message : "Triggered from dashboard"
+              }
+            )
+            .success(function(data, status, headers, config) {
+              // this callback will be called asynchronously
+              // when the response is available
+              console.log(data);
+            })
+            .error(function(data, status, headers, config) {
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+              console.log(data);
+            });
+          }
 
           // Set up functions and watchers
 
@@ -333,11 +355,6 @@ require([
               .append("svg:polygon")
               .attr('stroke', 'black')
               .attr("points", width / 2 + "," + radius + " " + ((width / 2) + (triangleSize / 2)) + "," + (triHeight + radius) + " " + ((width / 2) - (triangleSize / 2)) + "," + (triHeight + radius));
-
-            if (!GlobalThumbTimer) {
-              //GlobalThumbTimer = setInterval(globalThumbFunc, 60000);
-              GlobalThumbTimer = setInterval(globalThumbFunc, 1000);
-            }
           };
 
           $scope.getControlFillColor = function (data, index) {
@@ -426,6 +443,7 @@ require([
 
             });
           };
+
         }
       ]
     );

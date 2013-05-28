@@ -80,6 +80,10 @@ var DeviceSchema = new Schema({
     
     sensorMap : [ SensorMapSchema ],
     
+    
+    /**
+     * Maps the device outlets to controls
+     */
     outputMap : [ OutputMapSchema ],
     
     //recentSensorLogs : [ SensorLogSchema ],
@@ -93,15 +97,30 @@ var DeviceSchema = new Schema({
      */
     status : {
       
+      /**
+       * Actions from GPI.phase.actions
+       */
       actions : [{type: ObjectIdSchema, ref: 'Action'}],
       
-      immediateActions: [{ type: ObjectIdSchema, ref: 'ImmediateAction'}],
       
       /** 
-       * The consolidated list of immediateActions+actions
+       * Actions triggered through some manual means (like a dashboard button)
+       */
+      immediateActions: [{ type: ObjectIdSchema, ref: 'ImmediateAction'}],
+      
+      
+      /** 
+       * The merged list of immediateActions + actions, 
+       * where immediateActions take precedence
        */
       activeActions : [{type: ObjectIdSchema, ref: 'Action'}],
       
+      
+      /**
+       * Calibration mode (optional)
+       * Tells the device to enter a particular calib mode.
+       * Should be unset for normal operation.
+       */
       calibrationMode : { 
         type : String, 
         enum : [ 
