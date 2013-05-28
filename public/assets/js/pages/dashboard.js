@@ -356,94 +356,6 @@ require([
               .attr('stroke', 'black')
               .attr("points", width / 2 + "," + radius + " " + ((width / 2) + (triangleSize / 2)) + "," + (triHeight + radius) + " " + ((width / 2) - (triangleSize / 2)) + "," + (triHeight + radius));
           };
-
-          $scope.getControlFillColor = function (data, index) {
-            var num = parseInt(data.data.value, 10);
-
-            if (num == 0) {
-              return '#46f121'
-            } else {
-              return '#24d321';
-            }
-          };
-
-          $scope.drawControlGraphs = function () {
-            var controls = $scope.growPlanInstance.controls,
-              $container = $('#controls'),
-              outerMargin = 0,
-              width = $container.find('.control').width() - (outerMargin * 2),
-              height = width,
-              radius = width / 2,
-              innerWhitespaceRadius = radius / 2,
-            // sum of all arcSpans must fit between outer boundary and inner whitespace
-              arcSpan = (radius - innerWhitespaceRadius),
-              arcMargin = 0,
-              colorScale = d3.scale.category20c(),
-              pie = d3.layout.pie(),
-              dayMilliseconds = 24 * 60 * 60 * 1000;
-
-            // disable data sorting & force all slices to be the same size
-            pie
-              .sort(null)
-              .value(function (d) {
-                return d.timespan;
-              });
-
-            $.each(controls, function (controlKey, control) {
-              var svg = d3.select('#controls .control.' + control.className)
-                .append('svg:svg')
-                .attr('width', width)
-                .attr('height', height);
-
-              var arc = d3.svg.arc(),
-                className = 'control-' + control.className,
-                svgGroup;
-
-              var cycleStringParts = control.action.cycleString.split(',');
-              var cycleStates = [];
-              cycleStates[0] = {
-                value:parseInt(cycleStringParts[0], 10),
-                timespan:parseInt(cycleStringParts[1], 10)
-              };
-              cycleStates[1] = {
-                value:parseInt(cycleStringParts[2], 10),
-                timespan:parseInt(cycleStringParts[3], 10)
-              };
-              var overallCycleTimespan = cycleStates[0].timespan + cycleStates[1].timespan;
-              var numDayCycles = dayMilliseconds / overallCycleTimespan;
-              var cycleGraphData = [];
-              for (var i = 0; i < numDayCycles; i++) {
-                cycleGraphData.push(cycleStates[0]);
-                cycleGraphData.push(cycleStates[1]);
-              }
-
-
-              arc.outerRadius(radius - arcMargin)
-                .innerRadius(radius - arcSpan - arcMargin);
-
-              svgGroup = svg.append('svg:g')
-                .classed(className, true)
-                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-              svgGroup.selectAll('path')
-                .data(pie(cycleGraphData))
-                .enter()
-                .append('svg:path')
-                .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', bpn.pages.dashboard.getControlFillColor)
-              /*.append("svg:text")
-               .attr("transform", function(d) {
-               return "translate(" + arc.centroid(d) + ")";
-               })
-               .attr("dy", ".35em")
-               .attr("text-anchor", "middle")
-               .text(function(d, i) { return "TEST " + i });*/
-
-            });
-          };
-
         }
       ]
     );
@@ -583,6 +495,107 @@ require([
         }
       ]
     );
+
+
+    dashboardApp.directive('bpnDirectivesControlActionGraph', function() { 
+      return {
+        //templateUrl : "control-graph.html",
+        restrict : "EA",
+        template : '<div class="control {{controlAction.control.className}}"></div>',
+        replace : true,
+        scope : {
+          controlAction : "="
+        },
+        controller : function ($scope, $element, $attrs, $transclude){
+          $scope.getControlFillColor = function (data, index) {
+            var num = parseInt(data.data.value, 10);
+
+            if (num == 0) {
+              return '#46f121'
+            } else {
+              return '#24d321';
+            }
+          };
+
+
+        },
+        link: function (scope, element, attrs, controller) { 
+          // link is where we have a created directive element as
+          // well as populated scope to work with
+          // element is a jQuery wrapper on the element
+
+          var outerMargin = 0,
+              width = element.width() - (outerMargin * 2),
+              height = width,
+              radius = width / 2,
+              innerWhitespaceRadius = radius / 2,
+              arcSpan = (radius - innerWhitespaceRadius),
+              arcMargin = 0,
+              colorScale = d3.scale.category20c(),
+              pie = d3.layout.pie(),
+              dayMilliseconds = 24 * 60 * 60 * 1000,
+              svg,
+              arc,
+              className,
+              svgGroup,
+              cycleStates,
+              cyclesInADay,
+              cycleGraphData = [],
+              i;
+
+          // disable data sorting & force all slices to be the same size
+          pie
+          .sort(null)
+          .value(function (d) {
+            return d.milliseconds || 1; // don't allow a 0 duration. d3 can't draw it
+          });
+
+          svg = d3.select(element[0])
+          .append('svg:svg')
+          .attr('width', width)
+          .attr('height', height);
+
+          arc = d3.svg.arc();
+          className = 'control-' + scope.controlAction.control.className;
+
+          cycleStates = scope.controlAction.cycle.states.map(function(state){
+            return {
+              value : parseInt(state.controlValue, 10),
+              milliseconds : moment.duration(state.duration || 0, state.durationType || '').asMilliseconds()
+            }
+          });
+
+          if (scope.controlAction.overallDurationInMilliseconds === 0){
+            // then it's a single-state cycle with no duration (aka, just set to VALUE and leave forever)
+            cyclesInADay = 1;
+          } else {
+            cyclesInADay = dayMilliseconds / scope.controlAction.overallDurationInMilliseconds;
+          }
+          
+          for (i = 0; i < cyclesInADay; i++) {
+            cycleGraphData = cycleGraphData.concat(cycleStates);
+          }
+
+          arc
+          .outerRadius(radius - arcMargin)
+          .innerRadius(radius - arcSpan - arcMargin);
+
+          svgGroup = svg.append('svg:g')
+          .classed(className, true)
+          .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');          
+
+          svgGroup.selectAll('path')
+          .data(pie(cycleGraphData))
+          .enter()
+          .append('svg:path')
+          .attr('d', arc)
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 1)
+          .attr('fill', scope.getControlFillColor)
+          
+        }
+      };
+    });
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);

@@ -43,7 +43,9 @@ block content
         h2.main-heading Accessories
           div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
             h3 {{controlAction.control.name}}
-            
+
+            div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
+                    
             a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
             a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
@@ -62,7 +64,6 @@ block content
         |  </div>
 
 block footer-scripts
-
   script
     // GPI is a GPI with a fully-populated GP for "growPlan" property
     bpn.pageData.growPlanInstance = !{JSON.stringify(growPlanInstance)};
@@ -70,3 +71,5 @@ block footer-scripts
     bpn.pageData.controls = !{JSON.stringify(controls)};
     bpn.pageData.latestSensorLogs = !{JSON.stringify(latestSensorLogs)};
     
+  script(type='text/ng-template', id='control-graph.html')
+    div Hello, I'm a control graph
