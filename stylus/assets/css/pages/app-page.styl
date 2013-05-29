@@ -10,7 +10,8 @@
 			padding 0
 
 			&.first, &.app-user
-				display block
+				float: left;
+				width: 48.499999%;
 
 
 		h1.logo a, h1.logo span
@@ -21,6 +22,8 @@
 	.main
 		max-width 60em
 		margin 0 auto
+		overflow hidden
+		width 95%
 
 	.footer
 		min-height 0
@@ -55,6 +58,8 @@
 		line-height 1.25em
 		font-size: 1.5em;
 		// font-weight: bold;
+		line-height: 1em;
+		font-size: 1.75em;
 		
 	.separator-top
 		border-width 1px 0 0
@@ -65,10 +70,11 @@
 		margin 1em auto
 
 	.app-user
-		position absolute
-		top 0
-		right 0
-		width 50%
+		text-align right
+		// position absolute
+		// top 0
+		// right 0
+		// width 50%
 		
 		a
 			color color-logo-green!important

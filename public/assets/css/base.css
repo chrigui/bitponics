@@ -1467,6 +1467,23 @@ nav.open {
 .dashboard .content-module.side {
   width: 25%;
 }
+.dashboard .page-heading-small {
+  color: #999;
+  border-bottom: 1px solid #d8d8d8;
+  padding-bottom: 0.5em;
+}
+.dashboard .control h3 {
+  text-align: left;
+  color: #999;
+  font-size: 0.85em;
+}
+.dashboard .date {
+  margin-bottom: 0;
+  border: 0 none;
+}
+.circle {
+  margin: 1.5em 0;
+}
 .circle svg {
   max-width: 100%;
 }
@@ -1578,7 +1595,8 @@ li
 }
 .app-page .header .nav-section.first,
 .app-page .header .nav-section.app-user {
-  display: block;
+  float: left;
+  width: 48.499999%;
 }
 .app-page .header h1.logo a,
 .app-page .header h1.logo span {
@@ -1590,6 +1608,8 @@ li
 .app-page .main {
   max-width: 60em;
   margin: 0 auto;
+  overflow: hidden;
+  width: 95%;
 }
 .app-page .footer {
   min-height: 0;
@@ -1623,6 +1643,8 @@ li
 .app-page .page-heading-small {
   line-height: 1.25em;
   font-size: 1.5em;
+  line-height: 1em;
+  font-size: 1.75em;
 }
 .app-page .separator-top {
   border-width: 1px 0 0;
@@ -1633,10 +1655,7 @@ li
   margin: 1em auto;
 }
 .app-page .app-user {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50%;
+  text-align: right;
 }
 .app-page .app-user a {
   color: #00e36c !important;

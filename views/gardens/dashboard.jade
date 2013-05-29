@@ -15,8 +15,8 @@ block content
       h2.page-heading(ng-cloak)
         | {{growPlanInstance.name}}
 
-      div#sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
-        div.date.page-heading-small {{activeDate.date | date:'longDate'}}
+      div#sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
+        h2.page-heading-small.date {{activeDate.date | date:'longDate'}}
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
@@ -34,18 +34,18 @@ block content
             | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
             div.screen-reader-text Settings
 
-      div#visualizer.content-module.middle(ng-controller="bpn.controllers.dashboard.PhasesGraph")
+      div#visualizer.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
         div#phases-graph.circle.centered
     
-      div#controls.controls.content-module.side(ng-controller="bpn.controllers.dashboard.Controls")
-        h2.main-heading Accessories
-          div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-            h3 {{controlAction.control.name}}
+      div#controls.controls.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.Controls")
+        h2.page-heading-small Accessories
+        div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+          h3 {{controlAction.control.name}}
 
-            div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
-                    
-            a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
-            a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
+          div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
+                  
+          a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
+          a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
       div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
         h2.main-heading Reminders
