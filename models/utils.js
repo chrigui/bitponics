@@ -72,7 +72,8 @@ function logSensorLog(options, callback){
 
         var phaseDaySummary = {
           status : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
-          sensorSummaries : {}
+          sensorSummaries : {},
+          date : pendingSensorLog.ts
         };
 
 
@@ -141,7 +142,6 @@ function logSensorLog(options, callback){
             growPlanInstance.mergePhaseDaySummary(
               {
                 growPlanInstancePhase : activeGrowPlanInstancePhase,
-                date : pendingSensorLog.ts,
                 daySummary : phaseDaySummary
               },
               innerCallback

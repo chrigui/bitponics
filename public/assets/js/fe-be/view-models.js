@@ -17,7 +17,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var startDate = growPlanInstancePhase.startDate;
   		growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
-  			daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
+  			if (!daySummary.date) {
+          daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
+        }
   		});
 
   		if (growPlanInstance.growPlan.phases){
