@@ -158,6 +158,8 @@ module.exports = function(app) {
 	  }
   );
 
+
+
   /*
    * Read a grow plan
    *
@@ -187,6 +189,7 @@ module.exports = function(app) {
 	  }
   );
 
+  
   /*
    * Update a grow plan
    *
@@ -208,13 +211,13 @@ module.exports = function(app) {
   app.put('/api/grow-plans/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
-	    return GrowPlanModel.findById(req.params.id, function (err, grow_plan) {
+	    return GrowPlanModel.findById(req.params.id, function (err, growPlanResult) {
 	      if (err) { return next(err); }
 
-	      grow_plan.title = req.body.title;
-	      return grow_plan.save(function (err) {
+	      
+	      return growPlanResult.save(function (err, updatedGrowPlan) {
 	        if (err) { return next(err); }
-	        return res.send(grow_plan);
+	        return res.send(updatedGrowPlan);
 	      });
 	    });
 	  }

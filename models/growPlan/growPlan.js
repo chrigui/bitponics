@@ -268,8 +268,13 @@ GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
 
 /**
  * Takes a fully-populated GrowPlan object (such as is submitted from grow-plans creation page)
- * and, for all nested documents (plants, phases.actions, phases.nutrients, etc) creates them if they don't match existing DB entries
- * Then saves the whole shebang and returns it
+ * and, for all nested documents (plants, phases.actions, phases.nutrients, etc) creates them if they don't match existing DB entries.
+ *
+ * Then saves the whole shebang and returns it.
+ * 
+ * If a new GrowPlan is created, this will also update any associated GrowPlanInstances that have "trackGrowPlanUpdates == true".
+ * It will attempt to keep the GPI's on the same phase, and update their active actions, etc. And send out a Notification of things
+ * that have been done.
  * 
  * @param {object} options.growPlan : fully-populated grow plan POJO
  * @param {User} options.user : used to set "createdBy" field for new objects
@@ -282,7 +287,8 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       user = options.user,
       visibility = options.visibility,
       silentValidationFail = options.silentValidationFail,
-      GrowPlanModel = this;
+      GrowPlanModel = this,
+      GrowPlanInstanceModel = require('../growPlanInstance').model;
 
 
   ModelUtils.getFullyPopulatedGrowPlan( { _id: submittedGrowPlan._id }, function(err, growPlanResults){
@@ -300,7 +306,7 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       if (isEquivalent) { 
         // need to return a model object
         return GrowPlanModel.findById(growPlanResult._id, callback);
-      } 
+      }
       
       // if not equivalent, branch the  source GrowPlan
       submittedGrowPlan._id = new ObjectId();
@@ -364,8 +370,34 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
           }
         ],
         function(err, results){
+          if (err) { return callback(err); }
+
           // at this point, everything should have valid, saved referenced documents
-          var newGrowPlan = GrowPlanModel.create(submittedGrowPlan, callback);
+          GrowPlanModel.create(submittedGrowPlan, function(err, newlyBranchedGrowPlan){
+            if (err) { return callback(err); }
+
+            // Find all the GPI's using the old GP that are active and have "trackGrowPlanUpdates" set to true
+            GrowPlanInstanceModel.find({ growPlan : newlyBranchedGrowPlan.parentGrowPlanId, active : true, trackGrowPlanUpdates : true })
+            .exec(function(err, growPlanInstancesToUpdate){
+              if (err) { return callback(err); }
+
+              async.each(
+                growPlanInstancesToUpdate,
+                function gpiIterator(growPlanInstance, iteratorCallback){
+                  
+                  growPlanInstance.migrateToBranchedGrowPlan(
+                  {
+                    newGrowPlan : newlyBranchedGrowPlan
+                  },
+                  iteratorCallback
+                  );
+                },
+                function loopComplete(err){
+                  return callback(err, newlyBranchedGrowPlan);
+                }
+              );
+            });
+          });
         }
       );
     });

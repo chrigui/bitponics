@@ -61,7 +61,7 @@ module.exports = function(app){
           
           default:
             // if not one of those, assume it was a "done" message.
-            DeviceModel.update({_id : deviceId }, { $unset : { "status.calibrationMode" : "" } }).exec();
+            DeviceModel.update({_id : deviceId }, { $unset : { "status.calibrationMode" : 1 } }).exec();
             
             switch (mode){
               case feBeUtils.CALIB_MODES["PH_DONE"] :

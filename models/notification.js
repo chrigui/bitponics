@@ -7,7 +7,11 @@ var mongoose = require('mongoose'),
   feBeUtils = requirejs('fe-be-utils'),
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  async = require('async'),
+  utils = require('./utils'),
+  getObjectId = utils.getObjectId,
+  NotificationModel;
 
 
 var NotificationSentLogSchema = new Schema({ 
@@ -43,12 +47,13 @@ NotificationSentLogSchema.virtual('checked')
 /**
  * Notification
  * 
- * Current triggers for notifications:
- * IdealRange violation that can be handled by device (type="info")
- * IdealRange violation that can't be handled by device (type="actionNeeded")
- * Phase Actions being started (at phase activation) 
- * Actions triggered by IdealRange violations
- * Action cycles that aren't handled by device triggering repeating notifications (type="actionNeeded")
+ * - IdealRange violation that can be handled by device (type="info")
+ * - IdealRange violation that can't be handled by device (type="actionNeeded")
+ * - Phase Actions being started (at phase activation) 
+ * - Actions triggered by IdealRange violations
+ * - Action cycles that aren't handled by device triggering repeating notifications (type="actionNeeded")
+ * - GrowPlan was updated and we updated your Garden to use it
+ * - GrowPlan was updated but we couldn't automatically update your garden. Come select which phase of the new Grow Plan to use
  */
 var NotificationSchema = new Schema({
 	
@@ -105,21 +110,86 @@ var NotificationSchema = new Schema({
 	sl : [ NotificationSentLogSchema ],
 
 
-	/**
-	 * message
-   * If sent over SMS, it's ellipsis-ed at 160 chars
-	 */
-	m: { type: String },
+  /**
+   * title
+   *
+   * Plain-text title
+   *
+   * Emails: Becomes the header (and subject?),
+   * Dashboard: Becomes the default view (user needs to click to show detail (body))
+   * SMS : ?
+   */
+  t : { type : String },
+  
+  
+  /**
+   * body
+   * 
+   * Plain-text body
+   *
+   * Emails: Becomes the header (and subject?),
+   * Dashboard: Becomes the default view (user needs to click to show detail (body))
+   * SMS : ?
+   */
+  b : { type: String },
 
+  
+  /**
+   * template
+   *
+   * Name of the HTML template to use for email rendering
+   */
+  tmpl : { type : String },
 
+  
+  /**
+   * Storing the thing that triggered the notification.
+   * Going to use this to group notifications together
+   */
+  trigger : {
+    type : String,
+    enum : [
+      feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END,
+      feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+      feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION,
+      feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
+      feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION,
+      feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON
+      //feBeUtils.NOTIFICATION_TRIGGERS.SCHEDULED_MANUAL_PHASE_ACTION,
+    ],
+    required : true
+  },
+
+  
+  /**
+   * Mixed object type to let Notification triggers
+   * store any pertinent data, intended to be interpolated
+   * into the messages that are emailed or whatever
+   * 
+   * Current properties in use:
+   * - phaseName {String}
+   * - gpiPhaseId {ObjectId}
+   * - gpPhaseId {ObjectId}
+   * - actionId {ObjectId}
+   * - idealRangeId {ObjectId}
+   * - newGrowPlanId {ObjectId}
+   */
+  triggerDetails : Schema.Types.Mixed,
+
+  
   /**
    * type
    */
-	t : { type: String, enum: [
+	type : { 
+    type: String, 
+    enum: [
       feBeUtils.NOTIFICATION_TYPES.INFO,
       feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
       feBeUtils.NOTIFICATION_TYPES.ERROR
-    ]}
+    ],
+    required : true,
+    default : feBeUtils.NOTIFICATION_TYPES.INFO
+  }
 	
 
 },
@@ -195,33 +265,40 @@ NotificationSchema.virtual('sentLogs')
     this.sl = sentLogs;
   });
 
-NotificationSchema.virtual('message')
-  .get(function(){
-    return this.m;
-  })
-  .set(function(message){
-    this.m = message;
-  });
 
-/**
- * tmp virtual until we clean the code and refactor all refs to use "message"
- */
-NotificationSchema.virtual('msg')
-  .get(function(){
-    return this.m;
-  })
-  .set(function(message){
-    this.m = message;
-  });
-
-NotificationSchema.virtual('type')
+NotificationSchema.virtual('title')
   .get(function(){
     return this.t;
   })
-  .set(function(type){
-    this.t = type;
-  });  
+  .set(function(title){
+    this.t = title;
+  });
 
+
+NotificationSchema.virtual('body')
+  .get(function(){
+    return this.b;
+  })
+  .set(function(body){
+    this.b = body;
+  });
+
+
+NotificationSchema.virtual('template')
+  .get(function(){
+    return this.tmpl;
+  })
+  .set(function(template){
+    this.tmpl = template;
+  });
+
+
+
+NotificationSchema.virtual('gardenDashboardUrl')
+  .get(function(){
+    var appDomain = 'www.bitponics.com';//require('../app').config.appDomain;
+    return "https://" + appDomain + "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
+  });
 
 
 /*************** SERIALIZATION *************************/
@@ -245,8 +322,9 @@ NotificationSchema.set('toObject', {
       delete ret.tts;
       delete ret.r;
       delete ret.sl;
-      delete ret.m;
       delete ret.t;
+      delete ret.tmpl;
+      delete ret.b;
     }
   }
 });
@@ -257,10 +335,60 @@ NotificationSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
+
+
+
+
+/**
+ * All new instances of Notification should be created with this method.
+ * This method, by default, first checks whether we already have any existing duplicate of the submitted
+ * notification already exists. If so, it returns that existing Notification.
+ *
+ * TODO : should investigate how to compare against triggerDetails. Maybe make triggerDetails serialized JSON, provide a getter for deserialized. Then we can query for equality
+ *
+ * @param {Object} options : Properties of the NotificationModel object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
+ * @param {function(err, Notification)} callback
+ */
+NotificationSchema.static('create', function(options, callback){
+  // TODO : Investigate the performance of this query. Assuming it'll be fine because
+  // mongo can filter with the index we have on tts+gpi first, which
+  // should greatly lessen the load
+  NotificationModel.find({
+    gpi : options.gpi || options.growPlanInstance,
+    tts : { $gte : options.timeToSend },
+    type : options.type,
+    trigger : options.trigger,
+    t : options.title,
+    b : options.body,
+    url : options.url,
+    tmpl : options.template
+  }).exec(function(err, notificationResults){
+    if (err) { return callback(err); }
+    if (notificationResults.length){
+      return callback(null, notificationResults[0]);
+    }
+    var newNotification = new NotificationModel(options);
+    newNotification.save(callback);
+  });
+});
+
+
+
+NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(growPlanInstanceId, callback){
+  var now = new Date();
+
+  NotificationModel
+  .update(
+    { gpi : growPlanInstanceId, tts : { $gte : now }}, 
+    { $unset : { 'tts' : 1 }}
+  ).exec(callback);
+});
+
+
+
 // Sparse index on timeToSend so that we skip nulls
 NotificationSchema.index({ 'tts gpi' : -1} , { sparse : true } );
-//NotificationSchema.index({ 'gpi': 1 });
 
 
 exports.schema = NotificationSchema;
-exports.model = mongooseConnection.model('Notification', NotificationSchema);
+exports.model = NotificationModel = mongooseConnection.model('Notification', NotificationSchema);

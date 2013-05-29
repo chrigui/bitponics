@@ -499,7 +499,6 @@ require([
 
     dashboardApp.directive('bpnDirectivesControlActionGraph', function() { 
       return {
-        //templateUrl : "control-graph.html",
         restrict : "EA",
         template : '<div class="control {{controlAction.control.className}}"></div>',
         replace : true,

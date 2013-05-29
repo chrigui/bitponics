@@ -167,7 +167,7 @@ module.exports = [
         }
       ],
       recentSensorLogs : []
-    },
+    }, 
     {
 			_id: "000666809da0", //mac address
 			deviceType: "506de2fe8eebf7524342cb37",
@@ -179,5 +179,11 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "WD-301-HYAT",
 			name : "Hyatt Device"
+		},
+		{
+			_id: "000666809f61", //mac address
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "AA-301-AAAH",
+			name : "Development Device 2013-05-26"
 		}
 	];

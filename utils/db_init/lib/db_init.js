@@ -388,7 +388,7 @@ async.series([
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][_data.name] = doc._id;
-            console.log("created controls");
+            console.log("created control");
             decrementData();
           });
         }
@@ -517,7 +517,7 @@ async.series([
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][_data._id] = doc._id;
-            console.log("created: " + dataType);
+            console.log("created device");
             decrementData();
           });
         }
@@ -793,7 +793,7 @@ async.series([
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][_data.name] = doc._id;
-            console.log("created phase");
+            console.log("created growPlan");
             decrementData();
           });
         }

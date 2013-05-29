@@ -23,20 +23,26 @@ var mongoose = require('mongoose'),
 
 var PhaseDaySummarySchema = new Schema({
   
-  //ts : { type : Date, default: Date.now },
-
   status : { 
   
     type: String, 
   
     enum: [
       feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
-      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD,
+      feBeUtils.PHASE_DAY_SUMMARY_STATUSES.EMPTY
     ],
   
     default: feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD
   },
   
+  
+  /**
+   * Localized midnight of the day for this phase day
+   */
+  date : { type : Date },
+
+
   /**
    * sensorSummaries is a hash, 
    * Keys are Sensor.sCode
@@ -44,6 +50,7 @@ var PhaseDaySummarySchema = new Schema({
    */
   sensorSummaries : Schema.Types.Mixed
 }, 
+// Don't need ObjectId entries for PhaseDaySummaries
 { id : false, _id : false });
 
 
@@ -70,6 +77,13 @@ var GrowPlanInstanceSchema = new Schema({
   active: { type: Boolean },
 
   phases: [{
+    
+    /**
+     * ObjectId of GrowPlan. Stored because it's possible for a GPI 
+     * to be shifted to a new 
+     */
+    growPlan : { type : ObjectIdSchema, ref : 'GrowPlan' },
+
     /**
      * ObjectId of GrowPlan.Phase
      */
@@ -113,6 +127,14 @@ var GrowPlanInstanceSchema = new Schema({
   }],
 
 
+  growPlanMigrations : [
+    {
+      oldGrowPlan : { type : ObjectIdSchema, ref : 'GrowPlan' },
+      newGrowPlan : { type : ObjectIdSchema, ref : 'GrowPlan' },
+      ts : { type : Date }
+    }
+  ],
+
 	// not in use yet, but this will be how a user configures the view on their Dashboard
 	settings : {
 		visibleSensors : []
@@ -146,7 +168,16 @@ var GrowPlanInstanceSchema = new Schema({
 	}],
 
 
-	visibility : { type: String, enum: ['public', 'private'], default: 'public'}
+	visibility : { 
+    type: String, 
+    enum: [
+      feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
+      feBeUtils.VISIBILITY_OPTIONS.PRIVATE
+    ], 
+    default : feBeUtils.VISIBILITY_OPTIONS.PUBLIC
+  },
+
+  trackGrowPlanUpdates : { type : Boolean, default : true }
 },
 { id : false });
 
@@ -192,7 +223,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
   var gpi = new GrowPlanInstanceModel(gpiInitData);
  
-  async.series([
+  async.series(
+    [
       function initGrowPlanData (innerCallback){
         GrowPlanModel.findById(options.growPlan, function(err, growPlan){
           if (err) { return innerCallback(err); }
@@ -206,7 +238,10 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
 
           // add the phases
           growPlan.phases.forEach(function(phase){
-            gpi.phases.push({ phase : phase._id});
+            gpi.phases.push({ 
+              phase : phase._id,
+              growPlan : growPlan
+            });
           });
 
           return innerCallback();
@@ -254,11 +289,11 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
  *
  */
 GrowPlanInstanceSchema.method('getPhaseDay', function(growPlanInstancePhase, targetDate){
-    var moment = require('moment'),
-        phaseStart = moment(growPlanInstancePhase.startDate).subtract('days', growPlanInstancePhase.startedOnDay),
-        target = moment(targetDate);
+  var moment = require('moment'),
+      phaseStart = moment(growPlanInstancePhase.startDate).subtract('days', growPlanInstancePhase.startedOnDay),
+      target = moment(targetDate);
 
-    return target.diff(phaseStart, 'days');
+  return target.diff(phaseStart, 'days');
 });
 
 
@@ -271,6 +306,18 @@ GrowPlanInstanceSchema.method('getPhaseDay', function(growPlanInstancePhase, tar
 GrowPlanInstanceSchema.method('getPhaseByGrowPlanPhaseId', function(growPlanPhaseId) {
     for (var i = this.phases.length; i--;){
       if (this.phases[i].phase.equals(growPlanPhaseId)){
+        return this.phases[i];
+      }
+    }
+});
+
+
+/**
+ * Get the active phase
+ */
+GrowPlanInstanceSchema.method('getActivePhase', function() {
+    for (var i = this.phases.length; i--;){
+      if (this.phases[i].active){
         return this.phases[i];
       }
     }
@@ -355,16 +402,16 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
       function(err){
         async.parallel(
           [
-            function(innerCallback){
+            function updateDevice(innerCallback){
               deviceResult.activeGrowPlanInstance = gpi;
               deviceResult.refreshStatus(innerCallback);
             },
-            function(innerCallback){
+            function updateGPI(innerCallback){
               gpi.device = deviceResult._id;
               gpi.save(innerCallback);
             }
           ],
-          function(err, results){
+          function parallelFinal(err, results){
             if (err) { return callback(err); }
             var data = {
               device : results[0],
@@ -444,8 +491,10 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       phaseId = options.phaseId,
       device,
       now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
       phaseDay = options.phaseDay || 0,
-      growPlanPhase, 
+      growPlanPhase,
+      growPlanInstancePhase,
       actionsWithDeviceControl = [],
       prevPhase;
   
@@ -455,19 +504,19 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   // expire any existing action overrides
   // expire all existing notifications
   // Finally,
-  // activate the new phases' actions & send notifications
+  // activate the new phases' actions & trigger notifications
   
   async.series(
     [
-      function (innerCallback){
+      function getPopulatedOwner(innerCallback){
         UserModel.findById(growPlanInstance.owner, function (err, user){
           if (err) { return innerCallback(err);}
           growPlanInstance.owner = user;
-          innerCallback();
+          return innerCallback();
         });
       },
 
-      function (innerCallback){
+      function updateGrowPlanInstancePhases(innerCallback){
         GrowPlanModel
         .findById(growPlanInstance.growPlan)
         .populate('phases.actions')
@@ -477,12 +526,20 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
           growPlanPhase = growPlan.phases.filter(function(item){ return item._id.equals(phaseId);})[0];
 
+          
           growPlanInstance.phases.forEach(function(phase){
             if (phase.phase.equals(phaseId)){
-              phase.active = true;
-              phase.startDate = now;
-              phase.startedOnDay = phaseDay;
-              phase.expectedEndDate = now.valueOf() + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
+              growPlanInstancePhase = phase;
+
+              growPlanInstancePhase.active = true;
+              growPlanInstancePhase.startDate = now;
+              growPlanInstancePhase.startedOnDay = phaseDay;
+
+              var expectedEndDate = nowAsMilliseconds + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
+              if (expectedEndDate < nowAsMilliseconds){
+                expectedEndDate = nowAsMilliseconds;
+              }
+              growPlanInstancePhase.expectedEndDate = expectedEndDate;
             } else {
               if (phase.active == true){
                 prevPhase = phase;
@@ -491,15 +548,34 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
               phase.active = false;
             }
           });
+
+          if (!growPlanInstancePhase){
+            var expectedEndDate = nowAsMilliseconds + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
+            if (expectedEndDate < nowAsMilliseconds){
+              expectedEndDate = nowAsMilliseconds;
+            }
+
+            growPlanInstancePhase = {
+              phase : phaseId,
+              growPlan : growPlanInstance.growPlan,
+              active : true,
+              startDate : now,
+              startedOnDay : phaseDay,
+              expectedEndDate : expectedEndDate
+            };
+            growPlanInstance.phases.push(growPlanInstancePhase);
+          }
+          
+          
           
           return innerCallback();
         });
       },
 
-      function (innerCallback){
+      function getDeviceControllableActions(innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
         DeviceModel.findById(getDocumentIdString(growPlanInstance.device), function (err, deviceResult){
-          if (err) {  return innerCallback(err); }
+          if (err) { return innerCallback(err); }
 
           device = deviceResult;
           actionsWithDeviceControl = growPlanPhase.actions.filter(
@@ -508,11 +584,11 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             }
           );
           
-          innerCallback();
+          return innerCallback();
         });
       },
 
-      function (innerCallback){
+      function saveGPI(innerCallback){
         // At this point, the growPlanInstance is done being edited.
         if (options.save) {
           return growPlanInstance.save(innerCallback);
@@ -521,44 +597,29 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
         }
       },
 
-      function (innerCallback){
+      function expireExistingNotificationsAndImmediateActions(innerCallback){
 
         async.parallel([
           
           // Expire existing notifications for this GPI
-          function (innerParallelCallback){
-            NotificationModel
-            .find()
-            .where('gpi')
-            .equals(growPlanInstance._id)
-            .where('tts')
-            .gte(now)
-            .exec(function(err, existingNotifications){
-              if (err) { return innerParallelCallback(err); }
-              async.forEach(
-                existingNotifications,
-                function notificationIterator(notification, iteratorCallback){
-                  notification.timeToSend = null;
-                  notification.save(iteratorCallback);
-                },
-                function notificationLoopComplete(err){
-                  innerParallelCallback(err);
-                }
-              );
-            });
+          function expireExistingNotifications(innerParallelCallback){
+            NotificationModel.expireAllGrowPlanInstanceNotifications(
+              growPlanInstance._id,
+              innerParallelCallback
+            );
           },
           
           // Force refresh of device status on next request
-          function (innerParallelCallback){
+          function updateDeviceStatus(innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
             device.status.expires = now;
-            
+
             device.save(innerParallelCallback);
           },
           
           // Expire immediateActions that conflict with a device controlled action in the new phase
-          function (innerParallelCallback){
+          function updateImmediateActions(innerParallelCallback){
             if (!device){ return innerParallelCallback(); }
             
             ImmediateActionModel
@@ -595,14 +656,14 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             });
           }
         ],
-        function (err, results){
+        function (err, results){  
           return innerCallback(err);
         }
         );
       },
 
-      // Send notifications for the just-ended phase 
-      function (innerCallback){
+      // Trigger notifications for the just-ended phase 
+      function triggerPhaseEndNotifications(innerCallback){
         if (!(prevPhase && prevPhase.phaseEndActions)){ return innerCallback(); }
 
         ActionModel
@@ -617,14 +678,21 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           async.forEach(
             actionResults, 
             function(action, iteratorCallback){
-              var actionNotification = new NotificationModel({
-                    users : growPlanInstance.users,
-                    gpi : growPlanInstance,
-                    timeToSend : now,
-                    message : prevPhase.name + ' phase ended. Time for the following action: "' + action.description + '".'
-                  });
-
-              actionNotification.save(iteratorCallback);
+              NotificationModel.create(
+              {
+                users : growPlanInstance.users,
+                gpi : growPlanInstance,
+                timeToSend : now,
+                type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+                trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END,
+                triggerDetails : {
+                  phaseName : prevPhase.name,
+                  actionId : action._id,
+                  gpPhaseId : prevPhase._id
+                },
+                title : i18nKeys.get('Time for the following action', action.description)
+              },
+              iteratorCallback);
             },
             function (err){
               return innerCallback(err);
@@ -633,8 +701,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
         });
       },
 
-      // Send notifications for the newly activated phase
-      function (innerCallback){
+      // Trigger notifications for the newly activated phase
+      function triggerPhaseStartNotifications(innerCallback){
         ActionModel
         .find()
         .where('_id')
@@ -648,12 +716,19 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             actionResults, 
             function(action, iteratorCallback){
               var notificationsToSave = [],
-                actionNotification = new NotificationModel({
+                actionNotification = {
                   users : growPlanInstance.users,
                   gpi : growPlanInstance,
                   timeToSend : now,
-                  message : growPlanPhase.name + ' phase started. Time for the following action: "' + action.description + '".'
-                });
+                  type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                  triggerDetails : {
+                    phaseName : growPlanPhase.name,
+                    actionId : action._id,
+                    gpPhaseId : growPlanPhase._id
+                  },
+                  title : i18nKeys.get('Time for the following action', action.description)
+                };
 
               notificationsToSave.push(actionNotification);
 
@@ -663,80 +738,104 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     return action.control._id.equals(item.control);
                   })
                   ){
-                    actionNotification.type = 'info';
-                    actionNotification.message += ' Since you have a ' + action.control.name + ' connected, we\'ve triggered this automatically.';
+                    actionNotification.type = feBeUtils.NOTIFICATION_TYPES.INFO;
+                    actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
               } else {
-                actionNotification.type = 'actionNeeded';
-                actionNotification.message += ' ';
-
+                actionNotification.type = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
+                
                 if (action.cycle.repeat){
-                  actionNotification.message += " This action has a repeating cycle associated with it. We'll notify you whenever an action is required.";
+                  actionNotification.body = i18nKeys.get("Has repeating cycle");
+                  
                   // cycles with repeat=true are required to have 2 states (through validation rules)
                   var states = action.cycle.states;
                   
                   if (states[0].durationType && !states[1].durationType){
                     // state 0 has a duration and state 1 does not
-                    notificationsToSave.push(new NotificationModel({
+                    notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      triggerDetails : {
+                        phaseName : growPlanPhase.name,
+                        actionId : action._id,
+                        gpPhaseId : growPlanPhase._id
+                      },
+                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
                         type : states[0].durationType,
                         duration : states[0].duration,
                         timezone : growPlanInstance.owner.timezone
                       },
-                      type : 'actionNeeded'
-                    }));
+                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+                    });
                   } else if (!states[0].durationType && states[1].durationType){
                     // state 0 does not have a duration and state 1 does
-                    notificationsToSave.push(new NotificationModel({
+                    notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      triggerDetails : {
+                        phaseName : growPlanPhase.name,
+                        actionId : action._id,
+                        gpPhaseId : growPlanPhase._id
+                      },
+                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
                         type : states[1].durationType,
                         duration : states[1].duration,
                         timezone : growPlanInstance.owner.timezone
                       },
-                      type : 'actionNeeded'
-                    }));
+                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+                    });
                   } else if (states[0].durationType && states[1].durationType){
                     // both states have durations
-                    notificationsToSave.push(new NotificationModel({
+                    notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[1].message + '"',
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      triggerDetails : {
+                        phaseName : growPlanPhase.name,
+                        actionId : action._id,
+                        gpPhaseId : growPlanPhase._id
+                      },
+                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
                         timezone : growPlanInstance.owner.timezone
                       },
-                      type : 'actionNeeded'
-                    }));
+                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+                    });
 
-                    notificationsToSave.push(new NotificationModel({
+                    notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      message : 'As part of the following action: "' + action.description + '", it\'s time to take the following step: "' + action.cycle.states[0].message + '"',
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      triggerDetails : {
+                        phaseName : growPlanPhase.name,
+                        actionId : action._id,
+                        gpPhaseId : growPlanPhase._id
+                      },
+                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
                         timezone : growPlanInstance.owner.timezone
                       },
-                      type : 'actionNeeded'
-                    }));
+                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+                    });
                   }
                 }
               }
 
-              async.forEach(
+              async.each(
                 notificationsToSave, 
                 function(notificationToSave, innerIteratorCallback){
-                  notificationToSave.save(innerIteratorCallback);
+                  NotificationModel.create(notificationToSave, innerIteratorCallback);
                 },
                 function(err){
                   return iteratorCallback(err);
@@ -744,8 +843,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
               );
             },
             function(err){
-              if (err) { return innerCallback(err); }
-              innerCallback();
+              return innerCallback(err);
             }
           );
         });
@@ -757,6 +855,104 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   );
 });
 
+
+/**
+ * Called when a GP that the GPI is tracking has been updated (aka, branched).
+ * We then need to migrate this GPI to the new GrowPlan
+ *
+ * Assumes that this.growPlan is a populated GrowPlan model (so that we can scan the old phase names withotu re-retrieving the old GrowPlan)
+ *
+ * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
+ * @param {function(err, updatedGrowPlanInstance)} callback
+ */
+GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, callback){
+  var self = this,
+      NotificationModel = require('./notification').model,
+      newGrowPlan = options.newGrowPlan,
+      now = new Date(),
+      activeGPIPhase,
+      activeGrowPlanPhase,
+      elapsedPhaseDays,
+      matchingNewGrowPlanPhase;
+
+  if (!newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan))){
+    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated..."))); 
+  }
+
+
+  GrowPlanModel.findById(self.growPlan).exec(function(err, originalGrowPlan){
+    if (err) { return callback(err); }
+
+    activeGPIPhase = self.getActivePhase();
+    activeGrowPlanPhase = originalGrowPlan.phases.filter(function(phase){ return phase._id.equals(activeGPIPhase.phase); })[0];
+    elapsedPhaseDays = self.getPhaseDay(activeGPIPhase, now);
+
+    
+
+    // First, try to find the equivalent phase in the new GrowPlan to transition the GPI to
+    // Matching : match on name only...anything else might result in unexpected
+    // behavior from the perspective of the user
+    matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
+      return newPhase.name === activeGrowPlanPhase.name;
+    })[0];
+
+    if (!matchingNewGrowPlanPhase){
+      // Notify the user that there was a GrowPlan update that we couldn't automatically handle
+      NotificationModel.create(
+      {
+        users : self.users,
+        gpi : self,
+        timeToSend : now,
+        type : feBeUtils.NOTIFICATION_TYPES.INFO,
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
+        triggerDetails : {
+          newGrowPlanId : newGrowPlan._id
+        },
+        title : i18nKeys.get('Grow Plan Updated, failed migration title'),
+        body : i18nKeys.get('Grow Plan Updated, failed migration body')
+      }, 
+      callback);
+
+    } else {
+      self.growPlan = newGrowPlan;
+
+      
+      self.activatePhase({
+        phaseId : matchingNewGrowPlanPhase._id,
+        phaseDay : elapsedPhaseDays,
+        save : false
+      }, function(err){
+        self.growPlanMigrations.push({
+          oldGrowPlan : newGrowPlan.parentGrowPlanId,
+          newGrowPlan : newGrowPlan,
+          ts : now
+        });
+
+        self.save(function(err, updatedGrowPlanInstance){
+          if (err) { return callback(err); }
+
+          NotificationModel.create(
+          {
+            users : self.users,
+            gpi : self,
+            timeToSend : now,
+            type : feBeUtils.NOTIFICATION_TYPES.INFO,
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
+            triggerDetails : {
+              newGrowPlanId : newGrowPlan._id
+            },
+            title : i18nKeys.get('Grow Plan Updated, automatic migration title'),
+            body : i18nKeys.get('Grow Plan Updated, automatic migration body')
+          }, 
+          callback);
+        });  
+      });
+
+      
+    }
+  });
+  
+});
 /************** END INSTANCE METHODS ********************/
 
 

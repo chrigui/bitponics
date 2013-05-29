@@ -10,6 +10,7 @@ module.exports = [
       growPlan : "506de2ff8eebf7524342cb3a",
       device : "0006667211cf", 
       active: true,
+      trackGrowPlanUpdates : true
     },
     {
 			_id : '506de2fe8eebf7524342cb38',
