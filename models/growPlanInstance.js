@@ -510,10 +510,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   async.series(
     [
       function getPopulatedOwner(innerCallback){
-        UserModel.findById(growPlanInstance.owner, function (err, user){
-          if (err) { return innerCallback(err);}
-          if (!user) { return innerCallback(new Error("GrowPlanInstance owner could not be found")); }
-          owner = user;
+        growPlanInstance.populate({
+          path: 'owner',
+          select: 'timezone'
+        }, function(err, gpiResult){
+          if (err) { return innerCallback(err); }
+          growPlanInstance = gpiResult;
+          owner = gpiResult.owner;
           return innerCallback();
         });
       },
