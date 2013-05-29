@@ -386,6 +386,16 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
 
 
 
+
+
+
+NotificationSchema.pre('save', function(next){
+  this.markModified('triggerDetails');
+  next();
+});
+
+
+
 // Sparse index on timeToSend so that we skip nulls
 NotificationSchema.index({ 'tts gpi' : -1} , { sparse : true } );
 

@@ -510,6 +510,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   async.series(
     [
       function getPopulatedOwner(innerCallback){
+        /*
         growPlanInstance.populate({
           path: 'owner',
           select: 'timezone'
@@ -517,6 +518,16 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           if (err) { return innerCallback(err); }
           growPlanInstance = gpiResult;
           owner = gpiResult.owner;
+          return innerCallback();
+        });
+        */
+
+        UserModel.findById(growPlanInstance.owner)
+        .select('timezone')
+        .exec(function (err, user){
+          if (err) { return innerCallback(err);}
+          if (!user) { return innerCallback(new Error("GrowPlanInstance owner could not be found")); }
+          owner = user;
           return innerCallback();
         });
       },
