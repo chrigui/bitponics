@@ -30,7 +30,6 @@ describe('Notification', function(){
           timezone : 'America/New_York'
         },
         sentLogs : [],
-        message : 'notification message',
         type : 'actionNeeded'
       });
 
@@ -43,10 +42,6 @@ describe('Notification', function(){
     // only friendly 'growPlanInstance' should exist
     result.should.not.have.property('gpi');
     result.should.have.property('growPlanInstance');
-
-    // only friendly 'message' should exist
-    result.should.not.have.property('m');
-    result.should.have.property('message');
 
     // only friendly 'timeToSend' should exist
     result.should.not.have.property('tts');
@@ -77,7 +72,6 @@ describe('Notification', function(){
           timezone : 'America/New_York'
         },
         sentLogs : [],
-        message : 'notification message',
         type : 'actionNeeded'
       });
 
@@ -90,10 +84,6 @@ describe('Notification', function(){
     // only friendly 'growPlanInstance' should exist
     result.should.not.have.property('gpi');
     result.should.have.property('growPlanInstance');
-
-    // only friendly 'message' should exist
-    result.should.not.have.property('m');
-    result.should.have.property('message');
 
     // only friendly 'timeToSend' should exist
     result.should.not.have.property('tts');

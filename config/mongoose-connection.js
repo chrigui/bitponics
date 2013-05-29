@@ -31,7 +31,8 @@ var self = {
       auto_reconnect : true,
       socketOptions : {
           keepAlive : 1
-      }
+      }//,
+      //ssl: true
     },
     replset : {
       auto_reconnect : true,

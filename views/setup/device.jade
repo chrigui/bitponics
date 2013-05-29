@@ -36,7 +36,7 @@ block head
         li(id="enter-wifi-data", value="4")
             h4.page-heading-small Wifi Settings
             p Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
-            form#wifi-form(action='')
+            form#wifi-form(ng-submit="submitWifiForm()")
               ul 
                 li
                   label(for='key') Key (from previous page):
@@ -47,12 +47,12 @@ block head
                     //- label(for='wifi-ssid') 
                       //- select#wifi-ssid(name='wifi-ssid')
                     div.custom-dropdown-wrap(id="wifi-ssid")
-                      select(class="custom-dropdown", ng-model="selectedWifiNetwork", ng-options="wifi.ssid for wifi in scannedWifiNetworks")
+                      select(class="custom-dropdown", ng-model="sharedDataService.selectedWifiNetwork", ng-options="wifi.ssid for wifi in scannedWifiNetworks")
                         option(value="")  Select
                       div(class="dblarrow")
                         i
 
-                  div(ng-show="selectedWifiNetwork.isOtherNetwork")
+                  div(ng-show="sharedDataService.selectedWifiNetwork.isOtherNetwork")
                     p Enter your Wifi network information manually:
                     label(for='wifi-manual-ssid') Network Name:
                       input#wifi-manual-ssid(ng-model="manualWifiNetworkSSID", name="wifi-manual-ssid")  
@@ -72,7 +72,7 @@ block head
                     input#wifi-pass(ng-model="wifiPass", name='wifi-pass')
 
                 li
-                  button#submit-wifi-form(type='submit', class="btn next-step-btn", ng-click="wifiForm()") Connect To Network
+                  button#submit-wifi-form(type='submit', class="btn next-step-btn") Connect To Network
   
   script(type='text/ng-template', id='pair.html')
 
@@ -81,9 +81,9 @@ block head
         li(id="wifi-data-submitted", value="5")
           h4.page-heading-small Disconnect and Reconnect
           p Great! The Bitponics device is now connecting to the 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}} network.
+            span.selectedNetworkSsid {{sharedDataService.selectedWifiNetwork.ssid}} network.
           p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
-            span.selectedNetworkSsid {{selectedWifiNetwork.ssid}}.
+            span.selectedNetworkSsid {{sharedDataService.selectedWifiNetwork.ssid}}.
           
           p After you're back on your old wifi network, close this page and check back on the previous tab.
             | That page will notify you once your device is paired with your account. You can also check the status of all 

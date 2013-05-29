@@ -40,6 +40,7 @@ module.exports = function(app, callback) {
     //auth : require('./auth-config'),
     css : require('./css-config'),
     appUrl : appUrl,
+    appDomain : appDomain,
     js : require('./js-config')
   };
 

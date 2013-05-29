@@ -204,7 +204,6 @@ module.exports = function(app) {
   app.get('/api/grow-plan-instances/:id/sensor-logs', function (req, res, next){
     var response = {};
 
-    console.log('req.params.id', req.params.id);
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       if (err) { return next(err); }
       
@@ -258,6 +257,49 @@ module.exports = function(app) {
     });
   });
   
+
+  /**
+   * Add a sensor log to the GPI
+   *
+   * @param {SensorLog} req.body.sensorLog
+   */
+  app.post('/api/grow-plan-instances/:id/sensor-logs', function (req, res, next){
+    var response = {
+      status : undefined
+    };
+
+    if (!req.body.sensorLog){
+      response = {
+        status : "error",
+        message : "empty sensor log"
+      };
+      res.send(400, response);
+    }
+
+    GrowPlanInstanceModel.findById(req.params.id)
+    //.populate('device')
+    .exec(function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      
+      if ( !growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+        return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
+      }
+
+      ModelUtils.logSensorLog(
+        {
+          pendingSensorLog : req.body.sensorLog, 
+          growPlanInstance : growPlanInstance, 
+          user : req.user 
+        },
+        function(err){
+          if (err) { return next(err); }
+          return res.send({ status : "success" });
+        }
+      );
+    });
+  });
+
  
   /**
    * Add an ImmediateAction to the GPI

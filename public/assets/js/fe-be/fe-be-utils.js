@@ -29,6 +29,19 @@ define(['moment'], function(moment){
 
   /**
    *
+   */
+  utils.NOTIFICATION_TRIGGERS = {
+    PHASE_END : "phaseEnd",
+    PHASE_START : "phaseStart",
+    IDEAL_RANGE_VIOLATION : "idealRangeViolation",
+    IMMEDIATE_ACTION : "immediateAction",
+    PHASE_ENDING_SOON : "phaseEndingSoon",
+    GROW_PLAN_UPDATE : "growPlanUpdate"
+  };
+
+
+  /**
+   *
    * @type {Object}
    */
   utils.ACCESSORY_VALUES = {
@@ -85,7 +98,8 @@ define(['moment'], function(moment){
    */
   utils.PHASE_DAY_SUMMARY_STATUSES = {
     "GOOD" : "good",
-    "BAD" : "bad"
+    "BAD" : "bad",
+    "EMPTY" : "empty"
   };
 
 

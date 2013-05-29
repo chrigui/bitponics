@@ -72,7 +72,8 @@ function logSensorLog(options, callback){
 
         var phaseDaySummary = {
           status : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
-          sensorSummaries : {}
+          sensorSummaries : {},
+          date : pendingSensorLog.ts
         };
 
 
@@ -141,7 +142,6 @@ function logSensorLog(options, callback){
             growPlanInstance.mergePhaseDaySummary(
               {
                 growPlanInstancePhase : activeGrowPlanInstancePhase,
-                date : pendingSensorLog.ts,
                 daySummary : phaseDaySummary
               },
               innerCallback
@@ -272,16 +272,17 @@ function triggerImmediateAction(options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationMessage;
+            notificationTitle,
+            notificationBody;
 
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
           notificationType = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
-          notificationMessage = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
+          notificationTitle = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
           notificationType = feBeUtils.NOTIFICATION_TYPES.INFO;
-          notificationMessage = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
+          notificationTitle = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 
         // In parallel: 
@@ -304,15 +305,17 @@ function triggerImmediateAction(options, callback){
               immediateAction.save(innerCallback);
             },
             function(innerCallback){
-              var notification = new NotificationModel({
+              NotificationModel.create(
+              {
                   users : [user],
                   growPlanInstance : growPlanInstance,
                   timeToSend : now,
-                  message : notificationMessage,
-                  type : notificationType
-              });
-              winston.info('Creating notification : ' + notification.toString());
-              notification.save(innerCallback);
+                  title : notificationTitle,
+                  type : notificationType,
+                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION
+              },
+              innerCallback
+              );
             },
             function(innerCallback){
               if (actionHasDeviceControl){ 
@@ -341,11 +344,16 @@ function triggerImmediateAction(options, callback){
 function scanForPhaseChanges(GrowPlanInstanceModel, callback){
   var GrowPlanInstanceModel = require('./growPlanInstance').model,
       NotificationModel = require('./notification').model,
-      winston = require('winston');
+      winston = require('winston'),
+      async = require('async'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils'),
+      i18nKeys = require('../i18n/keys');
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf(),
-      tomorrow = new Date(nowAsMilliseconds + (24 * 60 * 60 * 1000));
+      tomorrow = new Date(nowAsMilliseconds + (24 * 60 * 60 * 1000)),
+      callback = callback || function(){};
 
     GrowPlanInstanceModel
     .find()
@@ -356,51 +364,55 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
     .populate('growPlan')
     .select('_id users growPlan phases')
     .exec(function(err, growPlanInstanceResults){
-      // TODO : log to winston/loggly
-      if (err) { console.log( err ); return; }
-      if (!growPlanInstanceResults.length) { return; }
+      if (err) { winston.error( err ); return callback(err); }
+      if (!growPlanInstanceResults.length) { return callback(); }
 
-      growPlanInstanceResults.forEach(function(growPlanInstance){
-        var currentGrowPlanInstancePhase,
-          currentGrowPlanInstancePhaseIndex, 
-          nextGrowPlanInstancePhase,
-          nextPhase,
-          notificationType = 'info',
-          notificationMessage = '',
-          notification;
+      async.each(growPlanInstanceResults, 
+        function growPlanInstanceIterator(growPlanInstance, iteratorCallback){
+          var currentGrowPlanInstancePhase,
+            currentGrowPlanInstancePhaseIndex, 
+            nextGrowPlanInstancePhase,
+            nextPhase;
 
-        growPlanInstance.phases.some(
-          function(item, index){ 
-            if (item.active === true){
-              currentGrowPlanInstancePhase = item;
-              currentGrowPlanInstancePhaseIndex = index;
-              return true;
+          growPlanInstance.phases.some(
+            function(item, index){ 
+              if (item.active === true){
+                currentGrowPlanInstancePhase = item;
+                currentGrowPlanInstancePhaseIndex = index;
+                return true;
+              }
             }
+        );
+        
+        nextGrowPlanInstancePhase = growPlanInstance.phases[currentGrowPlanInstancePhaseIndex + 1];
+
+        if (!nextGrowPlanInstancePhase) { return iteratorCallback(); }
+        
+        growPlanInstance.growPlan.phases.some(function(item){
+          if (item._id.equals(nextGrowPlanInstancePhase.phase)){
+            nextPhase = item;
+            return true;
           }
-      );
-      
-      nextGrowPlanInstancePhase = growPlanInstance.phases[currentGrowPlanInstancePhaseIndex + 1];
+        });
 
-      if (!nextGrowPlanInstancePhase) { return; }
-      
-      growPlanInstance.growPlan.phases.some(function(item){
-        if (item._id.equals(nextGrowPlanInstancePhase.phase)){
-          nextPhase = item;
-          return true;
-        }
-      });
-
-      notificationMessage = "It's almost time for the " + nextPhase.name + " phase. Log into your dashboard to advance your grow plan to the next phase.";
-      notification = new NotificationModel({
-        gpi : growPlanInstance._id,
-        users : growPlanInstance.users,
-        type : notificationType,
-        timeToSend : now,
-        msg : notificationMessage
-      });
-      notification.save();  
-      });
-    });
+        NotificationModel.create(
+          {
+            gpi : growPlanInstance._id,
+            users : growPlanInstance.users,
+            type : feBeUtils.NOTIFICATION_TYPES.INFO,
+            timeToSend : now,
+            title : i18nKeys.get("It's almost time", nextPhase.name),
+            body : i18nKeys.get("Log into your dashboard to advance"),
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON
+          },
+          iteratorCallback
+        );
+      },
+      function growPlanInstancesAllDone(err){
+        return callback(err);
+      }
+    );
+  });
 }
 
 /** 
@@ -415,10 +427,14 @@ function clearPendingNotifications (NotificationModel, callback){
       nodemailer = require('nodemailer'),
       tz = require('timezone/loaded'),
       async = require('async'),
-      winston = require('winston');
+      winston = require('winston'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils'),
+      i18nKeys = require('../i18n/keys');
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf();
+
   NotificationModel
   .find()
   .where('tts')
@@ -429,19 +445,24 @@ function clearPendingNotifications (NotificationModel, callback){
     if (!notificationResults.length){ return callback(); }
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
-    async.forEach(
+    async.each(
       notificationResults, 
-      function (notification, iteratorCallback){
-        var subject = "Bitponics Notification";
-        if (notification.type === 'actionNeeded'){ subject += ': Action Needed'; }
+      function notificationIterator(notification, iteratorCallback){
+        var subject = i18nKeys.get("Bitponics Notification"),
+            mailTo = notification.users.map(function(user) { return user.email; }).join(', '),
+            mailOptions;
+
+        if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED){ subject += ': ' + i18nKeys.get("Action Needed"); }
         
-        var mailOptions = {
+        mailOptions = {
             from: "notifications@bitponics.com", // sender address
-            to: notification.users.map(function(user) { return user.email; }).join(', '), 
+            to: mailTo,
             subject: subject, // Subject line
             text: notification.message,
             html: notification.message
         };
+
+        winston.info("ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
         
         emailTransport.sendMail(mailOptions, function(err, response){
           if(err){ return iteratorCallback(err); }
@@ -458,7 +479,7 @@ function clearPendingNotifications (NotificationModel, callback){
         });
       },
       function (err){
-        if (err) { return callback(err);}
+        return callback(err);
       }
     );
   });

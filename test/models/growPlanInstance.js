@@ -326,7 +326,8 @@ feBeUtils = requirejs('fe-be-utils');
               'water' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
               'hum' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD,
               'lux' : feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD
-            }
+            },
+            date : today
           };
 
           var phaseDay = gpi.getPhaseDay(gpiPhase, today);
@@ -334,7 +335,6 @@ feBeUtils = requirejs('fe-be-utils');
           gpi.mergePhaseDaySummary(
           {
             growPlanInstancePhase : gpiPhase,
-            date : today,
             daySummary : phaseDaySummary
           },
           function(err, updatedGrowPlanInstance){

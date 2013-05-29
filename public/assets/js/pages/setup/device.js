@@ -3,8 +3,7 @@ require([
   'domReady',
   'fe-be-utils',
   'angularResource',
-  'es5shim',
-  // 'overlay'
+  'es5shim'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
@@ -30,11 +29,6 @@ function (angular, domReady, feBeUtils) {
           })
           .when('/pair', {
             controller: 'bpn.controllers.setup.device.Pair',
-            // resolve: {
-            //   growPlan: ['GrowPlanLoader', function(GrowPlanLoader) {
-            //     return GrowPlanLoader();
-            //   }]
-            // },
             templateUrl:'pair.html'
           })
           .otherwise({redirectTo:'/'});
@@ -45,7 +39,7 @@ function (angular, domReady, feBeUtils) {
   setupApp.factory('sharedDataService', function(){
       return {
         selectedWifiNetwork : {}
-      }
+      };
   });
   
   setupApp.controller('bpn.controllers.setup.device.Connect',
@@ -54,8 +48,6 @@ function (angular, domReady, feBeUtils) {
       '$location',
       '$http',
       function($scope, $location, $http){
-        
-
         $scope.connect = function(){
           
           $.ajax({
@@ -113,19 +105,21 @@ function (angular, domReady, feBeUtils) {
       '$http',
       'sharedDataService',
       function($scope, $location, $http, sharedDataService){
-        $scope.wifiForm = function() {
+        
+
+
+
+        $scope.submitWifiForm = function() {
           var keys = $scope.bothKeys.split(feBeUtils.COMBINED_DEVICE_KEY_SPLITTER);
-          sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
+          //sharedDataService.selectedWifiNetwork = $scope.selectedWifiNetwork;
           $scope.publicDeviceKey = keys[0];
           $scope.privateDeviceKey = keys[1];
           
 
           //if manual entry, update $scope.selectedWifiNetwork with manual values
-          if($scope.selectedWifiNetwork.isOtherNetwork) {
-            $scope.selectedWifiNetwork = {
-              ssid: $scope.manualWifiNetworkSSID,
-              securityMode: $scope.manualWifiNetworkSecurityMode
-            }
+          if($scope.sharedDataService.selectedWifiNetwork.isOtherNetwork) {
+            $scope.sharedDataService.selectedWifiNetwork.ssid = $scope.manualWifiNetworkSSID;
+            $scope.sharedDataService.selectedWifiNetwork.securityMode = $scope.manualWifiNetworkSecurityMode;
           }
 
           // TODO : validate more
@@ -138,11 +132,11 @@ function (angular, domReady, feBeUtils) {
         $scope.postToDevice = function() {
           // Clean up data so that device can parse it
           // spaces must be replaced with '$'
-          $scope.selectedWifiNetwork.deviceFriendlySsid = $scope.selectedWifiNetwork.ssid.replace(/ /g, '$');
+          $scope.sharedDataService.selectedWifiNetwork.deviceFriendlySsid = $scope.sharedDataService.selectedWifiNetwork.ssid.replace(/ /g, '$');
 
-          var postDataStringPlainText = 'SSID=' + $scope.selectedWifiNetwork.deviceFriendlySsid + '\n' +
+          var postDataStringPlainText = 'SSID=' + $scope.sharedDataService.selectedWifiNetwork.deviceFriendlySsid + '\n' +
             'PASS=' + $scope.wifiPass + '\n' +
-            'MODE=' + $scope.selectedWifiNetwork.securityMode + '\n' +
+            'MODE=' + $scope.sharedDataService.selectedWifiNetwork.securityMode + '\n' +
             'SKEY=' + $scope.privateDeviceKey + '\n' +
             'PKEY=' + $scope.publicDeviceKey;
 
@@ -175,7 +169,7 @@ function (angular, domReady, feBeUtils) {
       '$http',
       'sharedDataService',
       function($scope, $location, $http, sharedDataService){
-        $scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
+        //$scope.selectedWifiNetwork = sharedDataService.selectedWifiNetwork;
         
         // Not needed now?
         // $scope.submitDeviceInfo = function(){
@@ -224,7 +218,6 @@ function (angular, domReady, feBeUtils) {
          * Format for wifi network objects:
          * { ssid : string, securityMode : string }
          */
-        $scope.selectedWifiNetwork = undefined;
         $scope.wifiPass = undefined;
         $scope.manualWifiNetworkSSID = undefined;
         $scope.manualWifiNetworkSecurityMode = undefined;
