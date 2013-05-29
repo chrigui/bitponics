@@ -496,7 +496,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       growPlanPhase,
       growPlanInstancePhase,
       actionsWithDeviceControl = [],
-      prevPhase;
+      prevPhase,
+      owner;
   
   // First, populate growPlan, owner, device
   // then, set the phase properties & save the gpi
@@ -511,7 +512,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       function getPopulatedOwner(innerCallback){
         UserModel.findById(growPlanInstance.owner, function (err, user){
           if (err) { return innerCallback(err);}
-          growPlanInstance.owner = user;
+          owner = user;
           return innerCallback();
         });
       },
@@ -765,7 +766,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       repeat : {
                         type : states[0].durationType,
                         duration : states[0].duration,
-                        timezone : growPlanInstance.owner.timezone
+                        timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
                     });
@@ -785,7 +786,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       repeat : {
                         type : states[1].durationType,
                         duration : states[1].duration,
-                        timezone : growPlanInstance.owner.timezone
+                        timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
                     });
@@ -805,7 +806,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
-                        timezone : growPlanInstance.owner.timezone
+                        timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
                     });
@@ -824,7 +825,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       repeat : {
                         type : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
-                        timezone : growPlanInstance.owner.timezone
+                        timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
                     });
