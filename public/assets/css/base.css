@@ -1589,6 +1589,7 @@ li
 .app-page .header {
   position: static;
   padding: 0.45em 0;
+  margin: 0 0 1em;
 }
 .app-page .header .nav-section {
   padding: 0;
