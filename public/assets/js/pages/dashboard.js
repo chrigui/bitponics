@@ -500,19 +500,19 @@ require([
     dashboardApp.directive('bpnDirectivesControlActionGraph', function() { 
       return {
         restrict : "EA",
-        template : '<div class="control {{controlAction.control.className}}"></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}"></div>',
         replace : true,
         scope : {
           controlAction : "="
         },
         controller : function ($scope, $element, $attrs, $transclude){
-          $scope.getControlFillColor = function (data, index) {
+          $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);
 
             if (num == 0) {
-              return '#46f121'
+              return 'off';
             } else {
-              return '#24d321';
+              return 'on';
             }
           };
 
@@ -588,9 +588,10 @@ require([
           .enter()
           .append('svg:path')
           .attr('d', arc)
-          .attr('stroke', '#fff')
-          .attr('stroke-width', 1)
-          .attr('fill', scope.getControlFillColor)
+          .attr('class', scope.getPathClassName)
+          //.attr('stroke', '#fff')
+          //.attr('stroke-width', 1)
+          //.attr('fill', scope.getControlFillColor)
           
         }
       };

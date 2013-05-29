@@ -1022,6 +1022,21 @@ button.btn:hover {
   bottom: 0.75em;
   right: 0.75em;
 }
+.ring-graph svg path {
+  stroke: #fff;
+  stroke-width: 1;
+}
+.ring-graph svg .on,
+.ring-graph svg .good {
+  fill: #00e36c;
+}
+.ring-graph svg .off,
+.ring-graph svg .empty {
+  fill: #cbffd1;
+}
+.ring-graph svg .bad {
+  fill: #fac400;
+}
 /*
  * controls
  */
