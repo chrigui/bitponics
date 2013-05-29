@@ -14,20 +14,12 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * device.status.activeActions[].outputId
    */
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
+
   	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
-  		var startDate = growPlanInstancePhase.startDate;
-      // ensure there's a daySummary for each day of each phase, past and future
-
-  		growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
-  			if (!daySummary.date) {
-          daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
-        }
-        if (!daySummary.status) {
-          daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
-        }
-  		});
-
-  		if (growPlanInstance.growPlan.phases){
+  		var startDate = growPlanInstancePhase.startDate,
+          i;
+      
+      if (growPlanInstance.growPlan.phases){
   			growPlanInstancePhase.phase = growPlanInstance.growPlan.phases.filter(
           function(growPlanPhase){
             return growPlanPhase._id === growPlanInstancePhase.phase;
@@ -35,6 +27,23 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         )[0];
   		}
   		
+      // ensure there's a daySummary for each day of each phase, past and future
+      for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
+        if (!growPlanInstancePhase.daySummaries[i]){
+          growPlanInstancePhase.daySummaries[i] = { status : utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY };
+        }
+      }
+
+
+      growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
+        if (!daySummary.date) {
+          daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
+        }
+        if (!daySummary.status) {
+          daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
+        }
+      });
+      
       if (growPlanInstancePhase.active){
         growPlanInstance.activePhase = growPlanInstancePhase;
       }

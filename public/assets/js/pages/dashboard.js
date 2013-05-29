@@ -190,17 +190,16 @@ require([
           // Since $scope is inherited from parent, this'll set Main controller's $scope.activeDate,
           // which in turn will update the DayOverview sidebar
 
-          $scope.getPhaseFillColor = function (data, index) {
-            var num = data.data;
+          $scope.getPhaseClass = function (data, index) {
+            var status = data.data.status;
 
-            if (num == 0) {
-              return '#46f121';
-            } else if (num == 2) {
-              return '#24d321';
-            } else if (num < 1) {
-              return '#D2E000';
-            } else {
-              return '#24d321';
+            switch(status){
+              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
+                return "good";
+              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
+                return "bad";
+              default : 
+                return "empty";
             }
           };
 
@@ -239,7 +238,7 @@ require([
               height = width,
               radius = width / 2,
               innerWhitespaceRadius = radius / (phaseCount + 1),
-            // sum of all arcSpans must fit between outer boundary and inner whitespace
+              // sum of all arcSpans must fit between outer boundary and inner whitespace
               arcSpan = (radius - innerWhitespaceRadius) / phaseCount,
               arcMargin = 0,
               colorScale = d3.scale.category20c(),
@@ -265,12 +264,6 @@ require([
                 className = 'phase' + index,
                 phaseGroup;
 
-              var phaseDaySummaries = [];
-              for (var i = 0; i < phase.phase.expectedNumberOfDays; i++) {
-                var colorVal = (index + (index == 1 ? (Math.random() - .4) : 0));
-                phaseDaySummaries.push(colorVal);
-              }
-
               arc.outerRadius(radius - (arcSpan * index) - arcMargin)
                 .innerRadius(radius - (arcSpan * (index + 1)) - arcMargin);
 
@@ -279,16 +272,14 @@ require([
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
 
               var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phaseDaySummaries));
+                .data(equalPie(phase.daySummaries));
 
               allArcs
                 .enter()
                 .append('svg:g')
                 .append('svg:path')
                 .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', $scope.getPhaseFillColor);
+                .attr('class', $scope.getPhaseClass);
 
               allArcs
                 .on('click', function (d, i) {
@@ -315,16 +306,14 @@ require([
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
 
               var allMasks = maskGroup.selectAll('mask')
-                .data(equalPie(phaseDaySummaries));
+                .data(equalPie(phase.daySummaries));
 
               allMasks
                 .enter()
                 .append('svg:mask')
                 .append('svg:path')
                 .attr('d', arc)
-                .attr('stroke', '#fff')
-                .attr('stroke-width', 1)
-                .attr('fill', $scope.getPhaseFillColor);
+                .attr('class', $scope.getPhaseClass);
             });
           };
 
@@ -341,6 +330,7 @@ require([
         function ($scope, $filter) {
           // TODO: Add functions to handle interactions with control widgets. Launch control overlay.
 
+          // NOTE: This is not currently in use
           $scope.makeDayProgressClock = function (svg, radius, triangleSize) {
             var triHeight = Math.cos(Math.PI / 6) * triangleSize,
               width = svg.clientWidth,
