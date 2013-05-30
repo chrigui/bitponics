@@ -192,8 +192,9 @@ module.exports = function(app) {
   /**
    * Sensor Logs nested resource
    * 
-   * @param {Date=} req.params.start-date (optional)
-   * @param {Date=} req.params.end-date (optional)
+   * @param {Date=} req.params.start-date (optional) Should be something parse-able by moment.js
+   * @param {Date=} req.params.end-date (optional) Should be something parse-able by moment.js
+   * @param {String=} req.params.timezone (optional) : Optionally set the timezone to use for the date filtering. If unset, uses the GPI owner's timezone
    * @param {string} req.params.sCode (optional)
    * @param {Number} req.params.limit
    *
@@ -223,9 +224,10 @@ module.exports = function(app) {
     	query.sort('-ts');
     	query.select('ts l'); // don't need to get the gpi in this query. already know it!
 
-    	if (startDate){
+    	// TODO : Localize start/end date based on owner's timezone?
+      if (startDate){
     		startDate = moment(startDate).toDate();
-    		query.where('ts').gt(startDate);
+    		query.where('ts').gte(startDate);
     	}
     	if (endDate){
     		endDate = moment(endDate).toDate();

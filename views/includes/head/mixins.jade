@@ -27,6 +27,7 @@ mixin requirejs(datamain)
         'fe-be-utils': '/assets/js/fe-be/fe-be-utils',
         'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
         'socket.io' : '/socket.io/socket.io',
+        'spin' : '/assets/js/libs/spin.min',
         'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
         'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
         'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
@@ -55,6 +56,9 @@ mixin requirejs(datamain)
         'socket.io': {
           exports: 'io'
         },
+        'spin' : {
+          exports : "Spinner"
+        }
       }
     });
 

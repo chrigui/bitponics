@@ -34,14 +34,21 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         }
       }
 
+      var phaseStartingOnGrowPlanInstanceDay = 0;
+      for (var i = 0; i < phaseIndex; i++){
+        phaseStartingOnGrowPlanInstanceDay += growPlanInstance.phases[i].daySummaries.length;
+      }
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
+        var daySummaryIndexInGrowPlan = daySummaryIndex + phaseStartingOnGrowPlanInstanceDay;
+
         if (!daySummary.date) {
-          daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
+          daySummary.date = moment(startDate).add('days', daySummaryIndexInGrowPlan);
         }
         if (!daySummary.status) {
           daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
         }
+        daySummary.dateKey = moment(daySummary.date).format("YYYY-MM-DD");
       });
       
       if (growPlanInstancePhase.active){

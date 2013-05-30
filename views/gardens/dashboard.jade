@@ -15,7 +15,7 @@ block content
       h2.page-heading(ng-cloak)
         | {{growPlanInstance.name}}
 
-      div#sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
+      div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
         h2.page-heading-small.date {{activeDate.date | date:'longDate'}}
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
@@ -35,7 +35,7 @@ block content
             div.screen-reader-text Settings
 
       div#visualizer.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
-        div#phases-graph.circle.centered.ring-graph
+        div(data-bpn-directives-phases-graph)
     
       div#controls.controls.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.Controls")
         h2.page-heading-small Accessories
