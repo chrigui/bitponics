@@ -951,7 +951,7 @@ button.btn:hover {
  */
 .ring-graph svg path {
   stroke: #fff;
-  stroke-width: 1;
+  stroke-width: 2;
 }
 .ring-graph svg .on,
 .ring-graph svg .good {

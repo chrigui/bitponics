@@ -77,7 +77,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         if (!daySummary.status) {
           daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
         }
-        daySummary.dateKey = moment(daySummary.date).format("YYYY-MM-DD");
+        daySummary.dateKey = utils.getDateKey(daySummary.date);
       });
       
       if (growPlanInstancePhase.active){
@@ -103,6 +103,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   /**
+   * Get a string key for the date, for use as object keys in a date hash
+   * 
+   * @param {Date} date
+   * @return {string} A string in the format YYYY-MM-DD
+   */
+  utils.getDateKey = function(date){
+    return moment(date).format("YYYY-MM-DD");
+  };
+
+
+  /**
    * Adds/calculates properties necessary for UI presentation
    *
    * Adds the following properties:
@@ -121,7 +132,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * Converts sensor readings array to a hash, keyed by sensor code
    */
   viewModels.initSensorLogsViewModel = function (sensorLogs){
-    return sensorLogs.forEach(viewModels.initSensorLogViewModel);
+    sensorLogs.forEach(viewModels.initSensorLogViewModel);
+    return sensorLogs;
   };
 
 

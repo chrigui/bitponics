@@ -28,7 +28,6 @@ module.exports = function(app){
 
 			GrowPlanInstanceModel
 			.find({ 'users': req.user })
-			.populate('device')
 			.sort('-startDate')
 			.exec(function(err, growPlanInstanceResults){
 				if (err) { return next(err); }
@@ -45,7 +44,7 @@ module.exports = function(app){
 	 * Hide/show elements in the dashboard.jade depending on
 	 * whether the req.user is the owner or not
 	 */
-	app.get('/gardens/:growPlanInstanceId', 
+	app.get('/gardens/:growPlanInstanceId',
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
@@ -55,7 +54,7 @@ module.exports = function(app){
 				growPlanInstance : undefined,
 				sensors : undefined,
 				controls : undefined,
-				sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis'],
+				sensorDisplayOrder : ['ph','air','lux','water','ec','tds','sal','hum','full','vis','ir'],
 				className: "app-page dashboard",
 				pageType: "app-page"
 			};
@@ -120,7 +119,13 @@ module.exports = function(app){
 				],
 				function(err, results){
 						if (err) { return next(err); }
-						locals.sensors = results[0];
+
+						var sortedSensors = [];
+						results[0].forEach(function(sensor){
+							sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
+						});
+
+						locals.sensors = sortedSensors;
 						locals.controls = results[1];
 						locals.growPlanInstance = results[2];
 						locals.latestSensorLogs = results[3] || [];

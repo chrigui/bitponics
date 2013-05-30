@@ -40,6 +40,7 @@ module.exports = function(app) {
 	  }
   );
 
+
   /**
    * Create single growPlanInstance
    *
@@ -103,7 +104,8 @@ module.exports = function(app) {
 	    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
 	      if (err) { return next(err); }
 	      if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE) && 
-           !growPlanInstance.owner.equals(req.user._id)
+           !growPlanInstance.owner.equals(req.user._id) &&
+           !req.user.admin
         ){
           return res.send(401, "The grow plan instance is private and only the owner may access its data.");
         }

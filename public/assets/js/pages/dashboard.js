@@ -8,21 +8,47 @@ require([
   'angularResource',
   'd3',
   'es5shim',
+  '/assets/js/services/socket.js',
   'overlay'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels, Spinner) {
     'use strict';
 
 
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
 
 
-    dashboardApp.factory('sharedDataService', function(){
-      return {
-        targetActiveDate : new Date(),
-        activeDate : {}
-      };
-    });
+    dashboardApp.factory('sharedDataService', 
+      [
+        'bpn.services.socket',
+        function(socket){
+          var sharedData = {
+            targetActiveDate : new Date(),
+            activeDate : {},
+            dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
+            socket : socket
+          };
+
+          socket.connect('/latest-grow-plan-instance-data');
+
+          socket.emit('ready', { growPlanInstanceId : bpn.pageData.growPlanInstance._id });
+
+          socket.on('update', function(data){
+            //console.log("SOCKET UPDATE", data);
+            var sensorLog = data.sensorLog,
+                dateKey;
+            if (sensorLog){
+              sensorLog = viewModels.initSensorLogViewModel(sensorLog);
+              dateKey = feBeUtils.getDateKey(sensorLog.timestamp);
+              sharedData.dateDataCache[dateKey].sensorLogs.push(sensorLog);
+              sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
+            }
+          });
+
+          return sharedData;
+        }
+      ]
+    );
 
 
     dashboardApp.factory('sensorLogsService', function(){
@@ -82,15 +108,15 @@ require([
               '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/sensor-logs',
               {
                 params : {
-                  "start-date" : dateMoment.format("YYYY-MM-DD"),
-                  "end-date" : dateMoment.add('days', 1).format("YYYY-MM-DD")
+                  "start-date" : feBeUtils.getDateKey(dateMoment),
+                  "end-date" : feBeUtils.getDateKey(dateMoment.add('days', 1))
                 }
               }
             )
             .success(function(data, status, headers, config) {
-              $scope.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
-              $scope.dateDataCache[dateKey].latestSensorLogs = data.data[data.data.length];
-              $scope.dateDataCache[dateKey].loaded = true;
+              $scope.sharedDataService.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
+              $scope.sharedDataService.dateDataCache[dateKey].latestSensorLogs = data.data[0];
+              $scope.sharedDataService.dateDataCache[dateKey].loaded = true;
               deferred.resolve(data);
             })
             .error(function(data, status, headers, config) {
@@ -146,19 +172,19 @@ require([
           $scope.displayDate = function (date) {
             // May get either a date object or a string, so use moment to clean up
             var dateMoment = moment(date),
-                dateKey = dateMoment.format("YYYY-MM-DD");
+                dateKey = feBeUtils.getDateKey(dateMoment);
 
-            if ($scope.dateDataCache[dateKey]){
-              $scope.sharedDataService.activeDate = $scope.dateDataCache[dateKey];
+            if ($scope.sharedDataService.dateDataCache[dateKey]){
+              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
             } else {
-              $scope.dateDataCache[dateKey] = {};
-              $scope.dateDataCache[dateKey].growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
-              $scope.dateDataCache[dateKey].growPlanPhase = $scope.dateDataCache[dateKey].growPlanInstancePhase.phase;
-              $scope.dateDataCache[dateKey].date = dateMoment.toDate();
-              $scope.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.sharedDataService.dateDataCache[dateKey] = {};
+              $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
+              $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
+              $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
+              $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
               $scope.getSensorLogsByDate(dateKey);
               
-              $scope.sharedDataService.activeDate = $scope.dateDataCache[dateKey];
+              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
             }
           };
 
@@ -179,7 +205,6 @@ require([
           // Finally, set the scope models
           $scope.controls = bpn.pageData.controls;
           $scope.sensors = bpn.pageData.sensors;
-          $scope.dateDataCache = {}; // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
           $scope.growPlanInstance = bpn.pageData.growPlanInstance;
           $scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
           

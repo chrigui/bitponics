@@ -1,6 +1,8 @@
 var DeviceModel = require('../models/device').model,
     CalibrationStatusLogModel = require('../models/calibrationStatusLog').model,
     CalibrationLogModel = require('../models/calibrationLog').model,
+    GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+    SensorLogModel = require('../models/sensorLog').model,
     UserModel = require('../models/user').model,
     requirejs = require('../lib/requirejs-wrapper'),
     feBeUtils = requirejs('fe-be-utils'),
@@ -85,13 +87,14 @@ module.exports = function(app){
             }
         }
       });
-    }); // /./calibrate
+    }); // /calibrate
 
-    
+  
+
+
     io
     .of('/setup')
     .on('connection', function(socket){
-      console.log("connected");
       var session = socket.handshake.session,
           userId = session.passport.user,
           checkIntervalId;
@@ -112,16 +115,129 @@ module.exports = function(app){
         checkIntervalId = setInterval(function(){
           
           UserModel.findById(userId)
+          .select('deviceKeys')
           .exec(function (err, user){
             if (err || !user) { return; }
             socket.emit(
-              'keys', 
+              'keys',
               user.deviceKeys
             );
           });
         }, 5 * 1000);
       });
-    }); // /./setup    
+    }); // /setup    
 
-  });
+
+
+    /**
+     * Socket for monitoring latest grow plan instance data
+     * - sensor logs
+     * - device status
+     *
+     * Does not send repeat data, only updates since the last time 
+     * data were sent.
+     */
+    io
+    .of('/latest-grow-plan-instance-data')
+    .on('connection', function(socket){
+      var session = socket.handshake.session,
+          userId = session.passport.user,
+          checkIntervalId;
+
+      socket.on('disconnect', function () {
+        clearInterval(checkIntervalId);
+      });
+
+      socket.on('ready', function (data) {
+        var growPlanInstanceId = data.growPlanInstanceId,
+            started = new Date(),
+            lastSent = started;
+
+        if (!growPlanInstanceId) { return; }
+
+        // before we set up the interval, 
+        // make sure the user has permission on the GPI
+
+        async.parallel(
+          [
+            function getGPI(innerCallback){
+              GrowPlanInstanceModel.findById(growPlanInstanceId)
+              .select('owner users visibility device')
+              .exec(innerCallback);
+            },
+            function getUser(innerCallback){
+              UserModel.findById(userId)
+              .select('admin')
+              .exec(innerCallback);
+            }
+          ],
+          function(err, results){
+            if (err) { return handleSocketError(err); }
+
+            var growPlanInstance = results[0],
+                user = results[1];
+
+            if (!growPlanInstance ){ return; }
+            if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE) && 
+               !growPlanInstance.owner.equals(user._id) &&
+               (!user && !user.admin)
+            ){
+              return;
+            }
+
+            // if we've gotten here, we're good
+            clearInterval(checkIntervalId);
+        
+            checkIntervalId = setInterval(function(){
+              async.parallel(
+                [
+                  function getSensorLogs(innerCallback){
+                    SensorLogModel.find({
+                      gpi : growPlanInstanceId,
+                      ts : { $gte : lastSent }
+                    })
+                    .limit(1)
+                    .exec(innerCallback);
+                  },
+                  function getDeviceStatus(innerCallback){
+                    // TODO 
+                    return innerCallback();
+                  }
+                ],
+                function parallelFinal(err, results){
+                  if (err) { return handleSocketError(err); }
+
+                  var sensorLog = results[0][0],
+                      device = results[1];
+
+                  if (sensorLog){
+                    socket.emit(
+                      'update',
+                      {
+                        sensorLog : sensorLog
+                      }
+                    );
+                  }
+
+                  lastSent = new Date();
+                }
+              );
+
+            }, 10 * 1000);
+          }
+        );
+        
+        
+      });
+    }); // /latest-grow-plan-instance-data
+
+
+
+  }); // /app.socketIOs.forEach(function(io){
+
+
+  function handleSocketError(err){
+    winston.info("SOCKET ERROR", err);
+    return;
+  }
 };
