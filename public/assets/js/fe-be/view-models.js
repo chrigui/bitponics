@@ -15,7 +15,36 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
 
-  	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
+  	
+    // growPlanInstance.phases only contains phases that the GPI has gone through.
+    // Add future growPlan phases for the visual 
+
+    var currentGrowPlanPhaseId = growPlanInstance.phases.filter(
+      function(growPlanInstancePhase){ 
+        return growPlanInstancePhase.active;
+      }
+    )[0].phase,
+    currentGrowPlanPhaseIndex;
+
+    growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
+      // get the active gpi.phase.phase. find the gp.phases that are after that
+      // one. append those to gpi.phases
+
+      if (growPlanPhase._id === currentGrowPlanPhaseId) {
+        currentGrowPlanPhaseIndex = index;
+      }
+
+      if (index > currentGrowPlanPhaseIndex){
+        growPlanInstance.phases.push({
+          phase : growPlanPhase._id,
+          daySummaries : []
+        });
+      }
+    });
+
+
+    // Now initialize the gpi phase data
+    growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var startDate = growPlanInstancePhase.startDate,
           i;
       

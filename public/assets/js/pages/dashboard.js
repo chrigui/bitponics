@@ -25,6 +25,11 @@ require([
     });
 
 
+    dashboardApp.factory('sensorLogsService', function(){
+      // TODO : consolidate the get/post/caching mechanisms for /grow-plan-instances/:id/sensor-logs here
+    });
+
+
     dashboardApp.controller('bpn.controllers.dashboard.Main',
       [
         '$scope',
@@ -63,6 +68,7 @@ require([
           viewModels.initSensorLogsViewModel(bpn.pageData.latestSensorLogs);
           
           
+          
           /**
            * Returns a an angular promise
            *
@@ -93,7 +99,11 @@ require([
 
             return deferred.promise;
           };
-       
+
+
+          /**
+           *
+           */
           $scope.triggerImmediateAction = function(actionId){
             $http.post(
               '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/immediate-actions',

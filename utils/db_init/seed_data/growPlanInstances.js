@@ -7,7 +7,7 @@ module.exports = [
         "506de30a8eebf7524342cb6c"//,
       ],
       owner : "506de30a8eebf7524342cb6c", // Amit
-      growPlan : "506de2ff8eebf7524342cb3a",
+      growPlan : "506de2ff8eebf7524342cb3a", // Tomato
       device : "0006667211cf", 
       active: true,
       trackGrowPlanUpdates : true
@@ -24,8 +24,23 @@ module.exports = [
 				//"506de30a8eebf7524342cb6b"
 			],
 			owner : "506de30a8eebf7524342cb6c", // Amit
-			growPlan : "506de2ff8eebf7524342cb3a",
+			growPlan : "506de2ff8eebf7524342cb3b", // Mixed Greens
 			device : "000666721fc1", 
+			active: true,
+		},
+		{
+			_id : '51a7b69ca3b04db08057e047',
+			users : [
+				"506de30a8eebf7524342cb6c"//,
+				//"506de3098eebf7524342cb66",
+				//"506de3098eebf7524342cb67",
+				//"506de3098eebf7524342cb68",
+				//"506de30a8eebf7524342cb69",
+				//"506de30a8eebf7524342cb6a",
+				//"506de30a8eebf7524342cb6b"
+			],
+			owner : "506de30a8eebf7524342cb6c", // Amit
+			growPlan : "506de30c8eebf7524342cb70", // All-Purpose
 			active: true,
 		},
 		{
