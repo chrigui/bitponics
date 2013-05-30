@@ -57,10 +57,14 @@ var SensorLogSchema = new Schema({
   	 * so we need to explicitly pass it ID for storage
   	 */
     d : { type : String, ref : 'Device'},
+
+
     /**
      * timestamp
      */
 	  ts: { type: Date, required: true, default: Date.now },
+
+
     /**
      * logs
      */

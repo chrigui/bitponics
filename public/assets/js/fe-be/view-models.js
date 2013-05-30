@@ -85,6 +85,31 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   };
 
 
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   *
+   * Converts sensor readings array to a hash, keyed by sensor code
+   */
+  viewModels.initSensorLogsViewModel = function (sensorLogs){
+    return sensorLogs.forEach(viewModels.initSensorLogViewModel);
+  };
+
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   *
+   * Converts sensor readings array to a hash, keyed by sensor code
+   */
+  viewModels.initSensorLogViewModel = function (sensorLog){
+    sensorLog.logs.forEach(function (log) {
+      sensorLog[log.sCode] = log.val;
+    });
+    // delete array to save memory, since we're not going to use it anymore
+    delete sensorLog.logs;
+    return sensorLog;
+  };
+
   /**
    * Adds/calculates properties necessary for UI presentation
    *

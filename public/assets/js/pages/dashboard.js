@@ -60,16 +60,8 @@ require([
 
           viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance, bpn.pageData.controls);
 
-
-          // Raise sensorLog readings to be hashes keyed by sensor code
-          bpn.pageData.latestSensorLogs.forEach(function (sensorLog) {
-            sensorLog.logs.forEach(function (log) {
-              sensorLog[log.sCode] = log.val;
-            });
-            // delete array to save memory, since we're not going to use it anymore
-            delete sensorLog.logs;
-          });
-
+          viewModels.initSensorLogsViewModel(bpn.pageData.latestSensorLogs);
+          
           
           /**
            * Returns a an angular promise
@@ -90,7 +82,7 @@ require([
               }
             )
             .success(function(data, status, headers, config) {
-              $scope.dateDataCache[dateKey].sensorLogs = data.data;
+              $scope.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
               $scope.dateDataCache[dateKey].latestSensorLogs = data.data[data.data.length];
               $scope.dateDataCache[dateKey].loaded = true;
               deferred.resolve(data);
@@ -192,23 +184,57 @@ require([
         function ($scope) {
           // TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 
-          $scope.getIdealRangeForSensor = function (sensor) {
+          $scope.getIdealRangeForSensor = function (sensor, date) {
             var idealRanges = $scope.sharedDataService.activeDate.growPlanPhase.idealRanges,
-              i;
-            // TODO : factor in time of day, for idealRange.applicableTimeSpan
+              idealRange,
+              i,
+              timeOfDayInMilliseconds,
+              applicableTimeSpan;
+            
             for (i = idealRanges.length; i--;) {
-              if (idealRanges[0].sCode === sensor.code) {
-                return idealRanges[0];
+              idealRange = idealRanges[0];
+              applicableTimeSpan = idealRange.applicableTimeSpan;
+
+              if (idealRange.sCode === sensor.code) {
+                if (applicableTimeSpan && date){
+                  // get the localized time of day for the sensor log
+                  // calling new Date(anything) in a browser will give the localized time.
+                  // our dates are stored with a UTC timestamp, so we good
+                  sensorReading = sensorLog[sensor.code];
+                  sensorLogTimeOfDayInMilliseconds = feBeUtils.getTimeOfDayInMilliseconds(date);
+
+                  // Handle regular span vs overnight span
+                  if (applicableTimeSpan.startTime < applicableTimeSpan.endTime) {
+                    if ( (timeOfDayInMilliseconds >= applicableTimeSpan.startTime) && (timeOfDayInMilliseconds <= applicableTimeSpan.endTime) ){
+                      return idealRange;
+                    }
+                  } else {
+                    // overnight span
+                    // time can be after startTime or before endTime
+                    if ( (timeOfDayInMilliseconds >= applicableTimeSpan.startTime) || (timeOfDayInMilliseconds<= applicableTimeSpan.endTime) ){
+                      return idealRange;
+                    }
+                  }
+                } else {
+                  return idealRange;  
+                }
               }
             }
           };
 
 
-          $scope.getSensorBlockClassNames = function (sensor) {
+          $scope.getSensorBlockClassNames = function (sensor, sensorLog) {
             var sensorCode = sensor.code,
               classNames = ['sensor', 'data-module', sensorCode],
-              idealRange = $scope.getIdealRangeForSensor(sensor),
-              sensorValue = $scope.sharedDataService.activeDate.latestSensorLogs ? $scope.sharedDataService.activeDate.latestSensorLogs[sensorCode] : undefined;
+              idealRange,
+              sensorValue,
+              sensorTimestamp;
+
+            if (sensorLog){
+               sensorValue = sensorLog[sensorCode];
+               sensorTimestamp = sensorLog.timestamp;
+               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
+            }
 
             // Determine whether we need to add the "warning" class
             if (idealRange) {

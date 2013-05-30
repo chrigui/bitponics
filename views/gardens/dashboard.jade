@@ -20,7 +20,7 @@ block content
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
-        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(this)")
+        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(this, sharedDataService.activeDate.latestSensorLogs)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data

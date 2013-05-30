@@ -74,7 +74,13 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
 	var dateParts = tz(date, userTimezone, '%T').split(':'),
       millisecondsIntoDay = (dateParts[0] * 60 * 60 * 1000) + (dateParts[1] * 60 * 1000) + (dateParts[2] * 1000);
 
-    return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) && (millisecondsIntoDay <= applicableTimeSpan.endTime) );
+    if (applicableTimeSpan.startTime < applicableTimeSpan.endTime){
+      return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) && (millisecondsIntoDay <= applicableTimeSpan.endTime) );  
+    } else {
+      // overnight span
+      // time can be after startTime or before endTime
+      return ( (millisecondsIntoDay >= applicableTimeSpan.startTime) || (millisecondsIntoDay <= applicableTimeSpan.endTime) );
+    }
 });
 
 /************************** END INSTANCE METHODS  ***************************/
