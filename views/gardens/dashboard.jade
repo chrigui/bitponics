@@ -16,7 +16,7 @@ block content
         | {{growPlanInstance.name}}
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
-        h2.page-heading-small.date {{activeDate.date | date:'longDate'}}
+        h2.page-heading-small.date {{sharedDataService.activeDate.date | date:'longDate'}}
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
@@ -24,8 +24,8 @@ block content
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="activeDate.latestSensorLogs[sensor.code]") {{activeDate.latestSensorLogs[sensor.code]}}
-            div.sensor-value(ng-hide="activeDate.latestSensorLogs[sensor.code]") ----
+            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code]") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensorcreen-reader-text {{sensor.code}}
@@ -50,16 +50,31 @@ block content
       div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
         h2.main-heading Reminders
     
-    section#templates(style="display:none")
-      //-textarea#control-tooltip-template
-        |  <div class="control-tooltip">
-        |    <h3>Available actions to trigger on your {{name}}:</h3>
-        |    {{#actions}}
-        |      <div>
-        |        <a class="action-trigger-link" data-action-id="{{_id}}">{{description}}</a>
-        |      </div>
-        |    {{/actions}}
-        |  </div>
+
+  svg(height='0')
+    mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')
+      lineargradient#svg-active-gradient(gradientunits='objectBoundingBox', x2='0', y2='1')
+        stop(stop-color='white', offset='0%')
+        stop(stop-color='white', offset='10%')
+        stop(stop-color='white', stop-opacity='0', offset='11%')
+        stop(stop-color='white', stop-opacity='0', offset='20%')
+        stop(stop-color='white', offset='21%')
+        stop(stop-color='white', offset='30%')
+        stop(stop-color='white', stop-opacity='0', offset='31%')
+        stop(stop-color='white', stop-opacity='0', offset='40%')
+        stop(stop-color='white', offset='41%')
+        stop(stop-color='white', offset='50%')
+        stop(stop-color='white', stop-opacity='0', offset='51%')
+        stop(stop-color='white', stop-opacity='0', offset='60%')
+        stop(stop-color='white', offset='61%')
+        stop(stop-color='white', offset='70%')
+        stop(stop-color='white', stop-opacity='0', offset='71%')
+        stop(stop-color='white', stop-opacity='0', offset='80%')
+        stop(stop-color='white', offset='81%')
+        stop(stop-color='white', offset='90%')
+        stop(stop-color='white', stop-opacity='0', offset='91%')
+        stop(stop-color='white', stop-opacity='0', offset='100%')
+      rect(width='1', height='1', fill='url(#svg-active-gradient)')
 
 block footer-scripts
   script

@@ -19,7 +19,8 @@ require([
 
     dashboardApp.factory('sharedDataService', function(){
       return {
-        targetActiveDate : new Date()
+        targetActiveDate : new Date(),
+        activeDate : {}
       };
     });
 
@@ -131,6 +132,7 @@ require([
                 return growPlanInstancePhases[i];
               }
             }
+            return growPlanInstancePhases[0];
           };
 
 
@@ -145,19 +147,21 @@ require([
                 dateKey = dateMoment.format("YYYY-MM-DD");
 
             if ($scope.dateDataCache[dateKey]){
-              $scope.activeDate = $scope.dateDataCache[dateKey];
+              $scope.sharedDataService.activeDate = $scope.dateDataCache[dateKey];
             } else {
               $scope.dateDataCache[dateKey] = {};
               $scope.dateDataCache[dateKey].growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
               $scope.dateDataCache[dateKey].growPlanPhase = $scope.dateDataCache[dateKey].growPlanInstancePhase.phase;
-              $scope.getSensorLogsByDate(dateKey);
               $scope.dateDataCache[dateKey].date = dateMoment.toDate();
-              $scope.activeDate = $scope.dateDataCache[dateKey];
+              $scope.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.getSensorLogsByDate(dateKey);
+              
+              $scope.sharedDataService.activeDate = $scope.dateDataCache[dateKey];
             }
           };
 
 
-          $scope.$watch('activeDate.loaded', function (newValue) {
+          $scope.$watch('sharedDataService.activeDate.loaded', function (newValue) {
             if (newValue) {
               $scope.spinner.stop();
             } else {
@@ -189,7 +193,7 @@ require([
           // TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 
           $scope.getIdealRangeForSensor = function (sensor) {
-            var idealRanges = $scope.activeDate.growPlanPhase.idealRanges,
+            var idealRanges = $scope.sharedDataService.activeDate.growPlanPhase.idealRanges,
               i;
             // TODO : factor in time of day, for idealRange.applicableTimeSpan
             for (i = idealRanges.length; i--;) {
@@ -204,7 +208,7 @@ require([
             var sensorCode = sensor.code,
               classNames = ['sensor', 'data-module', sensorCode],
               idealRange = $scope.getIdealRangeForSensor(sensor),
-              sensorValue = $scope.activeDate.latestSensorLogs ? $scope.activeDate.latestSensorLogs[sensorCode] : undefined;
+              sensorValue = $scope.sharedDataService.activeDate.latestSensorLogs ? $scope.sharedDataService.activeDate.latestSensorLogs[sensorCode] : undefined;
 
             // Determine whether we need to add the "warning" class
             if (idealRange) {
@@ -387,13 +391,34 @@ require([
         replace : true,
         controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
           $scope.sharedDataService = sharedDataService;
+          
           $scope.getDaySummaryClass = function(data){
-            return data.data.status;
+            var className = data.data.status;
+            if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+              className += " active";
+            }
+            return className;
           }
+
+          $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
+            d3.select($element[0]).selectAll('path')
+            .attr('class', $scope.getDaySummaryClass)
+            .each(function(d, i){
+              /*
+              if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
+                
+              } else {
+                d3.select(this).attr('transform', '');
+              }
+              */
+            });
+          });
         },
         link: function (scope, element, attrs, controller) {
           scope.$watch('growPlanInstance.phases', function (newVal, oldVal) {
-            var phases = newVal,
+            var phases = scope.growPlanInstance.phases,
               phaseCount = phases.length,
               outerMargin = 80,
               width = $(element[0]).width() - (outerMargin * 2),
