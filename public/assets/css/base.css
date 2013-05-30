@@ -753,7 +753,7 @@ label {
   color: #fff;
 }
 .data-module.warning {
-  background-color: color-warning;
+  background-color: #fac400;
 }
 .data-module .main-heading,
 .data-module .message,

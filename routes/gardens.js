@@ -124,6 +124,7 @@ module.exports = function(app){
 						results[0].forEach(function(sensor){
 							sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
 						});
+						sortedSensors = sortedSensors.filter(function(sensor){ return sensor;});
 
 						locals.sensors = sortedSensors;
 						locals.controls = results[1];

@@ -235,8 +235,7 @@ require([
                   // get the localized time of day for the sensor log
                   // calling new Date(anything) in a browser will give the localized time.
                   // our dates are stored with a UTC timestamp, so we good
-                  sensorReading = sensorLog[sensor.code];
-                  sensorLogTimeOfDayInMilliseconds = feBeUtils.getTimeOfDayInMilliseconds(date);
+                  timeOfDayInMilliseconds = feBeUtils.getTimeOfDayInMilliseconds(date);
 
                   // Handle regular span vs overnight span
                   if (applicableTimeSpan.startTime < applicableTimeSpan.endTime) {
