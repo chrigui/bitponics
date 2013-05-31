@@ -42,7 +42,9 @@ block content
         div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
           h3 {{controlAction.control.name}}
 
-          div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
+          div(data-bpn-directives-control-action-graph, data-control-action="controlAction", ng-click="console.log(this);sharedDataService.activeOverlay = 'ControlOverlay'")
+
+          a(ng-click="console.log(this);sharedDataService.activeOverlay = 'ControlOverlay'") ng-click-me
                   
           a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
           a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
@@ -60,6 +62,16 @@ block content
         |      </div>
         |    {{/actions}}
         |  </div>
+
+    //- Overlay Templates
+
+    div
+      div(ng-controller="bpn.controllers.dashboard.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'", close="close()", options="sharedDataService.modalOptions")
+        div(class="close btn", ng-click="close()")
+          | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+
+        div
+          h4 test control overlay
 
 block footer-scripts
   script

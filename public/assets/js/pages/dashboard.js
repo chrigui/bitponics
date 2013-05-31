@@ -15,13 +15,25 @@ require([
 
     var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource']);
 
+    dashboardApp.factory('sharedDataService', function(){
+      return {
+        activeOverlay : undefined,
+        modalOptions : {
+          backdropFade: true,
+          dialogFade: true,
+          dialogClass : 'overlay'
+        }
+      };
+    });
 
     dashboardApp.controller('bpn.controllers.dashboard.Main',
       [
         '$scope',
         '$filter',
         '$http',
-        function ($scope, $filter, $http) {
+        'sharedDataService',
+        function ($scope, $filter, GrowPlanModel, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
 
           // First, transform the data into viewModel-friendly formats
           bpn.pageData.controls.forEach(function (control) {
@@ -183,7 +195,9 @@ require([
       [
         '$scope',
         '$filter',
-        function ($scope, $filter) {
+        'sharedDataService',
+        function ($scope, $filter, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
           // TODO: Add functions to handle interactions on the phase graph.
 
           // TODO : function to set $scope.activeDate (will be called based on clicks or mouseovers on sections of the phaseGraph).
@@ -327,7 +341,9 @@ require([
       [
         '$scope',
         '$filter',
-        function ($scope, $filter) {
+        'sharedDataService',
+        function ($scope, $filter, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
           // TODO: Add functions to handle interactions with control widgets. Launch control overlay.
 
           // NOTE: This is not currently in use
@@ -350,6 +366,20 @@ require([
       ]
     );
 
+    dashboardApp.controller('bpn.controllers.dashboard.ControlOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          console.log('control overlay');
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+        }
+      ]
+    );
 
     dashboardApp.controller('bpn.controllers.dashboard.Notifications',
       [
