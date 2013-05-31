@@ -559,17 +559,23 @@ function getFullyPopulatedGrowPlan(query, callback){
           innerCallback();
         });
       },
-      function populateActions(innerCallback) {
+      function populateIdealRangeActions(innerCallback) {
         var actionIds = [];
         growPlans.forEach(function(growPlan) {
           growPlan.phases.forEach(function(phase) {
             phase.idealRanges.forEach(function(idealRange, i) {
-              actionIds.push(idealRange.actionAboveMax);
-              actionIds.push(idealRange.actionBelowMin);
+              if (idealRange.actionAboveMax){
+                actionIds.push(idealRange.actionAboveMax);  
+              }
+              if (idealRange.actionBelowMin){
+                actionIds.push(idealRange.actionBelowMin);
+              }
             });
           });
         });
         
+        //if (!actionIds.length){ return innerCallback(); }
+
         ActionModel.find({})
         .where('_id').in(actionIds)
         .exec(function (err, actions) {

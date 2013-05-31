@@ -7,6 +7,7 @@ ControlModel = require('../models/control').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
 DeviceModel = require('../models/device').model,
+NotificationModel = require('../models/notification').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
@@ -59,7 +60,18 @@ module.exports = function(app){
 				pageType: "app-page"
 			};
 
-			async.parallel(
+			// First, verify that the user can see this
+			GrowPlanInstanceModel.findById(req.params.growPlanInstanceId)
+			.select('owner users visibility')
+			.exec(function(err, growPlanInstanceResultToVerify){
+				if (err) { return next(err); }
+				if (!growPlanInstanceResultToVerify){ return next(new Error('Invalid grow plan instance id'));}
+
+				if (!routeUtils.checkResourceReadAccess(growPlanInstanceResultToVerify, req.user)){
+          return res.send(401, "This garden is private. You must be the owner to view it.");
+      	}
+
+				async.parallel(
 				[
 					function getSensors(innerCallback){
 						SensorModel.find({visible : true}).exec(innerCallback);
@@ -115,37 +127,43 @@ module.exports = function(app){
 						.find({gpi : req.params.growPlanInstanceId})
 						.where('ts').gte(Date.now() - (24 * 60 * 60 * 1000))
 						.exec(innerCallback);
-					}
+					},
+					function getNotifications(innerCallback){
+						NotificationModel.find({
+		          gpi : req.params.growPlanInstanceId,
+		          tts : { $ne : null }
+		        })
+		        .exec(innerCallback);
+		      }
 				],
 				function(err, results){
-						if (err) { return next(err); }
+					if (err) { return next(err); }
 
-						var sortedSensors = [];
-						results[0].forEach(function(sensor){
-							sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
-						});
-						sortedSensors = sortedSensors.filter(function(sensor){ return sensor;});
+					var sortedSensors = [];
+					results[0].forEach(function(sensor){
+						sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
+					});
+					sortedSensors = sortedSensors.filter(function(sensor){ return sensor;});
 
-						locals.sensors = sortedSensors;
-						locals.controls = results[1];
-						locals.growPlanInstance = results[2];
-						locals.latestSensorLogs = results[3] || [];
+					locals.sensors = sortedSensors;
+					locals.controls = results[1];
+					locals.growPlanInstance = results[2];
+					locals.latestSensorLogs = results[3] || [];
+					locals.notifications = results[4] || [];
 
-						if (locals.growPlanInstance.device){
-							if (locals.growPlanInstance.device.status.activeActions){
-								locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
-									activeAction.control = locals.controls.filter(function(control){
-										return control._id.equals(activeAction.control);
-									})[0];
-								});
-							}
+					if (locals.growPlanInstance.device){
+						if (locals.growPlanInstance.device.status.activeActions){
+							locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
+								activeAction.control = locals.controls.filter(function(control){
+									return control._id.equals(activeAction.control);
+								})[0];
+							});
 						}
+					}
 
-						res.render('gardens/dashboard', locals);
-				}
-			);
-
-			
+					res.render('gardens/dashboard', locals);
+				});
+			});
 		}
 	);
 

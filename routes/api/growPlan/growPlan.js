@@ -174,14 +174,13 @@ module.exports = function(app) {
   app.get('/api/grow-plans/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
-	    
 	    ModelUtils.getFullyPopulatedGrowPlan( { _id: req.params.id }, function(err, growPlanResults){
-        if (err) { return callback(err); }
+        if (err) { return next(err); }
 
         var growPlanResult = growPlanResults[0];
 
         if (!growPlanResult){ 
-          return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
+          return next(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
         }
 
         return res.send(growPlanResult);

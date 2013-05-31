@@ -25,6 +25,7 @@ require([
           var sharedData = {
             targetActiveDate : new Date(),
             activeDate : {},
+            notifications : bpn.pageData.notifications,
             dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
             socket : socket
           };
@@ -34,7 +35,7 @@ require([
           socket.emit('ready', { growPlanInstanceId : bpn.pageData.growPlanInstance._id });
 
           socket.on('update', function(data){
-            //console.log("SOCKET UPDATE", data);
+            console.log("SOCKET UPDATE", data);
             var sensorLog = data.sensorLog,
                 dateKey;
             if (sensorLog){
@@ -227,7 +228,7 @@ require([
               applicableTimeSpan;
             
             for (i = idealRanges.length; i--;) {
-              idealRange = idealRanges[0];
+              idealRange = idealRanges[i];
               applicableTimeSpan = idealRange.applicableTimeSpan;
 
               if (idealRange.sCode === sensor.code) {
@@ -269,6 +270,8 @@ require([
                sensorTimestamp = sensorLog.timestamp;
                idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
             }
+
+            console.log(sensor, sensorLog, idealRange);
 
             // Determine whether we need to add the "warning" class
             if (idealRange) {
@@ -312,8 +315,27 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.Notifications',
       [
         '$scope',
-        function ($scope) {
+        'sharedDataService',
+        function ($scope, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
+          $scope.pastNotifications = [];
+          $scope.impendingNotifications = []; // notifications for the next X days (2 days?)
+          $scope.futureNotifications = [];
 
+          $scope.$watch('sharedDataService.notifications', function(){
+            var notifications = sharedDataService.notifications,
+                nowMoment = moment();
+            if (!notifications && notifications.length){
+              $scope.pastNotifications = [];
+              $scope.impendingNotifications = [];
+              $scope.futureNotifications = [];
+            } else {
+              $scope.pastNotifications = sharedDataService.notifications;
+              $scope.impendingNotifications = [];
+              $scope.futureNotifications = [];
+            }
+            
+          });
         }
       ]
     );

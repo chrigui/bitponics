@@ -37,19 +37,28 @@ block content
       div#visualizer.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
         div(data-bpn-directives-phases-graph)
     
-      div#controls.controls.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.Controls")
-        h2.page-heading-small Accessories
-        div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-          h3 {{controlAction.control.name}}
+      div.content-module.side.separator-top
+        div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls")
+          h2.page-heading-small Accessories
+          div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+            h3 {{controlAction.control.name}}
 
-          div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
-                  
-          a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
-          a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
+            div(data-bpn-directives-control-action-graph, data-control-action="controlAction")
+                    
+            a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
+            a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
-      div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
-        h2.main-heading Reminders
-    
+        div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
+          h2.page-heading-small Notifications
+          h3(ng-show="pastNotifications.length") Past
+          div(ng-repeat="notification in pastNotifications")
+            div.date {{notification.timeToSend | date:'medium'}}
+            div.title {{notification.title}}
+          h3(ng-show="impendingNotifications.length") Upcoming
+          div(ng-repeat="notification in impendingNotifications")
+            div.date {{notification.timeToSend | date:'medium'}}
+            div.title {{notification.title}}
+      
 
   svg(height='0')
     mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')
@@ -83,3 +92,4 @@ block footer-scripts
     bpn.pageData.sensors = !{JSON.stringify(sensors)};
     bpn.pageData.controls = !{JSON.stringify(controls)};
     bpn.pageData.latestSensorLogs = !{JSON.stringify(latestSensorLogs)};
+    bpn.pageData.notifications = !{JSON.stringify(notifications)};

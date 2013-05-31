@@ -3,11 +3,13 @@ var DeviceModel = require('../models/device').model,
     CalibrationLogModel = require('../models/calibrationLog').model,
     GrowPlanInstanceModel = require('../models/growPlanInstance').model,
     SensorLogModel = require('../models/sensorLog').model,
+    NotificationModel = require('../models/notification').model,
     UserModel = require('../models/user').model,
     requirejs = require('../lib/requirejs-wrapper'),
     feBeUtils = requirejs('fe-be-utils'),
     async = require('async'),
-    winston = require('winston');
+    winston = require('winston'),
+    routeUtils = require('./route-utils');
 
 module.exports = function(app){
   
@@ -52,7 +54,6 @@ module.exports = function(app){
               .sort('-ts')
               .exec(function (err, calibrationStatusLogResults){
                 if (err || (!(calibrationStatusLogResults && calibrationStatusLogResults.length))) { return; }
-                console.log('recent calib logs', calibrationStatusLogResults);
                 socket.emit(
                   'device_calibration_response', 
                   calibrationStatusLogResults[0]
@@ -151,7 +152,7 @@ module.exports = function(app){
       socket.on('ready', function (data) {
         var growPlanInstanceId = data.growPlanInstanceId,
             started = new Date(),
-            lastSent = started;
+            lastChecked = started;
 
         if (!growPlanInstanceId) { return; }
 
@@ -177,11 +178,13 @@ module.exports = function(app){
             var growPlanInstance = results[0],
                 user = results[1];
 
-            if (!growPlanInstance ){ return; }
-            if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE) && 
-               !growPlanInstance.owner.equals(user._id) &&
-               (!user && !user.admin)
-            ){
+            if (!growPlanInstance){ 
+              socket.disconnect();
+              return; 
+            }
+            if (!routeUtils.checkResourceReadAccess(growPlanInstance, user)){
+              winston.info("UNAUTHORIZED ATTEMPT AT SOCKET latest-grow-plan-instance-data, " + user._id.toString() + ", gpi " + growPlanInstanceId);
+              socket.disconnect();
               return;
             }
 
@@ -194,32 +197,59 @@ module.exports = function(app){
                   function getSensorLogs(innerCallback){
                     SensorLogModel.find({
                       gpi : growPlanInstanceId,
-                      ts : { $gte : lastSent }
+                      ts : { $gte : lastChecked }
                     })
                     .limit(1)
                     .exec(innerCallback);
                   },
                   function getDeviceStatus(innerCallback){
-                    // TODO 
-                    return innerCallback();
+                    // Only retrieve it if it's been updated
+                    // since lastChecked and status.expires is in the future
+                    // (only want to retrieve a status that will actually
+                    // be sent to the device
+                    DeviceModel.findOne({
+                      _id : growPlanInstance.device,
+                      activeGrowPlanInstance : growPlanInstanceId,
+                      updatedAt : { $gte : lastChecked },
+                      "status.expires" : { $gte : lastChecked }
+                    })
+                    .select('status')
+                    .populate('status.activeActions')
+                    .exec(innerCallback);
+                  },
+                  function getNotifications(innerCallback){
+                    NotificationModel.find({
+                      gpi : growPlanInstanceId,
+                      tts : { $ne : null },
+                      createdAt : { $gte : lastChecked }
+                    })
+                    .exec(innerCallback);
                   }
                 ],
                 function parallelFinal(err, results){
                   if (err) { return handleSocketError(err); }
 
                   var sensorLog = results[0][0],
-                      device = results[1];
+                      device = results[1],
+                      notifications = results[2],
+                      responseData;
 
-                  if (sensorLog){
-                    socket.emit(
-                      'update',
-                      {
-                        sensorLog : sensorLog
-                      }
-                    );
+                  if (sensorLog || device || notifications.length){
+                    responseData = {};
+                    if (sensorLog){
+                      responseData.sensorLog = sensorLog;
+                    }
+                    if (device){
+                      responseData.deviceStatus = device.status;
+                    }
+                    if (notifications.length){
+                      responseData.notifications = notifications;
+                    }
+                    
+                    socket.emit('update', responseData);
                   }
 
-                  lastSent = new Date();
+                  lastChecked = new Date();
                 }
               );
 

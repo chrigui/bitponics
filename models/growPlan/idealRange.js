@@ -197,8 +197,6 @@ IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
 
       if (silentValidationFail){
         if (err || 
-            !submittedIdealRange.actionAboveMax || 
-            !submittedIdealRange.actionBelowMin ||
             !submittedIdealRange.sCode || 
             !submittedIdealRange.valueRange ||
             !submittedIdealRange.valueRange.min || 
