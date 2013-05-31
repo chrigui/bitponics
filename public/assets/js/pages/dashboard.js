@@ -271,8 +271,6 @@ require([
                idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
             }
 
-            console.log(sensor, sensorLog, idealRange);
-
             // Determine whether we need to add the "warning" class
             if (idealRange) {
               if ((sensorValue < idealRange.valueRange.min) ||
@@ -469,7 +467,7 @@ require([
     dashboardApp.directive('bpnDirectivesPhasesGraph', function() {
       return {
         restrict : "EA",
-        template : '<div class="phases-graph ring-graph circle centered"></div>',
+        template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new"></div></div>',
         replace : true,
         controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
           $scope.sharedDataService = sharedDataService;
@@ -499,6 +497,13 @@ require([
           });
         },
         link: function (scope, element, attrs, controller) {
+          $(element[0]).find('.icon-glyphlogo-new').click(function(e){
+            e.preventDefault();
+            scope.$apply(function(){
+              scope.sharedDataService.targetActiveDate = new Date();
+            });
+          });
+
           scope.$watch('growPlanInstance.phases', function (newVal, oldVal) {
             var phases = scope.growPlanInstance.phases,
               phaseCount = phases.length,

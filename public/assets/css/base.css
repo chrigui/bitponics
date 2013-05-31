@@ -1017,9 +1017,26 @@ button.btn:hover {
 /*
  * Phase Visualizer
  */
+.phases-graph {
+  position: relative;
+}
 .phases-graph svg {
   display: inline-block;
   vertical-align: top;
+  cursor: pointer;
+}
+.phases-graph .icon-glyphlogo-new {
+  display: block;
+  position: absolute;
+  font-size: 2em;
+  width: 1em;
+  height: 1em;
+  top: 50%;
+  left: 50%;
+  margin-left: -0.53em;
+  margin-top: -0.7em;
+  color: #00e36c;
+  cursor: pointer;
 }
 section.footer {
   clear: both;
