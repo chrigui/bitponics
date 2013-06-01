@@ -22,29 +22,64 @@ require([
       [
         'bpn.services.socket',
         function(socket){
+          
+          /**
+           * All the properties this service will expose
+           */ 
           var sharedData = {
             targetActiveDate : new Date(),
             activeDate : {},
             notifications : bpn.pageData.notifications,
             dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
-            socket : socket
+            socket : socket,
+            controls : bpn.pageData.controls,
+            sensors : bpn.pageData.sensors,
+            growPlanInstance : bpn.pageData.growPlanInstance,
+            controlHash : {}
+            //latestSensorLogs : bpn.pageData.latestSensorLogs
           };
 
-          socket.connect('/latest-grow-plan-instance-data');
-
-          socket.emit('ready', { growPlanInstanceId : bpn.pageData.growPlanInstance._id });
-
-          socket.on('update', function(data){
-            console.log("SOCKET UPDATE", data);
-            var sensorLog = data.sensorLog,
-                dateKey;
-            if (sensorLog){
-              sensorLog = viewModels.initSensorLogViewModel(sensorLog);
-              dateKey = feBeUtils.getDateKey(sensorLog.timestamp);
-              sharedData.dateDataCache[dateKey].sensorLogs.push(sensorLog);
-              sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
-            }
+          sharedData.controls.forEach(function(control){
+            sharedData.controlHash[control._id] = control;
           });
+
+          // Transform the data into viewModel-friendly formats
+          sharedData.controls.forEach(function (control) {
+            viewModels.initControlViewModel(control);
+          });
+
+          viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
+
+          //viewModels.initSensorLogsViewModel(sharedData.latestSensorLogs);
+
+
+
+          /**
+           * Set up the socket for live updates on sensors, device status, and notifications
+           */
+          var initSocket = function (){
+            socket.connect('/latest-grow-plan-instance-data');
+
+            socket.emit('ready', { growPlanInstanceId : sharedData.growPlanInstance._id });
+
+            socket.on('update', function(data){
+              var sensorLog = data.sensorLog,
+                  deviceStatus = data.deviceStatus,
+                  dateKey;
+              if (sensorLog){
+                sensorLog = viewModels.initSensorLogViewModel(sensorLog);
+                dateKey = feBeUtils.getDateKey(sensorLog.timestamp);
+                sharedData.dateDataCache[dateKey].sensorLogs.push(sensorLog);
+                sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
+              }
+              if (deviceStatus) {
+                viewModels.initDeviceStatusViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
+              }
+            });
+          }
+
+          initSocket();
+          
 
           return sharedData;
         }
@@ -85,16 +120,6 @@ require([
           }).spin();
 
 
-          // First, transform the data into viewModel-friendly formats
-          bpn.pageData.controls.forEach(function (control) {
-            viewModels.initControlViewModel(control);
-          });
-
-          viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance, bpn.pageData.controls);
-
-          viewModels.initSensorLogsViewModel(bpn.pageData.latestSensorLogs);
-          
-          
           
           /**
            * Returns a an angular promise
@@ -106,7 +131,7 @@ require([
                 deferred = $q.defer();
 
             $http.get(
-              '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/sensor-logs',
+              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
               {
                 params : {
                   "start-date" : feBeUtils.getDateKey(dateMoment),
@@ -133,17 +158,15 @@ require([
            */
           $scope.triggerImmediateAction = function(actionId){
             $http.post(
-              '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/immediate-actions',
+              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
               {
                 actionId : actionId,
                 message : "Triggered from dashboard"
               }
             )
             .success(function(data, status, headers, config) {
-              console.log(data);
             })
             .error(function(data, status, headers, config) {
-              console.log(data);
             });
           }
 
@@ -151,7 +174,7 @@ require([
 
           $scope.getGrowPlanInstancePhaseFromDate = function (date) {
             var dateMoment = moment(date),
-              growPlanInstancePhases = $scope.growPlanInstance.phases,
+              growPlanInstancePhases = $scope.sharedDataService.growPlanInstance.phases,
               i,
               phaseStart;
 
@@ -204,10 +227,10 @@ require([
           });
 
           // Finally, set the scope models
-          $scope.controls = bpn.pageData.controls;
-          $scope.sensors = bpn.pageData.sensors;
-          $scope.growPlanInstance = bpn.pageData.growPlanInstance;
-          $scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
+          //$scope.controls = bpn.pageData.controls;
+          //$scope.sensors = bpn.pageData.sensors;
+          //$scope.growPlanInstance = bpn.pageData.growPlanInstance;
+          //$scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
           
         }
       ]
@@ -504,8 +527,8 @@ require([
             });
           });
 
-          scope.$watch('growPlanInstance.phases', function (newVal, oldVal) {
-            var phases = scope.growPlanInstance.phases,
+          scope.$watch('sharedDataService.growPlanInstance.phases', function (newVal, oldVal) {
+            var phases = scope.sharedDataService.growPlanInstance.phases,
               phaseCount = phases.length,
               outerMargin = 80,
               width = $(element[0]).width() - (outerMargin * 2),

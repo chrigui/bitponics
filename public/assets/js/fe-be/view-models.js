@@ -12,8 +12,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * activePhase
    * device.status.activeActions[].control
    * device.status.activeActions[].outputId
+   * 
+   * @param {Object} growPlanInstance,
+   * @param {Object} controlHash : Keyed by control._id
    */
-  viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
+  viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance, controlHash){
 
   	
     // growPlanInstance.phases only contains phases that the GPI has gone through.
@@ -87,15 +90,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     
     if (growPlanInstance.device){
-      if (growPlanInstance.device.status.activeActions){
-        growPlanInstance.device.status.activeActions.forEach(function(activeAction){
-          activeAction = viewModels.initActionViewModel(activeAction);
-          activeAction.control = viewModels.initControlViewModel(activeAction.control);
-          activeAction.outputId = growPlanInstance.device.outputMap.filter(function(outputMapping){
-            return outputMapping.control === activeAction.control._id;
-          })[0].outputId;
-        });
-      }
+      viewModels.initDeviceStatusViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
     }
 
   	return growPlanInstance;
@@ -195,6 +190,35 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     growPlan.currentVisiblePhase = growPlan.phases[0];
 
     return growPlan;
+  };
+
+
+
+  /**
+   * Gets the device status ready to bind to the control graphs
+   * Basically just populates status.activeActions with full control objects
+   *
+   * @param {Object} deviceStatus : the device.status property
+   * @param {Array(Control)} controls : array of Control objects. Should contain all that may be referenced in the device status
+   */
+  viewModels.initDeviceStatusViewModel = function(device, deviceStatus, controlHash){
+    deviceStatus.activeActions = deviceStatus.activeActions || [];
+
+    deviceStatus.activeActions.forEach(function(action){
+      action = viewModels.initActionViewModel(action);
+
+      if (typeof action.control === 'string'){
+        action.control = controlHash[action.control];
+      }
+
+      action.outputId = device.outputMap.filter(function(outputMapping){
+        return outputMapping.control === action.control._id;
+      })[0].outputId;
+    });
+
+    device.status = deviceStatus;
+
+    return deviceStatus;
   };
 
 

@@ -85,7 +85,6 @@ module.exports = function(app){
 					function getGpi(innerCallback){
 						GrowPlanInstanceModel
 						.findById(req.params.growPlanInstanceId)
-						//.populate('device')
 						.exec(function(err, growPlanInstanceResult){
 							if (err) { return innerCallback(err); }
 
@@ -121,13 +120,6 @@ module.exports = function(app){
 							});
 						});
 					},
-					function getSensorLogs(innerCallback){
-						// get last day's sensor logs 
-						SensorLogModel
-						.find({gpi : req.params.growPlanInstanceId})
-						.where('ts').gte(Date.now() - (24 * 60 * 60 * 1000))
-						.exec(innerCallback);
-					},
 					function getNotifications(innerCallback){
 						NotificationModel.find({
 		          gpi : req.params.growPlanInstanceId,
@@ -148,18 +140,7 @@ module.exports = function(app){
 					locals.sensors = sortedSensors;
 					locals.controls = results[1];
 					locals.growPlanInstance = results[2];
-					locals.latestSensorLogs = results[3] || [];
-					locals.notifications = results[4] || [];
-
-					if (locals.growPlanInstance.device){
-						if (locals.growPlanInstance.device.status.activeActions){
-							locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
-								activeAction.control = locals.controls.filter(function(control){
-									return control._id.equals(activeAction.control);
-								})[0];
-							});
-						}
-					}
+					locals.notifications = results[3] || [];
 
 					res.render('gardens/dashboard', locals);
 				});
@@ -167,8 +148,9 @@ module.exports = function(app){
 		}
 	);
 
+
 	/**
-	 *
+	 * 
 	 */
 	app.get('/gardens/:growPlanInstanceId/sensor-logs', 
 		routeUtils.middleware.ensureSecure,
