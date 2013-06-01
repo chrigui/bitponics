@@ -125,6 +125,7 @@ module.exports = function(app){
 		          gpi : req.params.growPlanInstanceId,
 		          tts : { $ne : null }
 		        })
+		        .limit(10)
 		        .exec(innerCallback);
 		      }
 				],
