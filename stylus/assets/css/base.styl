@@ -93,7 +93,7 @@ input, label
 	}
 
 	&.warning {
-		background-color color-warning
+		background-color color-bg-orange
 	}
 
 
@@ -359,7 +359,7 @@ button.btn
 	svg
 		path 
 			stroke #fff
-			stroke-width 1
+			stroke-width 2
 			
 		.on, .good
 			fill : color-bg-green
@@ -369,6 +369,10 @@ button.btn
 
 		.bad 
 			fill : color-bg-orange
+
+		.active
+			mask url(#svg-active-mask);
+			//background-image: linear-gradient( 45deg, rgba(black, 0.1)  25%, transparent       25%, transparent       50%, rgba(black, 0.1)  50%, rgba(black, 0.1)  75%, transparent       75%, transparent)
 
 
 /*
@@ -414,10 +418,26 @@ button.btn
 /*
  * Phase Visualizer
  */
-#phases-graph
+.phases-graph
+	position relative
+	
 	svg
 		display: inline-block;
 		vertical-align: top;
+		cursor pointer
+	
+	.icon-glyphlogo-new
+		display block
+		position absolute
+		font-size 2em
+		width 1em
+		height 1em
+		top 50%
+		left 50%
+		margin-left -.53em
+		margin-top -.7em
+		color color-logo-green
+		cursor pointer
 
 section.footer
 	clear both
@@ -586,7 +606,11 @@ nav
 	// 	font-size 6.5em
 	// 	line-height 1em
 
-
+.spinner 
+	position absolute !important
+	right 0 !important
+	top 14px
+	margin-right 17px
 
 /*
  * Overlay

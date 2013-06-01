@@ -2,6 +2,7 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ActionModel = require('../../models/action').model,
     DeviceModel = require('../../models/device').model,
     SensorLogModel = require('../../models/sensorLog').model,
+    NotificationModel = require('../../models/notification').model,
     ImmediateActionModel = require('../../models/immediateAction').model,
     moment = require('moment'),
     ModelUtils = require('../../models/utils'),
@@ -39,6 +40,7 @@ module.exports = function(app) {
 	    });
 	  }
   );
+
 
   /**
    * Create single growPlanInstance
@@ -102,9 +104,7 @@ module.exports = function(app) {
   	function (req, res, next){
 	    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
 	      if (err) { return next(err); }
-	      if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE) && 
-           !growPlanInstance.owner.equals(req.user._id)
-        ){
+	      if (!routeUtils.checkResourceReadAccess(growPlanInstance, req.user)){
           return res.send(401, "The grow plan instance is private and only the owner may access its data.");
         }
 
@@ -133,7 +133,8 @@ module.exports = function(app) {
    */
   app.put('/api/grow-plan-instances/:id', function (req, res, next){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
-      if (!growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+      
+      if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
       	return res.send(401, "Only grow plan instance owner may modify a grow plan instance.");
       }
 
@@ -177,7 +178,7 @@ module.exports = function(app) {
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       if (err) { return next(err); }
 
-      if (!growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+      if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
       	return res.send(401, "Only grow plan instance owner may modify a grow plan instance.");
       }
 
@@ -192,8 +193,9 @@ module.exports = function(app) {
   /**
    * Sensor Logs nested resource
    * 
-   * @param {Date=} req.params.start-date (optional)
-   * @param {Date=} req.params.end-date (optional)
+   * @param {Date=} req.params.start-date (optional) Should be something parse-able by moment.js
+   * @param {Date=} req.params.end-date (optional) Should be something parse-able by moment.js
+   * @param {String=} req.params.timezone (optional) : Optionally set the timezone to use for the date filtering. If unset, uses the GPI owner's timezone
    * @param {string} req.params.sCode (optional)
    * @param {Number} req.params.limit
    *
@@ -204,12 +206,12 @@ module.exports = function(app) {
   app.get('/api/grow-plan-instances/:id/sensor-logs', function (req, res, next){
     var response = {};
 
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+    GrowPlanInstanceModel.findById(req.params.id)
+    .select('owner users visibility')
+    .exec(function (err, growPlanInstance) {
       if (err) { return next(err); }
       
-      if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE) && 
-      	   !growPlanInstance.owner.equals(req.user._id)
-      	){
+      if (!routeUtils.checkResourceReadAccess(growPlanInstance, req.user)){
       	return res.send(401, "The grow plan instance is private and only the owner may access its data.");
       }
 
@@ -223,9 +225,10 @@ module.exports = function(app) {
     	query.sort('-ts');
     	query.select('ts l'); // don't need to get the gpi in this query. already know it!
 
-    	if (startDate){
+    	// TODO : Localize start/end date based on owner's timezone?
+      if (startDate){
     		startDate = moment(startDate).toDate();
-    		query.where('ts').gt(startDate);
+    		query.where('ts').gte(startDate);
     	}
     	if (endDate){
     		endDate = moment(endDate).toDate();
@@ -251,7 +254,7 @@ module.exports = function(app) {
     			response.limit = limit;
     			response.skip = skip;
 
-    			return res.send(200, response);
+    			return routeUtils.sendJSONResponse(res, 200, response);
     		});
     	});
     });
@@ -282,7 +285,7 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
-      if ( !growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+      if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
         return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
@@ -319,7 +322,7 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
-      if ( !growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+      if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
       	return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
@@ -344,19 +347,17 @@ module.exports = function(app) {
   /**
    * Retrieve ImmediateActions that have been triggered on a GPI
    *
-   * Only GPI owners or Bitponics admins can request this.
    */
   app.get('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
     GrowPlanInstanceModel
     .findById(req.params.id)
+    .select('owner users visibility')
     .exec(function (err, growPlanInstance) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
-      if ( (growPlanInstance.visibility === feBeUtils.VISIBILITY_OPTIONS.PRIVATE)){
-        if (!growPlanInstance.owner.equals(req.user._id) && !req.user.admin){
+      if (!routeUtils.checkResourceReadAccess(growPlanInstance, req.user)){
           return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
-        }
       }
 
       ImmediateActionModel.find({gpi : growPlanInstance._id})
@@ -369,5 +370,41 @@ module.exports = function(app) {
     });
   });
 
-  
+
+
+  /**
+   * Retrieve Notifications on a GPI
+   *
+   * By default, only returns active Notifications
+   *
+   */
+  app.get('/api/grow-plan-instances/:id/notifications', function (req, res, next){
+    GrowPlanInstanceModel
+    .findById(req.params.id)
+    .select('owner users visibility')
+    .exec(function (err, growPlanInstance) {
+      if (err) { return next(err); }
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      
+      if (!routeUtils.checkResourceReadAccess(growPlanInstance, req.user)){
+          return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
+      }
+
+      NotificationModel.find(
+        {
+          gpi : growPlanInstance._id,
+          tts : { $ne : null }
+        }
+      ).exec(function(err, notificationResults){
+        if (err) { return next(err); }
+        return routeUtils.sendJSONResponse(
+          res,
+          200, 
+          {
+            data : notificationResults
+          }
+        );
+      });
+    });
+  });  
 };

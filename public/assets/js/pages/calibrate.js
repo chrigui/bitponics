@@ -250,7 +250,6 @@ function (angular, domReady, moment, feBeUtils) {
         });
         
         $scope.socket.on('device_calibration_response', function (data) {
-          console.log('device_calibration_response', data);
           switch(data.mode){
             // ph: 7, then 4, then 10
             case bpn.utils.CALIB_MODES.PH_7:

@@ -7,6 +7,7 @@ ControlModel = require('../models/control').model,
 Action = require('../models/action'),
 ActionModel = Action.model,
 DeviceModel = require('../models/device').model,
+NotificationModel = require('../models/notification').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
@@ -28,7 +29,6 @@ module.exports = function(app){
 
 			GrowPlanInstanceModel
 			.find({ 'users': req.user })
-			.populate('device')
 			.sort('-startDate')
 			.exec(function(err, growPlanInstanceResults){
 				if (err) { return next(err); }
@@ -45,7 +45,7 @@ module.exports = function(app){
 	 * Hide/show elements in the dashboard.jade depending on
 	 * whether the req.user is the owner or not
 	 */
-	app.get('/gardens/:growPlanInstanceId', 
+	app.get('/gardens/:growPlanInstanceId',
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
@@ -55,12 +55,23 @@ module.exports = function(app){
 				growPlanInstance : undefined,
 				sensors : undefined,
 				controls : undefined,
-				sensorDisplayOrder : ['ph','water','air','full','ec','tds','sal','hum','lux','ir','vis'],
+				sensorDisplayOrder : ['ph','air','lux','water','ec','tds','sal','hum','full','vis','ir'],
 				className: "app-page dashboard",
 				pageType: "app-page"
 			};
 
-			async.parallel(
+			// First, verify that the user can see this
+			GrowPlanInstanceModel.findById(req.params.growPlanInstanceId)
+			.select('owner users visibility')
+			.exec(function(err, growPlanInstanceResultToVerify){
+				if (err) { return next(err); }
+				if (!growPlanInstanceResultToVerify){ return next(new Error('Invalid grow plan instance id'));}
+
+				if (!routeUtils.checkResourceReadAccess(growPlanInstanceResultToVerify, req.user)){
+          return res.send(401, "This garden is private. You must be the owner to view it.");
+      	}
+
+				async.parallel(
 				[
 					function getSensors(innerCallback){
 						SensorModel.find({visible : true}).exec(innerCallback);
@@ -116,30 +127,43 @@ module.exports = function(app){
 						.find({gpi : req.params.growPlanInstanceId})
 						.where('ts').gte(Date.now() - (24 * 60 * 60 * 1000))
 						.exec(innerCallback);
-					}
+					},
+					function getNotifications(innerCallback){
+						NotificationModel.find({
+		          gpi : req.params.growPlanInstanceId,
+		          tts : { $ne : null }
+		        })
+		        .exec(innerCallback);
+		      }
 				],
 				function(err, results){
-						if (err) { return next(err); }
-						locals.sensors = results[0];
-						locals.controls = results[1];
-						locals.growPlanInstance = results[2];
-						locals.latestSensorLogs = results[3] || [];
+					if (err) { return next(err); }
 
-						if (locals.growPlanInstance.device){
-							if (locals.growPlanInstance.device.status.activeActions){
-								locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
-									activeAction.control = locals.controls.filter(function(control){
-										return control._id.equals(activeAction.control);
-									})[0];
-								});
-							}
+					var sortedSensors = [];
+					results[0].forEach(function(sensor){
+						sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
+					});
+					sortedSensors = sortedSensors.filter(function(sensor){ return sensor;});
+
+					locals.sensors = sortedSensors;
+					locals.controls = results[1];
+					locals.growPlanInstance = results[2];
+					locals.latestSensorLogs = results[3] || [];
+					locals.notifications = results[4] || [];
+
+					if (locals.growPlanInstance.device){
+						if (locals.growPlanInstance.device.status.activeActions){
+							locals.growPlanInstance.device.status.activeActions.forEach(function(activeAction){
+								activeAction.control = locals.controls.filter(function(control){
+									return control._id.equals(activeAction.control);
+								})[0];
+							});
 						}
+					}
 
-						res.render('gardens/dashboard', locals);
-				}
-			);
-
-			
+					res.render('gardens/dashboard', locals);
+				});
+			});
 		}
 	);
 

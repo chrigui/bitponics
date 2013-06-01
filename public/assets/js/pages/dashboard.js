@@ -4,36 +4,98 @@ require([
   'moment',
   'fe-be-utils',
   'view-models',
+  'spin',
   'angularResource',
   'd3',
   'es5shim',
+  'angularUI',
+  'angularUIBootstrap',
+  '/assets/js/services/socket.js',
+  '/assets/js/controllers/selection-overlay.js',
   'overlay'
 ],
-  function (angular, domReady, moment, feBeUtils, viewModels) {
+  function (angular, domReady, moment, feBeUtils, viewModels, Spinner) {
     'use strict';
 
 
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource']);
+    // var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']);
 
-    dashboardApp.factory('sharedDataService', function(){
-      return {
-        activeOverlay : undefined,
-        modalOptions : {
-          backdropFade: true,
-          dialogFade: true,
-          dialogClass : 'overlay'
+
+    dashboardApp.factory('sharedDataService', 
+      [
+        'bpn.services.socket',
+        function(socket){
+          var sharedData = {
+            targetActiveDate : new Date(),
+            activeDate : {},
+            notifications : bpn.pageData.notifications,
+            dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
+            socket : socket,
+            activeOverlay : undefined,
+            modalOptions : {
+              backdropFade: true,
+              dialogFade: true,
+              dialogClass : 'overlay'
+            }
+          };
+
+          socket.connect('/latest-grow-plan-instance-data');
+
+          socket.emit('ready', { growPlanInstanceId : bpn.pageData.growPlanInstance._id });
+
+          socket.on('update', function(data){
+            console.log("SOCKET UPDATE", data);
+            var sensorLog = data.sensorLog,
+                dateKey;
+            if (sensorLog){
+              sensorLog = viewModels.initSensorLogViewModel(sensorLog);
+              dateKey = feBeUtils.getDateKey(sensorLog.timestamp);
+              sharedData.dateDataCache[dateKey].sensorLogs.push(sensorLog);
+              sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
+            }
+          });
+
+          return sharedData;
         }
-      };
+      ]
+    );
+
+
+    dashboardApp.factory('sensorLogsService', function(){
+      // TODO : consolidate the get/post/caching mechanisms for /grow-plan-instances/:id/sensor-logs here
     });
+
 
     dashboardApp.controller('bpn.controllers.dashboard.Main',
       [
         '$scope',
-        '$filter',
         '$http',
+        '$q',
         'sharedDataService',
-        function ($scope, $filter, GrowPlanModel, sharedDataService) {
+        function ($scope, $http, $q, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
+          $scope.controls = bpn.controls;
+          $scope.sensors = bpn.sensors;
+          $scope.spinner = new Spinner({
+            lines: 15, // The number of lines to draw
+            length: 7, // The length of each line
+            width: 7, // The line thickness
+            radius: 3, // The radius of the inner circle
+            corners: 1, // Corner roundness (0..1)
+            rotate: 0, // The rotation offset
+            direction: 1, // 1: clockwise, -1: counterclockwise
+            color: '#00E36C', // #rgb or #rrggbb
+            speed: 2.5, // Rounds per second
+            trail: 44, // Afterglow percentage
+            //shadow: true, // Whether to render a shadow
+            hwaccel: true, // Whether to use hardware acceleration
+            className: 'spinner', // The CSS class to assign to the spinner
+            zIndex: 2e9, // The z-index (defaults to 2000000000)
+            top: 'auto', // Top position relative to parent in px
+            left: 'auto' // Left position relative to parent in px
+          }).spin();
+
 
           // First, transform the data into viewModel-friendly formats
           bpn.pageData.controls.forEach(function (control) {
@@ -42,33 +104,45 @@ require([
 
           viewModels.initGrowPlanInstanceViewModel(bpn.pageData.growPlanInstance, bpn.pageData.controls);
 
+          viewModels.initSensorLogsViewModel(bpn.pageData.latestSensorLogs);
+          
+          
+          
+          /**
+           * Returns a an angular promise
+           *
+           * @return {Promise}
+           */
+          $scope.getSensorLogsByDate = function (dateKey) {
+            var dateMoment = moment(dateKey),
+                deferred = $q.defer();
 
-          // Raise sensorLog readings to be hashes keyed by sensor code
-          bpn.pageData.latestSensorLogs.forEach(function (sensorLog) {
-            sensorLog.logs.forEach(function (log) {
-              sensorLog[log.sCode] = log.val;
-            });
-            // delete array to save memory, since we're not going to use it anymore
-            delete sensorLog.logs;
-          });
-
-          $scope.getLatestSensorLogsByDate = function (sensorLogs, date) {
-            // since sensorLog array is in desc date order, decrement through the array,
-            // stopping if we've found the date or if we've found a date less than date
-            var dateMoment = moment(date),
-              dateDiff;
-
-            for (var i = sensorLogs.length; i--;) {
-              dateDiff = dateMoment.diff(sensorLogs[i].timestamp, 'days')
-              if (dateDiff == 0) {
-                return sensorLogs[i]
-              } else if (dateDiff > 0) {
-                return [];
+            $http.get(
+              '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/sensor-logs',
+              {
+                params : {
+                  "start-date" : feBeUtils.getDateKey(dateMoment),
+                  "end-date" : feBeUtils.getDateKey(dateMoment.add('days', 1))
+                }
               }
-            }
+            )
+            .success(function(data, status, headers, config) {
+              $scope.sharedDataService.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
+              $scope.sharedDataService.dateDataCache[dateKey].latestSensorLogs = data.data[0];
+              $scope.sharedDataService.dateDataCache[dateKey].loaded = true;
+              deferred.resolve(data);
+            })
+            .error(function(data, status, headers, config) {
+              deferred.reject(data);
+            });
+
+            return deferred.promise;
           };
 
-       
+
+          /**
+           *
+           */
           $scope.triggerImmediateAction = function(actionId){
             $http.post(
               '/api/grow-plan-instances/' + $scope.growPlanInstance._id + '/immediate-actions',
@@ -78,13 +152,9 @@ require([
               }
             )
             .success(function(data, status, headers, config) {
-              // this callback will be called asynchronously
-              // when the response is available
               console.log(data);
             })
             .error(function(data, status, headers, config) {
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
               console.log(data);
             });
           }
@@ -103,29 +173,46 @@ require([
                 return growPlanInstancePhases[i];
               }
             }
+            return growPlanInstancePhases[0];
           };
 
 
           /**
-           * Based on activeDte, refresh the latest sensor logs & control actions
+           * Based on activeDate, refresh the latest sensor logs & control actions
+           *
+           * @param {Date|String} date
            */
-          $scope.loadActiveDateData = function () {
-            var date = $scope.activeDate.date;
+          $scope.displayDate = function (date) {
+            // May get either a date object or a string, so use moment to clean up
+            var dateMoment = moment(date),
+                dateKey = feBeUtils.getDateKey(dateMoment);
 
-            $scope.activeDate.latestSensorLogs = $scope.getLatestSensorLogsByDate($scope.latestSensorLogs, date);
-            $scope.activeDate.growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
-            $scope.activeDate.growPlanPhase = $scope.activeDate.growPlanInstancePhase.phase;
+            if ($scope.sharedDataService.dateDataCache[dateKey]){
+              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
+            } else {
+              $scope.sharedDataService.dateDataCache[dateKey] = {};
+              $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
+              $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
+              $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
+              $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.getSensorLogsByDate(dateKey);
+              
+              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
+            }
           };
 
-          $scope.$watch('activeDate.date', function () {
-            // get the day's GrowPlan Phase
-            // get the day's GrowPlanInstance.phase.daySummary
-            // If not today, clear out the activeDate.latestSensorLogs property to make the sensor values blank out. not going to get past day's sensorLogs just yet
-            $scope.loadActiveDateData();
 
-            // TODO POST-MVP : get the day's sensorLogs through a service call
-            // TODO POST-MVP : get the device-controlled actions for the day's phase, bind those
-            // TODO POST-MVP : get the sensors for the day's phase (union of device sensors and Phase's IdealRanges.sCode)
+          $scope.$watch('sharedDataService.activeDate.loaded', function (newValue) {
+            if (newValue) {
+              $scope.spinner.stop();
+            } else {
+              $('#sensors h2').append($scope.spinner.el);
+            }
+          });
+
+
+          $scope.$watch('sharedDataService.targetActiveDate', function (newVal, oldVal) {
+            $scope.displayDate($scope.sharedDataService.targetActiveDate);
           });
 
           // Finally, set the scope models
@@ -133,14 +220,7 @@ require([
           $scope.sensors = bpn.pageData.sensors;
           $scope.growPlanInstance = bpn.pageData.growPlanInstance;
           $scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
-          $scope.activeDate = {
-            date:new Date(),
-            daySummary:{},
-            latestSensorLogs:{},
-            growPlanInstancePhase:{},
-            growPlanPhase:{}
-          };
-          $scope.loadActiveDateData();
+          
         }
       ]
     );
@@ -149,27 +229,59 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.DayOverview',
       [
         '$scope',
-        '$filter',
-        function ($scope, $filter) {
+        function ($scope) {
           // TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 
-          $scope.getIdealRangeForSensor = function (sensor) {
-            var idealRanges = $scope.activeDate.growPlanPhase.idealRanges,
-              i;
-            // TODO : factor in time of day, for idealRange.applicableTimeSpan
+          $scope.getIdealRangeForSensor = function (sensor, date) {
+            var idealRanges = $scope.sharedDataService.activeDate.growPlanPhase.idealRanges,
+              idealRange,
+              i,
+              timeOfDayInMilliseconds,
+              applicableTimeSpan;
+            
             for (i = idealRanges.length; i--;) {
-              if (idealRanges[0].sCode === sensor.code) {
-                return idealRanges[0];
+              idealRange = idealRanges[i];
+              applicableTimeSpan = idealRange.applicableTimeSpan;
+
+              if (idealRange.sCode === sensor.code) {
+                if (applicableTimeSpan && date){
+                  // get the localized time of day for the sensor log
+                  // calling new Date(anything) in a browser will give the localized time.
+                  // our dates are stored with a UTC timestamp, so we good
+                  timeOfDayInMilliseconds = feBeUtils.getTimeOfDayInMilliseconds(date);
+
+                  // Handle regular span vs overnight span
+                  if (applicableTimeSpan.startTime < applicableTimeSpan.endTime) {
+                    if ( (timeOfDayInMilliseconds >= applicableTimeSpan.startTime) && (timeOfDayInMilliseconds <= applicableTimeSpan.endTime) ){
+                      return idealRange;
+                    }
+                  } else {
+                    // overnight span
+                    // time can be after startTime or before endTime
+                    if ( (timeOfDayInMilliseconds >= applicableTimeSpan.startTime) || (timeOfDayInMilliseconds<= applicableTimeSpan.endTime) ){
+                      return idealRange;
+                    }
+                  }
+                } else {
+                  return idealRange;  
+                }
               }
             }
           };
 
 
-          $scope.getSensorBlockClassNames = function (sensor) {
+          $scope.getSensorBlockClassNames = function (sensor, sensorLog) {
             var sensorCode = sensor.code,
               classNames = ['sensor', 'data-module', sensorCode],
-              idealRange = $scope.getIdealRangeForSensor(sensor),
-              sensorValue = $scope.activeDate.latestSensorLogs ? $scope.activeDate.latestSensorLogs[sensorCode] : undefined;
+              idealRange,
+              sensorValue,
+              sensorTimestamp;
+
+            if (sensorLog){
+               sensorValue = sensorLog[sensorCode];
+               sensorTimestamp = sensorLog.timestamp;
+               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
+            }
 
             // Determine whether we need to add the "warning" class
             if (idealRange) {
@@ -194,144 +306,7 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.PhasesGraph',
       [
         '$scope',
-        '$filter',
-        'sharedDataService',
-        function ($scope, $filter, sharedDataService) {
-          $scope.sharedDataService = sharedDataService;
-          // TODO: Add functions to handle interactions on the phase graph.
-
-          // TODO : function to set $scope.activeDate (will be called based on clicks or mouseovers on sections of the phaseGraph).
-          // Since $scope is inherited from parent, this'll set Main controller's $scope.activeDate,
-          // which in turn will update the DayOverview sidebar
-
-          $scope.getPhaseClass = function (data, index) {
-            var status = data.data.status;
-
-            switch(status){
-              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
-                return "good";
-              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
-                return "bad";
-              default : 
-                return "empty";
-            }
-          };
-
-          $scope.drawBarSet = function (target, barWidth, barLength, barSpacing, numBars) {
-            var svg,
-              startLoc = 0,
-              totalHeight = ((barWidth * numBars) + (barSpacing * (numBars - 1))),
-            //startLoc = ((barWidth*numBars) + (barSpacing*numBars))/-2,
-              bar,
-              barGroup;
-
-            svg = d3.select(target).append('svg:g').attr('class', 'barberPoleCont');
-
-            barGroup = svg
-              .attr('width', barLength)
-              .attr('height', ((barWidth * numBars) + (barSpacing * (numBars - 1))))
-              .append('svg:g')
-              .attr('class', 'barberPolePattern');
-
-            for (var i = 0; i < numBars; i++) {
-              barGroup
-                .append("svg:rect")
-                .attr('x', (barLength / -2))
-                .attr('y', ((startLoc + (barWidth * i) + (barSpacing * i)) + (totalHeight / -2)  ))
-                .attr('width', barLength)
-                .attr('height', barWidth);
-            }
-          };
-
-          $scope.drawPhaseGraphs = function () {
-            var phases = $scope.growPlanInstance.phases,
-              phaseCount = phases.length,
-              $container = $('#phases-graph'),
-              outerMargin = 80,
-              width = $container.width() - (outerMargin * 2),
-              height = width,
-              radius = width / 2,
-              innerWhitespaceRadius = radius / (phaseCount + 1),
-              // sum of all arcSpans must fit between outer boundary and inner whitespace
-              arcSpan = (radius - innerWhitespaceRadius) / phaseCount,
-              arcMargin = 0,
-              colorScale = d3.scale.category20c(),
-              equalPie = d3.layout.pie();
-
-
-            // disable data sorting & force all slices to be the same size
-            equalPie
-              .sort(null)
-              .value(function (d) {
-                return 1;
-              });
-
-            var svg = d3.select('#phases-graph')
-              .append('svg:svg')
-              .attr('width', width)
-              .attr('height', height);
-
-            //$('#phases-graph').append($('.barberPolePattern'));
-
-            $.each(phases, function (index, phase) {
-              var arc = d3.svg.arc(),
-                className = 'phase' + index,
-                phaseGroup;
-
-              arc.outerRadius(radius - (arcSpan * index) - arcMargin)
-                .innerRadius(radius - (arcSpan * (index + 1)) - arcMargin);
-
-              phaseGroup = svg.append('svg:g')
-                .classed(className, true)
-                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-              var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phase.daySummaries));
-
-              allArcs
-                .enter()
-                .append('svg:g')
-                .append('svg:path')
-                .attr('d', arc)
-                .attr('class', $scope.getPhaseClass);
-
-              allArcs
-                .on('click', function (d, i) {
-                  var barberPoleCont = $('.barberPoleCont');
-                  var barberPolePattern = $('.barberPolePattern');
-                  var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
-                  var centroidX = arc.centroid(d)[0] + width / 2;
-                  var centroidY = arc.centroid(d)[1] + width / 2;
-
-                  barberPolePattern.attr('transform', 'rotate(' + (Math.degrees(angle) + 45) + ')');
-
-                  //barberPole.attr('transform', 'translate(' + centroidX + ',' + centroidY + ') rotate(' + (Math.degrees(angle) + 45) + ')');
-                  barberPoleCont.css('mask', 'url(#mask-' + $(this).attr('id') + ')');
-                  barberPoleCont.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-
-                  //console.log("WIDTH " + width);
-
-                  //barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
-                });
-
-              var maskGroup = svg.append('defs')
-                .append('g')
-                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
-              var allMasks = maskGroup.selectAll('mask')
-                .data(equalPie(phase.daySummaries));
-
-              allMasks
-                .enter()
-                .append('svg:mask')
-                .append('svg:path')
-                .attr('d', arc)
-                .attr('class', $scope.getPhaseClass);
-            });
-          };
-
-          $scope.drawPhaseGraphs();
+        function ($scope) {
         }
       ]
     );
@@ -340,53 +315,37 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.Controls',
       [
         '$scope',
-        '$filter',
-        'sharedDataService',
-        function ($scope, $filter, sharedDataService) {
-          $scope.sharedDataService = sharedDataService;
+        function ($scope) {
           // TODO: Add functions to handle interactions with control widgets. Launch control overlay.
-
-          // NOTE: This is not currently in use
-          $scope.makeDayProgressClock = function (svg, radius, triangleSize) {
-            var triHeight = Math.cos(Math.PI / 6) * triangleSize,
-              width = svg.clientWidth,
-              height = svg.clientHeight;
-
-            var circleCont = d3.select(svg)
-              .append('svg:g')
-              .attr('class', 'timeProgressThumb')
-              .attr('width', width)
-              .attr('height', height)
-              //.attr("transform", "rotate(90, 250, 250)")
-              .append("svg:polygon")
-              .attr('stroke', 'black')
-              .attr("points", width / 2 + "," + radius + " " + ((width / 2) + (triangleSize / 2)) + "," + (triHeight + radius) + " " + ((width / 2) - (triangleSize / 2)) + "," + (triHeight + radius));
-          };
         }
       ]
     );
 
-    dashboardApp.controller('bpn.controllers.dashboard.ControlOverlay',
-      [
-        '$scope',
-        'sharedDataService',
-        function($scope, sharedDataService){
-          console.log('control overlay');
-          $scope.sharedDataService = sharedDataService;
-
-          $scope.close = function(){
-            $scope.sharedDataService.activeOverlay = undefined;
-          };
-        }
-      ]
-    );
 
     dashboardApp.controller('bpn.controllers.dashboard.Notifications',
       [
         '$scope',
-        '$filter',
-        function ($scope, $filter) {
+        'sharedDataService',
+        function ($scope, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
+          $scope.pastNotifications = [];
+          $scope.impendingNotifications = []; // notifications for the next X days (2 days?)
+          $scope.futureNotifications = [];
 
+          $scope.$watch('sharedDataService.notifications', function(){
+            var notifications = sharedDataService.notifications,
+                nowMoment = moment();
+            if (!notifications && notifications.length){
+              $scope.pastNotifications = [];
+              $scope.impendingNotifications = [];
+              $scope.futureNotifications = [];
+            } else {
+              $scope.pastNotifications = sharedDataService.notifications;
+              $scope.impendingNotifications = [];
+              $scope.futureNotifications = [];
+            }
+            
+          });
         }
       ]
     );
@@ -516,15 +475,174 @@ require([
       ]
     );
 
+    dashboardApp.controller('bpn.controllers.dashboardApp.ControlOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          
+          // $scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel',
+          //   function(newValue, oldValue){
+          //     $scope.close();
+          //   }
+          // );
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+        }
+      ]
+    );
+
+    dashboardApp.directive('bpnDirectivesPhasesGraph', function() {
+      return {
+        restrict : "EA",
+        template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new"></div></div>',
+        replace : true,
+        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          
+          $scope.getDaySummaryClass = function(data){
+            var className = data.data.status;
+            if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+              className += " active";
+            }
+            return className;
+          }
+
+          $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
+            d3.select($element[0]).selectAll('path')
+            .attr('class', $scope.getDaySummaryClass)
+            .each(function(d, i){
+              /*
+              if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
+                
+              } else {
+                d3.select(this).attr('transform', '');
+              }
+              */
+            });
+          });
+        },
+        link: function (scope, element, attrs, controller) {
+          $(element[0]).find('.icon-glyphlogo-new').click(function(e){
+            e.preventDefault();
+            scope.$apply(function(){
+              scope.sharedDataService.targetActiveDate = new Date();
+            });
+          });
+
+          scope.$watch('growPlanInstance.phases', function (newVal, oldVal) {
+            var phases = scope.growPlanInstance.phases,
+              phaseCount = phases.length,
+              outerMargin = 80,
+              width = $(element[0]).width() - (outerMargin * 2),
+              height = width,
+              radius = width / 2,
+              innerWhitespaceRadius = radius / (phaseCount + 1),
+              // sum of all arcSpans must fit between outer boundary and inner whitespace
+              arcSpan = (radius - innerWhitespaceRadius) / phaseCount,
+              arcMargin = 0,
+              colorScale = d3.scale.category20c(),
+              equalPie = d3.layout.pie();
+
+
+            // disable data sorting & force all slices to be the same size
+            equalPie
+              .sort(null)
+              .value(function (d) {
+                return 1;
+              });
+
+            var svg = d3.select(element[0])
+              .append('svg:svg')
+              .attr('width', width)
+              .attr('height', height);
+
+            phases.forEach(function(phase, index) {
+              var arcNumber = (phaseCount - index - 1),
+                arc = d3.svg.arc(),
+                className = 'phase' + index,
+                phaseGroup;
+
+              arc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+                .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+
+              phaseGroup = svg.append('svg:g')
+                .classed(className, true)
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+              var allArcs = phaseGroup.selectAll('path')
+                .data(equalPie(phase.daySummaries));
+
+              allArcs
+                .enter()
+                .append('svg:g')
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('class', scope.getDaySummaryClass);
+
+              allArcs
+                .on('click', function (d, i) {
+                  // Have to wrap this in a scope.$apply call because it occurs outside of the 
+                  // Angular lifecycle, need to tell angular that it should refresh itself
+                  scope.$apply(function(){
+                    scope.sharedDataService.targetActiveDate = d.data.dateKey;
+                  });
+                  
+                  //var barberPoleCont = $('.barberPoleCont');
+                  //var barberPolePattern = $('.barberPolePattern');
+                  //var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                  //var centroidX = arc.centroid(d)[0] + width / 2;
+                  //var centroidY = arc.centroid(d)[1] + width / 2;
+
+                  //barberPolePattern.attr('transform', 'rotate(' + (Math.degrees(angle) + 45) + ')');
+
+                  //barberPole.attr('transform', 'translate(' + centroidX + ',' + centroidY + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+                  //barberPoleCont.css('mask', 'url(#mask-' + $(this).attr('id') + ')');
+                  //barberPoleCont.attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+
+                  //console.log("WIDTH " + width);
+
+                  //barberPole.attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + (Math.degrees(angle) + 45) + ')');
+                });
+
+              /*
+              var maskGroup = svg.append('defs')
+                .append('g')
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+
+              var allMasks = maskGroup.selectAll('mask')
+                .data(equalPie(phase.daySummaries));
+
+              allMasks
+                .enter()
+                .append('svg:mask')
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('class', $scope.getPhaseClass);
+              */
+            });
+          });
+        }
+      };
+    });
+
+
 
     dashboardApp.directive('bpnDirectivesControlActionGraph', function() { 
       return {
         restrict : "EA",
-        template : '<div class="control ring-graph {{controlAction.control.className}}"></div>',
         replace : true,
         scope : {
-          controlAction : "="
+          controlAction : "=",
+          eventHandler : '&customClick'
         },
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"></div>',
         controller : function ($scope, $element, $attrs, $transclude){
           $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);
@@ -617,8 +735,100 @@ require([
       };
     });
 
+
+
+
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
     });
 
+
+
+
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+// Kyle's code
+
+$scope.getPhaseClass = function (data, index) {
+            var status = data.data.status;
+
+            switch(status){
+              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
+                return "good";
+              case feBeUtils.PHASE_DAY_SUMMARY_STATUSES.GOOD : 
+                return "bad";
+              default : 
+                return "empty";
+            }
+          };
+
+          $scope.drawBarSet = function (target, barWidth, barLength, barSpacing, numBars) {
+            var svg,
+              startLoc = 0,
+              totalHeight = ((barWidth * numBars) + (barSpacing * (numBars - 1))),
+            //startLoc = ((barWidth*numBars) + (barSpacing*numBars))/-2,
+              bar,
+              barGroup;
+
+            svg = d3.select(target).append('svg:g').attr('class', 'barberPoleCont');
+
+            barGroup = svg
+              .attr('width', barLength)
+              .attr('height', ((barWidth * numBars) + (barSpacing * (numBars - 1))))
+              .append('svg:g')
+              .attr('class', 'barberPolePattern');
+
+            for (var i = 0; i < numBars; i++) {
+              barGroup
+                .append("svg:rect")
+                .attr('x', (barLength / -2))
+                .attr('y', ((startLoc + (barWidth * i) + (barSpacing * i)) + (totalHeight / -2)  ))
+                .attr('width', barLength)
+                .attr('height', barWidth);
+            }
+          };
+
+
+
+$scope.makeDayProgressClock = function (svg, radius, triangleSize) {
+            var triHeight = Math.cos(Math.PI / 6) * triangleSize,
+              width = svg.clientWidth,
+              height = svg.clientHeight;
+
+            var circleCont = d3.select(svg)
+              .append('svg:g')
+              .attr('class', 'timeProgressThumb')
+              .attr('width', width)
+              .attr('height', height)
+              //.attr("transform", "rotate(90, 250, 250)")
+              .append("svg:polygon")
+              .attr('stroke', 'black')
+              .attr("points", width / 2 + "," + radius + " " + ((width / 2) + (triangleSize / 2)) + "," + (triHeight + radius) + " " + ((width / 2) - (triangleSize / 2)) + "," + (triHeight + radius));
+          };
+
+
+*/
+

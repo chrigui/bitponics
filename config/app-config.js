@@ -148,6 +148,7 @@ module.exports = function(app){
       io.configure(function () {
         io.set("transports", ["xhr-polling"]);
         io.set("polling duration", 10);
+        io.set("log level", 2);
       });
 
       // Make socket.io handlers aware of user sessions
@@ -204,7 +205,6 @@ module.exports = function(app){
           clearInterval(sessionRefreshIntervalId);
         });
 
-        socket.emit('news', { hello: 'world' });
       });
     });
     

@@ -15,17 +15,17 @@ block content
       h2.page-heading(ng-cloak)
         | {{growPlanInstance.name}}
 
-      div#sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
-        h2.page-heading-small.date {{activeDate.date | date:'longDate'}}
+      div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
+        h2.page-heading-small.date {{sharedDataService.activeDate.date | date:'longDate'}}
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
-        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(this)")
+        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="activeDate.latestSensorLogs[sensor.code]") {{activeDate.latestSensorLogs[sensor.code]}}
-            div.sensor-value(ng-hide="activeDate.latestSensorLogs[sensor.code]") ----
+            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code]") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensorcreen-reader-text {{sensor.code}}
@@ -34,44 +34,63 @@ block content
             | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
             div.screen-reader-text Settings
 
-      div#visualizer.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
-        div#phases-graph.circle.centered.ring-graph
+      div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
+        div(data-bpn-directives-phases-graph)
     
-      div#controls.controls.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.Controls")
-        h2.page-heading-small Accessories
-        div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-          h3 {{controlAction.control.name}}
+      div.content-module.side.separator-top
+        div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls")
+          h2.page-heading-small Accessories
+          div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+            h3 {{controlAction.control.name}}
 
-          div(data-bpn-directives-control-action-graph, data-control-action="controlAction", ng-click="console.log(this);sharedDataService.activeOverlay = 'ControlOverlay'")
+            div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
+            div
+              div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
+                div(ng-controller="bpn.controllers.SelectionOverlay")
+                  div(class="close btn", ng-click="close()")
+                    | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  h3(class="page-heading page-heading-small") {{controlAction.control.name}}
+                  a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
+                  a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
-          a(ng-click="console.log(this);sharedDataService.activeOverlay = 'ControlOverlay'") ng-click-me
-                  
-          a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
-          a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
+        div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
+          h2.page-heading-small Notifications
+          h3(ng-show="pastNotifications.length") Past
+          div(ng-repeat="notification in pastNotifications")
+            div.date {{notification.timeToSend | date:'medium'}}
+            div.title {{notification.title}}
+          h3(ng-show="impendingNotifications.length") Upcoming
+          div(ng-repeat="notification in impendingNotifications")
+            div.date {{notification.timeToSend | date:'medium'}}
+            div.title {{notification.title}}
+      
 
-      div#reminders.content-module.side(ng-controller="bpn.controllers.dashboard.Notifications")
-        h2.main-heading Reminders
-    
-    section#templates(style="display:none")
-      //-textarea#control-tooltip-template
-        |  <div class="control-tooltip">
-        |    <h3>Available actions to trigger on your {{name}}:</h3>
-        |    {{#actions}}
-        |      <div>
-        |        <a class="action-trigger-link" data-action-id="{{_id}}">{{description}}</a>
-        |      </div>
-        |    {{/actions}}
-        |  </div>
+  svg(height='0')
+    mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')
+      lineargradient#svg-active-gradient(gradientunits='objectBoundingBox', x2='0', y2='1')
+        stop(stop-color='white', offset='0%')
+        stop(stop-color='white', offset='10%')
+        stop(stop-color='white', stop-opacity='0', offset='11%')
+        stop(stop-color='white', stop-opacity='0', offset='20%')
+        stop(stop-color='white', offset='21%')
+        stop(stop-color='white', offset='30%')
+        stop(stop-color='white', stop-opacity='0', offset='31%')
+        stop(stop-color='white', stop-opacity='0', offset='40%')
+        stop(stop-color='white', offset='41%')
+        stop(stop-color='white', offset='50%')
+        stop(stop-color='white', stop-opacity='0', offset='51%')
+        stop(stop-color='white', stop-opacity='0', offset='60%')
+        stop(stop-color='white', offset='61%')
+        stop(stop-color='white', offset='70%')
+        stop(stop-color='white', stop-opacity='0', offset='71%')
+        stop(stop-color='white', stop-opacity='0', offset='80%')
+        stop(stop-color='white', offset='81%')
+        stop(stop-color='white', offset='90%')
+        stop(stop-color='white', stop-opacity='0', offset='91%')
+        stop(stop-color='white', stop-opacity='0', offset='100%')
+      rect(width='1', height='1', fill='url(#svg-active-gradient)')
 
-    //- Overlay Templates
-
-    div
-      div(ng-controller="bpn.controllers.dashboard.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'", close="close()", options="sharedDataService.modalOptions")
-        div(class="close btn", ng-click="close()")
-          | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-
-        div
-          h4 test control overlay
+  
 
 block footer-scripts
   script
@@ -80,3 +99,4 @@ block footer-scripts
     bpn.pageData.sensors = !{JSON.stringify(sensors)};
     bpn.pageData.controls = !{JSON.stringify(controls)};
     bpn.pageData.latestSensorLogs = !{JSON.stringify(latestSensorLogs)};
+    bpn.pageData.notifications = !{JSON.stringify(notifications)};

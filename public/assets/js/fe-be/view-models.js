@@ -15,7 +15,36 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance){
 
-  	growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
+  	
+    // growPlanInstance.phases only contains phases that the GPI has gone through.
+    // Add future growPlan phases for the visual 
+
+    var currentGrowPlanPhaseId = growPlanInstance.phases.filter(
+      function(growPlanInstancePhase){ 
+        return growPlanInstancePhase.active;
+      }
+    )[0].phase,
+    currentGrowPlanPhaseIndex;
+
+    growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
+      // get the active gpi.phase.phase. find the gp.phases that are after that
+      // one. append those to gpi.phases
+
+      if (growPlanPhase._id === currentGrowPlanPhaseId) {
+        currentGrowPlanPhaseIndex = index;
+      }
+
+      if (index > currentGrowPlanPhaseIndex){
+        growPlanInstance.phases.push({
+          phase : growPlanPhase._id,
+          daySummaries : []
+        });
+      }
+    });
+
+
+    // Now initialize the gpi phase data
+    growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var startDate = growPlanInstancePhase.startDate,
           i;
       
@@ -34,14 +63,21 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         }
       }
 
+      var phaseStartingOnGrowPlanInstanceDay = 0;
+      for (var i = 0; i < phaseIndex; i++){
+        phaseStartingOnGrowPlanInstanceDay += growPlanInstance.phases[i].daySummaries.length;
+      }
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
+        var daySummaryIndexInGrowPlan = daySummaryIndex + phaseStartingOnGrowPlanInstanceDay;
+
         if (!daySummary.date) {
-          daySummary.date = moment(startDate).add(daySummaryIndex, 'days');
+          daySummary.date = moment(startDate).add('days', daySummaryIndexInGrowPlan);
         }
         if (!daySummary.status) {
           daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
         }
+        daySummary.dateKey = utils.getDateKey(daySummary.date);
       });
       
       if (growPlanInstancePhase.active){
@@ -67,6 +103,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   /**
+   * Get a string key for the date, for use as object keys in a date hash
+   * 
+   * @param {Date} date
+   * @return {string} A string in the format YYYY-MM-DD
+   */
+  utils.getDateKey = function(date){
+    return moment(date).format("YYYY-MM-DD");
+  };
+
+
+  /**
    * Adds/calculates properties necessary for UI presentation
    *
    * Adds the following properties:
@@ -77,6 +124,32 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     return control;
   };
 
+
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   *
+   * Converts sensor readings array to a hash, keyed by sensor code
+   */
+  viewModels.initSensorLogsViewModel = function (sensorLogs){
+    sensorLogs.forEach(viewModels.initSensorLogViewModel);
+    return sensorLogs;
+  };
+
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   *
+   * Converts sensor readings array to a hash, keyed by sensor code
+   */
+  viewModels.initSensorLogViewModel = function (sensorLog){
+    sensorLog.logs.forEach(function (log) {
+      sensorLog[log.sCode] = log.val;
+    });
+    // delete array to save memory, since we're not going to use it anymore
+    delete sensorLog.logs;
+    return sensorLog;
+  };
 
   /**
    * Adds/calculates properties necessary for UI presentation

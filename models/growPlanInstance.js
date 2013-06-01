@@ -76,6 +76,15 @@ var GrowPlanInstanceSchema = new Schema({
 
   active: { type: Boolean },
 
+  
+  // TODO
+  //servicePlan : { type : ObjectIdSchema, ref : 'ServicePlan' },
+
+
+  /**
+   * Record of the phases this GPI has been through. 
+   * Last one should be the active one.
+   */
   phases: [{
     
     /**
@@ -95,6 +104,7 @@ var GrowPlanInstanceSchema = new Schema({
      */
     startDate: { type: Date },
 
+
     /**
      * Day of the GrowPlan phase on which this GPI Phase started.
      * 0-based.
@@ -102,16 +112,21 @@ var GrowPlanInstanceSchema = new Schema({
      */
     startedOnDay : { type : Number, default : 0 },
 
+
     /**
      * actual date the phase was ended. null/undefined if not yet ended
      */
     endDate: { type: Date },
 
+
     /**
      * set whenever a phase is started, based on GrowPlan.Phase.expectedNumberOfDays. 
      * used by the worker process to query & notify of impending phase advancement
+     *
+     * If null, means the user has opted out of automatic phase advancement, so just let this phase continue on indefinitely.
      */
-    expectedEndDate : { type : Date },
+    expectedEndDate : { type : Date, required : false },
+
 
     /**
      * Whether the phase is currently active. Should be max 1 phase active at a time.
@@ -123,7 +138,8 @@ var GrowPlanInstanceSchema = new Schema({
      * Summary of each day that's passed in this GPI Phase.
      * Used in Dashboard display.
      */
-    daySummaries : [ PhaseDaySummarySchema ]
+    daySummaries : [ PhaseDaySummarySchema ],
+
   }],
 
 
@@ -236,14 +252,12 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           	gpi.name = growPlan.name + " Garden";
           }
 
-          // add the phases
-          growPlan.phases.forEach(function(phase){
-            gpi.phases.push({ 
-              phase : phase._id,
-              growPlan : growPlan
-            });
-          });
+          if (!options.activePhaseId){
+            options.activePhaseId = growPlan.phases[0]._id;
+          }
 
+          // Don't add the phases. Phases are appended to the gpi.phases array as they're activated
+          
           return innerCallback();
         });
       }
@@ -472,8 +486,9 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
 
 
 /**
- * Activate a phase on a grow plan instance. 
+ * Activate a grow plan phase on a grow plan instance.
  * 
+ * Assumes it's passed a phase from gpi.growPlan
  *
  * @param {ObjectId|string} options.phaseId : (required) phaseId of the growPlan.phase
  * @param {Number=} options.phaseDay : (optional) Number of days into the phase. Used to offset phase.expectedEndDate
@@ -506,6 +521,11 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   // Finally,
   // activate the new phases' actions & trigger notifications
   
+  
+  // Make sure the gpi is active
+  growPlanInstance.active = true;
+
+
   async.series(
     [
       function getPopulatedOwner(innerCallback){
@@ -541,20 +561,10 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
           growPlanPhase = growPlan.phases.filter(function(item){ return item._id.equals(phaseId);})[0];
 
-          
+          // Deactivate the previous phase, and check to make sure we don't activate the already-active phase
           growPlanInstance.phases.forEach(function(phase){
-            if (phase.phase.equals(phaseId)){
+            if (phase.phase.equals(phaseId) && phase.active){
               growPlanInstancePhase = phase;
-
-              growPlanInstancePhase.active = true;
-              growPlanInstancePhase.startDate = now;
-              growPlanInstancePhase.startedOnDay = phaseDay;
-
-              var expectedEndDate = nowAsMilliseconds + (growPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) - (phaseDay * 24 * 60 * 60 * 1000);
-              if (expectedEndDate < nowAsMilliseconds){
-                expectedEndDate = nowAsMilliseconds;
-              }
-              growPlanInstancePhase.expectedEndDate = expectedEndDate;
             } else {
               if (phase.active == true){
                 prevPhase = phase;
@@ -580,8 +590,6 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
             };
             growPlanInstance.phases.push(growPlanInstancePhase);
           }
-          
-          
           
           return innerCallback();
         });
@@ -974,6 +982,7 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
 
 
 /***************** MIDDLEWARE **********************/
+
 /**
  * Remove old recentXLogs
  */

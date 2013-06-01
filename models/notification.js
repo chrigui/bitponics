@@ -189,9 +189,15 @@ var NotificationSchema = new Schema({
     ],
     required : true,
     default : feBeUtils.NOTIFICATION_TYPES.INFO
-  }
+  },
 	
-
+  /**
+   * checked
+   * User can "check" a notification log to hide it/mark completed
+   *
+   * TODO : decide what the behavior is if a repeating notification is marked checked
+   */
+  c : { type : Boolean }
 },
 { id : false });
 
@@ -292,12 +298,17 @@ NotificationSchema.virtual('template')
     this.tmpl = template;
   });
 
-
+NotificationSchema.virtual('checked')
+.get(function(){
+  return this.c;
+})
+.set(function(checked){
+  this.c = checked;
+})
 
 NotificationSchema.virtual('gardenDashboardUrl')
   .get(function(){
-    var appDomain = 'www.bitponics.com';//require('../app').config.appDomain;
-    return "https://" + appDomain + "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
+    return "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
   });
 
 

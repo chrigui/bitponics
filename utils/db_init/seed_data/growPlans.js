@@ -22,6 +22,7 @@ module.exports = [
                     "506de2f18eebf7524342cb27"
                 ],
                 phaseEndActions : [
+                    "506de2ec8eebf7524342cb24",
                 ],
                 phaseEndDescription: "This phase is over once the seedlings start growing their first true leaves.",
                 idealRanges: [
@@ -76,7 +77,6 @@ module.exports = [
                     "506de3038eebf7524342cb4d"
                 ],
                 actions: [
-                    "506de2ec8eebf7524342cb24",
                     "506de2ef8eebf7524342cb25",
                     "506de2f08eebf7524342cb26",
                     "506de2f18eebf7524342cb27"
@@ -127,10 +127,12 @@ module.exports = [
                 growMedium: "rockwool",
                 nutrients: [],
                 actions: [
-                    "506de2ec8eebf7524342cb24",
                     "506de2ef8eebf7524342cb25",
                     "506de2f08eebf7524342cb26",
                     "506de2f18eebf7524342cb27"
+                ],
+                phaseEndActions : [
+                    "506de2ec8eebf7524342cb24"
                 ],
                 idealRanges: [
                     {
@@ -176,7 +178,6 @@ module.exports = [
                     "506de3038eebf7524342cb4d"
                 ],
                 actions: [
-                    "506de2ec8eebf7524342cb24",
                     "506de2ef8eebf7524342cb25",
                     "506de2f08eebf7524342cb26",
                     "506de2f18eebf7524342cb27"
@@ -328,10 +329,12 @@ module.exports = [
                 growMedium: "rockwool",
                 nutrients: [],
                 actions: [
-                    "506de2ec8eebf7524342cb24",
                     "506de2ef8eebf7524342cb25",
                     "506de2f08eebf7524342cb26",
                     "506de2f18eebf7524342cb27"
+                ],
+                phaseEndActions : [
+                    "506de2ec8eebf7524342cb24"
                 ],
                 idealRanges: [
                     {
@@ -375,7 +378,6 @@ module.exports = [
                     "506de3038eebf7524342cb4d"
                 ],
                 actions: [
-                    "506de2ec8eebf7524342cb24",
                     "506de2ef8eebf7524342cb25",
                     "506de2f08eebf7524342cb26",
                     "506de2f18eebf7524342cb27"

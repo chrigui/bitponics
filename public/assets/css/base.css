@@ -753,7 +753,7 @@ label {
   color: #fff;
 }
 .data-module.warning {
-  background-color: color-warning;
+  background-color: #fac400;
 }
 .data-module .main-heading,
 .data-module .message,
@@ -951,7 +951,7 @@ button.btn:hover {
  */
 .ring-graph svg path {
   stroke: #fff;
-  stroke-width: 1;
+  stroke-width: 2;
 }
 .ring-graph svg .on,
 .ring-graph svg .good {
@@ -963,6 +963,9 @@ button.btn:hover {
 }
 .ring-graph svg .bad {
   fill: #fac400;
+}
+.ring-graph svg .active {
+  mask: url("#svg-active-mask");
 }
 /*
  * controls
@@ -1014,9 +1017,26 @@ button.btn:hover {
 /*
  * Phase Visualizer
  */
-#phases-graph svg {
+.phases-graph {
+  position: relative;
+}
+.phases-graph svg {
   display: inline-block;
   vertical-align: top;
+  cursor: pointer;
+}
+.phases-graph .icon-glyphlogo-new {
+  display: block;
+  position: absolute;
+  font-size: 2em;
+  width: 1em;
+  height: 1em;
+  top: 50%;
+  left: 50%;
+  margin-left: -0.53em;
+  margin-top: -0.7em;
+  color: #00e36c;
+  cursor: pointer;
 }
 section.footer {
   clear: both;
@@ -1174,6 +1194,12 @@ nav.open {
   border-top: 1px solid #fff;
   padding: 2em 0 0 12em;
   line-height: 1.5em;
+}
+.spinner {
+  position: absolute !important;
+  right: 0 !important;
+  top: 14px;
+  margin-right: 17px;
 }
 /*
  * Overlay
@@ -1495,6 +1521,7 @@ nav.open {
 .dashboard .date {
   margin-bottom: 0;
   border: 0 none;
+  position: relative;
 }
 .circle {
   margin: 1.5em 0;
@@ -1606,6 +1633,9 @@ li
   padding: 0.45em 0;
   margin: 0 0 1em;
 }
+.app-page .header header {
+  max-width: 120em;
+}
 .app-page .header .nav-section {
   padding: 0;
 }
@@ -1622,7 +1652,7 @@ li
   display: none;
 }
 .app-page .main {
-  max-width: 60em;
+  max-width: 120em;
   margin: 0 auto;
   overflow: hidden;
   width: 95%;

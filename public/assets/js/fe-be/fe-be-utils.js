@@ -149,6 +149,23 @@ define(['moment'], function(moment){
   };
 
 
+  
+  /**
+   * Get the localized time of day in milliseconds
+   * 
+   * Relies on browser behavior of giving localized values for date methods
+   * 
+   * @param {Date} date
+   * @return {Number} milliseconds since localized 00:00:00 of the day
+   */
+  utils.getTimeOfDayInMilliseconds = function(date){
+    return ( 
+      (date.getHours() * 60 * 60 * 1000) + 
+      (date.getMinutes() * 60 * 1000) +
+      (date.getSeconds() * 1000)
+    );
+  };
+
   /**
    * Generate an array with the times of day in :30 minute increments, along with milliseconds since start of day (00:00)
    */

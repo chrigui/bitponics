@@ -248,11 +248,18 @@ DeviceSchema.method('refreshStatus', function(callback) {
           }
         )[0];
 
-        // get the actions that have a control reference & a cycle definition & are repeating
+        // get the actions that have a control reference & a cycle definition & are repeating & a mapped outputId
         var actions = activeGrowPlanPhase.actions || [];
         actions = actions.filter(
           function(action){ 
-            return !!action.control && !!action.cycle && !!action.cycle.repeat; 
+            return (
+              !!action.control && 
+              !!action.cycle && 
+              !!action.cycle.repeat && 
+              device.outputMap.some(function(controlOutputPair){
+                return action.control.equals(controlOutputPair.control);
+              })
+            );
           }
         );
 
@@ -324,7 +331,12 @@ DeviceSchema.method('refreshStatus', function(callback) {
 
           // ok, now we're clean.
           // replace device.status.immediateActions with the result set
-          newDeviceStatus.immediateActions = immediateActionResults;
+          newDeviceStatus.immediateActions = immediateActionResults.filter(function(immediateAction){
+            var action = immediateAction.action;
+            return device.outputMap.some(function(controlOutputPair){
+              return action.control.equals(controlOutputPair.control);
+            });
+          });
 
           if (newDeviceStatus.expires > soonestImmediateActionExpiration){
             newDeviceStatus.expires = soonestImmediateActionExpiration;

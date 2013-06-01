@@ -43,7 +43,9 @@ define(
             }
             $scope.currentPage = 0;
             // now group by pages
-            $scope.groupToPages();
+            if ($scope.filteredItems) {
+              $scope.groupToPages();
+            }
           };
 
           // calculate page in place
