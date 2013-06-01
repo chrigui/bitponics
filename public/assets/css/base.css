@@ -1551,9 +1551,9 @@ nav.open {
   padding-top: 1.5em;
 }
 .single-page .footer {
-  background: none;
-  height: auto;
-  min-height: auto;
+  background: none !important;
+  height: auto !important;
+  min-height: 10em !important;
   padding: 0;
   font-size: 1em;
 }
