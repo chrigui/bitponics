@@ -42,7 +42,7 @@ var SensorMapSchema = new Schema({
 { id : false, _id : false });
 
 var OutputMapSchema = new Schema({
-  control : { type: ObjectIdSchema, ref: 'Control' },
+  control : { type: ObjectIdSchema, ref: 'Control', required : false }, // could have an unassigned output
   outputId : { type: String }
 },
 { id : false, _id : false });
@@ -460,10 +460,10 @@ DeviceSchema.method('getStatusResponse', function(callback) {
           }
         );
         
-        statusResponseBody += "STATES=" + statesResponseBody;
+        statusResponseBody += "STATES=" + statesResponseBody + "\n";
         
         if (device.status.calibrationMode){
-          statusResponseBody += "\nCALIB_MODE=" + device.status.calibrationMode;
+          statusResponseBody += "CALIB_MODE=" + device.status.calibrationMode + "\n";
         }
         
         statusResponseBody += String.fromCharCode(7);
