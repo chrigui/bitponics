@@ -154,9 +154,13 @@ module.exports = {
   checkResourceReadAccess : function(resource, user){
     // return true if public, or user is in allowed list, or user is admin.
     // else, return false
-    return ( (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC) ||
-              resource.owner.equals(user._id) || 
-              resource.users.some(function(resourceUser){ return resourceUser.equals(user._id);}) ||
+    if (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC){
+      return true;
+    }
+    if (!user._id){ return false; }
+    var userId = user._id;
+    return (  resource.owner.equals(userId) || 
+              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) ||
               req.user.admin
         );
   },

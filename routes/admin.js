@@ -97,12 +97,15 @@ module.exports = function(app){
     });
 	});
 
+	
 	app.post('/admin/photos/upload', function (req, res, next){
 		var PhotoModel = require('../models/photo').model,
 			s3Config = require('../config/s3-config'),
 			knox = require('knox'),
 			knoxClient = knox.createClient(s3Config),
-			fs = require('fs');
+			fs = require('fs'),
+			requirejs = require('../lib/requirejs-wrapper'),
+  		feBeUtils = requirejs('fe-be-utils');
 
 		// to send the photo back as the response:
 		//res.sendfile(req.files.photo.path);
@@ -117,7 +120,8 @@ module.exports = function(app){
 			type : photo.type,
 			date : photo.lastModifiedDate || now,
 			size : photo.size,
-			tags : []
+			tags : [],
+			visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
 		});
 
 		knoxClient.putFile(
@@ -142,56 +146,7 @@ module.exports = function(app){
     );
 	});
 
-	app.get('/admin/photos/:photoId', function (req, res, next){
-		var PhotoModel = require('../models/photo').model,
-				GrowPlanInstanceModel = require('../models/growPlanInstance').model,
-				routeUtils = require('./route-utils'),
-				s3Config = require('../config/s3-config'),
-				s3Policy = require('s3policy'),
-				policyGenerator = new s3Policy(s3Config.key, s3Config.secret),
-				expirationSeconds = 10,
-				// Create a fast-expiring signed S3 url
-				// http://www.arbitrarytech.com/2013/03/nodejs-library-for-client-side-uploads.html
-				url = policyGenerator.readPolicy(s3Config.photoPathPrefix + req.params.photoId, s3Config.bucket, expirationSeconds);
+	
 
-		async.waterfall(
-			[
-				function checkAuth(innerCallback){
-					PhotoModel.findById(req.params.photoId)
-					.select('owner gpi visibility')
-					.exec(function(err, photoResult){
-						if (err) { return innerCallback(err); }
-						if (!photoResult){ return innerCallback(new Error("Invalid photo id"));}
-						if (routeUtils.checkResourceReadAccess(photoResult, req.user)){
-							return innerCallback(null, true);
-						}
-						// fallback to checking the GPI
-						if (photoResult.gpi){
-							GrowPlanInstanceModel.findById(photoResult.gpi)
-							.select('owner users visibility')
-							.exec(function(err, growPlanResult){
-								if (err) { return innerCallback(err); }
-								return innerCallback(null, routeUtils.checkResourceReadAccess(photoResult, req.user));
-							});
-						} 
-						else {
-							return innerCallback(null, false);
-						}
-					});
-				}
-			],
-			function (err, isAuthorized){
-				if (err) { return next(err); }
-				if (isAuthorized){
-					// let the browser cache for expirationSeconds
-					res.setHeader("Expires", (new Date(Date.now() + (expirationSeconds * 1000))).toUTCString());
-					return res.redirect(302, url);	
-				} else {
-					// TODO : create a stylized 401 page
-					return res.send(401);	
-				}
-			}
-		);
-	});
 
 };
