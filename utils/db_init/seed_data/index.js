@@ -13,8 +13,8 @@ var data = {
 	actions: require('./actions'),
 	growPlans: require('./growPlans'),
 	growPlanInstances: require('./growPlanInstances'),
+	photos: require('./photos'),
 	sensorLogs: require('./sensorLogs'),
-	photoLogs: require('./photoLogs'),
 	tagLogs: require('./tagLogs')
 };
 

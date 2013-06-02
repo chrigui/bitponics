@@ -1,0 +1,15 @@
+extends ../layout
+
+block head
+  style
+    a {
+      display:block;text-decoration:underline;
+    }
+
+block content
+  h1 Upload a Photo
+  form(action="/admin/photos/upload", method="post", enctype="multipart/form-data")
+    input(type="file", name="photo", accept="image/*")
+    input(type="submit", value="Submit") 
+
+  

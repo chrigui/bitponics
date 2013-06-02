@@ -83,6 +83,7 @@ IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
     }
 });
 
+
 /************************** END INSTANCE METHODS  ***************************/
 
 

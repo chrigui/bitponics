@@ -20,7 +20,7 @@ var now = Date.now();
 // GPI
 // SensorLogs : (minutes in a day / log frequency in minutes) * 365)
 // TagLogs : 365
-// PhotoLogs: 24 * 365
+// Images: 24 * 365
 // ImmediateActions
 
 var minuteFrequency = 15;
