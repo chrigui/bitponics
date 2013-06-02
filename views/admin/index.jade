@@ -7,7 +7,7 @@ block head
     }
 
 block content
-  h1 Admin Panel
+  h1 Bitponics' Greatly Powerful Admin Panel
   form(action="/admin/trigger_clearPendingNotifications")
     input(type="submit", value="Trigger clearPendingNotifications") 
   form(action="/admin/trigger_scanForPhaseChanges")
@@ -16,6 +16,6 @@ block content
     a(href='/admin/add-device') Add Device
     a(href='/admin/generate-sample-device-request') Generate device request
     a(href='/admin/photos') View All Photo Data
-    a(href='/admin/photos?s3') View All S3 Photo Data
+    a(href='/admin/photos?s3=true') View All S3 Photo Data
     a(href='/admin/photos/upload') Upload a Photo
   

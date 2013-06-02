@@ -334,6 +334,7 @@ module.exports = function(app){
   require('./demo')(app);
   require('./gardens')(app);
   require('./guides')(app);
+  require('./photos')(app);
 	require('./reset')(app);
   require('./setup')(app);
   require('./sockets')(app);
