@@ -90,11 +90,12 @@ module.exports = function(app){
 	app.post('/admin/trigger_processUnreadEmailPhotos', function (req, res) {
 	  var emailFetcher = require('../utils/email-photo-fetcher');
 
-	  emailFetcher.processUnreadEmails(function(err){
+	  emailFetcher.processUnreadEmails(function(err, photos){
+	  	console.log("processUnreadEmails result ", err, photos);
 	  	if (err){
 	  		return res.send(500, err);
 	  	}
-	  	return res.send(200, 'success');
+	  	return res.send(200, photos);
 	  });
 	});	
 	
@@ -146,7 +147,7 @@ module.exports = function(app){
 		// to send the photo back as the response:
 		//res.sendfile(req.files.photo.path);
 
-		PhotoModel.createS3BackedPhoto(
+		PhotoModel.createAndStorePhoto(
 			{
 				owner : req.user,
 				originalFileName : photo.name,

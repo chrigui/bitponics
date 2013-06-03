@@ -94,7 +94,7 @@ PhotoSchema.index({ 'gpi ts': -1 });
  * @param {string} options.streamPath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
  * @param {bool=} options.preserveStreamPath : optional. If true, file at options.streamPath is left alone after upload. If omitted or false, file is deleted after uplaod.
  */
-PhotoSchema.static("createS3BackedPhoto",  function(options, callback){
+PhotoSchema.static("createAndStorePhoto",  function(options, callback){
   if (options.contentType.indexOf("image") !== 0){
     return callback(new Error("Invalid photo conten type " + options.contentType));
   }
@@ -118,19 +118,29 @@ PhotoSchema.static("createS3BackedPhoto",  function(options, callback){
       visibility : (options.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
     }),
     knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
-    knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath);
+    knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath),
+    knoxHeaders = {
+      'Content-Type': photo.type, 
+      'x-amz-acl': 'private'
+    };
+
+    if (options.size){
+      knoxHeaders["Content-Length"] = options.size;
+    }
+
+    console.log("DATE", options.date, photo.date);
 
     knoxClient[knoxMethod](
       knoxMethodArgument,
       s3Config.photoPathPrefix + photo._id.toString(), 
-      { 'Content-Type': photo.type, 'x-amz-acl': 'private' }, 
+      knoxHeaders, 
       function(err, result) {
         if (err) { return callback(err);  }
       
         if (result.statusCode !== 200) {
           return callback(new Error("Status " + result.statusCode + " from S3"));
         }
-          
+
         if (knoxMethod === 'putFile' && !options.preserveStreamPath){
           // Delete the file from disk
           fs.unlink(options.streamPath);

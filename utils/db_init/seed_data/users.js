@@ -147,5 +147,17 @@ module.exports = [ //default pw is "8bitpass" for all init users
 		        "private": "7f27ad4bf71ae693",
 		        "verified": true,
 		    }]
+		},
+		{
+			_id : "51ac0117a3b04db08057e04a",
+			email : "anderson.foote@hyatt.com",
+			name : {
+				first : "Anderson",
+				last : "Foote"
+			},
+			active : true,
+			locale : "en_US",
+			activationToken : "12345678900",
+			sentEmail : true
 		}
 	];

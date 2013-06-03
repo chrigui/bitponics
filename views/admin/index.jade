@@ -3,15 +3,22 @@ extends ../layout
 block head
   style
     a {
-      display:block;text-decoration:underline;
+      display:block;
+      text-decoration:underline;
     }
 
 block content
   h1 Bitponics' Greatly Powerful Admin Panel
-  form(action="/admin/trigger_clearPendingNotifications")
+  
+  form(action="/admin/trigger_clearPendingNotifications", method="POST")
     input(type="submit", value="Trigger clearPendingNotifications") 
-  form(action="/admin/trigger_scanForPhaseChanges")
+  
+  form(action="/admin/trigger_scanForPhaseChanges", method="POST")
     input(type="submit", value="Trigger scanForPhaseChanges")
+  
+  form(action="/admin/trigger_processUnreadEmailPhotos", method="POST")
+    input(type="submit", value="Trigger processUnreadEmailPhotos")
+
   div
     a(href='/admin/add-device') Add Device
     a(href='/admin/generate-sample-device-request') Generate device request
