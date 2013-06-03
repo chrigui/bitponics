@@ -4,15 +4,16 @@ var async = require('async'),
 	ModelUtils = require('../models/utils');
 	
 module.exports = function(app){
-	/*
-	 * Admin
-	 * Require authenticated user with property admin=true
+	
+	/**
+	 * Intercept all admin routes and require authenticated user with property admin=true
 	 */
 	app.all('/admin*',
 		routeUtils.middleware.ensureSecure, 
 		routeUtils.middleware.ensureUserIsAdmin);
 
-	/* 
+
+	/**
 	 * Admin landing
 	 */
 	app.get('/admin', function (req, res) {
@@ -23,54 +24,83 @@ module.exports = function(app){
 	});
 
 	
+	/**
+	 * 
+	 */
   app.get('/admin/generate-sample-device-request', function (req, res) {
     res.render('admin/generate-sample-device-request', {
       title: 'Bitponics Admin'
     })
   });
 
+
+  /**
+	 * 
+	 */
   app.get('/admin/add-device', function (req, res) {
 	  res.render('admin/add-device', {
 	    title: 'Bitponics Admin'
 	  })
 	});
 
+
+  /**
+	 * 
+	 */
   app.post('/admin/add-device', function (req, res) {
     res.render('admin/add-device', {
       title: 'Bitponics Admin',
       creationStatus : 'success'
     })
   });
-		
+	
+
+	/**
+	 * 
+	 */
 	app.post('/admin/trigger_clearPendingNotifications', function (req, res) {
 	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err){
 	  	if (err) { 
 	  		winston.error(err); 
-	  		res.status(500);
-	        res.send('error');
-	        return;
+	  		return res.send(500, err);
 	  	}
-	  	res.status(200);
-	  	res.send('success');
-	  	return;
+	  	return res.send(200, 'success');
 	  });
 	});	
 
+	
+	/**
+	 * 
+	 */
 	app.post('/admin/trigger_scanForPhaseChanges', function (req, res) {
 	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
 	  	if (err) { 
 	  		winston.error(err); 
-	  		res.status(500);
-	        res.send('error');
-	        return;
+	  		return res.send(500, err);
 	  	}
-	  	res.status(200);
-	  	res.send('success');
-	  	return;
+	  	return res.send(200, 'success');
 	  });
 	});
 
 
+
+	/**
+	 * 
+	 */
+	app.post('/admin/trigger_processUnreadEmailPhotos', function (req, res) {
+	  var emailFetcher = require('../utils/email-photo-fetcher');
+
+	  emailFetcher.processUnreadEmails(function(err){
+	  	if (err){
+	  		return res.send(500, err);
+	  	}
+	  	return res.send(200, 'success');
+	  });
+	});	
+	
+	/**
+	 * Get listing of all photos in database or S3
+	 */
 	app.get('/admin/photos', function (req, res, next){
 		var PhotoModel = require('../models/photo').model,
 			s3Config = require('../config/s3-config'),
@@ -91,6 +121,10 @@ module.exports = function(app){
 	});
 
 
+	
+	/**
+	 * Get the photo upload form
+	 */
 	app.get('/admin/photos/upload', function (req, res){
 		res.render('admin/upload-photo', {
       title: 'Bitponics Admin'
@@ -98,52 +132,36 @@ module.exports = function(app){
 	});
 
 	
+	
+	/**
+	 * Process an uploaded photo by uploading it to S3 and storing a 
+	 * Photo document
+	 */
 	app.post('/admin/photos/upload', function (req, res, next){
 		var PhotoModel = require('../models/photo').model,
-			s3Config = require('../config/s3-config'),
-			knox = require('knox'),
-			knoxClient = knox.createClient(s3Config),
-			fs = require('fs'),
-			requirejs = require('../lib/requirejs-wrapper'),
-  		feBeUtils = requirejs('fe-be-utils');
+			photo = req.files.photo,
+			now = new Date();
+
 
 		// to send the photo back as the response:
 		//res.sendfile(req.files.photo.path);
 
-		var photo = req.files.photo,
-				now = new Date();
-
-		var photoDocument = new PhotoModel({
-			owner : req.user,
-			originalFileName : photo.name,
-			name : photo.name,
-			type : photo.type,
-			date : photo.lastModifiedDate || now,
-			size : photo.size,
-			tags : [],
-			visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
-		});
-
-		knoxClient.putFile(
-			photo.path, 
-			s3Config.photoPathPrefix + photoDocument._id.toString(), 
-			{ 'Content-Type': photo.type, 'x-amz-acl': 'private' }, 
-    	function(err, result) {
-      	if (err) { return next(err);  }
-      
-        if (result.statusCode === 200) {
-        	// Delete the file from disk
-        	fs.unlink(photo.path);
-
-        	//res.send(result);
-        	photoDocument.save(function(err, savedImage){
-        		if (err) { return next(err); }
-
-        		return routeUtils.sendJSONResponse(res, 200, { data : savedImage });
-        	});
-        }
-      }
-    );
+		PhotoModel.createS3BackedPhoto(
+			{
+				owner : req.user,
+				originalFileName : photo.name,
+				name : photo.name,
+				contentType : photo.type,
+				date : photo.lastModifiedDate || (new Date()),
+				size : photo.size,
+				visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC),
+				streamPath : photo.path
+			},
+			function(err, photo){
+				if (err) { return next(err); }
+				return routeUtils.sendJSONResponse(res, 200, { data : photo });				
+			}
+		);
 	});
 
 	

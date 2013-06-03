@@ -12,6 +12,12 @@ var async = require('async'),
 	
 
 module.exports = function(app){
+	
+	/**
+	 * Route to retrieve any user-uploaded photo.
+	 * Verifies that the requesting user has access to the photo.
+	 * Returns a redirect to the image asset on S3
+	 */
 	app.get('/photos/:photoId', function (req, res, next){
 			
 		async.waterfall(
@@ -23,8 +29,6 @@ module.exports = function(app){
 					.exec(function(err, photoResult){
 						if (err) { return innerCallback(err); }
 						if (!photoResult){ return innerCallback(new Error("Invalid photo id"));}
-						
-						console.log(photoResult);
 						
 						if (routeUtils.checkResourceReadAccess(photoResult, req.user)){
 							return innerCallback(null, true);
