@@ -111,7 +111,8 @@ module.exports = function(app){
     // }
 
 
-    require('./mongoose-connection').open(app.settings.env, function(mongooseConnection){
+    require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
+      if (err) { winston.error(err.toString()); }
 
 	    app.config.mongooseConnection = mongooseConnection;
 

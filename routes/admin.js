@@ -88,9 +88,10 @@ module.exports = function(app){
 	 * 
 	 */
 	app.post('/admin/trigger_processUnreadEmailPhotos', function (req, res) {
-	  var emailFetcher = require('../utils/email-photo-fetcher');
+	  var PhotoModel = require('../models/photo').model,
+	  	emailFetcher = require('../utils/email-photo-fetcher');
 
-	  emailFetcher.processUnreadEmails(function(err, photos){
+	  emailFetcher.processUnreadEmails(PhotoModel, function(err, photos){
 	  	console.log("processUnreadEmails result ", err, photos);
 	  	if (err){
 	  		return res.send(500, err);

@@ -1,5 +1,5 @@
 /**
- * Used to log completed calibrations.
+ * Logs for completed calibrations.
  */
 
  

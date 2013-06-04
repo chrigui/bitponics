@@ -1,3 +1,8 @@
+/**
+ * Logs for calibration statuses as posted by device.
+ */
+
+
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
