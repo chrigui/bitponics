@@ -836,7 +836,6 @@ async.series([
               active: _data.active,
               phases: _data.phases,
               recentSensorLogs: _data.recentSensorLogs,
-              recentPhotoLogs: _data.recentPhotLogs,
               recentTagLogs: _data.recentTagLogs
             },
             function(err, doc){
@@ -858,7 +857,6 @@ async.series([
            active: _data.active,
            phases: _data.phases,
            recentSensorLogs: _data.recentSensorLogs,
-           recentPhotoLogs: _data.recentPhotLogs,
            recentTagLogs: _data.recentTagLogs
            });
 

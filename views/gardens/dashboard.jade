@@ -20,7 +20,7 @@ block content
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
-        div(ng-repeat="sensor in sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)")
+        div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
@@ -40,9 +40,8 @@ block content
       div.content-module.side.separator-top
         div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls")
           h2.page-heading-small Accessories
-          div(ng-repeat="controlAction in growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+          div(ng-repeat="controlAction in sharedDataService.growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
             h3 {{controlAction.control.name}}
-
             div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
             div
               div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
@@ -98,5 +97,4 @@ block footer-scripts
     bpn.pageData.growPlanInstance = !{JSON.stringify(growPlanInstance)};
     bpn.pageData.sensors = !{JSON.stringify(sensors)};
     bpn.pageData.controls = !{JSON.stringify(controls)};
-    bpn.pageData.latestSensorLogs = !{JSON.stringify(latestSensorLogs)};
     bpn.pageData.notifications = !{JSON.stringify(notifications)};

@@ -77,7 +77,7 @@ module.exports = function(app) {
 	      phases: req.body.phases,
 	      recentSensorLogs: req.body.recentSensorLogs,
 	      controlLogs: req.body.controlLogs,
-	      photoLogs: req.body.photoLogs,
+	      images: req.body.images,
 	      genericLogs: req.body.genericLogs
 	    });
 	    growPlanInstance.save(function (err) {
@@ -195,7 +195,6 @@ module.exports = function(app) {
    * 
    * @param {Date=} req.params.start-date (optional) Should be something parse-able by moment.js
    * @param {Date=} req.params.end-date (optional) Should be something parse-able by moment.js
-   * @param {String=} req.params.timezone (optional) : Optionally set the timezone to use for the date filtering. If unset, uses the GPI owner's timezone
    * @param {string} req.params.sCode (optional)
    * @param {Number} req.params.limit
    *
@@ -215,12 +214,15 @@ module.exports = function(app) {
       	return res.send(401, "The grow plan instance is private and only the owner may access its data.");
       }
 
-      var startDate = req.param('start-date'),
-      		endDate = req.param('end-date'),
-      		limit = req.param('limit') || 200,
-      		skip = req.param('skip'),
-      		sCode = req.param('sCode'),
+      var startDate = req.query['start-date'],
+      		endDate = req.query['end-date'],
+      		limit = req.query['limit'] || 200,
+      		skip = req.query['skip'],
+      		sCode = req.query['sCode'],
       		query = SensorLogModel.find({ gpi : growPlanInstance._id });
+
+      // cap the limit at 200
+      if (limit > 200) { limit = 200; }
 
     	query.sort('-ts');
     	query.select('ts l'); // don't need to get the gpi in this query. already know it!

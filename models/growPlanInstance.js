@@ -162,17 +162,6 @@ var GrowPlanInstanceSchema = new Schema({
 	recentSensorLogs: [SensorLogSchema],
 	
 	/**
-	 * Photo logs for the past 24 hours
-	 */
-	recentPhotoLogs: [{
-		ts: { type: Date, required: true, default: Date.now },
-		logs : [{
-			url: { type : mongoose.SchemaTypes.Url, required: true},
-			tags: { type : [String]}
-		}]
-	}],
-	
-	/**
 	 * Tag Logs for the past 24 hours
 	 */
 	recentTagLogs: [{
@@ -995,10 +984,6 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 	
 
 	this.recentSensorLogs.forEach(function(log){
-		if (log.ts < cutoff) { logsToRemove.push(log); }
-	});
-
-	this.recentPhotoLogs.forEach(function(log){
 		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
 

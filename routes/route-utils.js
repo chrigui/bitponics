@@ -133,7 +133,7 @@ module.exports = {
    * @param {Number=} options.count : Required if options.statusCode == 200. Total count of results matching query
    * @param {Number=} options.limit : Required if options.statusCode == 200. Limit on the number of results returned
    * @param {Number=} options.skip : Required if options.statusCode == 200. Number of results skipped in the query
-   * @param {Error|String=} options.error : Required if options.stausCode != 200
+   * @param {Error|String=} options.error : Required if options.statusCode != 200
    */
   sendJSONResponse : function(res, statusCode, options){
     res.send(statusCode, options);
@@ -154,9 +154,13 @@ module.exports = {
   checkResourceReadAccess : function(resource, user){
     // return true if public, or user is in allowed list, or user is admin.
     // else, return false
-    return ( (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC) ||
-              resource.owner.equals(user._id) || 
-              resource.users.some(function(resourceUser){ return resourceUser.equals(user._id);}) ||
+    if (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC){
+      return true;
+    }
+    if (!user._id){ return false; }
+    var userId = user._id;
+    return (  resource.owner.equals(userId) || 
+              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) ||
               req.user.admin
         );
   },

@@ -232,7 +232,9 @@ module.exports = function(app) {
               if (!device){ 
                 return next(new Error('Attempted to log to a nonexistent device'));
               }
-              pendingSensorLog.deviceId = id;
+              if (pendingSensorLog){
+                pendingSensorLog.deviceId = id;  
+              }
               return callback(err, device);
             });
           },
@@ -266,7 +268,6 @@ module.exports = function(app) {
                 },
                 function logCalibrationStatusLog(innerCallback){
                   if (!calibrationStatusLog){
-                    winston.info('/status no calibration status log');
                     return innerCallback();
                   }
                   calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();

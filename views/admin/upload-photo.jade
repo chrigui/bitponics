@@ -1,0 +1,25 @@
+extends ../layout
+
+block head
+  style
+    a {
+      display:block;text-decoration:underline;
+    }
+    input[type=checkbox] {
+      display:inline-block;
+      height:auto;
+      width:auto;
+      opacity:1;
+      visibility:visible;
+    }
+block content
+  h1 Upload a Photo
+  form(action="/admin/photos/upload", method="post", enctype="multipart/form-data")
+    input(type="file", name="photo", accept="image/*")
+    label 
+      | Private?
+      input(type="checkbox", name="private", value="Private") 
+      
+    input(type="submit", value="Submit") 
+
+  
