@@ -1256,6 +1256,20 @@ nav.open {
   color: #fff !important;
   background: #00e36c !important;
 }
+.overlay .overlay-contain {
+  position: relative;
+}
+.overlay .overlay-contain .close {
+  position: absolute;
+  height: 1em;
+  top: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+}
+.overlay .overlay-contain .close i {
+  height: 2em;
+}
 /*
  * Home Page
  */
@@ -1503,10 +1517,10 @@ nav.open {
  * Dashboard Page
  */
 .dashboard .content-module.middle {
-  width: 50%;
+  width: 60%;
 }
 .dashboard .content-module.side {
-  width: 25%;
+  width: 20%;
 }
 .dashboard .page-heading-small {
   color: #999;
@@ -1522,6 +1536,18 @@ nav.open {
   margin-bottom: 0;
   border: 0 none;
   position: relative;
+}
+.dashboard .overlay {
+  height: auto;
+  left: 24%;
+  top: 9em;
+  width: 40%;
+  overflow: hidden;
+}
+.dashboard .overlay .page-heading {
+  font-size: 2em;
+  text-align: left;
+  margin: 0 0.5em 0;
 }
 .circle {
   margin: 1.5em 0;

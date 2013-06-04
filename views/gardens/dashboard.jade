@@ -12,8 +12,7 @@ block content
   
   section#main(role="main", class="main", ng-cloak)
     div(ng-controller="bpn.controllers.dashboard.Main")
-      h2.page-heading(ng-cloak)
-        | {{growPlanInstance.name}}
+      h2.page-heading(ng-cloak) {{sharedDataService.growPlanInstance.name}}
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
         h2.page-heading-small.date {{sharedDataService.activeDate.date | date:'longDate'}}
@@ -45,7 +44,7 @@ block content
             div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
             div
               div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
-                div(ng-controller="bpn.controllers.SelectionOverlay")
+                div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
                   div(class="close btn", ng-click="close()")
                     | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
                   h3(class="page-heading page-heading-small") {{controlAction.control.name}}
