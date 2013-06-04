@@ -53,6 +53,11 @@ var PhotoSchema = new Schema({
 PhotoSchema.plugin(mongoosePlugins.useTimestamps);
 PhotoSchema.plugin(mongoosePlugins.visibility);
 
+
+PhotoSchema.index({ 'gpi ts': -1 });
+
+
+
 /*************** SERIALIZATION *************************/
 
 
@@ -74,11 +79,11 @@ PhotoSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-PhotoSchema.index({ 'gpi ts': -1 });
 
 
 
 
+/*************** STATIC METHODS *************************/
 
 /**
  *
@@ -151,6 +156,8 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
     );
   }
 );
+
+/*************** END STATIC METHODS *************************/
 
 
 
