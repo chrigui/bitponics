@@ -409,7 +409,7 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
         );
       },
       function growPlanInstancesAllDone(err){
-        return callback(err);
+        return callback(err, growPlanInstanceResults.length);
       }
     );
   });
@@ -434,6 +434,10 @@ function clearPendingNotifications (NotificationModel, callback){
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf();
+
+
+  // TEMP HACK : disabling emails til they're re-implemented with templates
+  return callback();
 
   NotificationModel
   .find()

@@ -1,4 +1,12 @@
-var Imap = require('imap'),
+
+
+
+module.exports = {
+	processUnreadEmails : function(PhotoModel, callback){
+
+
+
+		var Imap = require('imap'),
 		mailparser = require('mailparser'),
 		async = require('async'),
 		fs = require('fs'),
@@ -12,13 +20,13 @@ var Imap = require('imap'),
       secure: true
     },
 		imap = new Imap(imapConfig),
-    PhotoModel = require('../models/photo').model,
+    //PhotoModel = require('../models/photo').model,
     tmpDirectory = __dirname + '/../tmp/',
     allowedSenders = ["amit@bitponics.com", "michael@bitponics.com", "jack@bitponics.com", "accounts@bitponics.com"];
 
 
-module.exports = {
-	processUnreadEmails : function(callback){
+
+
 		imap.connect(function(err) {
 		  if (err) { return callback(err); }
 

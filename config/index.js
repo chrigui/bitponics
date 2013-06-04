@@ -25,8 +25,6 @@ module.exports = function(app, callback) {
   
   winston.info('Connecting to mongoose');
 	
-  require('./mongoose-connection').open(app.settings.env, callback);
-
   winstonConfig.setupLoggly(app.settings.env);
 
   appDomain = appDomain || appDomains[app.settings.env];
@@ -70,6 +68,8 @@ module.exports = function(app, callback) {
 
     app.socketIOs.push(app.config.https.io);
   }
+
+  require('./mongoose-connection').open(app.settings.env);
 
   require('./auth-config')(app);
   require('./app-config')(app);
