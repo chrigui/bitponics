@@ -227,7 +227,13 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.DayOverview',
       [
         '$scope',
-        function ($scope) {
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
           // TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 
           $scope.getIdealRangeForSensor = function (sensor, date) {
@@ -313,8 +319,10 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.Controls',
       [
         '$scope',
-        function ($scope) {
-          // TODO: Add functions to handle interactions with control widgets. Launch control overlay.
+        'sharedDataService',
+        function ($scope, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
+
         }
       ]
     );
@@ -352,7 +360,17 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.SensorDetailOverlay',
       [
         '$scope',
-        function ($scope) {
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.idealRanges = {}
+          $scope.sharedDataService.growPlanInstance.activePhase.phase.idealRanges.forEach(function(idealRange) {
+            $scope.idealRanges[idealRange.sCode] = idealRange;
+          });
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
 
           $scope.drawSparkGraph = function (svgCont, setData, idealLow, idealHigh, belowResolution) {
             var width = 400;
@@ -640,7 +658,7 @@ require([
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
         controller : function ($scope, $element, $attrs, $transclude){
           $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);
@@ -651,6 +669,16 @@ require([
               return 'on';
             }
           };
+
+          $scope.iconMap = {
+            'seedlingheatmat' : 'icon-18_seedling',
+            'humidifier' : 'icon-02_airtemperature',
+            'airconditioner' : 'icon-02_airtemperature',
+            'heater' : 'icon-02_airtemperature',
+            'fan' : 'icon-10_fan',
+            'waterpump' : 'icon-27_waterpump',
+            'light' : 'icon-12_light'
+          }
 
 
         },

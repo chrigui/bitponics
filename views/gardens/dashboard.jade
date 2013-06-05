@@ -21,7 +21,7 @@ block content
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
 
-        div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)")
+        div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)", ng-click="sharedDataService.activeOverlay = 'SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
@@ -29,11 +29,29 @@ block content
             div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
-            div.sensorcreen-reader-text {{sensor.code}}
+            div.sensor.screen-reader-text {{sensor.code}}
           //div.message #{warning ? 'Check' : 'OK'}
           div(class="settings icon")
             | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
             div.screen-reader-text Settings
+
+          div
+            div(modal="sharedDataService.activeOverlay=='SensorOverlay'+sensor.abbrev", close="close()", options="sharedDataService.modalOptions")
+              div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+                div(class="close btn", ng-click="close()")
+                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                h3(class="page-heading page-heading-small") {{sensor.name}}
+                div(ng-controller="bpn.controllers.dashboard.SensorDetailOverlay")
+                  div(class="overlay-data")
+                    div.left
+                      h4 Last Reading
+                      div.separator-top {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+                    div.right
+                      h4 Ideal Range
+                      div.separator-top {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
+                div.separator-top
+                  a(class="btn flush-left", href="/account/devices") Calibrate
+                
 
       div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
         div(data-bpn-directives-phases-graph)
@@ -50,19 +68,36 @@ block content
                   div(class="close btn", ng-click="close()")
                     | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
                   h3(class="page-heading page-heading-small") {{controlAction.control.name}}
-                  a.btn(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
-                  a.btn(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
+                  div(class="overlay-data", ng-show="controlAction.cycle.states.length > 1")
+                    div.left
+                      h4 Off cycle (mins)
+                      div.separator-top {{controlAction.cycle.states[0].duration}}
+                    div.right
+                      h4 On cycle (mins)
+                      div.separator-top {{controlAction.cycle.states[1].duration}}
+                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1")
+                    h4 This control does not cycle.
+                  p.clear-b
+                    {{controlAction.control.name}} is currently ???
+                  div.separator-top
+                    a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
+                    a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
           h2.page-heading-small Notifications
-          h3(ng-show="pastNotifications.length") Past
-          div(ng-repeat="notification in pastNotifications")
-            div.date {{notification.timeToSend | date:'medium'}}
-            div.title {{notification.title}}
-          h3(ng-show="impendingNotifications.length") Upcoming
-          div(ng-repeat="notification in impendingNotifications")
-            div.date {{notification.timeToSend | date:'medium'}}
-            div.title {{notification.title}}
+          div(class="page-heading-small smaller", ng-show="pastNotifications.length") Past
+          div(ng-repeat="notification in pastNotifications", class="past")
+            //- input(type="checkbox", model="notification._id", id="notification._id")
+            label(for="notification._id")
+              div.date {{notification.timeToSend | date:'medium'}}
+              div.title {{notification.title}}
+          div(class="page-heading-small smaller", ng-show="impendingNotifications.length") Upcoming
+          div(ng-repeat="notification in impendingNotifications", class="upcoming")
+            //- input(type="checkbox", model="notification._id", id="notification._id")
+            label(for="notification._id")
+              div.date {{notification.timeToSend | date:'medium'}}
+              div.title {{notification.title}}
+      
 
   svg(height='0')
     mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')

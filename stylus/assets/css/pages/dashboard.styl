@@ -15,6 +15,13 @@
 		&.side
 			width 20%
 
+	.data-module
+		.sensor-value
+			font-size: 3em;
+			line-height: 2em;
+			margin: 0 auto;
+			text-align: center;
+
 	select
 		// margin 0
 
@@ -31,6 +38,43 @@
 			text-align left
 			color color-text-gray
 			font-size .85em
+
+		.icon-glyph-new
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			vertical-align: middle;
+			top: 38%;
+			font-size: 1.5em;
+
+	.notifications
+		
+		.upcoming
+			color color-logo-green
+
+		.smaller
+			font-size 1em
+			border none
+		.data
+			font-size .75em
+		.title
+			font-size 1.3em
+			margin 0 0 1em
+
+		input[type="checkbox"]
+			@extends .display-ib
+			opacity 1
+			margin 1em 1em 0 0
+			height 1em
+			width 1em
+			font-size 1em
+		label
+			@extends .display-ib
+			position relative
+			top .75em
+			margin 0
+
+
 	.date
 		margin-bottom 0
 		border 0 none
@@ -43,10 +87,32 @@
 		width 40%
 		overflow hidden
 
+		.overlay-data
+			.left, .right
+				float left
+				width 45%
+				margin 0 5% 0 0
+
+				div
+					font-size 2em
+					color color-logo-green
+				p
+					margin-top 1.25em
+
+			h4
+				margin 1em 0 0
+
+
 		.page-heading
 			font-size: 2em;
 			text-align: left;
-			margin: 0 .5em 0;
+			// margin: 0 .5em 0;
+		
+		.flush-left
+			margin-left 0
+
+		.close
+			margin 0
 
 .circle
 	margin 1.5em 0

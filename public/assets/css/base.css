@@ -496,6 +496,8 @@ td {
 .featured-press a,
 .additional-press a,
 .dashboard .content-module,
+.dashboard .notifications input[type="checkbox"],
+.dashboard .notifications label,
 .growplans .edit-btn,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
@@ -1322,10 +1324,11 @@ nav.open {
   top: 0;
   right: 0;
   padding: 0;
-  margin: 0;
 }
 .overlay .overlay-contain .close i {
   height: 2em;
+  margin: 0;
+  overflow: hidden;
 }
 /*
  * Home Page
@@ -1584,6 +1587,12 @@ nav.open {
 .dashboard .content-module.side {
   width: 20%;
 }
+.dashboard .data-module .sensor-value {
+  font-size: 3em;
+  line-height: 2em;
+  margin: 0 auto;
+  text-align: center;
+}
 .dashboard .page-heading-small {
   color: #999;
   border-bottom: 1px solid #d8d8d8;
@@ -1597,6 +1606,42 @@ nav.open {
   color: #999;
   font-size: 0.85em;
 }
+.dashboard .control .icon-glyph-new {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  top: 38%;
+  font-size: 1.5em;
+}
+.dashboard .notifications .upcoming {
+  color: #00e36c;
+}
+.dashboard .notifications .smaller {
+  font-size: 1em;
+  border: none;
+}
+.dashboard .notifications .data {
+  font-size: 0.75em;
+}
+.dashboard .notifications .title {
+  font-size: 1.3em;
+  margin: 0 0 1em;
+}
+.dashboard .notifications input[type="checkbox"] {
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
+  margin: 1em 1em 0 0;
+  height: 1em;
+  width: 1em;
+  font-size: 1em;
+}
+.dashboard .notifications label {
+  position: relative;
+  top: 0.75em;
+  margin: 0;
+}
 .dashboard .date {
   margin-bottom: 0;
   border: 0 none;
@@ -1609,10 +1654,33 @@ nav.open {
   width: 40%;
   overflow: hidden;
 }
+.dashboard .overlay .overlay-data .left,
+.dashboard .overlay .overlay-data .right {
+  float: left;
+  width: 45%;
+  margin: 0 5% 0 0;
+}
+.dashboard .overlay .overlay-data .left div,
+.dashboard .overlay .overlay-data .right div {
+  font-size: 2em;
+  color: #00e36c;
+}
+.dashboard .overlay .overlay-data .left p,
+.dashboard .overlay .overlay-data .right p {
+  margin-top: 1.25em;
+}
+.dashboard .overlay .overlay-data h4 {
+  margin: 1em 0 0;
+}
 .dashboard .overlay .page-heading {
   font-size: 2em;
   text-align: left;
-  margin: 0 0.5em 0;
+}
+.dashboard .overlay .flush-left {
+  margin-left: 0;
+}
+.dashboard .overlay .close {
+  margin: 0;
 }
 .circle {
   margin: 1.5em 0;
