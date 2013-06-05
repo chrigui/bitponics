@@ -181,6 +181,10 @@ a:hover {
   font-size: 1em;
   margin: 0.35em 0;
 }
+.setup .unstyled-list {
+  list-style: none;
+  padding-left: 0;
+}
 .setup .list-style > li {
   font-size: 2.25em;
 }
