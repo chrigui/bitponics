@@ -338,8 +338,10 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.Controls',
       [
         '$scope',
-        function ($scope) {
-          // TODO: Add functions to handle interactions with control widgets. Launch control overlay.
+        'sharedDataService',
+        function ($scope, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
+
         }
       ]
     );
@@ -377,7 +379,13 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.SensorDetailOverlay',
       [
         '$scope',
-        function ($scope) {
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
 
           $scope.drawSparkGraph = function (svgCont, setData, idealLow, idealHigh, belowResolution) {
             var width = 400;

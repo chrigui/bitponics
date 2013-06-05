@@ -1265,10 +1265,11 @@ nav.open {
   top: 0;
   right: 0;
   padding: 0;
-  margin: 0;
 }
 .overlay .overlay-contain .close i {
   height: 2em;
+  margin: 0;
+  overflow: hidden;
 }
 /*
  * Home Page
@@ -1544,10 +1545,34 @@ nav.open {
   width: 40%;
   overflow: hidden;
 }
+.dashboard .overlay .cycle-text .left,
+.dashboard .overlay .cycle-text .right {
+  float: left;
+  width: 45%;
+  margin: 0 5% 0 0;
+}
+.dashboard .overlay .cycle-text .left div,
+.dashboard .overlay .cycle-text .right div {
+  font-size: 2em;
+  color: #00e36c;
+}
+.dashboard .overlay .cycle-text .left p,
+.dashboard .overlay .cycle-text .right p {
+  margin-top: 1.25em;
+}
+.dashboard .overlay .cycle-text h4 {
+  margin: 1em 0 0;
+}
 .dashboard .overlay .page-heading {
   font-size: 2em;
   text-align: left;
-  margin: 0 0.5em 0;
+}
+.dashboard .overlay .turn-off,
+.dashboard .overlay .turn-on {
+  margin-left: 0;
+}
+.dashboard .overlay .close {
+  margin: 0;
 }
 .circle {
   margin: 1.5em 0;
