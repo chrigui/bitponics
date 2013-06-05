@@ -98,7 +98,7 @@ async.eachSeries(
 		    var now = moment();
 		    console.log('Every 5 minutes, starting at ' + now.format());
 
-				async.each(
+				async.eachSeries(
 		    	environments,
 		    	function(env, iteratorCallback){
 		    		ModelUtils.clearPendingNotifications(notificationModels[env], function(err, count){

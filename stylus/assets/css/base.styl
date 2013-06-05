@@ -4,6 +4,7 @@
 @import "./global/icons"
 @import "helpers"
 @import "./global/colors"
+@import "./global/effects"
 
 html
 	min-height 100%
@@ -606,11 +607,38 @@ nav
 	// 	font-size 6.5em
 	// 	line-height 1em
 
-.spinner 
-	position absolute !important
-	right 0 !important
-	top 14px
-	margin-right 17px
+// .spinner 
+// 	position absolute !important
+// 	right 0 !important
+// 	top 14px
+// 	margin-right 17px
+
+
+
+.spinner {
+	width 1em
+	-webkit-animation: spin 0.5s infinite linear;
+	-moz-animation: spin 0.5s infinite linear;
+	-o-animation: spin 0.5s infinite linear;
+	-ms-animation: spin 0.5s infinite linear;
+	animation: spin 0.5s infinite linear;
+}
+@-webkit-keyframes spin {
+0% { -webkit-transform: rotate(0deg);}
+100% { -webkit-transform: rotate(360deg);}
+}
+@-moz-keyframes spin {
+0% { -moz-transform: rotate(0deg);}
+100% { -moz-transform: rotate(360deg);}
+}
+@-o-keyframes spin {
+0% { -o-transform: rotate(0deg);}
+100% { -o-transform: rotate(360deg);}
+}
+@-ms-keyframes spin {
+0% { -ms-transform: rotate(0deg);}
+100% { -ms-transform: rotate(360deg);}
+}
 
 /*
  * Overlay

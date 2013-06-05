@@ -353,7 +353,7 @@ NotificationSchema.set('toJSON', {
 /**
  * All new instances of Notification should be created with this method.
  * This method, by default, first checks whether we already have any existing duplicate of the submitted
- * notification already exists. If so, it returns that existing Notification.
+ * notification that's active (tts is not null). If so, it returns that existing Notification.
  *
  * TODO : should investigate how to compare against triggerDetails. Maybe make triggerDetails serialized JSON, provide a getter for deserialized. Then we can query for equality
  *
@@ -364,19 +364,20 @@ NotificationSchema.static('create', function(options, callback){
   // TODO : Investigate the performance of this query. Assuming it'll be fine because
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
-  NotificationModel.find({
+  NotificationModel.findOne({
     gpi : options.gpi || options.growPlanInstance,
-    tts : { $gte : options.timeToSend },
     type : options.type,
     trigger : options.trigger,
     t : options.title,
     b : options.body,
     url : options.url,
     tmpl : options.template
-  }).exec(function(err, notificationResults){
+  })
+  .exists('tts', true)
+  .exec(function(err, notificationResult){
     if (err) { return callback(err); }
-    if (notificationResults.length){
-      return callback(null, notificationResults[0]);
+    if (notificationResult){
+      return callback(null, notificationResult);
     }
     var newNotification = new NotificationModel(options);
     newNotification.save(callback);
@@ -390,7 +391,7 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
 
   NotificationModel
   .update(
-    { gpi : growPlanInstanceId, tts : { $gte : now }}, 
+    { gpi : growPlanInstanceId }, 
     { $unset : { 'tts' : 1 }}
   ).exec(callback);
 });
