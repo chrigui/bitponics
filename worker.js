@@ -8,8 +8,8 @@ var cronJob = require('cron').CronJob,
 	mongooseConnection = require('./config/mongoose-connection');
 	
 
-//var environments = ['local','development','staging','production'];
-var environments = ['local', 'development', 'staging', 'production'];
+var environments = ['local','development','staging','production'];
+//var environments = ['production'];
 
 
 var connections = {},
@@ -74,20 +74,20 @@ async.eachSeries(
 		 * Every 10 minutes
 		 * - Fetch email photos
 		 */
-		 new cronJob('00 */10 * * * * ', function(){
-		    var now = moment(),
-		    		emailPhotoFetcher = require('./utils/email-photo-fetcher');
+		//  new cronJob('00 */10 * * * * ', function(){
+		//     var now = moment(),
+		//     		emailPhotoFetcher = require('./utils/email-photo-fetcher');
 
-		    console.log('Every 10 minutes, starting at ' + now.format());
+		//     console.log('Every 10 minutes, starting at ' + now.format());
 
-				emailPhotoFetcher.processUnreadEmails(photoModels["production"], function(err, results){
-					if (err) { console.log(err); }
-		    	var finishedEnvironmentAt = moment();
-		    	console.log(env + ' ModelUtils.scanForPhaseChanges started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-		    	console.log((results ? results.length : 0) + " emails sent");
-				});    		
+		// 		emailPhotoFetcher.processUnreadEmails(photoModels["production"], function(err, results){
+		// 			if (err) { console.log(err); }
+		//     	var finishedEnvironmentAt = moment();
+		//     	console.log('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+		//     	console.log((results ? results.length : 0) + " email images processed");
+		// 		});    		
 		    
-		}, null, true, "America/New_York");
+		// }, null, true, "America/New_York");
 
 
 		/**
@@ -106,7 +106,7 @@ async.eachSeries(
 				    	if (err) { console.log(err); }
 				    	
 				    	var finishedEnvironmentAt = moment();
-				    	console.log(env + ' ModelUtils.scanForPhaseChanges started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+				    	console.log(env + ' ModelUtils.clearPendingNotifications started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
 				    	console.log((count || 0) + " records affected");
 				    });
 		    	},
