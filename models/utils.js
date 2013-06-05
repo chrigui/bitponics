@@ -436,8 +436,7 @@ function clearPendingNotifications (NotificationModel, callback){
       nowAsMilliseconds = now.valueOf();
 
 
-  // TEMP HACK : disabling emails til they're re-implemented with templates
-  return callback();
+  
 
   NotificationModel
   .find()
@@ -449,6 +448,10 @@ function clearPendingNotifications (NotificationModel, callback){
     if (!notificationResults.length){ return callback(); }
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
+  
+    // TEMP HACK : disabling emails til they're re-implemented with templates
+    return callback(null, notificationResults.length);
+
     async.each(
       notificationResults, 
       function notificationIterator(notification, iteratorCallback){
@@ -483,7 +486,7 @@ function clearPendingNotifications (NotificationModel, callback){
         });
       },
       function (err){
-        return callback(err);
+        return callback(err, notificationResults.length);
       }
     );
   });

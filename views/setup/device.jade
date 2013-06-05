@@ -37,7 +37,7 @@ block head
             h4.page-heading-small Wifi Settings
             p Hooray! You're connected to your Bitponics Base Station, and now you're ready to tell it how to connect to your WiFi network. 
             form#wifi-form(ng-submit="submitWifiForm()")
-              ul 
+              ul.unstyled-list
                 li
                   label(for='key') Key (from previous page):
                     input#key(ng-model="bothKeys", name='key')
@@ -106,10 +106,9 @@ block content
       include /includes/nav/main
   
   section(ng-cloak="")#main(role="main", class="main")
-    div.content-module.middle
-      form(id="setup-form", name="setup", data-ajax="false", ng-controller="bpn.controllers.setup.device.Main", novalidate)
-        h1.page-heading Setting up your Bitponics Base Station
-        section(ng-view)
+    div.content-module.middle(ng-controller="bpn.controllers.setup.device.Main")
+      h1.page-heading Setting up your Bitponics Base Station
+      section(ng-view)
 
 
         

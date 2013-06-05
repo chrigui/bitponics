@@ -594,7 +594,7 @@ require([
               var dataToSubmit = {
                 submittedGrowPlan:viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan),
                 growPlanInstance:{
-                  currentGrowPlanDay:1 // TODO
+                  currentGrowPlanDay: 0 // TODO. Should be zero-based 
                 },
                 deviceId: $scope.sharedDataService.selected.deviceId
               };

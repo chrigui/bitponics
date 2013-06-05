@@ -146,8 +146,8 @@ require([
               '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
               {
                 params : {
-                  "start-date" : feBeUtils.getDateKey(dateMoment),
-                  "end-date" : feBeUtils.getDateKey(dateMoment.add('days', 1))
+                  "start-date" : dateMoment.startOf("day").format(),
+                  "end-date" : dateMoment.endOf("day").format()
                 }
               }
             )
