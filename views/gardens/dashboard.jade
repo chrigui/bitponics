@@ -27,7 +27,7 @@ block content
             div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
-            div.sensorcreen-reader-text {{sensor.code}}
+            div.sensor.screen-reader-text {{sensor.code}}
           //div.message #{warning ? 'Check' : 'OK'}
           div(class="settings icon")
             | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
@@ -48,7 +48,7 @@ block content
                       h4 Ideal Range
                       div.separator-top {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
                 div.separator-top
-                  a(class="btn flush-left", href="/setup/calibrate") Calibrate
+                  a(class="btn flush-left", href="/account/devices") Calibrate
                 
 
       div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")

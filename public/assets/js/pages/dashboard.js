@@ -683,7 +683,7 @@ require([
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
         controller : function ($scope, $element, $attrs, $transclude){
           $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);
@@ -694,6 +694,16 @@ require([
               return 'on';
             }
           };
+
+          $scope.iconMap = {
+            'seedlingheatmat' : 'icon-18_seedling',
+            'humidifier' : 'icon-02_airtemperature',
+            'airconditioner' : 'icon-02_airtemperature',
+            'heater' : 'icon-02_airtemperature',
+            'fan' : 'icon-10_fan',
+            'waterpump' : 'icon-27_waterpump',
+            'light' : 'icon-12_light'
+          }
 
 
         },
