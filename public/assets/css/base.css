@@ -496,6 +496,8 @@ td {
 .featured-press a,
 .additional-press a,
 .dashboard .content-module,
+.dashboard .notifications input[type="checkbox"],
+.dashboard .notifications label,
 .growplans .edit-btn,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
@@ -1533,6 +1535,34 @@ nav.open {
   color: #999;
   font-size: 0.85em;
 }
+.dashboard .notifications .upcoming {
+  color: #00e36c;
+}
+.dashboard .notifications .smaller {
+  font-size: 1em;
+  border: none;
+}
+.dashboard .notifications .data {
+  font-size: 0.75em;
+}
+.dashboard .notifications .title {
+  font-size: 1.3em;
+  margin: 0 0 1em;
+}
+.dashboard .notifications input[type="checkbox"] {
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
+  margin: 1em 1em 0 0;
+  height: 1em;
+  width: 1em;
+  font-size: 1em;
+}
+.dashboard .notifications label {
+  position: relative;
+  top: 0.75em;
+  margin: 0;
+}
 .dashboard .date {
   margin-bottom: 0;
   border: 0 none;
@@ -1545,30 +1575,29 @@ nav.open {
   width: 40%;
   overflow: hidden;
 }
-.dashboard .overlay .cycle-text .left,
-.dashboard .overlay .cycle-text .right {
+.dashboard .overlay .overlay-data .left,
+.dashboard .overlay .overlay-data .right {
   float: left;
   width: 45%;
   margin: 0 5% 0 0;
 }
-.dashboard .overlay .cycle-text .left div,
-.dashboard .overlay .cycle-text .right div {
+.dashboard .overlay .overlay-data .left div,
+.dashboard .overlay .overlay-data .right div {
   font-size: 2em;
   color: #00e36c;
 }
-.dashboard .overlay .cycle-text .left p,
-.dashboard .overlay .cycle-text .right p {
+.dashboard .overlay .overlay-data .left p,
+.dashboard .overlay .overlay-data .right p {
   margin-top: 1.25em;
 }
-.dashboard .overlay .cycle-text h4 {
+.dashboard .overlay .overlay-data h4 {
   margin: 1em 0 0;
 }
 .dashboard .overlay .page-heading {
   font-size: 2em;
   text-align: left;
 }
-.dashboard .overlay .turn-off,
-.dashboard .overlay .turn-on {
+.dashboard .overlay .flush-left {
   margin-left: 0;
 }
 .dashboard .overlay .close {

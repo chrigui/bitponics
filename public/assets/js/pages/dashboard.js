@@ -252,7 +252,13 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.DayOverview',
       [
         '$scope',
-        function ($scope) {
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
           // TODO: Add functions to handle interactions on anything in the DayOverview sidebar (clicks to open sensor detail overlay)
 
           $scope.getIdealRangeForSensor = function (sensor, date) {
@@ -382,6 +388,10 @@ require([
         'sharedDataService',
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
+          $scope.idealRanges = {}
+          $scope.sharedDataService.growPlanInstance.activePhase.phase.idealRanges.forEach(function(idealRange) {
+            $scope.idealRanges[idealRange.sCode] = idealRange;
+          });
 
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
