@@ -287,6 +287,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
  * Since phase starts are always normalized to the localized 00:00 of the user's timezone,
  * we can be sure we're getting a useful number here.
  *
+ * Zero-based.
+ *
  * @param {GrowPlanInstancePhase} growPlanInstancePhase
  * @param {Date|Number} targetDate
  *
@@ -338,13 +340,16 @@ GrowPlanInstanceSchema.method('getActivePhase', function() {
  * @param {function(err, GrowPlanInstance)} callback : function called after GPI has been modified and saved
  */
 GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callback) {
-  var gpi = this,
+  var moment = require('moment'),
+      gpi = this,
       growPlanInstancePhase = settings.growPlanInstancePhase,
       submittedPhaseDaySummary = settings.daySummary,
       date = submittedPhaseDaySummary.date,
       phaseDay = gpi.getPhaseDay(growPlanInstancePhase, date),
       daySummary = growPlanInstancePhase.daySummaries[phaseDay],
-      sensorKey;
+      sensorKey,
+      phaseStartMoment = moment(growPlanInstancePhase.startDate),
+      normalizedDate = phaseStartMoment.add("days", phaseStartMoment.diff(date, "days"));
 
   if (daySummary){
     if (submittedPhaseDaySummary.status === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD){

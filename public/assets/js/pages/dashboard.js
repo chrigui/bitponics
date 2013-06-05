@@ -146,8 +146,8 @@ require([
               '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
               {
                 params : {
-                  "start-date" : encodeURIComponent(dateMoment.startOf("day").format()),
-                  "end-date" : encodeURIComponent(dateMoment.endOf("day").format())
+                  "start-date" : dateMoment.startOf("day").format(),
+                  "end-date" : dateMoment.endOf("day").format()
                 }
               }
             )
