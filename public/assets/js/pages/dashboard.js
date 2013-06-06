@@ -809,7 +809,8 @@ require([
 
     dashboardApp.filter('friendlyDate', function() {
       return function(input) {
-        return moment(input).calendar();
+        var val = moment(input).calendar()
+        return val.charAt(0).toUpperCase() + val.slice(1);
       }
     });
 

@@ -91,19 +91,12 @@ block content
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
           h2.page-heading-small Notifications
-          div(class="page-heading-small smaller", ng-show="pastNotifications.length") Past
           div(ng-repeat="notification in pastNotifications", class="past")
             //- input(type="checkbox", model="notification._id", id="notification._id")
             label(for="notification._id")
-              div.date {{notification.timeToSend | date:'medium'}}
+              div.date {{notification.timeToSend | friendlyDate }}
               div.title {{notification.title}}
-          div(class="page-heading-small smaller", ng-show="impendingNotifications.length") Upcoming
-          div(ng-repeat="notification in impendingNotifications", class="upcoming")
-            //- input(type="checkbox", model="notification._id", id="notification._id")
-            label(for="notification._id")
-              div.date {{notification.timeToSend | date:'medium'}}
-              div.title {{notification.title}}
-      
+          
 
   svg(height='0')
     mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')
