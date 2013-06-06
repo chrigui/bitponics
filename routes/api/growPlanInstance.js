@@ -331,9 +331,21 @@ module.exports = function(app) {
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
+      winston.info("POST /grow-plan-instances/:id/immediate-actions, have a grow plan, gpi " + 
+          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
+          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
+
       if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
+        winston.info("POST /grow-plan-instances/:id/immediate-actions, not allowed, gpi " + 
+          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
+          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
+
       	return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
+
+      winston.info("POST /grow-plan-instances/:id/immediate-actions, allowed, gpi " + 
+          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
+          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
 
       var device = growPlanInstance.device,
           now = new Date();
