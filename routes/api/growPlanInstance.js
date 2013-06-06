@@ -325,41 +325,18 @@ module.exports = function(app) {
     .populate('device')
     .populate('growPlan')
     .exec(function (err, growPlanInstance) {
-      winston.info("POST /grow-plan-instances/:id/immediate-actions, returned GPI.find(), gpi " + 
-          req.params.id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
-          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
+      if (err) { return next(err); }
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id')); }
       
-      if (err) { 
-        winston.info("POST /grow-plan-instances/:id/immediate-actions, error 1");
-        return next(err); }
-      if (!growPlanInstance){ 
-        winston.info("POST /grow-plan-instances/:id/immediate-actions, error 2")
-        return next(new Error('Invalid grow plan instance id'));
-      }
-      
-      winston.info("POST /grow-plan-instances/:id/immediate-actions, have a grow plan, gpi " + 
-          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
-          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
-
       if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
-        winston.info("POST /grow-plan-instances/:id/immediate-actions, not allowed, gpi " + 
-          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
-          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
-
       	return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
-
-      winston.info("POST /grow-plan-instances/:id/immediate-actions, allowed, gpi " + 
-          growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
-          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
 
       var device = growPlanInstance.device,
           now = new Date();
 
       if (req.query.expire === 'true'){
         console.log("GOT REQUEST TO EXPIRE ACTION " + req.body.actionId)
-
-
 
         var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active;})[0];
 
@@ -436,8 +413,6 @@ module.exports = function(app) {
 
         
       } else {
-        winston.info("POST /grow-plan-instances/:id/immediate-actions, triggeringImmediateAction, gpi " + 
-          growPlanInstance._id + ", device " + growPlanInstance.device._id + ", action " + req.body.actionId);
         ModelUtils.triggerImmediateAction(
           {
             growPlanInstance : growPlanInstance, 
@@ -447,10 +422,7 @@ module.exports = function(app) {
             user : req.user
           },
           function(err){
-            if (err) { 
-              winston.error("POST /grow-plan-instances/:id/immediate-actions, err:" + err.toString());
-              return next(err); 
-            }
+            if (err) { return next(err); }
             return res.send('success');
           }
         );  

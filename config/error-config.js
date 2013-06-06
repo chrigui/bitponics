@@ -62,13 +62,13 @@ module.exports = function(){
 
   app.get('/403', function(req, res, next){
     // trigger a 403 error
-    var err = new Error('not allowed!');
+    var err = new Error('You shall not pass.');
     err.status = 403;
     next(err);
   });
 
   app.get('/500', function(req, res, next){
     // trigger a generic (500) error
-    next(new Error('keyboard cat!'));
+    next(new Error('There are not 500 days of summer for you.'));
   });
 }
