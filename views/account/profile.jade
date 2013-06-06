@@ -1,21 +1,14 @@
 extends ../layout
 
+block head
+  mixin requirejs("/assets/js/pages/dashboard")
+
+block css
+
 block content
-
-  section#header
-    header#logo(role="banner") 
-      img(src="/assets/img/leaf-new-green.png", width="15%")
-
-    div#setup.select-block
-      h2.main-heading #{title}
-      //h3.sub-heading
-    div#user.select-block
-      h2.main-heading User
-      h3.sub-heading
-          if user.name.full != 'undefined undefined' && user.name.full != ''
-           | #{user.name.full}
-          else
-           | #{user.email}
+  section.header
+    header
+      include ../includes/nav/main
 
   section#main(role="main", class="main")
     div#profile.content-module.middle

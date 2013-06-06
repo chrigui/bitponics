@@ -11,7 +11,8 @@ module.exports = function(app){
 
 			res.render('account/profile', {
 				title : 'Profile',
-				className : 'profile'
+				className: "app-page single-page profile",
+    			pageType: "app-page"
 			});
 		}
 	);
