@@ -183,6 +183,12 @@ require([
           };
 
 
+          $scope.getDayOfPhase = function (growPlanInstancePhase, growPlanPhase, date) {
+            var daysOffset = growPlanInstancePhase.startedOnDay || 0;
+            // diff between date & gpiPhase.start + offset
+            return moment(date).diff(moment(growPlanInstancePhase.startDate || new Date()).add("days", daysOffset), "days");
+          };
+
           /**
            * Display data (sensor logs) for the provided date
            *
@@ -201,6 +207,11 @@ require([
               $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
               $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
               $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.sharedDataService.dateDataCache[dateKey].dayOfPhase = 
+                $scope.getDayOfPhase($scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase, 
+                $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase,
+                $scope.sharedDataService.dateDataCache[dateKey].date
+              );
               $scope.sharedDataService.dateDataCache[dateKey].loaded = false;
               $scope.getSensorLogsByDate(dateKey);
               
