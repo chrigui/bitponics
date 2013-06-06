@@ -82,7 +82,7 @@ require([
                 sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
               }
               if (deviceStatus) {
-                viewModels.initDeviceStatusViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
+                viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
               }
             });
           }

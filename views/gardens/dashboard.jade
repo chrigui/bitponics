@@ -81,7 +81,7 @@ block content
                   div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")
                     h4 This cycle has been overridden.
                   p.clear-b
-                    {{controlAction.control.name}} is currently ???
+                    {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
                   div.separator-top
                     a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
                     a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off

@@ -351,6 +351,8 @@ GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callbac
       phaseStartMoment = moment(growPlanInstancePhase.startDate),
       normalizedDate = phaseStartMoment.add("days", phaseStartMoment.diff(date, "days"));
 
+      // TODO : normalize the date to localized midnight. need owner.timezone
+
   if (daySummary){
     if (submittedPhaseDaySummary.status === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD){
       daySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;

@@ -90,7 +90,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     
     if (growPlanInstance.device){
-      viewModels.initDeviceStatusViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
+      viewModels.initDeviceViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
     }
 
   	return growPlanInstance;
@@ -208,7 +208,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * @param {Object} deviceStatus : the device.status property
    * @param {Array(Control)} controls : array of Control objects. Should contain all that may be referenced in the device status
    */
-  viewModels.initDeviceStatusViewModel = function(device, deviceStatus, controlHash){
+  viewModels.initDeviceViewModel = function(device, deviceStatus, controlHash, timeOfDayInMilliseconds){
+    var activeActionsByControlId = {};
+    timeOfDayInMilliseconds = (timeOfDayInMilliseconds || moment().diff(moment().startOf("day")));
+    deviceStatus = deviceStatus || device.status;
+
     deviceStatus.activeActions = deviceStatus.activeActions || [];
 
     for (var i = deviceStatus.actions.length; i--;){
@@ -241,15 +245,34 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         }
         return baseActionControlId === action.control._id;
       })[0].cycle;
+
+      activeActionsByControlId[action.control._id] = action;
     });
 
-
-
     device.status = deviceStatus;
+
+
+    device.outputMapByControlId = {};
+    
+    // Assumes device.outputMap[].control is a string id
+    device.outputMap.forEach(function(outputMapping){
+      device.outputMapByControlId[outputMapping.control] = {
+        controlId : outputMapping.control,
+        outputId : outputMapping.outputId,
+        currentState : utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds)
+      };
+    });
+
+    console.log(device.outputMapByControlId, new Date());
 
     return deviceStatus;
   };
 
+
+
+  viewModels.initDeviceOutputState = function(device, timeOfDayInMilliseconds){
+    device.outputMap
+  };
 
   /**
    * Adds/calculates properties necessary for UI presentation
@@ -299,7 +322,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     // Set overallDuration
     action.isDailyControlCycle = false;
     action.cycle.states.forEach(function(state){
-      overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
+      state.durationInMilliseconds = moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
+      overallDuration += state.durationInMilliseconds;
     });
     action.overallDurationInMilliseconds = overallDuration;
     

@@ -210,6 +210,12 @@ define(['moment'], function(moment){
   utils.getLargestWholeNumberDurationObject = function(duration, durationType){
     var duration = moment.duration(duration, durationType || ''),
       transformedDuration;
+    if (utils.isWholeNumber(transformedDuration = duration.asYears())) {
+      return {
+        duration : transformedDuration,
+        durationType : 'years'
+      }
+    }
     if (utils.isWholeNumber(transformedDuration = duration.asMonths())) {
       return {
         duration : transformedDuration,
@@ -258,6 +264,31 @@ define(['moment'], function(moment){
     return number + output;
   };
 
+
+
+  /**
+   * Assumes a viewModel Action, with action.overallDurationInMilliseconds and action.cycle.states[].durationInMilliseconds
+   */
+  utils.getCurrentControlStateFromAction = function(action, timeOfDayInMilliseconds){
+    var overallDurationInMilliseconds = action.overallDurationInMilliseconds,
+        cycleTimeElapsed = timeOfDayInMilliseconds % overallDurationInMilliseconds,
+        controlValue = '0',
+        states = action.cycle.states;
+
+    if (action.cycle.states.length <= 1){
+      controlValue = action.cycle.states[0].controlValue;
+    } else {
+      if (cycleTimeElapsed < states[0].durationInMilliseconds){
+        controlValue = states[0].controlValue;
+      } else if (cycleTimeElapsed < (states[0].durationInMilliseconds + states[1].durationInMilliseconds)){
+        controlValue = states[1].controlValue;
+      } else {
+        controlValue = states[0].controlValue;
+      }
+    }
+
+    return parseInt(controlValue, 10);
+  };
 
   /**
    * Get the message for the specified cycle state.
