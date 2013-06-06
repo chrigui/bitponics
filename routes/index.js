@@ -136,8 +136,8 @@ module.exports = function(app){
 				locals = {
 					title: 'Login',
 					formAction : '/login',
-					className: "landing-page single-page get-started",
-    			pageType: "landing-page"
+					className: "app-page single-page get-started",
+    				pageType: "app-page"
 				};
 
 			if (redirect){

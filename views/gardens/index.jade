@@ -1,26 +1,35 @@
 extends ../layout
 
 block head
+	mixin requirejs("/assets/js/pages/dashboard")
 
 block css
 
 block content
-	- if (typeof(userGrowPlanInstances) != 'undefined' && userGrowPlanInstances.length > 0)
-		h2 My Gardens
-		ul
-		each gpi in userGrowPlanInstances
-			li
-				a(href="/gardens/#{gpi._id}")
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading My Gardens
+		div.separator-top
+		- if (typeof(userGrowPlanInstances) != 'undefined' && userGrowPlanInstances.length > 0)
+			ul
+			each gpi in userGrowPlanInstances
+				li
+					a(href="/gardens/#{gpi._id}")
 					p Name: #{gpi.name} 
 					p Id: #{gpi._id} 
 					p Active: #{gpi.active}
 					p Start Date: #{gpi.startDate}
 					p Device: #{gpi.device}
-				hr
-	
-	h2 Community Gardens
-	p Coming soon...
 
-	block footer-scripts
+			hr
+
+			h2.page-heading Community Gardens
+			div.separator-top
+				p Coming soon...
+
+block footer-scripts
 	script
 		bpn.pageData.userGrowPlanInstances = !{JSON.stringify(userGrowPlanInstances)};

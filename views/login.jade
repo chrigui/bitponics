@@ -1,20 +1,23 @@
 extends layout
 
-block content
+block head
+  mixin requirejs("/assets/js/pages/dashboard")
 
-  section#header
-      header#logo(role="banner") 
-        img(src="/assets/img/leaf-new-green.png", width="15%")
-      div#setup.select-block
-        h2.main-heading #{title}
+block css
+
+block content
+  section.header
+    header
+      include includes/nav/main
 
   section#main(role="main", class="main")
-    div#home.content-module.middle
-      form(id='login-form', action=formAction, method='POST')
+    form(id='login-form', action=formAction, method='POST')
+      h2.page-heading Log in
+      div.separator-top
         label(for="email") Email
         input(type='email', name="email", autofocus="autofocus")
         label(for="password") Password
         input(type='password', name="password")
-        input(type='submit', value='Login')
+        input(type='submit', value='Submit')
 
-  section#footer
+block footer-scripts

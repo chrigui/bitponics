@@ -24,7 +24,9 @@ module.exports = function(app){
 		function (req, res, next) {
 			var locals = {
 				userGrowPlanInstances : [],
-				communityGrowPlanInstances : []
+				communityGrowPlanInstances : [],
+				className: "app-page single-page",
+    			pageType: "app-page"
 			};
 
 			GrowPlanInstanceModel
