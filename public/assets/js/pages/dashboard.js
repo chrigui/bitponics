@@ -144,6 +144,7 @@ require([
           };
 
 
+          
           /**
            *
            */
@@ -162,6 +163,10 @@ require([
             .error(function(data, status, headers, config) {
             });
           }
+
+          
+          
+
 
           // Set up functions and watchers
 
@@ -506,13 +511,32 @@ require([
     dashboardApp.controller('bpn.controllers.dashboardApp.ControlOverlay',
       [
         '$scope',
+        '$http',
         'sharedDataService',
-        function($scope, sharedDataService){
+        function($scope, $http, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
+
+
+          $scope.clearImmediateAction = function(currentControlAction, control){
+            currentControlAction.updateInProgress = true;
+
+            $http.post(
+              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions?expire=true',
+              {
+                actionId : currentControlAction._id,
+                message : "Triggered from dashboard"
+              }
+            )
+            .success(function(data, status, headers, config) {
+              $scope.close();
+            })
+            .error(function(data, status, headers, config) {
+            });
+          }
         }
       ]
     );
@@ -664,7 +688,7 @@ require([
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
         controller : function ($scope, $element, $attrs, $transclude){
           $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);

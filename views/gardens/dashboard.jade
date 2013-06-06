@@ -85,7 +85,7 @@ block content
                   div.separator-top
                     a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
                     a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
-                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction.control)") Resume cycle
+                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
                     img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
