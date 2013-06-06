@@ -317,6 +317,9 @@ module.exports = function(app) {
    * @param {String=} req.body.message : optional. Message to include with the immediateAction log.
    */
   app.post('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
+    winston.info("POST /grow-plan-instances/:id/immediate-actions, gpi " + 
+          req.params.id + ", action " + req.body.actionId);
+
     GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
@@ -412,6 +415,8 @@ module.exports = function(app) {
 
         
       } else {
+        winston.info("POST /grow-plan-instances/:id/immediate-actions, triggeringImmediateAction, gpi " + 
+          growPlanInstance._id + ", device " + growPlanInstance.device._id + ", action " + req.body.actionId);
         ModelUtils.triggerImmediateAction(
           {
             growPlanInstance : growPlanInstance, 
@@ -422,7 +427,7 @@ module.exports = function(app) {
           },
           function(err){
             if (err) { 
-              winston.error("ERROR IN POST /grow-plan-instances/:id/immediate-actions" + err.toString());
+              winston.error("POST /grow-plan-instances/:id/immediate-actions, err:" + err.toString());
               return next(err); 
             }
             return res.send('success');
