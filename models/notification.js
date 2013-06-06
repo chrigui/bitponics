@@ -376,7 +376,7 @@ NotificationSchema.static('create', function(options, callback){
   })
   .exists('tts', true)
   .exec(function(err, notificationResult){
-    winston.info("IN Notification.create, err:" + (err ? err.toString() : '') + ", notificationResult " + notificationResult.toString());
+    winston.info("IN Notification.create, err:" + (err ? err.toString() : '') + ", notificationResult " + (notificationResult ? notificationResult.toString() : ''));
     if (err) { return callback(err); }
     if (notificationResult){
       return callback(null, notificationResult);
