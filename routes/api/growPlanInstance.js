@@ -317,31 +317,116 @@ module.exports = function(app) {
    * @param {String=} req.body.message : optional. Message to include with the immediateAction log.
    */
   app.post('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
+    winston.info("POST /grow-plan-instances/:id/immediate-actions, gpi " + 
+          req.params.id + ", action " + req.body.actionId);
+
     GrowPlanInstanceModel
     .findById(req.params.id)
     .populate('device')
+    .populate('growPlan')
     .exec(function (err, growPlanInstance) {
       if (err) { return next(err); }
-      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id')); }
       
       if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
       	return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
-    
-      ModelUtils.triggerImmediateAction(
-        {
-          growPlanInstance : growPlanInstance, 
-          device : growPlanInstance.device, 
-          actionId : req.body.actionId, 
-          immediateActionMessage : req.body.message,
-          user : req.user
-        },
-        function(err){
-          if (err) { return next(err); }
-          return res.send('success');
+      var device = growPlanInstance.device,
+          now = new Date();
+
+      if (req.query.expire === 'true'){
+        console.log("GOT REQUEST TO EXPIRE ACTION " + req.body.actionId)
+
+        var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active;})[0];
+
+        if (!growPlanInstancePhase){
+          return res.send(400, "Request requires an active phase on the garden.");
         }
-      );
+
+        var growPlanPhase = growPlanInstance.growPlan.phases.filter(function(phase){ return phase._id.equals(growPlanInstancePhase.phase);})[0];
+
+
+        ActionModel.find()
+        .where('_id')
+        .in(growPlanPhase.actions)
+        .exec(function(err, growPlanPhaseActions){
+          var actionsWithDeviceControl = growPlanPhaseActions.filter(
+            function(item){ 
+              return (item.control && device.outputMap.some(function(controlPair){ return item.control.equals(controlPair.control);})); 
+            }
+          );
+
+          // TODO : DRY this up...duplicate code from GPI.activatePhase
+          async.series([
+            // Expire immediateActions that conflict with a device controlled action in the new phase
+            function expireImmediateAction(innerParallelCallback){
+              
+              ImmediateActionModel
+              .find()
+              .where('gpi')
+              .equals(growPlanInstance._id)
+              .where('e')
+              .gt(now)
+              .where('a') // the clause added on top of gpi.activatePhase implementation
+              .equals(req.body.actionId) // the clause added on top of gpi.activatePhase implementation
+              .populate('a')
+              .exec(function(err, immediateActionResults){
+                if (err) { return innerParallelCallback(err);}
+                if (!immediateActionResults.length){ return innerParallelCallback(); }
+              
+                var immediateActionsToExpire = [];
+                immediateActionResults.forEach(function(immediateAction){
+                  if (!immediateAction.action.control) { return; } 
+                  if (actionsWithDeviceControl.some(function(action){
+                    return immediateAction.action.control.equals(action.control);
+                  })){
+                    immediateActionsToExpire.push(immediateAction);
+                  } 
+                });
+
+                async.forEach(immediateActionsToExpire, 
+                  function(immediateAction, iteratorCallback){
+                    immediateAction.expires = now;
+                    immediateAction.save(iteratorCallback);
+                  }, 
+                  function(err){
+                    if (err) { return innerParallelCallback(err);}
+                    return innerParallelCallback();
+                  }
+                );
+              });
+            },
+            // Force refresh of device status on next request
+            function updateDeviceStatus(innerParallelCallback){
+              if (!growPlanInstance.device){ return innerParallelCallback(); }
+              
+              growPlanInstance.device.refreshStatus(innerParallelCallback);
+
+            }
+          ],
+          function(err){
+            if (err) { return next(err); }
+            return res.send('success');
+          })
+        });
+
+        
+      } else {
+        ModelUtils.triggerImmediateAction(
+          {
+            growPlanInstance : growPlanInstance, 
+            device : growPlanInstance.device, 
+            actionId : req.body.actionId, 
+            immediateActionMessage : req.body.message,
+            user : req.user
+          },
+          function(err){
+            if (err) { return next(err); }
+            return res.send('success');
+          }
+        );  
+      }
     });
   });
 
@@ -371,7 +456,6 @@ module.exports = function(app) {
       });
     });
   });
-
 
 
   /**

@@ -45,7 +45,6 @@ require([
             sensors : bpn.pageData.sensors,
             growPlanInstance : bpn.pageData.growPlanInstance,
             controlHash : {}
-            //latestSensorLogs : bpn.pageData.latestSensorLogs
           };
 
           sharedData.controls.forEach(function(control){
@@ -59,9 +58,7 @@ require([
 
           viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
 
-          //viewModels.initSensorLogsViewModel(sharedData.latestSensorLogs);
-
-
+          
 
           /**
            * Set up the socket for live updates on sensors, device status, and notifications
@@ -144,6 +141,7 @@ require([
           };
 
 
+          
           /**
            *
            */
@@ -163,6 +161,10 @@ require([
             });
           }
 
+          
+          
+
+
           // Set up functions and watchers
 
           $scope.getGrowPlanInstancePhaseFromDate = function (date) {
@@ -181,8 +183,14 @@ require([
           };
 
 
+          $scope.getDayOfPhase = function (growPlanInstancePhase, growPlanPhase, date) {
+            var daysOffset = growPlanInstancePhase.startedOnDay || 0;
+            // diff between date & gpiPhase.start + offset
+            return moment(date).diff(moment(growPlanInstancePhase.startDate || new Date()).add("days", daysOffset), "days");
+          };
+
           /**
-           * Based on activeDate, refresh the latest sensor logs & control actions
+           * Display data (sensor logs) for the provided date
            *
            * @param {Date|String} date
            */
@@ -199,6 +207,11 @@ require([
               $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
               $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
               $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.sharedDataService.dateDataCache[dateKey].dayOfPhase = 
+                $scope.getDayOfPhase($scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase, 
+                $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase,
+                $scope.sharedDataService.dateDataCache[dateKey].date
+              );
               $scope.sharedDataService.dateDataCache[dateKey].loaded = false;
               $scope.getSensorLogsByDate(dateKey);
               
@@ -506,13 +519,32 @@ require([
     dashboardApp.controller('bpn.controllers.dashboardApp.ControlOverlay',
       [
         '$scope',
+        '$http',
         'sharedDataService',
-        function($scope, sharedDataService){
+        function($scope, $http, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
+
+
+          $scope.clearImmediateAction = function(currentControlAction, control){
+            currentControlAction.updateInProgress = true;
+
+            $http.post(
+              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions?expire=true',
+              {
+                actionId : currentControlAction._id,
+                message : "Triggered from dashboard"
+              }
+            )
+            .success(function(data, status, headers, config) {
+              $scope.close();
+            })
+            .error(function(data, status, headers, config) {
+            });
+          }
         }
       ]
     );
@@ -664,7 +696,7 @@ require([
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
         controller : function ($scope, $element, $attrs, $transclude){
           $scope.getPathClassName = function (data, index) {
             var num = parseInt(data.data.value, 10);
@@ -770,6 +802,79 @@ require([
 
 
 
+    
+
+    dashboardApp.directive('bpnDirectivesSensorSparklineGraph', function() { 
+      return {
+        restrict : "EA",
+        replace : true,
+        scope : {
+          sensorCode : "=",
+          sensorLogs : "="
+        },
+        template : '<div class="sparkline {{sensorCode}}"></div>',
+        controller : function ($scope, $element, $attrs, $transclude){
+        },
+        link: function (scope, element, attrs, controller) { 
+          // link is where we have a created directive element as
+          // well as populated scope to work with
+          // element is a jQuery wrapper on the element
+
+          console.log(scope.sensorCode);
+          console.log(scope.sensorLogs);
+          var sensorReadings = scope.sensorLogs.map(function(sensorLog){
+            return sensorLog[scope.sensorCode];
+          });
+          sensorReadings = sensorReadings.filter(function(sensorReading){
+            return (typeof sensorReading === 'number');
+          });
+          sensorReadings = sensorReadings.reverse();
+          console.log(sensorReadings);
+          
+          if (!sensorReadings.length){
+            element.hide();
+            return;
+          }
+
+          var max=0, min=0, len=0;
+          min = d3.min(sensorReadings);
+          max = d3.max(sensorReadings);
+          len = sensorReadings.length;
+          
+          // TODO : figure out how to make the size dynamic based on container
+          var h = 50,
+              w = 750,
+              p = 2,
+              x = d3.scale.linear().domain([0, len]).range([p, w - p]),
+              y = d3.scale.linear().domain([min, max]).range([h - p, p]),
+              line = d3.svg.line()
+                     .x(function(d, i) { 
+                      console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+                      // return the X coordinate where we want to plot this datapoint
+                      return x(i); 
+                     })
+                     .y(function(d) { 
+                        console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+                        // return the Y coordinate where we want to plot this datapoint
+                        return y(d); 
+                     });
+
+          var svg = d3.select(element[0])
+                      .append("svg:svg")
+                      .attr("height", h)
+                      .attr("width", w);
+
+          var g = svg.append("svg:g");
+          g.append("svg:path")
+           .attr("d", line(sensorReadings));
+           //.attr("stroke", function(d) { return fill("hello"); });
+        }
+      };
+    });
+
+
+
+
     dashboardApp.filter('controlValueToWord', function() {
       return function(input, lowercase) {
         var out = "";
@@ -785,6 +890,15 @@ require([
         return out;
       }
     });
+
+    dashboardApp.filter('friendlyDate', function() {
+      return function(input) {
+        var val = moment(input).calendar()
+        return val.charAt(0).toUpperCase() + val.slice(1);
+      }
+    });
+
+
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);

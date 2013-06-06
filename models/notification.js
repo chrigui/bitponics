@@ -11,6 +11,7 @@ var mongoose = require('mongoose'),
   async = require('async'),
   utils = require('./utils'),
   getObjectId = utils.getObjectId,
+  winston = require('winston'),
   NotificationModel;
 
 

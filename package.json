@@ -23,6 +23,7 @@
 		, "mongoose"  : "=3.6.11"
 		, "mongoose-types" : ">=1.0"
 		, "nib"       : ">= 0.0.1"
+		, "nodetime"  : "=0.8.12"
 		, "socket.io" : "0.9"
 		, "stylus"    : ">= 0.0.1"
 	  	, "bootstrap-stylus": ">= 0.0.1"

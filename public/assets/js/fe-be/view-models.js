@@ -263,8 +263,6 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       };
     });
 
-    console.log(device.outputMapByControlId, new Date());
-
     return deviceStatus;
   };
 

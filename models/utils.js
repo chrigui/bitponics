@@ -213,13 +213,15 @@ function triggerImmediateAction(options, callback){
         expires = nowAsMilliseconds + (365 * 24 * 60 * 60 * 1000),
         actionHasDeviceControl = false;
 
+    winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : ''));
+
     async.series(
       [
         function(innerCallback){
           if (!action.control){ return innerCallback(); }
 
           // If we're here, action does have a control
-
+          winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", action has control");
           if (device){
             // get any other phase actions that exist for the same control.
             var growPlanInstancePhase = growPlanInstance.phases.filter(function(phase) { return phase.active;})[0];
@@ -230,6 +232,8 @@ function triggerImmediateAction(options, callback){
               }
             );
         
+            winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", action has device control " + actionHasDeviceControl);
+
             // Expire the immediateAction on the next cycle of a baseline phase action
             ActionModel.findOne()
             .where('_id')
@@ -292,6 +296,7 @@ function triggerImmediateAction(options, callback){
         async.parallel(
           [
             function(innerCallback){
+              winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating an ImmediateAction");
               var immediateAction = new ImmediateActionModel({
                   gpi : growPlanInstance._id,
                   message : immediateActionMessage,
@@ -305,6 +310,7 @@ function triggerImmediateAction(options, callback){
               immediateAction.save(innerCallback);
             },
             function(innerCallback){
+              winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating Notification");
               NotificationModel.create(
               {
                   users : [user],
@@ -318,6 +324,7 @@ function triggerImmediateAction(options, callback){
               );
             },
             function(innerCallback){
+              winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", checking actionHasDeviceControl " + actionHasDeviceControl);
               if (actionHasDeviceControl){ 
                 winston.info('Calling refreshStatus for device : ' + device._id.toString());
                 return device.refreshStatus(innerCallback);
@@ -326,6 +333,7 @@ function triggerImmediateAction(options, callback){
             }
           ],
           function(err, results){
+            winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", in parallel final, err: " + (err ? err.toString() : '') + ", results: " + results.length);
             if (err) { return callback(err); }
             var data = {
               immediateAction : results[0][0],

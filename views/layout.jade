@@ -3,6 +3,7 @@ html(class=className+" no-js")
   head
     title= title
     meta(charset="UTF-8")
+    meta(name="apple-mobile-web-app-capable", content="yes")
     meta(name="viewport", content="initial-scale=1, maximum-scale=1")
     include includes/head/head-content
     block head
@@ -14,11 +15,5 @@ html(class=className+" no-js")
             
             include includes/footer/main
 
-            //-script(src='/socket.io/socket.io.js')
-
-            //-script(src='/assets/js/libs/rickshaw/vendor/d3.min.js')
-            //-script(src='/assets/js/libs/rickshaw/vendor/d3.layout.min.js')
-            //-script(src='/assets/js/libs/rickshaw/rickshaw.min.js')
-            
             block footer-scripts
         

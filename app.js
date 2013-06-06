@@ -3,6 +3,11 @@
  * Module dependencies.
  */
 
+require('nodetime').profile({
+  accountKey: 'a45c389ba34a59d440401f32a925a2c8ce3b4b9f', 
+  appName: 'Bitponics ' + (process.env.NODE_ENV || 'local')
+});
+
 var express    = require('express'),
     app        = module.exports = express(),
     server     = require('http').createServer(app),

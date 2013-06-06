@@ -512,7 +512,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   // First, populate growPlan, owner, device
   // then, set the phase properties & save the gpi
   // Then, in parallel:
-  // expire any existing action overrides
+  // expire any existing immedaite actions
   // expire all existing notifications
   // Finally,
   // activate the new phases' actions & trigger notifications

@@ -1003,6 +1003,19 @@ button.btn:hover {
 .ring-graph svg .active {
   mask: url("#svg-active-mask");
 }
+.ring-graph .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -28.5%;
+  margin-left: -26%;
+  width: 51%;
+}
+.sparkline path {
+  stroke: #00e36c;
+  stroke-width: 1;
+  fill: none;
+}
 /*
  * controls
  */
@@ -1602,6 +1615,28 @@ nav.open {
 .dashboard .content-module.side {
   width: 20%;
 }
+.dashboard .data-module .main-heading.right {
+  right: 0.75em;
+  text-align: right;
+}
+.dashboard .data-module.phase-info {
+  height: 2.5em;
+}
+.dashboard .data-module.phase-info .phase-name {
+  position: absolute;
+  top: 0.5em;
+  font-size: 1em;
+  left: 0.5em;
+  text-transform: none;
+}
+.dashboard .data-module.phase-info .phase-day {
+  position: absolute;
+  top: 1.5em;
+  font-size: 1em;
+  right: 0.5em;
+  text-transform: none;
+  text-align: right;
+}
 .dashboard .data-module .sensor-value {
   font-size: 3em;
   text-align: left;
@@ -1689,6 +1724,13 @@ nav.open {
 }
 .dashboard .overlay .overlay-data h4 {
   margin: 1em 0 0;
+}
+.dashboard .overlay .overlay-data h5.reading-time {
+  margin: 0;
+}
+.dashboard .overlay .sparkline {
+  margin: 1em 0;
+  width: 100%;
 }
 .dashboard .overlay .page-heading {
   font-size: 2em;

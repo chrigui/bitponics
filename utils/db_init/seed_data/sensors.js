@@ -13,7 +13,7 @@ module.exports = [
 			_id : '506de3068eebf7524342cb5a',
 			name: "Electrical Conductivity",
 			abbrev: "EC",
-			unit: "Microsiemens", //=> µs
+			unit: "microsiemens", //=> µs
 			code: "ec",
 			visible : true
 		},

@@ -20,8 +20,10 @@ block content
         h2.page-heading-small.date 
           | {{sharedDataService.activeDate.date | date:'longDate'}}
           img.spinner(src="/assets/img/spinner.svg", ng-hide="sharedDataService.activeDate.loaded", ng-animate="{show: 'fade-in', hide:'fade-out'}")
-          div.time.page-heading-small(ng-show="sharedDataService.activeDate.showTime") {{sharedDataService.activeDate.date | date:'mediumTime'}}
+          //-div.time.page-heading-small(ng-show="sharedDataService.activeDate.showTime") {{sharedDataService.activeDate.date | date:'mediumTime'}}
           
+        div.data-module.phase-info
+          div.phase-name {{sharedDataService.activeDate.growPlanPhase.name}} Phase, Day {{sharedDataService.activeDate.dayOfPhase}}
         div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)", ng-click="sharedDataService.activeOverlay = 'SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
@@ -43,15 +45,19 @@ block content
                   | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
                 h3(class="page-heading page-heading-small") {{sensor.name}}
                 div(ng-controller="bpn.controllers.dashboard.SensorDetailOverlay")
-                  div(class="overlay-data")
+                  div(class="overlay-data clearfix")
                     div.left
-                      h4 Last Reading
-                      div.separator-top {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
-                    div.right
-                      h4 Ideal Range
-                      div.separator-top {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
-                div.separator-top
-                  a(class="btn flush-left", href="/account/devices") Calibrate
+                      h4 Last Reading ({{sensor.unit}})
+                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") ----
+                      h5.reading-time {{sharedDataService.activeDate.latestSensorLogs.timestamp | date:'short' }}
+                    div.right(ng-show="idealRanges[sensor.code]")
+                      h4 Ideal Range ({{sensor.unit}})
+                      div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
+
+                  div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
+                  div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
+                    a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
                 
 
       div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
@@ -85,24 +91,17 @@ block content
                   div.separator-top
                     a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
                     a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
-                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction.control)") Resume cycle
+                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
                     img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
           h2.page-heading-small Notifications
-          div(class="page-heading-small smaller", ng-show="pastNotifications.length") Past
           div(ng-repeat="notification in pastNotifications", class="past")
             //- input(type="checkbox", model="notification._id", id="notification._id")
             label(for="notification._id")
-              div.date {{notification.timeToSend | date:'medium'}}
+              div.date {{notification.timeToSend | friendlyDate }}
               div.title {{notification.title}}
-          div(class="page-heading-small smaller", ng-show="impendingNotifications.length") Upcoming
-          div(ng-repeat="notification in impendingNotifications", class="upcoming")
-            //- input(type="checkbox", model="notification._id", id="notification._id")
-            label(for="notification._id")
-              div.date {{notification.timeToSend | date:'medium'}}
-              div.title {{notification.title}}
-      
+          
 
   svg(height='0')
     mask#svg-active-mask(maskunits='objectBoundingBox', maskcontentunits='objectBoundingBox')
