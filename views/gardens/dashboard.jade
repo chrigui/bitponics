@@ -10,14 +10,18 @@ block content
       header
         include ../includes/nav/main
   
-  section#main(role="main", class="main", ng-cloak)
-    div(ng-controller="bpn.controllers.dashboard.Main")
-      h2.page-heading(ng-cloak) {{sharedDataService.growPlanInstance.name}}
+  section#main(role="main", class="main")
+    img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+    div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main")
+      h2.page-heading {{sharedDataService.growPlanInstance.name}}
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
-        h2.page-heading-small.date {{sharedDataService.activeDate.date | date:'longDate'}}
-        //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
+        h2.page-heading-small.date 
+          | {{sharedDataService.activeDate.date | date:'longDate'}}
+          img.spinner(src="/assets/img/spinner.svg", ng-hide="sharedDataService.activeDate.loaded", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+          div.time.page-heading-small(ng-show="sharedDataService.activeDate.showTime") {{sharedDataService.activeDate.date | date:'mediumTime'}}
+          
         div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)", ng-click="sharedDataService.activeOverlay = 'SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
@@ -65,20 +69,24 @@ block content
                   div(class="close btn", ng-click="close()")
                     | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
                   h3(class="page-heading page-heading-small") {{controlAction.control.name}}
-                  div(class="overlay-data", ng-show="controlAction.cycle.states.length > 1")
+                  div(class="overlay-data", ng-show="controlAction.baseCycle.states.length > 1")
                     div.left
-                      h4 Off cycle (mins)
-                      div.separator-top {{controlAction.cycle.states[0].duration}}
+                      h4 {{controlAction.baseCycle.states[0].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[0].durationType}})
+                      div.separator-top {{controlAction.baseCycle.states[0].duration}}
                     div.right
-                      h4 On cycle (mins)
-                      div.separator-top {{controlAction.cycle.states[1].duration}}
-                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1")
+                      h4 {{controlAction.baseCycle.states[1].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[1].durationType}})
+                      div.separator-top {{controlAction.baseCycle.states[1].duration}}
+                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length <= 1")
                     h4 This control does not cycle.
+                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")
+                    h4 This cycle has been overridden.
                   p.clear-b
-                    {{controlAction.control.name}} is currently ???
+                    {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
                   div.separator-top
-                    a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction.control.onAction._id)") Turn on
-                    a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction.control.offAction._id)") Turn off
+                    a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
+                    a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
+                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction.control)") Resume cycle
+                    img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
           h2.page-heading-small Notifications

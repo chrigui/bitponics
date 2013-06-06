@@ -90,7 +90,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     
     if (growPlanInstance.device){
-      viewModels.initDeviceStatusViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
+      viewModels.initDeviceViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
     }
 
   	return growPlanInstance;
@@ -195,14 +195,34 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   /**
-   * Gets the device status ready to bind to the control graphs
-   * Basically just populates status.activeActions with full control objects
+   * Gets the device status ready to bind to the control graph & overlay.
+   * Called on page load as well as when new deviceStatus is received through a socket update.
+   *
+   * - Merges deviceStatus into current device.status. deviceStatus.activeActions take precedence.
+   * - Populates status.activeActions with full control objects
+   * - Sets a "baseCycle" property on activeActions. If normal action, this will simply be a copy
+   *   of action.cycle. If an ImmediateAction, this will be the cycle of the action it overrides.
+   *   Used to bind the overlay details.
+   * - Sets a "currentValue" property.
    *
    * @param {Object} deviceStatus : the device.status property
    * @param {Array(Control)} controls : array of Control objects. Should contain all that may be referenced in the device status
    */
-  viewModels.initDeviceStatusViewModel = function(device, deviceStatus, controlHash){
+  viewModels.initDeviceViewModel = function(device, deviceStatus, controlHash, timeOfDayInMilliseconds){
+    var activeActionsByControlId = {};
+    timeOfDayInMilliseconds = (timeOfDayInMilliseconds || moment().diff(moment().startOf("day")));
+    deviceStatus = deviceStatus || device.status;
+
     deviceStatus.activeActions = deviceStatus.activeActions || [];
+
+    for (var i = deviceStatus.actions.length; i--;){
+      var action = deviceStatus.actions[i];
+      if (typeof action === 'string'){
+        deviceStatus.actions[i] = device.status.actions.filter(function(baseAction){
+          return baseAction._id === action;
+        })[0];
+      }
+    }
 
     deviceStatus.activeActions.forEach(function(action){
       action = viewModels.initActionViewModel(action);
@@ -214,13 +234,45 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       action.outputId = device.outputMap.filter(function(outputMapping){
         return outputMapping.control === action.control._id;
       })[0].outputId;
+
+
+      action.baseCycle = device.status.actions.filter(function(baseAction){
+        var baseActionControlId  = '';
+        if (typeof baseAction.control === 'string'){
+          baseActionControlId = baseAction.control;
+        } else {
+          baseActionControlId = baseAction.control._id;
+        }
+        return baseActionControlId === action.control._id;
+      })[0].cycle;
+
+      activeActionsByControlId[action.control._id] = action;
     });
 
     device.status = deviceStatus;
 
+
+    device.outputMapByControlId = {};
+    
+    // Assumes device.outputMap[].control is a string id
+    device.outputMap.forEach(function(outputMapping){
+      device.outputMapByControlId[outputMapping.control] = {
+        controlId : outputMapping.control,
+        outputId : outputMapping.outputId,
+        currentState : utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds)
+      };
+    });
+
+    console.log(device.outputMapByControlId, new Date());
+
     return deviceStatus;
   };
 
+
+
+  viewModels.initDeviceOutputState = function(device, timeOfDayInMilliseconds){
+    device.outputMap
+  };
 
   /**
    * Adds/calculates properties necessary for UI presentation
@@ -270,7 +322,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     // Set overallDuration
     action.isDailyControlCycle = false;
     action.cycle.states.forEach(function(state){
-      overallDuration += moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
+      state.durationInMilliseconds = moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
+      overallDuration += state.durationInMilliseconds;
     });
     action.overallDurationInMilliseconds = overallDuration;
     

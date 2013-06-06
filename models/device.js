@@ -92,7 +92,7 @@ var DeviceSchema = new Schema({
 
     /**
      * Current device status. Actions and ImmediateActions are just a denormalized 
-     * view into Actions and ImmediateActions.
+     * view into GPI Actions and ImmediateActions.
      * 
      */
     status : {

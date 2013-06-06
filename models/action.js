@@ -299,7 +299,7 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
  * @param action {Action}
  * @param userTimezone {String}
  *
- * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
+ * @return {0|1} 0 if control is OFF, 1 if control is ON.
  */
 ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstancePhase, action, userTimezone){
   if (!growPlanInstancePhase){

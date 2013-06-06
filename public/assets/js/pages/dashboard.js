@@ -4,7 +4,6 @@ require([
   'moment',
   'fe-be-utils',
   'view-models',
-  'spin',
   'angularResource',
   'd3',
   'es5shim',
@@ -14,7 +13,7 @@ require([
   '/assets/js/controllers/selection-overlay.js',
   'overlay'
 ],
-  function (angular, domReady, moment, feBeUtils, viewModels, Spinner) {
+  function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
 
 
@@ -83,7 +82,7 @@ require([
                 sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
               }
               if (deviceStatus) {
-                viewModels.initDeviceStatusViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
+                viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
               }
             });
           }
@@ -112,26 +111,6 @@ require([
           $scope.sharedDataService = sharedDataService;
           $scope.controls = bpn.controls;
           $scope.sensors = bpn.sensors;
-          $scope.spinner = new Spinner({
-            lines: 15, // The number of lines to draw
-            length: 7, // The length of each line
-            width: 7, // The line thickness
-            radius: 3, // The radius of the inner circle
-            corners: 1, // Corner roundness (0..1)
-            rotate: 0, // The rotation offset
-            direction: 1, // 1: clockwise, -1: counterclockwise
-            color: '#00E36C', // #rgb or #rrggbb
-            speed: 2.5, // Rounds per second
-            trail: 44, // Afterglow percentage
-            //shadow: true, // Whether to render a shadow
-            hwaccel: true, // Whether to use hardware acceleration
-            className: 'spinner', // The CSS class to assign to the spinner
-            zIndex: 2e9, // The z-index (defaults to 2000000000)
-            top: 'auto', // Top position relative to parent in px
-            left: 'auto' // Left position relative to parent in px
-          }).spin();
-
-
           
           /**
            * Returns a an angular promise
@@ -168,7 +147,9 @@ require([
           /**
            *
            */
-          $scope.triggerImmediateAction = function(actionId){
+          $scope.triggerImmediateAction = function(currentControlAction, actionId){
+            currentControlAction.updateInProgress = true;
+
             $http.post(
               '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
               {
@@ -218,6 +199,7 @@ require([
               $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
               $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
               $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.sharedDataService.dateDataCache[dateKey].loaded = false;
               $scope.getSensorLogsByDate(dateKey);
               
               $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
@@ -226,11 +208,7 @@ require([
 
 
           $scope.$watch('sharedDataService.activeDate.loaded', function (newValue) {
-            if (newValue) {
-              $scope.spinner.stop();
-            } else {
-              $('#sensors h2').append($scope.spinner.el);
-            }
+            
           });
 
 
@@ -238,12 +216,21 @@ require([
             $scope.displayDate($scope.sharedDataService.targetActiveDate);
           });
 
-          // Finally, set the scope models
-          //$scope.controls = bpn.pageData.controls;
-          //$scope.sensors = bpn.pageData.sensors;
-          //$scope.growPlanInstance = bpn.pageData.growPlanInstance;
-          //$scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
           
+          // To have a continually-updating time:
+          setInterval(function(){
+            var todayKey = feBeUtils.getDateKey(moment());
+            if (todayKey === $scope.sharedDataService.activeDate.dateKey){
+              $scope.sharedDataService.activeDate.date = new Date();
+              $scope.sharedDataService.activeDate.showTime = true;
+              
+            } else {
+              $scope.sharedDataService.activeDate.showTime = false;
+            }
+            $scope.$apply();
+
+          }, 1000);
+
         }
       ]
     );
@@ -523,12 +510,6 @@ require([
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           
-          // $scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel',
-          //   function(newValue, oldValue){
-          //     $scope.close();
-          //   }
-          // );
-
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
@@ -788,6 +769,22 @@ require([
 
 
 
+
+    dashboardApp.filter('controlValueToWord', function() {
+      return function(input, lowercase) {
+        var out = "";
+        if(parseInt(input, 10) === 0){
+          out += "Off";
+        } else {
+          out += "On"
+        }
+        // conditional based on optional argument
+        if (lowercase) {
+          out = out.toLowerCase();
+        }
+        return out;
+      }
+    });
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
