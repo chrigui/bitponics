@@ -325,6 +325,9 @@ module.exports = function(app) {
     .populate('device')
     .populate('growPlan')
     .exec(function (err, growPlanInstance) {
+      winston.info("POST /grow-plan-instances/:id/immediate-actions, returned GPI.find(), gpi " + 
+          req.params.id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
+          " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
       if (err) { return next(err); }
       if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
       
