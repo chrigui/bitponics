@@ -147,7 +147,9 @@ require([
           /**
            *
            */
-          $scope.triggerImmediateAction = function(actionId){
+          $scope.triggerImmediateAction = function(currentControlAction, actionId){
+            currentControlAction.updateInProgress = true;
+
             $http.post(
               '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
               {
@@ -498,12 +500,6 @@ require([
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           
-          // $scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel',
-          //   function(newValue, oldValue){
-          //     $scope.close();
-          //   }
-          // );
-
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
@@ -761,6 +757,24 @@ require([
       };
     });
 
+
+
+
+    dashboardApp.filter('controlValueToWord', function() {
+    return function(input, lowercase) {
+      var out = "";
+      if(parseInt(input, 10) === 0){
+        out += "Off";
+      } else {
+        out += "On"
+      }
+      // conditional based on optional argument
+      if (lowercase) {
+        out = out.toLowerCase();
+      }
+      return out;
+    }
+  });
 
 
 

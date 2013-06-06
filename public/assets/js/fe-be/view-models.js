@@ -195,14 +195,30 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   /**
-   * Gets the device status ready to bind to the control graphs
-   * Basically just populates status.activeActions with full control objects
+   * Gets the device status ready to bind to the control graph & overlay.
+   * Called on page load as well as when new deviceStatus is received through a socket update.
+   *
+   * - Merges deviceStatus into current device.status. deviceStatus.activeActions take precedence.
+   * - Populates status.activeActions with full control objects
+   * - Sets a "baseCycle" property on activeActions. If normal action, this will simply be a copy
+   *   of action.cycle. If an ImmediateAction, this will be the cycle of the action it overrides.
+   *   Used to bind the overlay details.
+   * - Sets a "currentValue" property.
    *
    * @param {Object} deviceStatus : the device.status property
    * @param {Array(Control)} controls : array of Control objects. Should contain all that may be referenced in the device status
    */
   viewModels.initDeviceStatusViewModel = function(device, deviceStatus, controlHash){
     deviceStatus.activeActions = deviceStatus.activeActions || [];
+
+    for (var i = deviceStatus.actions.length; i--;){
+      var action = deviceStatus.actions[i];
+      if (typeof action === 'string'){
+        deviceStatus.actions[i] = device.status.actions.filter(function(baseAction){
+          return baseAction._id === action;
+        })[0];
+      }
+    }
 
     deviceStatus.activeActions.forEach(function(action){
       action = viewModels.initActionViewModel(action);
@@ -214,7 +230,20 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       action.outputId = device.outputMap.filter(function(outputMapping){
         return outputMapping.control === action.control._id;
       })[0].outputId;
+
+
+      action.baseCycle = device.status.actions.filter(function(baseAction){
+        var baseActionControlId  = '';
+        if (typeof baseAction.control === 'string'){
+          baseActionControlId = baseAction.control;
+        } else {
+          baseActionControlId = baseAction.control._id;
+        }
+        return baseActionControlId === action.control._id;
+      })[0].cycle;
     });
+
+
 
     device.status = deviceStatus;
 
