@@ -328,8 +328,14 @@ module.exports = function(app) {
       winston.info("POST /grow-plan-instances/:id/immediate-actions, returned GPI.find(), gpi " + 
           req.params.id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
           " growplanresult:" + (growPlanInstance ? growPlanInstance._id : ''));
-      if (err) { return next(err); }
-      if (!growPlanInstance){ return next(new Error('Invalid grow plan instance id'));}
+      
+      if (err) { 
+        winston.info("POST /grow-plan-instances/:id/immediate-actions, error 1");
+        return next(err); }
+      if (!growPlanInstance){ 
+        winston.info("POST /grow-plan-instances/:id/immediate-actions, error 2")
+        return next(new Error('Invalid grow plan instance id'));
+      }
       
       winston.info("POST /grow-plan-instances/:id/immediate-actions, have a grow plan, gpi " + 
           growPlanInstance._id + ", action " + req.body.actionId + ", err: " + (err ? err.toString() : '') + 
