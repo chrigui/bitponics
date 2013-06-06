@@ -662,6 +662,37 @@ nav
 }
 
 /*
+ * Block style select (gp selection and gardens selection)
+ */
+.block-info-set
+	margin 0 0 3em
+	clear both
+	overflow hidden
+
+	li
+		margin: 1em 1em 0 0
+
+		.btn
+			margin: 0;
+			width: 100%;
+			text-align: center;
+
+	img
+		width 100%
+
+	.label
+		margin 0
+		padding .45em 0 0
+		border-top 1px solid color-text-gray
+
+	.first .label
+		border 0 none
+
+	.value
+		margin 0 0 1em
+
+
+/*
  * Overlay
  */
 @import "./components/overlay"
@@ -702,3 +733,8 @@ nav
  * Grow Plans Page
  */
 @import "./pages/growplans"
+
+/*
+ * Gardens List Page
+ */
+@import "./pages/gardens"

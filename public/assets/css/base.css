@@ -664,6 +664,9 @@ td {
 .separator-top {
   border-top: 1px solid #d8d8d8;
 }
+.ww-break-word {
+  word-wrap: break-word;
+}
 .fade-in-setup,
 .fade-out-setup {
   -webkit-transition: 0.7s linear opacity;
@@ -1287,6 +1290,36 @@ nav.open {
   100% {
     -ms-transform: rotate(360deg);
   }
+}
+/*
+ * Block style select (gp selection and gardens selection)
+ */
+.block-info-set {
+  margin: 0 0 3em;
+  clear: both;
+  overflow: hidden;
+}
+.block-info-set li {
+  margin: 1em 1em 0 0;
+}
+.block-info-set li .btn {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+.block-info-set img {
+  width: 100%;
+}
+.block-info-set .label {
+  margin: 0;
+  padding: 0.45em 0 0;
+  border-top: 1px solid #999;
+}
+.block-info-set .first .label {
+  border: 0 none;
+}
+.block-info-set .value {
+  margin: 0 0 1em;
 }
 /*
  * Overlay
@@ -3177,4 +3210,12 @@ button.close {
 .growplans .phaseEndDescription {
   margin: 2em 0 2em;
   clear: both;
+}
+/*
+ * Gardens List Page
+ */
+.gardens .img-wrapper .icon-glyph.icon-glyphlogo-new {
+  display: block !important;
+  color: #00e36c;
+  font-size: 4em;
 }

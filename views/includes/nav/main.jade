@@ -6,8 +6,8 @@ nav(role="nav")
           | bitponics
           span &trade;
         | <i class="icon-glyph icon-glyphlogo-new" aria-hidden="true"></i>
-  
-      if pageType == 'landing-page'  
+      - var pageType = pageType || null;
+      if !!pageType && pageType == 'landing-page'  
 
           li.nav-section
             ul
@@ -58,7 +58,7 @@ nav(role="nav")
                 a(href="contact", data-page-include="false")
                   | <i class="icon-glyph icon-glyphmail" aria-hidden="true"></i>
 
-      if pageType == 'app-page'
+      if !pageType || pageType == 'app-page'
         if user.name
           li(class="nav-section app-user")
             span welcome back, 
