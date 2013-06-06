@@ -1598,6 +1598,9 @@ nav.open {
   border-bottom: 1px solid #d8d8d8;
   padding-bottom: 0.5em;
 }
+.dashboard .page-heading-small.time {
+  font-size: 1em;
+}
 .dashboard .page-heading-small .spinner {
   float: right;
 }

@@ -199,6 +199,7 @@ require([
               $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
               $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
               $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
+              $scope.sharedDataService.dateDataCache[dateKey].loaded = false;
               $scope.getSensorLogsByDate(dateKey);
               
               $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
@@ -215,12 +216,21 @@ require([
             $scope.displayDate($scope.sharedDataService.targetActiveDate);
           });
 
-          // Finally, set the scope models
-          //$scope.controls = bpn.pageData.controls;
-          //$scope.sensors = bpn.pageData.sensors;
-          //$scope.growPlanInstance = bpn.pageData.growPlanInstance;
-          //$scope.latestSensorLogs = bpn.pageData.latestSensorLogs;
           
+          // To have a continually-updating time:
+          setInterval(function(){
+            var todayKey = feBeUtils.getDateKey(moment());
+            if (todayKey === $scope.sharedDataService.activeDate.dateKey){
+              $scope.sharedDataService.activeDate.date = new Date();
+              $scope.sharedDataService.activeDate.showTime = true;
+              
+            } else {
+              $scope.sharedDataService.activeDate.showTime = false;
+            }
+            $scope.$apply();
+
+          }, 1000);
+
         }
       ]
     );
@@ -761,22 +771,20 @@ require([
 
 
     dashboardApp.filter('controlValueToWord', function() {
-    return function(input, lowercase) {
-      var out = "";
-      if(parseInt(input, 10) === 0){
-        out += "Off";
-      } else {
-        out += "On"
+      return function(input, lowercase) {
+        var out = "";
+        if(parseInt(input, 10) === 0){
+          out += "Off";
+        } else {
+          out += "On"
+        }
+        // conditional based on optional argument
+        if (lowercase) {
+          out = out.toLowerCase();
+        }
+        return out;
       }
-      // conditional based on optional argument
-      if (lowercase) {
-        out = out.toLowerCase();
-      }
-      return out;
-    }
-  });
-
-
+    });
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
