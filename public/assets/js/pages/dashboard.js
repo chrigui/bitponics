@@ -45,7 +45,6 @@ require([
             sensors : bpn.pageData.sensors,
             growPlanInstance : bpn.pageData.growPlanInstance,
             controlHash : {}
-            //latestSensorLogs : bpn.pageData.latestSensorLogs
           };
 
           sharedData.controls.forEach(function(control){
@@ -59,9 +58,7 @@ require([
 
           viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
 
-          //viewModels.initSensorLogsViewModel(sharedData.latestSensorLogs);
-
-
+          
 
           /**
            * Set up the socket for live updates on sensors, device status, and notifications
@@ -809,6 +806,14 @@ require([
         return out;
       }
     });
+
+    dashboardApp.filter('friendlyDate', function() {
+      return function(input) {
+        return moment(input).calendar();
+      }
+    });
+
+
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
