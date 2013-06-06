@@ -1011,6 +1011,11 @@ button.btn:hover {
   margin-left: -26%;
   width: 51%;
 }
+.sparkline path {
+  stroke: #00e36c;
+  stroke-width: 1;
+  fill: none;
+}
 /*
  * controls
  */
@@ -1700,6 +1705,10 @@ nav.open {
 }
 .dashboard .overlay .overlay-data h5.reading-time {
   margin: 0;
+}
+.dashboard .overlay .sparkline {
+  margin: 1em 0;
+  width: 100%;
 }
 .dashboard .overlay .page-heading {
   font-size: 2em;

@@ -184,7 +184,7 @@ require([
 
 
           /**
-           * Based on activeDate, refresh the latest sensor logs & control actions
+           * Display data (sensor logs) for the provided date
            *
            * @param {Date|String} date
            */
@@ -784,6 +784,79 @@ require([
           //.attr('stroke-width', 1)
           //.attr('fill', scope.getControlFillColor)
           
+        }
+      };
+    });
+
+
+
+
+    
+
+    dashboardApp.directive('bpnDirectivesSensorSparklineGraph', function() { 
+      return {
+        restrict : "EA",
+        replace : true,
+        scope : {
+          sensorCode : "=",
+          sensorLogs : "="
+        },
+        template : '<div class="sparkline {{sensorCode}}"></div>',
+        controller : function ($scope, $element, $attrs, $transclude){
+        },
+        link: function (scope, element, attrs, controller) { 
+          // link is where we have a created directive element as
+          // well as populated scope to work with
+          // element is a jQuery wrapper on the element
+
+          console.log(scope.sensorCode);
+          console.log(scope.sensorLogs);
+          var sensorReadings = scope.sensorLogs.map(function(sensorLog){
+            return sensorLog[scope.sensorCode];
+          });
+          sensorReadings = sensorReadings.filter(function(sensorReading){
+            return (typeof sensorReading === 'number');
+          });
+          sensorReadings = sensorReadings.reverse();
+          console.log(sensorReadings);
+          
+          if (!sensorReadings.length){
+            element.hide();
+            return;
+          }
+
+          var max=0, min=0, len=0;
+          min = d3.min(sensorReadings);
+          max = d3.max(sensorReadings);
+          len = sensorReadings.length;
+          
+          // TODO : figure out how to make the size dynamic based on container
+          var h = 50,
+              w = 750,
+              p = 2,
+              x = d3.scale.linear().domain([0, len]).range([p, w - p]),
+              y = d3.scale.linear().domain([min, max]).range([h - p, p]),
+              line = d3.svg.line()
+                     .x(function(d, i) { 
+                      console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+                      // return the X coordinate where we want to plot this datapoint
+                      return x(i); 
+                     })
+                     .y(function(d) { 
+                        console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+                        // return the Y coordinate where we want to plot this datapoint
+                        return y(d); 
+                     });
+
+          var svg = d3.select(element[0])
+                      .append("svg:svg")
+                      .attr("height", h)
+                      .attr("width", w);
+
+          var g = svg.append("svg:g");
+          g.append("svg:path")
+           .attr("d", line(sensorReadings));
+           //.attr("stroke", function(d) { return fill("hello"); });
         }
       };
     });

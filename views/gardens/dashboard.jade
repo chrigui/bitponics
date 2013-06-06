@@ -46,13 +46,16 @@ block content
                   div(class="overlay-data clearfix")
                     div.left
                       h4 Last Reading ({{sensor.unit}})
-                      div.separator-top {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
+                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") ----
                       h5.reading-time {{sharedDataService.activeDate.latestSensorLogs.timestamp | date:'short' }}
-                    div.right
+                    div.right(ng-show="idealRanges[sensor.code]")
                       h4 Ideal Range ({{sensor.unit}})
-                      div.separator-top {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
-                div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
-                  a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
+                      div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
+
+                  div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
+                  div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
+                    a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
                 
 
       div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
