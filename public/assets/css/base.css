@@ -463,6 +463,23 @@ td {
 .icon-28_x:before {
   content: "\f11b";
 }
+.icon-ph:before {
+  content: "\f113";
+}
+.icon-water:before {
+  content: "\f119";
+}
+.icon-air:before,
+.icon-hum:before {
+  content: "\f101";
+}
+.icon-lux:before,
+.icon-full:before {
+  content: "\f10b";
+}
+.icon-ec:before {
+  content: "\f106";
+}
 .full-width {
   width: 100%;
 }
@@ -741,7 +758,7 @@ label {
   text-align: center;
   position: relative;
   background-color: #00e36c;
-  height: 11.5em;
+  height: 6em;
   text-transform: uppercase;
   margin: 0.125em 0;
 }
@@ -801,18 +818,16 @@ label {
   top: 1.85em;
   left: 0;
   width: 100%;
-  border-top: 1px solid #fff;
 }
 .data-module .sensor-value {
   font-size: 10em;
-  letter-spacing: -0.1em;
   line-height: 1.25em;
   margin: -0.15em 0 0 -0.15em;
   text-align: center;
 }
 .data-module .sensor-type {
-  bottom: 0.25em;
-  left: 0.5em;
+  top: 0.25em;
+  right: 0.5em;
 }
 .data-module.closed {
   min-height: 2em;
@@ -1527,9 +1542,9 @@ nav.open {
 }
 .dashboard .data-module .sensor-value {
   font-size: 3em;
-  line-height: 2em;
-  margin: 0 auto;
-  text-align: center;
+  text-align: left;
+  left: 0.25em;
+  position: relative;
 }
 .dashboard .page-heading-small {
   color: #999;

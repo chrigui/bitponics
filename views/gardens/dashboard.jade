@@ -18,7 +18,6 @@ block content
         h2.page-heading-small.date {{sharedDataService.activeDate.date | date:'longDate'}}
         //- div.time.page-heading-small {{activeDate.date | date:'shortTime'}}
 
-
         div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)", ng-click="sharedDataService.activeOverlay = 'SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
@@ -26,12 +25,12 @@ block content
             div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code]") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
             div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
           div(class="sensor-type icon {{sensor.code}}")
-            | <i class="icon-glyph icon-{{sensor.code}}" aria-hidden="true"></i>
+            | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
-          //div.message #{warning ? 'Check' : 'OK'}
-          div(class="settings icon")
-            | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
-            div.screen-reader-text Settings
+          //- div.message #{warning ? 'Check' : 'OK'}
+          //- div(class="settings icon")
+          //-   | <i class="icon-glyph icon-glyphbitponics_settings_icon" aria-hidden="true"></i>
+          //-   div.screen-reader-text Settings
 
           div
             div(modal="sharedDataService.activeOverlay=='SensorOverlay'+sensor.abbrev", close="close()", options="sharedDataService.modalOptions")
