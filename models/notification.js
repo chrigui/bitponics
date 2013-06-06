@@ -11,6 +11,7 @@ var mongoose = require('mongoose'),
   async = require('async'),
   utils = require('./utils'),
   getObjectId = utils.getObjectId,
+  winston = require('winston'),
   NotificationModel;
 
 
@@ -375,11 +376,13 @@ NotificationSchema.static('create', function(options, callback){
   })
   .exists('tts', true)
   .exec(function(err, notificationResult){
+    winston.info("IN Notification.create, err:" + (err ? err.toString() : '') + ", notificationResult " + notificationResult.toString());
     if (err) { return callback(err); }
     if (notificationResult){
       return callback(null, notificationResult);
     }
     var newNotification = new NotificationModel(options);
+    winston.info("IN Notification.create, creating new " + newNotification._id);
     newNotification.save(callback);
   });
 });

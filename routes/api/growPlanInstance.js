@@ -421,7 +421,10 @@ module.exports = function(app) {
             user : req.user
           },
           function(err){
-            if (err) { return next(err); }
+            if (err) { 
+              winston.error("ERROR IN POST /grow-plan-instances/:id/immediate-actions" + err.toString());
+              return next(err); 
+            }
             return res.send('success');
           }
         );  
