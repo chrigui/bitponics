@@ -8,7 +8,7 @@ var cronJob = require('cron').CronJob,
 	mongooseConnection = require('./config/mongoose-connection');
 	
 
-var environments = ['local','development','staging','production'];
+var environments = ['development','staging','production'];
 //var environments = ['production'];
 
 
