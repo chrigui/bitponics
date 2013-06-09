@@ -195,6 +195,10 @@ block head
                   label Phase Description
                   textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.description")
 
+                div(class="phaseEndDescription")
+                    label Phase End Description
+                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
+
                 ul(class="phase-tabs separator-top")
                   li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
                       class="btn inverse-btn", 
@@ -346,7 +350,7 @@ block head
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhaseactionsViewModel")
+                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel")
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
@@ -460,10 +464,6 @@ block head
 
                     //- end Action UI
                         
-                  div(class="phaseEndDescription separator-top")
-                    label Phase End Description
-                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
-                
                 div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
                   h4(class="page-heading-large separator-top") Device
                   p Here is where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
