@@ -51,7 +51,8 @@ async.eachSeries(
 		    console.log('Every day at 00:00, starting at ' + now.format());
 		    
 		    async.each(
-		    	environments,
+		    	//environments,
+		    	[],
 		    	function(env, iteratorCallback){
 		    		ModelUtils.scanForPhaseChanges(growPlanInstanceModels[env], function(err, count){
 				    	if (err) { console.log(err); }
@@ -90,6 +91,28 @@ async.eachSeries(
 		// }, null, true, "America/New_York");
 
 
+
+		/**
+		 * Every 10 minutes
+		 * - Fetch FTP photos
+		 */
+		 new cronJob('00 */10 * * * * ', function(){
+		    var now = moment(),
+		    		ftpPhotoFetcher = require('./utils/ftp-photo-fetcher');
+
+		    console.log('Every 10 minutes, starting at ' + now.format());
+
+				ftpPhotoFetcher.processNewPhotos(photoModels["production"], function(err, results){
+					if (err) { console.log(err); }
+		    	var finishedEnvironmentAt = moment();
+		    	console.log('production ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+		    	console.log((results ? results.length : 0) + " images processed");
+				});    		
+		    
+		}, null, true, "America/New_York");
+
+
+
 		/**
 		 * Every 5 minutes
 		 * - Clearing pending Notifications
@@ -99,7 +122,8 @@ async.eachSeries(
 		    console.log('Every 5 minutes, starting at ' + now.format());
 
 				async.eachSeries(
-		    	environments,
+		    	//environments,
+		    	[],
 		    	function(env, iteratorCallback){
 		    		ModelUtils.clearPendingNotifications(notificationModels[env], function(err, count){
 		    			//notificationModels[env].find().exec(function(err, results){
