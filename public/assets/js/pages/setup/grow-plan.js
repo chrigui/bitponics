@@ -621,6 +621,7 @@ require([
                 success:function (data) {
                   console.log(data);
                   // TODO : Show message, take user to /dashboard
+                  window.location = "/gardens/" + data.createdGrowPlanInstanceId;
                 },
                 error:function (jqXHR, textStatus, error) {
                   console.log('error', jqXHR, textStatus, error);
