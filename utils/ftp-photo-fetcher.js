@@ -54,7 +54,8 @@ module.exports = {
 					      
 								PhotoModel.createAndStorePhoto(
 									{
-										owner : "506de30a8eebf7524342cb6c",//"506de30a8eebf7524342cb6c",// Amit //"51ac0117a3b04db08057e04a", // HRJC Anderson
+										owner : "51ac0117a3b04db08057e04a",//"506de30a8eebf7524342cb6c",// Amit //"51ac0117a3b04db08057e04a", // HRJC Anderson
+										gpi : "51b4e59dcda057020000000c",
 										originalFileName : fileMetaData.name,
 										name : fileMetaData.name,
 										contentType : fileMetaData.contentType,
