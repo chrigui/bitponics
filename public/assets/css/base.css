@@ -961,6 +961,14 @@ ol.list-style {
 .btn.add {
   border: 0 none;
 }
+.btn.on {
+  background: #00e36c;
+  color: #fff;
+}
+.btn.off {
+  background: #fff;
+  color: #00e36c;
+}
 .page-content .center {
   width: 100%;
   clear: both;
