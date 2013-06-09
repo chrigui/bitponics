@@ -1,39 +1,6 @@
-var parseFtpListItem = function(listResponseItem){
-	var regexp   = new RegExp(
-    '^([\\-dbclps])' +                // Directory flag [1]
-    '([\\-rwxs]{9})\\s+' +            // Permissions [2]
-    '(\\d+)\\s+' +                    // Number of items [3]
-    '(\\w+)\\s+' +                    // File owner [4]
-    '(\\w+)\\s+' +                    // File group [5]
-    '(\\d+)\\s+' +                    // File size in bytes [6]
-    '(\\w{3}\\s+\\d{1,2}\\s+' +       // 3-char month and 1/2-char day of the month [7]
-    '(?:\\d{1,2}:\\d{1,2}|\\d{4}))' + // Time or year (need to check conditions) [+= 7]
-    '\\s+(.+)$'                       // File/directory name [8]
-  );
- 
-	var parsedLine = regexp.exec(listResponseItem);
-  if(parsedLine === null) {
-    return ; // Skip if no match
-  } else {
-    return {
-      type:  parsedLine[1],
-      perms: parsedLine[2],
-      items: parsedLine[3],
-      owner: parsedLine[4],
-      group: parsedLine[5],
-      size:  parsedLine[6],
-      date:  parsedLine[7],
-      file:  parsedLine[8],
-    };
-	}
-parseFtpListItem};
-
-
 module.exports = {
+
 	processNewPhotos : function(PhotoModel, callback){
-
-
-
 		var FTPClient = require('jsftp'),
 		async = require('async'),
 		fs = require('fs'),
@@ -49,7 +16,6 @@ module.exports = {
     fileList,
     createdPhotos = [];
     
-
 
 		var client = new FTPClient(ftpConfig);
 	  
@@ -73,11 +39,6 @@ module.exports = {
 
 				console.log(fileList);
 				
-				//return callback(null, fileList);
-
-
-
-
 				async.eachSeries(
 					fileList,
 					function fileIterator(fileMetaData, iteratorCallback){
@@ -123,35 +84,5 @@ module.exports = {
 				);
 			});
 		});
-		
-
-	  /*
-	  client.on('ready', function() {
-	    client.list(function(err, list) {
-	      if (err) { return callback(err); }
-	      fileList = list;
-	      
-	      console.log(list.map(parseFtpListItem));
-	      
-
-	      client.end();
-
-
-	    });
-	  });
-
-	  client.on('error', function(err) {
-	  	return callback(err);
-	  });
-
-
-	  client.on('end', function() {
-	  	return callback(null, fileList);
-	  });
-
-
-		client.connect(ftpConfig);
-	*/
-
 	}
 };

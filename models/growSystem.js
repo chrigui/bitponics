@@ -27,7 +27,8 @@ var GrowSystemSchema = new Schema({
 	
 	plantCapacity: { type: Number },
 
-	overallSize: {
+	// Numbers in feet
+  overallSize: {
 		w: { type: Number },
 		h: { type: Number },
 		d: { type: Number }

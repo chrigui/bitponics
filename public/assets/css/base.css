@@ -1939,10 +1939,14 @@ li
   color: #999;
 }
 .app-page .page-heading-small {
+  color: #999;
   line-height: 1.25em;
   font-size: 1.5em;
   line-height: 1em;
   font-size: 1.75em;
+}
+.app-page .page-heading-small.starting-day {
+  margin-top: 0.5em;
 }
 .app-page .separator-top {
   border-width: 1px 0 0;

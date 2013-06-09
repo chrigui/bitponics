@@ -95,13 +95,20 @@ block head
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         a.btn(href="customize/{{growPlan._id}}") Select
   
+
   script(type='text/ng-template', id='customize-overview.html')
     h4.page-heading Customize your grow plan
     div.separator-top
       div.question
-        label(for="gpedit_name", class="question-title") Name
+        label(for="gpedit_name", class="question-title") Grow Plan Name
         input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
       
+
+      div.question
+        label(class="question-title", for="gpi_name") Your Garden Name
+        input(type='text', id="gpi_name", name="gpi_name", ng-model="sharedDataService.growPlanInstance.name")
+          
+
       div(class="question-wrap-right")
         div.question
           label.question-title Plants
@@ -143,8 +150,13 @@ block head
                     value="expectedGrowPlanDuration",
                     ng-model="expectedGrowPlanDuration")
               span Days
-            //- span days and I am on day  
-            //- input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
+              
+            h5(class="starting-day question-title seamless-input-wrap page-heading-small") I am starting on day
+              input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
+                    type="number", 
+                    ng-model="sharedDataService.growPlanInstance.currentGrowPlanDay", 
+                    min="0",
+                    max="{{expectedGrowPlanDuration}}")
           
           //- div.phase-sliders
           section.separator-top
@@ -202,11 +214,11 @@ block head
                     textarea(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
                     label Type
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type")
-                    label Reservoir Size
+                    label Reservoir Size (gallons)
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize")
                     label Plant Capacity
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity")
-                    h7 Size
+                    h7 Size (feet)
                     input(type="text", placeholder="W", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w")
                     input(type="text", placeholder="H", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h")
                     input(type="text", placeholder="D", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d")

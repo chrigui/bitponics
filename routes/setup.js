@@ -306,7 +306,8 @@ module.exports = function(app){
             active : true,
             activePhaseId : startingPhaseData.phaseId,
             activePhaseDay : startingPhaseData.day,
-            device : req.body.deviceId
+            device : req.body.deviceId,
+            name : req.body.growPlanInstance.name
           },
           function(err, createdGrowPlanInstance){
             if (err) { 
