@@ -215,6 +215,46 @@ module.exports = [
 			}
 		}, // end flush Action
 		{
+			_id : '51b4dc475dd0f94858bac8ee',
+			description: "Reservior refill cycle",
+			cycle: {
+				states: [
+					{
+						message: "Turn off water pump. Discard all solution in the reservoir. Then refill the reservoir with water, leaving 1\" of room from the top. Mix in ½ cup FloraGro Grow nutrient and ½ cup FloraGro Bloom nutrient. Finally, resume water pump cycle."
+					},
+					{
+						durationType: 'weeks',
+						duration: 3
+					}
+				],
+				repeat: true
+			}
+		}, // end flush Action
+		{
+			_id : '51b0dd1b5dd0f94858bac8e2',
+			description: "Reservior top-off",
+			cycle: {
+				states: [
+					{
+						message: "Check reservoir level and top off if level has dipped more than an inch or so."
+					},
+					{
+						durationType: 'days',
+						duration: 1
+					}
+				],
+				repeat: true
+			}
+		},
+		{
+			_id : '51b0de3f5dd0f94858bac8e6',
+			description: "Top off reservoir to dilute nutrients back to safe range. Just add water until the reservoir is at its maximum level again.",
+		},
+		{
+			_id : '51b0de5e5dd0f94858bac8e7',
+			description: "Add nutrients.",
+		},
+		{
 			_id : '506de2f08eebf7524342cb26',
 			description: "Water pump cycle",
 			control: "506de2fc8eebf7524342cb2d", // reference to Pump control
@@ -223,12 +263,12 @@ module.exports = [
 					{
 						controlValue: '1',
 						durationType: 'minutes',
-						duration: 15
+						duration: 30
 					},
 					{
 						controlValue: '0',
 						durationType: 'minutes',
-						duration: 15
+						duration: 30
 					}
 				],
 				repeat: true
