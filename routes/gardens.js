@@ -73,6 +73,8 @@ module.exports = function(app){
           return res.send(401, "This garden is private. You must be the owner to view it.");
       	}
 
+      	locals.userCanModify = routeUtils.checkResourceModifyAccess(growPlanInstanceResultToVerify, req.user);
+
 				async.parallel(
 				[
 					function getSensors(innerCallback){

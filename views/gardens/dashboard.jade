@@ -9,7 +9,7 @@ block content
   section.header
       header
         include ../includes/nav/main
-  
+        
   section#main(role="main", class="main")
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main")
@@ -56,8 +56,9 @@ block content
                       div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
 
                   div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
-                  div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
-                    a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
+                  - if (userCanModify === true)
+                    div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
+                      a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
                 
 
       div.content-module.middle.separator-top(ng-controller="bpn.controllers.dashboard.PhasesGraph")
@@ -88,11 +89,12 @@ block content
                     h4 This cycle has been overridden.
                   p.clear-b
                     {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
-                  div.separator-top
-                    a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
-                    a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
-                    a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
-                    img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+                  - if (userCanModify === true)
+                    div.separator-top
+                      a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
+                      a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
+                      a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
+                      img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
         div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
           h2.page-heading-small Notifications

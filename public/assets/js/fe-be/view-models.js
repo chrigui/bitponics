@@ -310,7 +310,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       device.outputMapByControlId[outputMapping.control] = {
         controlId : outputMapping.control,
         outputId : outputMapping.outputId,
-        currentState : utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds)
+        currentState : activeActionsByControlId[outputMapping.control] ? utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds) : 0
       };
     });
 
