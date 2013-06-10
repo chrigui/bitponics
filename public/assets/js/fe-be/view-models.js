@@ -29,7 +29,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       }
     )[0],
     currentGrowPlanPhaseId = activeGrowPlanInstancePhase.phase,
-    currentGrowPlanPhaseIndex;
+    currentGrowPlanPhaseIndex,
+    now = new Date(),
+    nowMoment = moment(now);
 
     // If we're looking at a GPI that's on its original GP, show all phases, even if they're past
     // If we're looking at a GPI that's gone through a migration, don't show past phases (
@@ -92,8 +94,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     // Now initialize the gpi phase data
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
-  		var startDate = growPlanInstancePhase.startDate,
-          i;
+  		var i;
       
       // TODO: If this is a migrated GPI, past GP Phases wouldn't be found here. 
       // Should update the server response to send the old GP data also
@@ -104,36 +105,38 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       )[0];
   		
   		
+      
       // ensure there's a daySummary for each day of each phase, past and future
       for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
         if (!growPlanInstancePhase.daySummaries[i]){
-          growPlanInstancePhase.daySummaries[i] = { status : utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY };
+          growPlanInstancePhase.daySummaries[i] = {};
         }
-      }
-
-      
-      
-      var phaseStartingOnGrowPlanInstanceDay = 0;
-      for (var i = 0; i < phaseIndex; i++){
-        phaseStartingOnGrowPlanInstanceDay += growPlanInstance.phases[i].daySummaries.length;
       }
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
-        var daySummaryIndexInGrowPlan = (daySummaryIndex + phaseStartingOnGrowPlanInstanceDay + (growPlanInstancePhase.startedOnDay || 0));
-
+        
         if (!daySummary.date) {
-          //daySummary.date = moment(startDate).add('days', daySummaryIndexInGrowPlan);
           daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
         }
-        if (!daySummary.status) {
-          daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
-        }
+        
         daySummary.dateKey = utils.getDateKey(daySummary.date);
+
+        if (!daySummary.status){
+          if (daySummary.date.valueOf() < now.valueOf()){
+            daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
+          } else {
+            daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
+          }
+        }
       });
       
+
+      
+
       if (growPlanInstancePhase.active){
         growPlanInstance.activePhase = growPlanInstancePhase;
       }
+
   	});
 
     
