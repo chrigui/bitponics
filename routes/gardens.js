@@ -8,6 +8,7 @@ Action = require('../models/action'),
 ActionModel = Action.model,
 DeviceModel = require('../models/device').model,
 NotificationModel = require('../models/notification').model,
+PhotoModel = require('../models/photo').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
@@ -131,6 +132,13 @@ module.exports = function(app){
 		        })
 		        .limit(10)
 		        .exec(innerCallback);
+		      },
+		      function getPhotos(innerCallback){
+		      	PhotoModel.find({
+		      		gpi : req.params.growPlanInstancesId,
+		      	})
+		      	.limit(10)
+		      	.exec(innerCallback);
 		      }
 				],
 				function(err, results){
@@ -146,6 +154,7 @@ module.exports = function(app){
 					locals.controls = results[1];
 					locals.growPlanInstance = results[2];
 					locals.notifications = results[3] || [];
+					locals.photos = results[4] || [];
 
 					res.render('gardens/dashboard', locals);
 				});
