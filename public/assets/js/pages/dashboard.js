@@ -44,7 +44,8 @@ require([
             controls : bpn.pageData.controls,
             sensors : bpn.pageData.sensors,
             growPlanInstance : bpn.pageData.growPlanInstance,
-            controlHash : {}
+            controlHash : {},
+            photos : bpn.pageData.photos
           };
 
           sharedData.controls.forEach(function(control){
@@ -55,6 +56,11 @@ require([
           sharedData.controls.forEach(function (control) {
             viewModels.initControlViewModel(control);
           });
+
+          // TEMP
+          //sharedData.photos = [ {"createdAt":"2013-06-04T06:28:03.004Z","updatedAt":"2013-06-04T06:28:03.004Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"Screen Shot 2013-04-18 at 11.00.22 PM.png","name":"Screen Shot 2013-04-18 at 11.00.22 PM.png","type":"image/png","size":164946,"_id":"51ad88f2ab65cf932600000c","__v":0,"visibility":"public","date":"2013-06-04T00:46:46.000Z","tags":[]} ];
+
+          sharedData.photos.forEach(viewModels.initPhotoViewModel);
 
           viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
 
@@ -84,10 +90,16 @@ require([
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
               }
               if (notifications){
-                // TODO
+                notifications.forEach(function(notification){
+                  sharedData.notifications.unshift(notification);
+                });
               }
               if (photos){
-                // TODO 
+                var newPhotos = photos.forEach(viewModels.initPhotoViewModel);
+
+                newPhotos.forEach(function(photo){
+                  sharedData.photos.unshift(photo);
+                });
               }
             });
           }
@@ -372,8 +384,8 @@ require([
             dialogClass : 'overlay photo'
           };
 
-          $scope.open = function(timestamp){
-            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-'+timestamp
+          $scope.open = function(photoId){
+            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-' + photoId;
           };
 
           $scope.close = function(){

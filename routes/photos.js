@@ -28,6 +28,8 @@ module.exports = function(app){
 					.lean()
 					.exec(function(err, photoResult){
 						if (err) { return innerCallback(err); }
+						// to just return redirect URL regardless:
+						// if (!photoResult){ return innerCallback(null, true);}
 						if (!photoResult){ return innerCallback(new Error("Invalid photo id"));}
 						
 						if (routeUtils.checkResourceReadAccess(photoResult, req.user)){

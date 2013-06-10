@@ -5,6 +5,9 @@
 		margin 0 auto
 		width 30%
 
+	&.app-page .page-heading 
+		font-size 2.25em
+
 	.content-module
 		@extends .display-ib
 		&.middle
@@ -61,7 +64,13 @@
 		.spinner 
 			float right
 
+	
+	.controls
+		.page-heading-small
+				margin-bottom 0
+
 	.control
+
 		h3
 			text-align left
 			color color-text-gray
@@ -83,10 +92,10 @@
 		.smaller
 			font-size 1em
 			border none
-		.data
+		.date
 			font-size .75em
 		.title
-			font-size 1.3em
+			font-size 1em
 			margin 0 0 1em
 
 		input[type="checkbox"]
@@ -163,19 +172,23 @@
 	.grid
 		width 80%
 		text-align right
-		height 4em
+		height 3em
 		overflow hidden
-		margin 1.7em auto 0
+		//margin 1em auto 0
 		li
 			// @extends .display-ib
 			cursor pointer
 			float right
-			width 4em
-			height 4em
+			width 3em
+			height 3em
 			overflow hidden
 			vertical-align top
 			margin 0 0 .25em
+			border 1px solid #fff
 
+			img 
+				height 100%
+				width auto
 
 
 .circle

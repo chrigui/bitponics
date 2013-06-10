@@ -197,6 +197,20 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     return sensorLog;
   };
 
+
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   *
+   * Adds the following properties:
+   * url
+   */
+  viewModels.initPhotoViewModel = function (photo){
+    photo.url = '/photos/' + photo._id;
+    return photo;
+  };
+
+
   /**
    * Adds/calculates properties necessary for UI presentation
    *
