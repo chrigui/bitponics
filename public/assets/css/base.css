@@ -1740,6 +1740,18 @@ nav.open {
   width: 40%;
   overflow: hidden;
 }
+.dashboard .overlay.photo {
+  top: 5%;
+  left: 10%;
+  right: 10%;
+  width: auto;
+  height: auto;
+  position: absolute;
+}
+.dashboard .overlay.photo .content-module {
+  width: 100%;
+  text-align: center;
+}
 .dashboard .overlay .overlay-data .left,
 .dashboard .overlay .overlay-data .right {
   float: left;
@@ -1774,6 +1786,22 @@ nav.open {
 }
 .dashboard .overlay .close {
   margin: 0;
+}
+.dashboard .grid {
+  width: 80%;
+  text-align: right;
+  height: 4em;
+  overflow: hidden;
+  margin: 1.7em auto 0;
+}
+.dashboard .grid li {
+  cursor: pointer;
+  float: right;
+  width: 4em;
+  height: 4em;
+  overflow: hidden;
+  vertical-align: top;
+  margin: 0 0 0.25em;
 }
 .circle {
   margin: 1.5em 0;
