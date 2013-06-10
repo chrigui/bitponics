@@ -12,7 +12,8 @@ PhotoModel = require('../models/photo').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
-async = require('async'); 
+async = require('async'),
+moment = require('moment'); 
 
 module.exports = function(app){
 	
@@ -36,6 +37,13 @@ module.exports = function(app){
 			.exec(function(err, growPlanInstanceResults){
 				if (err) { return next(err); }
 				locals.userGrowPlanInstances = growPlanInstanceResults.map(function(gpi) { return gpi.toObject(); })
+				locals.userGrowPlanInstances.forEach(function(gpi){
+					gpi.friendlyStartDate = '';
+					if (gpi.startDate){
+						gpi.friendlyStartDate = moment(gpi.startDate).calendar();
+					}
+					
+				})
 				res.render('gardens', locals);
 			});
 		}

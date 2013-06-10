@@ -31,10 +31,13 @@ block content
 							div.value #{gpi.active}
 						div
 							h5.label Start Date
-							div.value #{gpi.startDate}
+							div.value #{gpi.friendlyStartDate}
 						div
 							h5.label Device
-							div.value #{gpi.device}
+							- if (gpi.device)
+								div.value #{gpi.device}
+							- else 
+								div.value None
 						
 						a.btn(href="/gardens/#{gpi._id}") Dashboard
 
