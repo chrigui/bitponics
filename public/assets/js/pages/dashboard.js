@@ -71,6 +71,8 @@ require([
             socket.on('update', function(data){
               var sensorLog = data.sensorLog,
                   deviceStatus = data.deviceStatus,
+                  notifications = data.notifications,
+                  photos = data.photos,
                   dateKey;
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
@@ -80,6 +82,12 @@ require([
               }
               if (deviceStatus) {
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
+              }
+              if (notifications){
+                // TODO
+              }
+              if (photos){
+                // TODO 
               }
             });
           }
