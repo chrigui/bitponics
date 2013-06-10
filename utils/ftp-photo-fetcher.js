@@ -14,7 +14,8 @@ module.exports = {
     },
     tmpDirectory = __dirname + '/../tmp/',
     fileList,
-    createdPhotos = [];
+    createdPhotos = [],
+    gm = require('gm').subClass({ imageMagick: true });
     
 
 		var client = new FTPClient(ftpConfig);
@@ -46,12 +47,15 @@ module.exports = {
 					    if (err) { return iteratorCallback(err); }
 
 					    console.log("RETRIEVED FILE ", fileMetaData);
-					    
+
 					    var localFilePath = tmpDirectory + (new Date()).toString() + fileMetaData.name;
-							        			
-        			fs.writeFile(localFilePath, fileBuffer, function(err) {
+							//fs.writeFile(localFilePath, fileBuffer, function(err) {
+client.keepAlive();
+							gm(fileBuffer, fileMetaData.name)
+					    .rotate("#fff", 90)
+						  .write(localFilePath, function (err) {
 						    if (err) { return iteratorCallback(err); }
-					      
+					      client.keepAlive();
 								PhotoModel.createAndStorePhoto(
 									{
 										owner : "51ac0117a3b04db08057e04a",//"506de30a8eebf7524342cb6c",// Amit //"51ac0117a3b04db08057e04a", // HRJC Anderson
@@ -65,12 +69,22 @@ module.exports = {
 										streamPath : localFilePath
 									},
 									function(err, photo){
+										console.log("IN Photo creation callback");
+
 										if (photo) { createdPhotos.push(photo); }
+									
 										
-										client.raw.dele(fileMetaData.name, function(err, data){
-											console.log("DELETED FILE ", data);
-											return iteratorCallback(err, photo);	
-										});
+
+										//var newClient = new FTPClient(ftpConfig);
+										//newClient.auth(ftpConfig.user, ftpConfig.password, function(err){
+											client.raw.dele(fileMetaData.name, function(err, data){
+												console.log("DELETED FILE ", data);
+												return iteratorCallback(err, photo);	
+											});
+										//});
+										//newClient.keepAlive();
+										
+										
 									}
 								);
 							});

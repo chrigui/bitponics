@@ -135,17 +135,18 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       knoxHeaders["Content-Length"] = options.size;
     }
 
-    console.log("DATE", options.date, photo.date);
+    console.log("PHOTO DATE", options.date, photo.date);
 
     knoxClient[knoxMethod](
       knoxMethodArgument,
       s3Config.photoPathPrefix + photo._id.toString(), 
       knoxHeaders, 
       function(err, result) {
+        console.log("RETURNED FROM S3, err:", err, ", statusCode: ", result.status);
         if (err) { return callback(err);  }
       
         if (result.statusCode !== 200) {
-          return callback(new Error("Status " + result.statusCode + " from S3"));
+          return callback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
         }
 
         if (knoxMethod === 'putFile' && !options.preserveStreamPath){
