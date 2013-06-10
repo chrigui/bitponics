@@ -554,6 +554,14 @@
 .app-page .page-heading {
   font-size: 3.25em;
 }
+.app-page .page-heading-small.date {
+  font-size: 1.5em;
+  text-align: justify;
+}
+.app-page.dashboard .data-module.phase-info .phase-name {
+  font-size: 0.9em;
+  text-align: justify;
+}
 /*
  * get-started/thankyou
  */
