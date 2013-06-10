@@ -9,6 +9,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * 
    * phases[].daySummaries[].date
    * phases[].phase
+   * phases[].calculatedStartDate : phase.startDate or the projected startDate the phase would have started in the past or future
    * activePhase
    * device.status.activeActions[].control
    * device.status.activeActions[].outputId
@@ -20,27 +21,72 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
   	
     // growPlanInstance.phases only contains phases that the GPI has gone through.
-    // Add future growPlan phases for the visual 
+    // Add past & future growPlan phases for the visual 
 
-    var currentGrowPlanPhaseId = growPlanInstance.phases.filter(
+    var activeGrowPlanInstancePhase = growPlanInstance.phases.filter(
       function(growPlanInstancePhase){ 
         return growPlanInstancePhase.active;
       }
-    )[0].phase,
-    currentGrowPlanPhaseIndex;
+    )[0],
+    currentGrowPlanPhaseId = activeGrowPlanInstancePhase.phase,
+    currentGrowPlanPhaseIndex,
+    now = new Date(),
+    nowMoment = moment(now);
+
+    // If we're looking at a GPI that's on its original GP, show all phases, even if they're past
+    // If we're looking at a GPI that's gone through a migration, don't show past phases (
+    // since the user has passed ove those phases in previous growPlans)
+    var includePastPhases = (growPlanInstance.growPlanMigrations.length === 0);
+
+
+    growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
+      growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate).subtract("days", growPlanInstancePhase.startedOnDay);  
+    });
+
+    growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
+      if (growPlanPhase._id === currentGrowPlanPhaseId) {
+        currentGrowPlanPhaseIndex = index;
+      }
+    });
+
 
     growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
       // get the active gpi.phase.phase. find the gp.phases that are after that
       // one. append those to gpi.phases
 
-      if (growPlanPhase._id === currentGrowPlanPhaseId) {
-        currentGrowPlanPhaseIndex = index;
+      if ( (index < currentGrowPlanPhaseIndex) &&
+          (includePastPhases)){
+        var gpiPhaseExists = growPlanInstance.phases.some(function(gpiPhase){
+          return (gpiPhase.phase === growPlanPhase._id)
+        });
+        
+        if (!gpiPhaseExists){
+          var calculatedStartDate = moment(activeGrowPlanInstancePhase.startDate);
+
+          for (var i = index; i < currentGrowPlanPhaseIndex; i++){
+            calculatedStartDate.subtract("days", growPlanInstance.growPlan.phases[i].expectedNumberOfDays);
+          }
+
+          growPlanInstance.phases.unshift({
+            phase : growPlanPhase._id,
+            daySummaries : [],
+            calculatedStartDate : calculatedStartDate
+          });
+        }
       }
 
+
       if (index > currentGrowPlanPhaseIndex){
+        var calculatedStartDate = moment(activeGrowPlanInstancePhase.startDate);
+
+        for (var i = currentGrowPlanPhaseIndex; i < index; i++){
+          calculatedStartDate.add("days", growPlanInstance.growPlan.phases[i].expectedNumberOfDays);
+        }
+
         growPlanInstance.phases.push({
           phase : growPlanPhase._id,
-          daySummaries : []
+          daySummaries : [],
+          calculatedStartDate : calculatedStartDate
         });
       }
     });
@@ -48,44 +94,49 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     // Now initialize the gpi phase data
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
-  		var startDate = growPlanInstancePhase.startDate,
-          i;
+  		var i;
       
-      if (growPlanInstance.growPlan.phases){
-  			growPlanInstancePhase.phase = growPlanInstance.growPlan.phases.filter(
-          function(growPlanPhase){
-            return growPlanPhase._id === growPlanInstancePhase.phase;
-          }
-        )[0];
-  		}
+      // TODO: If this is a migrated GPI, past GP Phases wouldn't be found here. 
+      // Should update the server response to send the old GP data also
+      growPlanInstancePhase.phase = growPlanInstance.growPlan.phases.filter(
+        function(growPlanPhase){
+          return growPlanPhase._id === growPlanInstancePhase.phase;
+        }
+      )[0];
   		
+  		
+      
       // ensure there's a daySummary for each day of each phase, past and future
       for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
         if (!growPlanInstancePhase.daySummaries[i]){
-          growPlanInstancePhase.daySummaries[i] = { status : utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY };
+          growPlanInstancePhase.daySummaries[i] = {};
         }
-      }
-
-      var phaseStartingOnGrowPlanInstanceDay = 0;
-      for (var i = 0; i < phaseIndex; i++){
-        phaseStartingOnGrowPlanInstanceDay += growPlanInstance.phases[i].daySummaries.length;
       }
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
-        var daySummaryIndexInGrowPlan = (daySummaryIndex + phaseStartingOnGrowPlanInstanceDay + (growPlanInstancePhase.startedOnDay || 0));
-
+        
         if (!daySummary.date) {
-          daySummary.date = moment(startDate).add('days', daySummaryIndexInGrowPlan);
+          daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
         }
-        if (!daySummary.status) {
-          daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
-        }
+        
         daySummary.dateKey = utils.getDateKey(daySummary.date);
+
+        if (!daySummary.status){
+          if (daySummary.date.valueOf() < now.valueOf()){
+            daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
+          } else {
+            daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
+          }
+        }
       });
       
+
+      
+
       if (growPlanInstancePhase.active){
         growPlanInstance.activePhase = growPlanInstancePhase;
       }
+
   	});
 
     
@@ -259,7 +310,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       device.outputMapByControlId[outputMapping.control] = {
         controlId : outputMapping.control,
         outputId : outputMapping.outputId,
-        currentState : utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds)
+        currentState : activeActionsByControlId[outputMapping.control] ? utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds) : 0
       };
     });
 

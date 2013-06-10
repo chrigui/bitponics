@@ -98,7 +98,27 @@ module.exports = function(app){
 	  	}
 	  	return res.send(200, photos);
 	  });
-	});	
+	});
+
+
+
+	/**
+	 * 
+	 */
+	app.post('/admin/trigger_processNewFTPPhotos', function (req, res) {
+	  var PhotoModel = require('../models/photo').model,
+	  	ftpPhotoFetcher = require('../utils/ftp-photo-fetcher');
+
+	  ftpPhotoFetcher.processNewPhotos(PhotoModel, function(err, photos){
+	  	console.log("processNewPhotos result ", err, photos);
+	  	if (err){
+	  		return res.send(500, err);
+	  	}
+	  	return res.send(200, photos);
+	  });
+	});
+
+
 	
 	/**
 	 * Get listing of all photos in database or S3

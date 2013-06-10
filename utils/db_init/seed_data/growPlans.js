@@ -100,8 +100,8 @@ module.exports = [
                         _id : '506de30b8eebf7524342cb6f',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -127,8 +127,7 @@ module.exports = [
                 growMedium: "rockwool",
                 nutrients: [],
                 actions: [
-                    "506de2ef8eebf7524342cb25",
-                    "506de2f08eebf7524342cb26",
+                    "506de3128eebf7524342cb87",
                     "506de2f18eebf7524342cb27"
                 ],
                 phaseEndActions : [
@@ -201,8 +200,8 @@ module.exports = [
                         _id : '506de30f8eebf7524342cb7e',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -257,8 +256,8 @@ module.exports = [
                         _id : '506de3108eebf7524342cb80',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -302,8 +301,8 @@ module.exports = [
                         _id : '506de3108eebf7524342cb82',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -329,8 +328,7 @@ module.exports = [
                 growMedium: "rockwool",
                 nutrients: [],
                 actions: [
-                    "506de2ef8eebf7524342cb25",
-                    "506de2f08eebf7524342cb26",
+                    "506de3128eebf7524342cb87",
                     "506de2f18eebf7524342cb27"
                 ],
                 phaseEndActions : [
@@ -355,8 +353,8 @@ module.exports = [
                         _id : '506de3118eebf7524342cb84',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -401,8 +399,8 @@ module.exports = [
                         _id : '506de3118eebf7524342cb86',
                         sCode: "air",
                         valueRange: {
-                            min: 30,
-                            max: 60
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -411,7 +409,114 @@ module.exports = [
             }
         ]
     },
-  
+     {
+        _id : '51b076c35dd0f94858bac8da',
+        createdBy: "506de30a8eebf7524342cb6c",
+        name: "Wall of Mixed Greens",
+        description: "When you want a wall you can eat buffet. Growing close to 100 plants, mix and match whatever kind of herbs & lettuces & greens you want to grow. This involves putting together your own system based on wool pocket planters.",
+        plants: ["50749120fe420e210be58a69", "50a016f8eb1164c6b88e3038", "5074983aab364e2a9fffd4f1", "5074912dfe420e210be58a82"],
+        phases: [
+            {
+                _id : '51b0de865dd0f94858bac8e8',
+                name : 'Seedling',
+                description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway. Use the seed-starting plugs from General Hydroponics Rapid Rooter or Flora Root.',
+                expectedNumberOfDays: 14,
+                light: "515a540205e45bc5a590301b",
+                growSystem: "51b084075dd0f94858bac8db", // Hydrofarm seed starting tray
+                growMedium: "Seed-starting plugs",
+                nutrients: [],
+                actions: [
+                    "506de3128eebf7524342cb87",
+                    "506de2f18eebf7524342cb27"
+                ],
+                phaseEndActions : [
+                    "506de2ec8eebf7524342cb24"
+                ],
+                idealRanges: [
+                    {
+                        _id : '51b0de965dd0f94858bac8ea',
+                        sCode: "lux",
+                        valueRange: {
+                            min: 2000,
+                            max: 4000
+                        },
+                        applicableTimeSpan: {
+                            startTime: (6 * 60 * 60 * 1000), //6am
+                            endTime: (22 * 60 * 60 * 1000)  //10pm
+                        },
+                        actionBelowMin : "506de2fb8eebf7524342cb28",
+                        actionAboveMax : "506de2fb8eebf7524342cb29"
+                    },
+                    {
+                        _id : '51b0de965dd0f94858bac8ea',
+                        sCode: "air",
+                        valueRange: {
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
+                        },
+                        actionBelowMin : "506de2fc8eebf7524342cb2b",
+                        actionAboveMax : "506de2fb8eebf7524342cb2a"
+                    }
+                ]
+            },
+
+            {
+                _id : '51b0de875dd0f94858bac8e9',
+                name : 'Vegetative',
+                description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves. Continually harvest leaves whenever you want; the plants should just continue to grow back.',
+                expectedNumberOfDays: 90,
+                light: "51b0da545dd0f94858bac8dc", // 12 3' FL fixtures
+                growSystem: "51b0db785dd0f94858bac8df", // wall garden
+                growMedium: "Mix of 1/2 vermiculute and 1/2 perlite.",
+                nutrients: [
+                    "51b0dc5e5dd0f94858bac8e0",
+                    "51b0dc685dd0f94858bac8e1"
+                ],
+                actions: [
+                    "51b0dd1b5dd0f94858bac8e2",
+                    "51b4dc475dd0f94858bac8ee",
+                    "506de2f08eebf7524342cb26",
+                    "506de2f18eebf7524342cb27"
+                ],
+                idealRanges: [
+                    {
+                        _id : '51b0dd7c5dd0f94858bac8e3',
+                        sCode: "lux",
+                        valueRange: {
+                            min: 15000,
+                            max: 27000
+                        },
+                        applicableTimeSpan: {
+                            startTime: (6 * 60 * 60 * 1000), //6am
+                            endTime: (22 * 60 * 60 * 1000)  //10pm
+                        },
+                        actionBelowMin : "506de2fb8eebf7524342cb28",
+                        actionAboveMax : "506de2fb8eebf7524342cb29"
+                    },
+                    {
+                        _id : '51b0dd845dd0f94858bac8e4',
+                        sCode: "air",
+                        valueRange: {
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
+                        },
+                        actionBelowMin : "506de2fc8eebf7524342cb2b",
+                        actionAboveMax : "506de2fb8eebf7524342cb2a"
+                    },
+                    {
+                        _id : '51b0dd8b5dd0f94858bac8e5',
+                        sCode : 'ec',
+                        valueRange : {
+                            min : 600,
+                            max : 1200
+                        },
+                        actionBelowMin : "51b0de5e5dd0f94858bac8e7",
+                        actionAboveMax : "51b0de3f5dd0f94858bac8e6"
+                    }
+                ]
+            }
+        ]
+    },  
     {
     	_id : "51a3885ea8162dbabd583f3b",
     	name : "Peppers",

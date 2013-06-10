@@ -95,6 +95,7 @@ PhotoSchema.set('toJSON', {
  * @param options.size
  * @param options.visibility
  * @param options.tags
+ * @param options.gpi
  * @param {Stream} options.stream : optional. If set, this is used to stream to S3
  * @param {string} options.streamPath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
  * @param {bool=} options.preserveStreamPath : optional. If true, file at options.streamPath is left alone after upload. If omitted or false, file is deleted after uplaod.
@@ -120,6 +121,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       date : options.date || now,
       size : options.size,
       tags : options.tags || [],
+      gpi : options.gpi,
       visibility : (options.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
     }),
     knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
@@ -133,17 +135,18 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       knoxHeaders["Content-Length"] = options.size;
     }
 
-    console.log("DATE", options.date, photo.date);
+    console.log("PHOTO DATE", options.date, photo.date);
 
     knoxClient[knoxMethod](
       knoxMethodArgument,
       s3Config.photoPathPrefix + photo._id.toString(), 
       knoxHeaders, 
       function(err, result) {
+        console.log("RETURNED FROM S3, err:", err, ", statusCode: ", result.status);
         if (err) { return callback(err);  }
       
         if (result.statusCode !== 200) {
-          return callback(new Error("Status " + result.statusCode + " from S3"));
+          return callback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
         }
 
         if (knoxMethod === 'putFile' && !options.preserveStreamPath){

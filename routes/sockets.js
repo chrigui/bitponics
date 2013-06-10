@@ -5,6 +5,7 @@ var DeviceModel = require('../models/device').model,
     SensorLogModel = require('../models/sensorLog').model,
     NotificationModel = require('../models/notification').model,
     UserModel = require('../models/user').model,
+    PhotoModel = require('../models/photo').model,
     requirejs = require('../lib/requirejs-wrapper'),
     feBeUtils = requirejs('fe-be-utils'),
     async = require('async'),
@@ -224,6 +225,13 @@ module.exports = function(app){
                       createdAt : { $gte : lastChecked }
                     })
                     .exec(innerCallback);
+                  },
+                  function getPhotos(innerCallback){
+                    NotificationModel.find({
+                      gpi : growPlanInstanceId,
+                      ts : { $gte : lastChecked }
+                    })
+                    .exec(innerCallback);
                   }
                 ],
                 function parallelFinal(err, results){
@@ -232,6 +240,7 @@ module.exports = function(app){
                   var sensorLog = results[0][0],
                       device = results[1],
                       notifications = results[2],
+                      photos = results[3],
                       responseData;
 
                   if (sensorLog || device || notifications.length){
@@ -244,6 +253,9 @@ module.exports = function(app){
                     }
                     if (notifications.length){
                       responseData.notifications = notifications;
+                    }
+                    if (photos.length){
+                      responseData.photos = photos; 
                     }
                     
                     socket.emit('update', responseData);

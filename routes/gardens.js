@@ -8,6 +8,7 @@ Action = require('../models/action'),
 ActionModel = Action.model,
 DeviceModel = require('../models/device').model,
 NotificationModel = require('../models/notification').model,
+PhotoModel = require('../models/photo').model,
 ModelUtils = require('../models/utils'),
 routeUtils = require('./route-utils'),
 winston = require('winston'),
@@ -44,8 +45,8 @@ module.exports = function(app){
 	
 	/**
 	 * Show a "dashboard" view of a growPlanInstance
-	 * Hide/show elements in the dashboard.jade depending on
-	 * whether the req.user is the owner or not
+	 * TODO : Hide/show elements in the dashboard.jade depending on
+	 * whether the req.user is the owner/permissioned member or not
 	 */
 	app.get('/gardens/:growPlanInstanceId',
 		routeUtils.middleware.ensureSecure,
@@ -57,7 +58,7 @@ module.exports = function(app){
 				growPlanInstance : undefined,
 				sensors : undefined,
 				controls : undefined,
-				sensorDisplayOrder : ['ph','air','lux','water','ec','tds','sal','hum','full','vis','ir'],
+				sensorDisplayOrder : ['lux','hum','air','ph','ec','water','tds','sal','full','vis','ir'],
 				className: "app-page dashboard",
 				pageType: "app-page"
 			};
@@ -72,6 +73,8 @@ module.exports = function(app){
 				if (!routeUtils.checkResourceReadAccess(growPlanInstanceResultToVerify, req.user)){
           return res.send(401, "This garden is private. You must be the owner to view it.");
       	}
+
+      	locals.userCanModify = routeUtils.checkResourceModifyAccess(growPlanInstanceResultToVerify, req.user);
 
 				async.parallel(
 				[
@@ -129,6 +132,13 @@ module.exports = function(app){
 		        })
 		        .limit(10)
 		        .exec(innerCallback);
+		      },
+		      function getPhotos(innerCallback){
+		      	PhotoModel.find({
+		      		gpi : req.params.growPlanInstancesId,
+		      	})
+		      	.limit(10)
+		      	.exec(innerCallback);
 		      }
 				],
 				function(err, results){
@@ -144,6 +154,7 @@ module.exports = function(app){
 					locals.controls = results[1];
 					locals.growPlanInstance = results[2];
 					locals.notifications = results[3] || [];
+					locals.photos = results[4] || [];
 
 					res.render('gardens/dashboard', locals);
 				});

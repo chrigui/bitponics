@@ -87,14 +87,22 @@ module.exports = [
 			abbrev: "Light",
 			unit: "Lumens",
 			code: "full",
-			visible : true
+			visible : false
 		},
 		{
 			_id : '506de3098eebf7524342cb64',
 			name: "Visible Light",
-			abbrev: "Visible Light",
+			abbrev: "Vis Light",
 			unit: "Lumens",
 			code: "vis",
 			visible : false
+		},
+		{
+			_id : '51b4d9c65dd0f94858bac8ed',
+			name: "Water Level",
+			abbrev: "H2O Lvl",
+			unit: "centimeters",
+			code: "wl",
+			visible : true
 		}
 	];

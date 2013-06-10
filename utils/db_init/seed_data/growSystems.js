@@ -48,5 +48,18 @@ module.exports = [
 			type: "deep water culture (DWC)",
 			reservoirSize: .1,
 			plantCapacity: 12
+		},
+		{
+			_id : '51b0db785dd0f94858bac8df',
+			name: "Vertical Wall Garden",
+			description: "A vertical wall garden build on a wooden frame, with 4 columns of 12 pockets holding 2 plants each. Using wool pocket planters from Plants On Walls.",
+			type: "drip",
+			reservoirSize: 15,
+			plantCapacity: 96,
+			overallSize : {
+				w : 4,
+				h : 7.5,
+				d : 1	
+			}
 		}
 	];

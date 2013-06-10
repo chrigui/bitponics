@@ -75,7 +75,11 @@ require([
 			    backdropFade: true,
 			    dialogFade: true,
 			    dialogClass : 'overlay'
-			  }
+			  },
+        growPlanInstance : {
+          name : '',
+          currentGrowPlanDay : 0
+        }
 			};
 		});
 
@@ -265,6 +269,12 @@ require([
     		function($scope, growPlan, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
 					
+          $scope.$watch('sharedDataService.growPlanInstance.name', function(){
+            if (!$scope.sharedDataService.growPlanInstance.name){
+              $scope.sharedDataService.growPlanInstance.name = "My " + $scope.sharedDataService.selectedGrowPlan.name + " Garden";
+            }
+          });
+
           $scope.updateSelectedGrowPlanPlants(true);
         }
     	]
@@ -420,6 +430,7 @@ require([
             growMedium:undefined,
             nutrient:{}
           };
+
 
           $scope.selectedSensors = function () {
             var list = [];
@@ -592,11 +603,9 @@ require([
 
             if ($scope.sharedDataService.selectedGrowPlan) {
               var dataToSubmit = {
-                submittedGrowPlan:viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan),
-                growPlanInstance:{
-                  currentGrowPlanDay: 0 // TODO. Should be zero-based 
-                },
-                deviceId: $scope.sharedDataService.selected.deviceId
+                submittedGrowPlan : viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan),
+                growPlanInstance : $scope.sharedDataService.growPlanInstance,
+                deviceId : $scope.sharedDataService.selected.deviceId
               };
 
               console.log(dataToSubmit);
@@ -612,6 +621,7 @@ require([
                 success:function (data) {
                   console.log(data);
                   // TODO : Show message, take user to /dashboard
+                  window.location = "/gardens/" + data.createdGrowPlanInstanceId;
                 },
                 error:function (jqXHR, textStatus, error) {
                   console.log('error', jqXHR, textStatus, error);

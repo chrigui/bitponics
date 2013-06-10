@@ -40,5 +40,13 @@ module.exports = [
 			brand : "",
 			name : "LED",
 			bulbCapacity : 1
+		},
+		{
+			_id : '51b0daa65dd0f94858bac8dd',
+			type: "Fluorescent",
+			watts: 36,
+			brand : "Hydrofarm",
+			name : "T5 1-tube 3-foot System",
+			bulbCapacity : 1
 		}
 	];

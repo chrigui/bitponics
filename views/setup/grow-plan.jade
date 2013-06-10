@@ -95,13 +95,20 @@ block head
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         a.btn(href="customize/{{growPlan._id}}") Select
   
+
   script(type='text/ng-template', id='customize-overview.html')
     h4.page-heading Customize your grow plan
     div.separator-top
       div.question
-        label(for="gpedit_name", class="question-title") Name
+        label(for="gpedit_name", class="question-title") Grow Plan Name
         input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
       
+
+      div.question
+        label(class="question-title", for="gpi_name") Your Garden Name
+        input(type='text', id="gpi_name", name="gpi_name", ng-model="sharedDataService.growPlanInstance.name")
+          
+
       div(class="question-wrap-right")
         div.question
           label.question-title Plants
@@ -143,8 +150,13 @@ block head
                     value="expectedGrowPlanDuration",
                     ng-model="expectedGrowPlanDuration")
               span Days
-            //- span days and I am on day  
-            //- input(type="range", name="phase_slider_current", id="phase_slider_current", class="no-disable", value="0", min="0", max="182", ng-model="currentGrowPlanDay")
+              
+            h5(class="starting-day question-title seamless-input-wrap page-heading-small") I am starting on day
+              input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
+                    type="number", 
+                    ng-model="sharedDataService.growPlanInstance.currentGrowPlanDay", 
+                    min="0",
+                    max="{{expectedGrowPlanDuration}}")
           
           //- div.phase-sliders
           section.separator-top
@@ -183,6 +195,10 @@ block head
                   label Phase Description
                   textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.description")
 
+                div(class="phaseEndDescription")
+                    label Phase End Description
+                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
+
                 ul(class="phase-tabs separator-top")
                   li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
                       class="btn inverse-btn", 
@@ -202,11 +218,11 @@ block head
                     textarea(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description")
                     label Type
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type")
-                    label Reservoir Size
+                    label Reservoir Size (gallons)
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize")
                     label Plant Capacity
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity")
-                    h7 Size
+                    h7 Size (feet)
                     input(type="text", placeholder="W", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w")
                     input(type="text", placeholder="H", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h")
                     input(type="text", placeholder="D", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d")
@@ -334,7 +350,7 @@ block head
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhaseactionsViewModel")
+                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel")
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
@@ -448,20 +464,14 @@ block head
 
                     //- end Action UI
                         
-                  div(class="phaseEndDescription separator-top")
-                    label Phase End Description
-                    textarea(placeholder="This phase is over when...", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription")
-                
                 div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
                   h4(class="page-heading-large separator-top") Device
-                  p Here is where you can pair up your Bitponics device to your grow plan. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
+                  p Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
                   ul(class="grid devicelist")
                     li(ng-repeat="device in sharedDataService.userOwnedDevices")
-                      label
+                      label.btn(ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}")
                         input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId", ng-change="toggleDevice(device)")
                         | {{device.name}}
-                        div(ng-show="sharedDataService.selected.deviceId == device._id", style="font-style:italic")
-                          | Selected
 
 
       div(class="step-footer separator-top")

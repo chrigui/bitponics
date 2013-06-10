@@ -305,7 +305,7 @@ async.series([
               deviceKeys : _data.deviceKeys,
               apiKey : _data.apiKey
             },
-            "8bitpass", //default password
+            _data.password || "8bitpass", //default password
             function(err, user){
               if (err) { console.log(err); return callback(err);}
               savedObjectIds[dataType][_data.email] = user._id;
@@ -669,7 +669,8 @@ async.series([
             description: _data.description,
             type: _data.type,
             reservoirSize: _data.reservoirSize,
-            plantCapacity: _data.plantCapacity
+            plantCapacity: _data.plantCapacity,
+            overallSize : _data.overallSize
           });
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}

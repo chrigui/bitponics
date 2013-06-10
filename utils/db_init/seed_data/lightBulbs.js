@@ -35,5 +35,12 @@ module.exports = [
 			watts: 10,
 			brand : "",
 			name : "LED"
+		},
+		{
+			_id : '51b0dad85dd0f94858bac8de',
+			type: "Fluorescent",
+			watts: 36,
+			brand : "",
+			name : "3-foot T5 Fluorescent Tube"
 		}
 	];

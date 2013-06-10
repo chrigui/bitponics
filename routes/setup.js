@@ -265,8 +265,8 @@ module.exports = function(app){
 				submittedGrowPlan = req.body.submittedGrowPlan,
         sourceGrowPlanId = req.body.submittedGrowPlan._id,
         result = {
-					status : 'success',
-					message : '',
+					createdGrowPlanInstanceId : '',
+          message : '',
 					errors : []
 				};
 
@@ -306,7 +306,8 @@ module.exports = function(app){
             active : true,
             activePhaseId : startingPhaseData.phaseId,
             activePhaseDay : startingPhaseData.day,
-            device : req.body.deviceId
+            device : req.body.deviceId,
+            name : req.body.growPlanInstance.name
           },
           function(err, createdGrowPlanInstance){
             if (err) { 
@@ -315,13 +316,20 @@ module.exports = function(app){
             } else {
               result.status = 'success';
               result.message = 'Activated grow plan';
+              result.createdGrowPlanInstanceId = createdGrowPlanInstance._id.toString();
+              
               winston.info(
                 'activated grow plan for user ' + user._id.toString() + 
                 ', gp id ' + validatedGrowPlan._id.toString() + 
                 ', gpi id ' + createdGrowPlanInstance._id.toString()
               );
             }
-            return res.json(result);
+
+            if (res.status === 'error'){
+              return res.json(400, result);
+            } else {
+              return res.json(200, result);
+            }
           }
         );      
       });

@@ -209,7 +209,8 @@ GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
  * @param options.device (optional) If present, sets the device property on the grow plan instance
  * @param options.activePhaseId (optional) The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance
  * @param options.activePhaseDay (optional) Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
- *
+ * @param options.name (optional) Name of the GPI
+
  * @param callback. Function called with (err, growPlanInstance)
  */
 
@@ -237,7 +238,9 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           gpi.growPlan = growPlan;
 
           // set the name
-          if (!options.name){
+          if (options.name){
+            gpi.name = options.name;
+          } else {
           	gpi.name = growPlan.name + " Garden";
           }
 
