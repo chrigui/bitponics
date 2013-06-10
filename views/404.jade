@@ -1,8 +1,17 @@
-extends error
+- pageType = 'app-page'
+extends layout
 
 block content
-  h2 #{url} doesn't seem to be a valid url. 
-  a(href="/") Click here to go back to the home page
-  | , or if this was a url that used to work for you, let us know by 
-  a(href="/help") submitting a support request
-  | . 
+  
+	section.header
+		header
+			include includes/nav/main
+
+	section#main(role="main", class="main error")
+		div.content-module.middle
+			h2.page-heading #{url} doesn't seem to be a valid url. 
+			div.separator-top
+				p Click here to go back to the home page
+					| , or if this was a url that used to work for you, let us know by 
+					a(href="/help") submitting a support request
+					| .

@@ -1877,55 +1877,70 @@ li
 /*
  * App Page
  */
+.undefined,
 .app-page {
   color: #999;
 }
+.undefined .header,
 .app-page .header {
   position: static;
   padding: 0.45em 0;
   margin: 0 0 1em;
 }
+.undefined .header header,
 .app-page .header header {
   max-width: 120em;
 }
+.undefined .header .nav-section,
 .app-page .header .nav-section {
   padding: 0;
 }
+.undefined .header .nav-section.first,
 .app-page .header .nav-section.first,
+.undefined .header .nav-section.app-user,
 .app-page .header .nav-section.app-user {
   float: left;
   width: 48.499999%;
 }
+.undefined .header h1.logo a,
 .app-page .header h1.logo a,
+.undefined .header h1.logo span,
 .app-page .header h1.logo span {
   color: #00e36c;
 }
+.undefined .header .icon-glyphlogo-new,
 .app-page .header .icon-glyphlogo-new {
   display: none;
 }
+.undefined .main,
 .app-page .main {
   max-width: 120em;
   margin: 0 auto;
   overflow: hidden;
   width: 95%;
 }
+.undefined .footer,
 .app-page .footer {
   min-height: 0;
   background: #fff;
 }
+.undefined .label,
 .app-page .label {
   font-size: 0.75em;
 }
+.undefined .value,
 .app-page .value {
   font-size: 1.5em;
   color: #999;
 }
+.undefined .page-heading,
 .app-page .page-heading {
   color: #999;
   font-size: 1.25em;
   line-height: 1.25em;
   margin: 0 0 0.25em 0;
 }
+.undefined .page-heading-large,
 .app-page .page-heading-large {
   font-size: 2em;
   line-height: 1.25em;
@@ -1933,28 +1948,36 @@ li
   color: #999;
   border-width: 0;
 }
+.undefined .page-heading-large span,
 .app-page .page-heading-large span,
+.undefined .page-heading-large input,
 .app-page .page-heading-large input,
+.undefined .page-heading-large div,
 .app-page .page-heading-large div {
   color: #999;
 }
+.undefined .page-heading-small,
 .app-page .page-heading-small {
   line-height: 1.25em;
   font-size: 1.5em;
   line-height: 1em;
   font-size: 1.75em;
 }
+.undefined .separator-top,
 .app-page .separator-top {
   border-width: 1px 0 0;
   padding-top: 0.25em;
   margin-top: 0.25em;
 }
+.undefined .dropdown,
 .app-page .dropdown {
   margin: 1em auto;
 }
+.undefined .app-user,
 .app-page .app-user {
   text-align: right;
 }
+.undefined .app-user a,
 .app-page .app-user a {
   color: #00e36c !important;
 }
@@ -3036,28 +3059,6 @@ button.close {
   top: 0;
   left: 0;
 }
-.growplans .grid li {
-  margin: 1em 1em 0 0;
-}
-.growplans .grid li .btn {
-  margin: 0;
-  width: 100%;
-  text-align: center;
-}
-.growplans .grid img {
-  width: 100%;
-}
-.growplans .grid .label {
-  margin: 0;
-  padding: 0.45em 0 0;
-  border-top: 1px solid #999;
-}
-.growplans .grid .first .label {
-  border: 0 none;
-}
-.growplans .grid .value {
-  margin: 0 0 1em;
-}
 .growplans .next-step-btn,
 .growplans .phase-tabs .btn {
   background: #fff !important;
@@ -3218,4 +3219,13 @@ button.close {
   display: block !important;
   color: #00e36c;
   font-size: 4em;
+}
+/*
+ * Error Pages
+ */
+.error {
+  min-height: 35em;
+}
+.error p {
+  max-width: 35em;
 }
