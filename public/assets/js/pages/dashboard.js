@@ -167,14 +167,19 @@ require([
 
           // Set up functions and watchers
 
+          /**
+           *
+           */
           $scope.getGrowPlanInstancePhaseFromDate = function (date) {
             var dateMoment = moment(date),
               growPlanInstancePhases = $scope.sharedDataService.growPlanInstance.phases,
               i,
               phaseStart;
 
+            // Reverse-loop through the phases. Once we've found one with a calculatedStartDate before the targetDate,
+            // we've found the phase
             for (i = growPlanInstancePhases.length; i--;) {
-              phaseStart = growPlanInstancePhases[i].startDate;
+              phaseStart = growPlanInstancePhases[i].calculatedStartDate;
               if (dateMoment.isAfter(phaseStart)) {
                 return growPlanInstancePhases[i];
               }
@@ -183,11 +188,14 @@ require([
           };
 
 
+          /**
+           *
+           */
           $scope.getDayOfPhase = function (growPlanInstancePhase, growPlanPhase, date) {
-            var daysOffset = growPlanInstancePhase.startedOnDay || 0;
             // diff between date & gpiPhase.start + offset
-            return moment(date).diff(moment(growPlanInstancePhase.startDate || new Date()).add("days", daysOffset), "days");
+            return moment(date).diff(growPlanInstancePhase.calculatedStartDate, "days");
           };
+
 
           /**
            * Display data (sensor logs) for the provided date
@@ -220,11 +228,17 @@ require([
           };
 
 
+          /**
+           *
+           */
           $scope.$watch('sharedDataService.activeDate.loaded', function (newValue) {
             
           });
 
 
+          /**
+           *
+           */
           $scope.$watch('sharedDataService.targetActiveDate', function (newVal, oldVal) {
             $scope.displayDate($scope.sharedDataService.targetActiveDate);
           });
