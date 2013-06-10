@@ -1,10 +1,20 @@
-extends error
+- pageType = 'app-page'
+extends layout
 
 block content
-  h1 Error: #{error.message}
-  if settings['verbose errors']
-    pre= error.stack
-  else
-    p We seem to have nematodes in our servers. Please pardon the error. Our engineers are automatically emailed every server error, but if you need to get in touch with us, you can do so through
-      a(href="/help") our help page
-      | .
+  
+	section.header
+		header
+			include includes/nav/main
+
+	section#main(role="main", class="main error")
+		div.content-module.middle
+			h2.page-heading Error:
+			div.separator-top
+				p #{error.message}
+				if settings['verbose errors']
+					pre= error.stack
+				else
+					p We seem to have nematodes in our servers. Please pardon the error. Our engineers are automatically emailed every server error, but if you need to get in touch with us, you can do so through
+					a(href="/help") our help page
+					| .

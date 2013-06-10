@@ -362,6 +362,27 @@ require([
       ]
     );
 
+    dashboardApp.controller('bpn.controllers.dashboard.PhotoLogs',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.modalOptions = {
+            dialogClass : 'overlay photo'
+          };
+
+          $scope.open = function(timestamp){
+            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-'+timestamp
+          };
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+
+        }
+      ]
+    );
 
     dashboardApp.controller('bpn.controllers.dashboard.Controls',
       [
