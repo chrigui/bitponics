@@ -95,8 +95,16 @@ block content
                     h3(class="page-heading page-heading-small") Photo Title #3
                     div.content-module.centered
                       img(src="http://leafandgrain.com/wp-content/uploads/2012/12/fall-herbs-parsley1.jpg")
-            li.photo(ng-click="open()")
+            li.photo(ng-click="open('unique-timestamp-4')") 
               img(src="http://0.tqn.com/d/herbgardens/1/0/q/4/-/-/471646021_ad3e378bf8.jpg")
+              div
+                div(modal="sharedDataService.activeOverlay=='PhotoLogsOverlay-unique-timestamp-4'", close="close()", options="modalOptions")
+                  div(class="overlay-contain")
+                    div(class="close btn", ng-click="close()")
+                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                    h3(class="page-heading page-heading-small") Photo Title #3
+                    div.content-module.centered
+                      img(src="http://0.tqn.com/d/herbgardens/1/0/q/4/-/-/471646021_ad3e378bf8.jpg")
             li.photo(ng-click="open()")
               img(src="/assets/img/placeholders/hydro6.jpg")
             li.photo(ng-click="open()")
