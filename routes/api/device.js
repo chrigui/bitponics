@@ -253,7 +253,7 @@ module.exports = function(app) {
                     });
                   });
                   
-                  winston.info('/status pendingSensorLog');
+                  winston.info('/status logSensorLogs');
                   winston.info(JSON.stringify(pendingSensorLog));
 
                   ModelUtils.logSensorLog(
@@ -270,6 +270,7 @@ module.exports = function(app) {
                   if (!calibrationStatusLog){
                     return innerCallback();
                   }
+                  winston.info('/status logCalibrationStatusLog');
                   calibrationStatusLog.timestamp = calibrationStatusLog.timestamp || Date.now();
 
                   DeviceModel.logCalibrationStatus({

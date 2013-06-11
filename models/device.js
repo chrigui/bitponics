@@ -334,7 +334,10 @@ DeviceSchema.method('refreshStatus', function(callback) {
           newDeviceStatus.immediateActions = immediateActionResults.filter(function(immediateAction){
             var action = immediateAction.action;
             return device.outputMap.some(function(controlOutputPair){
-              return action.control.equals(controlOutputPair.control);
+              if (action.control){
+                return action.control.equals(controlOutputPair.control);  
+              }
+              return false;
             });
           });
 

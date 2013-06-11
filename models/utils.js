@@ -13,7 +13,8 @@ function logSensorLog(options, callback){
       async = require('async'),
       SensorLogModel = require('./sensorLog').model,
       requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils');
+      feBeUtils = requirejs('fe-be-utils'),
+      winston = require('winston');
 
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
@@ -79,7 +80,7 @@ function logSensorLog(options, callback){
 
         async.forEach(
           pendingSensorLog.logs, 
-          function(log, iteratorCallback){
+          function logsIterator(log, iteratorCallback){
             var idealRange = phase.idealRanges.filter(function(idealRange){ return idealRange.sCode == log.sCode})[0],
                 valueRange,
                 message = '';
@@ -106,10 +107,7 @@ function logSensorLog(options, callback){
                   immediateActionMessage : message, 
                   user : user 
                 },
-                function(err){
-                  if (err) { return iteratorCallback(err); }
-                  iteratorCallback();
-                }
+                iteratorCallback
               );
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
@@ -127,16 +125,14 @@ function logSensorLog(options, callback){
                   immediateActionMessage : message, 
                   user : user 
                 },
-                function(err){
-                  if (err) { return iteratorCallback(err); }
-                  iteratorCallback();
-                }
+                iteratorCallback
               );
             } else { 
               return iteratorCallback(); 
             }
           },
-          function(err){
+          function logsIteratorEnd(err){
+            winston.info("IN logSensorLog, logsIteratorEnd");
             if (err) { return innerCallback(err);}
 
             growPlanInstance.mergePhaseDaySummary(
@@ -144,7 +140,10 @@ function logSensorLog(options, callback){
                 growPlanInstancePhase : activeGrowPlanInstancePhase,
                 daySummary : phaseDaySummary
               },
-              innerCallback
+              function(err){
+                winston.info("IN logSensrLog, logsIteratorEnd growPlanInstance.mergePhaseDaySummary callback");
+                return innerCallback(err);
+              }
             );
           }
         );
@@ -152,6 +151,7 @@ function logSensorLog(options, callback){
     }
     ], 
     function parallelFinal(err, result){
+      winston.info("IN logSensorLog, parallelFinal");
       return callback(err);
     }
   );
@@ -334,11 +334,15 @@ function triggerImmediateAction(options, callback){
           ],
           function(err, results){
             winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", in parallel final, err: " + (err ? err.toString() : '') + ", results: " + results.length);
-            if (err) { return callback(err); }
+            if (err) { 
+              winston.info("IN triggerImmediateAction, calling callback");
+              return callback(err); 
+            }
             var data = {
               immediateAction : results[0][0],
               notification : results[1][0]
             }
+            winston.info("IN triggerImmediateAction, calling callback");
             return callback(null, data);
           }
         );
