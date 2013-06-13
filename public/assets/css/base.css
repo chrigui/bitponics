@@ -1804,14 +1804,14 @@ nav.open {
 .dashboard .grid {
   width: 80%;
   text-align: right;
-  height: 3em;
+  height: 4em;
   overflow: hidden;
 }
 .dashboard .grid li {
   cursor: pointer;
   float: right;
-  width: 3em;
-  height: 3em;
+  width: 4em;
+  height: 4em;
   overflow: hidden;
   vertical-align: top;
   margin: 0 0 0.25em;

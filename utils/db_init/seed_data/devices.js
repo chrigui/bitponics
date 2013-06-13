@@ -185,5 +185,11 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "AA-301-AAAH",
 			name : "Development Device 2013-05-26"
+		},
+		{
+			_id : "000666809f76",
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-JPZF",
+			name : "Development Device 2013-06-13"
 		}
 	];

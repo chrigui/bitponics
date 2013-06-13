@@ -2,7 +2,7 @@ extends ../layout
 
 
 block head
-  base(href="/account/devices/calibrate/#{device._id}/")
+  base(href="/account/devices/#{device._id}/calibrate/")
   script 
     bpn.pageData["deviceId"] = !{JSON.stringify(device._id)};
 
