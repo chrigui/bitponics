@@ -19,7 +19,8 @@ block css
     }
 
 block content
-  div(ng-controller="bpn.controllers.calibrate.Main")
+  img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+  div(ng-cloak, ng-controller="bpn.controllers.calibrate.Main")
     div(ng-view)
 
   div#overlay.overlay

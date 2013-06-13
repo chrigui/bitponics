@@ -152,7 +152,7 @@ module.exports = {
    * @return {Boolean}
    */
   checkResourceReadAccess : function(resource, user){
-    // return true if public, or user is in allowed list, or user is admin.
+    // return true if resource is public, or user is in allowed list, or user is admin.
     // else, return false
     if (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC){
       return true;
@@ -177,7 +177,7 @@ module.exports = {
    * @return {Boolean}
    */
   checkResourceModifyAccess : function(resource, user){
-    // return true if public, or user is in allowed list, or user is admin.
+    // return true if resource is public, or user is in allowed list, or user is admin.
     // else, return false
     return (  resource.owner.equals(user._id) || 
               resource.users.some(function(resourceUser){ return resourceUser.equals(user._id);}) ||
