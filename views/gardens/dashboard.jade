@@ -58,7 +58,7 @@ block content
                   div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
                   - if (userCanModify === true)
                     div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
-                      a(class="btn flush-left", ng-href="/account/devices/calibrate/{{sharedDataService.growPlanInstance.device._id}}") Calibrate
+                      a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.growPlanInstance.device._id}}/calibrate") Calibrate
                 
 
       div.content-module.middle.separator-top

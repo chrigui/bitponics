@@ -2,7 +2,7 @@ extends ../layout
 
 
 block head
-  base(href="/account/devices/calibrate/#{device._id}/")
+  base(href="/account/devices/#{device._id}/calibrate/")
   script 
     bpn.pageData["deviceId"] = !{JSON.stringify(device._id)};
 
@@ -19,7 +19,8 @@ block css
     }
 
 block content
-  div(ng-controller="bpn.controllers.calibrate.Main")
+  img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+  div(ng-cloak, ng-controller="bpn.controllers.calibrate.Main")
     div(ng-view)
 
   div#overlay.overlay

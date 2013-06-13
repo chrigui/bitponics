@@ -1299,6 +1299,11 @@ nav.open {
     -ms-transform: rotate(360deg);
   }
 }
+img.page-spinner.spinner {
+  display: block;
+  margin: 0 auto;
+  width: 30%;
+}
 /*
  * Block style select (gp selection and gardens selection)
  */
@@ -1645,11 +1650,6 @@ nav.open {
 /*
  * Dashboard Page
  */
-.dashboard img.page-spinner.spinner {
-  display: block;
-  margin: 0 auto;
-  width: 30%;
-}
 .dashboard.app-page .page-heading {
   font-size: 2.25em;
 }

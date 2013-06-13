@@ -7,6 +7,10 @@ var DeviceModel = require('../../models/device').model,
 
 
 module.exports = function(app){
+  
+  /**
+   *
+   */
   app.get('/account/devices',
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
@@ -49,7 +53,11 @@ module.exports = function(app){
     }
   );
 
-  app.get('/account/devices/calibrate/:id',
+  
+  /**
+   *
+   */
+  app.get('/account/devices/:id/calibrate',
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureLoggedIn,
     function (req, res, next){
@@ -72,9 +80,53 @@ module.exports = function(app){
     }
   );
 
-  app.get('/account/devices/calibrate/:id/*',
+  
+
+  /**
+   *
+   */
+  app.get('/account/devices/:id/calibrate/*',
     function (req, res, next){
       return res.redirect('/account/devices/calibrate/' + req.param('id'));
+    }
+  );
+
+
+
+  /**
+   * Modify the device.
+   *
+   * For now, all you can do is clear the device's calibration mode.
+   *
+   * @param {String|bool} req.params.clearCalibrationMode
+   */
+  app.post('/account/devices/:id',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      var redirectToDeviceHome = function(){
+        res.redirect("/account/devices");
+      };
+
+      DeviceModel.findById(req.params.id)
+      .exec(function(err, deviceResult){
+        if (err) { return next(err); }
+        if (!deviceResult){ return redirectToDeviceHome(); }
+
+        if (!routeUtils.checkResourceModifyAccess(deviceResult, req.user)){
+          return res.send(401);
+        }
+
+        if (req.param("clearCalibrationMode")){
+          deviceResult.status.calibrationMode = undefined;
+          deviceResult.save(function(err){
+            if (err) { return next(err); }
+            return redirectToDeviceHome();
+          });
+        } else {
+          return redirectToDeviceHome();
+        }
+      });
     }
   );
 };
