@@ -239,7 +239,8 @@ module.exports = function(app) {
             });
           },
           function logLogs(device, callback){
-            async.parallel(
+            // Run in series so that we don't attempt to update an outdated device document
+            async.series(
               [
                 function logSensorLogs(innerCallback){
                   if (!pendingDeviceLogs){
@@ -280,8 +281,8 @@ module.exports = function(app) {
                   );
                 }
               ],
-              function parallelFinal(err, results){
-                winston.info('/status parallelFinal', err);
+              function seriesFinal(err, results){
+                winston.info('/status seriesFinal', err);
                 return callback(err);
               }
             );
@@ -301,10 +302,7 @@ module.exports = function(app) {
   var sendDeviceStatusResponse = function(req, res, next, id, deviceModel){
     async.waterfall([
       function getDevice(innerCallback){
-        if (deviceModel){
-          return innerCallback(null, deviceModel);
-        }
-
+        // Ensure we're working with the latest device document
         DeviceModel
         .findOne({ _id: id })
         .exec(innerCallback);

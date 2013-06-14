@@ -77,7 +77,9 @@ function logSensorLog(options, callback){
         };
 
 
-        async.forEach(
+        // Run this in series so that idealRange triggers don't stumble over each other with attempting to update an outdated
+        // device document resulting in mongo VersionErrors
+        async.eachSeries(
           pendingSensorLog.logs, 
           function(log, iteratorCallback){
             var idealRange = phase.idealRanges.filter(function(idealRange){ return idealRange.sCode == log.sCode})[0],
@@ -325,11 +327,18 @@ function triggerImmediateAction(options, callback){
             },
             function(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", checking actionHasDeviceControl " + actionHasDeviceControl);
-              if (actionHasDeviceControl){ 
-                winston.info('Calling refreshStatus for device : ' + device._id.toString());
-                return device.refreshStatus(innerCallback);
-              } 
-              return innerCallback();
+              if (!actionHasDeviceControl){ 
+                return innerCallback();
+              }
+              
+              winston.info('Calling refreshStatus for device : ' + device._id.toString());
+              DeviceModel.findById(device._id)
+              .exec(function(err, deviceResult){
+                if (err) { return innerCallback(err); }
+                return deviceResult.refreshStatus(innerCallback);
+              });
+              
+              
             }
           ],
           function(err, results){
@@ -337,8 +346,9 @@ function triggerImmediateAction(options, callback){
             if (err) { return callback(err); }
             var data = {
               immediateAction : results[0][0],
-              notification : results[1][0]
-            }
+              notification : results[1][0],
+              device : results[2]
+            };
             return callback(null, data);
           }
         );
