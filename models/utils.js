@@ -13,8 +13,7 @@ function logSensorLog(options, callback){
       async = require('async'),
       SensorLogModel = require('./sensorLog').model,
       requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils'),
-      winston = require('winston');
+      feBeUtils = requirejs('fe-be-utils');
 
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
@@ -78,9 +77,11 @@ function logSensorLog(options, callback){
         };
 
 
-        async.forEach(
+        // Run this in series so that idealRange triggers don't stumble over each other with attempting to update an outdated
+        // device document resulting in mongo VersionErrors
+        async.eachSeries(
           pendingSensorLog.logs, 
-          function logsIterator(log, iteratorCallback){
+          function(log, iteratorCallback){
             var idealRange = phase.idealRanges.filter(function(idealRange){ return idealRange.sCode == log.sCode})[0],
                 valueRange,
                 message = '';
@@ -107,7 +108,10 @@ function logSensorLog(options, callback){
                   immediateActionMessage : message, 
                   user : user 
                 },
-                iteratorCallback
+                function(err){
+                  if (err) { return iteratorCallback(err); }
+                  iteratorCallback();
+                }
               );
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
@@ -125,14 +129,16 @@ function logSensorLog(options, callback){
                   immediateActionMessage : message, 
                   user : user 
                 },
-                iteratorCallback
+                function(err){
+                  if (err) { return iteratorCallback(err); }
+                  iteratorCallback();
+                }
               );
             } else { 
               return iteratorCallback(); 
             }
           },
-          function logsIteratorEnd(err){
-            winston.info("IN logSensorLog, logsIteratorEnd");
+          function(err){
             if (err) { return innerCallback(err);}
 
             growPlanInstance.mergePhaseDaySummary(
@@ -140,10 +146,7 @@ function logSensorLog(options, callback){
                 growPlanInstancePhase : activeGrowPlanInstancePhase,
                 daySummary : phaseDaySummary
               },
-              function(err){
-                winston.info("IN logSensrLog, logsIteratorEnd growPlanInstance.mergePhaseDaySummary callback");
-                return innerCallback(err);
-              }
+              innerCallback
             );
           }
         );
@@ -151,7 +154,6 @@ function logSensorLog(options, callback){
     }
     ], 
     function parallelFinal(err, result){
-      winston.info("IN logSensorLog, parallelFinal");
       return callback(err);
     }
   );
@@ -325,24 +327,28 @@ function triggerImmediateAction(options, callback){
             },
             function(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", checking actionHasDeviceControl " + actionHasDeviceControl);
-              if (actionHasDeviceControl){ 
-                winston.info('Calling refreshStatus for device : ' + device._id.toString());
-                return device.refreshStatus(innerCallback);
-              } 
-              return innerCallback();
+              if (!actionHasDeviceControl){ 
+                return innerCallback();
+              }
+              
+              winston.info('Calling refreshStatus for device : ' + device._id.toString());
+              DeviceModel.findById(device._id)
+              .exec(function(err, deviceResult){
+                if (err) { return innerCallback(err); }
+                return deviceResult.refreshStatus(innerCallback);
+              });
+              
+              
             }
           ],
           function(err, results){
             winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", in parallel final, err: " + (err ? err.toString() : '') + ", results: " + results.length);
-            if (err) { 
-              winston.info("IN triggerImmediateAction, calling callback");
-              return callback(err); 
-            }
+            if (err) { return callback(err); }
             var data = {
               immediateAction : results[0][0],
-              notification : results[1][0]
-            }
-            winston.info("IN triggerImmediateAction, calling callback");
+              notification : results[1][0],
+              device : results[2]
+            };
             return callback(null, data);
           }
         );
