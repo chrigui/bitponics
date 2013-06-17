@@ -389,11 +389,8 @@ module.exports = function(app) {
                   function(immediateAction, iteratorCallback){
                     immediateAction.expires = now;
                     immediateAction.save(iteratorCallback);
-                  }, 
-                  function(err){
-                    if (err) { return innerParallelCallback(err);}
-                    return innerParallelCallback();
-                  }
+                  },
+                  innerParallelCallback
                 );
               });
             },
