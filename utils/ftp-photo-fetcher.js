@@ -52,7 +52,7 @@ module.exports = {
 							//fs.writeFile(localFilePath, fileBuffer, function(err) {
 client.keepAlive();
 							gm(fileBuffer, fileMetaData.name)
-					    .rotate("#fff", 90)
+					    .rotate("#fff", 270)
 						  .write(localFilePath, function (err) {
 						    if (err) { return iteratorCallback(err); }
 					      client.keepAlive();
