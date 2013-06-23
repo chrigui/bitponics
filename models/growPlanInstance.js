@@ -411,7 +411,7 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
         "_id" : { "$ne" : deviceResult._id }
       }, 
       { "$unset": { "activeGrowPlanInstance": 1 } }, 
-      function(err){
+      function(err, numberAffected){
         async.parallel(
           [
             function updateDevice(innerCallback){

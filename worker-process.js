@@ -107,7 +107,7 @@ new cronJob('0 0 0 * * *', function(){
     var now = moment();
     console.log('Every 5 minutes, starting at ' + now.format());
 
-	ModelUtils.clearPendingNotifications(NotificationModel, function(err, count){
+	NotificationModel.clearPendingNotifications(function(err, count){
 		if (err) { console.log(err); }
     	
     	var finishedEnvironmentAt = moment();

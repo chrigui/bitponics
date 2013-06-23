@@ -59,7 +59,8 @@ module.exports = function(app){
 	 * 
 	 */
 	app.post('/admin/trigger-clearPendingNotifications', function (req, res) {
-	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err, numberNotificationsAffected){
+	  var NotificationModel = require('../models/notification').model;
+	  NotificationModel.clearPendingNotifications(function(err, numberNotificationsAffected){
 	  	if (err) { 
 	  		winston.error(err); 
 	  		return res.send(500, err);

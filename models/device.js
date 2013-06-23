@@ -328,7 +328,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
 
           if (conflictingImmediateActionIds.length > 0){
             // Expire all the expired ImmediateActions. Deciding not to wait on the result to move forward
-            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }).exec();
+            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }, { multi : true }).exec();
 
             conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
               // since we're removing elements from the target array as we go,
