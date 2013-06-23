@@ -101,7 +101,7 @@ module.exports = [
                         sCode: "air",
                         valueRange: {
                             min: 12.77, // 55 fahrenheit
-                            max: 27 // 80 fahrenheit
+                            max: 30 // 86 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"
@@ -201,7 +201,7 @@ module.exports = [
                         sCode: "air",
                         valueRange: {
                             min: 12.77, // 55 fahrenheit
-                            max: 27 // 80 fahrenheit
+                            max: 30 // 86 fahrenheit
                         },
                         actionBelowMin : "506de2fc8eebf7524342cb2b",
                         actionAboveMax : "506de2fb8eebf7524342cb2a"

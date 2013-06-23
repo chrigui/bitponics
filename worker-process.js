@@ -58,6 +58,26 @@ new cronJob('0 0 0 * * *', function(){
 
 
 
+
+/**
+ * Every 20 minutes
+ * - Check device connections
+ */
+ new cronJob('00 */20 * * * * ', function(){
+    var now = moment();
+
+    console.log('Every 20 minutes, starting at ' + now.format());
+
+    ModelUtils.checkDeviceConnections(function(err, count){
+        if (err) { console.log(err); }
+        var finishedEnvironmentAt = moment();
+        console.log(environment + ' ModelUtils.checkDeviceConnections started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+        console.log((count || 0) + " records affected");
+    });
+
+}, null, true, "America/New_York");
+
+
 /**
  * Every 10 minutes
  * - Fetch FTP photos
@@ -87,7 +107,7 @@ new cronJob('0 0 0 * * *', function(){
     var now = moment();
     console.log('Every 5 minutes, starting at ' + now.format());
 
-	ModelUtils.clearPendingNotifications(NotificationModel, function(err, count){
+	NotificationModel.clearPendingNotifications(function(err, count){
 		if (err) { console.log(err); }
     	
     	var finishedEnvironmentAt = moment();

@@ -78,6 +78,15 @@ var DeviceSchema = new Schema({
       }
     ],
     
+
+    /**
+     * Every device request refreshes this property with the current time.
+     * Used to query for devices that haven't communicated in a while
+     * Right now, only updated in app.post('/api/devices/:id/status')
+     */
+    lastCommunicationAt : { type : Date },
+
+
     sensorMap : [ SensorMapSchema ],
     
     
@@ -141,7 +150,7 @@ var DeviceSchema = new Schema({
   { id : false });
 
 DeviceSchema.plugin(useTimestamps);
-
+DeviceSchema.index({ 'activeGrowPlanInstance lastCommunicationAt': -1 }, { sparse: true });
 /***************** END SCHEMA PROPERTIES **********************/
 
 
@@ -319,7 +328,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
 
           if (conflictingImmediateActionIds.length > 0){
             // Expire all the expired ImmediateActions. Deciding not to wait on the result to move forward
-            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }).exec();
+            ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }, { multi : true }).exec();
 
             conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
               // since we're removing elements from the target array as we go,
@@ -334,7 +343,10 @@ DeviceSchema.method('refreshStatus', function(callback) {
           newDeviceStatus.immediateActions = immediateActionResults.filter(function(immediateAction){
             var action = immediateAction.action;
             return device.outputMap.some(function(controlOutputPair){
-              return action.control.equals(controlOutputPair.control);
+              if (action.control){
+                return action.control.equals(controlOutputPair.control);  
+              }
+              return false;
             });
           });
 

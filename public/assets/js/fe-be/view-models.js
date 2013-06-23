@@ -115,9 +115,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
         
-        if (!daySummary.date) {
-          daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
-        }
+        //if (!daySummary.date) {
+        daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
+        //}
         
         daySummary.dateKey = utils.getDateKey(daySummary.date);
 
