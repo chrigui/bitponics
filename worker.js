@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-var environments = ['development','staging'],
+var environments = ['development','staging','production'],
     childProcess = require('child_process'),
     childProcesses = [];
 
