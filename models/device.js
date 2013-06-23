@@ -78,6 +78,15 @@ var DeviceSchema = new Schema({
       }
     ],
     
+
+    /**
+     * Every device request refreshes this property with the current time.
+     * Used to query for devices that haven't communicated in a while
+     * Right now, only updated in app.post('/api/devices/:id/status')
+     */
+    lastCommunicationAt : { type : Date },
+
+
     sensorMap : [ SensorMapSchema ],
     
     
@@ -141,7 +150,7 @@ var DeviceSchema = new Schema({
   { id : false });
 
 DeviceSchema.plugin(useTimestamps);
-
+DeviceSchema.index({ 'activeGrowPlanInstance lastCommunicationAt': -1 }, { sparse: true });
 /***************** END SCHEMA PROPERTIES **********************/
 
 

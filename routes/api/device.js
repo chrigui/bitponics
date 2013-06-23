@@ -155,14 +155,8 @@ module.exports = function(app) {
     routeUtils.middleware.ensureSecure, 
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      return DeviceModel.findOne({ _id: req.params.id }, function (err, device) {
-        if (err) { return next(err); }
-        return device.remove(function (err) {
-          if (err) { return next(err); }  
-          winston.info("removed");
-          return res.send('');
-        });
-      });
+      // TODO
+      return res.send('NOT IMPLEMENTED');
     }
   );
 
@@ -226,7 +220,12 @@ module.exports = function(app) {
         [
           function getDevice(callback){
             DeviceModel
-            .findOne({ _id: id })
+            .findByIdAndUpdate(id, 
+            {
+              $set : {
+                lastCommunicationAt : new Date()
+              }
+            })
             .populate('activeGrowPlanInstance')
             .exec(function(err, device){
               if (!device){ 

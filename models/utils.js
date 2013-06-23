@@ -1,3 +1,5 @@
+module.exports = {};
+
 /**
  * logSensorLog : Log a sensorLog to the sensorLog collection as well as the
  * device.recentSensorLogs & growPlanInstance.recentSensorLogs. Verify against
@@ -8,7 +10,7 @@
  * @param options.growPlanInstance {GrowPlan}: optional. GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
  * @param options.device {Device} : optional. Device Model instance on which to log this to recentSensorLogs
  */
-function logSensorLog(options, callback){
+module.exports.logSensorLog = function (options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
       SensorLogModel = require('./sensorLog').model,
@@ -46,7 +48,7 @@ function logSensorLog(options, callback){
       //console.log(pendingSensorLog);
       //device.recentSensorLogs.unshift(pendingSensorLog.toObject());
       //device.save(innerCallback);
-      innerCallback();
+      return innerCallback();
     },
     function saveToGPI(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
@@ -67,7 +69,7 @@ function logSensorLog(options, callback){
         
         var phase = growPlan.phases.filter(function(item){ return item._id.equals(activeGrowPlanInstancePhase.phase); })[0];
         if (!phase){ return new Error('Active phase not found for this grow plan instance'); }
-        if (!phase.idealRanges){ return innerCallback();}
+        if (!(phase.idealRanges && phase.idealRanges.length)){ return innerCallback();}
         
 
         var phaseDaySummary = {
@@ -106,7 +108,8 @@ function logSensorLog(options, callback){
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
                   immediateActionMessage : message, 
-                  user : user 
+                  user : user,
+                  triggeredByIdealRangeViolation : true
                 },
                 function(err){
                   if (err) { return iteratorCallback(err); }
@@ -127,7 +130,8 @@ function logSensorLog(options, callback){
                   device : device, 
                   actionId : idealRange.actionBelowMin, 
                   immediateActionMessage : message, 
-                  user : user 
+                  user : user,
+                  triggeredByIdealRangeViolation : true
                 },
                 function(err){
                   if (err) { return iteratorCallback(err); }
@@ -157,7 +161,7 @@ function logSensorLog(options, callback){
       return callback(err);
     }
   );
-}
+};
 
 
 /**
@@ -171,9 +175,10 @@ function logSensorLog(options, callback){
  * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
  * @param {string} options.immediateActionMessage : message to log with the immediateAction
  * @param {User} options.user : required. owner of GrowPlanInstance
+ * @param {bool} options.triggeredByIdealRangeViolation : optional. Used to set Notification trigger
  * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
-function triggerImmediateAction(options, callback){
+module.exports.triggerImmediateAction = function (options, callback){
   var Device = require('./device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
@@ -191,7 +196,8 @@ function triggerImmediateAction(options, callback){
     tz = require('timezone/loaded'),
     i18nKeys = require('../i18n/keys'),
     requirejs = require('../lib/requirejs-wrapper'),
-    feBeUtils = requirejs('fe-be-utils');
+    feBeUtils = requirejs('fe-be-utils'),
+    getObjectId = module.exports.getObjectId;
 
   var growPlanInstance = options.growPlanInstance,
       device = options.device, 
@@ -279,7 +285,8 @@ function triggerImmediateAction(options, callback){
         
         var notificationType,
             notificationTitle,
-            notificationBody;
+            notificationBody,
+            notificationTrigger = (options.triggeredByIdealRangeViolation ? feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION : feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION);
 
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
@@ -320,7 +327,7 @@ function triggerImmediateAction(options, callback){
                   timeToSend : now,
                   title : notificationTitle,
                   type : notificationType,
-                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION
+                  trigger : notificationTrigger
               },
               innerCallback
               );
@@ -358,8 +365,10 @@ function triggerImmediateAction(options, callback){
 };
 
 
-
-function scanForPhaseChanges(GrowPlanInstanceModel, callback){
+/**
+ *
+ */
+module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
   var GrowPlanInstanceModel = require('./growPlanInstance').model,
       NotificationModel = require('./notification').model,
       winston = require('winston'),
@@ -431,7 +440,8 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
       }
     );
   });
-}
+};
+
 
 /** 
  * Called from the worker process across each environment, which is why we
@@ -439,7 +449,7 @@ function scanForPhaseChanges(GrowPlanInstanceModel, callback){
  *
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  */
-function clearPendingNotifications (NotificationModel, callback){
+module.exports.clearPendingNotifications = function (NotificationModel, callback){
   var NotificationModel = require('./notification').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
@@ -452,8 +462,6 @@ function clearPendingNotifications (NotificationModel, callback){
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf();
-
-
   
 
   NotificationModel
@@ -468,14 +476,30 @@ function clearPendingNotifications (NotificationModel, callback){
     
   
     // TEMP HACK : disabling emails til they're re-implemented with templates
-    return callback(null, notificationResults.length);
+    //return callback(null, notificationResults.length);
+
+    winston.info('IN clearPendingNotifications');
 
     async.each(
       notificationResults, 
       function notificationIterator(notification, iteratorCallback){
         var subject = i18nKeys.get("Bitponics Notification"),
-            mailTo = notification.users.map(function(user) { return user.email; }).join(', '),
+        
+            // TEMP HACK : remove Hyatt from email notifications
+            users = notification.users.filter(function(user){ return user.email !== 'anderson.foote@hyatt.com'; }),
+            mailTo,
             mailOptions;
+
+        // TEMP HACK : if empty user set (because it was directed to only Hyatt), mail it to Amit
+        if (!users.length){
+          winston.info('IN clearPendingNotifications, special case adding bitponics team');
+          users.push({email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'});
+        }
+
+        // TEMP HACK : sending all emails to Amit
+        //users = [{email : 'amit@bitponics.com'}];
+
+        mailTo = users.map(function(user) { return user.email; }).join(', ');
 
         if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED){ subject += ': ' + i18nKeys.get("Action Needed"); }
         
@@ -483,19 +507,25 @@ function clearPendingNotifications (NotificationModel, callback){
             from: "notifications@bitponics.com", // sender address
             to: mailTo,
             subject: subject, // Subject line
-            text: notification.message,
-            html: notification.message
+            text: notification.title + ': ' + notification.body,
+            html: notification.title + ': ' + notification.body
         };
 
-        winston.info("ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
+        winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
         
         emailTransport.sendMail(mailOptions, function(err, response){
           if(err){ return iteratorCallback(err); }
           
           notification.sentLogs.push({ts: now});
           
-          if (notification.repeat && notification.repeat.duration){
-            notification.timeToSend = tz(notification.timeToSend, notification.timezone, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
+          if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
+            console.log("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType)
+            notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
+            // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
+            // if we've got notifications regularly being processed
+            if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
+              notification.timeToSend = now; 
+            }
           } else {
             notification.timeToSend = null;
           }
@@ -503,12 +533,86 @@ function clearPendingNotifications (NotificationModel, callback){
           notification.save(iteratorCallback);
         });
       },
-      function (err){
+      function notificationLoopEnd(err){
         return callback(err, notificationResults.length);
       }
     );
   });
-}
+};
+
+
+/**
+ *
+ * @param {function(err, devicesAffected)} callback
+ */
+module.exports.checkDeviceConnections = function(callback){
+  var NotificationModel = require('./notification').model,
+      DeviceModel = require('./device').model,
+      async = require('async'),
+      winston = require('winston'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils'),
+      i18nKeys = require('../i18n/keys'),
+      moment = require('moment');
+
+  var now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
+      cutOffDate = new Date(nowAsMilliseconds - (20 * 60 * 1000));
+
+  DeviceModel.find({
+    activeGrowPlanInstance : { $exists : true },
+    $or : [ 
+      {
+        lastConnectionAt : { $exists : false }
+      }, 
+      {
+        lastConnectionAt : { $lte : cutOffDate }
+      }
+    ]
+  })
+  .select('name owner users activeGrowPlanInstance')
+  .populate('activeGrowPlanInstance', 'name owner users active')
+  .exec(function(err, deviceResults){
+    if (err) { return callback(err); }
+    
+    async.each(deviceResults,
+      function iterator(device, iteratorCallback){
+        if (!device.activeGrowPlanInstance.active) { return iteratorCallback(); }
+
+        var lastConnectionAt = '';
+        if (device.lastConnectionAt){
+          lastConnectionAt = moment(device.lastConnectionAt).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        }
+
+        var notificationTitle = i18nKeys.get("Check device connection"),
+            notificationBody = '';
+        if (lastConnectionAt){
+          notificationBody = i18nKeys.get("Device last heard from", device.activeGrowPlanInstance.name, lastConnectionAt, device._id);
+        } else {
+          notificationBody = i18nKeys.get("Device never heard from", device.activeGrowPlanInstance.name, device._id);
+        }
+
+        NotificationModel.create({
+          users : device.activeGrowPlanInstance.users,
+          gpi : device.activeGrowPlanInstance._id,
+          timeToSend : now,
+          type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+          trigger : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING,
+          triggerDetails : {
+            deviceId : device._id
+          },
+          title : notificationTitle,
+          body : notificationBody
+        }, iteratorCallback)
+      },
+      function loopEnd(err){
+        return callback(err, deviceResults.length);
+      }
+    );
+  });
+};
+
+
 
 /**
  * Returns the ObjectId of the object, taking into account
@@ -517,7 +621,7 @@ function clearPendingNotifications (NotificationModel, callback){
  * @param object
  * @return ObjectId
  */
-function getObjectId (object){
+module.exports.getObjectId = function(object){
   var ObjectID = require('mongodb').ObjectID;
   var constructor = object.constructor.name.toLowerCase();
   if (constructor === 'objectid'){ return object; }
@@ -530,10 +634,16 @@ function getObjectId (object){
 }
 
 
-function getDocumentIdString (object){
+
+/**
+ * TODO: docs
+ */
+module.exports.getDocumentIdString = function(object){
   if (object._id){ return object._id.toString(); }
   return object.toString();
-}
+};
+
+
 
 /**
  * Retrieves a GrowPlan and populates all of its nested objects:
@@ -558,7 +668,7 @@ function getDocumentIdString (object){
  * @param query {Object} Mongoose query parameters.
  * @param callback {function} Function with the signature function(err, [GrowPlan]){}. "GrowPlan" param is an array of POJO GrowPlans.
  */
-function getFullyPopulatedGrowPlan(query, callback){
+module.exports.getFullyPopulatedGrowPlan = function(query, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
       winston = require('winston'),
@@ -567,7 +677,8 @@ function getFullyPopulatedGrowPlan(query, callback){
       LightModel = require('./light').model,
       LightBulbModel = require('./lightBulb').model,
       LightFixtureModel = require('./lightFixture').model,
-      growPlans;
+      growPlans,
+      getObjectId = module.exports.getObjectId;
       
   async.series(
     [
@@ -704,7 +815,7 @@ function getFullyPopulatedGrowPlan(query, callback){
       return callback(err, growPlans);
     }
   );
-}
+};
 
 
 /**
@@ -720,7 +831,7 @@ function getFullyPopulatedGrowPlan(query, callback){
  * @param {User} settings.device
  * @param {function(err, {device: Device, user: User})} callback 
  */
-function assignDeviceToUser(settings, callback){
+module.exports.assignDeviceToUser = function(settings, callback){
   var Device = require('./device'),
       DeviceModel = Device.model,
       DeviceUtils = Device.utils,
@@ -763,16 +874,4 @@ function assignDeviceToUser(settings, callback){
       return callback(null, data);
     }
   );
-}
-
-
-module.exports = {
-  logSensorLog : logSensorLog,
-  triggerImmediateAction : triggerImmediateAction,
-  scanForPhaseChanges : scanForPhaseChanges,
-  clearPendingNotifications : clearPendingNotifications,
-  getObjectId : getObjectId,
-  getFullyPopulatedGrowPlan : getFullyPopulatedGrowPlan,
-  assignDeviceToUser : assignDeviceToUser,
-  getDocumentIdString : getDocumentIdString
 };

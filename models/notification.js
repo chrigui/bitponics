@@ -62,6 +62,7 @@ var NotificationSchema = new Schema({
 	/**
    * users
    * Users to send the notification to.
+   * Will usually be a copy of a GPI's or Device's users
    */
   u : [{ type: ObjectIdSchema, ref: 'User', required: true }],
 
@@ -89,9 +90,9 @@ var NotificationSchema = new Schema({
 	 */
 	r : {
     /**
-     * repeatType
+     * durationType
      */
-	 	repeatType : { type: String, enum: feBeUtils.DURATION_TYPES },
+	 	durationType : { type: String, enum: feBeUtils.DURATION_TYPES },
 		
     /**
      * duration
@@ -116,7 +117,7 @@ var NotificationSchema = new Schema({
    *
    * Plain-text title
    *
-   * Emails: Becomes the header (and subject?),
+   * Email: Becomes the header (and subject?),
    * Dashboard: Becomes the default view (user needs to click to show detail (body))
    * SMS : ?
    */
@@ -128,9 +129,9 @@ var NotificationSchema = new Schema({
    * 
    * Plain-text body
    *
-   * Emails: Becomes the header (and subject?),
-   * Dashboard: Becomes the default view (user needs to click to show detail (body))
-   * SMS : ?
+   * Email: Body
+   * Dashboard: Shown on expansion
+   * SMS : Not shown
    */
   b : { type: String },
 
@@ -155,7 +156,8 @@ var NotificationSchema = new Schema({
       feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION,
       feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
       feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION,
-      feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON
+      feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
+      feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING
       //feBeUtils.NOTIFICATION_TRIGGERS.SCHEDULED_MANUAL_PHASE_ACTION,
     ],
     required : true
@@ -174,6 +176,7 @@ var NotificationSchema = new Schema({
    * - actionId {ObjectId}
    * - idealRangeId {ObjectId}
    * - newGrowPlanId {ObjectId}
+   * - deviceId {String}
    */
   triggerDetails : Schema.Types.Mixed,
 

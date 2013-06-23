@@ -10,15 +10,18 @@ block head
 block content
   h1 Bitponics' Greatly Powerful Admin Panel
   
-  form(action="/admin/trigger_clearPendingNotifications", method="POST")
+  form(action="/admin/trigger-clearPendingNotifications", method="POST")
     input(type="submit", value="Trigger clearPendingNotifications") 
   
-  form(action="/admin/trigger_scanForPhaseChanges", method="POST")
+  form(action="/admin/trigger-scanForPhaseChanges", method="POST")
     input(type="submit", value="Trigger scanForPhaseChanges")
   
+  form(action="/admin/trigger-checkDeviceConnections", method="POST")
+    input(type="submit", value="Trigger checkDeviceConnections")
   
-  form(action="/admin/trigger_processNewFTPPhotos", method="POST")
-    input(type="submit", value="Trigger trigger_processNewFTPPhotos")
+  form(action="/admin/trigger-processNewFTPPhotos", method="POST")
+    input(type="submit", value="Trigger processNewFTPPhotos")
+
   //-form(action="/admin/trigger_processUnreadEmailPhotos", method="POST")
     input(type="submit", value="Trigger processUnreadEmailPhotos")
 

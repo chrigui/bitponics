@@ -40,7 +40,10 @@ exports.keys = {
   "Grow Plan Updated, automatic migration title" : "Your grow plan was updated.",
   "Grow Plan Updated, automatic migration body" : "We've automatically updated your garden to use the latest version.",
   "It's almost time" : "It's almost time for the %s phase.",
-  "Log into dashboard to advance" : "Log into your dashboard to advance your grow plan to the next phase."
+  "Log into dashboard to advance" : "Log into your dashboard to advance your grow plan to the next phase.",
+  "Check device connection" : "Check device connection",
+  "Device last heard from" : "Your device for the garden \"%s\" was last heard from on %s. Device ID is %s.",
+  "Device never heard from" : "We haven't heard anything from your device for the garden \"%s\" yet. Device ID is %s."
 };
 
 /**
