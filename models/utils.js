@@ -449,7 +449,7 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
  *
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  */
-module.exports.clearPendingNotifications = function (NotificationModel, callback){
+module.exports.clearPendingNotifications = function (callback){
   var NotificationModel = require('./notification').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
@@ -475,7 +475,7 @@ module.exports.clearPendingNotifications = function (NotificationModel, callback
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
   
-    // TEMP HACK : disabling emails til they're re-implemented with templates
+    // TEMP HACK : enable next line to disable emails
     //return callback(null, notificationResults.length);
 
     winston.info('IN clearPendingNotifications');
@@ -490,13 +490,13 @@ module.exports.clearPendingNotifications = function (NotificationModel, callback
             mailTo,
             mailOptions;
 
-        // TEMP HACK : if empty user set (because it was directed to only Hyatt), mail it to Amit
+        // TEMP HACK : if empty user set (because we cleared Hyatt from email recipients), mail it to Amit
         if (!users.length){
           winston.info('IN clearPendingNotifications, special case adding bitponics team');
           users.push({email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'});
         }
 
-        // TEMP HACK : sending all emails to Amit
+        // TEMP HACK : send all emails to Amit
         //users = [{email : 'amit@bitponics.com'}];
 
         mailTo = users.map(function(user) { return user.email; }).join(', ');

@@ -354,7 +354,7 @@ GrowPlanInstanceSchema.method('mergePhaseDaySummary', function(settings, callbac
       phaseStartMoment = moment(growPlanInstancePhase.startDate),
       normalizedDate = phaseStartMoment.add("days", phaseStartMoment.diff(date, "days"));
 
-      // TODO : normalize the date to localized midnight. need owner.timezone
+  // TODO : normalize the date to localized midnight. need owner.timezone
 
   if (daySummary){
     if (submittedPhaseDaySummary.status === feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD){
@@ -411,7 +411,7 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
         "_id" : { "$ne" : deviceResult._id }
       }, 
       { "$unset": { "activeGrowPlanInstance": 1 } }, 
-      function(err){
+      function(err, numberAffected){
         async.parallel(
           [
             function updateDevice(innerCallback){
