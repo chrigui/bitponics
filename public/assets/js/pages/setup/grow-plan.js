@@ -14,7 +14,23 @@ require([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']);
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
+
+      function($rootScope) {
+        /**
+         * Debugging Tools
+         *
+         * Allows you to execute debug functions from the view
+         */
+        $rootScope.log = function(variable) {
+          console.log(variable);
+        };
+        $rootScope.alert = function(text) {
+          alert(text);
+        };
+      
+      }
+    );
 
 		growPlanApp.config(
 			[
@@ -66,7 +82,7 @@ require([
         userOwnedDevices : bpn.userOwnedDevices,
 				filteredPlantList : angular.copy(bpn.plants),
 				selectedPlants : [],
-				activeOverlay : undefined,
+				activeOverlay : { is: undefined },
 				selected: {
 					plants : {},
 					deviceId : undefined
@@ -79,6 +95,11 @@ require([
         growPlanInstance : {
           name : '',
           currentGrowPlanDay : 0
+        },
+        submit : {
+          error : false,
+          success : false,
+          updateInProgress : false
         }
 			};
 		});
@@ -136,7 +157,7 @@ require([
 
     			$scope.close = function(){
     				// TODO : update the growPlan's from sharedDataService.selected.plants
-						$scope.sharedDataService.activeOverlay = undefined;
+						$scope.sharedDataService.activeOverlay.is = undefined;
     			};
     		}
     	]
@@ -158,7 +179,7 @@ require([
   				);
 
     			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay = undefined;
+						$scope.sharedDataService.activeOverlay.is = undefined;
     			};
     		}
     	]
@@ -180,7 +201,7 @@ require([
   				);
 
     			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay = undefined;
+						$scope.sharedDataService.activeOverlay.is = undefined;
     			};
     		}
     	]
@@ -202,7 +223,7 @@ require([
   				);
 
     			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay = undefined;
+						$scope.sharedDataService.activeOverlay.is = undefined;
     			};
     		}
     	]
@@ -234,11 +255,44 @@ require([
     			};
 
     			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay = undefined;
+						$scope.sharedDataService.activeOverlay.is = undefined;
     			};
     		}
     	]
   	);
+
+    growPlanApp.controller('bpn.controllers.setup.growPlan.ActivationOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          
+          // $scope.$watch('sharedDataService.activeOverlay',
+          //   function(newValue, oldValue) {
+          //     console.log('watched var')
+          //     if (newValue == 'ActivationOverlay') {
+          //       $scope.open();
+          //     }
+          //   }
+          // );
+
+          // $scope.open = function(){
+          //   // var d = $dialog.dialog($scope.sharedDataService.modalOptions);
+          //   // d.open().then(function(result){
+          //   //   if(result){
+          //   //     alert('dialog closed with result: ' + result);
+          //   //   }
+          //   // });
+          //   console.log('open it!');
+          // };
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay.is = undefined;
+          };
+        }
+      ]
+    );
 
 
     growPlanApp.controller('bpn.controllers.setup.growPlan.Filter',
@@ -378,7 +432,7 @@ require([
         'sharedDataService',
         function ($scope, $filter, GrowPlanModel, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
-          
+
           //$scope.lights = bpn.lights;
           //$scope.lightFixtures = bpn.lightFixtures;
           //$scope.lightBulbs = bpn.lightBulbs;
@@ -560,46 +614,45 @@ require([
           };
 
           
-          $scope.toggleOverlay = function (overlayMetaData) {
-            $scope.overlayMetaData = overlayMetaData;
-            switch (overlayMetaData.type) {
-              //case 'plant':
-                //$scope.overlayItems = $scope.filteredPlantList;
-                // $scope.overlayItemKey = "plants";
-                //break;
-              //case 'fixture':
-                //$scope.overlayItems = $scope.lightFixtures;
-                // $scope.overlayItemKey = "lightFixture";
-                //break;
-              //case 'bulb':
-                //$scope.overlayItems = $scope.lightBulbs;
-                // $scope.overlayItemKey = "lightBulb";
-                //break;
-              case 'growSystem':
-                $scope.overlayItems = $scope.growSystems;
-                // $scope.overlayItemKey = "growSystem";
-                break;
-              case 'nutrient':
-                $scope.overlayItems = $scope.nutrients;
-                // $scope.overlayItemKey = "nutrients";
-                break;
-              default:
-                $scope.overlayItems = [];
-                // $scope.overlayItemKey = '';
-                break;
-            }
-            if ($scope.overlayStates[$scope.overlayMetaData.type]) {
-              $scope.overlayItems = [];
-              $scope.overlayStates[$scope.overlayMetaData.type] = false;
-            } else {
-              // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
-              $scope.$broadcast('newOverlay');
-              $scope.overlayStates[$scope.overlayMetaData.type] = true;
-            }
-          };
+          // $scope.toggleOverlay = function (overlayMetaData) {
+          //   $scope.overlayMetaData = overlayMetaData;
+          //   switch (overlayMetaData.type) {
+          //     //case 'plant':
+          //       //$scope.overlayItems = $scope.filteredPlantList;
+          //       // $scope.overlayItemKey = "plants";
+          //       //break;
+          //     //case 'fixture':
+          //       //$scope.overlayItems = $scope.lightFixtures;
+          //       // $scope.overlayItemKey = "lightFixture";
+          //       //break;
+          //     //case 'bulb':
+          //       //$scope.overlayItems = $scope.lightBulbs;
+          //       // $scope.overlayItemKey = "lightBulb";
+          //       //break;
+          //     case 'growSystem':
+          //       $scope.overlayItems = $scope.growSystems;
+          //       // $scope.overlayItemKey = "growSystem";
+          //       break;
+          //     case 'nutrient':
+          //       $scope.overlayItems = $scope.nutrients;
+          //       // $scope.overlayItemKey = "nutrients";
+          //       break;
+          //     default:
+          //       $scope.overlayItems = [];
+          //       // $scope.overlayItemKey = '';
+          //       break;
+          //   }
+          //   if ($scope.overlayStates[$scope.overlayMetaData.type]) {
+          //     $scope.overlayItems = [];
+          //     $scope.overlayStates[$scope.overlayMetaData.type] = false;
+          //   } else {
+          //     // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
+          //     $scope.$broadcast('newOverlay');
+          //     $scope.overlayStates[$scope.overlayMetaData.type] = true;
+          //   }
+          // };
 
           $scope.submit = function (e) {
-            //e.preventDefault();
 
             if ($scope.sharedDataService.selectedGrowPlan) {
               var dataToSubmit = {
@@ -608,24 +661,30 @@ require([
                 deviceId : $scope.sharedDataService.selected.deviceId
               };
 
+              $scope.sharedDataService.submit.updateInProgress = true;
               console.log(dataToSubmit);
 
-              // TODO : show spinner
               $.ajax({
-                url:'/setup/grow-plan',
-                type:'POST',
-                contentType:'application/json; charset=utf-8',
-                dataType:'json',
-                data:JSON.stringify(dataToSubmit),
-                processData:false,
-                success:function (data) {
+                url: '/setup/grow-plan',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                data: JSON.stringify(dataToSubmit),
+                processData: false,
+                success: function(data) {
                   console.log(data);
-                  // TODO : Show message, take user to /dashboard
-                  window.location = "/gardens/" + data.createdGrowPlanInstanceId;
+                  $scope.sharedDataService.createdGrowPlanInstanceId = data.createdGrowPlanInstanceId
+                  $scope.sharedDataService.submit.success = true;
                 },
-                error:function (jqXHR, textStatus, error) {
+                error: function(jqXHR, textStatus, error) {
                   console.log('error', jqXHR, textStatus, error);
-                  // TODO : show an error message
+                  $scope.sharedDataService.submit.error = true;
+                  $scope.sharedDataService.submit.success = false;
+                },
+                complete: function() {
+                  $scope.$apply(function() {
+                    $scope.sharedDataService.activeOverlay = { is: 'ActivationOverlay' };
+                  });
                 }
               });
             }
