@@ -58,21 +58,21 @@ module.exports = function(app){
 	/**
 	 * 
 	 */
-	app.post('/admin/trigger_clearPendingNotifications', function (req, res) {
-	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err){
+	app.post('/admin/trigger-clearPendingNotifications', function (req, res) {
+	  ModelUtils.clearPendingNotifications(require('../models/notification').model, function(err, numberNotificationsAffected){
 	  	if (err) { 
 	  		winston.error(err); 
 	  		return res.send(500, err);
 	  	}
-	  	return res.send(200, 'success');
+	  	return res.send(200, 'success, ' + numberNotificationsAffected + ' records affected');
 	  });
-	});	
+	});
 
 	
 	/**
 	 * 
 	 */
-	app.post('/admin/trigger_scanForPhaseChanges', function (req, res) {
+	app.post('/admin/trigger-scanForPhaseChanges', function (req, res) {
 	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
 	  	if (err) { 
 	  		winston.error(err); 
@@ -83,11 +83,24 @@ module.exports = function(app){
 	});
 
 
+	/**
+	 * 
+	 */
+	app.post('/admin/trigger-checkDeviceConnections', function (req, res) {
+	  ModelUtils.checkDeviceConnections(function(err){
+	  	if (err) { 
+	  		winston.error(err); 
+	  		return res.send(500, err);
+	  	}
+	  	return res.send(200, 'success');
+	  });
+	});
+
 
 	/**
 	 * 
 	 */
-	app.post('/admin/trigger_processUnreadEmailPhotos', function (req, res) {
+	app.post('/admin/trigger-processUnreadEmailPhotos', function (req, res) {
 	  var PhotoModel = require('../models/photo').model,
 	  	emailFetcher = require('../utils/email-photo-fetcher');
 
@@ -105,7 +118,7 @@ module.exports = function(app){
 	/**
 	 * 
 	 */
-	app.post('/admin/trigger_processNewFTPPhotos', function (req, res) {
+	app.post('/admin/trigger-processNewFTPPhotos', function (req, res) {
 	  var PhotoModel = require('../models/photo').model,
 	  	ftpPhotoFetcher = require('../utils/ftp-photo-fetcher');
 

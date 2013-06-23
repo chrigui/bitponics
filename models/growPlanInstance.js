@@ -785,7 +785,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       },
                       title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        type : states[0].durationType,
+                        durationType : states[0].durationType,
                         duration : states[0].duration,
                         timezone : owner.timezone
                       },
@@ -805,7 +805,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       },
                       title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        type : states[1].durationType,
+                        durationType : states[1].durationType,
                         duration : states[1].duration,
                         timezone : owner.timezone
                       },
@@ -825,7 +825,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       },
                       title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        type : 'seconds',
+                        durationType : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
                         timezone : owner.timezone
                       },
@@ -844,7 +844,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       },
                       title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        type : 'seconds',
+                        durationType : 'seconds',
                         duration : action.overallCycleTimespan * 1000,
                         timezone : owner.timezone
                       },

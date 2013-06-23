@@ -183,39 +183,42 @@ module.exports = function(app){
 	    	className: "garden-sensor-logs"
 	    };
 		  
-	    async.parallel(
-				[
-					function parallel1(innerCallback){
-						SensorModel.find({visible : true}).exec(innerCallback);
-					},
-					function parallel2(innerCallback){
-						ControlModel.find().exec(innerCallback);
-					},
-					function parallel3(innerCallback){
-						GrowPlanInstanceModel
-						.findById(req.params.growPlanInstanceId)
-						.populate('growPlan')
-						.exec(innerCallback);
-					},
-					function parallel4(innerCallback){
-						SensorLogModel
-						.find({ gpi : req.params.growPlanInstanceId})
-						.select('ts l')
-						.exec(innerCallback);
+		  GrowPlanInstanceModel
+			.findById(req.params.growPlanInstanceId)
+			.populate('growPlan')
+			.exec(function(err, growPlanInstanceResult){
+				if (!routeUtils.checkResourceReadAccess(growPlanInstanceResult, req.user)){
+          return res.send(401, "This garden is private. You must be the owner to view it.");
+      	}
+
+      	locals.growPlanInstance = growPlanInstanceResult;
+
+
+      	async.parallel(
+					[
+						function parallel1(innerCallback){
+							SensorModel.find({visible : true}).exec(innerCallback);
+						},
+						function parallel2(innerCallback){
+							ControlModel.find().exec(innerCallback);
+						},
+						function parallel3(innerCallback){
+							SensorLogModel
+							.find({ gpi : req.params.growPlanInstanceId})
+							.select('ts l')
+							.exec(innerCallback);
+						}
+					],
+					function(err, results){
+						if (err) { return next(err); }
+						locals.sensors = results[0];
+						locals.controls = results[1];
+						locals.sensorLogs = results[2];
+
+						res.render('gardens/sensor-logs', locals);
 					}
-				],
-				function(err, results){
-					if (err) { return next(err); }
-					locals.sensors = results[0];
-					locals.controls = results[1];
-					locals.growPlanInstance = results[2];
-					locals.sensorLogs = results[3];
-
-					res.render('gardens/sensor-logs', locals);
-				}
-	    );
-
-		  
+		    );
+			});
 		}
 	);
 };

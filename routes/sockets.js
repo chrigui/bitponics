@@ -20,8 +20,11 @@ module.exports = function(app){
     .of('/calibrate')
     .on('connection', function(socket){
       var session = socket.handshake.session,
-          userId = session.passport.user,
+          userId,
           checkIntervalId;
+
+      if (!session){ return; }
+      userId = session.passport.user,
 
       socket.on('disconnect', function () {
         clearInterval(checkIntervalId);

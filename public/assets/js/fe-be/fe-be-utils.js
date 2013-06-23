@@ -36,7 +36,8 @@ define(['moment'], function(moment){
     IDEAL_RANGE_VIOLATION : "idealRangeViolation",
     IMMEDIATE_ACTION : "immediateAction",
     PHASE_ENDING_SOON : "phaseEndingSoon",
-    GROW_PLAN_UPDATE : "growPlanUpdate"
+    GROW_PLAN_UPDATE : "growPlanUpdate",
+    DEVICE_MISSING : "deviceMissing"
   };
 
 
