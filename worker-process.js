@@ -88,12 +88,14 @@ new cronJob('0 0 0 * * *', function(){
 
     console.log('Every 10 minutes, starting at ' + now.format());
 
-	ftpPhotoFetcher.processNewPhotos(PhotoModel, function(err, results){
-		if (err) { console.log(err); }
-    	var finishedEnvironmentAt = moment();
-    	console.log(environment + 'ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-    	console.log((results ? results.length : 0) + " images processed");
-	});    		
+	if (environment === 'production'){
+        ftpPhotoFetcher.processNewPhotos(PhotoModel, function(err, results){
+            if (err) { console.log(err); }
+            var finishedEnvironmentAt = moment();
+            console.log(environment + 'ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+            console.log((results ? results.length : 0) + " images processed");
+        });             
+    }
 
 }, null, true, "America/New_York");
 
