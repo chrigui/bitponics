@@ -36,29 +36,6 @@ new cronJob('0 0 0 * * *', function(){
 }, null, true, "America/New_York");
 
 
-
-/**
- * Every 10 minutes
- * - Fetch email photos
- */
-//  new cronJob('00 */10 * * * * ', function(){
-//     var now = moment(),
-//     		emailPhotoFetcher = require('./utils/email-photo-fetcher');
-
-//     console.log('Every 10 minutes, starting at ' + now.format());
-
-// 		emailPhotoFetcher.processUnreadEmails(PhotoModel, function(err, results){
-// 			if (err) { console.log(err); }
-//     	var finishedEnvironmentAt = moment();
-//     	console.log('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-//     	console.log((results ? results.length : 0) + " email images processed");
-// 		});    		
-    
-// }, null, true, "America/New_York");
-
-
-
-
 /**
  * Every 20 minutes
  * - Check device connections
@@ -81,10 +58,12 @@ new cronJob('0 0 0 * * *', function(){
 /**
  * Every 10 minutes
  * - Fetch FTP photos
+ * - Fetch email photos
  */
  new cronJob('00 */10 * * * * ', function(){
     var now = moment(),
-    		ftpPhotoFetcher = require('./utils/ftp-photo-fetcher');
+		ftpPhotoFetcher = require('./utils/ftp-photo-fetcher'),
+        emailPhotoFetcher = require('./utils/email-photo-fetcher');
 
     console.log('Every 10 minutes, starting at ' + now.format());
 
@@ -94,7 +73,14 @@ new cronJob('0 0 0 * * *', function(){
             var finishedEnvironmentAt = moment();
             console.log(environment + 'ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
             console.log((results ? results.length : 0) + " images processed");
-        });             
+        });
+
+        emailPhotoFetcher.processUnreadEmails(PhotoModel, function(err, results){
+            if (err) { console.log(err); }
+            var finishedEnvironmentAt = moment();
+            console.log('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+            console.log((results ? results.length : 0) + " email images processed");
+        });
     }
 
 }, null, true, "America/New_York");
