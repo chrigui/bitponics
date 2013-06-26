@@ -159,9 +159,9 @@ module.exports = {
     }
     if (!user._id){ return false; }
     var userId = user._id;
-    return (  resource.owner.equals(userId) || 
-              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) ||
-              user.admin
+    return (  user.admin ||
+              resource.owner.equals(userId) || 
+              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
   },
 
@@ -177,11 +177,13 @@ module.exports = {
    * @return {Boolean}
    */
   checkResourceModifyAccess : function(resource, user){
-    // return true if resource is public, or user is in allowed list, or user is admin.
+    // return true if user is in allowed list or user is admin.
     // else, return false
-    return (  resource.owner.equals(user._id) || 
-              resource.users.some(function(resourceUser){ return resourceUser.equals(user._id);}) ||
-              user.admin
+    if (!user._id){ return false; }
+    var userId = user._id;
+    return (  user.admin ||
+              resource.owner.equals(userId) || 
+              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
   }
 
