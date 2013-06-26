@@ -102,7 +102,7 @@ module.exports.logSensorLog = function (options, callback){
               // TODO : replace log.sCode with the sensor name
               message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
               
-              triggerImmediateAction(
+              module.exports.triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
@@ -124,7 +124,7 @@ module.exports.logSensorLog = function (options, callback){
               
               message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
               
-              triggerImmediateAction(
+              module.exports.triggerImmediateAction(
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
@@ -442,103 +442,6 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
   });
 };
 
-
-/** 
- * Called from the worker process across each environment, which is why we
- * need the model to be passed in.
- *
- * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
- */
-module.exports.clearPendingNotifications = function (callback){
-  var NotificationModel = require('./notification').model,
-      EmailConfig = require('../config/email-config'),
-      nodemailer = require('nodemailer'),
-      tz = require('timezone/loaded'),
-      async = require('async'),
-      winston = require('winston'),
-      requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils'),
-      i18nKeys = require('../i18n/keys');
-
-  var now = new Date(),
-      nowAsMilliseconds = now.valueOf();
-  
-
-  NotificationModel
-  .find()
-  .where('tts')
-  .lte(now)
-  .populate('u', 'email') // only need the email field for Users
-  .exec(function(err, notificationResults){
-    if (err) { return callback(err); }
-    if (!notificationResults.length){ return callback(); }
-    var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
-    
-  
-    // TEMP HACK : enable next line to disable emails
-    //return callback(null, notificationResults.length);
-
-    winston.info('IN clearPendingNotifications');
-
-    async.each(
-      notificationResults, 
-      function notificationIterator(notification, iteratorCallback){
-        var subject = i18nKeys.get("Bitponics Notification"),
-        
-            // TEMP HACK : remove Hyatt from email notifications
-            users = notification.users.filter(function(user){ return user.email !== 'anderson.foote@hyatt.com'; }),
-            mailTo,
-            mailOptions;
-
-        // TEMP HACK : if empty user set (because we cleared Hyatt from email recipients), mail it to Amit
-        if (!users.length){
-          winston.info('IN clearPendingNotifications, special case adding bitponics team');
-          users.push({email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'});
-        }
-
-        // TEMP HACK : send all emails to Amit
-        //users = [{email : 'amit@bitponics.com'}];
-
-        mailTo = users.map(function(user) { return user.email; }).join(', ');
-
-        if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED){ subject += ': ' + i18nKeys.get("Action Needed"); }
-        
-        mailOptions = {
-            from: "notifications@bitponics.com", // sender address
-            to: mailTo,
-            subject: subject, // Subject line
-            text: notification.title + ': ' + notification.body,
-            html: notification.title + ': ' + notification.body
-        };
-
-        winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
-        
-        emailTransport.sendMail(mailOptions, function(err, response){
-          if(err){ return iteratorCallback(err); }
-          
-          notification.sentLogs.push({ts: now});
-          
-          if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
-            console.log("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType)
-            notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
-            // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-            // if we've got notifications regularly being processed
-            if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
-              notification.timeToSend = now; 
-            }
-          } else {
-            notification.timeToSend = null;
-          }
-          
-          notification.save(iteratorCallback);
-        });
-      },
-      function notificationLoopEnd(err){
-        return callback(err, notificationResults.length);
-      }
-    );
-  });
-};
 
 
 /**

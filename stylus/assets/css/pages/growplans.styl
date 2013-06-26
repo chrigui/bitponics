@@ -68,7 +68,13 @@
 	// 	min-height 3em
 
 	#growplans_activate
+		@extends .display-ib
 		clear both
+
+	.spinner
+		@extends .display-ib
+		width: 2em;
+		margin: 1em;
 
 	.phaseDescription
 		margin 0 0 2em 0
@@ -199,4 +205,10 @@
 		margin 2em 0 2em
 		clear both
 
-		
+
+	.activation
+		height auto
+		overflow hidden
+
+		.close
+			display none

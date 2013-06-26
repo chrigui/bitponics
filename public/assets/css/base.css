@@ -501,7 +501,8 @@ td {
 .display-n {
   display: none;
 }
-.display-i {
+.display-i,
+.link {
   display: inline;
 }
 .display-ib,
@@ -516,6 +517,8 @@ td {
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .growplans .edit-btn,
+.growplans #growplans_activate,
+.growplans .spinner,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
@@ -967,6 +970,14 @@ ol.list-style {
 }
 .btn.off {
   background: #fff;
+  color: #00e36c;
+}
+.link {
+  color: #00e36c;
+  background: #fff;
+  border: none;
+}
+.link:hover {
   color: #00e36c;
 }
 .page-content .center {
@@ -3146,6 +3157,10 @@ button.close {
 .growplans #growplans_activate {
   clear: both;
 }
+.growplans .spinner {
+  width: 2em;
+  margin: 1em;
+}
 .growplans .phaseDescription {
   margin: 0 0 2em 0;
 }
@@ -3262,6 +3277,13 @@ button.close {
 .growplans .phaseEndDescription {
   margin: 2em 0 2em;
   clear: both;
+}
+.growplans .activation {
+  height: auto;
+  overflow: hidden;
+}
+.growplans .activation .close {
+  display: none;
 }
 /*
  * Gardens List Page
