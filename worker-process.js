@@ -11,8 +11,11 @@ var environment = process.argv.slice(2)[0], //gets first cmd line arg
 	ModelUtils = require('./models/utils'),
 	NotificationModel = require('./models/notification').model,
 	GrowPlanInstanceModel = require('./models/growPlanInstance').model,
-	PhotoModel = require('./models/photo').model;
-	
+	PhotoModel = require('./models/photo').model,
+    winston = require('./config/winston-config')('worker');
+
+
+winston.info('Started worker-process.js for environment:' + environment);
 
 mongooseConnection.open(environment);
 
@@ -24,13 +27,15 @@ mongooseConnection.open(environment);
  */
 new cronJob('0 0 0 * * *', function(){
     var now = moment();
-    console.log('Every day at 00:00, starting at ' + now.format());
+    winston.info('Every day at 00:00, starting at ' + now.format());
+    
+    winston.info(environment + ' ModelUtils.scanForPhaseChanges');
     
     ModelUtils.scanForPhaseChanges(GrowPlanInstanceModel, function(err, count){
-    	if (err) { console.log(err); }
+    	if (err) { winston.info(err); }
     	var finishedEnvironmentAt = moment();
-    	console.log(environment + ' ModelUtils.scanForPhaseChanges started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-    	console.log((count || 0) + " records affected");
+    	winston.info(environment + ' ModelUtils.scanForPhaseChanges started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+    	winston.info((count || 0) + " records affected");
     });
     
 }, null, true, "America/New_York");
@@ -43,13 +48,15 @@ new cronJob('0 0 0 * * *', function(){
  new cronJob('00 */20 * * * * ', function(){
     var now = moment();
 
-    console.log('Every 20 minutes, starting at ' + now.format());
+    winston.info('Every 20 minutes, starting at ' + now.format());
 
+    winston.info(environment + ' ModelUtils.checkDeviceConnections');
+    
     ModelUtils.checkDeviceConnections(function(err, count){
-        if (err) { console.log(err); }
+        if (err) { winston.info(err); }
         var finishedEnvironmentAt = moment();
-        console.log(environment + ' ModelUtils.checkDeviceConnections started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-        console.log((count || 0) + " records affected");
+        winston.info(environment + ' ModelUtils.checkDeviceConnections started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+        winston.info((count || 0) + " records affected");
     });
 
 }, null, true, "America/New_York");
@@ -65,21 +72,26 @@ new cronJob('0 0 0 * * *', function(){
 		ftpPhotoFetcher = require('./utils/ftp-photo-fetcher'),
         emailPhotoFetcher = require('./utils/email-photo-fetcher');
 
-    console.log('Every 10 minutes, starting at ' + now.format());
+    winston.info('Every 10 minutes, starting at ' + now.format());
 
 	if (environment === 'production'){
+    
+        winston.info(environment + ' ftpPhotoFetcher.processNewPhotos')
+
         ftpPhotoFetcher.processNewPhotos(PhotoModel, function(err, results){
-            if (err) { console.log(err); }
+            if (err) { winston.info(err); }
             var finishedEnvironmentAt = moment();
-            console.log(environment + 'ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-            console.log((results ? results.length : 0) + " images processed");
+            winston.info(environment + 'ftpPhotoFetcher.processNewPhotos started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+            winston.info((results ? results.length : 0) + " images processed");
         });
 
+        winston.info(environment + ' emailPhotoFetcher.processUnreadEmails')
+        
         emailPhotoFetcher.processUnreadEmails(PhotoModel, function(err, results){
-            if (err) { console.log(err); }
+            if (err) { winston.info(err); }
             var finishedEnvironmentAt = moment();
-            console.log('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-            console.log((results ? results.length : 0) + " email images processed");
+            winston.info('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+            winston.info((results ? results.length : 0) + " email images processed");
         });
     }
 
@@ -93,14 +105,17 @@ new cronJob('0 0 0 * * *', function(){
  */
  new cronJob('00 */5 * * * * ', function(){
     var now = moment();
-    console.log('Every 5 minutes, starting at ' + now.format());
+    winston.info('Every 5 minutes, starting at ' + now.format());
 
-	NotificationModel.clearPendingNotifications(function(err, count){
-		if (err) { console.log(err); }
+	
+    winston.info(environment + ' NotificationModel.clearPendingNotifications');
+
+    NotificationModel.clearPendingNotifications(function(err, count){
+		if (err) { winston.info(err); }
     	
     	var finishedEnvironmentAt = moment();
-    	console.log(environment + ' ModelUtils.clearPendingNotifications started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-    	console.log((count || 0) + " records affected");
+    	winston.info(environment + ' ModelUtils.clearPendingNotifications started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
+    	winston.info((count || 0) + " records affected");
     });
     
 }, null, true, "America/New_York");
@@ -108,7 +123,7 @@ new cronJob('0 0 0 * * *', function(){
 
 
 
-console.log('Started worker');
+winston.info('Started worker');
 
 
 setInterval(function(){

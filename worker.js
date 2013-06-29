@@ -2,9 +2,12 @@
 
 var environments = ['development','staging','production'],
     childProcess = require('child_process'),
-    childProcesses = [];
+    childProcesses = [],
+    winston = require('./config/winston-config')('worker');
+    
 
 environments.forEach(function(env){
+	winston.info('Starting child worker process for ' + env);	
 	childProcesses.push(childProcess.spawn('./worker-process.js', [env], { stdio : "inherit"}));
 });
 

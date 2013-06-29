@@ -1,5 +1,4 @@
 var winston = require('winston'),
-    winstonConfig = require('./winston-config')(),
     appDomains = require('./app-domain-config');
 
 /**
@@ -21,12 +20,13 @@ module.exports = function(app, callback) {
   //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
   //       Setting it manually for now, but figure out what's going on
   app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
+  
+  require('./winston-config')(app.settings.env);
+
   winston.info(app.settings.env);
   
   winston.info('Connecting to mongoose');
 	
-  winstonConfig.setupLoggly(app.settings.env);
-
   appDomain = appDomain || appDomains[app.settings.env];
   
   appUrl = 'http://' + appDomain;
