@@ -143,9 +143,9 @@ module.exports = function(app){
 		      },
 		      function getPhotos(innerCallback){
 		      	PhotoModel.find({
-		      		gpi : req.params.growPlanInstancesId,
+		      		gpi : req.params.growPlanInstanceId,
 		      	})
-		      	.limit(10)
+		      	.limit(15)
 		      	.exec(innerCallback);
 		      }
 				],
