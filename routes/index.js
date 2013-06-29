@@ -331,7 +331,6 @@ module.exports = function(app){
   require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
-  require('./demo')(app);
   require('./gardens')(app);
   require('./guides')(app);
   require('./photos')(app);
