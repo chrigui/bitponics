@@ -19,7 +19,7 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
                                         <tr>
                                             <td valign="top" class="headerContent">
-                                            	<img src="http://gallery.mailchimp.com/2425ea8ad3/images/header_placeholder_600px.png" style="max-width:600px;" id="headerImage" />
+                                            	<img src="" style="max-width:600px;" id="headerImage" />
                                             </td>
                                         </tr>
                                     </table>
@@ -31,12 +31,10 @@
                                 	<!-- BEGIN BODY // -->
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
                                         <tr>
-                                            <td valign="top" class="bodyContent" mc:edit="body_content">
+                                            <td valign="top" class="bodyContent">
                                                 <h1><% message.title %></h1>
                                                 
-                                                <h2><% message.body %></h2>
-                                                
-
+                                                <% message.body %>
                                             </td>
                                         </tr>
                                     </table>
@@ -48,18 +46,18 @@
                                 	<!-- BEGIN FOOTER // -->
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter">
                                         <tr>
-                                            <td valign="top" class="footerContent" style="padding-top:0;" mc:edit="footer_content01">
+                                            <td valign="top" class="footerContent" style="padding-top:0;">
                                                 <em>Copyright &copy; <% (new Date()).getFullYear) &> Bitponics LLC, All rights reserved.</em>
                                                 <br />
                                                 <br />
-                                                <strong>Our mailing address is:</strong>
+                                                <strong>Mailing Address:</strong>
                                                 <br />
                                                 160 South 3rd Street, Suite 15, Brooklyn, NY 11211
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td valign="top" class="footerContent" style="padding-top:0; padding-bottom:40px;" mc:edit="footer_content02">
-                                            	<a href="<% subscriptionPreferences %>">update subscription preferences</a>&nbsp;
+                                            <td valign="top" class="footerContent" style="padding-top:0; padding-bottom:40px;">
+                                            	<a href="<% subscriptionPreferences %>">Update subscription preferences</a>&nbsp;
                                             </td>
                                         </tr>
                                     </table>

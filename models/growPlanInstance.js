@@ -541,7 +541,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
         */
 
         UserModel.findById(growPlanInstance.owner)
-        .select('timezone')
+        .select('timezone') // only property we actually need here is timezone
         .exec(function (err, user){
           if (err) { return innerCallback(err);}
           if (!user) { return innerCallback(new Error("GrowPlanInstance owner could not be found")); }
@@ -706,13 +706,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                 gpi : growPlanInstance,
                 timeToSend : now,
                 type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
-                trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END,
+                trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END_ACTION,
                 triggerDetails : {
                   phaseName : prevPhase.name,
                   actionId : action._id,
                   gpPhaseId : prevPhase._id
-                },
-                title : i18nKeys.get('Time for the following action', action.description)
+                }//,
+                //title : i18nKeys.get('Time for the following action', action.description)
               },
               iteratorCallback);
             },
@@ -743,7 +743,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   gpi : growPlanInstance,
                   timeToSend : now,
                   type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
-                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                   triggerDetails : {
                     phaseName : growPlanPhase.name,
                     actionId : action._id,
@@ -776,8 +776,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
@@ -797,7 +797,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
@@ -816,8 +816,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
@@ -836,7 +836,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,

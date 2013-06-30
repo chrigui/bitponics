@@ -12,6 +12,7 @@
 		, "connect"	  : "=2.4.3"
     , "connect-mongo" : "=0.3.2"
 		, "cron" 	  : "=1.0.1"
+		, "ejs" : "=0.8.4"
 		, "email-templates" : "=0.1.0"
     , "express"   : "3.0.1"
     , "gm"        : "=1.9.1"

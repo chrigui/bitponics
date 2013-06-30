@@ -79,12 +79,12 @@ require([
                   deviceStatus = data.deviceStatus,
                   notifications = data.notifications,
                   photos = data.photos,
-                  dateKey;
+                  dateDataCache;
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
-                dateKey = feBeUtils.getDateKey(sensorLog.timestamp);
-                sharedData.dateDataCache[dateKey].sensorLogs.push(sensorLog);
-                sharedData.dateDataCache[dateKey].latestSensorLogs = sensorLog;
+                dateDataCache = $scope.getDateDataCache(sensorLog.timestamp);
+                dateDataCache.sensorLogs.push(sensorLog);
+                dateDataCache.latestSensorLogs = sensorLog;
               }
               if (deviceStatus) {
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
@@ -217,34 +217,53 @@ require([
           };
 
 
+
+          /**
+           * Manages the dateDataCache. 
+           * Passed a date, and if that date is already populated, returns it.
+           * If not, creates a new entry for that date & retrieves the sensor data for that date.
+           *
+           * @param {Date|String} date : a date processable by momentjs
+           */
+          $scope.getDateDataCache = function(date, loadSensorData){
+            var dateMoment = moment(date),
+                dateKey = feBeUtils.getDateKey(dateMoment),
+                dateDataCache = $scope.sharedDataService.dateDataCache[dateKey];
+
+            if (dateDataCache){
+              return dateDataCache;
+            } else {
+              dateDataCache = {};
+              
+              dateDataCache.growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
+              dateDataCache.growPlanPhase = dateDataCache.growPlanInstancePhase.phase;
+              dateDataCache.date = dateMoment.toDate();
+              dateDataCache.dateKey = dateKey;
+              dateDataCache.dayOfPhase = $scope.getDayOfPhase(
+                dateDataCache.growPlanInstancePhase, 
+                dateDataCache.growPlanPhase,
+                dateDataCache.date
+              );
+              dateDataCache.loaded = false;
+              $scope.sharedDataService.dateDataCache[dateKey] = dateDataCache;
+
+              if (loadSensorData){
+                $scope.getSensorLogsByDate(dateKey);  
+              }
+              
+              
+              return dateDataCache;
+            }
+          };
+
+
           /**
            * Display data (sensor logs) for the provided date
            *
            * @param {Date|String} date
            */
           $scope.displayDate = function (date) {
-            // May get either a date object or a string, so use moment to clean up
-            var dateMoment = moment(date),
-                dateKey = feBeUtils.getDateKey(dateMoment);
-
-            if ($scope.sharedDataService.dateDataCache[dateKey]){
-              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
-            } else {
-              $scope.sharedDataService.dateDataCache[dateKey] = {};
-              $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
-              $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase = $scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase.phase;
-              $scope.sharedDataService.dateDataCache[dateKey].date = dateMoment.toDate();
-              $scope.sharedDataService.dateDataCache[dateKey].dateKey = dateKey;
-              $scope.sharedDataService.dateDataCache[dateKey].dayOfPhase = 
-                $scope.getDayOfPhase($scope.sharedDataService.dateDataCache[dateKey].growPlanInstancePhase, 
-                $scope.sharedDataService.dateDataCache[dateKey].growPlanPhase,
-                $scope.sharedDataService.dateDataCache[dateKey].date
-              );
-              $scope.sharedDataService.dateDataCache[dateKey].loaded = false;
-              $scope.getSensorLogsByDate(dateKey);
-              
-              $scope.sharedDataService.activeDate = $scope.sharedDataService.dateDataCache[dateKey];
-            }
+            $scope.sharedDataService.activeDate = $scope.getDateDataCache(date, true);
           };
 
 

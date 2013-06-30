@@ -31,13 +31,15 @@ define(['moment'], function(moment){
    *
    */
   utils.NOTIFICATION_TRIGGERS = {
-    PHASE_END : "phaseEnd",
-    PHASE_START : "phaseStart",
-    IDEAL_RANGE_VIOLATION : "idealRangeViolation",
-    IMMEDIATE_ACTION : "immediateAction",
-    PHASE_ENDING_SOON : "phaseEndingSoon",
-    GROW_PLAN_UPDATE : "growPlanUpdate",
-    DEVICE_MISSING : "deviceMissing"
+    PHASE_END : "phase-end",
+    PHASE_END_ACTION : "phase-end-action",
+    PHASE_START : "phase-start",
+    PHASE_ACTION : "phase-action",
+    IDEAL_RANGE_VIOLATION : "ideal-range-violation",
+    IMMEDIATE_ACTION : "immediate-action",
+    PHASE_ENDING_SOON : "phase-ending-soon",
+    GROW_PLAN_UPDATE : "grow-plan-update",
+    DEVICE_MISSING : "device-missing"
   };
 
 
