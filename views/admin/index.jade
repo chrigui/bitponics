@@ -1,34 +1,42 @@
 extends ../layout
 
 block head
+
   style
-    a {
+    a.page-link {
       display:block;
       text-decoration:underline;
     }
 
 block content
-  h1 Bitponics' Greatly Powerful Admin Panel
-  
-  form(action="/admin/trigger-clearPendingNotifications", method="POST")
-    input(type="submit", value="Trigger clearPendingNotifications") 
-  
-  form(action="/admin/trigger-scanForPhaseChanges", method="POST")
-    input(type="submit", value="Trigger scanForPhaseChanges")
-  
-  form(action="/admin/trigger-checkDeviceConnections", method="POST")
-    input(type="submit", value="Trigger checkDeviceConnections")
-  
-  form(action="/admin/trigger-processNewFTPPhotos", method="POST")
-    input(type="submit", value="Trigger processNewFTPPhotos")
+  section.header
+    header
+      include ../includes/nav/main
 
-  //-form(action="/admin/trigger_processUnreadEmailPhotos", method="POST")
-    input(type="submit", value="Trigger processUnreadEmailPhotos")
+  section#main(role="main", class="main")
+    h1 Bitponics' Greatly Powerful Admin Panel
+    h2 Be wise and generous.
+    
+    form(action="/admin/trigger-clearPendingNotifications", method="POST")
+      input(type="submit", value="Trigger clearPendingNotifications") 
+    
+    form(action="/admin/trigger-scanForPhaseChanges", method="POST")
+      input(type="submit", value="Trigger scanForPhaseChanges")
+    
+    form(action="/admin/trigger-checkDeviceConnections", method="POST")
+      input(type="submit", value="Trigger checkDeviceConnections")
+    
+    form(action="/admin/trigger-processNewFTPPhotos", method="POST")
+      input(type="submit", value="Trigger processNewFTPPhotos")
 
-  div
-    a(href='/admin/add-device') Add Device
-    a(href='/admin/generate-sample-device-request') Generate device request
-    a(href='/admin/photos') View All Photo Data
-    a(href='/admin/photos?s3=true') View All S3 Photo Data
-    a(href='/admin/photos/upload') Upload a Photo
-  
+    //-form(action="/admin/trigger_processUnreadEmailPhotos", method="POST")
+      input(type="submit", value="Trigger processUnreadEmailPhotos")
+
+    div
+      a.page-link(href='/admin/add-device') Add Device
+      a.page-link(href='/admin/generate-sample-device-request') Generate device request
+      a.page-link(href='/admin/photos') View All Photo Data
+      a.page-link(href='/admin/photos?s3=true') View All S3 Photo Data
+      a.page-link(href='/admin/photos/upload') Upload a Photo
+      a.page-link(href='/admin/gardens') View All Gardens
+    

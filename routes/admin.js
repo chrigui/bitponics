@@ -202,5 +202,23 @@ module.exports = function(app){
 
 	
 
+	app.get('/admin/gardens', function(req, res, next){
+		var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+				locals = {
+					title: 'Bitponics Admin | Gardens',
+					growPlanInstances : []
+				};
+
+		GrowPlanInstanceModel.find()
+		.select('owner _id device active startDate')
+		.populate('owner', '_id name')
+		.exec(function(err, growPlanInstanceResults){
+			if (err) { return next(err);}
+
+			locals.growPlanInstances = growPlanInstanceResults;
+			res.render('admin/gardens', locals);
+		});
+	});
+
 
 };
