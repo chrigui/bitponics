@@ -3,12 +3,31 @@ require([
   'domReady',
   'fe-be-utils',
   'angularResource',
-  'es5shim'
+  'es5shim',
+  'angularUI',
+  'angularUIBootstrap',
+  'overlay'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource']);
+  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ui', 'ui.bootstrap']).run(
+
+    function($rootScope) {
+      /**
+       * Debugging Tools
+       *
+       * Allows you to execute debug functions from the view
+       */
+      $rootScope.log = function(variable) {
+        console.log(variable);
+      };
+      $rootScope.alert = function(text) {
+        alert(text);
+      };
+    
+    }
+  );
 
   setupApp.config(
     [
@@ -38,7 +57,13 @@ function (angular, domReady, feBeUtils) {
 
   setupApp.factory('sharedDataService', function(){
       return {
-        selectedWifiNetwork : {}
+        selectedWifiNetwork : {},
+        activeOverlay : { is: undefined },
+        modalOptions : {
+          backdropFade: true,
+          dialogFade: true,
+          dialogClass : 'overlay auto-size'
+        }
       };
   });
   
@@ -47,7 +72,9 @@ function (angular, domReady, feBeUtils) {
       '$scope',
       '$location',
       '$http',
-      function($scope, $location, $http){
+      'sharedDataService',
+      function($scope, $location, $http, sharedDataService){
+        $scope.sharedDataService = sharedDataService;
         $scope.connect = function(){
           
           $.ajax({
@@ -91,9 +118,30 @@ function (angular, domReady, feBeUtils) {
 
               $location.path("/wifi");
               $scope.$apply();
+            },
+            error : function (data, textStatus) {
+              $scope.$apply(function() {
+                $scope.sharedDataService.activeOverlay = { is: 'ErrorOverlay' };
+              });
             }
           }); 
         };
+      }
+    ]
+  );
+
+  setupApp.controller('bpn.controllers.setup.device.ErrorOverlay',
+    [
+      '$scope',
+      'sharedDataService',
+      function($scope, sharedDataService) {
+
+        $scope.sharedDataService = sharedDataService;
+
+        $scope.close = function() {
+          $scope.sharedDataService.activeOverlay.is = undefined;
+        }
+
       }
     ]
   );

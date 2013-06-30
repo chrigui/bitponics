@@ -1,73 +1,79 @@
 extends ../layout
 
 block head
-  style
-    .device-list {
+  base(href="/setup/device/")
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js')
+  mixin requirejs("/assets/js/pages/account/devices")
 
-    }
-    .device-list .label {
-      
-    }
-
-    .device-list .value {
-      font-style: italic;
-    }
-
+block css 
+  link(rel='stylesheet', href='/assets/css/pages/account-devices.css')
+  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
 
 block content
+  section.header
+    header
+      include /includes/nav/main
+  
+  section(ng-cloak="")#main(role="main", class="main")
+    div.content-module.middle(ng-controller="bpn.controllers.account.devices.Main")
+      h1.page-heading Manage Devices
+      //- section(ng-view)
+      section.separator-top
 
-  h1 Manage Devices
+        if (userOwnedDevices.length > 0)
+          ul.device-list
+            each device in userOwnedDevices
+              li
+                
+                div
+                  span.label Name: 
+                  span.value.device-name #{device.name}
 
-  if (userOwnedDevices.length > 0)
-    ul.device-list
-      each device in userOwnedDevices
-        li
-          
-          div
-            span.label Name: 
-            span.value.device-name #{device.name}
-
-          div
-            span.label MAC Address: 
-            span.value.device-mac-address #{device._id}
+                div
+                  span.label MAC Address: 
+                  span.value.device-mac-address #{device._id}
 
 
-          div
-            span.label Device Key: 
-            span.value.device-mac-address #{device.combinedKey}
+                div
+                  span.label Device Key: 
+                  span.value.device-mac-address #{device.combinedKey}
 
-          //-div
-            span.label Last log: 
-            span.value #{device.recentSensorLogs[0]}
+                //-div
+                  span.label Last log: 
+                  span.value #{device.recentSensorLogs[0]}
 
-          div
-            span.label Power Outlet Mapping: 
-            ul 
-              each outputMapping in device.outputMap
-                li
-                  div 
-                    span.label Outlet: 
-                    span.value #{outputMapping.outputId}
+                div
+                  span.label Power Outlet Mapping: 
+                  ul 
+                    each outputMapping in device.outputMap
+                      li
+                        div 
+                          span.label Outlet: 
+                          span.value #{outputMapping.outputId}
+                        div
+                          span.label Accessory: 
+                          span.value #{outputMapping.control.name}
+
+
+                - if (typeof device.status.calibrationMode !== 'undefined')
                   div
-                    span.label Accessory: 
-                    span.value #{outputMapping.control.name}
+                    span.label Calibration Mode: 
+                    span.value Device is currently attempting to calibrate #{device.status.calibrationMode}
+                    form(action="/account/devices/#{device._id}", method="POST")
+                      input(type="hidden", name="clearCalibrationMode", value="true")
+                      button(type="submit") Exit Calibrate Mode
+                - else 
+                  div
+                    a(class="btn next-step-btn calibrate-device-item", href="/account/devices/#{device._id}/calibrate")
+                      | Calibrate 
+                
+                div
+                  a(class="btn next-step-btn", href="/account/devices/#{device._id}/outlet-map", target="_blank") 
+                    | Map accessories to power outlets
 
-
-          - if (typeof device.status.calibrationMode !== 'undefined')
-            div
-              span.label Calibration Mode: 
-              span.value Device is currently attempting to calibrate #{device.status.calibrationMode}
-              form(action="/account/devices/#{device._id}", method="POST")
-                input(type="hidden", name="clearCalibrationMode", value="true")
-                button(type="submit") Exit Calibrate Mode
-          - else 
-            div
-              a.btn.calibrate-device-item(href="/account/devices/#{device._id}/calibrate") 
-                | Calibrate 
-          
-          div
-            a.btn(href="#", href="#{appUrl}/setup", target="_blank") 
-              | Pair to a Wifi network
+                div
+                  a(class="btn next-step-btn", href="#{appUrl}/setup", target="_blank") 
+                    | Pair to a Wifi network
 
 
   a(href="/setup") Set up a new Bitponics Device

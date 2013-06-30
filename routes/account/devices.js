@@ -17,7 +17,8 @@ module.exports = function(app){
     function (req, res, next){
       var locals = {
         title : 'Devices',
-        className : 'account-devices',
+        className : 'app-page account-devices',
+        pageType : 'app-page',
         appUrl: app.config.appUrl
       };
 
@@ -66,7 +67,8 @@ module.exports = function(app){
 
       var locals = {
         title : 'Calibrate Sensors',
-        classname : 'calibrate'
+        className : 'app-page calibrate',
+        pageType : 'app-page'
       };
 
       DeviceModel.find({ _id : req.param('id') })
@@ -127,6 +129,48 @@ module.exports = function(app){
           return redirectToDeviceHome();
         }
       });
+    }
+  );
+
+  /**
+   * Power outlet mapping
+   */
+  app.get('/account/devices/:id/outlet-map',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      var locals = {
+        title : 'Devices - Outlet Map',
+        className : 'app-page account-devices account-devices-outlet-map',
+        pageType : 'app-page',
+        appUrl: app.config.appUrl
+      };
+
+      async.parallel(
+        [
+          function(innerCallback){
+            DeviceModel.findById(req.params.id)
+            .populate('activeGrowPlanInstance')
+            .populate('outputMap.control')
+            .exec(function(err, deviceResults){
+              if (err) { return innerCallback(err); }
+              locals.userOwnedDevice = deviceResults;
+              return innerCallback();
+            });
+          },
+          function(innerCallback){
+            ControlModel.find()
+            .exec(function(err, controls){
+              locals.controls = controls;
+              return innerCallback();
+            });
+          }
+        ],
+        function(err, results){
+          if (err) { return next(err); }
+          res.render('account/outlet-map', locals);
+        }
+      );
     }
   );
 };

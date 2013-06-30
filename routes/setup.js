@@ -36,7 +36,7 @@ module.exports = function(app){
 
         var locals = {
           title: 'Bitponics Device Setup',
-          className : 'landing-page single-page app-page setup',
+          className : 'app-page setup',
           pageType: "app-page",
           nextUrl: req.headers.host + '/setup/device',
           availableDeviceKey : availableDeviceKey
@@ -84,7 +84,7 @@ module.exports = function(app){
     function (req, res, next){
         var locals = {
           title: 'Bitponics Device Setup',
-          className : 'landing-page single-page app-page setup',
+          className : 'app-page setup',
           pageType: "app-page"
         };
         res.render('setup/device', locals);

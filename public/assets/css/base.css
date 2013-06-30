@@ -1409,11 +1409,19 @@ img.page-spinner.spinner {
   top: 0;
   right: 0;
   padding: 0;
+  margin: 0;
 }
 .overlay .overlay-contain .close i {
   height: 2em;
   margin: 0;
   overflow: hidden;
+}
+.overlay.auto-size {
+  height: auto;
+  overflow: hidden;
+}
+.overlay.dead-end .close {
+  display: none;
 }
 /*
  * Home Page
@@ -2042,6 +2050,20 @@ li
 .undefined .app-user a,
 .app-page .app-user a {
   color: #00e36c !important;
+}
+@media screen and (min-width: 40em) {
+  .undefined .main .page-heading,
+  .app-page .main .page-heading {
+    line-height: 1.25em;
+  }
+}
+@media screen and (min-width: 60em) {
+  .undefined .overlay.auto-size,
+  .app-page .overlay.auto-size {
+    left: 25%;
+    right: 25%;
+    width: 50%;
+  }
 }
 /*
  * Grow Plans Page
@@ -3278,13 +3300,6 @@ button.close {
   margin: 2em 0 2em;
   clear: both;
 }
-.growplans .activation {
-  height: auto;
-  overflow: hidden;
-}
-.growplans .activation .close {
-  display: none;
-}
 /*
  * Gardens List Page
  */
@@ -3296,9 +3311,9 @@ button.close {
 /*
  * Error Pages
  */
-.error {
+.main.error {
   min-height: 35em;
 }
-.error p {
+.main.error p {
   max-width: 35em;
 }

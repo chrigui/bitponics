@@ -13,6 +13,7 @@ block head
   mixin requirejs("/assets/js/pages/setup/grow-plan")
 
   script(type='text/ng-template', id='filter.html')
+  
     h4.page-heading Ready to set up your grow plan?
     .separator-top
         
@@ -65,6 +66,7 @@ block head
         | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
   script(type='text/ng-template', id='browse.html')
+
     h4.page-heading Select a Grow Plan
     ul(class="block-info-set grid sortlist photos separator-top")
       //- each growPlan, i in growPlans
@@ -97,6 +99,7 @@ block head
   
 
   script(type='text/ng-template', id='customize-overview.html')
+
     h4.page-heading Customize your grow plan
     div.separator-top
       div.question
@@ -709,20 +712,21 @@ block content
                     li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
                       a(href, ng-click="nextPage()") Next »
         div
-          div(ng-controller="bpn.controllers.setup.growPlan.ActivationOverlay", modal="sharedDataService.activeOverlay.is=='ActivationOverlay'", close="close()", options="{ dialogClass: 'overlay activation', backdropFade: true, dialogFade: true }")
-            div(class="close btn", ng-click="close()")
-              | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-            div(ng-show="!sharedDataService.submit.error")
-              h3(class="page-heading page-heading-small") Garden Activated
-              p 
-                | Your garden is all set up! Visit your garden's 
-                a(class="link", href="/gardens/{{sharedDataService.createdGrowPlanInstanceId}}") dashboard 
-                | to view your progress, monitor sensor readings and control any connected accessories.
-            div(ng-show="sharedDataService.submit.error")
-              h3(class="page-heading page-heading-small error") Garden Error
-              p.error
-                | There was a technical problem and your garden was not set up.
-      
+          div(ng-controller="bpn.controllers.setup.growPlan.ActivationOverlay", modal="sharedDataService.activeOverlay.is=='ActivationOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+            div(class="overlay-contain")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              div(ng-show="!sharedDataService.submit.error")
+                h3(class="page-heading page-heading-small") Garden Activated
+                p 
+                  | Your garden is all set up! Visit your garden's 
+                  a(class="link", href="/gardens/{{sharedDataService.createdGrowPlanInstanceId}}") dashboard 
+                  | to view your progress, monitor sensor readings and control any connected accessories.
+              div(ng-show="sharedDataService.submit.error")
+                h3(class="page-heading page-heading-small error") Garden Error
+                p.error
+                  | There was a technical problem and your garden was not set up.
+        
 
         //- End Overlay Templates
         

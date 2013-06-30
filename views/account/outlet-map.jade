@@ -1,0 +1,40 @@
+extends ../layout
+
+block head
+  base(href="/setup/device/")
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js')
+  mixin requirejs("/assets/js/pages/account/outlet-map")
+
+block css 
+  link(rel='stylesheet', href='/assets/css/pages/account-devices.css')
+  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
+
+block content
+  section.header
+    header
+      include /includes/nav/main
+  
+  section(ng-cloak="")#main(role="main", class="main")
+    div.content-module.middle(ng-controller="bpn.controllers.account.outletMap.Main")
+      h1.page-heading Manage Devices
+      //- section(ng-view)
+      section.separator-top
+        if (userOwnedDevice)
+          ul.device-list
+              li
+                div
+                  span.label Power Outlet Mapping: 
+                  ul 
+                    each outputMapping in userOwnedDevice.outputMap
+                      li
+                        div 
+                          span.label Outlet: 
+                          span.value #{outputMapping.outputId}
+                        div
+                          span.label Accessory: 
+                          span.value #{outputMapping.control.name}
+
+
+block footer-scripts
+  script
+    bpn.controls = !{JSON.stringify(controls)};

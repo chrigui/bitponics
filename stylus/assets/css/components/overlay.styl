@@ -56,6 +56,8 @@
 		color white!important
 		background color-logo-green!important
 
+
+	// Use for overlays that are not full screen to contain the abs positioned close button (dashboard, growplan activation)
 	.overlay-contain
 		position relative
 
@@ -65,8 +67,19 @@
 			top 0
 			right 0
 			padding 0
+			margin 0
 
 			i
 				height 2em
 				margin 0
 				overflow hidden
+
+	// Makes size of overlay depend on content within as opposed to default full window
+	&.auto-size
+		height auto
+		overflow hidden
+
+	// If user should proceed via link in overlay and not return to page
+	&.dead-end
+		.close
+			display none

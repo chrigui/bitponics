@@ -110,9 +110,21 @@ block content
       h1.page-heading Setting up your Bitponics Base Station
       section(ng-view)
 
+      div
+        div(ng-controller="bpn.controllers.setup.device.ErrorOverlay", modal="sharedDataService.activeOverlay.is=='ErrorOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(class="overlay-contain")
+            div(class="close btn", ng-click="close()")
+              | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+            div
+              h3(class="page-heading page-heading error") Connection Problem
+              p.error
+                | The request to your Bitponics device was not successful. Please repeat steps 1-3 and try again.
+
 
         
 
                
 
 block footer-scripts
+  script
+    bpn.user = !{JSON.stringify(user.toPublicJSON())};
