@@ -2,8 +2,8 @@ module.exports = {};
 
 /**
  * logSensorLog : Log a sensorLog to the sensorLog collection as well as the
- * device.recentSensorLogs & growPlanInstance.recentSensorLogs. Verify against
- * IdealRanges and trigger Actions if necessary.
+ * device.recentSensorLogs & growPlanInstance.recentSensorLogs. 
+ * Verify against IdealRanges and trigger Actions if necessary.
  *
  * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
  *      the device's recentSensorLogs
@@ -106,7 +106,8 @@ module.exports.logSensorLog = function (options, callback){
                 {
                   growPlanInstance : growPlanInstance, 
                   device : device, 
-                  actionId : idealRange.actionBelowMin, 
+                  actionId : idealRange.actionBelowMin,
+
                   immediateActionMessage : message, 
                   user : user,
                   triggeredByIdealRangeViolation : true
@@ -161,6 +162,18 @@ module.exports.logSensorLog = function (options, callback){
       return callback(err);
     }
   );
+};
+
+
+
+/**
+ *
+ * @param options.gpi
+ * @param options.growPlanPhase
+ * @param options.idealRange
+ * @param options.sensorValue
+ */
+module.exports.processIdealRangeViolation = function (options, callback){
 };
 
 

@@ -110,7 +110,7 @@ new cronJob('0 0 0 * * *', function(){
 	
     winston.info(environment + ' NotificationModel.clearPendingNotifications');
 
-    NotificationModel.clearPendingNotifications(function(err, count){
+    NotificationModel.clearPendingNotifications({env: environment}, function(err, count){
 		if (err) { winston.info(err); }
     	
     	var finishedEnvironmentAt = moment();

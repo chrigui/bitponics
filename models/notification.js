@@ -111,38 +111,6 @@ var NotificationSchema = new Schema({
    */
 	sl : [ NotificationSentLogSchema ],
 
-
-  /**
-   * title
-   *
-   * Plain-text title
-   *
-   * Email: Becomes the header (and subject?),
-   * Dashboard: Becomes the default view (user needs to click to show detail (body))
-   * SMS : ?
-   */
-  t : { type : String },
-  
-  
-  /**
-   * body
-   * 
-   * Plain-text body
-   *
-   * Email: Body
-   * Dashboard: Shown on expansion
-   * SMS : Not shown
-   */
-  b : { type: String },
-
-  
-  /**
-   * template
-   *
-   * Name of the HTML template to use for email rendering
-   */
-  tmpl : { type : String },
-
   
   /**
    * Storing the thing that triggered the notification.
@@ -160,7 +128,6 @@ var NotificationSchema = new Schema({
       feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
       feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
       feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING
-      //feBeUtils.NOTIFICATION_TRIGGERS.SCHEDULED_MANUAL_PHASE_ACTION,
     ],
     required : true
   },
@@ -179,6 +146,8 @@ var NotificationSchema = new Schema({
    * - idealRangeId {ObjectId}
    * - newGrowPlanId {ObjectId}
    * - deviceId {String}
+   * - handledByDeviceControl {bool}
+   * - cycleStateIndex {Number=}
    */
   triggerDetails : Schema.Types.Mixed,
 
@@ -411,8 +380,11 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
  * Send all pending notifications to their recipients.
  *
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
+ *
+ * @param {'local'|'development'|'staging'|'production'} options.env
+ * @param {function(err, numberResultsAffected)} callback
  */
-NotificationSchema.static('clearPendingNotifications', function (callback){
+NotificationSchema.static('clearPendingNotifications', function (options, callback){
   var ActionModel = require('./action').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
@@ -425,149 +397,169 @@ NotificationSchema.static('clearPendingNotifications', function (callback){
       ejs = require('ejs'),
       path = require('path'),
       fs = require('fs'),
+      emailTemplates = require('email-templates'),
+      emailTemplatesDir = path.join(__dirname, '/../views/emails'),
       notificationTemplateDirectory = path.join(__dirname, '/../views/notifications'),
       notificationTemplateTypes = ['email-subject', 'email-body-text', 'email-body-html', 'detail-html', 'summary-text'],
-      compiledNotificationTemplates = {};
-
-  
-  // Compile all the EJS templates
-  Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
-    var keyValue = feBeUtils.NOTIFICATION_TRIGGERS[key];
-    compiledNotificationTemplates[keyValue] = {};
-
-    notificationTemplateTypes.forEach(function(templateType){
-      compiledNotificationTemplates[keyValue][templateType] = ejs.compile(fs.readFileSync(path.join(notificationTemplateDirectory, keyValue, templateType + ".ejs"), 'utf8'));
-    });
-  });
-
-
-  var now = new Date(),
+      compiledNotificationTemplates = {},
+      secureAppUrl = 'https://' + (require('../config/app-domain-config')[options.env || 'local']),
+      subscriptionPreferencesUrl = secureAppUrl + "/account/profile",
+      logoUrl = 'http://' + (require('../config/app-domain-config')[options.env || 'local']) + "/assets/img/b-133w.png",
+      now = new Date(),
       nowAsMilliseconds = now.valueOf();
-  
+
+  winston.info('IN clearPendingNotifications');
+
   NotificationModel
   .find()
   .where('tts')
   .lte(now)
   .populate('u', 'email') // only need the email field for Users
+  .populate('gpi')
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
-    if (!notificationResults.length){ return callback(); }
-    var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
-    
-  
+    if (!notificationResults.length){ return callback(null, 0); }
+
     // TEMP HACK : enable next line to disable emails
     //return callback(null, notificationResults.length);
 
-    winston.info('IN clearPendingNotifications');
+    winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS');
 
-    async.each(
-      notificationResults, 
-      function notificationIterator(notification, iteratorCallback){
-        var subject = i18nKeys.get("Bitponics Notification"),
-        
-            // TEMP HACK : remove Hyatt from email notifications
-            users = notification.users.filter(function(user){ return user.email !== 'anderson.foote@hyatt.com'; }),
-            mailTo,
-            mailOptions;
+    var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
+    
+    // Compile all the EJS templates
+    Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
+      var keyValue = feBeUtils.NOTIFICATION_TRIGGERS[key];
+      compiledNotificationTemplates[keyValue] = {};
 
-        // TEMP HACK : if empty user set (because we cleared Hyatt from email recipients), mail it to Amit
-        if (!users.length){
-          winston.info('IN clearPendingNotifications, special case adding bitponics team');
-          users.push({email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'});
-        }
+      notificationTemplateTypes.forEach(function(templateType){
+        console.log("COMPILING " + keyValue + " " + templateType);
+        compiledNotificationTemplates[keyValue][templateType] = ejs.compile(fs.readFileSync(path.join(notificationTemplateDirectory, keyValue, templateType + ".ejs"), 'utf8'));
+        console.log("COMPLETED COMPILING " + keyValue + " " + templateType);
+      });
+    });
 
-        
-        // TEMP HACK : send all emails to Amit
-        users = [{email : 'amit@bitponics.com'}];
-
-        mailTo = users.map(function(user) { return user.email; }).join(', ');
-
-
-        var templateLocals = {
-          notification : notification
-        };
-
-        async.series(
-          [
-            function populateTriggerDetails(innerCallback){
-              if (notification.triggerDetails.actionId){
-                ActionModel.findById(notification.triggerDetails.actionId)
-                .populate('control')
-                .exec(function(err, actionResult){
-                  templateLocals.action = actionResult;
-                  return innerCallback(err);
-                });
-              }
-            },
-            function sendEmail(innerCallback){
-              var subject = compiledNotificationTemplates[notification.trigger]['email-subject'](templateLocals),
-                  emailBodyHtml = compiledNotificationTemplates[notification.trigger]['email-body-html'](templateLocals),
-                  emailBodyText = compiledNotificationTemplates[notification.trigger]['email-body-text'](templateLocals);
-
-
-              if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED){ subject += ': ' + i18nKeys.get("Action Needed"); }
+    async.waterfall(
+      [
+        function compileEmailTemplate(innerCallback){
+          emailTemplates(emailTemplatesDir, innerCallback);
+        },
+        function processNotificationResults(runEmailTemplate, innerCallback){
+          async.each(
+            notificationResults, 
+            function notificationIterator(notification, iteratorCallback){
               
-              // TEMP HACK : special alert for hyatt device
-              winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
-              try {
-                if (NotificationModel.db.name.indexOf('prod') >= 0){
-                  if ( (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING) &&
-                       (notification.triggerDetails.deviceId === '000666809f5b')
-                     ){
-                    subject = "HYATT DEVICE CONNECTION DROPPED";
-                  }
-                }
-              } catch(e){
-                winston.error(e.toString());
-              }
-
-
-              mailOptions = {
-                  from: "notifications@bitponics.com", // sender address
-                  to: mailTo,
-                  subject: subject, // Subject line
-                  text: emailBodyText,
-                  html: emailBodyHtml
+              var notificationTemplateLocals = {
+                notification : notification,
+                NOTIFICATION_TYPES : feBeUtils.NOTIFICATION_TYPES,
+                ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
+                secureAppUrl : secureAppUrl
               };
 
-              winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
-              
-              emailTransport.sendMail(mailOptions, function(err, response){
-                if(err){ return innerCallback(err); }
-                
-                notification.sentLogs.push({ts: now});
-                
-                if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
-                  console.log("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType)
-                  notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
-                  // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-                  // if we've got notifications regularly being processed
-                  if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
-                    notification.timeToSend = now; 
+              // Populate trigger details
+              async.parallel(
+                [
+                  function populateAction(innerCallback){
+                    if (notification.triggerDetails.actionId){
+                      ActionModel.findById(notification.triggerDetails.actionId)
+                      .populate('control', 'name')
+                      .exec(function(err, actionResult){
+                        notificationTemplateLocals.action = actionResult;
+                        return innerCallback(err);
+                      });
+                    }
+                  },
+                  function populateGrowPlan(innerCallback){
+                    return innerCallback();
                   }
-                } else {
-                  notification.timeToSend = null;
-                }
-                
-                notification.save(innerCallback);
-              });
-            }
-          ],
-          function(err){
-            return iteratorCallback(err);
-          }
-        );
+                ],
+                function(err){
+                  if (err) { return iteratorCallback(err); }
 
-        
-      },
-      function notificationLoopEnd(err){
-        return callback(err, notificationResults.length);
+                  var emailTemplateLocals = {
+                    emailSubject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                    emailBodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                    emailBodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals),
+                    subscriptionPreferencesUrl : subscriptionPreferencesUrl,
+                    logoUrl : logoUrl
+                  },
+                  users = notification.users;
+
+                  // TEMP HACK : special alert for hyatt device
+                  winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
+                  
+                  try {
+                    if (NotificationModel.db.name.indexOf('prod') >= 0){
+                      if ( (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING) &&
+                           (notification.triggerDetails.deviceId === '000666809f5b')
+                         ){
+                        
+                        winston.info('IN clearPendingNotifications, special case adding bitponics team');
+                        // TEMP HACK : remove Hyatt from email notifications
+                        users = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
+                        emailTemplateLocals.emailSubject = "HYATT DEVICE CONNECTION DROPPED";
+                      }
+                    }
+                  } catch(e){
+                    winston.error(e.toString());
+                  }
+
+                  // TEMP HACK : send all emails to Amit
+                  users = [{email : 'amit@bitponics.com'}];
+
+                  runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
+                    if (err) { return iteratorCallback(err); }
+
+                    var mailOptions = {
+                      from: "notifications@bitponics.com",
+                      to: users.map(function(user) { return user.email; }).join(', '),
+                      subject: emailTemplateLocals.emailSubject,
+                      text: finalEmailText,
+                      html: finalEmailHtml
+                    };
+
+                    winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
+                    
+                    emailTransport.sendMail(mailOptions, function(err, response){
+                      if (err) { return iteratorCallback(err); }
+                      
+                      notification.sentLogs.push({ts: now});
+                      
+                      if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
+                        winston.info("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
+                        notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);
+                        // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
+                        // if we've got notifications regularly being processed
+                        if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
+                          notification.timeToSend = now; 
+                        }
+                      } else {
+                        notification.timeToSend = null;
+                      }
+                      
+                      notification.save(iteratorCallback);
+                    });
+                  });
+                }
+              );
+            },
+            function notificationLoopEnd(err){
+              return innerCallback(err, notificationResults.length);
+            }
+          );
+        }
+      ],
+      function (err, numberResultsAffected){
+        return callback(err, numberResultsAffected);
       }
     );
   });
 });
 
 
+/**
+ *
+ */
 NotificationSchema.pre('save', function(next){
   this.markModified('triggerDetails');
   next();

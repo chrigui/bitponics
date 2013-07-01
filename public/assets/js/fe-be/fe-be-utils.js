@@ -206,8 +206,8 @@ define(['moment'], function(moment){
    * Takes a duration and returns the largest unit of time for which the duration is a whole number.
    * Used to simplify presentation of durations in UI (avoiding decimals).
    *
-   * @param duration. Number. If durationType is omitted, it is assumed to be milliseconds.
-   * @param durationType. String. One of bpn.utils.durationTypes
+   * @param duration. Number. 
+   * @param durationType. String. One of bpn.utils.durationTypes. If omitted, it is assumed to be milliseconds.
    * @return { 'duration' : number, 'durationType' : string }
    */
   utils.getLargestWholeNumberDurationObject = function(duration, durationType){

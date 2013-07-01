@@ -747,9 +747,10 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   triggerDetails : {
                     phaseName : growPlanPhase.name,
                     actionId : action._id,
-                    gpPhaseId : growPlanPhase._id
+                    gpPhaseId : growPlanPhase._id,
+                    handledByDeviceControl : false
                   },
-                  title : i18nKeys.get('Time for the following action', action.description)
+                  //title : i18nKeys.get('Time for the following action', action.description)
                 };
 
               notificationsToSave.push(actionNotification);
@@ -761,15 +762,19 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   })
                   ){
                     actionNotification.type = feBeUtils.NOTIFICATION_TYPES.INFO;
-                    actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
-              } else {
+                    actionNotification.triggerDetails.handledByDeviceControl = true;
+                    //actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
+              } 
+              // else it either doesn't require a control, or device doesn't have the required control
+              else {
                 actionNotification.type = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
                 
                 if (action.cycle.repeat){
                   actionNotification.body = i18nKeys.get("Has repeating cycle");
                   
                   // cycles with repeat=true are required to have 2 states (through validation rules)
-                  var states = action.cycle.states;
+                  var states = action.cycle.states,
+                      overallDurationObject = action.getOverallCycleDurationObject();
                   
                   if (states[0].durationType && !states[1].durationType){
                     // state 0 has a duration and state 1 does not
@@ -781,12 +786,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
+                        gpPhaseId : growPlanPhase._id,
+                        cycleStateIndex : 1
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        durationType : states[0].durationType,
-                        duration : states[0].duration,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -801,12 +807,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
+                        gpPhaseId : growPlanPhase._id,
+                        cycleStateIndex : 0
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        durationType : states[1].durationType,
-                        duration : states[1].duration,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -823,10 +830,10 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                         actionId : action._id,
                         gpPhaseId : growPlanPhase._id
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        durationType : 'seconds',
-                        duration : action.overallCycleTimespan * 1000,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -842,10 +849,10 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                         actionId : action._id,
                         gpPhaseId : growPlanPhase._id
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        durationType : 'seconds',
-                        duration : action.overallCycleTimespan * 1000,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED

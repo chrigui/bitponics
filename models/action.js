@@ -128,7 +128,9 @@ ActionSchema.virtual('overallCycleTimespan')
 
 
 /************************** INSTANCE METHODS ***************************/
-
+ActionSchema.method('getOverallCycleDurationObject', function(){
+  return feBeUtils.getLargestWholeNumberDurationObject(this.overallCycleTimespan);
+});
 
 /************************** END INSTANCE METHODS ***************************/
 
