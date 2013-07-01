@@ -515,7 +515,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   }
 
                   // TEMP HACK : send all emails to Amit
-                  users = [{email : 'amit@bitponics.com'}];
+                  //users = [{email : 'amit@bitponics.com'}];
 
                   runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                     if (err) { return iteratorCallback(err); }
