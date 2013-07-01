@@ -606,7 +606,8 @@ module.exports.checkDeviceConnections = function(callback){
           type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
           trigger : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING,
           triggerDetails : {
-            deviceId : device._id
+            deviceId : device._id,
+            lastConnectionAt : lastConnectionAt
           },
           title : notificationTitle,
           body : notificationBody
