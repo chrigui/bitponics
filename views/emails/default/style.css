@@ -36,7 +36,7 @@ body, #bodyTable{
 * @theme page
 */
 #bodyCell{
-	/*@editable*/ border-top:4px solid #BBBBBB;
+	/*@editable*/ border-top:1px solid #BBBBBB;
 }
 
 /**
@@ -60,7 +60,7 @@ h1{
 	/*@editable*/ font-family:Helvetica;
 	/*@editable*/ font-size:26px;
 	/*@editable*/ font-style:normal;
-	/*@editable*/ font-weight:bold;
+	/*@editable*/ font-weight:normal;
 	/*@editable*/ line-height:100%;
 	/*@editable*/ letter-spacing:normal;
 	margin-top:0;
@@ -82,7 +82,7 @@ h2{
 	/*@editable*/ font-family:Helvetica;
 	/*@editable*/ font-size:20px;
 	/*@editable*/ font-style:normal;
-	/*@editable*/ font-weight:bold;
+	/*@editable*/ font-weight:normal;
 	/*@editable*/ line-height:100%;
 	/*@editable*/ letter-spacing:normal;
 	margin-top:0;
@@ -103,7 +103,6 @@ h3{
 	display:block;
 	/*@editable*/ font-family:Helvetica;
 	/*@editable*/ font-size:16px;
-	/*@editable*/ font-style:italic;
 	/*@editable*/ font-weight:normal;
 	/*@editable*/ line-height:100%;
 	/*@editable*/ letter-spacing:normal;
@@ -125,7 +124,6 @@ h4{
 	display:block;
 	/*@editable*/ font-family:Helvetica;
 	/*@editable*/ font-size:14px;
-	/*@editable*/ font-style:italic;
 	/*@editable*/ font-weight:normal;
 	/*@editable*/ line-height:100%;
 	/*@editable*/ letter-spacing:normal;
@@ -194,12 +192,9 @@ h4{
 	/*@editable*/ color:#505050;
 	/*@editable*/ font-family:Helvetica;
 	/*@editable*/ font-size:20px;
-	/*@editable*/ font-weight:bold;
+	/*@editable*/ font-weight:normal;
 	/*@editable*/ line-height:100%;
-	/*@editable*/ padding-top:0;
-	/*@editable*/ padding-right:0;
-	/*@editable*/ padding-bottom:0;
-	/*@editable*/ padding-left:0;
+	/*@editable*/ padding: 10px 20px;
 	/*@editable*/ text-align:left;
 	/*@editable*/ vertical-align:middle;
 }
@@ -266,6 +261,16 @@ h4{
 	display:inline;
 	height:auto;
 	max-width:560px;
+}
+
+.bodyContent a.btn {
+	border: 3px solid #00e36c;
+	color: #00e36c;
+	padding: 1em;
+	text-decoration: none;
+	text-align: center;
+	display:inline-block;
+	font-size:1.2em;
 }
 
 /* ========== Footer Styles ========== */

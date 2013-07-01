@@ -148,6 +148,9 @@ var NotificationSchema = new Schema({
    * - deviceId {String}
    * - handledByDeviceControl {bool}
    * - cycleStateIndex {Number=}
+   * - sensorValue {Number}
+   * - timestamp {Date}
+   * - immediateActionId {ObjectId}
    */
   triggerDetails : Schema.Types.Mixed,
 
@@ -396,6 +399,8 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
  */
 NotificationSchema.static('clearPendingNotifications', function (options, callback){
   var ActionModel = require('./action').model,
+      GrowPlanModel = require('./growPlan').growPlan.model,
+      SensorModel = require('./sensor').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
       tz = require('timezone/loaded'),
@@ -412,9 +417,9 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
       notificationTemplateDirectory = path.join(__dirname, '/../views/notifications'),
       notificationTemplateTypes = ['email-subject', 'email-body-text', 'email-body-html', 'detail-html', 'summary-text'],
       compiledNotificationTemplates = {},
+      appUrl = 'http://' + (require('../config/app-domain-config')[options.env || 'local']),
       secureAppUrl = 'https://' + (require('../config/app-domain-config')[options.env || 'local']),
       subscriptionPreferencesUrl = secureAppUrl + "/account/profile",
-      logoUrl = 'http://' + (require('../config/app-domain-config')[options.env || 'local']) + "/assets/img/b-133w.png",
       now = new Date(),
       nowAsMilliseconds = now.valueOf();
 
@@ -480,7 +485,25 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     }
                   },
                   function populateGrowPlan(innerCallback){
-                    return innerCallback();
+                    if (notification.triggerDetails.gpPhaseId){
+                      GrowPlanModel.findById(notification.gpi.growPlan)
+                      .exec(function(err, growPlanResult){
+                        if (err) { return innerCallback(err);}
+                        
+                        notificationTemplateLocals.growPlanPhase = growPlanResult.phases.id(notification.triggerDetails.gpPhaseId);
+                          
+                        if (notification.triggerDetails.idealRangeId){
+                          notificationTemplateLocals.idealRange = notificationTemplateLocals.growPlanPhase.idealRanges.id(notification.triggerDetails.idealRangeId);
+                          SensorModel.findOne({code : notificationTemplateLocals.idealRange.sCode})
+                          .exec(function(err, sensorResult){
+                            notificationTemplateLocals.sensor = sensorResult;
+                            return innerCallback();  
+                          });
+                        } else {
+                          return innerCallback();
+                        }
+                      });
+                    }
                   }
                 ],
                 function(err){
@@ -491,7 +514,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     emailBodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
                     emailBodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals),
                     subscriptionPreferencesUrl : subscriptionPreferencesUrl,
-                    logoUrl : logoUrl
+                    appUrl : appUrl
                   },
                   users = notification.users;
 
