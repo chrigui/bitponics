@@ -166,6 +166,13 @@ var NotificationSchema = new Schema({
     default : feBeUtils.NOTIFICATION_TYPES.INFO
   },
 	
+
+  /**
+   * hash
+   * MD5 hash of unique details (gpi + trigger + trigger details)
+   */
+  h : { type : String },
+
   /**
    * checked
    * User can "check" a notification log to hide it/mark completed
@@ -173,6 +180,7 @@ var NotificationSchema = new Schema({
    * TODO : decide what the behavior is if a repeating notification is marked checked
    */
   c : { type : Boolean }
+
 },
 { id : false });
 
@@ -246,33 +254,6 @@ NotificationSchema.virtual('sentLogs')
     this.sl = sentLogs;
   });
 
-
-NotificationSchema.virtual('title')
-  .get(function(){
-    return this.t;
-  })
-  .set(function(title){
-    this.t = title;
-  });
-
-
-NotificationSchema.virtual('body')
-  .get(function(){
-    return this.b;
-  })
-  .set(function(body){
-    this.b = body;
-  });
-
-
-NotificationSchema.virtual('template')
-  .get(function(){
-    return this.tmpl;
-  })
-  .set(function(template){
-    this.tmpl = template;
-  });
-
 NotificationSchema.virtual('checked')
 .get(function(){
   return this.c;
@@ -281,10 +262,19 @@ NotificationSchema.virtual('checked')
   this.c = checked;
 })
 
+NotificationSchema.virtual('hash')
+  .get(function(){
+    return this.h;
+  })
+  .set(function(hash){
+    this.h = hash;
+  });
+
 NotificationSchema.virtual('gardenDashboardUrl')
   .get(function(){
     return "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
   });
+
 
 
 /*************** SERIALIZATION *************************/
@@ -324,13 +314,35 @@ NotificationSchema.set('toJSON', {
 
 
 
+/*************** INSTANCE METHODS *************************/
+NotificationSchema.method('ensureHash', function(callback){
+  if (!this.hash) { 
+    var crypto = require('crypto'),
+        stringToHash;
+    
+    stringToHash = (
+      (this.gpi ? this.gpi.toString() : '') + 
+      (JSON.stringify(this.r) || '') + 
+      this.type + 
+      this.trigger + 
+      (JSON.stringify(this.triggerDetails) || '')
+    );
 
+    this.hash = crypto.createHash('md5').update(stringToHash).digest('hex');
+  }
+  return this.hash;
+});
+
+/*************** END INSTANCE METHODS *************************/
+
+
+
+/*************** STATIC METHODS *************************/
 /**
  * All new instances of Notification should be created with this method.
  * This method, by default, first checks whether we already have any existing duplicate of the submitted
  * notification that's active (tts is not null). If so, it returns that existing Notification.
  *
- * TODO : should investigate how to compare against triggerDetails. Maybe make triggerDetails serialized JSON, provide a getter for deserialized. Then we can query for equality
  *
  * @param {Object} options : Properties of the NotificationModel object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
  * @param {function(err, Notification)} callback
@@ -339,14 +351,12 @@ NotificationSchema.static('create', function(options, callback){
   // TODO : Investigate the performance of this query. Assuming it'll be fine because
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
+  
+  var newNotification = new NotificationModel(options);
+  newNotification.ensureHash();
+
   NotificationModel.findOne({
-    gpi : options.gpi || options.growPlanInstance,
-    type : options.type,
-    trigger : options.trigger,
-    t : options.title,
-    b : options.body,
-    url : options.url,
-    tmpl : options.template
+    h : newNotification.h
   })
   .exists('tts', true)
   .exec(function(err, notificationResult){
@@ -354,7 +364,7 @@ NotificationSchema.static('create', function(options, callback){
     if (notificationResult){
       return callback(null, notificationResult);
     }
-    var newNotification = new NotificationModel(options);
+    
     newNotification.save(callback);
   });
 });
@@ -562,6 +572,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
  */
 NotificationSchema.pre('save', function(next){
   this.markModified('triggerDetails');
+  this.ensureHash();
   next();
 });
 
@@ -569,6 +580,7 @@ NotificationSchema.pre('save', function(next){
 
 // Sparse index on timeToSend so that we skip nulls
 NotificationSchema.index({ 'tts gpi' : -1} , { sparse : true } );
+NotificationSchema.index({ 'h' : 1 }, { sparse : true }); // TODO: shouldn't be sparse, but correct it after we've ensured all notifications have hash
 
 
 exports.schema = NotificationSchema;
