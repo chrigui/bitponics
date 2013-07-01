@@ -487,7 +487,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     
                   },
                   function populateDevice(innerCallback){
-                    if (notification.triggerDetails.deviceId){ return innerCallback(); }
+                    if (!notification.triggerDetails.deviceId){ return innerCallback(); }
 
                     DeviceModel.findById(notification.triggerDetails.deviceId)
                     .exec(function(err, deviceResult){
