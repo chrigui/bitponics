@@ -1,0 +1,18 @@
+<h1>
+<% if (notification.type === NOTIFICATION_TYPES.ACTION_NEEDED){ %>
+<%= "Time for action." %>
+<% } else if (notification.type === NOTIFICATION_TYPES.INFO) { %>
+<%= "Your Bitponics device has it covered." %>
+<% } %>
+</h1>
+
+<p>For your <%= notification.gpi.name %>, the following action was triggered at <%=: notificationDetails.immediateAction.timeRequested | friendlyDate %>:</p>
+<p><%= notificationDetails.action.description %></p>
+
+<% if (notificationDetails.handledByDeviceControl){ %>
+	<p>Since your device has a <%= notificationDetails.action.control.name %> connected, it's taken care of this automatically.</p>
+<% } %>
+
+<p>This action will expire at <%=: notificationDetails.immediateAction.expires | friendlyDate %>.</p>
+
+<a class="btn" href="<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>">Visit your garden dashboard</a>

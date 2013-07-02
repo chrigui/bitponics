@@ -7,13 +7,13 @@
 </h1>
 
 <p>For your <%= notification.gpi.name %>, it's time for the following action:</p>
-<p><%= action.description %></p>
+<p><%= notificationDetails.action.description %></p>
 
-<% if (notification.triggerDetails.handledByDeviceControl){ %>
-	<p>Since your device has a <%= action.control.name %> connected, it's taken care of this automatically.</p>
-<% } else if (typeof notification.triggerDetails.cycleStateIndex !== 'undefined') { %>
+<% if (notificationDetails.handledByDeviceControl){ %>
+	<p>Since your device has a <%= notificationDetails.action.control.name %> connected, it's taken care of this automatically.</p>
+<% } else if (typeof notificationDetails.cycleStateIndex !== 'undefined') { %>
 	<p>And the following step of that action: </p>
-	<p><%= action.cycle.states[notification.triggerDetails.cycleStateIndex].message %></p>
+	<p><%= notificationDetails.action.cycle.states[notificationDetails.cycleStateIndex].message %></p>
 <% } %>
 
 <a class="btn" href="<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>">Visit your garden dashboard</a>

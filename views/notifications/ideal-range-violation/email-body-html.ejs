@@ -1,17 +1,17 @@
-<h1><%= sensor.name %> is out of range<% if (notification.triggerDetails.handledByDeviceControl){ %>, but your Bitponics device has it taken care of<% } %>.</h1>
+<h1><%= notificationDetails.sensor.name %> is out of range<% if (notificationDetails.handledByDeviceControl){ %>, but your Bitponics device has it taken care of<% } %>.</h1>
 
 
-<p>It’s <%= sensorValue %>, and the ideal range is between <%= idealRange.valueRange.min %> and <%= idealRange.valueRange.max %>.</p>
+<p>It’s <%= notificationDetails.sensorValue %>, and the ideal range is between <%= notificationDetails.idealRange.valueRange.min %> and <%= notificationDetails.idealRange.valueRange.max %>.</p>
 
-<% if (action) { %>
+<% if (notificationDetails.action) { %>
 	<p>To fix this, 	
-	<% if (notification.triggerDetails.handledByDeviceControl){ %>
-		since your device has a <%= action.control.name %> connected, it's automatically taken the following action:
+	<% if (notificationDetails.handledByDeviceControl){ %>
+		since your device has a <%= notificationDetails.action.control.name %> connected, it's automatically taken the following action:
 	<% } else { %>
 		you'll need to take the following action:
 	<% } %>
 	</p>
-	<p><%= action.description %></p>
+	<p><%= notificationDetails.action.description %></p>
 <% } %>
 
 <a class="btn" href="<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>">Visit your garden dashboard</a>

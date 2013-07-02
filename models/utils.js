@@ -389,7 +389,7 @@ module.exports.triggerImmediateAction = function (options, callback){
             notificationTriggerDetails = options.idealRangeViolation || {};
 
         notificationTriggerDetails.actionId = actionId;
-        notificationTriggerDetails.handledactionHasDeviceControl = actionHasDeviceControl;
+        notificationTriggerDetails.handledByDeviceControl = actionHasDeviceControl;
 
 
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
@@ -404,7 +404,7 @@ module.exports.triggerImmediateAction = function (options, callback){
         // log to ImmediateAction
         // log a Notification, and 
         // if device has a relevant control, refresh its commands
-        async.parallel(
+        async.series(
           [
             function createImmediateAction(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating an ImmediateAction");
@@ -532,9 +532,12 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
             users : growPlanInstance.users,
             type : feBeUtils.NOTIFICATION_TYPES.INFO,
             timeToSend : now,
-            title : i18nKeys.get("It's almost time", nextPhase.name),
-            body : i18nKeys.get("Log into your dashboard to advance"),
-            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
+            triggerDetails : {
+              gpPhaseId : currentGrowPlanInstancePhase.phase,
+              nextGpPhaseId : nextGrowPlanInstancePhase.phase,
+              gpiPhaseId : nextGrowPlanInstancePhase._id
+            }
           },
           iteratorCallback
         );

@@ -192,7 +192,7 @@ UserSchema.virtual('locale.full')
 /**
  *  Get the current timezone offset from UTC time. This can't be a static
  *  value since offsets change with daylight savings and stuff. 
- */
+ *
 UserSchema.virtual('timezoneOffset')
 	.get(function(){
 		var now = new Date(),
@@ -203,7 +203,7 @@ UserSchema.virtual('timezoneOffset')
 			timezoneOffset = (timezoneOffsetDirection == '-' ? -1 : 1) * (timezoneOffsetHours * 60 * 60 * 1000) + (timezoneOffsetMinutes * 60 * 1000);
 		return timezoneoffset;
 	});
-
+*/
 /************************** STATIC METHODS  ***************************/
 
 

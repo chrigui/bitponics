@@ -1,0 +1,18 @@
+<% if (notification.type === NOTIFICATION_TYPES.ACTION_NEEDED){ %>
+<%= "Time for action." %>
+<% } else if (notification.type === NOTIFICATION_TYPES.INFO) { %>
+<%= "Your Bitponics device has it covered." %>
+<% } %>
+
+For your <%= notification.gpi.name %>, the following action was triggered at <%=: notificationDetails.immediateAction.timeRequested | friendlyDate %>:
+
+<%= notificationDetails.action.description %>
+<% if (notificationDetails.handledByDeviceControl){ %>
+
+Since your device has a <%= notificationDetails.action.control.name %> connected, it's taken care of this automatically.
+<% } %>
+
+This action will expire at <%=: notificationDetails.immediateAction.expires | friendlyDate %>.
+
+Visit your garden dashboard here:
+<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>

@@ -136,21 +136,50 @@ var NotificationSchema = new Schema({
   /**
    * Mixed object type to let Notification triggers
    * store any pertinent data, intended to be interpolated
-   * into the messages that are emailed or whatever
+   * into the notification display
    * 
    * Current properties in use:
    * - phaseName {String}
    * - gpiPhaseId {ObjectId}
    * - gpPhaseId {ObjectId}
    * - actionId {ObjectId}
-   * - idealRangeId {ObjectId}
    * - newGrowPlanId {ObjectId}
    * - deviceId {String}
+   *
+   * PHASE_END
+   * - phaseName
+   * - gpPhaseId
+   *
+   * PHASE_ENDING_SOON
+   * - gpPhaseId
+   * - gpiPhaseId
+   * - nextGpPhaseId
+   *
+   * PHASE_ACTION
+   * - actionId {ObjectId}
    * - handledByDeviceControl {bool}
    * - cycleStateIndex {Number=}
+   *
+   * IMMEDIATE_ACTION
+   * - actionId {ObjectId}
+   * - immediateActionId {ObjectId}
+   * - handledByDeviceControl {bool}
+   *
+   * IDEAL_RANGE_VIOLATION
+   * - idealRangeId {ObjectId}
    * - sensorValue {Number}
    * - timestamp {Date}
+   * - gpPhaseId {ObjectId}
    * - immediateActionId {ObjectId}
+   * - actionId {ObjectId}
+   * - handledByDeviceControl {bool}
+   *
+   * GROW_PLAN_UPDATE
+   * - newGrowPlanId {ObjectId}
+   * - migrationSuccessful {bool}
+   *
+   * DEVICE_MISSING
+   * - deviceId {string}
    */
   triggerDetails : Schema.Types.Mixed,
 
@@ -402,6 +431,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
       GrowPlanModel = require('./growPlan').growPlan.model,
       SensorModel = require('./sensor').model,
       DeviceModel = require('./device').model,
+      ImmediateActionModel = require('./immediateAction').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
       tz = require('timezone/loaded'),
@@ -467,6 +497,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
               
               var notificationTemplateLocals = {
                 notification : notification,
+                notificationDetails : notification.triggerDetails,
                 NOTIFICATION_TYPES : feBeUtils.NOTIFICATION_TYPES,
                 ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
                 secureAppUrl : secureAppUrl
@@ -481,7 +512,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     ActionModel.findById(notification.triggerDetails.actionId)
                     .populate('control', 'name')
                     .exec(function(err, actionResult){
-                      notificationTemplateLocals.action = actionResult;
+                      notificationTemplateLocals.notificationDetails.action = actionResult;
                       return innerCallback(err);
                     });
                     
@@ -491,7 +522,16 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
 
                     DeviceModel.findById(notification.triggerDetails.deviceId)
                     .exec(function(err, deviceResult){
-                      notificationTemplateLocals.device = deviceResult;
+                      notificationTemplateLocals.notificationDetails.device = deviceResult;
+                      return innerCallback(err);
+                    });
+                  },
+                  function populateImmediateAction(innerCallback){
+                    if (!notification.triggerDetails.immediateActionId){ return innerCallback(); }
+
+                    ImmediateActionModel.findById(notification.triggerDetails.immediateActionId)
+                    .exec(function(err, immediateActionResult){
+                      notificationTemplateLocals.notificationDetails.immediateAction = immediateActionResult;
                       return innerCallback(err);
                     });
                   },
@@ -502,18 +542,36 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     .exec(function(err, growPlanResult){
                       if (err) { return innerCallback(err);}
                       
-                      notificationTemplateLocals.growPlanPhase = growPlanResult.phases.id(notification.triggerDetails.gpPhaseId);
-                        
-                      if (notification.triggerDetails.idealRangeId){
-                        notificationTemplateLocals.idealRange = notificationTemplateLocals.growPlanPhase.idealRanges.id(notification.triggerDetails.idealRangeId);
-                        SensorModel.findOne({code : notificationTemplateLocals.idealRange.sCode})
-                        .exec(function(err, sensorResult){
-                          notificationTemplateLocals.sensor = sensorResult;
-                          return innerCallback();  
-                        });
-                      } else {
-                        return innerCallback();
+                      notificationTemplateLocals.notificationDetails.growPlanPhase = growPlanResult.phases.id(notification.triggerDetails.gpPhaseId);
+
+                      if (notification.triggerDetails.nextGpPhaseId){
+                        notificationTemplateLocals.notificationDetails.nextGrowPlanPhase = growPlanResult.phases.id(notification.triggerDetails.nextGpPhaseId);  
                       }
+                      
+                      if (notification.triggerDetails.gpiPhaseId){
+                        notificationTemplateLocals.notificationDetails.growPlanInstancePhase = notification.gpi.phases.id(notification.triggerDetails.gpiPhaseId);
+                      }
+                        
+                      if (!notification.triggerDetails.idealRangeId){ return innerCallback(); }
+                      
+                      notificationTemplateLocals.notificationDetails.idealRange = notificationTemplateLocals.notificationDetails.growPlanPhase.idealRanges.id(notification.triggerDetails.idealRangeId);
+                      SensorModel.findOne({code : notificationTemplateLocals.notificationDetails.idealRange.sCode})
+                      .exec(function(err, sensorResult){
+                        notificationTemplateLocals.notificationDetails.sensor = sensorResult;
+                        return innerCallback();  
+                      });
+                      
+                    });
+                  },
+                  function populateNewGrowPlan(innerCallback){
+                    if (!notification.triggerDetails.newGrowPlanId){ return innerCallback(); }
+
+                    GrowPlanModel.findById(notification.triggerDetails.newGrowPlanId)
+                    .select('parentGrowPlanId name owner createdAt')
+                    .populate('owner','name')
+                    .exec(function(err, growPlanResult){
+                      notificationTemplateLocals.notificationDetails.newGrowPlan = growPlanResult;
+                      return innerCallback(err);
                     });
                   }
                   

@@ -1,0 +1,5 @@
+<%= notificationDetails.growPlanPhase.name %> phase is scheduled to end on <%=: notificationDetails.growPlanInstancePhase.expectedEndDate | friendlyDate %>
+
+To advance your garden to the <%= notificationDetails.nextGrowPlanPhase.name %> phase, visit your garden dashboard:
+
+<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>">

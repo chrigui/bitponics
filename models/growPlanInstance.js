@@ -935,7 +935,8 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
         type : feBeUtils.NOTIFICATION_TYPES.INFO,
         trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
         triggerDetails : {
-          newGrowPlanId : newGrowPlan._id
+          newGrowPlanId : newGrowPlan._id,
+          migrationSuccessful : false
         },
         title : i18nKeys.get('Grow Plan Updated, failed migration title'),
         body : i18nKeys.get('Grow Plan Updated, failed migration body')
@@ -968,7 +969,8 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
             type : feBeUtils.NOTIFICATION_TYPES.INFO,
             trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
             triggerDetails : {
-              newGrowPlanId : newGrowPlan._id
+              newGrowPlanId : newGrowPlan._id,
+              migrationSuccessful : true
             },
             title : i18nKeys.get('Grow Plan Updated, automatic migration title'),
             body : i18nKeys.get('Grow Plan Updated, automatic migration body')
