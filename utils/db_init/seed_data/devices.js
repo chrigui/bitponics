@@ -197,5 +197,11 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "WD-301-8CIP",
 			name : "Amit's Device 2013-06-26"
+		},
+		{
+			_id : "000666809ef6",
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-TPRP",
+			name : "Jack's Very First Bitponics Device"
 		}
 	];
