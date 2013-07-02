@@ -7,6 +7,6 @@
 <%=: device.lastConnectionAt | fromNow %>
 <% } %>.</p>
 
-<p>Click the link below to visit your device page and diagnose what's going on. And if you're still having issues, you can always reach us at <a href="<%= secureAppUrl + '/help' %>">our help page</a></p>
+<p>Click the link below to visit your device page and diagnose what's going on. And if you're still having issues, you can always reach us at our <a href="<%= secureAppUrl + '/help' %>">help page</a>.</p>
 
-<a class="btn" href="<%= secureAppUrl + '/account/devices/' + notification.gpi._id.toString() %>">Manage your devices</a>
+<a class="btn" href="<%= secureAppUrl + '/account/devices/' + device._id.toString() %>">Manage your devices</a>

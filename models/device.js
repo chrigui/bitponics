@@ -84,7 +84,7 @@ var DeviceSchema = new Schema({
      * Used to query for devices that haven't communicated in a while
      * Right now, only updated in app.post('/api/devices/:id/status')
      */
-    lastCommunicationAt : { type : Date },
+    lastConnectionAt : { type : Date },
 
 
     sensorMap : [ SensorMapSchema ],
@@ -150,7 +150,7 @@ var DeviceSchema = new Schema({
   { id : false });
 
 DeviceSchema.plugin(useTimestamps);
-DeviceSchema.index({ 'activeGrowPlanInstance lastCommunicationAt': -1 }, { sparse: true });
+DeviceSchema.index({ 'activeGrowPlanInstance lastConnectionAt': -1 }, { sparse: true });
 /***************** END SCHEMA PROPERTIES **********************/
 
 
