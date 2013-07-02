@@ -24,7 +24,9 @@ require([
     dashboardApp.factory('sharedDataService', 
       [
         'bpn.services.socket',
-        function(socket){
+        '$http',
+        '$q',
+        function(socket, $http, $q){
           
           /**
            * All the properties this service will expose
@@ -57,14 +59,116 @@ require([
             viewModels.initControlViewModel(control);
           });
 
-          // TEMP
-          //sharedData.photos = [ {"createdAt":"2013-06-04T06:28:03.004Z","updatedAt":"2013-06-04T06:28:03.004Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"Screen Shot 2013-04-18 at 11.00.22 PM.png","name":"Screen Shot 2013-04-18 at 11.00.22 PM.png","type":"image/png","size":164946,"_id":"51ad88f2ab65cf932600000c","__v":0,"visibility":"public","date":"2013-06-04T00:46:46.000Z","tags":[]} ];
 
           sharedData.photos.forEach(viewModels.initPhotoViewModel);
 
           viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
 
-          
+
+
+
+          /**
+           *
+           */
+          sharedData.getDayOfPhase = function (growPlanInstancePhase, growPlanPhase, date) {
+            // diff between date & gpiPhase.start + offset
+            return moment(date).diff(growPlanInstancePhase.calculatedStartDate, "days");
+          };
+
+
+          /**
+           *
+           */
+          sharedData.getGrowPlanInstancePhaseFromDate = function (date) {
+            var dateMoment = moment(date),
+              growPlanInstancePhases = sharedData.growPlanInstance.phases,
+              i,
+              phaseStart;
+
+            // Reverse-loop through the phases. Once we've found one with a calculatedStartDate before the targetDate,
+            // we've found the phase
+            for (i = growPlanInstancePhases.length; i--;) {
+              phaseStart = growPlanInstancePhases[i].calculatedStartDate;
+              if (dateMoment.isAfter(phaseStart)) {
+                return growPlanInstancePhases[i];
+              }
+            }
+            return growPlanInstancePhases[0];
+          };
+
+
+
+          /**
+           * Returns a an angular promise
+           *
+           * @return {Promise}
+           */
+          sharedData.getSensorLogsByDate = function (dateKey) {
+            var dateMoment = moment(dateKey),
+                deferred = $q.defer();
+
+            $http.get(
+              '/api/grow-plan-instances/' + sharedData.growPlanInstance._id + '/sensor-logs',
+              {
+                params : {
+                  "start-date" : dateMoment.startOf("day").format(),
+                  "end-date" : dateMoment.endOf("day").format()
+                }
+              }
+            )
+            .success(function(data, status, headers, config) {
+              sharedData.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
+              sharedData.dateDataCache[dateKey].latestSensorLogs = data.data[0];
+              sharedData.dateDataCache[dateKey].loaded = true;
+              deferred.resolve(data);
+            })
+            .error(function(data, status, headers, config) {
+              deferred.reject(data);
+            });
+
+            return deferred.promise;
+          };
+
+
+    
+          /**
+           * Manages the dateDataCache. 
+           * Passed a date, and if that date is already populated, returns it.
+           * If not, creates a new entry for that date & retrieves the sensor data for that date.
+           *
+           * @param {Date|String} date : a date processable by momentjs
+           */
+          sharedData.getDateDataCache = function(date, loadSensorData){
+            var dateMoment = moment(date),
+                dateKey = feBeUtils.getDateKey(dateMoment),
+                dateDataCache = sharedData.dateDataCache[dateKey];
+
+            if (dateDataCache){
+              return dateDataCache;
+            } else {
+              dateDataCache = {};
+              
+              dateDataCache.growPlanInstancePhase = sharedData.getGrowPlanInstancePhaseFromDate(date);
+              dateDataCache.growPlanPhase = dateDataCache.growPlanInstancePhase.phase;
+              dateDataCache.date = dateMoment.toDate();
+              dateDataCache.dateKey = dateKey;
+              dateDataCache.dayOfPhase = sharedData.getDayOfPhase(
+                dateDataCache.growPlanInstancePhase, 
+                dateDataCache.growPlanPhase,
+                dateDataCache.date
+              );
+              dateDataCache.loaded = false;
+              sharedData.dateDataCache[dateKey] = dateDataCache;
+
+              if (loadSensorData){
+                sharedData.getSensorLogsByDate(dateKey);  
+              }
+              
+              
+              return dateDataCache;
+            }
+          };          
+
 
           /**
            * Set up the socket for live updates on sensors, device status, and notifications
@@ -82,7 +186,7 @@ require([
                   dateDataCache;
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
-                dateDataCache = $scope.getDateDataCache(sensorLog.timestamp);
+                dateDataCache = sharedData.getDateDataCache(sensorLog.timestamp);
                 dateDataCache.sensorLogs.push(sensorLog);
                 dateDataCache.latestSensorLogs = sensorLog;
               }
@@ -129,39 +233,8 @@ require([
           $scope.controls = bpn.controls;
           $scope.sensors = bpn.sensors;
           
-          /**
-           * Returns a an angular promise
-           *
-           * @return {Promise}
-           */
-          $scope.getSensorLogsByDate = function (dateKey) {
-            var dateMoment = moment(dateKey),
-                deferred = $q.defer();
-
-            $http.get(
-              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
-              {
-                params : {
-                  "start-date" : dateMoment.startOf("day").format(),
-                  "end-date" : dateMoment.endOf("day").format()
-                }
-              }
-            )
-            .success(function(data, status, headers, config) {
-              $scope.sharedDataService.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
-              $scope.sharedDataService.dateDataCache[dateKey].latestSensorLogs = data.data[0];
-              $scope.sharedDataService.dateDataCache[dateKey].loaded = true;
-              deferred.resolve(data);
-            })
-            .error(function(data, status, headers, config) {
-              deferred.reject(data);
-            });
-
-            return deferred.promise;
-          };
-
-
           
+
           /**
            *
            */
@@ -184,86 +257,13 @@ require([
           
           
 
-
-          // Set up functions and watchers
-
-          /**
-           *
-           */
-          $scope.getGrowPlanInstancePhaseFromDate = function (date) {
-            var dateMoment = moment(date),
-              growPlanInstancePhases = $scope.sharedDataService.growPlanInstance.phases,
-              i,
-              phaseStart;
-
-            // Reverse-loop through the phases. Once we've found one with a calculatedStartDate before the targetDate,
-            // we've found the phase
-            for (i = growPlanInstancePhases.length; i--;) {
-              phaseStart = growPlanInstancePhases[i].calculatedStartDate;
-              if (dateMoment.isAfter(phaseStart)) {
-                return growPlanInstancePhases[i];
-              }
-            }
-            return growPlanInstancePhases[0];
-          };
-
-
-          /**
-           *
-           */
-          $scope.getDayOfPhase = function (growPlanInstancePhase, growPlanPhase, date) {
-            // diff between date & gpiPhase.start + offset
-            return moment(date).diff(growPlanInstancePhase.calculatedStartDate, "days");
-          };
-
-
-
-          /**
-           * Manages the dateDataCache. 
-           * Passed a date, and if that date is already populated, returns it.
-           * If not, creates a new entry for that date & retrieves the sensor data for that date.
-           *
-           * @param {Date|String} date : a date processable by momentjs
-           */
-          $scope.getDateDataCache = function(date, loadSensorData){
-            var dateMoment = moment(date),
-                dateKey = feBeUtils.getDateKey(dateMoment),
-                dateDataCache = $scope.sharedDataService.dateDataCache[dateKey];
-
-            if (dateDataCache){
-              return dateDataCache;
-            } else {
-              dateDataCache = {};
-              
-              dateDataCache.growPlanInstancePhase = $scope.getGrowPlanInstancePhaseFromDate(date);
-              dateDataCache.growPlanPhase = dateDataCache.growPlanInstancePhase.phase;
-              dateDataCache.date = dateMoment.toDate();
-              dateDataCache.dateKey = dateKey;
-              dateDataCache.dayOfPhase = $scope.getDayOfPhase(
-                dateDataCache.growPlanInstancePhase, 
-                dateDataCache.growPlanPhase,
-                dateDataCache.date
-              );
-              dateDataCache.loaded = false;
-              $scope.sharedDataService.dateDataCache[dateKey] = dateDataCache;
-
-              if (loadSensorData){
-                $scope.getSensorLogsByDate(dateKey);  
-              }
-              
-              
-              return dateDataCache;
-            }
-          };
-
-
           /**
            * Display data (sensor logs) for the provided date
            *
            * @param {Date|String} date
            */
           $scope.displayDate = function (date) {
-            $scope.sharedDataService.activeDate = $scope.getDateDataCache(date, true);
+            $scope.sharedDataService.activeDate = $scope.sharedDataService.getDateDataCache(date, true);
           };
 
 

@@ -49,17 +49,22 @@ function (angular, domReady) {
 
         $scope.$watch('serial', function(){
           $scope.maskedSerial = $('#serial')[0].value.substring(0, 11);
-        })
+        });
 
         $scope.sendSerialToServer = function() {
-          $http.post("/setup", { 'serial': $scope.maskedSerial })
-            .success(function (data) {
-              if (typeof data === 'string'){
-                data = JSON.parse(data);
-              }
-              $scope.key = data.combinedKey;
-            });
-        }
+          $http.post(
+            "/setup", 
+            { 
+              'serial': $scope.maskedSerial 
+            }
+          )
+          .success(function (data) {
+            if (typeof data === 'string'){
+              data = JSON.parse(data);
+            }
+            $scope.key = data.combinedKey;
+          });
+        };
 
         $scope.openWifiPairingPage = function() {
           window.open('http://' + bpn.pageData.nextUrl, "_blank");
@@ -69,17 +74,17 @@ function (angular, domReady) {
           $scope.socket.connect('/setup');
           $scope.socket.on('connect', function(){
             $scope.socket.emit('ready', { "serial" : $scope.serial } );
-          })
+          });
           $scope.socket.on('keys', function (keys) {
             keys.forEach(function(key){
               if (key.serial === $scope.maskedSerial && key.verified){
                 $scope.pairingComplete = true;
                 $scope.socket.disconnect();
               }
-            })
+            });
           });
           
-        }
+        };
 
       }
     ]
