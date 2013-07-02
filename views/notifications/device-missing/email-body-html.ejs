@@ -3,6 +3,7 @@
 
 <p>We haven't heard from your device with the id <%= device._id.toString() %>
 <% if (device.lastConnectionAt){ %>
+ since 
 <%=: device.lastConnectionAt | fromNow %>
 <% } %>.</p>
 
