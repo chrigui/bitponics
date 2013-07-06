@@ -12,7 +12,27 @@ var mongoose = require('mongoose'),
   utils = require('./utils'),
   getObjectId = utils.getObjectId,
   winston = require('winston'),
-  NotificationModel;
+  NotificationModel,
+  ejs = require('../config/ejs-config'),
+  path = require('path'),
+  fs = require('fs'),
+  notificationTemplateDirectory = path.join(__dirname, '/../views/notifications'),
+  notificationTemplateTypes = ['email-subject', 'email-body-text', 'email-body-html', 'detail-html', 'summary-text'],
+  compiledNotificationTemplates = {};
+
+// Compile all the EJS templates
+Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
+  var keyValue = feBeUtils.NOTIFICATION_TRIGGERS[key];
+  compiledNotificationTemplates[keyValue] = {};
+
+  notificationTemplateTypes.forEach(function(templateType){
+    // Enable the console.logs whenever making edits to the EJS templates...ejs.compile fails silently so that's
+    // the only way to know which template failed compilation
+    //console.log("COMPILING " + keyValue + " " + templateType);
+    compiledNotificationTemplates[keyValue][templateType] = ejs.compile(fs.readFileSync(path.join(notificationTemplateDirectory, keyValue, templateType + ".ejs"), 'utf8'));
+    //console.log("COMPLETED COMPILING " + keyValue + " " + templateType);
+  });
+});;
 
 
 var NotificationSentLogSchema = new Schema({ 
@@ -35,7 +55,7 @@ NotificationSentLogSchema.virtual('timestamp')
 })
 .set(function(timestamp){
   this.ts = timestamp;
-})
+});
 
 NotificationSentLogSchema.virtual('checked')
 .get(function(){
@@ -43,7 +63,7 @@ NotificationSentLogSchema.virtual('checked')
 })
 .set(function(checked){
   this.c = checked;
-})
+});
 
 /**
  * Notification
@@ -347,17 +367,32 @@ NotificationSchema.set('toJSON', {
 
 
 /*************** INSTANCE METHODS *************************/
+
+/**
+ * Creates a hash of the pertinent Notification details
+ * Used to prevent insertion of duplicate Notifications 
+ * by checking whether a pending Notification matches an existing one.
+ *
+ * Contains a couple rules custom to each Notification trigger type:
+ * Ignores triggerDetails.sensorValue, 
+ * since sensor values can change rapidly but we don't want to swamp a user with 
+ * a bunch of Notifications on the same sensor
+ * 
+ */
 NotificationSchema.method('ensureHash', function(callback){
   if (!this.hash) { 
     var crypto = require('crypto'),
-        stringToHash;
+        stringToHash,
+        triggerDetailsToHash = JSON.parse(JSON.stringify(this.triggerDetails || {}));
+
+    delete triggerDetailsToHash.sensorValue;
     
     stringToHash = (
       (this.gpi ? this.gpi.toString() : '') + 
       (JSON.stringify(this.r) || '') + 
       this.type + 
       this.trigger + 
-      (JSON.stringify(this.triggerDetails) || '')
+      JSON.stringify(triggerDetailsToHash)
     );
 
     this.hash = crypto.createHash('md5').update(stringToHash).digest('hex');
@@ -373,8 +408,10 @@ NotificationSchema.method('ensureHash', function(callback){
 /**
  * All new instances of Notification should be created with this method.
  * This method, by default, first checks whether we already have any existing duplicate of the submitted
- * notification that's active (tts is not null). If so, it returns that existing Notification.
+ * notification that's active (tts is not null) or has recently been sent. 
+ * If so, it returns that existing Notification.
  *
+ * "Recently been sent" cutoff varies per trigger type.
  *
  * @param {Object} options : Properties of the NotificationModel object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
  * @param {function(err, Notification)} callback
@@ -384,13 +421,19 @@ NotificationSchema.static('create', function(options, callback){
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
   
-  var newNotification = new NotificationModel(options);
+  var newNotification = new NotificationModel(options),
+      // Try out a 30-minute sent cutoff for dupes
+      sentCutoff = new Date((new Date()).valueOf() - 30*60*1000);
+  
   newNotification.ensureHash();
 
   NotificationModel.findOne({
-    h : newNotification.h
+    h : newNotification.h,
+    $or: [
+      { sl : { $gte : sentCutoff } },
+      { tts: { $ne : null } }
+    ]
   })
-  .exists('tts', true)
   .exec(function(err, notificationResult){
     if (err) { return callback(err); }
     if (notificationResult){
@@ -445,9 +488,6 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
       fs = require('fs'),
       emailTemplates = require('email-templates'),
       emailTemplatesDir = path.join(__dirname, '/../views/emails'),
-      notificationTemplateDirectory = path.join(__dirname, '/../views/notifications'),
-      notificationTemplateTypes = ['email-subject', 'email-body-text', 'email-body-html', 'detail-html', 'summary-text'],
-      compiledNotificationTemplates = {},
       appUrl = 'http://' + (require('../config/app-domain-config')[options.env || 'local']),
       secureAppUrl = 'https://' + (require('../config/app-domain-config')[options.env || 'local']),
       subscriptionPreferencesUrl = secureAppUrl + "/account/profile",
@@ -473,18 +513,6 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
 
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
-    // Compile all the EJS templates
-    Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
-      var keyValue = feBeUtils.NOTIFICATION_TRIGGERS[key];
-      compiledNotificationTemplates[keyValue] = {};
-
-      notificationTemplateTypes.forEach(function(templateType){
-        console.log("COMPILING " + keyValue + " " + templateType);
-        compiledNotificationTemplates[keyValue][templateType] = ejs.compile(fs.readFileSync(path.join(notificationTemplateDirectory, keyValue, templateType + ".ejs"), 'utf8'));
-        console.log("COMPLETED COMPILING " + keyValue + " " + templateType);
-      });
-    });
-
     async.waterfall(
       [
         function compileEmailTemplate(innerCallback){
@@ -497,7 +525,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
               
               var notificationTemplateLocals = {
                 notification : notification,
-                notificationDetails : notification.triggerDetails,
+                notificationDetails : JSON.parse(JSON.stringify(notification.triggerDetails)),
                 NOTIFICATION_TYPES : feBeUtils.NOTIFICATION_TYPES,
                 ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
                 secureAppUrl : secureAppUrl
@@ -608,7 +636,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   }
 
                   // TEMP HACK : send all emails to Amit
-                  //users = [{email : 'amit@bitponics.com'}];
+                  users = [{email : 'amit@bitponics.com'}];
 
                   runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                     if (err) { return iteratorCallback(err); }
@@ -664,6 +692,8 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
  *
  */
 NotificationSchema.pre('save', function(next){
+  // Since triggerDetails is a Mixed type, mongoose can't auto-detect whether it's modified.
+  // Just always mark it modified.
   this.markModified('triggerDetails');
   this.ensureHash();
   next();
@@ -672,8 +702,10 @@ NotificationSchema.pre('save', function(next){
 
 
 // Sparse index on timeToSend so that we skip nulls
-NotificationSchema.index({ 'tts gpi' : -1} , { sparse : true } );
-NotificationSchema.index({ 'h' : 1 }, { sparse : true }); // TODO: shouldn't be sparse, but correct it after we've ensured all notifications have hash
+NotificationSchema.index({ 'tts': -1 }, { sparse : true });
+// Compound index on gpi+tts. Won't get expensive since all sent items will collapse into a single index entry of gpi+null
+NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
+NotificationSchema.index({ 'h' : 1, 'sl' : -1 });
 
 
 exports.schema = NotificationSchema;

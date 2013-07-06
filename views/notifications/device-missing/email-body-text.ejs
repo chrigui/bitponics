@@ -1,6 +1,6 @@
 <%= notificationDetails.device.name %> seems to have dropped its connection.
 
-We haven't heard from your device with the id <%= notificationDetails.device._id.toString() %><% if (notificationDetails.device.lastConnectionAt){ %> since <%=: notificationDetails.device.lastConnectionAt | fromNow %><% } %>.
+We haven't heard from your device with the id <%= notificationDetails.device._id.toString() %><% if (notificationDetails.device.lastConnectionAt){ %> since <%=: notificationDetails.device.lastConnectionAt | friendlyDate %><% } %>.
 
 Click the link below to visit your device page and diagnose what's going on:
 <%= secureAppUrl + '/account/devices/' + notificationDetails.device._id.toString() %>
