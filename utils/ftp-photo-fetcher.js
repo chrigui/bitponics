@@ -24,7 +24,7 @@ module.exports = {
 		client.auth(ftpConfig.user, ftpConfig.password, function(err){
 			if (err) { return callback(err); }
 			
-			client.ls('./', function(err, fileList){
+			client.ls('./cam/', function(err, fileList){
 				if (err) { return callback(err); }
 				
 				fileList = (fileList || []).filter(
@@ -52,7 +52,7 @@ module.exports = {
 							//fs.writeFile(localFilePath, fileBuffer, function(err) {
 client.keepAlive();
 							gm(fileBuffer, fileMetaData.name)
-					    .rotate("#fff", 270)
+					    //.rotate("#fff", 270)
 						  .write(localFilePath, function (err) {
 						    if (err) { return iteratorCallback(err); }
 					      client.keepAlive();
