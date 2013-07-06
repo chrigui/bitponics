@@ -144,7 +144,7 @@ ImmediateActionSchema.set('toJSON', {
 
 
 
-ImmediateActionSchema.index({ 'gpi e ts': -1 });
+ImmediateActionSchema.index({ 'gpi': 1,  'e' : -1, 'ts': -1 });
 
 exports.schema = ImmediateActionSchema;
 exports.model = mongooseConnection.model('ImmediateAction', ImmediateActionSchema);

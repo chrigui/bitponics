@@ -892,7 +892,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
  * Assumes that this.growPlan is a populated GrowPlan model (so that we can scan the old phase names withotu re-retrieving the old GrowPlan)
  *
  * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
- * @param {function(err, updatedGrowPlanInstance)} callback
+ * @param {function(err)} callback
  */
 GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, callback){
   var self = this,

@@ -125,7 +125,7 @@ SensorLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-SensorLogSchema.index({ 'gpi ts': -1 }, { sparse: true });
+SensorLogSchema.index({ 'gpi' : 1,  'ts': -1 });
 
 exports.schema = SensorLogSchema;
 exports.model = mongooseConnection.model('SensorLog', SensorLogSchema);
