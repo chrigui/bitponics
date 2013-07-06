@@ -427,8 +427,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
       },
       notificationDisplay;
 
-  console.log("notification.populated('gpi')", notification.populated('gpi'));
-
+  
   async.waterfall(
     [
       function populateGPI(innerCallback){
@@ -473,7 +472,6 @@ NotificationSchema.method('getDisplay', function(options, callback){
             function populateGrowPlan(innerCallback){
               if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
 
-              console.log('notification', notification);
               GrowPlanModel.findById(notification.gpi.growPlan)
               .exec(function(err, growPlanResult){
                 if (err) { return innerCallback(err);}
@@ -573,7 +571,7 @@ NotificationSchema.static('create', function(options, callback){
   NotificationModel.findOne({
     h : newNotification.h,
     $or: [
-      { sl : { $gte : sentCutoff } },
+      { "sl.ts" : { $gte : sentCutoff } },
       { tts: { $ne : null } }
     ]
   })
@@ -773,7 +771,7 @@ NotificationSchema.pre('save', function(next){
 NotificationSchema.index({ 'tts': -1 }, { sparse : true });
 // Compound index on gpi+tts. Won't get expensive since all sent items will collapse into a single index entry of gpi+null
 NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
-NotificationSchema.index({ 'h' : 1, 'sl' : -1 });
+NotificationSchema.index({ 'h' : 1, 'sl.ts' : -1 });
 
 
 exports.schema = NotificationSchema;
