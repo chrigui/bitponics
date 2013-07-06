@@ -138,8 +138,33 @@ module.exports = function(app){
 		          gpi : req.params.growPlanInstanceId,
 		          tts : { $ne : null }
 		        })
+		        .sort({ 'tts' : -1 })
 		        .limit(10)
-		        .exec(innerCallback);
+		        .exec(function(err, notificationResults){
+		        	if (err) { return innerCallback(err); }
+		        	var notificationsWithSummaries = [];
+		        	async.each(notificationResults, 
+		        		function notificationIterator(notification, iteratorCallback){
+			        		var notificationObject = notification.toObject();
+			        		notification.getDisplay(
+			        			{ 
+			        				secureAppUrl : app.config.secureAppUrl,
+			        				displayType : 'summary'
+			        			},
+			        			function (err, notificationDisplay){
+			        				notificationObject.displays = {
+					        			summary : notificationDisplay
+					        		};
+					        		notificationsWithSummaries.push(notificationObject);
+			        				return iteratorCallback();
+			        			}
+		        			);
+		        		},
+		        		function notificationLoopEnd(err){
+		        			innerCallback(err, notificationsWithSummaries);
+		        		}
+	        		);
+		        });
 		      },
 		      function getPhotos(innerCallback){
 		      	PhotoModel.find({

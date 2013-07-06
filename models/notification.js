@@ -427,101 +427,120 @@ NotificationSchema.method('getDisplay', function(options, callback){
       },
       notificationDisplay;
 
-  async.parallel(
+  console.log("notification.populated('gpi')", notification.populated('gpi'));
+
+  async.waterfall(
     [
-      function populateAction(innerCallback){
-        if (!notification.triggerDetails.actionId){ return innerCallback(); }
-        
-        ActionModel.findById(notification.triggerDetails.actionId)
-        .populate('control', 'name')
-        .exec(function(err, actionResult){
-          notificationTemplateLocals.notificationDetails.action = actionResult;
-          return innerCallback(err);
-        });
-        
+      function populateGPI(innerCallback){
+        if (notification.gpi && !notification.populated('gpi')){ 
+          notification.populate('gpi', innerCallback);
+        } else {
+          return innerCallback(null, notification); 
+        }
       },
-      function populateDevice(innerCallback){
-        if (!notification.triggerDetails.deviceId){ return innerCallback(); }
+      function doTheRest(notification){
+        async.parallel(
+          [
+            function populateAction(innerCallback){
+              if (!notification.triggerDetails.actionId){ return innerCallback(); }
+              
+              ActionModel.findById(notification.triggerDetails.actionId)
+              .populate('control', 'name')
+              .exec(function(err, actionResult){
+                notificationTemplateLocals.notificationDetails.action = actionResult;
+                return innerCallback(err);
+              });
+              
+            },
+            function populateDevice(innerCallback){
+              if (!notification.triggerDetails.deviceId){ return innerCallback(); }
 
-        DeviceModel.findById(notification.triggerDetails.deviceId)
-        .exec(function(err, deviceResult){
-          notificationTemplateLocals.notificationDetails.device = deviceResult;
-          return innerCallback(err);
-        });
-      },
-      function populateImmediateAction(innerCallback){
-        if (!notification.triggerDetails.immediateActionId){ return innerCallback(); }
+              DeviceModel.findById(notification.triggerDetails.deviceId)
+              .exec(function(err, deviceResult){
+                notificationTemplateLocals.notificationDetails.device = deviceResult;
+                return innerCallback(err);
+              });
+            },
+            function populateImmediateAction(innerCallback){
+              if (!notification.triggerDetails.immediateActionId){ return innerCallback(); }
 
-        ImmediateActionModel.findById(notification.triggerDetails.immediateActionId)
-        .exec(function(err, immediateActionResult){
-          notificationTemplateLocals.notificationDetails.immediateAction = immediateActionResult;
-          return innerCallback(err);
-        });
-      },
-      function populateGrowPlan(innerCallback){
-        if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
+              ImmediateActionModel.findById(notification.triggerDetails.immediateActionId)
+              .exec(function(err, immediateActionResult){
+                notificationTemplateLocals.notificationDetails.immediateAction = immediateActionResult;
+                return innerCallback(err);
+              });
+            },
+            function populateGrowPlan(innerCallback){
+              if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
 
-        GrowPlanModel.findById(notification.gpi.growPlan)
-        .exec(function(err, growPlanResult){
-          if (err) { return innerCallback(err);}
-          
-          notificationTemplateLocals.notificationDetails.growPlanPhase = growPlanResult.phases.id(notification.triggerDetails.gpPhaseId);
+              console.log('notification', notification);
+              GrowPlanModel.findById(notification.gpi.growPlan)
+              .exec(function(err, growPlanResult){
+                if (err) { return innerCallback(err);}
+                
+                notificationTemplateLocals.notificationDetails.growPlanPhase = growPlanResult.phases.id(notification.triggerDetails.gpPhaseId);
 
-          if (notification.triggerDetails.nextGpPhaseId){
-            notificationTemplateLocals.notificationDetails.nextGrowPlanPhase = growPlanResult.phases.id(notification.triggerDetails.nextGpPhaseId);  
-          }
-          
-          if (notification.triggerDetails.gpiPhaseId){
-            notificationTemplateLocals.notificationDetails.growPlanInstancePhase = notification.gpi.phases.id(notification.triggerDetails.gpiPhaseId);
-          }
+                if (notification.triggerDetails.nextGpPhaseId){
+                  notificationTemplateLocals.notificationDetails.nextGrowPlanPhase = growPlanResult.phases.id(notification.triggerDetails.nextGpPhaseId);  
+                }
+                
+                if (notification.triggerDetails.gpiPhaseId){
+                  notificationTemplateLocals.notificationDetails.growPlanInstancePhase = notification.gpi.phases.id(notification.triggerDetails.gpiPhaseId);
+                }
+                  
+                if (!notification.triggerDetails.idealRangeId){ return innerCallback(); }
+                
+                notificationTemplateLocals.notificationDetails.idealRange = notificationTemplateLocals.notificationDetails.growPlanPhase.idealRanges.id(notification.triggerDetails.idealRangeId);
+                SensorModel.findOne({code : notificationTemplateLocals.notificationDetails.idealRange.sCode})
+                .exec(function(err, sensorResult){
+                  notificationTemplateLocals.notificationDetails.sensor = sensorResult;
+                  return innerCallback();  
+                });
+                
+              });
+            },
+            function populateNewGrowPlan(innerCallback){
+              if (!notification.triggerDetails.newGrowPlanId){ return innerCallback(); }
+
+              GrowPlanModel.findById(notification.triggerDetails.newGrowPlanId)
+              .select('parentGrowPlanId name owner createdAt')
+              .populate('owner','name')
+              .exec(function(err, growPlanResult){
+                notificationTemplateLocals.notificationDetails.newGrowPlan = growPlanResult;
+                return innerCallback(err);
+              });
+            }
             
-          if (!notification.triggerDetails.idealRangeId){ return innerCallback(); }
-          
-          notificationTemplateLocals.notificationDetails.idealRange = notificationTemplateLocals.notificationDetails.growPlanPhase.idealRanges.id(notification.triggerDetails.idealRangeId);
-          SensorModel.findOne({code : notificationTemplateLocals.notificationDetails.idealRange.sCode})
-          .exec(function(err, sensorResult){
-            notificationTemplateLocals.notificationDetails.sensor = sensorResult;
-            return innerCallback();  
-          });
-          
-        });
-      },
-      function populateNewGrowPlan(innerCallback){
-        if (!notification.triggerDetails.newGrowPlanId){ return innerCallback(); }
+          ],
+          function(err){
+            if (err) { return callback(err); }
+            
+            // At this point, notificationTemplateLocals is fully populated
+            switch(options.displayType){
+              case 'email':
+                notificationDisplay = {
+                  subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                  bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                  bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+                };
+                break;
+              case 'summary':
+                notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+                break;
+              case 'detail':
+                notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+                break;
+            }
 
-        GrowPlanModel.findById(notification.triggerDetails.newGrowPlanId)
-        .select('parentGrowPlanId name owner createdAt')
-        .populate('owner','name')
-        .exec(function(err, growPlanResult){
-          notificationTemplateLocals.notificationDetails.newGrowPlan = growPlanResult;
-          return innerCallback(err);
-        });
+            return callback(null, notificationDisplay);
+          }
+        );
       }
-      
-    ],
-    function(err){
-      if (err) { return callback(err); }
-      
-      // At this point, notificationTemplateLocals is fully populated
-      switch(options.displayType){
-        case 'email':
-          notificationDisplay = {
-            subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-            bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-            bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-          };
-          break;
-        case 'summary':
-          notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-          break;
-        case 'detail':
-          notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-          break;
-      }
-
-      return callback(null, notificationDisplay);
-    }
+    ]
   );
+  
+
+  
 });
 
 /*************** END INSTANCE METHODS *************************/
