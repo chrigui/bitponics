@@ -723,12 +723,11 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                       notification.sentLogs.push({ts: now});
                       
                       if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
-                        winston.info("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
-                        notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);
+                        winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
                         // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
                         // if we've got notifications regularly being processed
-                        if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
-                          notification.timeToSend = now; 
+                        while (notification.timeToSend.valueOf() < nowAsMilliseconds){
+                          notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);  
                         }
                       } else {
                         notification.timeToSend = null;
