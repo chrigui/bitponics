@@ -100,12 +100,12 @@ new cronJob('0 0 0 * * *', function(){
 
 
 /**
- * Every 5 minutes
+ * Every 1 minute
  * - Clearing pending Notifications
  */
- new cronJob('00 */5 * * * * ', function(){
+ new cronJob('00 */1 * * * * ', function(){
     var now = moment();
-    winston.info('Every 5 minutes, starting at ' + now.format());
+    winston.info('Every 1 minutes, starting at ' + now.format());
 
 	
     winston.info(environment + ' NotificationModel.clearPendingNotifications');

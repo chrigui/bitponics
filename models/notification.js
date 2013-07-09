@@ -650,6 +650,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
     // TEMP HACK : enable next line to disable emails
     //return callback(null, notificationResults.length);
 
+    winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
     winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS');
 
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
@@ -683,8 +684,6 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   users = notification.users;
 
                   // TEMP HACK : special alert for hyatt device
-                  winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
-                  
                   try {
                     if (NotificationModel.db.name.indexOf('prod') >= 0){
                       if ( (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING) &&
