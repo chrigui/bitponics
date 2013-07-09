@@ -1,0 +1,20 @@
+extends ../layout
+
+block head
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading #{garden.name} Details
+		div.separator-top
+
+		p Email Photo Upload (add to contacts for easy access)
+		a(href="mailto:accounts+photo.upload+#{garden._id}@bitponics.com") accounts+photo.upload+#{garden._id}@bitponics.com
+
+block footer-scripts
+	script
