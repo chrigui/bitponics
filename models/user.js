@@ -403,6 +403,11 @@ UserSchema.method('ensureDeviceKey', function(serial, done){
 /***************** MIDDLEWARE **********************/
 
 
+UserSchema.pre('save', true, function(next){
+	this.email = this.email.toLowerCase();
+	next();
+});
+
 /**
  *  Give user API keys if needed. Can be done in parallel with other pre save hooks. 
  *  http://mongoosejs.com/docs/middleware.html

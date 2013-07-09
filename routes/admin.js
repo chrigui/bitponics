@@ -105,7 +105,7 @@ module.exports = function(app){
 	  var PhotoModel = require('../models/photo').model,
 	  	emailFetcher = require('../utils/email-photo-fetcher');
 
-	  emailFetcher.processUnreadEmails(PhotoModel, function(err, photos){
+	  emailFetcher.processUnreadEmails(function(err, photos){
 	  	console.log("processUnreadEmails result ", err, photos);
 	  	if (err){
 	  		return res.send(500, err);

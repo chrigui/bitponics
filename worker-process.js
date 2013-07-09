@@ -87,7 +87,7 @@ new cronJob('0 0 0 * * *', function(){
 
         winston.info(environment + ' emailPhotoFetcher.processUnreadEmails')
         
-        emailPhotoFetcher.processUnreadEmails(PhotoModel, function(err, results){
+        emailPhotoFetcher.processUnreadEmails(function(err, results){
             if (err) { winston.info(err); }
             var finishedEnvironmentAt = moment();
             winston.info('production emailPhotoFetcher.processUnreadEmails started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
