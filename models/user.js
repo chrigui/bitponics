@@ -403,7 +403,7 @@ UserSchema.method('ensureDeviceKey', function(serial, done){
 /***************** MIDDLEWARE **********************/
 
 
-UserSchema.pre('save', true, function(next){
+UserSchema.pre('save', function(next){
 	this.email = this.email.toLowerCase();
 	next();
 });
