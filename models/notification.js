@@ -222,6 +222,7 @@ var NotificationSchema = new Schema({
   /**
    * hash
    * MD5 hash of unique details (gpi + trigger + trigger details)
+   * Used to prevent creation of contemporaneous duplicates
    */
   h : { type : String },
 
@@ -350,9 +351,7 @@ NotificationSchema.set('toObject', {
       delete ret.tts;
       delete ret.r;
       delete ret.sl;
-      delete ret.t;
-      delete ret.tmpl;
-      delete ret.b;
+      delete ret.h;
     }
   }
 });
@@ -386,6 +385,10 @@ NotificationSchema.method('ensureHash', function(callback){
         triggerDetailsToHash = JSON.parse(JSON.stringify(this.triggerDetails || {}));
 
     delete triggerDetailsToHash.sensorValue;
+    
+    // ImmediateActions can be created in response to every sensor reading, and should be created
+    // in response to every violation. But as far as the Notification, immediateActionId isn't pertinent data.
+    delete triggerDetailsToHash.immediateActionId;
     
     stringToHash = (
       (this.gpi ? this.gpi.toString() : '') + 
