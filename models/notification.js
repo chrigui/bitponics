@@ -664,87 +664,88 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           emailTemplates(emailTemplatesDir, innerCallback);
         },
         function processNotificationResults(runEmailTemplate, innerCallback){
-          async.each(
-            notificationResults, 
-            function notificationIterator(notification, iteratorCallback){
-              
-              // Populate trigger details
-              notification.getDisplay(
-                {
-                  secureAppUrl : secureAppUrl,
-                  displayType : 'email'
+          
+          var notificationIterator = function (notification, iteratorCallback){
+            // Populate trigger details
+            notification.getDisplay(
+              {
+                secureAppUrl : secureAppUrl,
+                displayType : 'email'
+              },
+              function(err, notificationDisplay){
+                if (err) { return iteratorCallback(err); }
+
+                var emailTemplateLocals = {
+                  emailSubject : notificationDisplay.subject,
+                  emailBodyHtml : notificationDisplay.bodyHtml,
+                  emailBodyText : notificationDisplay.bodyText,
+                  subscriptionPreferencesUrl : subscriptionPreferencesUrl,
+                  appUrl : appUrl
                 },
-                function(err, notificationDisplay){
+                users = notification.users;
+
+                // TEMP HACK : special alert for hyatt device
+                try {
+                  if (NotificationModel.db.name.indexOf('prod') >= 0){
+                    if ( (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING) &&
+                         (notification.triggerDetails.deviceId === '000666809f5b')
+                       ){
+                      
+                      winston.info('IN clearPendingNotifications, special case adding bitponics team');
+                      // TEMP HACK : remove Hyatt from email notifications
+                      users = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
+                      emailTemplateLocals.emailSubject = "HYATT DEVICE CONNECTION DROPPED";
+                    }
+                  }
+                } catch(e){
+                  winston.error(e.toString());
+                }
+
+                // TEMP HACK : send all emails to Amit
+                // users = [{email : 'amit@bitponics.com'}];
+
+                runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                   if (err) { return iteratorCallback(err); }
 
-                  var emailTemplateLocals = {
-                    emailSubject : notificationDisplay.subject,
-                    emailBodyHtml : notificationDisplay.bodyHtml,
-                    emailBodyText : notificationDisplay.bodyText,
-                    subscriptionPreferencesUrl : subscriptionPreferencesUrl,
-                    appUrl : appUrl
-                  },
-                  users = notification.users;
+                  var mailOptions = {
+                    from: "notifications@bitponics.com",
+                    to: users.map(function(user) { return user.email; }).join(', '),
+                    subject: emailTemplateLocals.emailSubject,
+                    text: finalEmailText,
+                    html: finalEmailHtml
+                  };
 
-                  // TEMP HACK : special alert for hyatt device
-                  try {
-                    if (NotificationModel.db.name.indexOf('prod') >= 0){
-                      if ( (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING) &&
-                           (notification.triggerDetails.deviceId === '000666809f5b')
-                         ){
-                        
-                        winston.info('IN clearPendingNotifications, special case adding bitponics team');
-                        // TEMP HACK : remove Hyatt from email notifications
-                        users = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
-                        emailTemplateLocals.emailSubject = "HYATT DEVICE CONNECTION DROPPED";
-                      }
-                    }
-                  } catch(e){
-                    winston.error(e.toString());
-                  }
-
-                  // TEMP HACK : send all emails to Amit
-                  // users = [{email : 'amit@bitponics.com'}];
-
-                  runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
+                  winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
+                  
+                  emailTransport.sendMail(mailOptions, function(err, response){
                     if (err) { return iteratorCallback(err); }
-
-                    var mailOptions = {
-                      from: "notifications@bitponics.com",
-                      to: users.map(function(user) { return user.email; }).join(', '),
-                      subject: emailTemplateLocals.emailSubject,
-                      text: finalEmailText,
-                      html: finalEmailHtml
-                    };
-
-                    winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
                     
-                    emailTransport.sendMail(mailOptions, function(err, response){
-                      if (err) { return iteratorCallback(err); }
-                      
-                      notification.sentLogs.push({ts: now});
-                      
-                      if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
-                        winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
-                        // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-                        // if we've got notifications regularly being processed
-                        while (notification.timeToSend.valueOf() < nowAsMilliseconds){
-                          notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);  
-                        }
-                      } else {
-                        notification.timeToSend = null;
+                    notification.sentLogs.push({ts: now});
+                    
+                    if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
+                      winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
+                      // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
+                      // if we've got notifications regularly being processed
+                      while (notification.timeToSend.valueOf() < nowAsMilliseconds){
+                        notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);  
                       }
-                      
-                      notification.save(iteratorCallback);
-                    });
+                    } else {
+                      notification.timeToSend = null;
+                    }
+                    
+                    notification.save(iteratorCallback);
                   });
-                }
-              );
-            },
-            function notificationLoopEnd(err){
-              return innerCallback(err, notificationResults.length);
-            }
-          );
+                });
+              }
+            );
+          };
+
+          var notificationResultProcessingQueue = async.queue(notificationIterator, 10);
+          notificationResultProcessingQueue.drain = function(){
+            return innerCallback(err, notificationResults.length);
+          };
+          notificationResultProcessingQueue.push(notificationResults);
+
         }
       ],
       function (err, numberResultsAffected){
