@@ -389,6 +389,8 @@ NotificationSchema.method('ensureHash', function(callback){
     // ImmediateActions can be created in response to every sensor reading, and should be created
     // in response to every violation. But as far as the Notification, immediateActionId isn't pertinent data.
     delete triggerDetailsToHash.immediateActionId;
+
+    delete triggerDetailsToHash.timestamp;
     
     stringToHash = (
       (this.gpi ? this.gpi.toString() : '') + 
