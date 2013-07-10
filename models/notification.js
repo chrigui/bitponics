@@ -422,6 +422,8 @@ NotificationSchema.method('getDisplay', function(options, callback){
       GrowPlanModel = require('./growPlan').growPlan.model,
       SensorModel = require('./sensor').model,
       DeviceModel = require('./device').model,
+      ControlModel = require('./control').model, // need this so that mongoose registers Control schema in worker process
+      UserModel = require('./user').model, // need this so that mongoose registers Control schema in worker process
       ImmediateActionModel = require('./immediateAction').model,
       notificationTemplateLocals = {
         notification : notification,
@@ -620,6 +622,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
       GrowPlanModel = require('./growPlan').growPlan.model,
       SensorModel = require('./sensor').model,
       DeviceModel = require('./device').model,
+      ControlModel = require('./control').model, // need this so that mongoose registers Control schema in worker process
       ImmediateActionModel = require('./immediateAction').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
