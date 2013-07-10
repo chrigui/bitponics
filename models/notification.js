@@ -742,12 +742,20 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
             );
           };
 
-          var notificationResultProcessingQueue = async.queue(notificationIterator, 10);
-          notificationResultProcessingQueue.drain = function(){
+          var notificationProcessingEnded = function(){
             return innerCallback(err, notificationResults.length);
           };
-          notificationResultProcessingQueue.push(notificationResults);
 
+          if (!notificationResults.length){
+            return notificationProcessingEnded();
+          }
+          
+          var notificationResultProcessingQueue = async.queue(notificationIterator, 10);
+          notificationResultProcessingQueue.drain = notificationProcessingEnded;
+          notificationResultProcessingQueue.push(notificationResults, function(err){
+            winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION");
+            if (err) { winston.error(err); }
+          });
         }
       ],
       function (err, numberResultsAffected){
