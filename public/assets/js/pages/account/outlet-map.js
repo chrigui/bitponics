@@ -6,12 +6,14 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
+  '/assets/js/services/device.js',
+  '/assets/js/controllers/selection-overlay.js',
   'overlay'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var outletApp = angular.module('bpn.apps.account.outletMap', ['ngResource', 'ui', 'ui.bootstrap']).run(
+  var outletApp = angular.module('bpn.apps.account.outletMap', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
 
     function($rootScope) {
       /**
@@ -29,53 +31,97 @@ function (angular, domReady, feBeUtils) {
     }
   );
 
-  // outletApp.config(
-  //   [
-  //     '$locationProvider',
-  //     '$routeProvider',
-  //     function($locationProvider, $routeProvider) {
-  //       $locationProvider.html5Mode(true);
-  //       $locationProvider.hashPrefix = '!';
+  // outletApp.factory('DeviceLoader', 
+  //     [
+  //       'DeviceModel', 
+  //       'sharedDataService',
+  //       '$route', 
+  //       '$q',
+  //       function(DeviceModel, sharedDataService, $route, $q) {
+  //         return function() {
+  //           DeviceModel.get( { id : bpn.userOwnedDevice._id }, 
+  //               function (device) {
+  //                 // viewModels.initGrowPlanViewModel(growPlan);
+  //                 sharedDataService.userOwnedDevice = device;
+  //                 delay.resolve(sharedDataService.userOwnedDevice);
+  //               }, 
+  //               function() {
+  //                 delay.reject('Unable to fetch device '  + bpn.userOwnedDevice._id );
+  //               }
+  //             );
+  //             return delay.promise; 
+  //         };
+  //       }
+  //     ]
+  //   );
 
-  //       $routeProvider
-  //         .when('/', {
-  //           controller: 'bpn.controllers.setup.device.Connect',
-  //           templateUrl: 'connect.html'
-  //         })
-  //         .when('/wifi', {
-  //           controller: 'bpn.controllers.setup.device.Wifi',
-  //           templateUrl: 'wifi.html'
-  //         })
-  //         .when('/pair', {
-  //           controller: 'bpn.controllers.setup.device.Pair',
-  //           templateUrl:'pair.html'
-  //         })
-  //         .otherwise({redirectTo:'/'});
-  //     }
-  //   ]
-  // );
+  outletApp.factory('sharedDataService', 
+  	[
+	  	'DeviceModel',
+      // 'DeviceLoader',
+	  	function(DeviceModel){
+	      return {
+          // userOwnedDevice : DeviceLoader(),
+	      	userOwnedDevice : new DeviceModel(bpn.userOwnedDevice),
+	        controls : bpn.controls,
+	        currentVisibleOutput : undefined,
+	        activeOverlay : { is: undefined },
+	        modalOptions : {
+	          backdropFade : true,
+	          dialogFade : true,
+	          dialogClass : 'overlay'
+	        }
+	      };
+	  	}
+  	]
+  );
 
-  outletApp.factory('sharedDataService', function(){
-      return {
-        controls : bpn.controls,
-        activeOverlay : { is: undefined },
-        modalOptions : {
-          backdropFade: true,
-          dialogFade: true,
-          dialogClass : 'overlay auto-size'
-        }
-      };
-  });
+
+  outletApp.controller('bpn.controllers.account.outputMapping.ControlOverlay',
+	[
+		'$scope',
+		'sharedDataService',
+		function($scope, sharedDataService){
+			$scope.sharedDataService = sharedDataService;
+			$scope.overlayItems = $scope.sharedDataService.controls;
+			$scope.itemsPerPage = 10;
+
+			$scope.toggleItemSelection = function(control, input){
+				sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control = control;
+				sharedDataService.userOwnedDevice.$update();
+				$scope.close();
+			};
+
+  			// $scope.device = new DeviceModel($scope.sharedDataService.userOwnedDevice);
+
+			//   	$scope.setControlMap = function(outputId, controlId){
+			//   		$scope.device.outputMap.filter(function(output){
+			//   			return output.outputId === outputId;
+			//   		})[0].control = controlId;
+			//   		$scope.device.$save;
+			//   	};
+
+			$scope.close = function(){
+				$scope.sharedDataService.activeOverlay.is = undefined;
+			};
+		}
+	]
+  );
+
 
   outletApp.controller('bpn.controllers.account.outletMap.Main',
     [
       '$scope',
       '$filter',
       'sharedDataService',
-      function ($scope, $filter, sharedDataService) {
+      'DeviceModel',
+      function ($scope, $filter, sharedDataService, DeviceModel) {
       	$scope.sharedDataService = sharedDataService;
-        console.log('yay:');
-        console.log(sharedDataService.controls);
+
+		$scope.setCurrentVisibleOutput = function (index) {
+			$scope.sharedDataService.currentVisibleOutput = index;
+			$scope.sharedDataService.activeOverlay.is = 'ControlOverlay';
+		};
       }
     ]
   );
@@ -83,7 +129,5 @@ function (angular, domReady, feBeUtils) {
   domReady(function () {
     angular.bootstrap(document, ['bpn.apps.account.outletMap']);
   });
-
-  
 
 });

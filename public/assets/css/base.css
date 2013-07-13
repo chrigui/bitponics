@@ -227,8 +227,6 @@ textarea {
   vertical-align: top;
   resize: vertical;
 }
-input:valid,
-textarea:valid,
 input:invalid,
 textarea:invalid {
   background-color: #f0dddd;
@@ -1400,6 +1398,11 @@ img.page-spinner.spinner {
   color: #fff !important;
   background: #00e36c !important;
 }
+.overlay input[type='radio']+ label,
+.overlay input[type='checkbox'] + label {
+  color: #00e36c !important;
+  background: #fff !important;
+}
 .overlay .overlay-contain {
   position: relative;
 }
@@ -1584,7 +1587,7 @@ img.page-spinner.spinner {
   min-height: auto;
   height: auto;
 }
-#pricing .development-status // TEMP while we're only showing dev-status messaging {
+#pricing .development-status {
   color: #00e36c;
   font-size: 1.5em;
   margin-bottom: 0;
@@ -2202,11 +2205,11 @@ li
   background-image: -webkit-linear-gradient(top, #08c, #0077b3);
   background-image: -o-linear-gradient(top, #08c, #0077b3);
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #08c), color-stop(1, #0077b3));
-  background-image: -webkit-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -moz-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -o-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -ms-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: linear-gradient(top, #08c 0%, #0077b3 100%);
+  background-image: -webkit-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -moz-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -o-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -ms-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: linear-gradient(top, #08c 0, #0077b3 100%);
   background-repeat: repeat-x;
 }
 .dropdown-menu > .active > a,
@@ -2220,11 +2223,11 @@ li
   background-image: -webkit-linear-gradient(top, #08c, #0077b3);
   background-image: -o-linear-gradient(top, #08c, #0077b3);
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #08c), color-stop(1, #0077b3));
-  background-image: -webkit-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -moz-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -o-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: -ms-linear-gradient(top, #08c 0%, #0077b3 100%);
-  background-image: linear-gradient(top, #08c 0%, #0077b3 100%);
+  background-image: -webkit-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -moz-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -o-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: -ms-linear-gradient(top, #08c 0, #0077b3 100%);
+  background-image: linear-gradient(top, #08c 0, #0077b3 100%);
   background-repeat: repeat-x;
   outline: 0;
 }
@@ -2361,8 +2364,8 @@ li
 }
 .fade {
   opacity: 0;
-  filter: alpha(opacity=0);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
   -webkit-transition: opacity 0.15s linear;
   -moz-transition: opacity 0.15s linear;
   -o-transition: opacity 0.15s linear;
@@ -2401,8 +2404,8 @@ li
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: 0.2;
-  filter: alpha(opacity=20);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
 }
 .close:hover,
 .close:focus {
@@ -2410,8 +2413,8 @@ li
   text-decoration: none;
   cursor: pointer;
   opacity: 0.4;
-  filter: alpha(opacity=40);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+  filter: alpha(opacity=40);
 }
 button.close {
   padding: 0;
@@ -2781,14 +2784,14 @@ button.close {
 }
 .modal-backdrop.fade {
   opacity: 0;
-  filter: alpha(opacity=0);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
 }
 .modal-backdrop,
 .modal-backdrop.fade.in {
   opacity: 0.8;
-  filter: alpha(opacity=80);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
 }
 .modal {
   position: fixed;
@@ -2892,14 +2895,14 @@ button.close {
   font-size: 11px;
   line-height: 1.4;
   opacity: 0;
-  filter: alpha(opacity=0);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
   visibility: visible;
 }
 .tooltip.in {
   opacity: 0.8;
-  filter: alpha(opacity=80);
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
 }
 .tooltip.top {
   padding: 5px 0;

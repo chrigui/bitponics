@@ -875,3 +875,82 @@ module.exports.assignDeviceToUser = function(settings, callback){
     }
   );
 };
+
+/*
+ * TODO: IMPLEMENT THIS...
+ * Pass in a doc and what fields you want populated with their data model
+ * 
+ * @param arrayOfObjects [Array] array of mongoose objects
+ * @param fields [Array] array of object of form: 
+ *        
+ *      { 'key': key, 'dataModel': require('./someModel')}
+ *
+ * @param callback {function} Function with the signature function(err, [Obj]){}. "Obj" param is a POJO.
+ *
+ */
+module.exports.populateObjArray = function(arrayOfDocs, fields, callback) {
+  var 
+      async = require('async'),
+      // arrayOfObjects = arrayOfDocs.map(function(obj){ return obj.toObject() }),
+      functionSeries = [];
+
+  async.series([
+    function getIds(innerCallback){
+      arrayOfDocs.forEach(function(doc){
+        
+      });
+
+      innerCallback();
+    },
+
+    function populate(innerCallback){
+      fields.forEach(function(fieldObj){
+        var Model = fieldObj.dataModel,
+            newFunction = function(innerInnerCallback){ 
+              console.log(doc[fieldObj.key]);
+
+              Model.find({})
+                .where('_id').in(lightBulbIds)
+                .exec(function (err, lightBulbs) {
+                  if (err) { return innerCallback(err); }
+                  
+                  var lightBulbsById = {};
+                  lightBulbs.forEach(function(item, index) {
+                     lightBulbsById[item._id.toString()] = item;
+                  });
+
+                  growPlans.forEach(function(growPlan) {
+                    growPlan.phases.forEach(function(phase) {
+                      if (phase.light && phase.light.bulb){
+                        phase.light.bulb = lightBulbsById[getObjectId(phase.light.bulb).toString()];
+                      }
+                    });
+                  });
+
+                  return innerInnerCallback();
+                });
+            };
+        functionSeries.push(newFunction);
+      });
+      innerCallback();
+    }],
+    function(err, results){
+      if (err) { return callback(err); }
+      
+
+      console.log(functionSeries);
+  
+      async.parallel(
+        functionSeries,
+        function(err, results){
+          if (err) { return callback(err); }
+          var data = results;
+          console.log('data:');
+          console.log(data);
+          return callback(null, data);
+        }
+      );
+
+    }
+  );
+}

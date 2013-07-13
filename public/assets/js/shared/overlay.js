@@ -4,7 +4,7 @@ function overlayCtrl($scope, $filter, $compile) {
     $scope.reverse = false;
     $scope.filteredItems = [];
     $scope.groupedItems = [];
-    $scope.itemsPerPage = 5;
+    $scope.itemsPerPage = $scope.itemsPerPage || 5;
     $scope.pagedItems = [];
     $scope.currentPage = 0;
     // $scope.overlayItems = []; //defined in parent controller

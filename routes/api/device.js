@@ -13,7 +13,8 @@ var mongoose = require('mongoose'),
     async = require('async'),
     timezone = require('timezone/loaded'),
     routeUtils = require('../route-utils');
-    
+
+
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
  * 
@@ -55,22 +56,14 @@ module.exports = function(app) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/devices', 
+  app.post('/api/devices/', 
     routeUtils.middleware.ensureSecure, 
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
       var device;
       winston.info("POST: ");
       winston.info(req.body);
-      device = new DeviceModel({
-        id: req.body.id,
-        name: req.body.name,
-        deviceType: req.body.deviceType,
-        owner: req.body.owner,
-        users : req.body.users,
-        sensorMap : req.body.sensorMap,
-        outputMap : req.body.outputMap
-      });
+      device = new DeviceModel(req.body);
       device.save(function (err) {
         if (err) { return next(err); }
         winston.info("created device");
@@ -124,13 +117,44 @@ module.exports = function(app) {
     routeUtils.middleware.ensureSecure,
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      return DeviceModel.findOne({ _id: req.params.id }, function (err, device) {
+      winston.info('in PUT')
+      var data = {
+        deviceType: req.body.deviceType,
+        name: req.body.name,
+        serial: req.body.serial,
+        owner: req.body.owner,
+        activeGrowPlanInstance: req.body.activeGrowPlanInstance._id,
+        // status: {
+        //   actions: req.body.status.actions,
+        //   activeActions: req.body.status.activeAction,
+        //   immediateActions: req.body.status.immediateActions
+        // },
+        outputMap: req.body.outputMap.map(function(output){ return { control: output.control._id, outputId: output.outputId } }),
+        // sensorMap: req.body.sensorMap,
+        // userAssignmentLogs: req.body.userAssignmentLogs,
+        // users: req.body.users
+      }
+      
+      return DeviceModel.findByIdAndUpdate(req.params.id, data, function (err, device) {
         if (err) { return next(err); }
-        device.title = req.body.title;
-        return device.save(function (err) {
+        return device.save(function (err, device) {
           if (err) { return next(err); }
+          
           winston.info("updated device");
-          return res.send(device);
+
+          //TODO: use a more generic pop helper for any obj/prop that we want to return from server to UI
+          // ModelUtils.populateObjArray(
+          //   device.outputMap, 
+          //   [{'key': 'control', 'dataModel': require('./control')}], 
+          //   function(err, obj){
+          //     if (err) { return next(err); }
+          //     return res.send(obj);
+          //   }
+          // );
+
+          //For now, can just return nothing and Angular will ignore
+          return res.send();
+          
         });
       });
     }
