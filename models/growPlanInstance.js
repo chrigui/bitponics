@@ -541,7 +541,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
         */
 
         UserModel.findById(growPlanInstance.owner)
-        .select('timezone')
+        .select('timezone') // only property we actually need here is timezone
         .exec(function (err, user){
           if (err) { return innerCallback(err);}
           if (!user) { return innerCallback(new Error("GrowPlanInstance owner could not be found")); }
@@ -706,13 +706,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                 gpi : growPlanInstance,
                 timeToSend : now,
                 type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
-                trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END,
+                trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END_ACTION,
                 triggerDetails : {
                   phaseName : prevPhase.name,
                   actionId : action._id,
                   gpPhaseId : prevPhase._id
-                },
-                title : i18nKeys.get('Time for the following action', action.description)
+                }//,
+                //title : i18nKeys.get('Time for the following action', action.description)
               },
               iteratorCallback);
             },
@@ -743,13 +743,14 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   gpi : growPlanInstance,
                   timeToSend : now,
                   type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
-                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                  trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                   triggerDetails : {
                     phaseName : growPlanPhase.name,
                     actionId : action._id,
-                    gpPhaseId : growPlanPhase._id
+                    gpPhaseId : growPlanPhase._id,
+                    handledByDeviceControl : false
                   },
-                  title : i18nKeys.get('Time for the following action', action.description)
+                  //title : i18nKeys.get('Time for the following action', action.description)
                 };
 
               notificationsToSave.push(actionNotification);
@@ -761,32 +762,37 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   })
                   ){
                     actionNotification.type = feBeUtils.NOTIFICATION_TYPES.INFO;
-                    actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
-              } else {
+                    actionNotification.triggerDetails.handledByDeviceControl = true;
+                    //actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
+              } 
+              // else it either doesn't require a control, or device doesn't have the required control
+              else {
                 actionNotification.type = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
                 
                 if (action.cycle.repeat){
                   actionNotification.body = i18nKeys.get("Has repeating cycle");
                   
                   // cycles with repeat=true are required to have 2 states (through validation rules)
-                  var states = action.cycle.states;
+                  var states = action.cycle.states,
+                      overallDurationObject = action.getOverallCycleDurationObject();
                   
                   if (states[0].durationType && !states[1].durationType){
                     // state 0 has a duration and state 1 does not
                     notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
+                        gpPhaseId : growPlanPhase._id,
+                        cycleStateIndex : 1
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        durationType : states[0].durationType,
-                        duration : states[0].duration,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -797,16 +803,17 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
+                        gpPhaseId : growPlanPhase._id,
+                        cycleStateIndex : 0
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        durationType : states[1].durationType,
-                        duration : states[1].duration,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -816,17 +823,17 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                     notificationsToSave.push({
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
-                      timeToSend : now + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
                         gpPhaseId : growPlanPhase._id
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
                       repeat : {
-                        durationType : 'seconds',
-                        duration : action.overallCycleTimespan * 1000,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -836,16 +843,16 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                       users : growPlanInstance.users,
                       growPlanInstance : growPlanInstance,
                       timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_START,
+                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                       triggerDetails : {
                         phaseName : growPlanPhase.name,
                         actionId : action._id,
                         gpPhaseId : growPlanPhase._id
                       },
-                      title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
+                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
                       repeat : {
-                        durationType : 'seconds',
-                        duration : action.overallCycleTimespan * 1000,
+                        durationType : overallDurationObject.durationType,
+                        duration : overallDurationObject.duration,
                         timezone : owner.timezone
                       },
                       type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
@@ -885,7 +892,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
  * Assumes that this.growPlan is a populated GrowPlan model (so that we can scan the old phase names withotu re-retrieving the old GrowPlan)
  *
  * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
- * @param {function(err, updatedGrowPlanInstance)} callback
+ * @param {function(err)} callback
  */
 GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, callback){
   var self = this,
@@ -928,7 +935,8 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
         type : feBeUtils.NOTIFICATION_TYPES.INFO,
         trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
         triggerDetails : {
-          newGrowPlanId : newGrowPlan._id
+          newGrowPlanId : newGrowPlan._id,
+          migrationSuccessful : false
         },
         title : i18nKeys.get('Grow Plan Updated, failed migration title'),
         body : i18nKeys.get('Grow Plan Updated, failed migration body')
@@ -961,7 +969,8 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
             type : feBeUtils.NOTIFICATION_TYPES.INFO,
             trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
             triggerDetails : {
-              newGrowPlanId : newGrowPlan._id
+              newGrowPlanId : newGrowPlan._id,
+              migrationSuccessful : true
             },
             title : i18nKeys.get('Grow Plan Updated, automatic migration title'),
             body : i18nKeys.get('Grow Plan Updated, automatic migration body')

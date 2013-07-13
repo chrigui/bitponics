@@ -2,8 +2,8 @@ module.exports = {};
 
 /**
  * logSensorLog : Log a sensorLog to the sensorLog collection as well as the
- * device.recentSensorLogs & growPlanInstance.recentSensorLogs. Verify against
- * IdealRanges and trigger Actions if necessary.
+ * device.recentSensorLogs & growPlanInstance.recentSensorLogs. 
+ * Verify against IdealRanges and trigger Actions if necessary.
  *
  * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
  *      the device's recentSensorLogs
@@ -99,45 +99,40 @@ module.exports.logSensorLog = function (options, callback){
               phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
               phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
 
-              // TODO : replace log.sCode with the sensor name
-              message = log.sCode + ' is below recommended minimum of ' + valueRange.min;
-              
-              triggerImmediateAction(
+              module.exports.processIdealRangeViolation(
                 {
+                  idealRange : idealRange,
+                  sensorValue : log.val,
+                  growPlanPhase : phase,
+                  timestamp : pendingSensorLog.ts,
                   growPlanInstance : growPlanInstance, 
                   device : device, 
-                  actionId : idealRange.actionBelowMin, 
-                  immediateActionMessage : message, 
-                  user : user,
-                  triggeredByIdealRangeViolation : true
+                  user : user
                 },
-                function(err){
-                  if (err) { return iteratorCallback(err); }
-                  iteratorCallback();
-                }
+                iteratorCallback
               );
+
             } else if (log.val > valueRange.max){
               if (!idealRange.checkIfWithinTimespan(timezone, pendingSensorLog.ts)){ return iteratorCallback(); }
               
               phaseDaySummary.sensorSummaries[log.sCode] = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
               phaseDaySummary.status = feBeUtils.PHASE_DAY_SUMMARY_STATUSES.BAD;
               
-              message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
+              //message = log.sCode + ' is above recommended maximum of ' + valueRange.max;
               
-              triggerImmediateAction(
+              module.exports.processIdealRangeViolation(
                 {
+                  idealRange : idealRange,
+                  sensorValue : log.val,
+                  growPlanPhase : phase,
+                  timestamp : pendingSensorLog.ts,
                   growPlanInstance : growPlanInstance, 
                   device : device, 
-                  actionId : idealRange.actionBelowMin, 
-                  immediateActionMessage : message, 
-                  user : user,
-                  triggeredByIdealRangeViolation : true
+                  user : user
                 },
-                function(err){
-                  if (err) { return iteratorCallback(err); }
-                  iteratorCallback();
-                }
+                iteratorCallback
               );
+
             } else { 
               return iteratorCallback(); 
             }
@@ -164,13 +159,122 @@ module.exports.logSensorLog = function (options, callback){
 };
 
 
+
+/**
+ * Create a Notification and triggers an ImmediateAction if defined
+ * Should only be called after verifying an IdealRange was violated.
+ * 
+ * @param {IdealRange} options.idealRange : required
+ * @param {Number} options.sensorValue : required
+ * @param {Date} options.timestamp : required
+ * @param {Phase} options.growPlanPhase : required
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel 
+ * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
+ * @param {User} options.user : required. owner of GrowPlanInstance
+ * @param {function(err, { notification : Notification, immediateAction : ImmediateAction })} callback
+ */
+module.exports.processIdealRangeViolation = function (options, callback){
+  var idealRange = options.idealRange,
+      valueRange = options.idealRange.valueRange,
+      sensorValue = options.sensorValue,
+      NotificationModel = require('./notification').model,
+      winston = require('winston'),
+      async = require('async'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils'),
+      message;
+    
+  
+  if (sensorValue < valueRange.min) {
+    if (options.idealRange.actionBelowMin){
+      module.exports.triggerImmediateAction(
+        {
+          growPlanInstance : options.growPlanInstance, 
+          device : options.device, 
+          actionId : idealRange.actionBelowMin,
+          immediateActionMessage : (idealRange.sCode + ' is below recommended minimum of ' + valueRange.min),
+          user : options.user,
+          idealRangeViolation : {
+            gpPhaseId : options.growPlanPhase._id,
+            sensorValue : options.sensorValue,
+            idealRangeId : idealRange._id,
+            timestamp : options.timestamp
+          }
+        },
+        callback
+      );  
+    } else {
+      NotificationModel.create(
+        {
+          users : options.growPlanInstance.users,
+          type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+          gpi : options.growPlanInstance._id,
+          trigger : feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION,
+          triggerDetails : {
+            gpPhaseId : options.growPlanPhase._id,
+            sensorValue : options.sensorValue,
+            idealRangeId : options.idealRange._id,
+            timestamp : options.timestamp
+          }
+        }, 
+        function(err, notification){
+          return callback(err, { notification : notification });
+        }
+      );
+    }
+    
+  } else if (sensorValue > valueRange.max){
+
+    if (options.idealRange.actionAboveMax){
+      module.exports.triggerImmediateAction(
+        {
+          growPlanInstance : options.growPlanInstance, 
+          device : options.device, 
+          actionId : idealRange.actionAboveMax,
+          immediateActionMessage : (idealRange.sCode + ' is above recommended max of ' + valueRange.max),
+          user : options.user,
+          idealRangeViolation : {
+            gpPhaseId : options.growPlanPhase._id,
+            sensorValue : options.sensorValue,
+            idealRangeId : idealRange._id,
+            timestamp : options.timestamp
+          }
+        },
+        callback
+      );  
+    } else {
+      NotificationModel.create(
+        {
+          users : options.growPlanInstance.users,
+          type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+          gpi : options.growPlanInstance._id,
+          trigger : feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION,
+          triggerDetails : {
+            gpPhaseId : options.growPlanPhase._id,
+            sensorValue : options.sensorValue,
+            idealRangeId : options.idealRange._id,
+            timestamp : options.timestamp
+          }
+        }, 
+        function(err, notification){
+          return callback(err, { notification : notification });
+        }
+      );
+    }
+
+  } else {
+    return callback(new Error('ModelUtils.processIdealRangeViolation was called without an actual violation'));
+  }
+};
+
+
 /**
  * Trigger an immediate action. Can be called manually or because of an IdealRange violation.
  *
  * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
  *
  * @param {object} options  
- * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel 
+ * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel. Should have populated "owner" (just need timezone) 
  * @param {ObjectId|string} options.actionId : ObjectID 
  * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
  * @param {string} options.immediateActionMessage : message to log with the immediateAction
@@ -188,9 +292,6 @@ module.exports.triggerImmediateAction = function (options, callback){
     ActionModel = Action.model,
     ImmediateActionModel = require('./immediateAction').model,
     NotificationModel = require('./notification').model,
-    SensorLogModel = require('./sensorLog').model,
-    EmailConfig = require('../config/email-config'),
-    nodemailer = require('nodemailer'),
     winston = require('winston'),
     async = require('async'),
     tz = require('timezone/loaded'),
@@ -284,27 +385,28 @@ module.exports.triggerImmediateAction = function (options, callback){
         if (err) { return callback(err); }
         
         var notificationType,
-            notificationTitle,
-            notificationBody,
-            notificationTrigger = (options.triggeredByIdealRangeViolation ? feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION : feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION);
+            notificationTrigger = (options.idealRangeViolation ? feBeUtils.NOTIFICATION_TRIGGERS.IDEAL_RANGE_VIOLATION : feBeUtils.NOTIFICATION_TRIGGERS.IMMEDIATE_ACTION),
+            notificationTriggerDetails = options.idealRangeViolation || {};
+
+        notificationTriggerDetails.actionId = actionId;
+        notificationTriggerDetails.handledByDeviceControl = actionHasDeviceControl;
+
 
         winston.info('Logging immediateAction for gpi ' + growPlanInstance._id + ' "' + immediateActionMessage + '", action ' + action._id);
         
         if (!actionHasDeviceControl){ 
           notificationType = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
-          notificationTitle = i18nKeys.get('manual action trigger message', immediateActionMessage, action.description);
         } else {
           notificationType = feBeUtils.NOTIFICATION_TYPES.INFO;
-          notificationTitle = i18nKeys.get('device action trigger message', immediateActionMessage, action.description);
         }
 
         // In parallel: 
         // log to ImmediateAction
         // log a Notification, and 
         // if device has a relevant control, refresh its commands
-        async.parallel(
+        async.series(
           [
-            function(innerCallback){
+            function createImmediateAction(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating an ImmediateAction");
               var immediateAction = new ImmediateActionModel({
                   gpi : growPlanInstance._id,
@@ -315,24 +417,26 @@ module.exports.triggerImmediateAction = function (options, callback){
                   expires : expires
                 });
 
+              notificationTriggerDetails.immediateActionId = immediateAction._id;
+
               // push the log to ImmediateActionModel
               immediateAction.save(innerCallback);
             },
-            function(innerCallback){
+            function createNotification(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating Notification");
               NotificationModel.create(
-              {
-                  users : [user],
-                  growPlanInstance : growPlanInstance,
-                  timeToSend : now,
-                  title : notificationTitle,
-                  type : notificationType,
-                  trigger : notificationTrigger
-              },
-              innerCallback
+                {
+                    users : growPlanInstance.users,
+                    growPlanInstance : growPlanInstance,
+                    timeToSend : now,
+                    type : notificationType,
+                    trigger : notificationTrigger,
+                    triggerDetails : notificationTriggerDetails
+                },
+                innerCallback
               );
             },
-            function(innerCallback){
+            function updateDevice(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", checking actionHasDeviceControl " + actionHasDeviceControl);
               if (!actionHasDeviceControl){ 
                 return innerCallback();
@@ -348,7 +452,7 @@ module.exports.triggerImmediateAction = function (options, callback){
               
             }
           ],
-          function(err, results){
+          function (err, results){
             winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", in parallel final, err: " + (err ? err.toString() : '') + ", results: " + results.length);
             if (err) { return callback(err); }
             var data = {
@@ -428,9 +532,12 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
             users : growPlanInstance.users,
             type : feBeUtils.NOTIFICATION_TYPES.INFO,
             timeToSend : now,
-            title : i18nKeys.get("It's almost time", nextPhase.name),
-            body : i18nKeys.get("Log into your dashboard to advance"),
-            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
+            triggerDetails : {
+              gpPhaseId : currentGrowPlanInstancePhase.phase,
+              nextGpPhaseId : nextGrowPlanInstancePhase.phase,
+              gpiPhaseId : nextGrowPlanInstancePhase._id
+            }
           },
           iteratorCallback
         );
@@ -442,103 +549,6 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
   });
 };
 
-
-/** 
- * Called from the worker process across each environment, which is why we
- * need the model to be passed in.
- *
- * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
- */
-module.exports.clearPendingNotifications = function (callback){
-  var NotificationModel = require('./notification').model,
-      EmailConfig = require('../config/email-config'),
-      nodemailer = require('nodemailer'),
-      tz = require('timezone/loaded'),
-      async = require('async'),
-      winston = require('winston'),
-      requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils'),
-      i18nKeys = require('../i18n/keys');
-
-  var now = new Date(),
-      nowAsMilliseconds = now.valueOf();
-  
-
-  NotificationModel
-  .find()
-  .where('tts')
-  .lte(now)
-  .populate('u', 'email') // only need the email field for Users
-  .exec(function(err, notificationResults){
-    if (err) { return callback(err); }
-    if (!notificationResults.length){ return callback(); }
-    var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
-    
-  
-    // TEMP HACK : enable next line to disable emails
-    //return callback(null, notificationResults.length);
-
-    winston.info('IN clearPendingNotifications');
-
-    async.each(
-      notificationResults, 
-      function notificationIterator(notification, iteratorCallback){
-        var subject = i18nKeys.get("Bitponics Notification"),
-        
-            // TEMP HACK : remove Hyatt from email notifications
-            users = notification.users.filter(function(user){ return user.email !== 'anderson.foote@hyatt.com'; }),
-            mailTo,
-            mailOptions;
-
-        // TEMP HACK : if empty user set (because we cleared Hyatt from email recipients), mail it to Amit
-        if (!users.length){
-          winston.info('IN clearPendingNotifications, special case adding bitponics team');
-          users.push({email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'});
-        }
-
-        // TEMP HACK : send all emails to Amit
-        //users = [{email : 'amit@bitponics.com'}];
-
-        mailTo = users.map(function(user) { return user.email; }).join(', ');
-
-        if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED){ subject += ': ' + i18nKeys.get("Action Needed"); }
-        
-        mailOptions = {
-            from: "notifications@bitponics.com", // sender address
-            to: mailTo,
-            subject: subject, // Subject line
-            text: notification.title + ': ' + notification.body,
-            html: notification.title + ': ' + notification.body
-        };
-
-        winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailTo);
-        
-        emailTransport.sendMail(mailOptions, function(err, response){
-          if(err){ return iteratorCallback(err); }
-          
-          notification.sentLogs.push({ts: now});
-          
-          if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
-            console.log("IN clearPendingNotifications, resetting notification.repeat", notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType)
-            notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.repeatType);
-            // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-            // if we've got notifications regularly being processed
-            if (notification.timeToSend.valueOf() < nowAsMilliseconds) { 
-              notification.timeToSend = now; 
-            }
-          } else {
-            notification.timeToSend = null;
-          }
-          
-          notification.save(iteratorCallback);
-        });
-      },
-      function notificationLoopEnd(err){
-        return callback(err, notificationResults.length);
-      }
-    );
-  });
-};
 
 
 /**
@@ -599,7 +609,8 @@ module.exports.checkDeviceConnections = function(callback){
           type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
           trigger : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING,
           triggerDetails : {
-            deviceId : device._id
+            deviceId : device._id,
+            lastConnectionAt : lastConnectionAt
           },
           title : notificationTitle,
           body : notificationBody

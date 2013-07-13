@@ -1,0 +1,43 @@
+extends ../layout
+
+block head
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading All Gardens
+		div.separator-top
+			
+			ul(class="block-info-set grid photos content-module")
+				each gpi in growPlanInstances
+					li
+						div.first
+							h5.label Name
+							div.value #{gpi.name} 
+						div
+							h5.label Owner
+							div.value.ww-break-word #{gpi.owner.name.full} 
+						div
+							h5.label ID
+							div.value.ww-break-word #{gpi._id} 
+						div
+							h5.label Active
+							div.value #{gpi.active}
+						div
+							h5.label Start Date
+							div.value #{gpi.friendlyStartDate}
+						div
+							h5.label Device
+							- if (gpi.device)
+								div.value #{gpi.device}
+							- else 
+								div.value None
+						a.btn(href="/gardens/#{gpi._id}") Dashboard
+
+block footer-scripts
+	

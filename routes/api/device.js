@@ -247,7 +247,7 @@ module.exports = function(app) {
             .findByIdAndUpdate(id, 
             {
               $set : {
-                lastCommunicationAt : new Date()
+                lastConnectionAt : new Date()
               }
             })
             .populate('activeGrowPlanInstance')

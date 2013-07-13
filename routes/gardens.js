@@ -138,14 +138,39 @@ module.exports = function(app){
 		          gpi : req.params.growPlanInstanceId,
 		          tts : { $ne : null }
 		        })
+		        .sort({ 'tts' : -1 })
 		        .limit(10)
-		        .exec(innerCallback);
+		        .exec(function(err, notificationResults){
+		        	if (err) { return innerCallback(err); }
+		        	var notificationsWithSummaries = [];
+		        	async.each(notificationResults, 
+		        		function notificationIterator(notification, iteratorCallback){
+			        		var notificationObject = notification.toObject();
+			        		notification.getDisplay(
+			        			{ 
+			        				secureAppUrl : app.config.secureAppUrl,
+			        				displayType : 'summary'
+			        			},
+			        			function (err, notificationDisplay){
+			        				notificationObject.displays = {
+					        			summary : notificationDisplay
+					        		};
+					        		notificationsWithSummaries.push(notificationObject);
+			        				return iteratorCallback();
+			        			}
+		        			);
+		        		},
+		        		function notificationLoopEnd(err){
+		        			innerCallback(err, notificationsWithSummaries);
+		        		}
+	        		);
+		        });
 		      },
 		      function getPhotos(innerCallback){
 		      	PhotoModel.find({
-		      		gpi : req.params.growPlanInstancesId,
+		      		gpi : req.params.growPlanInstanceId,
 		      	})
-		      	.limit(10)
+		      	.limit(15)
 		      	.exec(innerCallback);
 		      }
 				],
@@ -166,6 +191,39 @@ module.exports = function(app){
 
 					res.render('gardens/dashboard', locals);
 				});
+			});
+		}
+	);
+
+
+
+	app.get('/gardens/:growPlanInstanceId/details',
+		routeUtils.middleware.ensureSecure,
+		routeUtils.middleware.ensureLoggedIn,
+		function (req, res, next) {
+			var locals = {
+				title : 'Bitponics - Dashboard',
+				user : req.user,
+				garden : undefined,
+				className: "app-page garden-details",
+				pageType: "app-page"
+			};
+
+			// First, verify that the user can see this
+			GrowPlanInstanceModel.findById(req.params.growPlanInstanceId)
+			.exec(function(err, growPlanInstanceResult){
+				if (err) { return next(err); }
+				if (!growPlanInstanceResult){ return next(new Error('Invalid grow plan instance id'));}
+
+				if (!routeUtils.checkResourceReadAccess(growPlanInstanceResult, req.user)){
+          return res.send(401, "This garden is private. You must be the owner to view it.");
+      	}
+
+      	locals.userCanModify = routeUtils.checkResourceModifyAccess(growPlanInstanceResult, req.user);
+
+      	locals.garden = growPlanInstanceResult.toObject();
+
+				res.render('gardens/details', locals);
 			});
 		}
 	);

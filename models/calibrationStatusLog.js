@@ -109,7 +109,7 @@ CalibrationStatusLogSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
-CalibrationStatusLogSchema.index({ 'd ts': -1 });
+CalibrationStatusLogSchema.index({ 'd': 1, 'ts': -1 });
 
 exports.schema = CalibrationStatusLogSchema;
 exports.model = mongooseConnection.model('CalibrationStatusLog', CalibrationStatusLogSchema);

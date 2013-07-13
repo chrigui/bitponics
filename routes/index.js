@@ -17,17 +17,6 @@ module.exports = function(app){
 	});
 
 
-	app.get('/socket_graph_test', 
-		routeUtils.middleware.ensureLoggedIn, 
-		function (req, res){
-		  //print_visits(req, res);
-		  res.render('dashboard', {
-		    title: 'Express',
-		    locals : { temp: 1 }
-		  });
-		}
-	);
-
 	app.get('/', function (req, res){
 	  var locals = {
     	title: "Bitponics",
@@ -331,7 +320,6 @@ module.exports = function(app){
   require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
-  require('./demo')(app);
   require('./gardens')(app);
   require('./guides')(app);
   require('./photos')(app);

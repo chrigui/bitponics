@@ -54,7 +54,7 @@ PhotoSchema.plugin(mongoosePlugins.useTimestamps);
 PhotoSchema.plugin(mongoosePlugins.visibility);
 
 
-PhotoSchema.index({ 'gpi ts': -1 });
+PhotoSchema.index({ 'gpi' : 1, 'ts': -1 });
 
 
 

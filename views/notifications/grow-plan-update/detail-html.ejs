@@ -1,0 +1,10 @@
+<% if (notificationDetails.migrationSuccessful){ %>
+	<h1><%= notification.gpi.name %> has received a Grow Plan update.</h1>
+	<p>Since your garden is subscribed to receive automatic Grow Plan updates, we've done this automatically. To see the details of the new Grow Plan, click the link below:</p>
+<% } else { %>
+	<h1><%= notification.gpi.name %> has a Grow Plan update available.</h1>
+	<p>To see the details of the update and decide if you want to migrate your <%= notification.gpi.name %> to it, click the link below:</p>
+<% } %>
+<a class="btn" href="<%= secureAppUrl + '/grow-plans/' + notificationDetails.newGrowPlan._id.toString() %>"><%= notificationDetails.newGrowPlan.name %> Grow Plan Details</a>
+<p>And to see how your garden's doing now:</p>
+<a class="btn" href="<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>">Visit your garden dashboard</a>

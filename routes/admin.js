@@ -60,7 +60,7 @@ module.exports = function(app){
 	 */
 	app.post('/admin/trigger-clearPendingNotifications', function (req, res) {
 	  var NotificationModel = require('../models/notification').model;
-	  NotificationModel.clearPendingNotifications(function(err, numberNotificationsAffected){
+	  NotificationModel.clearPendingNotifications({env : app.settings.env}, function(err, numberNotificationsAffected){
 	  	if (err) { 
 	  		winston.error(err); 
 	  		return res.send(500, err);
@@ -105,7 +105,7 @@ module.exports = function(app){
 	  var PhotoModel = require('../models/photo').model,
 	  	emailFetcher = require('../utils/email-photo-fetcher');
 
-	  emailFetcher.processUnreadEmails(PhotoModel, function(err, photos){
+	  emailFetcher.processUnreadEmails(function(err, photos){
 	  	console.log("processUnreadEmails result ", err, photos);
 	  	if (err){
 	  		return res.send(500, err);
@@ -201,6 +201,24 @@ module.exports = function(app){
 	});
 
 	
+
+	app.get('/admin/gardens', function(req, res, next){
+		var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+				locals = {
+					title: 'Bitponics Admin | Gardens',
+					growPlanInstances : []
+				};
+
+		GrowPlanInstanceModel.find()
+		.select('owner _id device active startDate')
+		.populate('owner', '_id name')
+		.exec(function(err, growPlanInstanceResults){
+			if (err) { return next(err);}
+
+			locals.growPlanInstances = growPlanInstanceResults;
+			res.render('admin/gardens', locals);
+		});
+	});
 
 
 };

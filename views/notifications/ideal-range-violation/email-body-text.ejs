@@ -1,0 +1,12 @@
+<%= notificationDetails.sensor.name %> is out of range<% if (notificationDetails.handledByDeviceControl){ %>, but your Bitponics device has it taken care of<% } %>.
+
+It’s <%= notificationDetails.sensorValue %>, and the ideal range is between <%= notificationDetails.idealRange.valueRange.min %> and <%= notificationDetails.idealRange.valueRange.max %>.
+
+<% if (notificationDetails.action) { %>
+To fix this,<% if (notificationDetails.handledByDeviceControl){ %> since your device has a <%= notificationDetails.action.control.name %> connected, it's automatically taken the following action:<% } else { %> you'll need to take the following action: <% } %>
+
+<%= notificationDetails.action.description %>
+<% } %>
+
+Visit your garden dashboard here:
+<%= secureAppUrl + '/gardens/' + notification.gpi._id.toString() %>

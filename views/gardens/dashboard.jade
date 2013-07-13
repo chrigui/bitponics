@@ -118,7 +118,7 @@ block content
             //- input(type="checkbox", model="notification._id", id="notification._id")
             label(for="notification._id")
               div.date {{notification.timeToSend | friendlyDate }}
-              div.title {{notification.title}}
+              div.title {{notification.displays.summary}}
           
 
   svg(height='0')
