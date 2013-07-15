@@ -1,0 +1,56 @@
+extends ../layout
+
+block head
+	mixin requirejs("/assets/js/pages/dashboard")
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading My Grow Plans
+		div.separator-top
+		- if (typeof(userGrowPlanInstances) != 'undefined' && userGrowPlanInstances.length > 0)
+			ul(class="block-info-set grid photos content-module")
+				each gpi in userGrowPlanInstances
+					li
+						div.img-wrapper
+							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
+							div.icon-glyph.icon-glyphlogo-new
+						div.first
+							h5.label Name
+							div.value #{gpi.name} 
+						div
+							h5.label ID
+							div.value.ww-break-word #{gpi._id} 
+						div
+							h5.label Active
+							div.value #{gpi.active}
+						div
+							h5.label Start Date
+							div.value #{gpi.friendlyStartDate}
+						div
+							h5.label Device
+							- if (gpi.device)
+								div.value #{gpi.device}
+							- else 
+								div.value None
+						
+						a.btn(href="/gardens/#{gpi._id}") Dashboard
+
+		h2.page-heading.clear-b Community Member Grow Plans
+		div.separator-top
+		- if (typeof(growPlans) != 'undefined' && growPlans.length > 0)
+			ul(class="block-info-set grid photos content-module")
+				each gpi in userGrowPlanInstances
+					li
+						#{gp._id}
+		- else
+			p Coming soon...
+
+block footer-scripts
+	script
+		bpn.pageData.userGrowPlanInstances = !{JSON.stringify(userGrowPlanInstances)};

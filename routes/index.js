@@ -321,6 +321,7 @@ module.exports = function(app){
 	require('./api')(app);
 	require('./dashboard')(app);
   require('./gardens')(app);
+  require('./grow-plans')(app);
   require('./guides')(app);
   require('./photos')(app);
 	require('./reset')(app);
