@@ -24,6 +24,7 @@
   display: inline;
 }
 .display-ib,
+.grid li,
 .idealRanges .hi label,
 .idealRanges .lo label {
   display: -moz-inline-stack;
@@ -185,7 +186,7 @@
  * Grow Plans Page
  */
 .grid li {
-  float: left;
+  vertical-align: top;
   width: 15em;
 }
 .idealRanges li {

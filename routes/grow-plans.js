@@ -39,11 +39,11 @@ module.exports = function(app){
 
 			GrowPlanModel
 			.find({})
-			// .sort('-startDate')
+			.sort('-updatedAt')
 			.exec(function(err, growPlanResults){
 				if (err) { return next(err); }
 				locals.growPlans = growPlanResults;
-				// locals.userGrowPlanInstances.forEach(function(gpi){
+				// locals.userGrowPlans.forEach(function(gpi){
 				// 	gpi.friendlyStartDate = '';
 				// 	if (gpi.startDate){
 				// 		gpi.friendlyStartDate = moment(gpi.startDate).calendar();
