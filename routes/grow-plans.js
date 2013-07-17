@@ -31,29 +31,71 @@ module.exports = function(app){
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
-				userGrowPlanInstances : [],
-				communityGrowPlanInstances : [],
-				className: "grow-plans app-page single-page",
+				userGrowPlans : [],
+				communityGrowPlans : [],
+				className: "grow-plans gardens app-page single-page",
     			pageType: "app-page"
 			};
+			async.parallel(
+				[
+					function getUserGrowPlans(innerCallback){
+						GrowPlanModel
+							.find({ createdBy: req.user })
+							.sort('-updatedAt')
+							.exec(innerCallback);
+					},
+					function getCommunityGrowPlans(innerCallback){
+						GrowPlanModel
+							.find({ visibility: 'public' })
+							.sort('-updatedAt')
+							.exec(innerCallback);
+					}
+				],
+				function(err, results){
+					if (err) { return next(err); }
 
-			GrowPlanModel
-			.find({})
-			.sort('-updatedAt')
-			.exec(function(err, growPlanResults){
-				if (err) { return next(err); }
-				locals.growPlans = growPlanResults;
-				// locals.userGrowPlans.forEach(function(gpi){
-				// 	gpi.friendlyStartDate = '';
-				// 	if (gpi.startDate){
-				// 		gpi.friendlyStartDate = moment(gpi.startDate).calendar();
-				// 	}
-					
-				// })
-				res.render('grow-plans', locals);
-			});
+					locals.userGrowPlans = results[0];
+					locals.communityGrowPlans = results[1];
+
+					res.render('grow-plans', locals);
+
+				}
+			);
 		}
 	);
+
+	app.get('/grow-plans/:id',
+		routeUtils.middleware.ensureSecure,
+		routeUtils.middleware.ensureLoggedIn,
+		function (req, res, next) {
+			var locals = {
+				title : 'Bitponics - Grow Plan',
+				user : req.user,
+				growPlan : undefined,
+				// sensors : undefined,
+				// controls : undefined,
+				// sensorDisplayOrder : ['lux','hum','air','ph','ec','water','tds','sal','full','vis','ir'],
+				className: "grow-plans garden app-page dashboard",
+				pageType: "app-page"
+			};
+
+			// First, verify that the user can see this
+			GrowPlanModel.findById(req.params.id)
+				.exec(function(err, growPlan){
+					if (err) { return next(err); }
+					if (!growPlan){ return next(new Error('Invalid grow plan id'));}
+					if (!routeUtils.checkResourceReadAccess(growPlan, req.user)){
+	          			return res.send(401, "This garden is private. You must be the owner to view it.");
+	          		}
+	          		if (!routeUtils.checkResourceModifyAccess(growPlan, req.user)){
+	          			return res.send(401, "This garden is private. You must be the owner to modify it.");
+	          		}
+
+	          		locals.growPlan = growPlan;
+
+	          		res.render('grow-plans/details', locals);
+	      		});
+      	});
 
 	
 	

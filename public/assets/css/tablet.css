@@ -187,7 +187,8 @@
  */
 .grid li {
   vertical-align: top;
-  width: 15em;
+  width: 22em;
+  margin: 0.25em 0.25em 3em 0;
 }
 .idealRanges li {
   zoom: 1;

@@ -1,6 +1,7 @@
 extends ../layout
 
 block head
+	mixin requirejs("/assets/js/pages/dashboard")
 
 block css
 
@@ -10,11 +11,21 @@ block content
 			include ../includes/nav/main
 
 	section#main(role="main", class="main")
-		h2.page-heading #{garden.name} Details
-		div.separator-top
+		- if (typeof(growPlan) != 'undefined')
+			h2.page-heading #{growPlan.name}
+			div.separator-top
+				p Desc: #{growPlan.description}
+				p Phases: #{growPlan.phases.length}
+				p Plants: #{growPlan.plants.length}
+		
 
-		p Email Photo Upload (add to contacts for easy access)
-		a(href="mailto:accounts+photo.upload+#{garden._id}@bitponics.com") accounts+photo.upload+#{garden._id}@bitponics.com
+
+		- else
+			h2.page-heading 
+			div.separator-top
+				p Invalid grow plan id.
+		
 
 block footer-scripts
 	script
+		bpn.pageData.growPlan = !{JSON.stringify(growPlan)};

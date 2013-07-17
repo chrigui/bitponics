@@ -161,6 +161,7 @@ module.exports = {
     var userId = user._id;
     return (  user.admin ||
               resource.owner.equals(userId) || 
+              resource.createdBy.equals(userId) || 
               resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
   },
@@ -183,6 +184,7 @@ module.exports = {
     var userId = user._id;
     return (  user.admin ||
               resource.owner.equals(userId) || 
+              resource.createdBy.equals(userId) || 
               resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
   }

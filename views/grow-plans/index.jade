@@ -13,39 +13,30 @@ block content
 	section#main(role="main", class="main")
 		h2.page-heading My Grow Plans
 		div.separator-top
-		- if (typeof(userGrowPlanInstances) != 'undefined' && userGrowPlanInstances.length > 0)
+		- if (typeof(userGrowPlans) != 'undefined' && userGrowPlans.length > 0)
 			ul(class="block-info-set grid photos content-module")
-				each gpi in userGrowPlanInstances
+				each gp in userGrowPlans
 					li
 						div.img-wrapper
 							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
 							div.icon-glyph.icon-glyphlogo-new
 						div.first
+							h5.label Created By
+							div.value.ww-break-word #{gp.createdBy} 
+						div
 							h5.label Name
-							div.value #{gpi.name} 
+							div.value.ww-break-word #{gp.name} 
 						div
 							h5.label ID
-							div.value.ww-break-word #{gpi._id} 
-						div
-							h5.label Active
-							div.value #{gpi.active}
-						div
-							h5.label Start Date
-							div.value #{gpi.friendlyStartDate}
-						div
-							h5.label Device
-							- if (gpi.device)
-								div.value #{gpi.device}
-							- else 
-								div.value None
+							div.value.ww-break-word #{gp._id} 
 						
-						a.btn(href="/gardens/#{gpi._id}") Dashboard
+						a.btn(href="/grow-plans/#{gp._id}") Details
 
 		h2.page-heading.clear-b Community Member Grow Plans
 		div.separator-top
-		- if (typeof(growPlans) != 'undefined' && growPlans.length > 0)
+		- if (typeof(communityGrowPlans) != 'undefined' && communityGrowPlans.length > 0)
 			ul(class="block-info-set grid photos content-module")
-				each gp in growPlans
+				each gp in communityGrowPlans
 					- if(gp.visibility == 'public')
 						li
 							div.img-wrapper
@@ -67,4 +58,4 @@ block content
 
 block footer-scripts
 	script
-		bpn.pageData.userGrowPlanInstances = !{JSON.stringify(userGrowPlanInstances)};
+		bpn.pageData.userGrowPlans = !{JSON.stringify(userGrowPlans)};
