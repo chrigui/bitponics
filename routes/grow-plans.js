@@ -1,19 +1,31 @@
-var ControlModel = require('../models/control').model,
-GrowPlanModel = require('../models/growPlan').growPlan.model,
-GrowPlanInstanceModel = require('../models/growPlanInstance').model,
-SensorModel = require('../models/sensor').model,
-SensorLogModel = require('../models/sensorLog').model,
+var ActionModel = require('../models/action').model,
 ControlModel = require('../models/control').model,
-Action = require('../models/action'),
-ActionModel = Action.model,
+Device = require('../models/device'),
 DeviceModel = require('../models/device').model,
-NotificationModel = require('../models/notification').model,
-PhotoModel = require('../models/photo').model,
+DeviceUtils = Device.utils,
+GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+GrowPlanModel = require('../models/growPlan').growPlan.model,
+GrowSystemModel = require('../models/growSystem').model,
+IdealRangesModel = require('../models/growPlan/idealRange').model,
+LightBulbModel = require('../models/lightBulb').model,
+LightFixtureModel = require('../models/lightFixture').model,
+LightModel = require('../models/light').model,
 ModelUtils = require('../models/utils'),
-routeUtils = require('./route-utils'),
-winston = require('winston'),
+NotificationModel = require('../models/notification').model,
+NutrientModel = require('../models/nutrient').model,
+PhotoModel = require('../models/photo').model,
+PlantModel = require('../models/plant').model,
+SensorLogModel = require('../models/sensorLog').model,
+SensorModel = require('../models/sensor').model,
+UserModel = require('../models/user').model,
+allPurposeGrowPlanId = '506de30c8eebf7524342cb70'
 async = require('async'),
-moment = require('moment'); 
+requirejs = require('../lib/requirejs-wrapper'),
+feBeUtils = requirejs('fe-be-utils'),
+moment = require('moment'),
+passport = require('passport'),
+routeUtils = require('./route-utils'),
+winston = require('winston');
 
 module.exports = function(app){
 	
@@ -72,29 +84,140 @@ module.exports = function(app){
 				title : 'Bitponics - Grow Plan',
 				user : req.user,
 				growPlan : undefined,
-				// sensors : undefined,
-				// controls : undefined,
-				// sensorDisplayOrder : ['lux','hum','air','ph','ec','water','tds','sal','full','vis','ir'],
-				className: "grow-plans garden app-page dashboard",
-				pageType: "app-page"
+				className: "grow-plans growplans garden app-page dashboard",
+        		pageType: 'app-page',
+				//message : req.flash('info') //TODO: this isn't coming thru
+				growSystems: {},
+				plants: {},
+				controls: {},
+				idealRanges: [],
+				actions: {},
+				sensors: {}
 			};
 
-			// First, verify that the user can see this
-			GrowPlanModel.findById(req.params.id)
-				.exec(function(err, growPlan){
-					if (err) { return next(err); }
-					if (!growPlan){ return next(new Error('Invalid grow plan id'));}
-					if (!routeUtils.checkResourceReadAccess(growPlan, req.user)){
-	          			return res.send(401, "This garden is private. You must be the owner to view it.");
-	          		}
-	          		if (!routeUtils.checkResourceModifyAccess(growPlan, req.user)){
-	          			return res.send(401, "This garden is private. You must be the owner to modify it.");
-	          		}
 
-	          		locals.growPlan = growPlan;
+			async.parallel(
+				[
+					function parallel1(callback){
+						//get all grow systems
+						GrowSystemModel.find({}, callback);
+					},
+					function parallel2(callback){
+						//get all plants
+						PlantModel.find({}, '_id name', callback);
+					},
+					function parallel3(callback){
+						//get all controls
+						ControlModel.find({}, callback);
+					},
+					function parallel4(callback){
+						//get all grow plans and populate
+						async.series(
+							[
+								function (innerCallback) {									
+									// First, verify that the user can see this
+									GrowPlanModel.findById(req.params.id)
+										.exec(function(err, growPlan){
+											if (err) { return next(err); }
+											if (!growPlan){ return next(new Error('Invalid grow plan id'));}
+											if (!routeUtils.checkResourceReadAccess(growPlan, req.user)){
+							          			return res.send(401, "This garden is private. You must be the owner to view it.");
+							          		}
+							          		if (!routeUtils.checkResourceModifyAccess(growPlan, req.user)){
+							          			return res.send(401, "This garden is private. You must be the owner to modify it.");
+							          		}
+
+							          		locals.growPlan = growPlan;
+							          		innerCallback();
+							        	});
+
+
+								},
+								function (innerCallback) {
+									var actionIds = [];
+									// locals.growPlans.forEach(function(growPlan) {
+										locals.growPlan.phases.forEach(function(phase) {
+											phase.idealRanges.forEach(function(idealRange, i) {
+												actionIds.push(idealRange.actionAboveMax);
+												actionIds.push(idealRange.actionBelowMin);
+											});
+										});
+									// });
+									ActionModel.find({})
+										.where('_id').in(actionIds)
+										.exec(function (err, actions) {
+											if (err) { return innerCallback(err); }
+											actions.forEach(function(item, index) {
+												locals.actions[item._id] = item;
+											});
+											innerCallback();
+										});
+								}
+							],
+							function (err, result) {
+								callback();
+							}
+						);
+					},
+					function parallel5(callback){
+						// Get the devices that the user owns
+						DeviceModel.find({owner : req.user._id}, callback);
+					},
+					function parallel6(callback){
+						// Get all sensors
+						SensorModel.find({}, callback);
+					},
+					function parallel7(callback){
+						// Get all lights
+						LightModel.find({}, callback);
+					},
+					function parallel8(callback){
+						// Get all lights
+						LightFixtureModel.find({}, callback);
+					},
+					function parallel9(callback){
+						// Get all lights
+						LightBulbModel.find({}, callback);
+					},
+					function parallel10(callback){
+						// Get all lights
+						NutrientModel.find({}, callback);
+					}
+				],
+				function parallelFinal(err, result){
+					if (err) { return next(err); }
+					var growSystems = result[0],
+						plants = result[1],
+						controls = result[2],
+						userOwnedDevices = result[4],
+						sensors = result[5],
+						lights = result[6],
+						lightFixtures = result[7],
+						lightBulbs = result[8],
+						nutrients = result[9];
+          
+					locals.growSystems = growSystems;
+					locals.plants = plants;
+					locals.userOwnedDevices = userOwnedDevices;
+					locals.lights = lights;
+					locals.lightFixtures = lightFixtures;
+					locals.lightBulbs = lightBulbs;
+					locals.nutrients = nutrients;
+          
+					//convert controls into obj with id as keys
+					controls.forEach(function (item, index) {
+						locals.controls[item._id] = item;
+					});
+          
+					//convert sensors into obj with id as keys
+					sensors.forEach(function (item, index) {
+						locals.sensors[item.code] = item;
+					});
 
 	          		res.render('grow-plans/details', locals);
-	      		});
+			      	
+				}
+			);
       	});
 
 	

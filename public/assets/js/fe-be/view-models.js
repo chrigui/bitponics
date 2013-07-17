@@ -19,7 +19,10 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initGrowPlanInstanceViewModel = function (growPlanInstance, controlHash){
 
-  	
+  	if(!growPlanInstance.phases.length){
+      return true
+    }
+
     // growPlanInstance.phases only contains phases that the GPI has gone through.
     // Add past & future growPlan phases for the visual 
 
