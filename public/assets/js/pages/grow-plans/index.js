@@ -45,7 +45,7 @@ require([
 			        controller: 'bpn.controllers.growPlan.CustomizeOverview',
 			        resolve: {
 			          growPlan: ['GrowPlanLoader', function(GrowPlanLoader) {
-			            return GrowPlanLoader();
+                  return GrowPlanLoader();
 			          }]
 			        },
 			        templateUrl:'customize-overview.html'
@@ -54,8 +54,7 @@ require([
 			        controller: 'bpn.controllers.growPlan.CustomizeDetails',
 			        templateUrl:'customize-details.html'
 			      })
-			      .otherwise({redirectTo:'/'}
-	      	);
+			      .otherwise({redirectTo:'/'});
 				}
 			]
 		);
@@ -104,6 +103,7 @@ require([
 				'$q',
 		    function(GrowPlanModel, sharedDataService, $route, $q) {
 		  		return function() {
+            console.log('yo');
 		  			var selectedGrowPlanId = $route.current.params.growPlanId;
 
 		  			if ((sharedDataService.selectedGrowPlan instanceof GrowPlanModel)

@@ -84,7 +84,7 @@ module.exports = function(app){
 				title : 'Bitponics - Grow Plan',
 				user : req.user,
 				growPlan : undefined,
-				className: "grow-plans growplans garden app-page dashboard",
+				className: "grow-plans growplans garden app-page",
         		pageType: 'app-page',
 				//message : req.flash('info') //TODO: this isn't coming thru
 				growSystems: {},

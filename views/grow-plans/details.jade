@@ -1,7 +1,7 @@
 extends ../layout
 
 block head
-  base(href="/setup/grow-plan/")
+  base(href="/grow-plans/")
   
   mixin requirejs("/assets/js/pages/grow-plans/index")
 
@@ -39,7 +39,7 @@ block head
         textarea(name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
     
     div(class="step-footer separator-top")
-      a(class="btn next-step-btn", href="customize/{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
+      a(class="btn next-step-btn", href="{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
         | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
   
