@@ -28,12 +28,13 @@ function(){
         //match section height to window
         //create fixed nav
         self.screenWidth = $(window).width();
-        if(self.screenWidth > 700){
+        self.screenHeight = screenHeight = $(window).height() > self.MIN_SECTION_HEIGHT ? $(window).height() : self.MIN_SECTION_HEIGHT;
+        
+        if(self.screenWidth > 700 && self.screenHeight < 1000){
           bpn.utils.sectionHeightAlign(self.MIN_SECTION_HEIGHT, '#main > .content-module');
         }
 
         //create fixed nav
-        self.screenHeight = screenHeight = $(window).height() > self.MIN_SECTION_HEIGHT ? $(window).height() : self.MIN_SECTION_HEIGHT;
         self.sectionNavSetup(screenHeight);
 
         //smooth anchor scrolling to sections
