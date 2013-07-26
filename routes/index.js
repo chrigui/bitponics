@@ -288,7 +288,9 @@ module.exports = function(app){
 							user.sentEmail = true; //if we get here, this should be true
 							user.save( function(err, user){
 								if (err) { return next(err); }
-								locals.message = 'Your registration was successfull. Have you preordered a device yet?';
+								locals.message = 'Your registration was successfull.';
+								locals.link = '/login?redirect=/setup';
+								// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
 								locals.user = user;
 								res.render('register', locals);
 							});

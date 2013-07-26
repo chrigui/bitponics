@@ -71,6 +71,16 @@ input[type=radio], input[type=checkbox]
 	width 0
 	margin 0
 
+input[type='radio'] + label.btn,
+input[type='checkbox'] + label.btn
+	background white
+	color color-logo-green
+	border 3px solid color-logo-green
+
+input[type='radio']:checked + label.btn,
+input[type='checkbox']:checked + label.btn
+	background color-logo-green
+	color white
 
 
 .question

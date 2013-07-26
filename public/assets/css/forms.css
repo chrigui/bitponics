@@ -238,6 +238,17 @@ input[type=checkbox] {
   width: 0;
   margin: 0;
 }
+input[type='radio'] + label.btn,
+input[type='checkbox'] + label.btn {
+  background: #fff;
+  color: #00e36c;
+  border: 3px solid #00e36c;
+}
+input[type='radio']:checked + label.btn,
+input[type='checkbox']:checked + label.btn {
+  background: #00e36c;
+  color: #fff;
+}
 .question {
   margin: 0 0 3em;
 }

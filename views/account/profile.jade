@@ -1,18 +1,16 @@
 extends ../layout
 
-block head
-  mixin requirejs("/assets/js/pages/dashboard")
-
 block css
 
 block content
   section.header
     header
       include ../includes/nav/main
-
+  
   section#main(role="main", class="main")
     div#profile.content-module.middle
-      form(id="profile-form", method="POST", action="/profile")
+      h1.page-heading Account Profile
+      form(id="profile-form", method="POST", action="/account/profile")
         input(type="hidden", name="_method", value="PUT")
         label(for="email") Email
         input(id="email", name="email", type="email", value="#{user.email}")
@@ -23,7 +21,7 @@ block content
         label(for="lastname") Last Name
         input(id="lastname", name="lastname", type="text", value="#{user.name.last}")
 
-        label(for="locale_timezone", class="display-i") Locale
+        label(for="locale_timezone", class="display-ib") Locale
         //not working
         //button(id="detect", class="display-i") Detect
         include ../misc/timezone_select_html
@@ -44,10 +42,10 @@ block content
         label Preferred Notification Methods 
         input(class="display-i", id="notifications_email", name="notifications_email", 
           type="checkbox", checked=user.notificationPreferences.email)
-        label(class="display-i", for="notifications_email") Email
+        label(class="btn", for="notifications_email") Email
         input(class="display-i", id="notifications_sms", name="notifications_sms", 
           type="checkbox", checked=user.notificationPreferences.sms)
-        label(class="display-i", for="notifications_sms") SMS
+        label(class="btn", for="notifications_sms") SMS
 
         input(type="submit", value="Save Profile")
 

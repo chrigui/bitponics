@@ -1855,6 +1855,9 @@ img.page-spinner.spinner {
 /*
  * Single landing page overrides
  */
+.single-page .main a {
+  color: #00e36c;
+}
 .single-page .icon-glyphlogo-new {
   display: none !important;
 }

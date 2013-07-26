@@ -1,8 +1,5 @@
 extends layout
 
-block head
-  mixin requirejs("/assets/js/pages/dashboard")
-
 block css
 
 block content
@@ -19,5 +16,10 @@ block content
         label(for="password") Password
         input(type='password', name="password")
         input(type='submit', value='Submit')
+
+        div
+          span Don't have an account?  
+          a(href="/signup", class="display-ib") Register
+          span .
 
 block footer-scripts

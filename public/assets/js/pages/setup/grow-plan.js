@@ -346,14 +346,19 @@ require([
   					$scope.setExpectedGrowPlanDuration();
           	//$scope.setCurrentPhaseTab(0);
 
-          	if ($scope.sharedDataService.userOwnedDevices.length === 1){
-          		$scope.sharedDataService.selected.device = $scope.sharedDataService.userOwnedDevices[0];
+            //auto-select the first device that is not already linked to a grow plan instance
+          	if ($scope.sharedDataService.userOwnedDevices.length){
+              $scope.sharedDataService.userOwnedDevices.forEach(function(device){
+                if(!device.activeGrowPlanInstance){
+                  $scope.sharedDataService.selected.deviceId = $scope.sharedDataService.userOwnedDevices[0]._id;
+                  break;
+                }
+              });
           	}
   				};
 
   				$scope.toggleDevice = function(device){
-  					console.log(device);
-  					console.log('selected', $scope.sharedDataService.selected.deviceId);
+            $scope.sharedDataService.selected.deviceId = device._id;
   				};
 
     			$scope.setExpectedGrowPlanDuration = function () {
