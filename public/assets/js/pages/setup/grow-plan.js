@@ -348,10 +348,10 @@ require([
 
             //auto-select the first device that is not already linked to a grow plan instance
           	if ($scope.sharedDataService.userOwnedDevices.length){
-              $scope.sharedDataService.userOwnedDevices.forEach(function(device){
+              $scope.sharedDataService.userOwnedDevices.some(function(device){
                 if(!device.activeGrowPlanInstance){
-                  $scope.sharedDataService.selected.deviceId = $scope.sharedDataService.userOwnedDevices[0]._id;
-                  break;
+                  $scope.sharedDataService.selected.deviceId = device._id;
+                  return true;
                 }
               });
           	}
@@ -543,6 +543,13 @@ require([
                   if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
                     $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
                   }
+                  // if($scope.sharedDataService.selectedGrowPlan){
+                  //   if($scope.sharedDataService.selectedGrowPlan.plants){
+                  //     $scope.sharedDataService.selectedGrowPlan.plants.push($scope.sharedDataService.plants[i]);
+                  //   }else{
+                  //     $scope.sharedDataService.selectedGrowPlan.plants = [$scope.sharedDataService.plants[i]];
+                  //   }
+                  // }
                 });
               }
 

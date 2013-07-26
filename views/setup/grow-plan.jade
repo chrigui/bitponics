@@ -72,7 +72,7 @@ block head
       //- each growPlan, i in growPlans
       li(ng-repeat="growPlan in filteredGrowPlanList")
         div.img-wrapper
-          img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest {{growPlan.name}} photo")
+          div.icon-glyph.icon-glyphlogo-new
         div.first
           h5.label Name
           div.value {{growPlan.name}}
@@ -517,7 +517,8 @@ block content
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
+                    div.img-wrapper
+                      div.icon-glyph.icon-glyphlogo-new
                     dl
                       dt Type:
                       dd {{plant.name}}
@@ -548,7 +549,8 @@ block content
 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    div.img-wrapper
+                      div.icon-glyph.icon-glyphlogo-new
                     dl
                       dt Brand:
                       dd.brand {{item.brand || '--'}}
@@ -594,7 +596,8 @@ block content
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    div.img-wrapper
+                      div.icon-glyph.icon-glyphlogo-new
                     dl
                       dt Brand:
                       dd {{item.brand || '--'}}
@@ -638,7 +641,8 @@ block content
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                    div.img-wrapper
+                      div.icon-glyph.icon-glyphlogo-new
                     dl
                       dt Name:
                       dd {{item.name}}
@@ -689,7 +693,8 @@ block content
                   
                   ul(class="grid plantlist")
                     li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                      img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{item.name}}")
+                      div.img-wrapper
+                        div.icon-glyph.icon-glyphlogo-new
                       dl
                         dt Brand:
                         dd {{item.brand}}

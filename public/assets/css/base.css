@@ -3132,7 +3132,7 @@ button.close {
   position: fixed;
 }
 .growplans .plantlist {
-  padding: 1em 0 0;
+  padding: 0;
   float: left;
 }
 .growplans .btn {
@@ -3171,13 +3171,18 @@ button.close {
   width: auto;
 }
 .growplans .question .grid li .btn {
-  margin: 1em 1em 0 0;
+  margin: 0.7em 1em 1em 0;
   width: auto;
 }
 .growplans .question .add {
   float: left;
   clear: left;
-  margin-left: 0;
+  margin: 0.7em 1em 1em 0;
+}
+.growplans .img-wrapper .icon-glyph.icon-glyphlogo-new {
+  display: block !important;
+  color: #00e36c;
+  font-size: 4em;
 }
 .growplans .icon-glyph-new {
   height: 1em;
@@ -3315,11 +3320,6 @@ button.close {
 /*
  * Gardens List Page
  */
-.gardens .img-wrapper .icon-glyph.icon-glyphlogo-new {
-  display: block !important;
-  color: #00e36c;
-  font-size: 4em;
-}
 /*
  * Error Pages
  */
