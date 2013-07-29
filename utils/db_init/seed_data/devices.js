@@ -203,5 +203,18 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "WD-301-TPRP",
 			name : "Jack's Very First Bitponics Device"
+		},
+		{
+			_id : "000666809d8c",
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-YJ3S",
+			name : "PSFK Apartment Device"
+		},
+		{
+			_id : "000666809d3f",
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-1PQE",
+			name : "PSFK Window Device"
+			
 		}
 	];

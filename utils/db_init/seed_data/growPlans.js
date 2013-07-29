@@ -669,5 +669,142 @@ module.exports = [
     			]
     		}
     	]
+    },
+    {
+        _id : '51e89d21849a131883eb82e3',
+        createdBy: "506de30a8eebf7524342cb6c",
+        name: "Glass Curtain",
+        description: "A grow plan for Bitponics' PSFK window exhibit, featuring 25 glass vessels hung across a 6'x10' window.",
+        plants: ["50749120fe420e210be58a69", "51a388c7a8162dbabd583f3c", "50a016f8eb1164c6b88e3038", "50749120fe420e210be58a69", "507492f3fe420e210be58a86", "507492f5fe420e210be58a8a" ],
+        phases: [
+            {
+                _id : '51e89c52849a131883eb82d8',
+                name : 'Seedling',
+                description: 'Seedling phase, from planting seeds until first true leaves appear. The Bitponics device isn\'t necessary for this phase since seedlings do fine with just plain tap water, and most seed-starting systems are too small for the water sensors anyway. This phase is for the "All-Purpose" grow plan so its sensor ranges aren\'t optimal for any specific plant, but instead describe a range that should be adequate for most plants.',
+                expectedNumberOfDays: 7,
+                light: "515a540205e45bc5a590301b",
+                growSystem: "51e89c2b849a131883eb82d7",
+                growMedium: "rockwool",
+                nutrients: [],
+                actions: [
+                    "506de3128eebf7524342cb87",
+                    "506de2f18eebf7524342cb27"
+                ],
+                phaseEndActions : [
+                    "506de2ec8eebf7524342cb24",
+                ],
+                phaseEndDescription: "This phase is over once the seedlings start growing their first true leaves.",
+                idealRanges: [
+                    {
+                        _id : '51e89d1e849a131883eb82db',
+                        sCode: "water",
+                        valueRange: {
+                            min: 18.33, // 65 fahrenheit
+                            max: 21.11 // 70 fahrenheit
+                        },
+                        actionBelowMin : "506de30c8eebf7524342cb73",
+                        actionAboveMax : "506de30d8eebf7524342cb75"
+                    },
+                    {
+                        _id : '51e89d1e849a131883eb82dc',
+                        sCode: "air",
+                        valueRange: {
+                            min: 12.77, // 55 fahrenheit
+                            max: 27 // 80 fahrenheit
+                        },
+                        actionBelowMin : "506de2fc8eebf7524342cb2b",
+                        actionAboveMax : "506de2fb8eebf7524342cb2a",
+                        source : "Gardening Indoors"
+                    },
+                    {
+                        _id : '51e89d1f849a131883eb82dd',
+                        sCode: "lux",
+                        valueRange: {
+                            min: 2000,
+                            max: 4000
+                        },
+                        applicableTimeSpan: {
+                            startTime: (6 * 60 * 60 * 1000), //6am
+                            endTime: (22 * 60 * 60 * 1000)//10pm
+                        },
+                        actionBelowMin : "506de2fb8eebf7524342cb28",
+                        actionAboveMax : "506de2fb8eebf7524342cb29"
+                    }
+                ]
+            },
+            {
+                _id : '51e89c53849a131883eb82d9',
+                name : 'Vegetative',
+                description: 'Open-ended vegetative phase. Bring in any existing plants or seedlings with their first pair of true leaves.',
+                expectedNumberOfDays: 28,
+                light: "515a540a05e45bc5a590301d",
+                growSystem: "506de30d8eebf7524342cb77",
+                growMedium: "hydroton",
+                nutrients: [
+                    "506de3038eebf7524342cb4b",
+                    "506de3038eebf7524342cb4c",
+                    "506de3038eebf7524342cb4d"
+                ],
+                actions: [
+                    "506de2ef8eebf7524342cb25",
+                    "51e89d20849a131883eb82e1",
+                    "51e89d21849a131883eb82e2"
+                ],
+                idealRanges: [
+                    {
+                        _id : '51e89d1f849a131883eb82de',
+                        sCode: "lux",
+                        valueRange: {
+                            min: 15000,
+                            max: 100000
+                        },
+                        applicableTimeSpan: {
+                            startTime: (6 * 60 * 60 * 1000), //6am
+                            endTime: (22 * 60 * 60 * 1000)//10pm
+                        },
+                        actionBelowMin : "506de2fb8eebf7524342cb28",
+                        actionAboveMax : "506de2fb8eebf7524342cb29"
+                    },
+                    {
+                        _id : '51e89d1f849a131883eb82df',
+                        sCode: "air",
+                        valueRange: {
+                            min: 12.77, // 55 fahrenheit
+                            max: 30 // 86 fahrenheit
+                        },
+                        actionBelowMin : "506de2fc8eebf7524342cb2b",
+                        actionAboveMax : "506de2fb8eebf7524342cb2a"
+                    },
+                    {
+                        _id : '51e89d20849a131883eb82e0',
+                        sCode: "water",
+                        valueRange: {
+                            min: 12.77, // 55 fahrenheit
+                            max: 30 // 86 fahrenheit
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        _id : '51eb73866b21df1a6a836b4e',
+        createdBy: "506de30a8eebf7524342cb6c",
+        name: "Island of Microgreens",
+        description: "A grow plan designed for Bitponics' custom microgreens drawer island. Continuous harvests of any edible microgreens you want to grow.",
+        plants: ["5074911efe420e210be58a68", "5074912afe420e210be58a78"],
+        phases: [
+            {
+                _id : '51eb73886b21df1a6a836b4f',
+                name : 'Forever',
+                description: 'This garden runs a single, continuous phase indefinitely. Designed for optimal growth of seedlings.',
+                expectedNumberOfDays: 60,
+                growSystem: "51eb73886b21df1a6a836b50",
+                actions: [
+                    "506de2f18eebf7524342cb27",
+                    "51e89d20849a131883eb82e1"
+                ]
+            }
+        ]
     }
 ];

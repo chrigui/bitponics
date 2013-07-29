@@ -39,9 +39,15 @@ block content
     label Salt (X-Bpn-Fert)
       input(type="text", id="salt", placeholder="Salt", value="1.123089")
 
+    label Content-Type
+      input(type="text", id="content-type", placeholder="content-type", value="application/vnd.bitponics.v2.deviceText")
+
+    label X-Bpn-Mode (blank if anything but calibration mode. if calib mode, "calib")
+      input(type="text", id="header-mode", placeholder="", value="")
+
     label Request Body
       textarea(id="request-body", placeholder="request body")
-        | {"sensors":{"air":30.2}}
+        | 4000,25,25,30,6.5,600,,,
 
     button(type="submit") Generate Request
 
@@ -63,15 +69,7 @@ block content
     $(function(){
       //$("input:text").focus(function() { $(this).select(); } );
 
-      var apiRequest = {
-        headers : {
-          "Accept" : "application/vnd.bitponics.v1.deviceText",
-          "Content-Type" : "application/vnd.bitponics.v1.deviceText",
-          "Authorization" : "",
-          "X-Bpn-Fert" : ""
-        },
-        body : ""
-      }
+      
       $('#request-form').submit(function(e){
         e.preventDefault();
 
@@ -93,17 +91,10 @@ block content
           "Accept: application/vnd.bitponics.v1.deviceText\r\n" + 
           ($('#method').val() != "GET" ? "Content-Type: application/vnd.bitponics.v1.deviceText\r\n" : "") + 
           "Authorization: BPN_DEVICE {publicKey}:{hmac}\r\n" +
-          "X-Bpn-Fert: {salt}\r\n\r\n" +
-          "{body}";
+          "X-Bpn-Fert: {salt}\r\n" +
+          "\r\n{body}";
 
-        apiRequest.headers["Authorization"] = "BPN_DEVICE " + $('#public-key').val() + ":" + hmac;
-        apiRequest.headers["X-Bpn-Fert"] = $('#salt').val();
-
-        if ($('#method').val() != "GET"){
-          apiRequest.headers["Content-Type"] = "application/vnd.bitponics.v1.deviceText";
-        } else {
-          delete apiRequest.headers["Content-Type"];
-        }
+        
 
         var populatedResult = resultTemplate
         .replace("{method}", $('#method').val())
@@ -122,14 +113,50 @@ block content
 
       $('#do-it').click(function(e){
         $.ajax({
-          type:$('#method').val(),
+          type: $('#method').val(),
           beforeSend: function (request)
           {
-              for (var headerKey in apiRequest.headers){
-                if (apiRequest.headers.hasOwnProperty(headerKey)){
-                  request.setRequestHeader(headerKey, apiRequest.headers[headerKey]);    
-                }
+            
+            var apiRequest = {
+              headers : {
+                "Accept" : "application/vnd.bitponics.v1.deviceText",
+                "Authorization" : "",
+                "X-Bpn-Fert" : ""
               }
+            };
+
+
+            var shaTemplate = "{method} {url} HTTP/1.1{body}{salt}";
+            var populatedShaTemplate = shaTemplate
+              .replace('{method}', $('#method').val())
+              .replace('{url}', $('#url').val())
+              .replace('{body}', $('#request-body').val())
+              .replace('{salt}', $('#salt').val());
+
+            var shaObj = new jsSHA(populatedShaTemplate, "TEXT");
+            var hash = shaObj.getHash("SHA-256", "HEX");
+            var hmac = shaObj.getHMAC($('#private-key').val(), "TEXT", "SHA-256", "HEX");
+
+
+            apiRequest.headers["Authorization"] = "BPN_DEVICE " + $('#public-key').val() + ":" + hmac;
+            apiRequest.headers["X-Bpn-Fert"] = $('#salt').val();
+
+            if ($('#method').val() != "GET"){
+              apiRequest.headers["Content-Type"] = $('#content-type').val();
+            } else {
+              delete apiRequest.headers["Content-Type"];
+            }
+
+            if ($('#header-mode').val()){
+              apiRequest.headers["X-Bpn-Mode"] = $('#header-mode').val();  
+            }
+
+            for (var headerKey in apiRequest.headers){
+              if (apiRequest.headers.hasOwnProperty(headerKey)){
+                request.setRequestHeader(headerKey, apiRequest.headers[headerKey]);    
+              }
+            }
+
           },
           url: $("#url").val(),
           data: $('#request-body').val(),

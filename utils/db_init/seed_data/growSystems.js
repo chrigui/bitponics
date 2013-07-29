@@ -50,16 +50,37 @@ module.exports = [
 			plantCapacity: 12
 		},
 		{
-			_id : '51b0db785dd0f94858bac8df',
-			name: "Vertical Wall Garden",
-			description: "A vertical wall garden build on a wooden frame, with 4 columns of 12 pockets holding 2 plants each. Using wool pocket planters from Plants On Walls.",
+			_id : '51e89a96849a131883eb82d6',
+			name: "Bitponics Glass Curtain",
+			description: "Columns of plants grown in custom glass vessels, hung on steel wires extending from floor to ceiling. Originally designed for PSFK's \"Future of Home Living\" exhibit in the summer of 2013.",
 			type: "drip",
-			reservoirSize: 15,
-			plantCapacity: 96,
+			reservoirSize: 30,
+			plantCapacity: 25,
+			overallSize : {
+				w : 7,
+				h : 13,
+				d : 2
+			}
+		},
+		{
+			_id: "51e89c2b849a131883eb82d7",
+			name: "72-cell seed starter",
+			description: "",
+			type: "deep water culture (DWC)",
+			reservoirSize: .1,
+			plantCapacity : 72
+		},
+		{
+			_id: "51eb73886b21df1a6a836b50",
+			name: "Bitponics Microgreens Kitchen Island",
+			description: "A beautiful wooden 4'x2' kitchen island with a butcher-block countertop and 8 pull-out drawers of microgreen trays, with built-in LED lighting for each drawer.",
+			type: "Nutrient Film Technique (NFT)",
+			reservoirSize: 10,
+			plantCapacity : 800,
 			overallSize : {
 				w : 4,
-				h : 7.5,
-				d : 1	
+				h : 3,
+				d : 2
 			}
 		}
 	];

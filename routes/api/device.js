@@ -221,7 +221,8 @@ module.exports = function(app) {
           pendingDeviceLogs,
           calibrationStatusLog,
           device,
-          growPlanInstance;
+          growPlanInstance,
+          contentTypeVersion;
 
       winston.info('/status POST headers');
       winston.info(req.headers);
@@ -229,15 +230,57 @@ module.exports = function(app) {
       winston.info(JSON.stringify(req.rawBody));
 
       // For now, only accept requests that use the device content-type
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') == -1){
+      if(req.headers['content-type'].indexOf('application/vnd.bitponics') === -1){
         return next(new Error('Invalid Content-Type'));
       }
 
       if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1 && req.rawBody){
-        // we get req.rawBody created for all requests that come from a device
-        reqBody = JSON.parse(req.rawBody);
-        pendingDeviceLogs = reqBody["sensors"];
-        calibrationStatusLog = reqBody["calib"];
+
+        
+        contentTypeVersion = req.headers['content-type'].split("/")[1].split(".")[2];
+
+        switch(contentTypeVersion) {
+          case "v1":
+            // we get req.rawBody created for all requests that come from a device
+            reqBody = JSON.parse(req.rawBody);
+            pendingDeviceLogs = reqBody["sensors"];
+            calibrationStatusLog = reqBody["calib"];
+            break;
+          case "v2":
+            var csvRequestBodyParts = req.rawBody.split(",");
+            if (req.headers['x-bpn-mode'] === "calib") {
+              // [calibration mode],[calibration status]
+              // we get req.rawBody created for all requests that come from a device
+              calibrationStatusLog = {
+                mode : csvRequestBodyParts[0],
+                status : csvRequestBodyParts[1]
+              };
+            } else {
+              // [lfull ight],[air],[water],[hum],[ph],[ec/do],[wl],[custom sensor 1],[custom sensor 2(optional)]
+              var tempDeviceLogs = {};
+              tempDeviceLogs.full = csvRequestBodyParts[0];
+              tempDeviceLogs.air = csvRequestBodyParts[1];
+              tempDeviceLogs.water = csvRequestBodyParts[2];
+              tempDeviceLogs.hum = csvRequestBodyParts[3];
+              tempDeviceLogs.ph = csvRequestBodyParts[4];
+              tempDeviceLogs.ec = csvRequestBodyParts[5];
+              tempDeviceLogs.wl = csvRequestBodyParts[6];
+
+              pendingDeviceLogs = {};
+              Object.keys(tempDeviceLogs).forEach(function(key){
+                if (tempDeviceLogs[key] !== ""){
+                  try{
+                    pendingDeviceLogs[key] = parseFloat(tempDeviceLogs[key]);
+                  } catch(e){
+                    winston.error(e);
+                    delete pendingDeviceLogs[key];
+                  }
+                }
+              });
+            }
+            break;
+          // no default case
+        }
       }
 
       async.waterfall(

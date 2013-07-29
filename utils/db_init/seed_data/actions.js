@@ -275,6 +275,26 @@ module.exports = [
 			}
 		}, // end "Water pump cycle" action	
 		{
+			_id : '51e89d20849a131883eb82e1',
+			description: "Water pump cycle",
+			control: "506de2fc8eebf7524342cb2d", // reference to Pump control
+			cycle: {
+				states: [
+					{
+						controlValue: '1',
+						durationType: 'minutes',
+						duration: 15
+					},
+					{
+						controlValue: '0',
+						durationType: 'minutes',
+						duration: 15
+					}
+				],
+				repeat: true
+			}
+		}, // end "Water pump cycle" action	
+		{
 			_id : '506de2f18eebf7524342cb27',
 			description: "Light cycle, with lights on between 6am and 10pm.",
 			control: "506de2fd8eebf7524342cb32",
@@ -296,6 +316,30 @@ module.exports = [
 				offset : {
 					durationType: 'hours',
 					duration: 6
+				},
+				repeat: true
+			}
+		},
+		{
+			_id : '51e89d21849a131883eb82e2',
+			description: "Spotlights on between 8pm and 6am.",
+			control: "506de2fd8eebf7524342cb32",
+			cycle: {
+				states: [
+					{
+						controlValue: '1',
+						durationType: 'hours',
+						duration: 10
+					},
+					{
+						controlValue: '0',
+						durationType: 'hours',
+						duration: 14
+					}
+				],
+				offset : {
+					durationType: 'hours',
+					duration: 20
 				},
 				repeat: true
 			}
