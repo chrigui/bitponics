@@ -27,7 +27,7 @@ mongooseConnection.open(environment);
  */
 new cronJob('0 0 0 * * *', function(){
     var now = moment();
-    winston.info('Every day at 00:00, starting at ' + now.format());
+    winston.info(environment + ' Every day at 00:00, starting at ' + now.format());
     
     winston.info(environment + ' ModelUtils.scanForPhaseChanges');
     
@@ -48,7 +48,7 @@ new cronJob('0 0 0 * * *', function(){
  new cronJob('00 */20 * * * * ', function(){
     var now = moment();
 
-    winston.info('Every 20 minutes, starting at ' + now.format());
+    winston.info(environment + ' Every 20 minutes, starting at ' + now.format());
 
     winston.info(environment + ' ModelUtils.checkDeviceConnections');
     
@@ -72,7 +72,7 @@ new cronJob('0 0 0 * * *', function(){
 		ftpPhotoFetcher = require('./utils/ftp-photo-fetcher'),
         emailPhotoFetcher = require('./utils/email-photo-fetcher');
 
-    winston.info('Every 10 minutes, starting at ' + now.format());
+    winston.info(environment + ' Every 10 minutes, starting at ' + now.format());
 
 	if (environment === 'production'){
     
@@ -105,7 +105,7 @@ new cronJob('0 0 0 * * *', function(){
  */
  new cronJob('00 */1 * * * * ', function(){
     var now = moment();
-    winston.info('Every 1 minutes, starting at ' + now.format());
+    winston.info(environment + ' Every 1 minutes, starting at ' + now.format());
 
 	
     winston.info(environment + ' NotificationModel.clearPendingNotifications');

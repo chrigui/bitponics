@@ -671,6 +671,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
         function processNotificationResults(runEmailTemplate, innerCallback){
           
           var notificationIterator = function (notification, iteratorCallback){
+            winston.info("PROCESSING NOTIFICATION " + notification._id.toString());
             // Populate trigger details
             notification.getDisplay(
               {
@@ -679,6 +680,8 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
               },
               function(err, notificationDisplay){
                 if (err) { return iteratorCallback(err); }
+
+                winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION DISPLAY");
 
                 var emailTemplateLocals = {
                   emailSubject : notificationDisplay.subject,
@@ -707,9 +710,11 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                 }
 
                 // TEMP HACK : send all emails to Amit
-                // users = [{email : 'amit@bitponics.com'}];
+                users = [{email : 'amit@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
+                  winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION EMAIL TEMPLATE POPULATED");
+
                   if (err) { return iteratorCallback(err); }
 
                   var mailOptions = {
@@ -723,21 +728,29 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
                   
                   emailTransport.sendMail(mailOptions, function(err, response){
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT RESPONSE FROM EMAIL TRANSPORT");
                     if (err) { return iteratorCallback(err); }
                     
                     notification.sentLogs.push({ts: now});
                     
-                    if (notification.repeat && notification.repeat.duration && notification.repeat.durationType){
+                    if (notification.repeat && notification.repeat.timezone && notification.repeat.duration && notification.repeat.durationType){
                       winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
                       // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
                       // if we've got notifications regularly being processed
+                      console.log('nowAsMilliseconds', nowAsMilliseconds);
+                      console.log('timeToSend start', notification.timeToSend.valueOf());
+                      console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+
                       while (notification.timeToSend.valueOf() < nowAsMilliseconds){
-                        notification.timeToSend = tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType);  
-                      }
+                        console.log(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
+                        notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
+                        //notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+1 day'));  
+                        //winston.info(notification.timeToSend.valueOf());
+                      } 
                     } else {
                       notification.timeToSend = null;
                     }
-                    
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "SAVING UPDATED NOTIFICATION DOCUMENT");
                     notification.save(iteratorCallback);
                   });
                 });
@@ -753,7 +766,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
             return notificationProcessingEnded();
           }
           
-          var notificationResultProcessingQueue = async.queue(notificationIterator, 10);
+          var notificationResultProcessingQueue = async.queue(notificationIterator, 5);
           notificationResultProcessingQueue.drain = notificationProcessingEnded;
           notificationResultProcessingQueue.push(notificationResults, function(err){
             winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION");

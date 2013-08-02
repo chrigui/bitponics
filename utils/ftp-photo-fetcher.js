@@ -53,7 +53,7 @@ module.exports = {
 						//fs.writeFile(localFilePath, fileBuffer, function(err) {
 						client.keepAlive();
 						gm(fileBuffer, fileMetaData.name)
-				    //.rotate("#fff", 270)
+				    .rotate("#fff", 90)
 					  .write(localFilePath, function (err) {
 					    if (err) { return iteratorCallback(err); }
 				      client.keepAlive();
@@ -93,7 +93,7 @@ module.exports = {
 				};
 
 				if (fileList.length){
-					var fileQueue = async.queue(fileIterator, 10);
+					var fileQueue = async.queue(fileIterator, 5);
 					fileQueue.drain = function(){
 						client.raw.quit(function(err, res) {
 			        return callback(err, createdPhotos);

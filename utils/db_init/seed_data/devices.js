@@ -215,6 +215,11 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "WD-301-1PQE",
 			name : "PSFK Window Device"
-			
+		},
+		{
+			_id : "000666809dab",
+			deviceType: "506de2fe8eebf7524342cb37",
+			serial: "WD-301-CW9W",
+			name : "Development Device 2013-07-30"
 		}
 	];

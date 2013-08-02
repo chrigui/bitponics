@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-var environments = ['development','staging','production'],
+var environments = ['production'], //['development','staging','production'],
     childProcess = require('child_process'),
     childProcesses = [],
     winston = require('./config/winston-config')('worker');
