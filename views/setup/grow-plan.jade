@@ -52,7 +52,7 @@ block head
           
           ul(class="grid plantlist")
             li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
@@ -115,10 +115,14 @@ block head
       div(class="question-wrap-right")
         div.question
           label.question-title Plants
-          ul(class="grid plantlist")
+          ul(class="grid plantlist hide-unchecked-items")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
             li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()")
+              input(id="{{plant._id}}", 
+                type='checkbox', 
+                name="plants", 
+                ng-model="sharedDataService.selected.plants[plant._id]", 
+                ng-checked="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
@@ -522,7 +526,12 @@ block content
                     dl
                       dt Type:
                       dd {{plant.name}}
-                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelected['plants']()", checked="sharedDataService.selected.plants[plant._id]")
+                    input(id="search_{{plant._id}}", 
+                      type='checkbox', 
+                      name="plants", 
+                      value="{{plant._id}}", 
+                      ng-model="sharedDataService.selected.plants[plant._id]"
+                    )
                     label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
                       //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
                 

@@ -148,12 +148,6 @@ require([
     		function($scope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
-    			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.plants',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
 
     			$scope.close = function(){
     				// TODO : update the growPlan's from sharedDataService.selected.plants
@@ -534,8 +528,23 @@ require([
           //     }
           // };
 
-          $scope.updateSelected = {
 
+          $scope.$watch('sharedDataService.selected.plants', function(){
+            $scope.sharedDataService.selectedPlants= [];
+            for (var i = $scope.sharedDataService.plants.length; i--;) {
+              if ($scope.sharedDataService.selected.plants[$scope.sharedDataService.plants[i]._id]){
+                $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
+              }  
+            }
+
+            if($scope.sharedDataService.selectedGrowPlan){
+              $scope.sharedDataService.selectedGrowPlan.plants = $scope.sharedDataService.selectedPlants;
+            }
+
+          }, true);
+
+          $scope.updateSelected = {
+            /*
             'plants':function () {
               $scope.sharedDataService.selectedPlants = [];
               for (var i = $scope.sharedDataService.plants.length; i--;) {
@@ -543,15 +552,18 @@ require([
                   if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
                     $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
                   }
-                  // if($scope.sharedDataService.selectedGrowPlan){
-                  //   if($scope.sharedDataService.selectedGrowPlan.plants){
-                  //     $scope.sharedDataService.selectedGrowPlan.plants.push($scope.sharedDataService.plants[i]);
-                  //   }else{
-                  //     $scope.sharedDataService.selectedGrowPlan.plants = [$scope.sharedDataService.plants[i]];
-                  //   }
-                  // }
+
+                  
                 });
               }
+
+              // if($scope.sharedDataService.selectedGrowPlan){
+              //   if($scope.sharedDataService.selectedGrowPlan.plants){
+              //     $scope.sharedDataService.selectedGrowPlan.plants.push($scope.sharedDataService.plants[i]);
+              //   }else{
+              //     $scope.sharedDataService.selectedGrowPlan.plants = [$scope.sharedDataService.plants[i]];
+              //   }
+              // }
 
               $scope.updateSelectedGrowPlanPlants();
 
@@ -559,6 +571,7 @@ require([
                 $scope.updatefilteredGrowPlans();
               }
             },
+            */
 
             'lightFixture':function (data, phase) {
               $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.fixture = data.item;
