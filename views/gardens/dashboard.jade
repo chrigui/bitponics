@@ -23,7 +23,8 @@ block content
           //-div.time.page-heading-small(ng-show="sharedDataService.activeDate.showTime") {{sharedDataService.activeDate.date | date:'mediumTime'}}
           
         div.data-module.phase-info
-          div.phase-name {{sharedDataService.activeDate.growPlanPhase.name}} Phase, Day {{sharedDataService.activeDate.dayOfPhase}}
+          div.phase-name {{sharedDataService.activeDate.growPlanPhase.name}} Phase
+          div.phase-day Day {{sharedDataService.activeDate.dayOfPhase}}
         div(ng-repeat="sensor in sharedDataService.sensors", ng-class="getSensorBlockClassNames(sensor, sharedDataService.activeDate.latestSensorLogs)", ng-click="sharedDataService.activeOverlay = 'SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}

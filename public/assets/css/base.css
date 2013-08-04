@@ -1686,7 +1686,7 @@ img.page-spinner.spinner {
   text-align: right;
 }
 .dashboard .data-module.phase-info {
-  height: 2.5em;
+  height: 3.2em;
 }
 .dashboard .data-module.phase-info .phase-name {
   position: absolute;
@@ -1699,9 +1699,8 @@ img.page-spinner.spinner {
   position: absolute;
   top: 1.5em;
   font-size: 1em;
-  right: 0.5em;
+  left: 0.5em;
   text-transform: none;
-  text-align: right;
 }
 .dashboard .data-module .sensor-value {
   font-size: 3em;
