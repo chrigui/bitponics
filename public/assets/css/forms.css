@@ -419,7 +419,7 @@ input[type='checkbox']:checked + label.btn {
   background: #fff !important;
   color: #00e36c !important;
   border: 4px solid #00e36c !important;
-  font-size: 1.2em !important;
+  font-size: 1.5em !important;
 }
 #mc-embedded-subscribe-form input[type=email] {
   width: 70%;
@@ -435,7 +435,7 @@ input[type='checkbox']:checked + label.btn {
   width: 90%;
 }
 #wufoo-form input[type=submit] {
-  font-size: 1.1em;
+  font-size: 1.5em;
 }
 .wufoo {
   background-color: #c1c2c4 !important;

@@ -79,7 +79,7 @@ define(['moment'], function(moment){
         setTimeout(function() {
           sectionHeight = section.height();
           if(sectionHeight < minHeight) {
-            section.outerHeight(screenHeight);
+            section.css('min-height', screenHeight);
           }
         }, 1000);
       }

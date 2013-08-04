@@ -1886,6 +1886,36 @@ img.page-spinner.spinner {
 .single-page .page-heading {
   width: 100%;
 }
+.single-page #installs .contact-wrapper {
+  display: block;
+}
+.single-page #installs .contact-wrapper p {
+  float: none;
+  border: none;
+  width: auto;
+  margin-left: 0;
+}
+.single-page #installs form,
+.single-page #contact form {
+  background: transparent !important;
+  color: #999 !important;
+}
+.single-page #contact,
+.single-page #team {
+  background: #fff;
+}
+.single-page #contact div,
+.single-page #team div,
+.single-page #contact p,
+.single-page #team p,
+.single-page #contact a,
+.single-page #team a,
+.single-page #contact h3,
+.single-page #team h3 {
+  background: transparent !important;
+  color: #999 !important;
+  border-color: #00e36c;
+}
 /*
  * Register page
  */

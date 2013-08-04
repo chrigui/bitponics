@@ -454,8 +454,8 @@
 .landing-page #how-it-works #details .detail-block {
   width: 100%;
 }
-.landing-page #contact #wufoo-wrapper,
-.landing-page #contact #email-sub {
+.landing-page #wufoo-wrapper,
+.landing-page #email-sub {
   float: left;
   width: 40%;
   margin: 1em 10% 0 0;
@@ -554,6 +554,9 @@
   width: 29%;
   border-top: 1px solid #00e36c;
   padding: 1em 0 0 0;
+}
+#installs .contact-wrapper {
+  display: none;
 }
 .app-page .page-heading {
   font-size: 3.25em;
