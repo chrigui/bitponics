@@ -410,6 +410,7 @@
 }
 .landing-page .page-heading {
   line-height: 2em;
+  margin-bottom: 1em;
 }
 .landing-page .main .content-module,
 .landing-page .main #details {
@@ -547,12 +548,13 @@
 #pricing .center {
   margin: 1em;
 }
-/*
- * Single landing page overrides
- */
-/*
- * App page overrides
- */
+#installs p {
+  float: left;
+  margin: 1em 2%;
+  width: 29%;
+  border-top: 1px solid #00e36c;
+  padding: 1em 0 0 0;
+}
 .app-page .page-heading {
   font-size: 3.25em;
 }

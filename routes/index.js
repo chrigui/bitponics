@@ -63,12 +63,12 @@ module.exports = function(app){
 	});
 
 	app.get('/press', function (req, res){
-	  var locals = {
-    	title: "Press",
-    	className: "landing-page single-page press",
-    	pageType: "landing-page"
-    };
-	  res.render('press', locals);
+		var locals = {
+			title: "Press",
+			className: "landing-page single-page press",
+			pageType: "landing-page"
+		};
+		res.render('press', locals);
 	});
 
 	app.get('/contact', function (req, res){
@@ -100,23 +100,37 @@ module.exports = function(app){
 	  res.render('getstarted', locals);
 	});
 
-  app.get('/privacy', function (req, res){
-    var locals = {
-      title: "Privacy",
-      className: "landing-page single-page privacy",
-    	pageType: "landing-page"
-    };
-    res.render('privacy', locals);
-  });
+	app.get('/privacy', function (req, res){
+		var locals = {
+			title: "Privacy",
+			className: "landing-page single-page privacy",
+			pageType: "landing-page"
+		};
+		res.render('privacy', locals);
+	});
 
-  app.get('/returns', function (req, res){
-    var locals = {
-      title: "Return",
-      className: "landing-page single-page returns",
-    	pageType: "landing-page"
-    };
-    res.render('returns', locals);
-  });
+	app.get('/returns', function (req, res){
+		var locals = {
+			title: "Return",
+			className: "landing-page single-page returns",
+			pageType: "landing-page"
+		};
+		res.render('returns', locals);
+	});
+
+
+	app.get('/installs', function (req, res) {
+		var locals = {
+			title: "Installs",
+			className: "landing-page single-page installs",
+			pageType: "landing-page"
+		};
+		res.render('installs', locals);
+	});
+	
+	app.get('/install', function (req, res) {
+		res.redirect('/installs');
+	});
 
 	app.get('/login', 
 		routeUtils.middleware.ensureSecure, 
@@ -260,7 +274,6 @@ module.exports = function(app){
 	  req.logout();
 	  res.redirect('/');
 	});
-	
 
 	
 	/*
@@ -319,16 +332,16 @@ module.exports = function(app){
 
 
 	require('./account')(app);
-  require('./admin')(app);
+	require('./admin')(app);
 	require('./api')(app);
 	require('./dashboard')(app);
-  require('./gardens')(app);
-  require('./grow-plans')(app);
-  require('./guides')(app);
-  require('./photos')(app);
+	require('./gardens')(app);
+	require('./grow-plans')(app);
+	require('./guides')(app);
+	require('./photos')(app);
 	require('./reset')(app);
-  require('./setup')(app);
-  require('./sockets')(app);
+	require('./setup')(app);
+	require('./sockets')(app);
 	require('./styleguide')(app);
 	
 
