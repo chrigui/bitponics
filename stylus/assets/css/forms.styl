@@ -82,6 +82,14 @@ input[type='checkbox']:checked + label.btn
 	background color-logo-green
 	color white
 
+.hide-unchecked-items
+	input[type='radio'] + label.btn,
+	input[type='checkbox'] + label.btn
+		display none
+	input[type='radio']:checked + label.btn,
+	input[type='checkbox']:checked + label.btn
+		display inline-block
+
 
 .question
 	margin 0 0 3em

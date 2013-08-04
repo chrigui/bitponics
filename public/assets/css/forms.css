@@ -249,6 +249,14 @@ input[type='checkbox']:checked + label.btn {
   background: #00e36c;
   color: #fff;
 }
+.hide-unchecked-items input[type='radio'] + label.btn,
+.hide-unchecked-items input[type='checkbox'] + label.btn {
+  display: none;
+}
+.hide-unchecked-items input[type='radio']:checked + label.btn,
+.hide-unchecked-items input[type='checkbox']:checked + label.btn {
+  display: inline-block;
+}
 .question {
   margin: 0 0 3em;
 }
