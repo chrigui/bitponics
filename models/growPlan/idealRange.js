@@ -68,7 +68,7 @@ var IdealRangeSchema = new Schema({
 /************************** INSTANCE METHODS  ***************************/
 
 IdealRangeSchema.method('checkIfWithinTimespan', function(userTimezone, date){
-	var tz = require('timezone/loaded'),
+	var tz = require('../../lib/timezone-wrapper'),
     applicableTimeSpan = this.applicableTimeSpan;
 	
   // Not sure of exact reason for this, but Mongoose is storing an empty object for applicableTimeSpan

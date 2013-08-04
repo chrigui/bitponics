@@ -3,8 +3,7 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
   LightFixture = require('../../models/lightFixture'),
   should = require('should'),
   moment = require('moment'),
-  i18nKeys = require('../../i18n/keys'),
-  timezone = require('timezone/loaded');
+  i18nKeys = require('../../i18n/keys');
 
 
 /*

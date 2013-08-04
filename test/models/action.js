@@ -4,7 +4,7 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
   should = require('should'),
   moment = require('moment'),
   i18nKeys = require('../../i18n/keys'),
-  timezone = require('timezone/loaded');
+  timezone = require('../../lib/timezone-wrapper');
 
 
 /*

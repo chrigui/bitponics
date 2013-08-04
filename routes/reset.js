@@ -3,7 +3,7 @@ var User = require('../models/user').model,
 	bcrypt = require('bcrypt'),
 	crypto = require('crypto'),
 	winston = require('winston'),
-	timezone = require('timezone/loaded'),	
+	timezone = require('../lib/timezone-wrapper'),	
 	verificationEmailDomain = 'bitponics.com'
 	routeUtils = require('./route-utils');
 

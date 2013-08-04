@@ -11,7 +11,7 @@ var mongoose = require('mongoose'),
     ModelUtils = require('../../models/utils'),
     winston = require('winston'),
     async = require('async'),
-    timezone = require('timezone/loaded'),
+    timezone = require('../../lib/timezone-wrapper'),
     routeUtils = require('../route-utils');
 
 

@@ -33,7 +33,7 @@
 	  	, "passport": ">= 0.1.1"
 	  	, "passport-local": ">= 0.1.6"
 	  	, "s3policy" : "=0.0.1"
-	  	, "timezone" : "=0.0.15"
+	  	, "timezone" : "=0.0.23"
 	  	, "nodemailer" : ">=0.3"
 	  	, "express-csv" : ">=0.4.1"
 	  	, "winston" : ">= 0.6.2"

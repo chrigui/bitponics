@@ -1,13 +1,14 @@
-var ejs = require('ejs');
+var ejs = require('ejs'),
+		moment = require('moment'),
+		timezone = require('../lib/timezone-wrapper');
 
 ejs.filters.fromNow = function(date, timezone) {
-	moment = require('moment');
-  return moment(date).fromNow();
+	return moment(date).fromNow();
 };
 
 ejs.filters.friendlyDate = function(date, timezone) {
-	moment = require('moment');
-  return moment(date).format("dddd, MMMM Do YYYY, h:mm:ss a"); ;
+	return moment(date).format("dddd, MMMM Do YYYY, h:mm a"); ;
+	//return timezone(date, timezone, '%A, %B %-d, %Y %-I:%M:%S %p');
 };
 
 module.exports = ejs;

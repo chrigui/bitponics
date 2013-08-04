@@ -518,26 +518,37 @@ NotificationSchema.method('getDisplay', function(options, callback){
             
           ],
           function(err){
+            //console.log("PARALLEL FINAL", err, options, notification, notificationTemplateLocals);
+
             if (err) { return callback(err); }
             
             // At this point, notificationTemplateLocals is fully populated
-            switch(options.displayType){
-              case 'email':
-                notificationDisplay = {
-                  subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-                  bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-                  bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-                };
-                break;
-              case 'summary':
-                notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-                break;
-              case 'detail':
-                notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-                break;
-            }
 
-            return callback(null, notificationDisplay);
+            try{
+              switch(options.displayType){
+                case 'email':
+                  notificationDisplay = {
+                    subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                    bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                    bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+                  };
+                  break;
+                case 'summary':
+                  notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+                  break;
+                case 'detail':
+                  notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+                  break;
+              }
+            } catch(e){
+              winston.error(e);
+            } finally {
+              //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
+              if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
+                err = new Error("Error populating EJS notification template for " + notification._id.toString());
+              }
+              return callback(err, notificationDisplay);  
+            }
           }
         );
       }
@@ -626,7 +637,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
       ImmediateActionModel = require('./immediateAction').model,
       EmailConfig = require('../config/email-config'),
       nodemailer = require('nodemailer'),
-      tz = require('timezone/loaded'),
+      tz = require('../lib/timezone-wrapper'),
       async = require('async'),
       winston = require('winston'),
       requirejs = require('../lib/requirejs-wrapper'),
@@ -709,8 +720,8 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   winston.error(e.toString());
                 }
 
-                // TEMP HACK : send all emails to Amit
-                users = [{email : 'amit@bitponics.com'}];
+                // TEMP HACK WHILE DEBUGGING : send all emails to self
+                //users = [{email : 'amit@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                   winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION EMAIL TEMPLATE POPULATED");
@@ -737,14 +748,13 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                       winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
                       // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
                       // if we've got notifications regularly being processed
-                      console.log('nowAsMilliseconds', nowAsMilliseconds);
-                      console.log('timeToSend start', notification.timeToSend.valueOf());
-                      console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+                      //console.log('nowAsMilliseconds', nowAsMilliseconds);
+                      //console.log('timeToSend start', notification.timeToSend.valueOf());
+                      //console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
 
                       while (notification.timeToSend.valueOf() < nowAsMilliseconds){
-                        console.log(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
-                        notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
-                        //notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+1 day'));  
+                        //console.log(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
+                        notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
                         //winston.info(notification.timeToSend.valueOf());
                       } 
                     } else {
