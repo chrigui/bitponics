@@ -93,7 +93,7 @@ module.exports = {
 				};
 
 				if (fileList.length){
-					var fileQueue = async.queue(fileIterator, 5);
+					var fileQueue = async.queue(fileIterator, 1);
 					fileQueue.drain = function(){
 						client.raw.quit(function(err, res) {
 			        return callback(err, createdPhotos);
