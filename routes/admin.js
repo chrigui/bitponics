@@ -123,6 +123,7 @@ module.exports = function(app){
 	  var PhotoModel = require('../models/photo').model,
 	  	ftpPhotoFetcher = require('../utils/ftp-photo-fetcher');
 
+	  winston.info("/admin/trigger-processNewFTPPhotos");
 	  ftpPhotoFetcher.processNewPhotos(PhotoModel, function(err, photos){
 	  	console.log("processNewPhotos result ", err, photos);
 	  	if (err){
