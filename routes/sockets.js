@@ -213,9 +213,9 @@ module.exports = function(app){
                     // be sent to the device
                     DeviceModel.findOne({
                       _id : growPlanInstance.device,
-                      activeGrowPlanInstance : growPlanInstanceId,
-                      updatedAt : { $gte : lastChecked },
-                      "status.expires" : { $gte : lastChecked }
+                      activeGrowPlanInstance : growPlanInstanceId//,
+                      //updatedAt : { $gte : lastChecked },
+                      //"status.expires" : { $gte : lastChecked }
                     })
                     .select('status')
                     .populate('status.activeActions')
