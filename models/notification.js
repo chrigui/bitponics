@@ -581,8 +581,8 @@ NotificationSchema.static('create', function(options, callback){
   // should greatly lessen the load
   
   var newNotification = new NotificationModel(options),
-      // Try out a 30-minute sent cutoff for dupes
-      sentCutoff = new Date((new Date()).valueOf() - 30*60*1000);
+      // 8 hour sent cutoff for dupes
+      sentCutoff = new Date((new Date()).valueOf() - 8 * 60 * 60 * 1000);
   
   newNotification.ensureHash();
 
