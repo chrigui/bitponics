@@ -380,9 +380,8 @@ require([
             $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
           };
 
-          $scope.addIdealRange = function (e) {
-            var phase = e.phase,
-              newIdealRange = {
+          $scope.addIdealRange = function (phase) {
+            var newIdealRange = {
                 _id:phase.idealRanges.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
                 valueRange:{
                   min:0,
@@ -393,9 +392,8 @@ require([
             phase.idealRanges.unshift(newIdealRange);
           };
 
-          $scope.addAction = function (e) {
-            var phase = e.phase,
-              newAction = {
+          $scope.addAction = function (phase) {
+            var newAction = {
                 _id:phase.actions.length.toString() + '-' + (Date.now().toString()) // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
               };
             // Unshift to make it show up first
@@ -521,24 +519,38 @@ require([
           //     }
           // };
 
+          $scope.$watch('sharedDataService.selected.plants', function(){
+            $scope.sharedDataService.selectedPlants= [];
+            for (var i = $scope.sharedDataService.plants.length; i--;) {
+              if ($scope.sharedDataService.selected.plants[$scope.sharedDataService.plants[i]._id]){
+                $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
+              }  
+            }
+
+            if($scope.sharedDataService.selectedGrowPlan){
+              $scope.sharedDataService.selectedGrowPlan.plants = $scope.sharedDataService.selectedPlants;
+            }
+
+          }, true);
+          
           $scope.updateSelected = {
 
-            'plants':function () {
-              $scope.sharedDataService.selectedPlants = [];
-              for (var i = $scope.sharedDataService.plants.length; i--;) {
-                Object.keys($scope.sharedDataService.selected.plants).forEach(function (_id) {
-                  if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
-                    $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
-                  }
-                });
-              }
+            // 'plants':function () {
+            //   $scope.sharedDataService.selectedPlants = [];
+            //   for (var i = $scope.sharedDataService.plants.length; i--;) {
+            //     Object.keys($scope.sharedDataService.selected.plants).forEach(function (_id) {
+            //       if ($scope.sharedDataService.selected.plants[_id] && $scope.sharedDataService.plants[i]._id == _id) {
+            //         $scope.sharedDataService.selectedPlants.push($scope.sharedDataService.plants[i]);
+            //       }
+            //     });
+            //   }
 
-              $scope.updateSelectedGrowPlanPlants();
+            //   $scope.updateSelectedGrowPlanPlants();
 
-              if ($scope.selectedGrowSystem) {
-                $scope.updatefilteredGrowPlans();
-              }
-            },
+            //   if ($scope.selectedGrowSystem) {
+            //     $scope.updatefilteredGrowPlans();
+            //   }
+            // },
 
             'lightFixture':function (data, phase) {
               $scope.sharedDataService.selectedGrowPlan.phases[$scope.selected.selectedGrowPlanPhaseSection].light.fixture = data.item;

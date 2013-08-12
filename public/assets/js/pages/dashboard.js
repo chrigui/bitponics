@@ -11,15 +11,16 @@ require([
   'angularUIBootstrap',
   '/assets/js/services/socket.js',
   '/assets/js/controllers/selection-overlay.js',
-  'overlay'
+  'overlay',
+  'flexslider',
+  'angular-flexslider'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
 
 
     // var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']);
-
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider']);
 
     dashboardApp.factory('sharedDataService', 
       [
@@ -397,14 +398,18 @@ require([
       [
         '$scope',
         'sharedDataService',
-        function($scope, sharedDataService){
+        '$anchorScroll',
+        function($scope, sharedDataService, $anchorScroll){
           $scope.sharedDataService = sharedDataService;
           $scope.modalOptions = {
             dialogClass : 'overlay photo'
           };
 
-          $scope.open = function(photoId){
-            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-' + photoId;
+          $scope.open = function(photoId, index){
+            // $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-' + photoId;
+            $scope.startAt = $scope.sharedDataService.photos.length - index;
+            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay';
+            $anchorScroll();
           };
 
           $scope.close = function(){

@@ -31,7 +31,8 @@ mixin requirejs(datamain)
         'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
         'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
         'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
-        'overlay': '/assets/js/shared/overlay'
+        'overlay': '/assets/js/shared/overlay',
+        'angular-flexslider' : '/assets/js/libs/angular-flexslider'
       },
       shim: { 
         angular: { 
@@ -58,6 +59,12 @@ mixin requirejs(datamain)
         },
         'spin' : {
           exports : "Spinner"
+        },
+        'flexslider' : {
+          deps: ['jquery']
+        },
+        'angular-flexslider' : {
+          deps: ['angular', 'flexslider']
         }
       }
     });
