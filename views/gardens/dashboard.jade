@@ -4,6 +4,7 @@ block head
   mixin requirejs("/assets/js/pages/dashboard")
 
 block css
+  link(rel="stylesheet", href="/assets/js/libs/flexslider/flexslider.css")
 
 block content
   section.header
@@ -70,16 +71,21 @@ block content
           //- ordered from new to old
           
           ul(class="grid photos centered", ng-show="sharedDataService.photos.length > 0") 
-            li.photo(ng-repeat="photo in sharedDataService.photos", ng-click="open(photo._id)")
+            li.photo(ng-repeat="photo in sharedDataService.photos", ng-click="open(photo._id, $index)")
               img(ng-src="{{photo.url}}")
-              div
-                div(modal="sharedDataService.activeOverlay==('PhotoLogsOverlay-' + photo._id)", close="close()", options="modalOptions")
-                  div(class="overlay-contain")
-                    div(class="close btn", ng-click="close()")
-                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-                    h3(class="page-heading page-heading-small") {{photo.date | date:medium}}
-                    div.content-module.centered
+              
+          div
+            div(modal="sharedDataService.activeOverlay==('PhotoLogsOverlay')", close="close()", options="modalOptions")
+              div(class="overlay-contain")
+                div(class="close btn", ng-click="close()")
+                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                div
+                  div(data-flex-slider, flex-slider-slides="photo in sharedDataService.photos", startAt="{{startAt}}", touch="true", animation="slide")
+                    li
+                      h3(class="page-heading page-heading-small") {{photo.date | date:medium}}
                       img(ng-src="{{photo.url}}")
+
+                        
     
       div.content-module.side.separator-top
         div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls")

@@ -1369,6 +1369,7 @@ img.page-spinner.spinner {
   cursor: pointer;
   background: #fff;
   color: #999;
+  z-index: 1;
 }
 .overlay .page-heading {
   text-align: center;
@@ -1501,51 +1502,6 @@ img.page-spinner.spinner {
   left: -0.09em;
   top: -0.025em;
 }
-.flexslider ul {
-  margin: 0;
-  padding: 0;
-}
-.flexslider img {
-  width: 100%;
-  height: auto;
-  display: inline;
-}
-.slides li {
-  position: relative;
-  overflow: hidden;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.45, #a4a4a4), color-stop(0.7, #cacecf));
-  background: -webkit-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
-  background: -moz-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
-  background: -o-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
-  background: -ms-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
-  background: linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
-}
-.flex-direction-nav {
-  position: relative;
-  top: -8em;
-  color: #fff;
-  z-index: 3;
-  width: 100%;
-}
-.flex-direction-nav li {
-  position: absolute;
-  width: 100%;
-}
-.flex-direction-nav a {
-  color: #fff;
-  display: block;
-  position: absolute;
-}
-.flex-direction-nav .flex-prev {
-  left: 1em;
-}
-.flex-direction-nav .flex-next {
-  right: 1em;
-}
-.flex-direction-nav i {
-  color: #fff;
-  font-size: 3em;
-}
 #how-it-works p {
   text-align: left;
   color: #999;
@@ -1668,6 +1624,51 @@ img.page-spinner.spinner {
 }
 .member img {
   border: 4px solid #fff;
+}
+.landing-page .flexslider ul {
+  margin: 0;
+  padding: 0;
+}
+.landing-page .flexslider img {
+  width: 100%;
+  height: auto;
+  display: inline;
+}
+.landing-page .slides li {
+  position: relative;
+  overflow: hidden;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.45, #a4a4a4), color-stop(0.7, #cacecf));
+  background: -webkit-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -moz-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -o-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: -ms-linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+  background: linear-gradient(top, #a4a4a4 45%, #cacecf 70%);
+}
+.landing-page .flex-direction-nav {
+  position: relative;
+  top: -8em;
+  color: #fff;
+  z-index: 3;
+  width: 100%;
+}
+.landing-page .flex-direction-nav li {
+  position: absolute;
+  width: 100%;
+}
+.landing-page .flex-direction-nav a {
+  color: #fff;
+  display: block;
+  position: absolute;
+}
+.landing-page .flex-direction-nav .flex-prev {
+  left: 1em;
+}
+.landing-page .flex-direction-nav .flex-next {
+  right: 1em;
+}
+.landing-page .flex-direction-nav i {
+  color: #fff;
+  font-size: 3em;
 }
 /*
  * Dashboard Page
@@ -2085,6 +2086,13 @@ li
 .undefined .app-user a,
 .app-page .app-user a {
   color: #00e36c !important;
+}
+.undefined .flexslider,
+.app-page .flexslider {
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 @media screen and (min-width: 40em) {
   .undefined .main .page-heading,
