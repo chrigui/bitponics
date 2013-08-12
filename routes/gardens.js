@@ -171,6 +171,7 @@ module.exports = function(app){
 		      	PhotoModel.find({
 		      		gpi : req.params.growPlanInstanceId,
 		      	})
+		      	.sort('-date')
 		      	.limit(15)
 		      	.exec(innerCallback);
 		      }
