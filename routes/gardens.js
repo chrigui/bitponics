@@ -144,6 +144,7 @@ module.exports = function(app){
 		        	if (err) { return innerCallback(err); }
 		        	var notificationsWithSummaries = [];
 		        	async.each(notificationResults, 
+		        		//TODO: make this sync
 		        		function notificationIterator(notification, iteratorCallback){
 			        		var notificationObject = notification.toObject();
 			        		notification.getDisplay(
