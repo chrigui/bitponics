@@ -190,7 +190,7 @@ block head
                     | that the ideal range should apply.
                   ul
                     li
-                      label(class="add btn", ng-click="addIdealRange(this);") 
+                      label(class="add btn", ng-click="addIdealRange(sharedDataService.selectedGrowPlan.currentVisiblePhase);") 
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
@@ -255,7 +255,7 @@ block head
                   
                   ul
                     li.add
-                      label(class="add btn", ng-click="addAction(this);") 
+                      label(class="add btn", ng-click="addAction(sharedDataService.selectedGrowPlan.currentVisiblePhase);") 
                         | Add
                         | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 

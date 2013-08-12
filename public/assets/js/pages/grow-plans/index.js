@@ -380,9 +380,8 @@ require([
             $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
           };
 
-          $scope.addIdealRange = function (e) {
-            var phase = e.phase,
-              newIdealRange = {
+          $scope.addIdealRange = function (phase) {
+            var newIdealRange = {
                 _id:phase.idealRanges.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
                 valueRange:{
                   min:0,
@@ -393,9 +392,8 @@ require([
             phase.idealRanges.unshift(newIdealRange);
           };
 
-          $scope.addAction = function (e) {
-            var phase = e.phase,
-              newAction = {
+          $scope.addAction = function (phase) {
+            var newAction = {
                 _id:phase.actions.length.toString() + '-' + (Date.now().toString()) // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
               };
             // Unshift to make it show up first
