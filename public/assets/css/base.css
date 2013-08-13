@@ -2091,7 +2091,63 @@ li
 }
 .undefined .app-user a,
 .app-page .app-user a {
-  color: #00e36c !important;
+  color: #00e36c;
+}
+.undefined .app-user span,
+.app-page .app-user span {
+  font-size: 0.85em;
+}
+.undefined .app-user .settings,
+.app-page .app-user .settings {
+  position: relative;
+  width: 1.2em;
+  display: inline-block;
+  cursor: pointer;
+}
+.undefined .app-user .settings .icon-19_settings,
+.app-page .app-user .settings .icon-19_settings {
+  color: #999;
+  right: 0;
+  top: 0;
+  line-height: 1em;
+  height: 1em;
+  top: -0.75em;
+  font-size: 1em;
+  position: absolute;
+}
+.undefined .app-user .settings .settings-display,
+.app-page .app-user .settings .settings-display {
+  display: none;
+  position: absolute;
+  background: #00e36c;
+  color: #fff;
+}
+.undefined .app-user .settings .settings-display.visible,
+.app-page .app-user .settings .settings-display.visible {
+  display: block;
+  top: 0.5em;
+  right: 0;
+  min-width: 12em;
+  padding: 0 1em 1em;
+  text-align: left;
+  z-index: 1;
+}
+.undefined .app-user .settings .settings-display.visible h2,
+.app-page .app-user .settings .settings-display.visible h2 {
+  margin: 0.5em 0;
+  border-bottom: 1px solid #fff;
+}
+.undefined .app-user .settings .settings-display.visible li,
+.app-page .app-user .settings .settings-display.visible li {
+  display: block;
+  margin: 0;
+}
+.undefined .app-user .settings .settings-display.visible a,
+.app-page .app-user .settings .settings-display.visible a {
+  text-align: left;
+  color: #fff;
+  margin: 0;
+  line-height: 2em;
 }
 .undefined .flexslider,
 .app-page .flexslider {

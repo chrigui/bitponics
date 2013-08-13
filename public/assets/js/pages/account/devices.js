@@ -6,7 +6,8 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  'overlay'
+  'overlay',
+  '/assets/js/controllers/nav.js'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';

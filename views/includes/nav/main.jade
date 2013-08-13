@@ -1,4 +1,4 @@
-nav(role="nav")
+nav(role="nav", ng-controller="bpn.controllers.Nav")
   ul
     li(class="nav-section first")
       h1(class="logo icon", role="banner")
@@ -72,3 +72,18 @@ nav(role="nav")
                | #{user.name.full}
               else
                | #{user.email}
+            div(class="settings", ng-click="toggleSettings()")
+              | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
+              div(class="settings-display", ng-class="{'visible':settingsDisplayVisible}")
+                h2 Settings
+                ul
+                  if typeof growPlanInstance !== 'undefined'
+                    li
+                      a(href="/grow-plans/#{growPlanInstance.growPlan._id}") Grow Plan Details
+                  li
+                    a(href="/account/profile") Profile
+                  li
+                    a(href="/gardens") Gardens
+                  li
+                    a(href="/account/devices") Devices
+                  

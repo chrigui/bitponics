@@ -11,6 +11,7 @@ require([
   'angularUIBootstrap',
   '/assets/js/services/socket.js',
   '/assets/js/controllers/selection-overlay.js',
+  '/assets/js/controllers/nav.js',
   'overlay',
   'flexslider',
   'angular-flexslider'
@@ -977,7 +978,12 @@ require([
       }
     });
 
-
+    dashboardApp.filter('photoDate', function() {
+      return function(input) {
+        var val = moment(input).format("MMMM Do YYYY, h:mm a");
+        return val;
+      }
+    });    
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);

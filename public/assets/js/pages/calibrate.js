@@ -7,7 +7,8 @@ require([
     'angularUIBootstrap',
     'es5shim',
     '/assets/js/services/socket.js',
-    'overlay'
+    'overlay',
+    '/assets/js/controllers/nav.js'
     ],
 function (angular, domReady, moment, feBeUtils) {
   'use strict';

@@ -66,7 +66,7 @@ module.exports = function(app){
 				growPlanInstance : undefined,
 				sensors : undefined,
 				controls : undefined,
-				sensorDisplayOrder : ['lux','hum','air','ph','ec','water','tds','sal','full','vis','ir'],
+				sensorDisplayOrder : ['full','hum','air','wl','ph','ec','water','tds','sal','lux','vis','ir'],
 				className: "app-page dashboard",
 				pageType: "app-page"
 			};
