@@ -2130,6 +2130,7 @@ li
   min-width: 12em;
   padding: 0 1em 1em;
   text-align: left;
+  z-index: 1;
 }
 .undefined .app-user .settings .settings-display.visible h2,
 .app-page .app-user .settings .settings-display.visible h2 {
