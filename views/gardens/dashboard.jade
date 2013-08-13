@@ -83,7 +83,7 @@ block content
                   div(data-flex-slider, flex-slider-slides="photo in sharedDataService.photos", startAt="{{startAt}}", touch="true", animation="slide")
                     li
                       h3(class="page-heading page-heading-small") {{photo.date | date:medium}}
-                      img(ng-src="http://www.bitponics.com{{photo.url}}")
+                      img(ng-src="{{photo.url}}")
 
                         
     
