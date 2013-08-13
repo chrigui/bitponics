@@ -8,7 +8,8 @@ require([
   'angularUIBootstrap',
   '/assets/js/services/device.js',
   '/assets/js/controllers/selection-overlay.js',
-  'overlay'
+  'overlay',
+  '/assets/js/controllers/nav.js'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';

@@ -5,7 +5,8 @@ require([
   'es5shim',
   'angularUI',
   '/assets/js/services/socket.js',
-  '/assets/js/libs/angular/mask.js'
+  '/assets/js/libs/angular/mask.js',
+  '/assets/js/controllers/nav.js'
 ],
 function (angular, domReady) {
   'use strict';
