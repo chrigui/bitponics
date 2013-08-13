@@ -514,6 +514,7 @@ td {
 .dashboard .content-module,
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
+.dashboard .overlay.photo img,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -1777,12 +1778,17 @@ img.page-spinner.spinner {
   overflow: hidden;
 }
 .dashboard .overlay.photo {
-  top: 5%;
-  left: 10%;
-  right: 10%;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  left: 0;
+  text-align: center;
+}
+.dashboard .overlay.photo img {
+  max-height: 100%;
   width: auto;
-  height: auto;
-  position: absolute;
+  padding: 0 0 4em 0;
 }
 .dashboard .overlay.photo .content-module {
   width: 100%;
@@ -3247,6 +3253,9 @@ button.close {
 }
 .growplans .phase-tabs .btn {
   width: auto;
+}
+.growplans .phase-tabs div {
+  padding-left: 1em;
 }
 .growplans .phase-tabs .selected {
   background: #00e36c !important;

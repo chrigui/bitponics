@@ -14,9 +14,9 @@ block head
         input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
       
 
-      div.question
-        label(class="question-title", for="gpi_name") Your Garden Name
-        input(type='text', id="gpi_name", name="gpi_name", ng-model="sharedDataService.growPlanInstance.name")
+      //- div.question
+      //-   label(class="question-title", for="gpi_name") Your Garden Name
+      //-   input(type='text', id="gpi_name", name="gpi_name", ng-model="sharedDataService.growPlanInstance.name")
           
 
       div(class="question-wrap-right")
@@ -44,7 +44,7 @@ block head
 
   
   script(type='text/ng-template', id='customize-details.html')
-      h4.page-heading Your grow plan
+      h4.page-heading {{sharedDataService.selectedGrowPlan.name}}
 
       div.Phases
         div
@@ -61,12 +61,12 @@ block head
                     ng-model="expectedGrowPlanDuration")
               span Days
               
-            h5(class="starting-day question-title seamless-input-wrap page-heading-small") I am starting on day
-              input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
-                    type="number", 
-                    ng-model="sharedDataService.growPlanInstance.currentGrowPlanDay", 
-                    min="0",
-                    max="{{expectedGrowPlanDuration}}")
+            //- h5(class="starting-day question-title seamless-input-wrap page-heading-small") I am starting on day
+            //-   input(class="seamless-input-with-bg date-duration text-align-c no-disable", 
+            //-         type="number", 
+            //-         ng-model="sharedDataService.growPlanInstance.currentGrowPlanDay", 
+            //-         min="0",
+            //-         max="{{expectedGrowPlanDuration}}")
           
           //- div.phase-sliders
           section.separator-top
@@ -111,9 +111,10 @@ block head
 
                 ul(class="phase-tabs separator-top")
                   li(ng-repeat="phaseSection in growPlanPhaseSectionUITabs",
-                      class="btn inverse-btn", 
+                      class="btn inverse-btn {{ phaseSection | lowercase }}", 
                       ng-class="{selected: selected.selectedGrowPlanPhaseSection == $index}", 
-                      ng-click="setCurrentPhaseSectionTab($index)") {{ phaseSection }}
+                      ng-click="setCurrentPhaseSectionTab($index)",
+                      ng-show="phaseSection != 'Device'") {{ phaseSection }}
 
                 div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
                   div.question

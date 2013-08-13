@@ -119,12 +119,26 @@
 		overflow hidden
 
 		&.photo
-			top 5%
-			left 10%
-			right 10%
-			width auto
-			height auto
-			position absolute
+			// top 5%
+			// left 10%
+			// right 10%
+			// width auto
+			// height auto
+			// position absolute
+
+			width: 100%;
+			height: 100%;
+			top: 0;
+			right: 0;
+			left: 0;
+			text-align center
+
+			img
+				@extend .display-ib;
+				max-height 100%
+				width auto
+				padding 0 0 4em 0
+
 
 			.content-module
 				width 100%

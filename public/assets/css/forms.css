@@ -362,7 +362,6 @@ input[type='checkbox']:checked + label.btn {
   margin-left: -2em;
   display: inline-block;
   font-size: 24px;
-  height: 1em;
 }
 .custom-dropdown-wrap .dblarrow i {
   width: 0;
