@@ -71,7 +71,7 @@ module.exports = [
 			abbrev: "Lux",
 			unit: "lm/(m^2)",
 			code: "lux",
-			visible : true
+			visible : false
 		},
 		{
 			_id : '506de3088eebf7524342cb62',
@@ -83,11 +83,11 @@ module.exports = [
 		},
 		{
 			_id : '506de3088eebf7524342cb63',
-			name: "Full Light",
-			abbrev: "Light",
-			unit: "Lumens",
+			name: "Lux",
+			abbrev: "Lux",
+			unit: "lux",
 			code: "full",
-			visible : false
+			visible : true
 		},
 		{
 			_id : '506de3098eebf7524342cb64',
@@ -100,7 +100,7 @@ module.exports = [
 		{
 			_id : '51b4d9c65dd0f94858bac8ed',
 			name: "Water Level",
-			abbrev: "H2O Lvl",
+			abbrev: "Water Level",
 			unit: "centimeters",
 			code: "wl",
 			visible : true
