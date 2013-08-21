@@ -35,6 +35,20 @@ Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
 });;
 
 
+/*************** Validate ******************************/
+var dateNotInPast = function(date) {
+  // 30s cutoff for ensuring notification has future tts date
+  var futureCutoff = new Date((new Date()).valueOf() - 30 * 1000),
+      date = date ? date : new Date();
+
+  //if date not in past return true = valid date
+  return (date.valueOf() > futureCutoff);
+};
+
+var dateValidationFns = [
+  { validator: dateNotInPast, msg: 'Newly created notifications must have an immediate or future tts date.' }
+];
+
 var NotificationSentLogSchema = new Schema({ 
   /**
    * timestamp
@@ -99,7 +113,7 @@ var NotificationSchema = new Schema({
 	 * Once a notification is sent and has no further repeats, this is set to null. 
 	 * To clear pending notifications, this field is queried for values <= now
 	 */ 
-	tts : { type: Date, default: Date.now },
+	tts : { type: Date, default: Date.now, validate: dateValidationFns },
 
 
 	/**
@@ -308,12 +322,12 @@ NotificationSchema.virtual('sentLogs')
   });
 
 NotificationSchema.virtual('checked')
-.get(function(){
-  return this.c;
-})
-.set(function(checked){
-  this.c = checked;
-})
+  .get(function(){
+    return this.c;
+  })
+  .set(function(checked){
+    this.c = checked;
+  })
 
 NotificationSchema.virtual('hash')
   .get(function(){
@@ -327,7 +341,6 @@ NotificationSchema.virtual('gardenDashboardUrl')
   .get(function(){
     return "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
   });
-
 
 
 /*************** SERIALIZATION *************************/
@@ -600,6 +613,7 @@ NotificationSchema.static('create', function(options, callback){
     }
     
     newNotification.save(callback);
+
   });
 });
 
@@ -721,7 +735,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
-                //users = [{email : 'amit@bitponics.com'}];
+                users = [{email : 'jack@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                   winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION EMAIL TEMPLATE POPULATED");
