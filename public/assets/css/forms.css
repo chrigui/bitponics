@@ -22,7 +22,9 @@
 .display-i {
   display: inline;
 }
-.display-ib {
+.display-ib,
+.custom-checkbox-wrap label,
+.custom-checkbox-wrap label:after {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -362,6 +364,7 @@ input[type='checkbox']:checked + label.btn {
   margin-left: -2em;
   display: inline-block;
   font-size: 24px;
+  height: 1em;
 }
 .custom-dropdown-wrap .dblarrow i {
   width: 0;
@@ -390,6 +393,52 @@ input[type='checkbox']:checked + label.btn {
 /*Important*/
   padding: 0.45em 1.25em 0.45em 0.45em;
   font-weight: lighter;
+}
+.custom-checkbox-wrap {
+  position: relative;
+}
+.custom-checkbox-wrap input[type="checkbox"],
+.custom-checkbox-wrap input[type="radio"] {
+  visibility: hidden;
+  position: absolute;
+}
+.custom-checkbox-wrap label {
+  position: relative;
+}
+.custom-checkbox-wrap label:before {
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  content: '';
+  position: absolute;
+  width: 1em;
+  height: 0.35em;
+  background: transparent;
+  top: 0.6em;
+  right: 0.35em;
+  border: 3px solid #fcfff4;
+  border-top: none;
+  border-right: none;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+.custom-checkbox-wrap label:after {
+  cursor: pointer;
+  content: '';
+  width: 2em;
+  height: 2em;
+  margin: 0 0 0 1em;
+  vertical-align: middle;
+  background: #00e36c;
+}
+.custom-checkbox-wrap input[type="checkbox"]:checked + label:before,
+.custom-checkbox-wrap input[type="radio"]:checked + label:before {
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
 }
 .wufoo {
   background-color: #c1c2c4 !important;

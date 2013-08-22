@@ -183,6 +183,7 @@ input[type='checkbox']:checked + label.btn
 	// input[type='checkbox']:checked ~ .info
 	// 	display block
 
+
 .custom-dropdown-wrap {
 	position relative
 	white-space nowrap
@@ -192,7 +193,7 @@ input[type='checkbox']:checked + label.btn
 	  margin-left: -2em;
 	  display: inline-block;
 	  font-size 24px;
-	  // height: 1em;
+	  height: 1em;
 	}
 	// .dblarrow b {
 	// 	width: 0; 
@@ -232,6 +233,62 @@ input[type='checkbox']:checked + label.btn
 	    font-weight: lighter;
 	}
 }
+
+
+.custom-checkbox-wrap {
+	position relative
+
+	input[type="checkbox"], input[type="radio"] {
+		visibility hidden
+		position absolute
+	}
+
+	label {
+		@extends .display-ib
+		position relative
+
+		&:before {
+			// @extends .display-ib
+			// -ms-filter "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"
+			// filter alpha(opacity=0)
+			opacity 0
+			content ''
+			position absolute
+			width 1em
+			height 0.35em
+			background transparent
+			top 0.6em
+			right .35em
+			border 3px solid #fcfff4
+			border-top none
+			border-right none
+			transform rotate(-45deg)
+		}
+
+		&:after {
+			@extends .display-ib
+			cursor pointer
+			content ''
+			width 2em
+			height 2em
+			margin 0 0 0 1em
+			vertical-align middle
+			// box-shadow inset 0px 1px 1px rgba(0,0,0,0.5), 0px 1px 0px rgba(255,255,255,1)
+			background color-logo-green
+			// filter progid:DXImageTransform.Microsoft.gradient( startColorstr='#222', endColorstr='#45484d',GradientType=0 )
+		}
+	}
+
+	input[type="checkbox"]:checked + label:before,
+	input[type="radio"]:checked + label:before {
+		// -ms-filter "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"
+		// filter alpha(opacity=100)
+		opacity 1
+	}
+}
+
+
+
 .wufoo
 	background-color color-bg-gray!important
 	color white!important

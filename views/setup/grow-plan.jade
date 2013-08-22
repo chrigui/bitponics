@@ -322,28 +322,38 @@ block head
                         input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
                         span {{sensors[idealRange.sCode].unit}}
                         textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                        div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
+                        //- div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
 
                       div(class="lo separator-top")
                         label Low
                         input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
                         span {{sensors[idealRange.sCode].unit}}
                         textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-                        div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
+                        //- div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
 
 
                       div.separator-top
                         label What time of day should the ideal range apply?
-                        label All Day
-                          input(class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
+                        div(class="custom-checkbox-wrap")
+                          input(id="action_control_time_{{$index}}", class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
+                          label(for="action_control_time_{{$index}}") All Day
 
                         div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
                           // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
                           label.idealRangeStartTime Start Time
-                            select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                          div.custom-dropdown-wrap
+                            select(class="custom-dropdown", ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                              option(value="") Select
+                            div(class="dblarrow")
+                              i
 
                           label.idealRangeEndTime End Time
-                            select(ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                                option(value="") Select
+                              div(class="dblarrow")
+                                i
+
 
                 div(class="actions", ng-show="selected.selectedGrowPlanPhaseSection == 3")
                   h4(class="page-heading-large separator-top") Actions
@@ -361,7 +371,7 @@ block head
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
 
-                      div.separator-top
+                      div
                         label Description
                         textarea(placeholder="Describe the action.", ng-model="action.description")
 
@@ -384,20 +394,7 @@ block head
                           div(class="dblarrow")
                             i
 
-                      //- label Scheduling. Trigger this action:
-                      //-   label 
-                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseStart", ng-model="action.scheduleType")
-                      //-     | Once at the start of the phase
-
-                      //-   label
-                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="phaseEnd", ng-model="action.scheduleType") 
-                      //-     | Once at the end of the phase
-
-                      //-   label 
-                      //-     input(type="radio", name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase_id}}_action_{{action._id}}_schedule", value="repeat", ng-model="action.scheduleType") 
-                      //-     | Repeat throughout the phase
-
-
+                      
                       div(ng-show="action.scheduleType != 'repeat'")
 
 
@@ -405,54 +402,63 @@ block head
                         
 
                         div(ng-show="action.control")
-                          label.separator-top Daily
-                            input(type="checkbox", ng-model="action.isDailyControlCycle")
+                          div(class="custom-checkbox-wrap separator-top")
+                            input(id="action_control_{{$index}}", type="checkbox", ng-model="action.isDailyControlCycle")
+                            label(for="action_control_{{$index}}") Daily                            
 
                           div(class="separator-top", ng-show="action.isDailyControlCycle")
                             label Turn {{action.control.name}} on at 
                             div.custom-dropdown-wrap
                               select(class="custom-dropdown", ng-model="action.dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                                option(value="") Select
                               div(class="dblarrow")
                                 i
 
                             label Turn {{action.control.name}} off at 
                             div.custom-dropdown-wrap
                               select(class="custom-dropdown", ng-model="action.dailyOffTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                                option(value="") Select
                               div(class="dblarrow")
                                 i
 
                           div(class="separator-top", ng-show="!action.isDailyControlCycle")
                             div Repeating actions have alternating on/off states.
                             
-                            div First, turn {{action.control.name}}
-                              label 
-                                input(type="radio", value="1", ng-model="action.cycle.states[0].controlValue")
-                                | On
+                            div 
+                              p First, turn {{action.control.name}}
+                              div(class="custom-checkbox-wrap")
+                                input(id="first_action_states_on_{{$index}}", type="radio", value="1", ng-model="action.cycle.states[0].controlValue")
+                                label(for="first_action_states_on_{{$index}}") On
 
-                              label
-                                input(type="radio", value="0", ng-model="action.cycle.states[0].controlValue")
-                                | Off
+                              div(class="custom-checkbox-wrap")
+                                input(id="first_action_states_off_{{$index}}", type="radio", value="0", ng-model="action.cycle.states[0].controlValue")
+                                label(for="first_action_states_off_{{$index}}") Off
 
-                              div for
+                              div 
+                                p for
                                 input(type="number", ng-model="action.cycle.states[0].duration", value="1")
                                 div.custom-dropdown-wrap
                                   select(class="custom-dropdown", ng-model="action.cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                    option(value="") Select
                                   div(class="dblarrow")
                                     i
                               
-                            div Then turn {{action.control.name}}
-                              label 
-                                input(type="radio", value="1", ng-model="action.cycle.states[1].controlValue")
-                                | On
+                            div 
+                              p Then turn {{action.control.name}}
+                              div(class="custom-checkbox-wrap")
+                                input(id="then_action_states_on_{{$index}}", type="radio", value="1", ng-model="action.cycle.states[1].controlValue")
+                                label(for="then_action_states_on_{{$index}}") On
 
-                              label
-                                input(type="radio", value="0", ng-model="action.cycle.states[1].controlValue")
-                                | Off
+                              div(class="custom-checkbox-wrap")
+                                input(id="then_action_states_off_{{$index}}", type="radio", value="0", ng-model="action.cycle.states[1].controlValue")
+                                label(for="then_action_states_off_{{$index}}") Off
 
-                              div for 
+                              div 
+                                p for 
                                 input(type="number", ng-model="action.cycle.states[1].duration", value="1")
                                 div.custom-dropdown-wrap
                                   select(class="custom-dropdown", ng-model="action.cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
+                                    option(value="") Select
                                   div(class="dblarrow")
                                     i
 
@@ -460,11 +466,19 @@ block head
                           div.separator-top 
                             label Every:
                             input(type="number", ng-model="action.overallDuration", value="1")
-                            select(ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+                                option(value="") Select
+                              div(class="dblarrow")
+                                i
 
                           div(ng-show="action.overallDurationType == 'days'")
                             label At 
-                            select(ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+                            div.custom-dropdown-wrap
+                              select(class="custom-dropdown", ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+                                option(value="") Select
+                              div(class="dblarrow")
+                                i
 
                           label.separator-top Send me the following message:
                             textarea(ng-model="action.message", placeholder="It's time to...")
