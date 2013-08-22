@@ -423,7 +423,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
       SensorModel = require('./sensor').model,
       DeviceModel = require('./device').model,
       ControlModel = require('./control').model, // need this so that mongoose registers Control schema in worker process
-      UserModel = require('./user').model, // need this so that mongoose registers Control schema in worker process
+      UserModel = require('./user').model, // need this so that mongoose registers User schema in worker process
       ImmediateActionModel = require('./immediateAction').model,
       notificationTemplateLocals = {
         notification : notification,
@@ -444,7 +444,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
           return innerCallback(null, notification); 
         }
       },
-      function doTheRest(notification){
+      function populateParallels(notification, waterfallCallback){
         async.parallel(
           [
             function populateAction(innerCallback){
@@ -474,6 +474,17 @@ NotificationSchema.method('getDisplay', function(options, callback){
               .exec(function(err, immediateActionResult){
                 notificationTemplateLocals.notificationDetails.immediateAction = immediateActionResult;
                 return innerCallback(err);
+              });
+            },
+            function populateIdealRangeSensor(innerCallback){
+              if (!notification.triggerDetails.idealRange){ return innerCallback(); }
+
+              SensorModel.findOne({ code : notification.triggerDetails.idealRange.sCode })
+              .select('name')
+              .exec(function(err, sensorResult){
+                if (err) { return innerCallback(err); }
+                notificationTemplateLocals.notificationDetails.idealRange.sensorName = sensorResult.name;
+                return innerCallback();
               });
             },
             function populateGrowPlan(innerCallback){
@@ -519,44 +530,49 @@ NotificationSchema.method('getDisplay', function(options, callback){
           ],
           function(err){
             //console.log("PARALLEL FINAL", err, options, notification, notificationTemplateLocals);
-
-            if (err) { return callback(err); }
-            
-            // At this point, notificationTemplateLocals is fully populated
-
-            try{
-              switch(options.displayType){
-                case 'email':
-                  notificationDisplay = {
-                    subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-                    bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-                    bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-                  };
-                  break;
-                case 'summary':
-                  notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-                  break;
-                case 'detail':
-                  notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-                  break;
-              }
-            } catch(e){
-              winston.error(e);
-            } finally {
-              //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
-              if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
-                err = new Error("Error populating EJS notification template for " + notification._id.toString());
-              }
-              return callback(err, notificationDisplay);  
-            }
+            return waterfallCallback(err);
           }
         );
+      },
+      function populateTimezone(waterfallCallback){
+        notification.triggerDetails.timezone = "America/New_York";
+        return waterfallCallback();
       }
-    ]
+    ],
+    function waterfallFinal(err){
+      if (err) { return callback(err); }
+          
+      // At this point, notificationTemplateLocals is fully populated
+      // 2013-08-22 AK: Getting occasional errors that I don't have time to fully debug, just wrapping things in a try/finally to ensure execution continues
+      try {
+        switch(options.displayType){
+          case 'email':
+            notificationDisplay = {
+              subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+              bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+              bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+            };
+            break;
+          case 'summary':
+            notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+            break;
+          case 'detail':
+            notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+            break;
+        }
+      } catch(e){
+        winston.error(e);
+      } finally {
+        //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
+        if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
+          console.log("Error populating EJS notification template for " + notification._id.toString());
+          console.log(JSON.stringify(notificationTemplateLocals));
+          err = new Error("Error populating EJS notification template for " + notification._id.toString());
+        }
+        return callback(err, notificationDisplay);  
+      }
+    }
   );
-  
-
-  
 });
 
 /*************** END INSTANCE METHODS *************************/
