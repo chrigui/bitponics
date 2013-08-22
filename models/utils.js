@@ -279,7 +279,7 @@ module.exports.processIdealRangeViolation = function (options, callback){
  * @param {Device=} options.device : optional. Device of GrowPlanInstance. Should be full DeviceModel doc, not just an ObjectId
  * @param {string} options.immediateActionMessage : message to log with the immediateAction
  * @param {User} options.user : required. owner of GrowPlanInstance
- * @param {bool} options.triggeredByIdealRangeViolation : optional. Used to set Notification trigger
+ * @param {Object} options.idealRangeViolation : optional. Set if triggered by idealRangeViolation, else this is assumed to be triggered manually. Used to define Notification trigger
  * @param {function(err, {{immediateAction: ImmediateAction, notification : Notification }} )} callback 
  */
 module.exports.triggerImmediateAction = function (options, callback){
@@ -567,7 +567,7 @@ module.exports.checkDeviceConnections = function(callback){
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf(),
-      cutOffDate = new Date(nowAsMilliseconds - (20 * 60 * 1000));
+      cutOffDate = new Date(nowAsMilliseconds - (20 * 60 * 1000)); // 20 minutes
 
   DeviceModel.find({
     activeGrowPlanInstance : { $exists : true },
@@ -594,14 +594,6 @@ module.exports.checkDeviceConnections = function(callback){
           lastConnectionAt = moment(device.lastConnectionAt).format("dddd, MMMM Do YYYY, h:mm:ss a");
         }
 
-        var notificationTitle = i18nKeys.get("Check device connection"),
-            notificationBody = '';
-        if (lastConnectionAt){
-          notificationBody = i18nKeys.get("Device last heard from", device.activeGrowPlanInstance.name, lastConnectionAt, device._id);
-        } else {
-          notificationBody = i18nKeys.get("Device never heard from", device.activeGrowPlanInstance.name, device._id);
-        }
-
         NotificationModel.create({
           users : device.activeGrowPlanInstance.users,
           gpi : device.activeGrowPlanInstance._id,
@@ -611,9 +603,7 @@ module.exports.checkDeviceConnections = function(callback){
           triggerDetails : {
             deviceId : device._id,
             lastConnectionAt : lastConnectionAt
-          },
-          title : notificationTitle,
-          body : notificationBody
+          }
         }, iteratorCallback)
       },
       function loopEnd(err){
