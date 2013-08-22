@@ -103,7 +103,7 @@ describe('Notification', function(){
   });
 
   it('Create new notification', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       log = new Notification.model.create({
         gpi : ObjectID("51a7b69ca3b04db08057e047"),
         trigger : "phase-action",
@@ -120,7 +120,7 @@ describe('Notification', function(){
           duration : 1,
           timezone : "America/New_York"
         },
-        tts : "2013-08-08T14:31:02.788Z",
+        tts : now,
         u : [
           ObjectID("506de30a8eebf7524342cb6c")
         ]
@@ -133,7 +133,7 @@ describe('Notification', function(){
   });
 
   it('Should not create a new notification when it already exists', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       options = {
         gpi : ObjectID("51a7b69ca3b04db08057e047"),
         trigger : "phase-action",
@@ -150,7 +150,7 @@ describe('Notification', function(){
           duration : 1,
           timezone : "America/New_York"
         },
-        tts : "2013-08-08T14:31:02.788Z",
+        tts : now,
         u : [
           ObjectID("506de30a8eebf7524342cb6c")
         ]
@@ -177,7 +177,7 @@ describe('Notification', function(){
   });
 
   it('Should not create a new notification with tts in the past', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       log = new Notification.model.create({
         gpi : new ObjectID(),
         trigger : "phase-action",
@@ -234,7 +234,7 @@ describe('Notification', function(){
   });
 
   it('Can create a new notification without tts date', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       log = new Notification.model.create({
         gpi : new ObjectID(),
         trigger : "phase-action",
@@ -263,7 +263,7 @@ describe('Notification', function(){
   });
 
   it('Can create a new notification with tts date of now', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       log = new Notification.model.create({
         gpi : new ObjectID(),
         trigger : "phase-action",
@@ -292,7 +292,7 @@ describe('Notification', function(){
   });
 
   it('Cannot create a new notification with tts date of 30s ago', function(done){
-    var now = Date.now(),
+    var now = new Date(),
       log = new Notification.model.create({
         gpi : new ObjectID(),
         trigger : "phase-action",
