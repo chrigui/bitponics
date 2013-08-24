@@ -457,10 +457,23 @@ ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, act
  *
  *  Cycles always start with the start of a phase, and
  *  phases always start at the start of a day (at 00:00:00) local time.
+ *  Cycles have 1 or 2 states (on/off).
  *
- *  An "offset" cycle, like a 16-hour light cycle that starts at 6am,
- *  is represented with 3 states, with the 1st and 3rd having the same value.
+ *  An "offset" is represented by the offset property on a cycle.
  */
+/*************** Validate ******************************/
+ActionSchema.path('cycle.states').validate(function(states) {
+  if(states.length) {
+    return states.length > 0 && states.length < 3;
+  }
+
+  return true;
+}, "Invalid number of cycle states. Cycles have 1 or 2 states (on/off).");
+
+ActionSchema.path('control').validate(function(control) {
+  return control && this.cycle.states.length;
+}, "An action with a control must define a cycle with 1 or 2 control states");
+
 ActionSchema.pre('save', function(next){
   var action = this,
     cycle = action.cycle,
@@ -468,9 +481,9 @@ ActionSchema.pre('save', function(next){
 
   // An Action can have no cycle. In this case it's a simple reminder.
   if (!cycle.states.length){
-    if (this.control){
-      return next(new Error(i18nKeys.get('An action with a control must define a cycle with 1 or more control states')));
-    }
+    // if (this.control){
+    //   return next(new Error(i18nKeys.get('An action with a control must define a cycle with 1 or more control states')));
+    // }
     // make sure cycle.repeat doesn't exist, since it doesn't need to
     delete this.cycle.repeat;
     return next();
@@ -478,9 +491,9 @@ ActionSchema.pre('save', function(next){
 
   states = cycle.states;
 
-  if ((states.length > 2)){
-    return next(new Error(i18nKeys.get('Invalid number of cycle states')));
-  }
+  // if ((states.length > 2)){
+  //   return next(new Error(i18nKeys.get('Invalid number of cycle states')));
+  // }
 
   if (action.control){
     if (states.some(function(state){
