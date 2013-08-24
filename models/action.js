@@ -104,18 +104,17 @@ ActionSchema.virtual('overallCycleTimespan')
       case 1:
         // Single-state cycle. If it has a control, it's considered to be a one-time
         // trigger that should last until explicitly changed, which means it's effectively
-        // an infinite duration. we can "infinite" at 1-year.
+        // an infinite duration. we cap "infinite" at 1-year.
         if (this.control){
           return total;
         } else {
+          // if no control, it's just a message notification (aka, a reminder).
+          // no duration
           return 0;
         }
-
-        // if no control, it's just a message notification (aka, a reminder).
-        // no duration
+        
         break;
       case 2:
-      case 3:
         total = 0;
         states.forEach(function(state){
           total += ActionSchema.statics.convertDurationToMilliseconds(state.duration, state.durationType);
@@ -362,8 +361,7 @@ ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstanc
  * ControlValues are parsed into integers since that's all the firmware can parse.
  *
  *
- * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
- *                Otherwise it's just written straight to the template. 
+ * @param offset. Only a factor in a 2-state cycle. Otherwise it's just written straight to the template. 
  *                For single-state cycles, this is ignored and offset is set to 0.
  *
  * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
@@ -419,8 +417,8 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycle, offset){
  *
  * Assumes it's passed an action with states with controlValues.
  *
- * @param offset. Only a factor in a 3-state cycle, where we need to pull it back by the duration of the 3rd state
- *                Otherwise it's just written straight to the template.
+ * @param offset. Only a factor in an offset cycle. Otherwise it's just written straight to the template.
+ * 
  * @return Object. {
  *    cycleString : String,
  *    offset : Number,
