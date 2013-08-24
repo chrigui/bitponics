@@ -789,19 +789,18 @@ describe('Action', function(){
           description : "desc",
           control : "506de2fc8eebf7524342cb2e", // humidifier
           cycle : {
+            offset : {
+              duration : 6,
+              durationType : 'hours'
+            },
             states : [
-              {
-                duration : 6,
-                durationType : 'hours',
-                controlValue : '0'
-              },
               {
                 duration : 10,
                 durationType : 'hours',
                 controlValue : '1'
               },
               {
-                duration : 8,
+                duration : 14,
                 durationType : 'hours',
                 controlValue : '0'
               }
