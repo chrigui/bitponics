@@ -899,26 +899,308 @@ describe('Action', function(){
           cycle : {
             states : [
               {
-                duration : 6,
-                durationType : 'hours',
-                controlValue : '0'
-              },
-              {
                 duration : 10,
                 durationType : 'hours',
                 controlValue : '1'
               },
               {
-                duration : 8,
+                duration : 14,
                 durationType : 'hours',
                 controlValue : '0'
               }
             ],
+            offset: {
+              duration : 6,
+              durationType : 'hours'
+            },
             repeat : true
           }
         });
 
       // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+
+    it('factors in offset value when from date is WITHIN the initial offset', function(done){
+      var userTimezone = "America/Los_Angeles",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-01-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 12
+            },
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(0);
+
+      done();
+    });
+
+    it('factors in offset value when from date is AFTER the initial offset', function(done){
+      var userTimezone = "America/Los_Angeles",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-01-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+
+    it('factors in offset value when from date is AFTER the initial offset (Different timezone)', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-01-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+
+   it('factors in offset value when from date is AFTER the initial offset (Different date)', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-02-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      // Since we have a 24-hour action cycle, and started at 10:30am, there should be 13.5 hours remaining, which means we're in states[1]
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+   it('factors in offset value when from date is AFTER the initial offset (Different date)', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-02-01 10:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+
+
+   it('factors in offset value when from date is AFTER the initial offset (overnight cycle)', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-02-01 01:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '1'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '0'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
+
+      done();
+    });
+
+    it('factors in offset value when from date is AFTER the initial offset (overnight cycle) reverse', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-02-01 01:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                duration : 18,
+                durationType : 'hours',
+                controlValue : '0'
+              },
+              {
+                duration : 6,
+                durationType : 'hours',
+                controlValue : '1'
+              }
+            ],
+            offset : {
+              durationType : 'hours',
+              duration : 8
+            },
+            repeat : true
+          }
+        });
+
+      
+      Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(0);
+
+      done();
+    });
+
+    it('Always returns a single state value', function(done){
+      var userTimezone = "America/New_York",
+          startDate = timezone("2013-01-01 08:00", userTimezone),
+          fromDate = timezone("2013-02-01 01:30", userTimezone),
+          mockGPIPhase = {
+            startDate : startDate
+          },
+        action = new Action.model({
+          description : "desc",
+          control : "506de2fc8eebf7524342cb2e", // humidifier
+          cycle : {
+            states : [
+              {
+                controlValue : '1'
+              }
+            ]
+          }
+        });
+
+      
       Action.model.getCurrentControlValue(fromDate, mockGPIPhase, action, userTimezone).should.equal(1);
 
       done();

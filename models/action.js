@@ -311,29 +311,46 @@ ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstanc
       phaseStartDateParts = timezone(growPlanInstancePhase.startDate, userTimezone, '%T').split(':'),
       // get the midnight of the start date
       phaseStartDate = growPlanInstancePhase.startDate.valueOf() - ( (phaseStartDateParts[0] * 60 * 60 * 1000) + (phaseStartDateParts[1] * 60 * 1000) + (phaseStartDateParts[2] * 1000)),
+      offset = action.cycle.offset || {},
+      offsetInMilliseconds = ActionSchema.statics.convertDurationToMilliseconds(offset.duration, offset.durationType),
+      offsetPhaseStartDate = phaseStartDate + offsetInMilliseconds,
       phaseTimeElapsed = fromDateAsMilliseconds - phaseStartDate,
+      offsetPhaseTimeElapsed = fromDateAsMilliseconds - offsetPhaseStartDate,
+      offsetRemainder,
       cycleTimeElapsed,
       overallCycleTimespan,
       cycle = action.cycle,
       states,
       stateDurationsInMilliseconds = [];
 
-    if (! action.control || !cycle || !cycle.states.length){ return 0; }
+  if (! action.control || !cycle || !cycle.states.length){ return 0; }
 
-    states = cycle.states;
+  states = cycle.states;
 
-    switch(states.length){
-      case 1:
-        return parseInt(states[0].controlValue, 10);
-        break;
-      case 2:
-      case 3:
+  switch(states.length){
+    case 1:
+      return parseInt(states[0].controlValue, 10);
+      break;
+    case 2:
+
+      // if the from date is within the initial offset
+      if(offsetPhaseTimeElapsed < 0){
+        offsetRemainder = -1 * offsetPhaseTimeElapsed;
+        while (offsetRemainder > 0) {
+          for (var i = states.length; i--;) {
+            offsetRemainder -= ActionSchema.statics.convertDurationToMilliseconds(states[i].duration, states[i].durationType);
+            if (offsetRemainder <= 0) {
+              return parseInt(states[i].controlValue, 10);
+            }
+          }
+        }
+      } else {
         overallCycleTimespan = 0;
         states.forEach(function(state, index){
           stateDurationsInMilliseconds[index] = ActionSchema.statics.convertDurationToMilliseconds(state.duration, state.durationType);
           overallCycleTimespan += stateDurationsInMilliseconds[index];
         });
-        cycleTimeElapsed = (phaseTimeElapsed % overallCycleTimespan);
+        cycleTimeElapsed = (offsetPhaseTimeElapsed % overallCycleTimespan);
 
         if (cycleTimeElapsed < stateDurationsInMilliseconds[0]){
           return parseInt(states[0].controlValue, 10);
@@ -342,8 +359,10 @@ ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstanc
         } else {
           return parseInt(states[0].controlValue, 10);
         }
-        break;
-    }
+        break;  
+      }
+      
+  }
 });
 
 
@@ -479,20 +498,13 @@ ActionSchema.pre('save', function(next){
 
   // An Action can have no cycle. In this case it's a simple reminder.
   if (!cycle.states.length){
-    // if (this.control){
-    //   return next(new Error(i18nKeys.get('An action with a control must define a cycle with 1 or more control states')));
-    // }
-    // make sure cycle.repeat doesn't exist, since it doesn't need to
     delete this.cycle.repeat;
     return next();
   }
 
   states = cycle.states;
 
-  // if ((states.length > 2)){
-  //   return next(new Error(i18nKeys.get('Invalid number of cycle states')));
-  // }
-
+  //TODO: move to own validate function
   if (action.control){
     if (states.some(function(state){
       return (typeof state.controlValue === 'undefined' || state.controlValue === null);
@@ -510,6 +522,7 @@ ActionSchema.pre('save', function(next){
       // if 2 states, at least one must have a duration defined
       if ( !(states[0].durationType && states[0].duration) &&
            !(states[1].durationType && states[1].duration)){
+        //TODO: move to own validate function
         return next(new Error(i18nKeys.get('In a 2-state cycle, at least one state must have a duration defined')));
       }
       break;
