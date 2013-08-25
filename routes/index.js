@@ -277,7 +277,7 @@ module.exports = function(app){
 
 	
 	/*
-	 * Email verification (and new user preorder offer)
+	 * Email verification
 	 * 
 	 */
 	app.get('/register', 
@@ -334,6 +334,7 @@ module.exports = function(app){
 	require('./account')(app);
 	require('./admin')(app);
 	require('./api')(app);
+	require('./buy')(app);
 	require('./dashboard')(app);
 	require('./gardens')(app);
 	require('./grow-plans')(app);
