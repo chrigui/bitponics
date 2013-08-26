@@ -327,7 +327,7 @@ DeviceSchema.method('refreshStatus', function(callback) {
           });
 
           if (conflictingImmediateActionIds.length > 0){
-            // Expire all the expired ImmediateActions. Deciding not to wait on the result to move forward
+            // Expire all the conflicting ImmediateActions. Deciding not to wait on the result to move forward
             ImmediateActionModel.update({_id : {$in: conflictingImmediateActionIds}}, { e : new Date(nowAsMilliseconds - 1000) }, { multi : true }).exec();
 
             conflictingImmediateActionIndices.forEach(function(indexToRemove, index){
@@ -399,13 +399,17 @@ DeviceSchema.method('refreshStatus', function(callback) {
 });
 
 
+
 /**
  * Get the compiled device status response, to be sent to the device when requested at /status
  *
+ * @param {Date=} options.date. Moment in time for which to calculate the status. If omitted, assumes now.
+ * @param {feBeUtils.MIME_TYPES=} options.contentType. Device status format version. If omitted, returns JSON.
+ * @param {bool} options.forceRefresh. If true, forces call to device.refreshStatus before generating status response
  * @param {function(err, statusResponse)} callback
  *
  */
-DeviceSchema.method('getStatusResponse', function(callback) {
+DeviceSchema.method('getStatusResponse', function(options, callback) {
   var device = this,
       User = require('./user'),
       UserSchema = User.schema,
@@ -414,14 +418,24 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       utils = require('./utils'),
       getObjectId = utils.getObjectId,
       getDocumentIdString = utils.getDocumentIdString,
-      now = new Date(),
-      nowAsMilliseconds = now.valueOf(),
+      date = options.date || (new Date()),
       deviceOwner,
-      statesResponseBody = ''
-      statusResponseBody = '';
+      statusResponseJson = { states : {} },
+      statusResponseString = '';
 
   async.waterfall(
     [
+      function decideWhetherToRefreshStatus(innerCallback){
+        if (device.status.expires > date && !options.forceRefresh){
+          return innerCallback();
+        }
+
+        device.refreshStatus(function(err, updatedDevice){
+          if (err){ return innerCallback(err); }
+          device = updatedDevice;
+          return innerCallback();
+        });
+      },
       function getDeviceOwner(innerCallback){
         if (!device.owner) { 
           deviceOwner = undefined;
@@ -448,7 +462,7 @@ DeviceSchema.method('getStatusResponse', function(callback) {
       },
       function compileStatusBody(innerCallback){
         var stateTemplate = DeviceUtils.stateTemplate,
-            activeGrowPlanInstancePhase = device.activeGrowPlanInstance ? device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0] : null;
+            activeGrowPlanInstancePhase = device.activeGrowPlanInstance ? device.activeGrowPlanInstance.phases.filter(function(item){ return item.active === true; })[0] : null,
             statesResponseBody = '';
 
         device.outputMap.forEach(
@@ -464,28 +478,44 @@ DeviceSchema.method('getStatusResponse', function(callback) {
             // Need an entry for every output, even if there's no associated cycle
             if (!controlAction){
               // if no action, just 0 everything out
-              controlStateString = controlStateString.replace(/{value}/, '0');
+              statusResponseJson.states[controlOutputPair.outputId] = 0;
             } else {
-              controlStateString = controlStateString.replace(/{value}/, ActionModel.getCurrentControlValue(now, activeGrowPlanInstancePhase, controlAction, deviceOwner ? deviceOwner.timezone : ''));
+              statusResponseJson.states[controlOutputPair.outputId] = ActionModel.getCurrentControlValue(date, activeGrowPlanInstancePhase, controlAction, deviceOwner ? deviceOwner.timezone : '');
             }
+
+            controlStateString = controlStateString.replace(/{value}/, statusResponseJson.states[controlOutputPair.outputId]);
+
             statesResponseBody += controlStateString;
           }
         );
         
-        statusResponseBody += "STATES=" + statesResponseBody + "\n";
+        statusResponseString += "STATES=" + statesResponseBody + "\n";
         
         if (device.status.calibrationMode){
-          statusResponseBody += "CALIB_MODE=" + device.status.calibrationMode + "\n";
+          statusResponseJson.calibMode = device.status.calibrationMode;
+          statusResponseString += "CALIB_MODE=" + device.status.calibrationMode + "\n";
         }
         
-        statusResponseBody += String.fromCharCode(7);
+        statusResponseString += String.fromCharCode(7);
 
         return innerCallback(null);
       },
 
     ],
     function(err){
-      return callback(err, statusResponseBody);
+      var response;
+      switch(options.contentType){
+        case feBeUtils.MIME_TYPES.BITPONICS.V1.DEVICE_TEXT:
+        case feBeUtils.MIME_TYPES.BITPONICS.V2.DEVICE_TEXT:
+          response = statusResponseString;
+          break;
+        case feBeUtils.MIME_TYPES.JSON : 
+          response = JSON.stringify(statusResponseJson);
+          break;
+        default : 
+          response = statusResponseJson;
+      }
+      return callback(err, response);
     }
   );
 });

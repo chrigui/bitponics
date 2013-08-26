@@ -12,7 +12,9 @@ var mongoose = require('mongoose'),
     winston = require('winston'),
     async = require('async'),
     timezone = require('../../lib/timezone-wrapper'),
-    routeUtils = require('../route-utils');
+    routeUtils = require('../route-utils'),
+    requirejs = require('../../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils');
 
 
 /**
@@ -230,11 +232,11 @@ module.exports = function(app) {
       winston.info(JSON.stringify(req.rawBody));
 
       // For now, only accept requests that use the device content-type
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') === -1){
+      if(req.headers['content-type'].indexOf(feBeUtils.MIME_TYPES.BITPONICS.PREFIX) === -1){
         return next(new Error('Invalid Content-Type'));
       }
 
-      if(req.headers['content-type'].indexOf('application/vnd.bitponics') > -1 && req.rawBody){
+      if(req.headers['content-type'].indexOf(feBeUtils.MIME_TYPES.BITPONICS.PREFIX) > -1 && req.rawBody){
 
         
         contentTypeVersion = req.headers['content-type'].split("/")[1].split(".")[2];
@@ -378,18 +380,16 @@ module.exports = function(app) {
         if (!device){ 
           return innerCallback(new Error('No device found for id ' + req.params.id));
         }
-        var now = Date.now();
-
+        
         //console.log('forceRefreshParam', req.params['forceRefresh']);
         
-        if (device.status.expires > now && !req.params['forceRefresh']){
-          return device.getStatusResponse(innerCallback);
-        }
-
-        device.refreshStatus(function(err, updatedDevice){
-          if (err){ return innerCallback(err); }
-          return updatedDevice.getStatusResponse(innerCallback);
-        });
+        return device.getStatusResponse(
+          { 
+            forceRefresh : req.params['forceRefresh'] ? true : false,
+            contentType : req.headers['content-type']
+          }, 
+          innerCallback
+        );
       }
     ],
     function(err, deviceStatusResponse){
@@ -423,7 +423,7 @@ module.exports = function(app) {
     req.session.destroy();
     res.clearCookie('connect.sid', { path: '/' }); 
     res.header('X-Bpn-ResourceName', settings.resourceName);
-    res.header('Content-Type', 'application/vnd.bitponics.v1.deviceText');
+    res.header('Content-Type', feBeUtils.MIME_TYPES.BITPONICS.V1.DEVICE_TEXT);
     res.header('Connection', 'close');
 
     if (responseBody){

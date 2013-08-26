@@ -207,6 +207,10 @@ module.exports = function(app){
                     .exec(innerCallback);
                   },
                   function getDeviceStatus(innerCallback){
+                    if (!growPlanInstance.device){
+                      return innerCallback();
+                    }
+
                     // Only retrieve it if it's been updated
                     // since lastChecked and status.expires is in the future
                     // (only want to retrieve a status that will actually
@@ -219,7 +223,15 @@ module.exports = function(app){
                     })
                     .select('status')
                     .populate('status.activeActions')
-                    .exec(innerCallback);
+                    .exec(function(err, deviceResult){
+                      if (err) { return innerCallback(err);}
+
+                      deviceResult.getStatusResponse({}, function(err, deviceStatusResponse){
+                        var deviceStatus = deviceResult.toObject().status;
+                        deviceStatus.outputValues = deviceStatusResponse.states;
+                        return innerCallback(err, deviceStatus);
+                      });
+                    });
                   },
                   function getNotifications(innerCallback){
                     NotificationModel.find({
@@ -241,18 +253,18 @@ module.exports = function(app){
                   if (err) { return handleSocketError(err); }
 
                   var sensorLog = results[0][0],
-                      device = results[1],
+                      deviceStatus = results[1],
                       notifications = results[2],
                       photos = results[3],
                       responseData;
 
-                  if (sensorLog || device || notifications.length){
+                  if (sensorLog || deviceStatus || notifications.length){
                     responseData = {};
                     if (sensorLog){
                       responseData.sensorLog = sensorLog;
                     }
-                    if (device){
-                      responseData.deviceStatus = device.status;
+                    if (deviceStatus){
+                      responseData.deviceStatus = deviceStatus;
                     }
                     if (notifications.length){
                       responseData.notifications = notifications;

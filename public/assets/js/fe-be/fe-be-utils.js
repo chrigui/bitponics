@@ -106,6 +106,23 @@ define(['moment'], function(moment){
   };
 
 
+  /**
+   * API Mime Types
+   */
+  utils.MIME_TYPES = {
+    "JSON" : "application/json",
+    "BITPONICS" : {
+      "PREFIX" : "application/vnd.bitponics",
+      "V1" : {
+        "DEVICE_TEXT" : "application/vnd.bitponics.v1.deviceText", 
+      },
+      "V2" : {
+        "DEVICE_TEXT" : "application/vnd.bitponics.v2.deviceText", 
+      }
+    }
+  };
+
+
   utils.COMBINED_DEVICE_KEY_SPLITTER = "|";
 
   /**
@@ -278,16 +295,22 @@ define(['moment'], function(moment){
         controlValue = '0',
         states = action.cycle.states;
 
-    if (action.cycle.states.length <= 1){
-      controlValue = action.cycle.states[0].controlValue;
-    } else {
-      if (cycleTimeElapsed < states[0].durationInMilliseconds){
-        controlValue = states[0].controlValue;
-      } else if (cycleTimeElapsed < (states[0].durationInMilliseconds + states[1].durationInMilliseconds)){
-        controlValue = states[1].controlValue;
-      } else {
-        controlValue = states[0].controlValue;
-      }
+    switch(action.cycle.states.length) {
+      case 0:
+        controlValue = '0';
+        break;
+      case 1:
+        controlValue = action.cycle.states[0].controlValue;
+        break;
+      default:
+        if (cycleTimeElapsed < states[0].durationInMilliseconds){
+          controlValue = states[0].controlValue;
+        } else if (cycleTimeElapsed < (states[0].durationInMilliseconds + states[1].durationInMilliseconds)){
+          controlValue = states[1].controlValue;
+        } else {
+          controlValue = states[0].controlValue;
+        }
+        break;
     }
 
     return parseInt(controlValue, 10);
