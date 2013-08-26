@@ -7,12 +7,12 @@ require([
   'angularUI',
   'angularUIBootstrap',
   'overlay',
-  '/assets/js/controllers/nav.js'
+  'controller-nav'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var devicesApp = angular.module('bpn.apps.account.devices', ['ngResource', 'ui', 'ui.bootstrap']).run(
+  var devicesApp = angular.module('bpn.apps.account.devices', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
 
     function($rootScope) {
       /**
@@ -47,7 +47,7 @@ function (angular, domReady, feBeUtils) {
       '$filter',
       'sharedDataService',
       function ($scope, $filter, sharedDataService) {
-        console.log('yay');
+        // console.log('yay');
       }
     ]
   );
