@@ -1,19 +1,19 @@
 require([
-    'angular',
-    'domReady',
-    'moment',
-    'fe-be-utils',
-    'angularUI',
-    'angularUIBootstrap',
-    'es5shim',
-    '/assets/js/services/socket.js',
-    'overlay',
-    '/assets/js/controllers/nav.js'
-    ],
+  'angular',
+  'domReady',
+  'moment',
+  'fe-be-utils',
+  'angularUI',
+  'angularUIBootstrap',
+  'es5shim',
+  'services-socket',
+  'overlay',
+  'controller-nav'
+  ],
 function (angular, domReady, moment, feBeUtils) {
   'use strict';
 
-  var calibrateApp = angular.module('bpn.apps.calibrate', ['ui', 'ui.bootstrap', 'bpn.services']);
+  var calibrateApp = angular.module('bpn.apps.calibrate', ['ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']);
 
 
   calibrateApp.config(

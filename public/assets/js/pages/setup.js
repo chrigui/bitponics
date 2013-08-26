@@ -4,14 +4,14 @@ require([
   'angularResource',
   'es5shim',
   'angularUI',
-  '/assets/js/services/socket.js',
-  '/assets/js/libs/angular/mask.js',
-  '/assets/js/controllers/nav.js'
+  'services-socket',
+  'angular-mask',
+  'controller-nav'
 ],
 function (angular, domReady) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup', ['ui.mask', 'ngResource', 'bpn.services']);
+  var setupApp = angular.module('bpn.apps.setup', ['ui.mask', 'ngResource', 'bpn.controllers', 'bpn.services']);
 
 
   // http://stackoverflow.com/a/15253892/117331

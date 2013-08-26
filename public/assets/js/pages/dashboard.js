@@ -9,9 +9,9 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  '/assets/js/services/socket.js',
-  '/assets/js/controllers/selection-overlay.js',
-  '/assets/js/controllers/nav.js',
+  'services-socket',
+  'selection-overlay',
+  'controller-nav',
   'overlay',
   'flexslider',
   'angular-flexslider'

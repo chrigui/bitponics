@@ -32,7 +32,11 @@ mixin requirejs(datamain)
         'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
         'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
         'overlay': '/assets/js/shared/overlay',
-        'angular-flexslider' : '/assets/js/libs/angular-flexslider'
+        'angular-flexslider' : '/assets/js/libs/angular-flexslider',
+        'services-socket' : '/assets/js/services/socket',
+        'angular-mask' : '/assets/js/libs/angular/mask',
+        'controller-nav' : '/assets/js/controllers/nav',
+        'selection-overlay' : '/assets/js/controllers/selection-overlay',
       },
       shim: { 
         angular: { 
@@ -74,12 +78,18 @@ mixin requirejs(datamain)
         },
         'scrollto' : {
           deps: ['jquery']
+        },
+        'selection-overlay' : {
+          deps: ['angular']
+        },
+        'angular-mask' : {
+          deps: ['angular']
         }
       }
     });
 
 
-//TODO: work in progress, not used yet
+//- //TODO: work in progress, not used yet
 mixin overlayTemplate(toggleVarName, itemsArray, headingText, itemText, classNames)
   div(ng-hide="!#{toggleVarName}", class="overlay #{classNames}")
     div(class="close btn", ng-click="toggleOverlay('#{toggleVarName}')")

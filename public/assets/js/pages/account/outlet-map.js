@@ -7,9 +7,9 @@ require([
   'angularUI',
   'angularUIBootstrap',
   '/assets/js/services/device.js',
-  '/assets/js/controllers/selection-overlay.js',
+  'selection-overlay',
   'overlay',
-  '/assets/js/controllers/nav.js'
+  'controller-nav'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';

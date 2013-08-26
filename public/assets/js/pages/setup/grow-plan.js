@@ -8,9 +8,9 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  '/assets/js/controllers/selection-overlay.js',
+  'selection-overlay',
   'overlay',
-  '/assets/js/controllers/nav.js'
+  'controller-nav'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';

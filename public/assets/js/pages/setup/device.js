@@ -7,12 +7,12 @@ require([
   'angularUI',
   'angularUIBootstrap',
   'overlay',
-  '/assets/js/controllers/nav.js'
+  'controller-nav'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ui', 'ui.bootstrap']).run(
+  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
 
     function($rootScope) {
       /**
