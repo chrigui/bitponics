@@ -390,7 +390,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     // Set overallDuration
     action.isDailyControlCycle = false;
-    action.cycle.states.forEach(function(state){
+    action.cycle.states && action.cycle.states.forEach(function(state){
       state.durationInMilliseconds = moment.duration(state.duration || 0, state.durationType || '').asMilliseconds();
       overallDuration += state.durationInMilliseconds;
     });
@@ -424,7 +424,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     
     // If no control, then this is just a repeating notification.
     // Get the message from the state that has a message
-    if (!action.control && action.cycle && action.cycle.states.length){
+    if (!action.control && action.cycle && action.cycle.states && action.cycle.states.length){
       for (var stateIndex = 0, statesLength = action.cycle.states.length; stateIndex < statesLength; stateIndex++){
         if (action.cycle.states[stateIndex].message){
           action.message = action.cycle.states[stateIndex].message;

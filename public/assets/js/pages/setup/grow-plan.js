@@ -402,18 +402,21 @@ require([
 
           $scope.addAction = function (phase) {
             var newAction = {
-                _id:phase.actions.length.toString() + '-' + (Date.now().toString()) // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
+                _id:phase.actions.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
+                cycle: { offset: { duration: 0, durationType: null } }
               };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
+            phase.actionsViewModel.unshift(viewModels.initActionViewModel(newAction));
           };
 
           $scope.removeIdealRange = function (phaseIndex, idealRangeIndex) {
-            $scope.sharedDataService.selectedGrowPlan.phases[phaseIndex].idealRanges.splice(idealRangeIndex, 1);
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges.splice(idealRangeIndex, 1);
           };
 
           $scope.removeAction = function (phaseIndex, actionIndex) {
-            $scope.sharedDataService.selectedGrowPlan.phases[phaseIndex].actions.splice(actionIndex, 1);
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actions.splice(actionIndex, 1);
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel.splice(actionIndex, 1)
           };
 
     			$scope.init();
