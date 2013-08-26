@@ -5,7 +5,10 @@ Models = require('../../models'),
 Device = require('../../models/device'),
 DeviceModel = Device.model,
 ModelUtils = Models.utils,
-should = require('should');
+should = require('should'),
+timezone = require('../../lib/timezone-wrapper'),
+requirejs = require('../../lib/requirejs-wrapper'),
+feBeUtils = requirejs('fe-be-utils');
 
 
 /*
@@ -52,6 +55,337 @@ should = require('should');
       
     });
 
+
+    describe("#getStatusResponse", function(){
+      /*
+        {
+          "__v" : 1,
+          "_id" : "0006667211cf",
+          "activeGrowPlanInstance" : ObjectId("514fe0c0658ae4f3f325e5b8"),
+          "createdAt" : ISODate("2013-08-24T19:07:47.230Z"),
+          "deviceType" : ObjectId("506de2fe8eebf7524342cb37"),
+          "name" : "Bitponics Device 1",
+          "outputMap" : [
+            {
+              "control" : ObjectId("506de2fd8eebf7524342cb32"),
+              "outputId" : "1"
+            },
+            {
+              "control" : ObjectId("506de2fc8eebf7524342cb2d"),
+              "outputId" : "2"
+            }
+          ],
+          "owner" : ObjectId("506de30a8eebf7524342cb6c"),
+          "sensorMap" : [ ],
+          "serial" : "AA-301-AAAA",
+          "status" : {
+            "actions" : [
+              ObjectId("506de2f18eebf7524342cb27")
+            ],
+            "activeActions" : [
+              ObjectId("506de2f18eebf7524342cb27")
+            ],
+            "expires" : ISODate("2013-09-03T19:07:47.550Z"),
+            "immediateActions" : [ ]
+          },
+          "updatedAt" : ISODate("2013-08-24T19:07:48.113Z"),
+          "userAssignmentLogs" : [ ],
+          "users" : [
+            ObjectId("506de3098eebf7524342cb66"),
+            ObjectId("506de3098eebf7524342cb67"),
+            ObjectId("506de30a8eebf7524342cb6c"),
+            ObjectId("506de3098eebf7524342cb68"),
+            ObjectId("506de30a8eebf7524342cb69"),
+            ObjectId("506de30a8eebf7524342cb6a"),
+            ObjectId("506de30a8eebf7524342cb6b")
+          ]
+        }
+
+        {
+          _id : '506de2f18eebf7524342cb27',
+          description: "Light cycle, with lights on between 6am and 10pm.",
+          control: "506de2fd8eebf7524342cb32",
+          cycle: {
+            states: [
+              {
+                controlValue: '1',
+                durationType: 'hours',
+                duration: 16
+              },
+              // finish off the 24 hour day with off
+              {
+                controlValue: '0',
+                durationType: 'hours',
+                duration: 8
+              }
+            ],
+            // start the day with 6 hours off
+            offset : {
+              durationType: 'hours',
+              duration: 6
+            },
+            repeat: true
+          }
+        },
+       */
+       it('returns ON state when light should be on', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 7am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.states["1"].should.equal(1);
+              //statusResponse.should.equal("STATES=1,1;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+      it('returns OFF state when light should be off', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 5am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.states["1"].should.equal(0);
+              //statusResponse.should.equal("STATES=1,0;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+
+      it('returns response in specified mime type (V1), ON state', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 7am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am,
+              contentType : feBeUtils.MIME_TYPES.BITPONICS.V1.DEVICE_TEXT
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.should.equal("STATES=1,1;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+
+      it('returns response in specified mime type (V2), ON state', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 7am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am,
+              contentType : feBeUtils.MIME_TYPES.BITPONICS.V2.DEVICE_TEXT
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.should.equal("STATES=1,1;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+
+      it('returns response in specified mime type (JSON), ON state', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 7am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am,
+              contentType : feBeUtils.MIME_TYPES.JSON
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.should.equal('{"states":{"1":1,"2":0}}');
+              return done();
+            }
+          );
+        });
+      });
+
+
+      it('returns response in specified mime type (V1), OFF state', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 5am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am,
+              contentType : feBeUtils.MIME_TYPES.BITPONICS.V1.DEVICE_TEXT
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.should.equal("STATES=1,0;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+
+      it('returns response in specified mime type (V2), OFF state', function(done){
+        var now = new Date(),
+            nowMonth = (now.getMonth() + 1).toString();
+
+        if (nowMonth.length === 1){
+          nowMonth = "0" + nowMonth;
+        }
+        
+        // garden is started at the time of database init
+        // generate the next day's 5am, accounting for timezone
+        var next7am = new Date(
+          timezone(
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            "+1 day",
+            "America/New_York"
+          )
+        );
+
+        DeviceModel.findById("0006667211cf")
+        .exec(function(err, deviceResult){
+          should.not.exist(err);
+
+          deviceResult.getStatusResponse(
+            {
+              date : next7am,
+              contentType : feBeUtils.MIME_TYPES.BITPONICS.V2.DEVICE_TEXT
+            }, 
+            function(err, statusResponse){
+              should.not.exist(err);
+              statusResponse.should.equal("STATES=1,0;2,0;\n" + String.fromCharCode(7));
+              return done();
+            }
+          );
+        });
+       });
+
+    });
 
     describe('.logCalibrationStatus', function(){
       

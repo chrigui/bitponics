@@ -330,7 +330,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       device.outputMapByControlId[outputMapping.control] = {
         controlId : outputMapping.control,
         outputId : outputMapping.outputId,
-        currentState : activeActionsByControlId[outputMapping.control] ? utils.getCurrentControlStateFromAction(activeActionsByControlId[outputMapping.control], timeOfDayInMilliseconds) : 0
+        currentState : activeActionsByControlId[outputMapping.control] ? deviceStatus.outputValues[outputMapping.outputId] : 0
       };
     });
 
@@ -422,7 +422,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     action.offsetTimeOfDay = offsetDurationInMilliseconds;
     
-    // If no control, then this is just a repeating notification.
+    // If no control, then this is just a repeating reminder.
     // Get the message from the state that has a message
     if (!action.control && action.cycle && action.cycle.states && action.cycle.states.length){
       for (var stateIndex = 0, statesLength = action.cycle.states.length; stateIndex < statesLength; stateIndex++){
