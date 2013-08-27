@@ -115,13 +115,20 @@ module.exports = function(app){
 									.populate('status.activeActions')
 									.exec(function(err, deviceResult){
 										if (err) { return innerInnerCallback(err); }
-										growPlanInstanceResult.device = deviceResult.toObject();
-										return innerInnerCallback();
-									})
+										
+                    deviceResult.getStatusResponse({}, function(err, deviceStatusResponse){
+                      if (err) { return innerInnerCallback(err); }
+
+                      var device = deviceResult.toObject();
+                      device.status.outputValues = deviceStatusResponse.states;
+                      growPlanInstanceResult.device = device;
+                      return innerInnerCallback();
+                    });
+									});
 								},
 								function getGrowPlan(innerInnerCallback){
 									ModelUtils.getFullyPopulatedGrowPlan({ _id: growPlanInstanceResult.growPlan }, function(err, growPlanResult){
-										if (err) { return innerCallback(err); }
+										if (err) { return innerInnerCallback(err); }
 										
 										growPlanInstanceResult.growPlan = growPlanResult[0];
 										return innerInnerCallback();

@@ -286,11 +286,14 @@ DeviceSchema.method('refreshStatus', function(callback) {
               (activeGrowPlanPhase.expectedNumberOfDays * 24 * 60 * 60 * 1000) -
               (nowAsMilliseconds - activeGrowPlanInstancePhase.startDate)
             );
-        } else {
-          // If phase.expectedNumberOfDays is undefined, means the phase is infinite.
-          // Make the device check back in in a year anyway.
+        } 
+
+        // If phase.expectedNumberOfDays is undefined or it ran out in the past,
+        // it means we're running the phase as infinite.
+        // Make the device check back in in a year anyway.
+        if (!newDeviceStatus.expires || (newDeviceStatus.expires < nowAsMilliseconds)){
           newDeviceStatus.expires = nowAsMilliseconds + (365*24*60*60*1000);
-        }      
+        }
 
         return innerCallback();
       },

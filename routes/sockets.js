@@ -109,7 +109,6 @@ module.exports = function(app){
       });
 
       socket.on('ready', function (data) {
-        console.log("ready");
         var serial = data.serial,
             started = Date.now();
 
@@ -222,6 +221,7 @@ module.exports = function(app){
                       //"status.expires" : { $gte : lastChecked }
                     })
                     .select('status')
+                    .populate('status.actions')
                     .populate('status.activeActions')
                     .exec(function(err, deviceResult){
                       if (err) { return innerCallback(err);}
