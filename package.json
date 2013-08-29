@@ -42,7 +42,8 @@
 	  	, "express-cdn" : ">= 0.0.9"
 	  	, "semver" : ">= 1.1.1"
 	  	, "requirejs" : ">=2.1.2"
-	  	, "moment" : ">=2.0.0"
+	  	, "moment" : ">=2.1.0"
+	  	, "moment-timezone" : "=0.0.2"
 	  	, "braintree": "*"
 	}
 	, "devDependencies": {

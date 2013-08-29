@@ -2,7 +2,9 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
 	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
   Notification = require('../../models/notification'),
-  should = require('should');
+  Device = require('../../models/device'),
+  should = require('should'),
+  async = require('async');
 
 
 /*
@@ -317,6 +319,113 @@ describe('Notification', function(){
         should.exist(err);
         return done();
       });
+  });
+
+  
+  describe("#getDisplay", function(){
+    beforeEach(function(done){
+      var self = this;
+      
+      async.parallel([
+        function prepareNotification(innerCallback){
+          Notification.model.create({
+            "_id" : ObjectID("521edeb06179930400000015"), 
+            "gpi" : ObjectID("51caf958f613580200000270"), 
+            "trigger" : "device-missing", 
+            "triggerDetails" : { 
+              "deviceId" : "000666809f76"
+            }, 
+            "tts" : null, 
+            "type" : "actionNeeded", 
+            "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+          }, function(err, notification){
+            self.notification = notification;
+            return innerCallback();   
+          });
+        },
+        function prepareDevice(innerCallback){
+          Device.model.update(
+            { _id : "000666809f76" },
+            { lastConnectionAt: new Date("Thu Aug 29 2013 12:00:00 GMT-0000")
+          }, function(err, device){
+            self.device = device;
+            return innerCallback();
+          });
+        }
+      ],
+      function(err){
+        return done();
+      });
+    });
+
+
+    afterEach(function(done){
+      var self = this;
+      Notification.model.remove({_id : self.notification._id}, done);
+    });
+
+
+    describe("NOTIFICATION_TRIGGERS.DEVICE_MISSING", function(){
+      it("handles email display", function(done){
+        var self = this;
+        should.exist(self.notification);
+        should.exist(self.device);
+
+        self.notification.getDisplay({
+          secureAppUrl : "http://test.com",
+          displayType : 'email'
+        }, function(err, display){
+          should.not.exist(err);
+          
+          display.should.include({ 
+            subject: 'Bitponics Alert | Development Device 2013-06-13 Connection Dropped',
+            bodyHtml: '<h1>Development Device 2013-06-13 seems to have dropped its connection.</h1>\n\n<p>We haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.</p>\n\n\n<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>\n\n\n<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know our <a href="http://test.com/help">help page</a>. We\'ll help you resolve any issues ASAP.</p>\n\n<a class="btn" href="http://test.com/account/devices/000666809f76">Manage your devices</a>',
+            bodyText: 'Development Device 2013-06-13 seems to have dropped its connection.\n\nWe haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.\n\nIt probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.\n\nTo see device details, click the link below:\nhttp://test.com/account/devices/000666809f76\n\nIf you continue to have device connectivity issues, please let us know through our help page: http://test.com/help">. We\'ll help you resolve any issues ASAP.\n\n' 
+          });
+
+          return done();
+        });
+      });
+
+
+      it("handles summary display", function(done){
+        var self = this;
+        should.exist(self.notification);
+        should.exist(self.device);
+
+        self.notification.getDisplay({
+          secureAppUrl : "http://test.com",
+          displayType : 'summary'
+        }, function(err, display){
+          should.not.exist(err);
+          
+          display.should.equal("Development Device 2013-06-13 seems to have dropped its connection.");
+
+          return done();
+        });
+      });
+
+
+      it("handles detail display", function(done){
+        var self = this;
+        should.exist(self.notification);
+        should.exist(self.device);
+
+        self.notification.getDisplay({
+          secureAppUrl : "http://test.com",
+          displayType : 'detail'
+        }, function(err, display){
+          should.not.exist(err);
+          
+          display.should.equal('<h1>Development Device 2013-06-13 seems to have dropped its connection.</h1>\n\n<p>We haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.</p>\n\n\n<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>\n\n\n<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know our <a href="http://test.com/help">help page</a>. We\'ll help you resolve any issues ASAP.</p>\n\n<a class="btn" href="http://test.com/account/devices/000666809f76">Manage your devices</a>');
+
+          return done();
+        });
+      });      
+
+    });
+    
+
   });
 
   // TODO: need to figure out error for below test:

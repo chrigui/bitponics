@@ -76,7 +76,8 @@ var GrowPlanInstanceSchema = new Schema({
 
   active: { type: Boolean },
 
-  
+  tz: { type : String, default : 'America/New_York' },
+
   // TODO
   //servicePlan : { type : ObjectIdSchema, ref : 'ServicePlan' },
 
@@ -189,6 +190,14 @@ var GrowPlanInstanceSchema = new Schema({
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
 
+
+GrowPlanInstanceSchema.virtual('timezone')
+  .get(function(){
+    return this.tz;
+  })
+  .set(function(timezone){
+    this.tz = timezone;
+  });
 
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
 GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });

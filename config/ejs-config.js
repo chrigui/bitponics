@@ -1,5 +1,5 @@
 var ejs = require('ejs'),
-		moment = require('moment'),
+		moment = require('moment-timezone'),
 		timezone = require('../lib/timezone-wrapper');
 
 ejs.filters.fromNow = function(date, timezone) {
@@ -7,8 +7,7 @@ ejs.filters.fromNow = function(date, timezone) {
 };
 
 ejs.filters.friendlyDate = function(date, timezone) {
-	return moment(date).format("dddd, MMMM Do YYYY, h:mm a"); ;
-	//return timezone(date, timezone, '%A, %B %-d, %Y %-I:%M:%S %p');
+	return moment(date).tz(timezone || "America/New_York").format("dddd, MMMM Do YYYY, h:mm a");
 };
 
 module.exports = ejs;

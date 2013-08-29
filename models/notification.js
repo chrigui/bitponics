@@ -337,11 +337,6 @@ NotificationSchema.virtual('hash')
     this.h = hash;
   });
 
-NotificationSchema.virtual('gardenDashboardUrl')
-  .get(function(){
-    return "/gardens/" + getObjectId(this.gpi).toString() + "/?notification=" + this._id.toString();
-  });
-
 
 /*************** SERIALIZATION *************************/
 

@@ -99,6 +99,13 @@ var DeviceSchema = new Schema({
   
     activeGrowPlanInstance : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
+
+    /** 
+     * timezone. 
+     */
+    tz: { type : String, default : 'America/New_York' },
+
+
     /**
      * Current device status. Actions and ImmediateActions are just a denormalized 
      * view into GPI Actions and ImmediateActions.
@@ -150,6 +157,17 @@ var DeviceSchema = new Schema({
   { id : false });
 
 DeviceSchema.plugin(useTimestamps);
+
+
+DeviceSchema.virtual('timezone')
+  .get(function(){
+    return this.tz;
+  })
+  .set(function(timezone){
+    this.tz = timezone;
+  });
+
+
 DeviceSchema.index({ 'activeGrowPlanInstance lastConnectionAt': -1 }, { sparse: true });
 /***************** END SCHEMA PROPERTIES **********************/
 
@@ -171,6 +189,7 @@ DeviceSchema.set('toObject', {
       //return SensorLogSchema.options.toObject.transform(doc, ret, options);
     //} else {
       // else we're operating on the parent doc (the Device doc)
+      delete doc.tz;
     //}
   }
 });
@@ -483,6 +502,7 @@ DeviceSchema.method('getStatusResponse', function(options, callback) {
               // if no action, just 0 everything out
               statusResponseJson.states[controlOutputPair.outputId] = 0;
             } else {
+              // TODO : timezone passed should come from garden
               statusResponseJson.states[controlOutputPair.outputId] = ActionModel.getCurrentControlValue(date, activeGrowPlanInstancePhase, controlAction, deviceOwner ? deviceOwner.timezone : '');
             }
 

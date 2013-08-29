@@ -1,11 +1,11 @@
 <h1><%= notificationDetails.device.name %> seems to have dropped its connection.</h1>
 
-<p>We haven't heard from your device with the id <%= notificationDetails.device._id.toString() %>
-<% if (notificationDetails.device.lastConnectionAt){ %>
- since 
-<%=: notificationDetails.device.lastConnectionAt | fromNow %>
-<% } %>.</p>
+<p>We haven't heard from your device with the id <%= notificationDetails.device._id.toString() %><% if (notificationDetails.device.lastConnectionAt){ %> since <%=: notificationDetails.device.lastConnectionAt | friendlyDate:notificationDetails.device.timezone %><% } %>.</p>
 
-<p>Click the link below to visit your device page and diagnose what's going on. And if you're still having issues, you can always reach us at our <a href="<%= secureAppUrl + '/help' %>">help page</a>.</p>
+<% if (notificationDetails.device.lastConnectionAt){ %>
+<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>
+<% } %>
+
+<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know our <a href="<%= secureAppUrl + '/help' %>">help page</a>. We'll help you resolve any issues ASAP.</p>
 
 <a class="btn" href="<%= secureAppUrl + '/account/devices/' + notificationDetails.device._id.toString() %>">Manage your devices</a>
