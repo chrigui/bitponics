@@ -580,7 +580,7 @@ module.exports.checkDeviceConnections = function(callback){
       }
     ]
   })
-  .select('name owner users activeGrowPlanInstance')
+  .select('name owner users activeGrowPlanInstance lastConnectionAt')
   .populate('activeGrowPlanInstance', 'name owner users active')
   .exec(function(err, deviceResults){
     if (err) { return callback(err); }
@@ -588,11 +588,6 @@ module.exports.checkDeviceConnections = function(callback){
     async.each(deviceResults,
       function iterator(device, iteratorCallback){
         if (!device.activeGrowPlanInstance.active) { return iteratorCallback(); }
-
-        var lastConnectionAt = '';
-        if (device.lastConnectionAt){
-          lastConnectionAt = moment(device.lastConnectionAt).format("dddd, MMMM Do YYYY, h:mm:ss a");
-        }
 
         NotificationModel.create({
           users : device.activeGrowPlanInstance.users,
@@ -602,7 +597,7 @@ module.exports.checkDeviceConnections = function(callback){
           trigger : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING,
           triggerDetails : {
             deviceId : device._id,
-            lastConnectionAt : lastConnectionAt
+            lastConnectionAt : device.lastConnectionAt
           }
         }, iteratorCallback)
       },

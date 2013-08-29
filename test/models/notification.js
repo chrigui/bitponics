@@ -346,11 +346,12 @@ describe('Notification', function(){
         function prepareDevice(innerCallback){
           Device.model.update(
             { _id : "000666809f76" },
-            { lastConnectionAt: new Date("Thu Aug 29 2013 12:00:00 GMT-0000")
-          }, function(err, device){
-            self.device = device;
-            return innerCallback();
-          });
+            { lastConnectionAt: new Date("2013-08-29T12:00:00.000Z") }, 
+            function(err, device){
+              self.device = device;
+              return innerCallback();
+            }
+          );
         }
       ],
       function(err){
