@@ -4,7 +4,9 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
   Notification = require('../../models/notification'),
   Device = require('../../models/device'),
   should = require('should'),
-  async = require('async');
+  async = require('async'),
+  requirejs = require('../../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
 
 /*
@@ -32,7 +34,7 @@ describe('Notification', function(){
           timezone : 'America/New_York'
         },
         sentLogs : [],
-        type : 'actionNeeded'
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
       });
 
     var result = log.toObject();
@@ -74,7 +76,7 @@ describe('Notification', function(){
           timezone : 'America/New_York'
         },
         sentLogs : [],
-        type : 'actionNeeded'
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
       });
 
     var result = log.toJSON();
@@ -104,18 +106,22 @@ describe('Notification', function(){
     result.should.have.property('type');
   });
 
-  it('Create new notification', function(done){
-    var now = new Date(),
-      log = new Notification.model.create({
+
+
+  describe(".create", function(){
+
+    it('Creates new notification', function(done){
+      var now = new Date();
+      Notification.model.create({
         gpi : ObjectID("51a7b69ca3b04db08057e047"),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : ObjectID("5203aba6cddbb70000000014"),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -132,37 +138,38 @@ describe('Notification', function(){
         n.should.have.property('_id');
         return done();
       });
-  });
+    });
 
-  it('Should not create a new notification when it already exists', function(done){
-    var now = new Date(),
-      options = {
-        gpi : ObjectID("51a7b69ca3b04db08057e047"),
-        trigger : "phase-action",
-        triggerDetails : {
-          gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
-          actionId : ObjectID("506de2f18eebf7524342cb27"),
-          phaseName : "Seedling"
-        },
-        _id : ObjectID("5203aba6cddbb70000000014"),
-        type : "actionNeeded",
-        sl : [ ],
-        r : {
-          durationType : "days",
-          duration : 1,
-          timezone : "America/New_York"
-        },
-        tts : now,
-        u : [
-          ObjectID("506de30a8eebf7524342cb6c")
-        ]
-      },
-      log2 = {},
-      log1 = new Notification.model.create(options, function (err, n) {
+    it('Should not create a new notification when it already exists', function(done){
+      var now = new Date(),
+        options = {
+          gpi : ObjectID("51a7b69ca3b04db08057e047"),
+          trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
+          triggerDetails : {
+            gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
+            actionId : ObjectID("506de2f18eebf7524342cb27"),
+            phaseName : "Seedling"
+          },
+          _id : ObjectID("5203aba6cddbb70000000014"),
+          type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+          sl : [ ],
+          r : {
+            durationType : "days",
+            duration : 1,
+            timezone : "America/New_York"
+          },
+          tts : now,
+          u : [
+            ObjectID("506de30a8eebf7524342cb6c")
+          ]
+        };
+
+      Notification.model.create(options, function (err, n) {
         should.not.exist(err);
         should.exist(n);
         n.should.have.property('_id');
-        log2 = new Notification.model.create(options, function (err, n2) {
+
+        Notification.model.create(options, function (err, n2) {
           should.not.exist(err);
           should.exist(n2);
           n2.should.have.property('_id');
@@ -176,20 +183,20 @@ describe('Notification', function(){
           
         });
       });
-  });
+    });
 
-  it('Should not create a new notification with tts in the past', function(done){
-    var now = new Date(),
-      log = new Notification.model.create({
+    it('Should not create a new notification with tts in the past', function(done){
+      var now = new Date();
+      Notification.model.create({
         gpi : new ObjectID(),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : new ObjectID(),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -204,20 +211,20 @@ describe('Notification', function(){
         should.exist(err);
         return done();
       });
-  });
+    });
 
-  it('Should create a new notification with tts in the future', function(done){
-    var now = Date.now(),
-      log = new Notification.model.create({
+    it('Should create a new notification with tts in the future', function(done){
+      var now = Date.now();
+      Notification.model.create({
         gpi : new ObjectID(),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : new ObjectID(),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -233,20 +240,20 @@ describe('Notification', function(){
         should.exist(n);
         return done();
       });
-  });
+    });
 
-  it('Can create a new notification without tts date', function(done){
-    var now = new Date(),
-      log = new Notification.model.create({
+    it('Can create a new notification without tts date', function(done){
+      var now = new Date();
+      Notification.model.create({
         gpi : new ObjectID(),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : new ObjectID(),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -262,20 +269,20 @@ describe('Notification', function(){
         should.exist(n);
         return done();
       });
-  });
+    });
 
-  it('Can create a new notification with tts date of now', function(done){
-    var now = new Date(),
-      log = new Notification.model.create({
+    it('Can create a new notification with tts date of now', function(done){
+      var now = new Date();
+      Notification.model.create({
         gpi : new ObjectID(),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : new ObjectID(),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -291,20 +298,21 @@ describe('Notification', function(){
         should.exist(n);
         return done();
       });
-  });
+    });
 
-  it('Cannot create a new notification with tts date of 30s ago', function(done){
-    var now = new Date(),
-      log = new Notification.model.create({
+    it('Cannot create a new notification with tts date of 30s ago', function(done){
+      var now = new Date();
+      
+      Notification.model.create({
         gpi : new ObjectID(),
-        trigger : "phase-action",
+        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
         triggerDetails : {
           gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
           actionId : ObjectID("506de2f18eebf7524342cb27"),
           phaseName : "Seedling"
         },
         _id : new ObjectID(),
-        type : "actionNeeded",
+        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
         sl : [ ],
         r : {
           durationType : "days",
@@ -319,6 +327,91 @@ describe('Notification', function(){
         should.exist(err);
         return done();
       });
+    });
+
+  });
+  
+
+  describe("#ensureHash", function(){
+    
+    it('returns an identical hash for Notifications with identical details that were created at different times', function(done){
+      var now = new Date(),
+          options1 = {
+            createdAt : now,
+            gpi : ObjectID("51a7b69ca3b04db08057e047"),
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
+            triggerDetails : {
+              gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
+              actionId : ObjectID("506de2f18eebf7524342cb27"),
+              phaseName : "Seedling"
+            },
+            type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+            sl : [ ],
+            r : {
+              durationType : "days",
+              duration : 1,
+              timezone : "America/New_York"
+            },
+            tts : now,
+            u : [
+              ObjectID("506de30a8eebf7524342cb6c")
+            ]
+          },
+          options2 = JSON.parse(JSON.stringify(options1)),
+          notification1,
+          notification2;
+      
+
+      notification1 = new Notification.model(options1);
+      options2.createdAt = new Date(now.valueOf() + 2000);
+      notification2 = new Notification.model(options2);
+      notification1.ensureHash();
+      notification2.ensureHash();
+
+      notification1.hash.should.equal(notification2.hash);
+      done();
+    });
+
+    
+    it('returns a different hash for Notifications with different trigger details', function(done){
+      var now = new Date(),
+          options1 = {
+            createdAt : now,
+            gpi : ObjectID("51a7b69ca3b04db08057e047"),
+            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
+            triggerDetails : {
+              gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
+              actionId : ObjectID("506de2f18eebf7524342cb27"),
+              phaseName : "Seedling"
+            },
+            type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+            sl : [ ],
+            r : {
+              durationType : "days",
+              duration : 1,
+              timezone : "America/New_York"
+            },
+            tts : now,
+            u : [
+              ObjectID("506de30a8eebf7524342cb6c")
+            ]
+          },
+          options2 = JSON.parse(JSON.stringify(options1)),
+          notification1,
+          notification2;
+      
+
+      notification1 = new Notification.model(options1);
+      options2.triggerDetails.actionId = new ObjectID("506de2f18eeb000000000000");
+      notification2 = new Notification.model(options2);
+      notification1.ensureHash();
+      notification2.ensureHash();
+
+      notification1.hash.should.not.equal(notification2.hash);
+      done();
+    });    
+
+
   });
 
   
@@ -331,12 +424,13 @@ describe('Notification', function(){
           Notification.model.create({
             "_id" : ObjectID("521edeb06179930400000015"), 
             "gpi" : ObjectID("51caf958f613580200000270"), 
-            "trigger" : "device-missing", 
+            "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
             "triggerDetails" : { 
-              "deviceId" : "000666809f76"
+              "deviceId" : "000666809f76",
+              "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
             }, 
             "tts" : null, 
-            "type" : "actionNeeded", 
+            "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
             "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
           }, function(err, notification){
             self.notification = notification;

@@ -376,7 +376,9 @@ NotificationSchema.set('toJSON', {
 /*************** INSTANCE METHODS *************************/
 
 /**
- * Creates a hash of the pertinent Notification details
+ * Creates a hash of the pertinent Notification details:
+ * gpi, repeat, type, trigger, triggerDetails
+ * 
  * Used to prevent insertion of duplicate Notifications 
  * by checking whether a pending Notification matches an existing one.
  *
@@ -385,11 +387,13 @@ NotificationSchema.set('toJSON', {
  * since sensor values can change rapidly but we don't want to swamp a user with 
  * a bunch of Notifications on the same sensor
  * 
+ * @return {string} hash of the Notification
  */
-NotificationSchema.method('ensureHash', function(callback){
+NotificationSchema.method('ensureHash', function(){
   if (!this.hash) { 
     var crypto = require('crypto'),
         stringToHash,
+        // clone the triggerDetails so we can operate on the clone without affecting the original
         triggerDetailsToHash = JSON.parse(JSON.stringify(this.triggerDetails || {}));
 
     delete triggerDetailsToHash.sensorValue;
@@ -482,17 +486,6 @@ NotificationSchema.method('getDisplay', function(options, callback){
               .exec(function(err, immediateActionResult){
                 notificationTemplateLocals.notificationDetails.immediateAction = immediateActionResult;
                 return innerCallback(err);
-              });
-            },
-            function populateIdealRangeSensor(innerCallback){
-              if (!notification.triggerDetails.idealRange){ return innerCallback(); }
-
-              SensorModel.findOne({ code : notification.triggerDetails.idealRange.sCode })
-              .select('name')
-              .exec(function(err, sensorResult){
-                if (err) { return innerCallback(err); }
-                notificationTemplateLocals.notificationDetails.idealRange.sensorName = sensorResult.name;
-                return innerCallback();
               });
             },
             function populateGrowPlan(innerCallback){
@@ -605,8 +598,19 @@ NotificationSchema.static('create', function(options, callback){
   // should greatly lessen the load
   
   var newNotification = new NotificationModel(options),
-      // 8 hour sent cutoff for dupes
+      sentCutoff;
+
+  switch(options.trigger){
+    case feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING:
+      // for device missing, the hash takes into account the "lastConnectionAt" property
+      // We don't want to bombard the user with multiple emails per connection outage...
+      // cap it at 1 per day for a given continuous outage
+      sentCutoff = new Date((new Date()).valueOf() - 24 * 60 * 60 * 1000);
+      break;
+    default:
+      // default is 8 hour sent cutoff for dupes
       sentCutoff = new Date((new Date()).valueOf() - 8 * 60 * 60 * 1000);
+  } 
   
   newNotification.ensureHash();
 
