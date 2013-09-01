@@ -25,13 +25,15 @@ module.exports = function(app){
       async.parallel(
         [
           function(innerCallback){
-            DeviceModel.find({ owner : req.user._id })
+            DeviceModel
+            .find({ 'users' : req.user._id })
             .populate('activeGrowPlanInstance')
             .populate('outputMap.control')
             .exec(function(err, deviceResults){
               if (err) { return innerCallback(err); }
               
               // TODO : send the user's device keys to the page too, so that the user can see them.
+              
               locals.userOwnedDevices = deviceResults.map(function(device) { return device.toObject(); });
 
               req.user.deviceKeys.forEach(function(deviceKey){

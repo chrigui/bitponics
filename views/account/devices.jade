@@ -38,6 +38,11 @@ block content
                   span.label Device Key: 
                   span.value.device-mac-address #{device.combinedKey}
 
+                - if (device.activeGrowPlanInstance)
+                  div 
+                    span.label Garden:
+                    span.value 
+                      a(href="/gardens/#{device.activeGrowPlanInstance._id}") #{device.activeGrowPlanInstance.name}
                 //-div
                   span.label Last log: 
                   span.value #{device.recentSensorLogs[0]}

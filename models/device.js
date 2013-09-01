@@ -168,6 +168,7 @@ DeviceSchema.virtual('timezone')
   });
 
 
+DeviceSchema.index({ users: 1 });
 DeviceSchema.index({ 'activeGrowPlanInstance lastConnectionAt': -1 }, { sparse: true });
 /***************** END SCHEMA PROPERTIES **********************/
 
