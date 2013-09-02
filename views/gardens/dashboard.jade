@@ -100,12 +100,22 @@ block content
                     | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
                   h3(class="page-heading page-heading-small") {{controlAction.control.name}}
                   div(class="overlay-data", ng-show="controlAction.baseCycle.states.length > 1")
-                    div.left
-                      h4 {{controlAction.baseCycle.states[0].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[0].durationType}})
-                      div.separator-top {{controlAction.baseCycle.states[0].duration}}
-                    div.right
-                      h4 {{controlAction.baseCycle.states[1].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[1].durationType}})
-                      div.separator-top {{controlAction.baseCycle.states[1].duration}}
+                    div(ng-show="controlAction.isDailyControlCycle")
+
+                      div.left
+                        h4 Turns on at
+                        div.separator-top {{controlAction.dailyOnTime | timeOfDayFromMilliseconds}}
+                      div.right
+                        h4 Turns off at
+                        div.separator-top {{controlAction.dailyOffTime | timeOfDayFromMilliseconds}}
+                    
+                    div(ng-hide="controlAction.isDailyControlCycle")
+                      div.left
+                        h4 {{controlAction.baseCycle.states[0].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[0].durationType}})
+                        div.separator-top {{controlAction.baseCycle.states[0].duration}}
+                      div.right
+                        h4 {{controlAction.baseCycle.states[1].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[1].durationType}})
+                        div.separator-top {{controlAction.baseCycle.states[1].duration}}
                   div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length <= 1")
                     h4 This control does not cycle.
                   div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")

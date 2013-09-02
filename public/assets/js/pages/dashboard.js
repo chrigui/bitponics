@@ -983,7 +983,13 @@ require([
         var val = moment(input).format("MMMM Do YYYY, h:mm a");
         return val;
       }
-    });    
+    });
+
+    dashboardApp.filter('timeOfDayFromMilliseconds', function() {
+      return function(input) {
+        return feBeUtils.getTimeOfDayFromMilliseconds(input);
+      };
+    });
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);

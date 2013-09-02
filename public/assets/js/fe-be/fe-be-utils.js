@@ -186,6 +186,20 @@ define(['moment'], function(moment){
     );
   };
 
+
+  /**
+   * Get the time of day from milliseconds since 00:00:00
+   * 
+   * Relies on browser behavior of giving localized values for date methods
+   * 
+   * @param {Number} milliseconds
+   * @return {z`} milliseconds since localized 00:00:00 of the day
+   */
+  utils.getTimeOfDayFromMilliseconds = function(milliseconds){
+    var duration = moment.duration(milliseconds);
+    return moment().hour(duration.hours()).minute(duration.minutes()).format("h:mma");
+  };  
+
   /**
    * Generate an array with the times of day in :30 minute increments, along with milliseconds since start of day (00:00)
    */
