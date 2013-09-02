@@ -5,6 +5,7 @@ require([
   'fe-be-utils',
   'view-models',
   'angularResource',
+  'angularRoute',
   'd3',
   'es5shim',
   'angularUI',
@@ -21,7 +22,7 @@ require([
 
 
     // var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider', 'ngRoute']);
 
     dashboardApp.factory('sharedDataService', 
       [
@@ -994,10 +995,6 @@ require([
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
     });
-
-
-
-
   });
 
 

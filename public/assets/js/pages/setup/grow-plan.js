@@ -6,6 +6,7 @@ require([
   'fe-be-utils',
   '/assets/js/services/grow-plan.js',
   'es5shim',
+  'angularRoute',
   'angularUI',
   'angularUIBootstrap',
   'selection-overlay',
@@ -15,7 +16,7 @@ require([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
 
       function($rootScope) {
         /**

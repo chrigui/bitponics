@@ -4,6 +4,7 @@ require([
   'fe-be-utils',
   'angularResource',
   'es5shim',
+  'angularRoute',
   'angularUI',
   'angularUIBootstrap',
   'overlay',
@@ -12,7 +13,7 @@ require([
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
+  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
 
     function($rootScope) {
       /**

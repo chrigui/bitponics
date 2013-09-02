@@ -3,6 +3,7 @@ require([
   'domReady',
   'moment',
   'fe-be-utils',
+  'angularRoute',
   'angularUI',
   'angularUIBootstrap',
   'es5shim',
@@ -13,7 +14,7 @@ require([
 function (angular, domReady, moment, feBeUtils) {
   'use strict';
 
-  var calibrateApp = angular.module('bpn.apps.calibrate', ['ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']);
+  var calibrateApp = angular.module('bpn.apps.calibrate', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']);
 
 
   calibrateApp.config(
