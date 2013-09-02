@@ -23,7 +23,7 @@ module.exports = function(app) {
    * 
    * @param {ObjectId} req.query.owner
    */
-  app.get('/api/grow-plan-instances', 
+  app.get('/api/gardens', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    var query = GrowPlanInstanceModel.find();
@@ -46,7 +46,7 @@ module.exports = function(app) {
    * Create single growPlanInstance
    *
    *  Test with:
-   *  jQuery.post("/api/grow-plan-instances", {
+   *  jQuery.post("/api/gardens", {
    *    users : [{ type: ObjectId, ref: 'User'}],
    *    growPlan : { type : ObjectId, ref : 'GrowPlan', required: true},
    *    device : { type : String , ref : 'Device', required: false },
@@ -61,7 +61,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow-plan-instances', 
+  app.post('/api/gardens', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    var growPlanInstance;
@@ -92,14 +92,14 @@ module.exports = function(app) {
    * Read a growPlanInstance
    *
    * To test:
-   * jQuery.get("/api/grow-plan-instances/${id}", function(data, textStatus, jqXHR) {
+   * jQuery.get("/api/gardens/${id}", function(data, textStatus, jqXHR) {
    *     console.log("Get response:");
    *     console.dir(data);
    *     console.log(textStatus);
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow-plan-instances/:id', 
+  app.get('/api/gardens/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
@@ -118,7 +118,7 @@ module.exports = function(app) {
    * Update a growPlanInstance
    *
    * jQuery.ajax({
-   *     url: "/api/grow-plan-instances/503a86812e57c70000000001",
+   *     url: "/api/gardens/503a86812e57c70000000001",
    *     type: "PUT",
    *     data: {
    *       "device": "503a86812e57c70000000001"
@@ -131,7 +131,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow-plan-instances/:id', function (req, res, next){
+  app.put('/api/gardens/:id', function (req, res, next){
     return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       
       if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
@@ -160,7 +160,7 @@ module.exports = function(app) {
    *
    * To test:
    * jQuery.ajax({
-   *     url: "/api/grow-plan-instances/${id}", 
+   *     url: "/api/gardens/${id}", 
    *     type: "DELETE",
    *     success: function (data, textStatus, jqXHR) { 
    *         console.log("Post resposne:"); 
@@ -170,7 +170,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow-plan-instances/:id',
+  app.delete('/api/gardens/:id',
 		routeUtils.middleware.ensureSecure, 
 		routeUtils.middleware.ensureUserIsAdmin,
 		function (req, res, next){
@@ -202,7 +202,7 @@ module.exports = function(app) {
    * @param {Array[SensorLog]} data
    * @param {Number} count
    */
-  app.get('/api/grow-plan-instances/:id/sensor-logs', function (req, res, next){
+  app.get('/api/gardens/:id/sensor-logs', function (req, res, next){
     var response = {};
 
     GrowPlanInstanceModel.findById(req.params.id)
@@ -268,7 +268,7 @@ module.exports = function(app) {
    *
    * @param {SensorLog} req.body.sensorLog
    */
-  app.post('/api/grow-plan-instances/:id/sensor-logs', function (req, res, next){
+  app.post('/api/gardens/:id/sensor-logs', function (req, res, next){
     var response = {
       status : undefined
     };
@@ -316,8 +316,8 @@ module.exports = function(app) {
    * @param {ObjectIdString} req.body.actionId
    * @param {String=} req.body.message : optional. Message to include with the immediateAction log.
    */
-  app.post('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
-    winston.info("POST /grow-plan-instances/:id/immediate-actions, gpi " + 
+  app.post('/api/gardens/:id/immediate-actions', function (req, res, next){
+    winston.info("POST /gardens/:id/immediate-actions, gpi " + 
           req.params.id + ", action " + req.body.actionId);
 
     GrowPlanInstanceModel
@@ -432,7 +432,7 @@ module.exports = function(app) {
    * Retrieve ImmediateActions that have been triggered on a GPI
    *
    */
-  app.get('/api/grow-plan-instances/:id/immediate-actions', function (req, res, next){
+  app.get('/api/gardens/:id/immediate-actions', function (req, res, next){
     GrowPlanInstanceModel
     .findById(req.params.id)
     .select('owner users visibility')
@@ -461,7 +461,7 @@ module.exports = function(app) {
    * By default, only returns active Notifications
    *
    */
-  app.get('/api/grow-plan-instances/:id/notifications', function (req, res, next){
+  app.get('/api/gardens/:id/notifications', function (req, res, next){
     GrowPlanInstanceModel
     .findById(req.params.id)
     .select('owner users visibility')

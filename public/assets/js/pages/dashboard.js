@@ -110,7 +110,7 @@ require([
                 deferred = $q.defer();
 
             $http.get(
-              '/api/grow-plan-instances/' + sharedData.growPlanInstance._id + '/sensor-logs',
+              '/api/gardens/' + sharedData.growPlanInstance._id + '/sensor-logs',
               {
                 params : {
                   "start-date" : dateMoment.startOf("day").format(),
@@ -220,7 +220,7 @@ require([
 
 
     dashboardApp.factory('sensorLogsService', function(){
-      // TODO : consolidate the get/post/caching mechanisms for /grow-plan-instances/:id/sensor-logs here
+      // TODO : consolidate the get/post/caching mechanisms for /gardens/:id/sensor-logs here
     });
 
 
@@ -244,7 +244,7 @@ require([
             currentControlAction.updateInProgress = true;
 
             $http.post(
-              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
+              '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
               {
                 actionId : actionId,
                 message : "Triggered from dashboard"
@@ -613,7 +613,7 @@ require([
             currentControlAction.updateInProgress = true;
 
             $http.post(
-              '/api/grow-plan-instances/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions?expire=true',
+              '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions?expire=true',
               {
                 actionId : currentControlAction._id,
                 message : "Triggered from dashboard"
