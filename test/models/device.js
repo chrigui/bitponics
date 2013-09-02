@@ -130,17 +130,14 @@ feBeUtils = requirejs('fe-be-utils');
        */
        it('returns ON state when light should be on', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 7am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 07:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -157,7 +154,6 @@ feBeUtils = requirejs('fe-be-utils');
             function(err, statusResponse){
               should.not.exist(err);
               statusResponse.states["1"].should.equal(1);
-              //statusResponse.should.equal("STATES=1,1;2,0;\n" + String.fromCharCode(7));
               return done();
             }
           );
@@ -166,17 +162,16 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns OFF state when light should be off', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
+            // short way to get 2-digit month & day : http://stackoverflow.com/questions/6040515/how-do-i-get-month-and-date-of-javascript-in-2-digit-format
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
 
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
         
         // garden is started at the time of database init
         // generate the next day's 5am, accounting for timezone
-        var next7am = new Date(
+        var next5am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 05:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -188,12 +183,11 @@ feBeUtils = requirejs('fe-be-utils');
 
           deviceResult.getStatusResponse(
             {
-              date : next7am
+              date : next5am
             }, 
             function(err, statusResponse){
               should.not.exist(err);
               statusResponse.states["1"].should.equal(0);
-              //statusResponse.should.equal("STATES=1,0;2,0;\n" + String.fromCharCode(7));
               return done();
             }
           );
@@ -203,17 +197,14 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns response in specified mime type (V1), ON state', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 7am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 07:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -240,17 +231,14 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns response in specified mime type (V2), ON state', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 7am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 07:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -277,17 +265,14 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns response in specified mime type (JSON), ON state', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 7am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 07:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 07:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -314,17 +299,14 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns response in specified mime type (V1), OFF state', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 5am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 05:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
@@ -351,17 +333,14 @@ feBeUtils = requirejs('fe-be-utils');
 
       it('returns response in specified mime type (V2), OFF state', function(done){
         var now = new Date(),
-            nowMonth = (now.getMonth() + 1).toString();
-
-        if (nowMonth.length === 1){
-          nowMonth = "0" + nowMonth;
-        }
+            nowMonth = ("0" + (now.getMonth() + 1)).slice(-2),
+            nowDay = ("0" + now.getDate()).slice(-2);
         
         // garden is started at the time of database init
         // generate the next day's 5am, accounting for timezone
         var next7am = new Date(
           timezone(
-            timezone(now.getFullYear() + "-" + nowMonth + "-" + now.getDate() + " 05:00", "America/New_York"),
+            timezone(now.getFullYear() + "-" + nowMonth + "-" + nowDay + " 05:00", "America/New_York"),
             "+1 day",
             "America/New_York"
           )
