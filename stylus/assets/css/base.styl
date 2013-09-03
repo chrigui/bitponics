@@ -590,12 +590,58 @@ nav
 		margin 0
 		padding .25em .5em
 		background none
-		color color-text-gray
+		// color color-text-gray
 		display none
 		&.first
 			display block
+
+		li
+			a, a:visited
+				color color-logo-green
 	&.open
-		display block
+		height 2.5em
+		z-index 5
+		position relative
+
+		& > ul
+			position fixed
+			// width 95%
+			// margin 0 2.5%
+			width 100%
+			background white
+			box-shadow 0 0 .5em .25em color-bg-gray
+
+		li
+			display block
+			background white
+
+		.toggle-menu
+			position fixed
+
+	.toggle-menu
+		position: absolute;
+		top: 0em;
+		right: 0;
+		height: 2.5em;
+		width: 3em;
+		border: none;
+		outline: none;
+		// background: green;
+		padding: 0;
+
+		span
+			display none
+
+		i
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 75%;
+			outline: none;
+	// &.open
+	// 	li
+	// 		display block
 
 .logo
 	font-size 1.45em

@@ -240,6 +240,19 @@ section.footer
 		i
 			color white
 
+	
+	.toggle-menu
+		display none
+
+	.open > ul
+			position static
+			width auto
+			background transparent
+			box-shadow none
+
+			li
+				background transparent
+
 	.nav-section
 		float left
 		margin 0 0 0 0
@@ -248,7 +261,9 @@ section.footer
 		li
 			display inline-block
 			// margin 0 1em 0 0
-
+			
+			a
+				color color-text-gray
 
 			&.active
 				float none
@@ -295,7 +310,7 @@ section.footer
 			top: -.5em;
 			left: 0;
 			font-size: 1.25em;
-			color white
+			color white!important
 			i
 				width: 1em;
 				height: 1em;

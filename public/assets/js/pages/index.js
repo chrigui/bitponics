@@ -1,14 +1,35 @@
 /* Home Page */
 
-define([
-    'scrollto',
-    'localscroll',
-    'es5shim',
-    'utils',
-    'flexslider',
-    'throttle-debounce'
-    ],
-function(){
+require([
+  'angular',
+  'domReady',
+  'scrollto',
+  'localscroll',
+  'es5shim',
+  'utils',
+  'flexslider',
+  'throttle-debounce',
+  'angular-flexslider',
+  'controller-nav'
+],
+function (angular, domReady) {
+  'use strict';
+
+  var homePageApp = angular.module('bpn.apps.homepage', ['bpn.controllers', 'angular-flexslider']);
+  homePageApp.controller('bpn.controllers.homepage.Main',
+    [
+      '$scope',
+      function ($scope) {
+        console.log('angularized home page');
+      }
+    ]
+  );
+
+  domReady(function () {
+    angular.bootstrap(document, ['bpn.apps.homepage']);
+  });
+
+  //TODO: not angularized yet
   bpn.pages.home = {
     
     MIN_SECTION_HEIGHT: 800,

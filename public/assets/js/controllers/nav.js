@@ -13,9 +13,14 @@ define(
         function ($scope, $filter, $compile) {
           // init
           $scope.settingsDisplayVisible = false;
+          $scope.navMenuDisplayVisible = false;
 
           $scope.toggleSettings = function(){
             $scope.settingsDisplayVisible = !$scope.settingsDisplayVisible;
+          }
+
+          $scope.toggleNavMenu = function(){
+            $scope.navMenuDisplayVisible = !$scope.navMenuDisplayVisible;
           }
         }
       ]

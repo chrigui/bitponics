@@ -1,4 +1,4 @@
-nav(role="nav", ng-controller="bpn.controllers.Nav")
+nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDisplayVisible}")
   ul
     li(class="nav-section first")
       h1(class="logo icon", role="banner")
@@ -9,32 +9,37 @@ nav(role="nav", ng-controller="bpn.controllers.Nav")
       - var pageType = pageType || null;
       if !!pageType && pageType == 'landing-page'  
 
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="howitworks", data-name="how-it-works")
                 a(href="/how-it-works") How It Works
 
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="pricing", data-name="pricing") 
                 a(href="/pricing") Pricing
 
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
+            ul
+              li(class="buy", data-name="buy") 
+                a(href="/buy", data-page-include="false") Buy
+
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="press", data-name="press")
                 a(href="/press") Press
           
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="installs", data-name="installs")
                 a(href="/installs") Installs
 
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="contact", data-name="contact")
                 a(href="/contact") Contact
 
-          li.nav-section
+          li.nav-section(ng-click="toggleNavMenu()")
             ul
               li(class="team", data-name="team") 
                 a(href="/team") Our Team
@@ -86,4 +91,10 @@ nav(role="nav", ng-controller="bpn.controllers.Nav")
                     a(href="/gardens") Gardens
                   li
                     a(href="/account/devices") Devices
-                  
+  
+  if !!pageType && pageType == 'landing-page'  
+    button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")
+      span Menu
+      i(class="icon-glyph-new icon-01_-", aria-hidden="true", ng-hide="navMenuDisplayVisible")
+      i(class="icon-glyph-new icon-28_x", aria-hidden="true", ng-show="navMenuDisplayVisible")
+      

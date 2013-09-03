@@ -29,7 +29,7 @@ module.exports = function(app){
 		}
 	);
 
-	app.post("/create_transaction", function (req, res) {
+	app.post("/buy/create_transaction", function (req, res) {
 		var saleRequest = {
 				amount: "1000.00",
 				creditCard: {
