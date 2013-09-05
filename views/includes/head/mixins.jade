@@ -1,7 +1,7 @@
 //mixins
 
-mixin requirejs(datamain)
-  script(src='/assets/js/libs/require.js', data-main=datamain)
+mixin requirejs(dataMain)
+  script(src='/assets/js/libs/require.js', data-main=dataMain)
   script
     require.config({
       paths: {
@@ -11,7 +11,8 @@ mixin requirejs(datamain)
         'angularResource' : '/assets/js/libs/angular/1.2.0/angular-resource.min',
         'angularRoute' : '/assets/js/libs/angular/1.2.0/angular-route.min',
         'angularUI' : '/assets/js/libs/angular/angular-ui.min',
-        'angularUIBootstrap' : '/assets/js/libs/angular/ui-bootstrap-0.2.0.min',
+        'angularUIBootstrap' : '/assets/js/libs/angular/ui-bootstrap-0.5.0.min',
+        'angularUISelect2' : '/assets/js/libs/angular/angular-ui-select2',
         'bpn.services' : '/assets/js/core/services',
         'bpnApp' : '/assets/js/core/bpn',
         'controllers' : '/assets/js/core/controllers',
@@ -27,6 +28,7 @@ mixin requirejs(datamain)
         'moment': '/assets/js/libs/moment.min',
         'overlay': '/assets/js/shared/overlay',
         'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
+        'select2' : '/assets/js/libs/jquery/select2.min',
         'selection-overlay' : '/assets/js/controllers/selection-overlay',
         'services-socket' : '/assets/js/services/socket',
         'socket.io' : '/socket.io/socket.io',
@@ -37,26 +39,29 @@ mixin requirejs(datamain)
         'view-models': '/assets/js/fe-be/view-models'
       },
       shim: { 
-        angular: { 
-          deps: [ 'jquery' ], 
+        'angular': { 
+          deps: [ ], 
           exports: 'angular' 
         }, 
-        angularResource: { 
+        'angularResource': { 
           deps: [ 'angular' ] 
         },
-        angularRoute: { 
+        'angularRoute': { 
           deps: [ 'angular' ] 
         },
-        angularUI: { 
+        'angularUISelect2': {
+          deps: [ 'angular', 'select2' ] 
+        },
+        'angularUI': { 
           deps: [ 'angular' ] 
         },
-        angularUIBootstrap: { 
+        'angularUIBootstrap': { 
           deps: [ 'angular' ] 
         },
-        d3 : {
+        'd3' : {
           exports : 'd3'
         },
-        jquery: { 
+        'jquery': { 
           exports : '$'
         },
         'socket.io': {

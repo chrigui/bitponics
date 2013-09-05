@@ -42,6 +42,7 @@ require([
             socket : socket,
             activeOverlay : undefined,
             modalOptions : {
+              backdrop: true,
               backdropFade: true,
               dialogFade: true,
               dialogClass : 'overlay'

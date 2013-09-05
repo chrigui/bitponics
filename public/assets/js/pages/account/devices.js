@@ -34,6 +34,7 @@ function (angular, domReady, feBeUtils) {
       return {
         activeOverlay : { is: undefined },
         modalOptions : {
+          backdrop: true,
           backdropFade: true,
           dialogFade: true,
           dialogClass : 'overlay auto-size'

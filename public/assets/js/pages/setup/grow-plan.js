@@ -9,6 +9,7 @@ require([
   'angularRoute',
   'angularUI',
   'angularUIBootstrap',
+  'angularUISelect2',
   'selection-overlay',
   'overlay',
   'controller-nav'
@@ -16,7 +17,7 @@ require([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers']).run(
 
       function($rootScope) {
         /**
@@ -102,6 +103,18 @@ require([
           error : false,
           success : false,
           updateInProgress : false
+        },
+        growSystemSelectOptions : {
+          width: '100%',
+          placeholder: "Select",
+
+          formatResult : function(object, container, query){
+            var growSystem = angular.element(object.element).scope().growSystem;
+            console.log(growSystem);
+
+
+            return '<div style="float:left;width:30%"><img style="width:100%" src="http://placekitten.com/200/200"/></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
+          }
         }
 			};
 		});

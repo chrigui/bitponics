@@ -18,13 +18,17 @@ block head
     .separator-top
         
       .question
-        h5.question-title What kind of hydroponic system are you using?
+        h5.question-title What kind of hydroponic system would you like to use?
         
-        .custom-dropdown-wrap
-          select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in sharedDataService.growSystems | orderBy:name")
-            option(value="") Select
-          .dblarrow
-            i
+        select(ui-select2="sharedDataService.growSystemSelectOptions", ng-model="selectedGrowSystem")
+          option(value="")
+          option(ng-repeat="growSystem in sharedDataService.growSystems", value="{{growSystem._id}}") {{growSystem.name}}
+          
+        //-.custom-dropdown-wrap
+        //-  select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in sharedDataService.growSystems | orderBy:name")
+        //-    option(value="") Select
+        //-  .dblarrow
+        //-    i
 
         //- div.dropdown-wrap
         //-   ul(class="dropdown initial")
@@ -36,7 +40,7 @@ block head
 
       .question-wrap-right
         .question
-          h5.question-title What are you going to be growing?
+          h5.question-title What plants would you like to grow?
           //- input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
           //- div(ng-hide="filteredPlantList.length") 
           //-   label(href="#", class="add btn", ng-click="addPlant()") Add
