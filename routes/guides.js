@@ -3,7 +3,8 @@ module.exports = function(app){
 	  //print_visits(req, res);
 	  res.render('guides/waterculturesystem', {
 	    title: "Bitponics Water Culture System",
-    	className: "guides water-culture-system"
+    	className: "landing-page single-page guides water-culture-system",
+		pageType: "landing-page"
 	  });
 
 	});
