@@ -4623,7 +4623,7 @@ button.close {
 }
 .landing-page.buy .order-info {
   border: 1px dotted #c1c2c4;
-  padding: 0 1em 12em 1em;
+  padding: 0 1em 7em 1em;
   font-size: 1.5em;
   position: relative;
 }
@@ -4637,6 +4637,26 @@ button.close {
 .landing-page.buy .order-info .total-price {
   position: absolute;
   bottom: 0;
+}
+.landing-page.buy .order-info .total-price label,
+.landing-page.buy .order-info .total-price input {
+  font-size: 1em;
+  padding: 0;
+  margin: 0;
+  line-height: 2em;
+  height: 2em;
+}
+.landing-page.buy .order-info .total-price label {
+  float: left;
+  clear: left;
+  padding: 0;
+}
+.landing-page.buy .order-info .total-price input {
+  float: right;
+  clear: right;
+  max-width: 4.5em;
+  text-align: right;
+  margin-right: 1em;
 }
 /*
  * Buy Pages

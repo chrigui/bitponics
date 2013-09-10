@@ -467,6 +467,7 @@ input[type='checkbox']:checked + label.btn {
 .custom-checkbox-wrap.left-orient label {
   padding-left: 2.35em;
   line-height: 2em;
+  white-space: nowrap;
 }
 .custom-checkbox-wrap.left-orient label:before {
   left: 0.35em;

@@ -1,3 +1,5 @@
+@import "helpers"
+
 .landing-page
 
   .main, .header
@@ -103,3 +105,179 @@
 .question-wrap-right
   float right
   width 65%
+
+
+
+
+
+.landing-page.buy
+
+  form
+    
+    p
+      margin 0
+      width auto
+      max-width 100%
+      input
+        width auto
+        max-width 100%
+
+    // 
+    label[for="locality"],
+    label[for="region"]
+      display block
+      visibility hidden
+
+
+  // General order-info styles
+  // order-info element can layout vert or horiz
+  // specific styles below
+  .order-info
+    @extends .display-ib
+    clear both
+    overflow auto
+
+
+    & > div
+      // @extends .display-ib
+      // float left
+      // vertical-align top
+      // position relative
+
+      // img
+      //  // margin 1em 0
+      //  width 90%
+
+    .link
+      text-decoration underline
+
+    .bitponics-device
+      // float left
+      // width 33%
+
+    .quantity-layout
+      // float left
+      // width 33%
+    
+    .web-service-layout
+      // float right
+      // width 33%
+      // text-align right
+
+      label
+        // text-align right
+        // max-width 10em
+        // margin 0
+        // float right
+        clear both
+
+    .total-price
+      // label, input
+      //   font-size 1em
+      //   padding 0
+      //   margin 0
+      //   line-height 2em
+      //   height 2em
+      // label
+      //   float left
+      //   clear left
+      //   // margin .25em 0 0
+      //   padding 0
+      // input
+      //   float right
+      //   clear right
+      //   max-width 2.5em
+
+  .order-info-horizontal
+    .order-info
+      padding 0 1em
+
+      .bitponics-device,
+      .quantity-layout
+        float left
+        width 33%
+
+      .web-service-layout
+        float right
+        width 30%
+
+      .bitponics-device
+        img
+          width 90%
+
+      .total-price
+        position static
+
+
+  .order-info-vertical
+    position relative
+
+    h3.sub-heading
+      width 60%
+
+    .order-info
+      position absolute
+      top 1em
+      right 0
+      width 30%
+      min-width 13em
+
+      .bitponics-device
+        img
+          margin-bottom 0
+          width 100%
+
+    .creditcard-info, .account-info
+      @extends .float-l
+
+
+
+
+  .personal-info
+    @extends .float-l
+    width 40%
+
+    p
+      @extends .float-l
+
+    p.city-group
+      // @extends .float-r
+      label[for="locality"],
+      label[for="region"]
+        visibility hidden
+
+    p.postal-code-group
+      @extends .half-width
+      @extends .clear-r
+
+      input
+        @extends .half-width
+
+    p.country-group
+      // @extends .fifth-width
+      margin 0 0 1em
+
+  .creditcard-info
+    @extends .float-r
+    width 50%
+
+    p
+      @extends .float-l
+
+    p.cardnumber-group
+      // @extends .fifth-widthX4
+
+    p.cvv-group
+      @extends .fifth-width
+      @extends .float-l
+
+    p.expiration-group
+      @extends .clear-b
+
+      input
+        @extends .fifth-width
+  
+  .account-info
+    @extends .float-r
+    @extends .clear-r
+    width 50%

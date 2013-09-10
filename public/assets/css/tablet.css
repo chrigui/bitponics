@@ -1,9 +1,7 @@
 .full-width {
   width: 100%;
 }
-.half-width,
-.landing-page.buy .personal-info p.postal-code-group,
-.landing-page.buy .personal-info p.postal-code-group input {
+.half-width {
   width: 50%;
 }
 .quarter-width {
@@ -12,9 +10,7 @@
 .quarter-widthX3 {
   width: 75%;
 }
-.fifth-width,
-.landing-page.buy .creditcard-info p.cvv-group,
-.landing-page.buy .creditcard-info p.expiration-group input {
+.fifth-width {
   width: 20%;
 }
 .fifth-widthX4 {
@@ -45,8 +41,7 @@
 .display-ib,
 .grid li,
 .idealRanges .hi label,
-.idealRanges .lo label,
-.landing-page.buy .order-info {
+.idealRanges .lo label {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -55,16 +50,13 @@
 .display-t {
   display: table;
 }
-.clear-b,
-.landing-page.buy .creditcard-info p.expiration-group {
+.clear-b {
   clear: both;
 }
 .clear-l {
   clear: left;
 }
-.clear-r,
-.landing-page.buy .personal-info p.postal-code-group,
-.landing-page.buy .account-info {
+.clear-r {
   clear: right;
 }
 .clearfix {
@@ -78,18 +70,10 @@
 .clearfix:after {
   clear: both;
 }
-.float-l,
-.landing-page.buy .order-info-vertical .creditcard-info,
-.landing-page.buy .order-info-vertical .account-info,
-.landing-page.buy .personal-info,
-.landing-page.buy .personal-info p,
-.landing-page.buy .creditcard-info p,
-.landing-page.buy .creditcard-info p.cvv-group {
+.float-l {
   float: left;
 }
-.float-r,
-.landing-page.buy .creditcard-info,
-.landing-page.buy .account-info {
+.float-r {
   float: right;
 }
 .float-n {
@@ -661,94 +645,4 @@
 }
 .overlay {
   padding: 1em 2em 1em;
-}
-.landing-page.buy form p {
-  margin: 0;
-  width: auto;
-  max-width: 100%;
-}
-.landing-page.buy form p input {
-  width: auto;
-  max-width: 100%;
-}
-.landing-page.buy form label[for="locality"],
-.landing-page.buy form label[for="region"] {
-  display: block;
-  visibility: hidden;
-}
-.landing-page.buy .order-info {
-  clear: both;
-  overflow: auto;
-}
-.landing-page.buy .order-info .link {
-  text-decoration: underline;
-}
-.landing-page.buy .order-info .web-service-layout label {
-  clear: both;
-}
-.landing-page.buy .order-info .total-price label,
-.landing-page.buy .order-info .total-price input {
-  font-size: 1em;
-  padding: 0;
-  margin: 0;
-  line-height: 2em;
-  height: 2em;
-}
-.landing-page.buy .order-info .total-price label {
-  float: left;
-  clear: left;
-  padding: 0;
-}
-.landing-page.buy .order-info .total-price input {
-  float: right;
-  clear: right;
-  max-width: 2.5em;
-}
-.landing-page.buy .order-info-horizontal .order-info {
-  padding: 0 1em;
-}
-.landing-page.buy .order-info-horizontal .order-info .bitponics-device,
-.landing-page.buy .order-info-horizontal .order-info .quantity-layout,
-.landing-page.buy .order-info-horizontal .order-info .web-service-layout {
-  float: left;
-  width: 33%;
-}
-.landing-page.buy .order-info-horizontal .order-info .bitponics-device img {
-  width: 90%;
-}
-.landing-page.buy .order-info-horizontal .order-info .total-price {
-  position: static;
-}
-.landing-page.buy .order-info-vertical {
-  position: relative;
-}
-.landing-page.buy .order-info-vertical h3.sub-heading {
-  width: 60%;
-}
-.landing-page.buy .order-info-vertical .order-info {
-  position: absolute;
-  top: 1em;
-  right: 0;
-  width: 30%;
-  min-width: 13em;
-}
-.landing-page.buy .order-info-vertical .order-info .bitponics-device img {
-  margin-bottom: 0;
-  width: 100%;
-}
-.landing-page.buy .personal-info {
-  width: 40%;
-}
-.landing-page.buy .personal-info p.city-group label[for="locality"],
-.landing-page.buy .personal-info p.city-group label[for="region"] {
-  visibility: hidden;
-}
-.landing-page.buy .personal-info p.country-group {
-  margin: 0 0 1em;
-}
-.landing-page.buy .creditcard-info {
-  width: 50%;
-}
-.landing-page.buy .account-info {
-  width: 50%;
 }
