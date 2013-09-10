@@ -4,6 +4,21 @@
 .full-width
   width 100%
 
+.half-width
+  width 50%
+
+.quarter-width
+  width 25%
+
+.quarter-widthX3
+  width 75%
+
+.fifth-width
+  width 20%
+
+.fifth-widthX4
+  width 80%
+
 .full-height
   height 100%
 
@@ -79,6 +94,11 @@
 .no-margin-bottom
   margin-bottom 0
 
+.bottom-anchor
+  @extends .bottom-0
+  position absolute
+
+
 // fonts
 .uppercase
   text-transform uppercase
@@ -140,6 +160,9 @@
   vertical-align: top;
   font-size: base-font-size;
 
+.font-style-normal
+  font-style: normal;
+
 .hide-text
   text-indent: -300%;
   white-space: nowrap;
@@ -188,6 +211,9 @@
 
 .separator-top
   border-top 1px solid color-border-gray
+.separator-bottom
+  border-bottom 1px solid color-border-gray
+
 
 .ww-break-word
   word-wrap: break-word;

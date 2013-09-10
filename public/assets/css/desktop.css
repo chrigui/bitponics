@@ -50,15 +50,14 @@
     width: 85%;
   }
 }
-.landing-page.getstarted .retail-price {
+.landing-page.getstarted .preorder-price {
   margin: 0.5em;
 }
-.landing-page.getstarted .preorder-price {
-  margin-top: -1.5em;
-}
+.landing-page.getstarted .retail-price .additional-text,
 .landing-page.getstarted .preorder-price .additional-text {
   display: inline-block;
 }
+.landing-page.getstarted .retail-price .additional-text span,
 .landing-page.getstarted .preorder-price .additional-text span {
   width: 100%;
 }

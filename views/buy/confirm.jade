@@ -1,0 +1,43 @@
+extends ../layout
+
+block css
+
+block content
+  section.header
+    header
+      include ../includes/nav/main
+
+  section#main(role="main", class="main")
+    div(id="buy", class="content-module middle")
+        - if (!completedTransaction)
+          h3(class="page-heading nav-section")
+            | Confirm your order
+        - else
+          h3(class="page-heading nav-section")
+            | Order complete! 
+
+        div(class="page-content")
+
+          - if (completedTransaction)
+            h3.sub-heading Check your inbox for a confirmation receipt.
+
+          h3.sub-heading Order Overview
+
+          span TODO: tempUserInformation.orderInfo
+
+          br
+          #{tempUserInformation.email}
+          br
+          #{tempUserInformation.password}
+          br
+          #{tempUserInformation.number}
+          br
+          #{tempUserInformation.cvv}
+          br
+          #{tempUserInformation.month}
+          br
+          #{tempUserInformation.year}
+
+          - if (!completedTransaction)
+            form(action="/buy/confirm", method="POST", id="order_confirmation")
+                input(type="submit", id="submit") Place Order

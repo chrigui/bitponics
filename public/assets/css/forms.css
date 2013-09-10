@@ -1,6 +1,21 @@
 .full-width {
   width: 100%;
 }
+.half-width {
+  width: 50%;
+}
+.quarter-width {
+  width: 25%;
+}
+.quarter-widthX3 {
+  width: 75%;
+}
+.fifth-width {
+  width: 20%;
+}
+.fifth-widthX4 {
+  width: 80%;
+}
 .full-height {
   height: 100%;
 }
@@ -65,7 +80,8 @@
 .top-0 {
   top: 0;
 }
-.bottom-0 {
+.bottom-0,
+.bottom-anchor {
   bottom: 0;
 }
 .left-0 {
@@ -76,6 +92,9 @@
 }
 .no-margin-bottom {
   margin-bottom: 0;
+}
+.bottom-anchor {
+  position: absolute;
 }
 .uppercase {
   text-transform: uppercase;
@@ -134,6 +153,9 @@
   vertical-align: top;
   font-size: 16px;
 }
+.font-style-normal {
+  font-style: normal;
+}
 .hide-text {
   text-indent: -300%;
   white-space: nowrap;
@@ -167,6 +189,9 @@
 }
 .separator-top {
   border-top: 1px solid #d8d8d8;
+}
+.separator-bottom {
+  border-bottom: 1px solid #d8d8d8;
 }
 .ww-break-word {
   word-wrap: break-word;
@@ -438,6 +463,23 @@ input[type='checkbox']:checked + label.btn {
   opacity: 1;
   -ms-filter: none;
   filter: none;
+}
+.custom-checkbox-wrap.left-orient label {
+  padding-left: 2.35em;
+  line-height: 2em;
+}
+.custom-checkbox-wrap.left-orient label:before {
+  left: 0.35em;
+  padding-left: 0.35em;
+  z-index: 1;
+  width: 1em;
+}
+.custom-checkbox-wrap.left-orient label:after {
+  width: 2em;
+  height: 2em;
+  margin: 0 0 0 0;
+  position: absolute;
+  left: 0;
 }
 .wufoo {
   background-color: #c1c2c4 !important;

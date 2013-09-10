@@ -6,22 +6,7 @@ block content
       header
         include /includes/nav/main
 
-  section#main(role="main", class="main")
-    div(id="signup", class="content-module middle")
-      h3(class="page-heading nav-section")
-        | Register for your bitponics account.
-      ul
-        li Create your own grow plans and apply them to your gardens
-        li Get access to preorder offers
-        li Receive news and announcements
-
-      div(class="page-content")
-        form(id="register-form", method="POST", action="/signup")
-          label(for="email") Email
-          input(id="email", name="email", type="email", autofocus="autofocus", required) 
-          label(for="password") Password
-          input(id="password", name="password", type="password", required) 
-          input(type="submit", value="Submit")
+  include includes/signup/main
 
   section#footer
 

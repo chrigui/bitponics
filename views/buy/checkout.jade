@@ -1,0 +1,102 @@
+extends ../layout
+
+block css
+
+block content
+  section.header
+    header
+      include ../includes/nav/main
+
+  section#main(role="main", class="main")
+    div(id="buy", class="content-module middle")
+        h3(class="page-heading nav-section")
+          | Checkout
+
+        //- div(class="page-content order-info-horizontal")
+        div(class="page-content order-info-vertical")
+          
+          form(action="/buy/verify_transaction", method="POST", id="braintree-payment-form", class="steps")
+              h3.sub-heading Review your order and choose your Bitponics Cloud Web Service tier.
+
+              div.order-info
+                div.bitponics-device
+                  p
+                    img(src="/assets/img/buy/device_smaller.jpg", alt="Bitponics Device", width="200")
+                div.quantity-layout
+                  p
+                    label(for="base-station-quantity") Device Quantity
+                    input(id="base-station-quantity", class="display-ib", type="number", size="2", max-length="2", name="base-station-quantity", value="1", max="5")
+                  div.total-price
+                    p
+                      label(for="price-subtotal") Subtotal
+                      input(id="price-subtotal", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="subtotal", value="00.00")
+                      label(for="price-shipping") Shipping
+                      input(id="price-shipping", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="shipping", value="00.00")
+                      label(for="price-total") Total
+                      input(id="price-total", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="total", value="00.00")
+                div.web-service-layout
+                    p
+                      label Bitponics Cloud Web Service
+                        | (<a href="/pricing" target="_blank" class="link">more info</a>)
+                      div.custom-checkbox-wrap.left-orient
+                        input(id="cloud-web-free", type="radio", name="cloud-web-service-tier", value="free", checked)
+                        label(for="cloud-web-free") Trial (Free)
+                      div.custom-checkbox-wrap.left-orient
+                        input(id="cloud-web-serious", type="radio", name="cloud-web-service-tier", value="serious")
+                        label(for="cloud-web-serious") Serious ($9/mo)
+                      div.custom-checkbox-wrap.left-orient
+                        input(id="cloud-web-commercial", type="radio", name="cloud-web-service-tier", value="commercial")
+                        label(for="cloud-web-commercial") Commercial ($49/mo)
+
+                    
+
+              h3.sub-heading Fill out some information and we'll go ahead and verify your order.
+              - if (transactionError)
+                h3.error-message.sub-heading There was a problem with some of the information entered.
+
+              div.personal-info
+                p
+                  label(for="firstName") Name
+                  input(id="firstName", name="firstName", autofocus="autofocus", type="text", value="#{tempUserInformation.firstName}", class="display-ib") 
+                  input(id="lastName", name="password", type="text", value="#{tempUserInformation.lastName}", class="display-ib")
+                p
+                  label(for="address") Address
+                  input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
+                  input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
+                p.city-group
+                  label(for="locality") City
+                  input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
+                  //- label(for="region") State
+                  input(id="region", name="region", type="text", placeholder="State")
+                p.postal-code-group
+                  label(for="postalCode") Postal Code
+                  input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
+                p.country-group
+                  label(for="locale_timezone") Country
+                  include ../misc/timezone_country_select_html
+              div.creditcard-info
+                p.cardnumber-group
+                  label(for="card") Card Number
+                  input(id="card", type="number", size="20", max-length="20", autocomplete="off", data-encrypted-name="number", value="#{tempUserInformation.number}")
+                p.cvv-group
+                  label(for="cvv") CVV
+                  input(id="cvv", type="number", size="4", max-length="4", autocomplete="off", data-encrypted-name="cvv", value="#{tempUserInformation.cvv}")
+                p.expiration-group
+                  label(for="month") Expiration (MM/YYYY)
+                  input(id="month", class="display-ib", type="number", size="2", max-length="2", name="month", value="#{tempUserInformation.month}")
+                  input(class="display-ib", type="number", size="4", max-length="4", name="year", value="#{tempUserInformation.year}")
+              p.account-info
+                label(for="email") Email
+                input(id="email", name="email", type="email", value="#{tempUserInformation.email}") 
+                label(for="password") Password
+                input(id="password", name="password", type="password", value="#{tempUserInformation.password}")
+              
+              div.step-footer.separator-top.clear-b
+                input(type="submit", id="submit")
+
+
+block footer-scripts
+  script(type="text/javascript", src="https://js.braintreegateway.com/v1/braintree.js")
+  script
+    var braintree = Braintree.create("#{braintreeClientSideKey}");
+    braintree.onSubmitEncryptForm('braintree-payment-form');

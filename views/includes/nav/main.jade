@@ -19,10 +19,10 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
               li(class="pricing", data-name="pricing") 
                 a(href="/pricing") Pricing
 
-          li.nav-section(ng-click="toggleNavMenu()")
-            ul
-              li(class="buy", data-name="buy") 
-                a(href="/buy", data-page-include="false") Buy
+          //- li.nav-section(ng-click="toggleNavMenu()")
+          //-   ul
+          //-     li(class="buy", data-name="buy") 
+          //-       a(href="/buy", data-page-include="false") Buy
 
           li.nav-section(ng-click="toggleNavMenu()")
             ul
@@ -95,6 +95,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
   if !!pageType && pageType == 'landing-page'  
     button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")
       span Menu
-      i(class="icon-glyph-new icon-01_-", aria-hidden="true", ng-hide="navMenuDisplayVisible")
+      //- i(class="icon-glyph-new icon-01_-", aria-hidden="true", ng-hide="navMenuDisplayVisible")
+      i(class="font-style-normal", aria-hidden="true", ng-hide="navMenuDisplayVisible") &#9776;
       i(class="icon-glyph-new icon-28_x", aria-hidden="true", ng-show="navMenuDisplayVisible")
       

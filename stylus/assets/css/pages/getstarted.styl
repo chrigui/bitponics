@@ -41,22 +41,29 @@
       font-size 10px
       text-align center
   
-  .retail-price
-    // margin .5em
-  
   .preorder-price
+    // margin .5em
+
+    .additional-text
+      span
+        display inline-block
+        text-align left
+  
+  .retail-price, .preorder-price
     position relative
     font-size 3em
     span.dollar-sign, span.price-number
       color color-logo-green
     .additional-text
-      // font-size .333em
-      //display inline-block
-      // width 2em
-
       span
         display inline-block
         text-align left
+
+  .preorder-price
+    font-size 2em
+    span.dollar-sign, span.price-number
+      color color-text-gray
+
   .checkout-imgs
     border-top: 1px solid color-logo-green
     padding-top 1em

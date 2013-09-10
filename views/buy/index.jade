@@ -1,0 +1,37 @@
+extends ../layout
+
+block css
+
+block content
+  section.header
+    header
+      include ../includes/nav/main
+
+  section#main(role="main", class="main")
+    div(id="buy", class="content-module middle")
+        h3(class="page-heading nav-section text-align-c")
+          | You can now order the Bitponics device.
+
+        div(class="page-content")
+
+          img(src="/assets/img/buy/device_small.jpg", alt="Bitponics Device")
+
+          div.preorder-price
+            span.dollar-sign $
+            span.price-number 499
+            div.additional-text
+              span Preorder Offer &nbsp;
+              span Coming Soon!
+
+
+          div.center.retail-price
+            span.dollar-sign $
+            span.price-number 499
+            div.additional-text
+              span Retail Price &nbsp;
+              span Limited run of 40 devices!
+
+            div(class="center clearfix")
+              a(class="btn next-step-btn", href="buy/checkout")
+                | Buy
+                i(class="icon-glyph icon-glypharrow", aria-hidden="true")
