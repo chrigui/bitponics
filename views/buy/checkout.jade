@@ -50,30 +50,10 @@ block content
 
                     
 
-              h3.sub-heading Fill out some information and we'll go ahead and verify your order.
+              h3.sub-heading Fill out the billing information below and we'll go ahead and verify your order.
               - if (transactionError)
                 h3.error-message.sub-heading There was a problem with some of the information entered.
 
-              div.personal-info
-                p
-                  label(for="firstName") Name
-                  input(id="firstName", name="firstName", autofocus="autofocus", type="text", value="#{tempUserInformation.firstName}", class="display-ib") 
-                  input(id="lastName", name="password", type="text", value="#{tempUserInformation.lastName}", class="display-ib")
-                p
-                  label(for="address") Address
-                  input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
-                  input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
-                p.city-group
-                  label(for="locality") City
-                  input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
-                  //- label(for="region") State
-                  input(id="region", name="region", type="text", placeholder="State")
-                p.postal-code-group
-                  label(for="postalCode") Postal Code
-                  input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
-                p.country-group
-                  label(for="locale_timezone") Country
-                  include ../misc/timezone_country_select_html
               div.creditcard-info
                 p.cardnumber-group
                   label(for="card") Card Number
@@ -83,14 +63,67 @@ block content
                   input(id="cvv", type="number", size="4", max-length="4", autocomplete="off", data-encrypted-name="cvv", value="#{tempUserInformation.cvv}")
                 p.expiration-group
                   label(for="month") Expiration (MM/YYYY)
-                  input(id="month", class="display-ib", type="number", size="2", max-length="2", name="month", value="#{tempUserInformation.month}")
-                  input(class="display-ib", type="number", size="4", max-length="4", name="year", value="#{tempUserInformation.year}")
-              p.account-info
-                label(for="email") Email
-                input(id="email", name="email", type="email", value="#{tempUserInformation.email}") 
-                label(for="password") Password
-                input(id="password", name="password", type="password", value="#{tempUserInformation.password}")
-              
+                  input(id="month", class="", type="number", size="2", max-length="2", name="month", value="#{tempUserInformation.month}", placeholder="MM")
+                  input(class="", type="number", size="4", max-length="4", name="year", value="#{tempUserInformation.year}", placeholder="YYYY")
+              div.personal-info
+                div.name-group
+                  p
+                    label(for="firstName") Name
+                    input(id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
+                    input(id="lastName", name="password", type="text", class="", placeholder="Last")
+                div.address-group
+                  p
+                    label(for="address") Address
+                    input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
+                    input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
+                  p.city-group
+                    label(for="locality") City
+                    input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
+                    //- label(for="region") State
+                    input(id="region", name="region", type="text", placeholder="State")
+                p.postal-code-group
+                  label(for="postalCode") Postal Code
+                  input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
+                p.country-group
+                  label(for="locale_timezone") Country
+                  include ../misc/timezone_country_select_html
+
+              div.shipping-info
+                p
+                  div.custom-checkbox-wrap.left-orient
+                    input(id="same-shipping-address", type="checkbox", name="same-shipping-address", checked)
+                    label(for="same-shipping-address") Shipping address is same as billing address
+                  div(style="display: none")
+                    div.name-group
+                      p
+                        label(for="firstName") Name
+                        input(id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
+                        input(id="lastName", name="password", type="text", class="", placeholder="Last")
+                    div.address-group
+                      p
+                        label(for="address") Address
+                        input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
+                        input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
+                      p.city-group
+                        label(for="locality") City
+                        input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
+                        //- label(for="region") State
+                        input(id="region", name="region", type="text", placeholder="State")
+                    p.postal-code-group
+                      label(for="postalCode") Postal Code
+                      input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
+                    p.country-group
+                      label(for="locale_timezone") Country
+                      include ../misc/timezone_country_select_html
+
+              //- TODO: this feels like too much additional work for user, maybe move to confirmation page?
+              //- div.account-info
+              //-   h3 Pre-register your Bitponics account.
+              //-   p
+              //-     label(for="email") Email
+              //-     input(id="email", name="email", type="email", value="#{tempUserInformation.email}") 
+              //-     label(for="password") Password
+              //-     input(id="password", name="password", type="password", value="#{tempUserInformation.password}")
               div.step-footer.separator-top.clear-b
                 input(type="submit", id="submit")
 

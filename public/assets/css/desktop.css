@@ -13,8 +13,7 @@
   width: 75%;
 }
 .fifth-width,
-.landing-page.buy .creditcard-info p.cvv-group,
-.landing-page.buy .creditcard-info p.expiration-group input {
+.landing-page.buy .creditcard-info p.cvv-group {
   width: 20%;
 }
 .fifth-widthX4 {
@@ -51,8 +50,7 @@
 .display-t {
   display: table;
 }
-.clear-b,
-.landing-page.buy .creditcard-info p.expiration-group {
+.clear-b {
   clear: both;
 }
 .clear-l {
@@ -79,12 +77,18 @@
 .landing-page.buy .order-info-vertical .account-info,
 .landing-page.buy .personal-info,
 .landing-page.buy .personal-info p,
+.landing-page.buy .personal-info .name-group,
+.landing-page.buy .personal-info .address-group,
+.landing-page.buy .creditcard-info,
 .landing-page.buy .creditcard-info p,
-.landing-page.buy .creditcard-info p.cvv-group {
+.landing-page.buy .creditcard-info p.cardnumber-group,
+.landing-page.buy .creditcard-info p.cvv-group,
+.landing-page.buy .creditcard-info p.expiration-group,
+.landing-page.buy .creditcard-info p.expiration-group input,
+.landing-page.buy .shipping-info {
   float: left;
 }
 .float-r,
-.landing-page.buy .creditcard-info,
 .landing-page.buy .account-info {
   float: right;
 }
@@ -342,13 +346,20 @@
 .landing-page.buy .order-info-vertical {
   position: relative;
 }
+.landing-page.buy .order-info-vertical h3.sub-heading,
+.landing-page.buy .order-info-vertical .personal-info,
+.landing-page.buy .order-info-vertical .creditcard-info,
+.landing-page.buy .order-info-vertical .shipping-info {
+  width: 100%;
+  padding-left: 20em;
+}
 .landing-page.buy .order-info-vertical h3.sub-heading {
-  width: 60%;
+  padding-left: 17.125em;
 }
 .landing-page.buy .order-info-vertical .order-info {
   position: absolute;
   top: 1em;
-  right: 0;
+  left: 0;
   width: 30%;
   min-width: 13em;
 }
@@ -356,8 +367,8 @@
   margin-bottom: 0;
   width: 100%;
 }
-.landing-page.buy .personal-info {
-  width: 40%;
+.landing-page.buy .personal-info .address-group {
+  min-width: 23em;
 }
 .landing-page.buy .personal-info p.city-group label[for="locality"],
 .landing-page.buy .personal-info p.city-group label[for="region"] {
@@ -366,9 +377,7 @@
 .landing-page.buy .personal-info p.country-group {
   margin: 0 0 1em;
 }
-.landing-page.buy .creditcard-info {
-  width: 50%;
-}
 .landing-page.buy .account-info {
-  width: 50%;
+  width: 100%;
+  padding-left: 20em;
 }

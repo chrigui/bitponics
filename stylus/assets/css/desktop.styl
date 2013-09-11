@@ -212,13 +212,21 @@
   .order-info-vertical
     position relative
 
+    h3.sub-heading, 
+    .personal-info,
+    .creditcard-info,
+    .shipping-info
+      width 100%
+      padding-left 20em
+
     h3.sub-heading
-      width 60%
+      padding-left 17.125em
 
     .order-info
       position absolute
       top 1em
-      right 0
+      // right 0
+      left 0
       width 30%
       min-width 13em
 
@@ -235,10 +243,16 @@
 
   .personal-info
     @extends .float-l
-    width 40%
-
-    p
+    
+    p, .name-group, .address-group
       @extends .float-l
+
+    .name-group
+      // min-width 13em
+
+    .address-group
+      min-width 23em
+
 
     p.city-group
       // @extends .float-r
@@ -258,13 +272,13 @@
       margin 0 0 1em
 
   .creditcard-info
-    @extends .float-r
-    width 50%
+    @extends .float-l
 
     p
       @extends .float-l
 
     p.cardnumber-group
+      @extends .float-l
       // @extends .fifth-widthX4
 
     p.cvv-group
@@ -272,12 +286,18 @@
       @extends .float-l
 
     p.expiration-group
-      @extends .clear-b
+      @extends .float-l
 
       input
-        @extends .fifth-width
+        @extends .float-l
   
+  .shipping-info
+    @extends .float-l
+    
+
+
   .account-info
     @extends .float-r
     @extends .clear-r
-    width 50%
+    width 100%
+    padding-left: 20em;
