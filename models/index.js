@@ -16,5 +16,6 @@ module.exports = {
 	sensor: require('./sensor').model,
 	sensorLog: require('./sensorLog').model,
 	user: require('./user').model,
+	bitponicsProduct: require('./product').model,
 	utils : require('./utils')
 };

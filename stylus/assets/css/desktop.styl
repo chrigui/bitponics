@@ -134,8 +134,8 @@
   // specific styles below
   .order-info
     @extends .display-ib
-    clear both
-    overflow auto
+    // clear both
+    // overflow auto
 
 
     & > div
@@ -216,19 +216,23 @@
     .personal-info,
     .creditcard-info,
     .shipping-info
-      width 100%
-      padding-left 20em
+      float left
+      width 70%
+      padding-left 1em
 
     h3.sub-heading
-      padding-left 17.125em
+      padding-left 1em
+
+      &.right
+        float right
 
     .order-info
-      position absolute
+      float left
       top 1em
-      // right 0
-      left 0
       width 30%
       min-width 13em
+      margin 0 0 2.5em 0
+
 
       .bitponics-device
         img
@@ -241,7 +245,7 @@
 
 
 
-  .personal-info
+  .personal-info, .shipping-info
     @extends .float-l
     
     p, .name-group, .address-group

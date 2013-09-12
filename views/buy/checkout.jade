@@ -1,39 +1,44 @@
 extends ../layout
 
-block css
+block head
+  base(href="/buy/checkout")
+  mixin requirejs("/assets/js/pages/buy/checkout")
 
 block content
   section.header
     header
       include ../includes/nav/main
 
-  section#main(role="main", class="main")
+  section#main(role="main", class="main", ng-controller="bpn.controllers.buy.checkout.Main", ng-init="init()")
     div(id="buy", class="content-module middle")
         h3(class="page-heading nav-section")
           | Checkout
 
+        //- Tested an alt. layout for checkout page.. didnt like it as much
         //- div(class="page-content order-info-horizontal")
         div(class="page-content order-info-vertical")
           
           form(action="/buy/verify_transaction", method="POST", id="braintree-payment-form", class="steps")
-              h3.sub-heading Review your order and choose your Bitponics Cloud Web Service tier.
+              h3.sub-heading.right Review your order and choose your Bitponics Cloud Web Service tier.
 
-              div.order-info
+              div.order-info(ng-controller="bpn.controllers.buy.checkout.OrderInfo")
                 div.bitponics-device
                   p
                     img(src="/assets/img/buy/device_smaller.jpg", alt="Bitponics Device", width="200")
                 div.quantity-layout
                   p
                     label(for="base-station-quantity") Device Quantity
-                    input(id="base-station-quantity", class="display-ib", type="number", size="2", max-length="2", name="base-station-quantity", value="1", max="5")
+                    input(ng-model="sharedDataService.orderInfo.baseStationQuantity", ng-change="updateOrderInfo()", id="base-station-quantity", class="display-ib", type="number", size="2", max-length="2", min="1", max="5")
                   div.total-price
                     p
                       label(for="price-subtotal") Subtotal
-                      input(id="price-subtotal", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="subtotal", value="00.00")
-                      label(for="price-shipping") Shipping
-                      input(id="price-shipping", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="shipping", value="00.00")
-                      label(for="price-total") Total
-                      input(id="price-total", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3", name="total", value="00.00")
+                      input(ng-model="sharedDataService.orderInfo.priceSubtotal", id="price-subtotal", readonly, class="display-ib seamless-input", type="number", size="9", max-length="3")
+                      label(for="priceShipping") Shipping
+                      input(ng-model="sharedDataService.orderInfo.priceShipping", id="price-shipping", readonly, class="display-ib seamless-input", type="text", size="9", max-length="3")
+                      label(for="priceTaxes") Tax
+                      input(ng-model="sharedDataService.orderInfo.priceTaxes", id="price-taxes", readonly, class="display-ib seamless-input", type="text", size="9", max-length="3")
+                      label(for="priceTotal") Total
+                      input(ng-model="sharedDataService.orderInfo.priceTotal", id="price-total", readonly, class="display-ib seamless-input", type="text", size="9", max-length="3")
                 div.web-service-layout
                     p
                       label Bitponics Cloud Web Service
@@ -54,66 +59,68 @@ block content
               - if (transactionError)
                 h3.error-message.sub-heading There was a problem with some of the information entered.
 
-              div.creditcard-info
+              div.creditcard-info(ng-controller="bpn.controllers.buy.checkout.CCInfo")
                 p.cardnumber-group
                   label(for="card") Card Number
-                  input(id="card", type="number", size="20", max-length="20", autocomplete="off", data-encrypted-name="number", value="#{tempUserInformation.number}")
+                  input(integer, ng-model="sharedDataService.orderInfo.cardInfo.number", id="card", size="16", max="16", autocomplete="on", data-encrypted-name="number", value="#{tempUserInformation.number}")
                 p.cvv-group
                   label(for="cvv") CVV
-                  input(id="cvv", type="number", size="4", max-length="4", autocomplete="off", data-encrypted-name="cvv", value="#{tempUserInformation.cvv}")
+                  input(integer, ng-model="sharedDataService.orderInfo.cardInfo.cvv", id="cvv", size="4", max-length="4", autocomplete="off", data-encrypted-name="cvv", value="#{tempUserInformation.cvv}")
                 p.expiration-group
                   label(for="month") Expiration (MM/YYYY)
-                  input(id="month", class="", type="number", size="2", max-length="2", name="month", value="#{tempUserInformation.month}", placeholder="MM")
-                  input(class="", type="number", size="4", max-length="4", name="year", value="#{tempUserInformation.year}", placeholder="YYYY")
-              div.personal-info
+                  input(integer, ng-model="sharedDataService.orderInfo.cardInfo.expMonth", id="month", class="", size="2", max="2", name="month", value="#{tempUserInformation.month}", placeholder="MM")
+                  input(integer, ng-model="sharedDataService.orderInfo.cardInfo.expYear", class="", size="4", max="4", name="year", value="#{tempUserInformation.year}", placeholder="YYYY")
+              
+              div.personal-info(ng-controller="bpn.controllers.buy.checkout.PersonalInfo")
                 div.name-group
                   p
                     label(for="firstName") Name
-                    input(id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
-                    input(id="lastName", name="password", type="text", class="", placeholder="Last")
+                    input(ng-model="sharedDataService.orderInfo.personalInfo.firstName", id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
+                    input(ng-model="sharedDataService.orderInfo.personalInfo.lastName", id="lastName", name="password", type="text", class="", placeholder="Last")
                 div.address-group
                   p
                     label(for="address") Address
-                    input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
-                    input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
+                    input(ng-model="sharedDataService.orderInfo.personalInfo.streetAddress1", id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
+                    input(ng-model="sharedDataService.orderInfo.personalInfo.streetAddress2", name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
                   p.city-group
                     label(for="locality") City
-                    input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
+                    input(ng-model="sharedDataService.orderInfo.personalInfo.locality", id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
                     //- label(for="region") State
                     input(id="region", name="region", type="text", placeholder="State")
                 p.postal-code-group
                   label(for="postalCode") Postal Code
-                  input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
+                  input(ng-model="sharedDataService.orderInfo.personalInfo.region", id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
                 p.country-group
                   label(for="locale_timezone") Country
                   include ../misc/timezone_country_select_html
 
-              div.shipping-info
+              div.shipping-info(ng-controller="bpn.controllers.buy.checkout.ShippingInfo")
                 p
                   div.custom-checkbox-wrap.left-orient
-                    input(id="same-shipping-address", type="checkbox", name="same-shipping-address", checked)
+                    input(ng-model="sharedDataService.orderInfo.shippingSameAsBilling", id="same-shipping-address", type="checkbox", name="same-shipping-address", checked)
                     label(for="same-shipping-address") Shipping address is same as billing address
-                  div(style="display: none")
+                  div(ng-show="!sharedDataService.orderInfo.shippingSameAsBilling")
                     div.name-group
                       p
                         label(for="firstName") Name
-                        input(id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
-                        input(id="lastName", name="password", type="text", class="", placeholder="Last")
+                        input(ng-model="sharedDataService.orderInfo.shippingInfo.firstName", id="firstName", name="firstName", type="text", class="no-margin-bottom", placeholder="First") 
+                        input(ng-model="sharedDataService.orderInfo.shippingInfo.lastName", id="lastName", name="password", type="text", class="", placeholder="Last")
                     div.address-group
                       p
                         label(for="address") Address
-                        input(id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
-                        input(name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
+                        input(ng-model="sharedDataService.orderInfo.shippingInfo.streetAddress1", id="address", name="streetAddress", type="text", class="no-margin-bottom", placeholder="Street 1")
+                        input(ng-model="sharedDataService.orderInfo.shippingInfo.streetAddress2", name="extendedAddress", type="text", class="no-margin-bottom", placeholder="Street 2")
                       p.city-group
                         label(for="locality") City
-                        input(id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
+                        input(ng-model="sharedDataService.orderInfo.shippingInfo.locality", id="locality", name="locality", type="text", class="no-margin-bottom", placeholder="City")
                         //- label(for="region") State
                         input(id="region", name="region", type="text", placeholder="State")
                     p.postal-code-group
                       label(for="postalCode") Postal Code
-                      input(id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
+                      input(ng-model="sharedDataService.orderInfo.shippingInfo.postalCode", id="postalCode", name="postalCode", type="number", max-lengh="15", size="15")
                     p.country-group
                       label(for="locale_timezone") Country
+                      //TODO: need to differentiate this between billing country
                       include ../misc/timezone_country_select_html
 
               //- TODO: this feels like too much additional work for user, maybe move to confirmation page?
@@ -131,5 +138,6 @@ block content
 block footer-scripts
   script(type="text/javascript", src="https://js.braintreegateway.com/v1/braintree.js")
   script
-    var braintree = Braintree.create("#{braintreeClientSideKey}");
-    braintree.onSubmitEncryptForm('braintree-payment-form');
+    bpn.braintree = Braintree.create("#{braintreeClientSideKey}");
+    bpn.braintree.onSubmitEncryptForm('braintree-payment-form');
+    bpn.products = !{JSON.stringify(bitponicsProducts)};

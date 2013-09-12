@@ -1,7 +1,9 @@
 var async = require('async'),
 	winston = require('winston'),
 	routeUtils = require('./route-utils'),
-	braintree = require('braintree');
+	braintree = require('braintree'),
+	ProductModel = require('../models/product').model,
+	baseStationProductSKU = 'HBIT0000001';
 	
 
 module.exports = function(app){
@@ -44,21 +46,32 @@ module.exports = function(app){
 				};
 			}
 
-			var locals = {
-					title: 'Checkout - Bitponics',
-					className: "landing-page single-page getstarted register buy",
-					pageType: "landing-page",
-					braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
-					signupError: null,
-					transactionError: req.session.declined ? req.session.declined : null,
-					tempUserInformation: req.session.tempUserInformation
-				};
+			ProductModel.findOne({ 'SKU': baseStationProductSKU })
+				.exec(function(err, bitponicsBaseStation){
+					if (err) { return next(err); }
+					var locals = {
+						title: 'Checkout - Bitponics',
+						className: "landing-page single-page getstarted register buy",
+						pageType: "landing-page",
+						braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
+						signupError: null,
+						transactionError: req.session.declined ? req.session.declined : null,
+						tempUserInformation: req.session.tempUserInformation,
+						bitponicsProducts: {}
+					};
 
-			console.log('req.session:');
-			console.log(req.session);
+					locals.bitponicsProducts[bitponicsBaseStation.SKU] = bitponicsBaseStation;
 
-			console.log(req.param.declined);
-			res.render('./buy/checkout', locals);
+					console.log('req.session:');
+					console.log(req.session);
+
+					console.log('bitponicsBaseStation:');
+					console.log(bitponicsBaseStation);
+
+					res.render('./buy/checkout', locals);
+				});
+
+			
 		}
 	);
 

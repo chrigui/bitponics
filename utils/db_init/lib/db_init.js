@@ -50,7 +50,8 @@ var mongoose   = require('mongoose'),
     growPlans: {},
     growPlanInstances: {},
     users: {},
-    sensorLogs: {}
+    sensorLogs: {},
+    bitponicsProducts: {}
   },
   mongooseConnection;
 
@@ -258,6 +259,14 @@ async.series([
           mongooseConnection.collections['immediateactions'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('immediateactions collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongooseConnection.collections['bitponicsproducts']){ return innerCallback();}
+          mongooseConnection.collections['bitponicsproducts'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('bitponicsproducts collection dropped');
             innerCallback();
           });
         }
@@ -917,6 +926,49 @@ async.series([
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][doc._id] = doc._id;
             console.log("created sensor log");
+            decrementData();
+          });
+        }
+      });
+    });
+  },
+
+  function(callback){
+    /**
+     * Sensor Logs
+     */
+
+    var dataType = 'bitponicsProducts',
+      dataCount = data[dataType].length,
+      decrementData = function(){
+        dataCount--;
+        if (dataCount === 0){
+          callback();
+        }
+      };
+
+    console.log('####### ' + dataType + ' #######');
+
+    data[dataType].forEach(function(_data){
+      models.bitponicsProduct.findById(_data._id, function(err, result){
+        if (err) { console.log(err); return callback(err);}
+        if (result){
+          return decrementData();
+        } else {
+          var dataObj = new models.bitponicsProduct({
+            _id : _data._id,
+            SKU: _data.SKU,
+            productType: _data.productType,
+            name: _data.name,
+            description: _data.description,
+            price: _data.price,
+            stock: _data.stock
+          });
+
+          dataObj.save(function (err, doc) {
+            if (err) { console.log(err); return callback(err);}
+            savedObjectIds[dataType][doc._id] = doc._id;
+            console.log("created bitponicsProduct");
             decrementData();
           });
         }

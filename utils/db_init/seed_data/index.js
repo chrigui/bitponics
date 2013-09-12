@@ -15,7 +15,8 @@ var data = {
 	growPlanInstances: require('./growPlanInstances'),
 	photos: require('./photos'),
 	sensorLogs: require('./sensorLogs'),
-	tagLogs: require('./tagLogs')
+	tagLogs: require('./tagLogs'),
+	bitponicsProducts: require('./bitponicsProducts')
 };
 
 module.exports = data;
