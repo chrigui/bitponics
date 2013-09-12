@@ -175,8 +175,8 @@ module.exports = function(app){
 		function (req, res){
 			res.render('signup', {
 				title : 'Signup',
-				className: "landing-page single-page getstarted",
-    		pageType: "landing-page"
+				className: "signup single-page app-page",
+    			pageType: "app-page"
 			});
 		}
 	);

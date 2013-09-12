@@ -1,4 +1,6 @@
-<select id="locale_timezone" name="locale_timezone" ng-model="country">
+- if (!form_prefix) form_prefix = "";
+
+<select id="#{form_prefix}locale_timezone" name="#{form_prefix}locale_timezone" ng-model="#{form_prefix}country">
 <option value="" selected="selected">- None -</option>
 <option value="AF">Afghanistan</option>
 <option value="AX">Aland Islands</option>

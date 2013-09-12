@@ -1,0 +1,30 @@
+extends ../layout
+
+block head
+  script
+    bpn.products = !{JSON.stringify(bitponicsProducts)};
+    bpn.tempUserInfo = !{JSON.stringify(tempUserInfo)};
+    alert(bpn.tempUserInfo)
+
+block content
+  section.header
+    header
+      include ../includes/nav/main
+
+  section#main(role="main", class="main")
+    div(id="buy", class="content-module middle")
+        h3(class="page-heading nav-section")
+          | Order complete! 
+
+        div(class="page-content")
+
+
+          h3.sub-heading Order Overview
+          - if (tempUserInfo)
+            p You have successfully pre-ordered #{tempUserInfo.baseStationQuantity} Bitponics Base Station
+              -if (tempUserInfo.baseStationQuantity.length > 1)
+                |s.
+              -else
+                |.
+
+            p Check your inbox for a confirmation email.

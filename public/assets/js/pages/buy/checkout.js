@@ -73,11 +73,12 @@ function (angular, domReady, feBeUtils) {
             expMonth: null,
             expYear: null
           },
+          email: null,
           personalInfo: {
             firstName: null,
             lastName: null,
-            streetAddress1: null,
-            streetAddress2: null,
+            streetAddress: null,
+            extendedStreetAddress: null,
             locality: null,
             region: null,
             postalCode: null,
@@ -87,8 +88,8 @@ function (angular, domReady, feBeUtils) {
           shippingInfo: {
             firstName: null,
             lastName: null,
-            streetAddress1: null,
-            streetAddress2: null,
+            streetAddress: null,
+            extendedStreetAddress: null,
             locality: null,
             region: null,
             postalCode: null,
@@ -114,16 +115,18 @@ function (angular, domReady, feBeUtils) {
         $scope.priceCollection = ['$scope.sharedDataService.baseStationQuantity','$scope.sharedDataService.priceSubtotal','$scope.sharedDataService.priceShipping','$scope.sharedDataService.priceTaxes'];
         
         $scope.updateOrderInfo = function () {
-          //add subtotals
-          $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.orderInfo.priceTaxes + 
-            $scope.sharedDataService.orderInfo.priceSubtotal + 
-            $scope.sharedDataService.orderInfo.priceShipping;
-
           // multiply device price by quantity
-          $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.orderInfo.priceTotal + 
-            $scope.sharedDataService.bitponicsProducts['HBIT0000001'].price * $scope.sharedDataService.orderInfo.baseStationQuantity; //Base Station V1 Device
+          $scope.sharedDataService.orderInfo.priceSubtotal = $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.bitponicsProducts['HBIT0000001'].price * $scope.sharedDataService.orderInfo.baseStationQuantity; //Base Station V1 Device
+          
+          //add subtotals
+          $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.orderInfo.priceSubtotal +
+            $scope.sharedDataService.orderInfo.priceTaxes + 
+            $scope.sharedDataService.orderInfo.priceShipping;
           
           // format with currency symbol
+          $scope.sharedDataService.orderInfo.priceSubtotal = $filter('currency')($scope.sharedDataService.orderInfo.priceSubtotal, '$');
+          $scope.sharedDataService.orderInfo.priceTaxes = $filter('currency')($scope.sharedDataService.orderInfo.priceTaxes, '$');
+          $scope.sharedDataService.orderInfo.priceShipping = $filter('currency')($scope.sharedDataService.orderInfo.priceShipping, '$');
           $scope.sharedDataService.orderInfo.priceTotal = $filter('currency')($scope.sharedDataService.orderInfo.priceTotal, '$');
           
         }
@@ -176,63 +179,34 @@ function (angular, domReady, feBeUtils) {
 
         $scope.init = function () {
           console.log('stuff')
-          $scope.sharedDataService.orderInfo.baseStationQuantity = 1;  
-          $scope.sharedDataService.bitponicsProducts = bpn.products;  
+          $scope.sharedDataService.orderInfo.baseStationQuantity = 1;
+          $scope.sharedDataService.orderInfo.webServicePlan = 'WBIT0000002';
+          $scope.sharedDataService.bitponicsProducts = bpn.products;
+          
+          // repopulate form
+          if (bpn.tempUserInfo) {
+            $scope.sharedDataService.orderInfo.baseStationQuantity = bpn.tempUserInfo.baseStationQuantity * 1;
+            $scope.sharedDataService.orderInfo.webServicePlan = bpn.tempUserInfo.webServicePlan;
+            $scope.sharedDataService.orderInfo.email = bpn.tempUserInfo.email;
+            $scope.sharedDataService.orderInfo.personalInfo = bpn.tempUserInfo.personalInfo;
+            $scope.sharedDataService.orderInfo.shippingInfo = bpn.tempUserInfo.shippingInfo;
+            $scope.sharedDataService.orderInfo.shippingSameAsBilling = bpn.tempUserInfo.shippingSameAsBilling;
+
+            console.log(bpn.tempUserInfo);
+          }
         }
         
       }
     ]
   );
   
-  // checkoutApp.directive('creditCardNumber', function() {
-  //   return {
-  //     require: 'ngModel',
-  //     link: function(scope, elm, attrs, ctrl) {
-  //       ctrl.$parsers.unshift(function(viewValue) {
-          
-  //         var nondigits = new RegExp(/[^0-9]+/g);
-  //         var number = viewValue.replace(nondigits,'');
-  //         var pos, digit, i, sub_total, sum = 0;
-  //         var strlen = number.length;
-  //         if (strlen < 13) { 
-  //           console.log('inside < 13')
-  //           return false; 
-  //         }
-  //         for(i=0;i<strlen;i++){
-  //           pos = strlen - i;
-  //           digit = parseInt(number.substring(pos - 1, pos));
-  //           if(i % 2 == 1){
-  //             sub_total = digit * 2;
-  //             if(sub_total > 9){
-  //               sub_total = 1 + (sub_total - 10);
-  //             }
-  //           } else {
-  //             sub_total = digit;
-  //           }
-  //           sum += sub_total;
-  //         }
-  //         if(sum > 0 && sum % 10 == 0){
-  //           console.log('inside true')
-  //           ctrl.$setValidity('creditcardnumber', true);
-  //           return viewValue;
-  //         } else {
-  //           console.log('inside false')
-  //           ctrl.$setValidity('creditcardnumber', false);
-  //           return undefined;
-  //         }
-  //       });
-  //     }
-  //   };
-  // });
-
   checkoutApp.directive('integer', function() {
     return {
       require: 'ngModel',
       link: function(scope, elm, attrs, ctrl) {
-        var maxLength = elm.attr('max');
         ctrl.$parsers.unshift(function(viewValue, maxLength) {
           var INTEGER_REGEXP = /^\-?\d*$/;
-          if (INTEGER_REGEXP.test(viewValue) && viewValue.length < maxLength) {
+          if (INTEGER_REGEXP.test(viewValue)) {
             // it is valid
             ctrl.$setValidity('integer', true);
             return viewValue;

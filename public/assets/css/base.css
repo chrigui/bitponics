@@ -2513,26 +2513,26 @@ img.page-spinner.spinner {
 /*
  * Register page
  */
-.landing-page.getstarted #main {
+.landing-page.getstarted .main {
   margin: 1em 1em 0;
 }
-.landing-page.getstarted #main .page-heading {
+.landing-page.getstarted .main .page-heading {
   font-size: 2em;
   color: #00e36c;
   font-size: 2.5em;
   line-height: 1;
   padding: 0.5em 0;
 }
-.landing-page.getstarted #main .page-content {
+.landing-page.getstarted .main .page-content {
   border-top: 1px solid #00e36c;
 }
-.landing-page.getstarted #main ul {
+.landing-page.getstarted .main ul {
   padding: 0 1em 1em;
   margin-left: 1em;
   list-style: initial;
 li
 }
-.landing-page.getstarted #main p {
+.landing-page.getstarted .main p {
   color: #00e36c;
 }
 .landing-page.register #main .page-content {
@@ -2583,6 +2583,28 @@ li
   display: block;
   width: auto;
   margin: 0 auto;
+}
+.signup .main {
+  margin: 1em 1em 0;
+}
+.signup .main .page-heading {
+  font-size: 2em;
+  color: #00e36c;
+  font-size: 2.5em;
+  line-height: 1;
+  padding: 0.5em 0;
+}
+.signup .main .page-content {
+  border-top: 1px solid #00e36c;
+}
+.signup .main ul {
+  padding: 0 1em 1em;
+  margin-left: 1em;
+  list-style: initial;
+li
+}
+.signup .main p {
+  color: #00e36c;
 }
 /*
  * App Page
@@ -4592,7 +4614,9 @@ button.close {
   color: #f00;
 }
 form .ng-invalid.ng-dirty {
-  background-color: #f00;
+  color: #f00;
+  -webkit-box-shadow: inset 0px 0px 5px #f00;
+  box-shadow: inset 0px 0px 5px #f00;
 }
 /*
  * Buy Pages
@@ -4623,6 +4647,9 @@ form .ng-invalid.ng-dirty {
 }
 .landing-page.buy form input[type="submit"] {
   margin: 1em 0 0;
+}
+.landing-page.buy p.sub-heading {
+  color: #999;
 }
 .landing-page.buy .order-info {
   border: 1px dotted #c1c2c4;

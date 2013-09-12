@@ -35,17 +35,8 @@ module.exports = function(app){
 	app.get('/buy/checkout',
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next) {
-			if (!req.session.tempUserInformation) {
-				req.session.tempUserInformation = {
-					email: '',
-					password: '',
-					number: '',
-					cvv: '',
-					month: '',
-					year: ''
-				};
-			}
 
+			// Only grabbing the Base Station data since thats the only one that can sell out
 			ProductModel.findOne({ 'SKU': baseStationProductSKU })
 				.exec(function(err, bitponicsBaseStation){
 					if (err) { return next(err); }
@@ -54,19 +45,12 @@ module.exports = function(app){
 						className: "landing-page single-page getstarted register buy",
 						pageType: "landing-page",
 						braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
-						signupError: null,
+						bitponicsProducts: {},
 						transactionError: req.session.declined ? req.session.declined : null,
-						tempUserInformation: req.session.tempUserInformation,
-						bitponicsProducts: {}
+						tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
 					};
 
 					locals.bitponicsProducts[bitponicsBaseStation.SKU] = bitponicsBaseStation;
-
-					console.log('req.session:');
-					console.log(req.session);
-
-					console.log('bitponicsBaseStation:');
-					console.log(bitponicsBaseStation);
 
 					res.render('./buy/checkout', locals);
 				});
@@ -78,171 +62,165 @@ module.exports = function(app){
 	/*
 	 * CC info form POST
 	 * Connects to Braintree to verify CC info
-	 * TODO: client side form validation
+	 * Creates customer in Braintree Vault, then does pre-auth since we're only taking pre-orders now
 	 */
 	app.post("/buy/verify_transaction",
 		routeUtils.middleware.ensureSecure, 
 		function (req, res) {
 			var customerRequest = {
-				firstName: req.body.firstName,
-				lastName: req.body.lastName,
+					firstName: req.body.firstName,
+					lastName: req.body.lastName,
+					creditCard: {
+						number: req.body.number,
+						cvv: req.body.cvv,
+						expirationMonth: req.body.month,
+						expirationYear: req.body.year,
+						billingAddress: {
+							postalCode: req.body.postalCode
+						}
+					}
+				},
+				saleRequest = {},
+				
+				// save non-sensitive pertinent info in case of error, back button, etc.
+				userInfo = {
+					isPreOrder: req.body.isPreOrder,
+					baseStationQuantity: req.body.baseStationQuantity,
+					webServicePlan: req.body.webServicePlan,
+					email: req.body.email,
+					personalInfo: {
+						firstName: req.body.firstName,
+						lastName: req.body.lastName,
+						streetAddress: req.body.streetAddress,
+						extendedAddress: req.body.extendedAddress,
+						locality: req.body.locality,
+						region: req.body.region,
+						postalCode: req.body.postalCode,
+						countryCodeAlpha2: req.body.locale_timezone
+					},
+					shippingInfo: {
+						firstName: req.body.ship_firstName,
+						lastName: req.body.ship_lastName,
+						streetAddress: req.body.ship_streetAddress,
+						extendedAddress: req.body.ship_extendedAddress,
+						locality: req.body.ship_locality,
+						region: req.body.ship_region,
+						postalCode: req.body.ship_postalCode,
+						countryCodeAlpha2: req.body.ship_locale_timezone
+					},
+					shippingSameAsBilling: req.body.shippingSameAsBilling
+				},
+				totalPriceToAuthorize = req.body.priceTotal.replace(/[^\d.-]/g, '');
+
+			//save user info in session for repopulation if needed
+			req.session.tempUserInfo = userInfo;
+
+			saleRequest = {
+				amount: totalPriceToAuthorize,
 				creditCard: {
 					number: req.body.number,
 					cvv: req.body.cvv,
 					expirationMonth: req.body.month,
-					expirationYear: req.body.year,
-					billingAddress: {
-						postalCode: req.body.postalCode
-					}
+					expirationYear: req.body.year
+				},
+				customer: {
+					firstName: req.body.firstName,
+					lastName: req.body.lastName,
+				},
+				billing: {
+					streetAddress: req.body.streetAddress,
+					extendedAddress: req.body.extendedAddress,
+					locality: req.body.locality,
+					region: req.body.region,
+					postalCode: req.body.postalCode,
+					countryCodeAlpha2: req.body.locale_timezone
+				},
+				options: {
+					storeInVault: true,
+					addBillingAddressToPaymentMethod: true,
+					storeShippingAddressInVault: true,
+					submitForSettlement: false
 				}
 			};
 
-			gateway.customer.create(customerRequest, function (err, result) {
+			if (!userInfo.shippingSameAsBilling) {
+				saleRequest.shipping = {
+					firstName: req.body.ship_firstName,
+					lastName: req.body.ship_lastName,
+					streetAddress: req.body.ship_streetAddress,
+					extendedAddress: req.body.ship_extendedAddress,
+					locality: req.body.ship_locality,
+					region: req.body.ship_region,
+					postalCode: req.body.ship_postalCode,
+					countryCodeAlpha2: req.body.ship_locale_timezone
+				}
+			}
+
+			// TODO: add subscription to web service to saleRequest
+			// https://www.braintreepayments.com/docs/node/subscriptions/overview
+
+			console.log('saleRequest');
+			console.log(saleRequest);
+			gateway.transaction.sale(saleRequest, function (err, result) {
+				console.log('err:')
+				console.log(err)
+				console.log('transaction result:');
+				console.log(result);
 				if (result.success) {
-					var customerId = result.id;
+
+					// reset error property
 					req.session.declined = false;
-					res.redirect('/buy/confirm');
-					
-					console.log('customer created:'+ customerId);
 
-					var saleRequest = {
-						amount: '399.00',
-						creditCard: {
-							number: req.body.number,
-							cvv: req.body.cvv,
-							expirationMonth: req.body.month,
-							expirationYear: req.body.year,
-							billingAddress: {
-								postalCode: req.body.postalCode
-							}
-						},
-						customer: {
-							id: customerId
-						},
-						// billing: {
-						// 	firstName: 'Paul',
-						// 	lastName: 'Smith',
-						// 	company: 'Braintree',
-						// 	streetAddress: '1 E Main St',
-						// 	extendedAddress: 'Suite 403',
-						// 	locality: 'Chicago',
-						// 	region: 'Illinois',
-						// 	postalCode: '60622',
-						// 	countryCodeAlpha2: 'US'
-						// },
-						shipping: {
-							firstName: req.body.firstName,
-							lastName: req.body.lastName,
-							streetAddress: req.body.streetAddress,
-							extendedAddress: req.body.extendedStreetAddress,
-							locality: req.body.locality,
-							region: req.body.region,
-							postalCode: req.body.postalCode,
-							countryCodeAlpha2: 'US'
-						},
-						options: {
-							storeInVault: true,
-							addBillingAddressToPaymentMethod: true,
-							storeShippingAddressInVault: true
-						}
-					};
+					// TODO: Here is probably where we should save the customerId on a new user account
+					// We should also record on the user model what the user purchased this session 
+					// 		Or have a new model just for Purchases keyed on user id?
+					// - Product SKU's are defined in bitponics/utils/db_init/seed_data/bitponicsProducts.js
+					// - Can get result.transaction.customer.id here
+					// We'll want to be able to search on the customerId later
+					// https://www.braintreepayments.com/docs/node/customers/search
 
-				//save user info in session
-				req.session.tempUserInformation = {
-					email: req.body.email,
-					password: req.body.password,
-					number: req.body.number,
-					cvv: req.body.cvv,
-					month: req.body.month,
-					year: req.body.year
-				};
+					console.log('result.transaction.customer.id:');
+					console.log(result.transaction.customer.id);
 
-				gateway.transaction.sale(saleRequest, function (err, result) {
-					if (result.success) {
-						req.session.declined = false;
-						res.redirect('/buy/confirm');
-						// res.send("<h1>Success! Transaction ID: " + result.transaction.id + "</h1>");
-					} else {
-						req.session.declined = true;
-						res.redirect('/buy/checkout?declined=true')
-						// res.send("<h1>Error:  " + result.message + "</h1>");
-					}
-				});
+					// TODO: decrement the Base Station inventory by baseStationQuantity
 
+					// TODO: send confimation email now as well
+
+					res.redirect('/buy/confirmation');
 				} else {
 					req.session.declined = true;
-					req.session.declinedMessage = result.message;
 					res.redirect('/buy/checkout');
-					// res.send("<h1>Error:  " + result.message + "</h1>");
 				}
 			});
 		}
 	);
 
 	/*
-	 * Order Confirm Page
+	 * Order Confirmation Page
 	 * 
 	 */
-	app.get('/buy/confirm',
+	app.get('/buy/confirmation',
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next) {
-			var locals = {
-					title: 'Confirm Order - Bitponics',
-					className: "landing-page single-page getstarted register buy",
-					pageType: "landing-page",
-					braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
-					tempUserInformation: req.session.tempUserInformation,
-					completedTransaction: req.session.completedTransaction
-				};
+			
+			// Only grabbing the Base Station data since thats the only one that can sell out
+			ProductModel.findOne({ 'SKU': baseStationProductSKU })
+				.exec(function(err, bitponicsBaseStation){
+					if (err) { return next(err); }
+					console.log(req.session.tempUserInfo);
+					var locals = {
+							title: 'Order Complete - Bitponics',
+							className: "landing-page single-page getstarted register buy",
+							pageType: "landing-page",
+							braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
+							bitponicsProducts: {},
+							tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
+						};
 
-			console.log('req.session:');
-			console.log(req.session);
+					locals.bitponicsProducts[bitponicsBaseStation.SKU] = bitponicsBaseStation;
 
-			res.render('./buy/confirm', locals);
-		}
-	);
-
-	/*
-	 * Confirm Order POST to braintree
-	 * Here we submit transaction for settlement as opposed to just verify
-	 * TODO:
-	 *	on success: 
-	 *		- show confirmation success message
-	 *		- remind them that their bitponics account activation email has been sent
-	 * 		- save transaction ID
-	 *		- save user info in braintree vault
-	 * 		- how and when to clear session data?
-	 *	on fail:
-	 *		- redirect to checkout page to re-check submitted info
-	 *
-	 * 
-	 */
-	app.post("/buy/create_transaction",
-		routeUtils.middleware.ensureSecure, 
-		function (req, res) {
-			var saleRequest = {
-					amount: "399.00",
-					creditCard: {
-						number: req.tempUserInformation.session.number,
-						cvv: req.tempUserInformation.session.cvv,
-						expirationMonth: req.tempUserInformation.session.month,
-						expirationYear: req.tempUserInformation.session.year
-					},
-					options: {
-						submitForSettlement: true
-					}
-				};
-
-			gateway.transaction.sale(saleRequest, function (err, result) {
-				if (result.success) {
-					req.session.completedTransaction = true;
-					res.redirect('/buy/confirm');
-				} else {
-					req.session.completedTransaction = false;
-					req.session.declined = true;
-					res.redirect('/buy/checkout');
-				}
-			});
+					res.render('./buy/confirmation', locals);
+				});
 		}
 	);
 
