@@ -64,7 +64,7 @@ module.exports = function(app){
 	 * Connects to Braintree to verify CC info
 	 * Creates customer in Braintree Vault, then does pre-auth since we're only taking pre-orders now
 	 */
-	app.post("/buy/verify_transaction",
+	app.post("/buy/verify-transaction",
 		routeUtils.middleware.ensureSecure, 
 		function (req, res) {
 			var customerRequest = {
