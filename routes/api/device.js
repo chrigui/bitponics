@@ -266,6 +266,8 @@ module.exports = function(app) {
               tempDeviceLogs.hum = csvRequestBodyParts[3];
               tempDeviceLogs.ph = csvRequestBodyParts[4];
               tempDeviceLogs.ec = csvRequestBodyParts[5];
+              
+              // TODO : make sure device document specifies that it actually has a water level sensor
               tempDeviceLogs.wl = csvRequestBodyParts[6];
 
               pendingDeviceLogs = {};
@@ -288,6 +290,9 @@ module.exports = function(app) {
       async.waterfall(
         [
           function getDevice(callback){
+            
+            // TODO : in addition to setting lastConnectionAt, clear any pending device-connection-dropped Notifications
+
             DeviceModel
             .findByIdAndUpdate(id, 
             {

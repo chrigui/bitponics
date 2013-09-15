@@ -359,6 +359,7 @@
 }
 .landing-page.buy .order-info-vertical .sub-heading {
   padding-left: 1em;
+  margin-top: 0;
 }
 .landing-page.buy .order-info-vertical .sub-heading.right {
   float: right;
@@ -369,7 +370,6 @@
 }
 .landing-page.buy .order-info-vertical .order-info {
   float: left;
-  top: -3em;
   width: 30%;
   min-width: 13em;
   margin: 0 0 2.5em 0;

@@ -2,16 +2,22 @@ var async = require('async'),
 	winston = require('winston'),
 	routeUtils = require('./route-utils'),
 	braintree = require('braintree'),
-	ProductModel = require('../models/product').model,
-	baseStationProductSKU = 'HBIT0000001';
+  async = require('async'),
+	OrderModel = require('../models/order').model,
+  ProductModel = require('../models/product').model,
+  UserModel = require('../models/user').model,
+	baseStationProductId = 'BPN_HARDWARE_BASE-STATION_1',
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 	
 
 module.exports = function(app){
-	var braintreeConfig = require('../config/braintree-config')(app.settings.env),
+	var braintreeConfig = require('../config/braintree-config'),
 		gateway = braintree.connect(braintreeConfig.braintreeGatewayConfig);
 
-	/*
-	 * Order/Preorder Landing Page
+	
+  /**
+	 * Order Landing Page
 	 * 
 	 */
 	app.get('/buy',
@@ -28,17 +34,17 @@ module.exports = function(app){
 		}
 	);
 
-	/*
-	 * Order Checkout Page
+	
+  /**
+	 * Checkout Page
 	 * 
 	 */
 	app.get('/buy/checkout',
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next) {
 
-			// Only grabbing the Base Station data since thats the only one that can sell out
-			ProductModel.findOne({ 'SKU': baseStationProductSKU })
-				.exec(function(err, bitponicsBaseStation){
+			ProductModel.find({"productType" : { $ne : feBeUtils.PRODUCT_TYPES.SERVICE_PLAN }})
+				.exec(function(err, productResults){
 					if (err) { return next(err); }
 					var locals = {
 						title: 'Checkout - Bitponics',
@@ -50,20 +56,263 @@ module.exports = function(app){
 						tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
 					};
 
-					locals.bitponicsProducts[bitponicsBaseStation.SKU] = bitponicsBaseStation;
+          productResults.forEach(function(product){
+            locals.bitponicsProducts[product._id] = product;
+          });
+					
 
 					res.render('./buy/checkout', locals);
-				});
-
-			
+				}
+      );
 		}
 	);
 
-	/*
+	
+  /**
+   * CC info form POST
+   * Connects to Braintree to verify CC info
+   * Creates customer in Braintree Vault, then does pre-auth since we're only taking pre-orders now
+   */
+  app.post("/buy/verify-transaction",
+    routeUtils.middleware.ensureSecure, 
+    function (req, res, next) {
+      
+      var reqBody = req.body,
+          email = reqBody.email ? reqBody.email.toLowerCase() : '',
+          user,
+          billingAddress = {
+            firstName: reqBody.firstName,
+            lastName: reqBody.lastName,
+            streetAddress: reqBody.streetAddress,
+            extendedAddress: reqBody.extendedAddress,
+            locality: reqBody.locality,
+            region: reqBody.region,
+            postalCode: reqBody.postalCode,
+            countryCodeAlpha2: reqBody.locale_timezone
+          },
+          shippingAddress,
+          order,
+          braintreeCC;
+      
+
+      winston.info('verify-transaction POST', reqBody);
+
+      if (reqBody.shippingSameAsBilling) { 
+        shippingAddress = billingAddress;
+      } else {
+        shippingAddress = {
+          firstName: reqBody.ship_firstName,
+          lastName: reqBody.ship_lastName,
+          streetAddress: reqBody.ship_streetAddress,
+          extendedAddress: reqBody.ship_extendedAddress,
+          locality: reqBody.ship_locality,
+          region: reqBody.ship_region,
+          postalCode: reqBody.ship_postalCode,
+          countryCodeAlpha2: reqBody.ship_locale_timezone
+        };
+      }
+
+      async.waterfall(
+        [
+          function ensureUserExists(innerCallback){
+            if (req.user && req.user._id){
+              user = req.user;
+              email = user.email;
+              return innerCallback();
+            }
+
+            UserModel.findOne({email : email}, function(err, userResult){
+              if (err) { return next(err); }
+              if (userResult){ 
+                user = userResult;
+                return innerCallback(); 
+              } else {
+                UserModel.createUserWithPassword(
+                {
+                  email : email,
+                  name : {
+                    first : reqBody.firstName,
+                    last : reqBody.lastName
+                  },
+                  streetAddress: reqBody.streetAddress,
+                  extendedAddress: reqBody.extendedAddress,
+                  locality: reqBody.locality,
+                  region: reqBody.region,
+                  postalCode: reqBody.postalCode,
+                  countryCodeAlpha2: reqBody.locale_timezone      
+                },
+                reqBody.password,
+                function(err, createdUser){
+                  if (err) { return innerCallback(err); }
+                  
+                  user = createdUser;
+                  
+                  return innerCallback();
+                });
+              }
+            });
+          },
+          function ensureBraintreeCustomerExists(innerCallback){
+            gateway.customer.find(user._id.toString(), 
+              function(err, customer){
+                winston.info("ensureBraintreeCustomerExists", err, customer);
+                if (err && err.type !== "notFoundError") { return innerCallback(err); }
+                
+                if (customer) { 
+                  return innerCallback(); 
+                }
+                
+                gateway.customer.create({
+                  id : user._id.toString(),
+                  email: email.toLowerCase(),
+                  firstName: reqBody.firstName,
+                  lastName: reqBody.lastName
+                }, function (err, result) {
+                  if (err) { return innerCallback(err); }
+                  
+                  winston.info("CREATED BRAINTREE CUSTOMER", result.customer);
+
+                  return innerCallback();
+                });
+              }
+            );
+          },
+          function createBraintreeCreditCard(innerCallback){
+            gateway.creditCard.create(
+              {
+                customerId: user._id.toString(),
+                number: reqBody.number,
+                cvv: reqBody.cvv,
+                expirationMonth: reqBody.month,
+                expirationYear: reqBody.year,
+                billingAddress: {
+                  firstName: reqBody.firstName,
+                  lastName: reqBody.lastName,
+                  streetAddress: reqBody.streetAddress,
+                  extendedAddress: reqBody.extendedAddress,
+                  locality: reqBody.locality,
+                  region: reqBody.region,
+                  postalCode: reqBody.postalCode,
+                  countryCodeAlpha2: reqBody.locale_timezone
+                }
+              }, 
+              function (err, result) {
+                winston.info("createBraintreeCreditCard", err, result);
+                if (err) { return innerCallback(err); }
+                // Customer, CC, and billing address are now in the vault
+                winston.info("CREATED BRAINTREE CC", result);
+                braintreeCC = result.creditCard;
+                return innerCallback();
+              }
+            );
+          },
+          function createShippingAddress(innerCallback){
+            if (reqBody.shippingSameAsBilling) { 
+              return innerCallback(); 
+            }
+
+            shippingAddress.customerId = user._id.toString();
+
+            gateway.address.create(
+              shippingAddress,
+              function (err, result) {
+                if (err) { return innerCallback(err); }
+                return innerCallback();
+              }
+            );
+          },
+          function createOrder(innerCallback){
+            ProductModel.find()
+            .exec(function(err, productResults){
+              if (err) { return innerCallback(err); }
+
+              var bitponicsProducts = {};
+              productResults.forEach(function(product){
+                bitponicsProducts[product._id] = product; 
+              });
+
+              var baseStation = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_HARDWARE_BASE-STATION_1"]],
+                  ecProbe = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_ACC_EC-PROBE"]],
+                  chosenWebServicePlan;
+
+              
+              order = {
+                owner : user,
+                braintreePaymentMethodToken : braintreeCC.token,
+                shippingAddress : shippingAddress,
+                items : []
+              };
+
+              // Add a device
+              order.items.push({
+                product: baseStation._id,
+                quantity : 1,
+                unitPrice : baseStation.price,
+                shippingHandling: (shippingAddress.countryCodeAlpha2 === "US" ? 15 : 50),
+                salesTax : 0 // TODO
+              });
+
+              // Check whether to add the EC probe
+              if (reqBody.ecSensor === 'true'){
+                order.items.push({
+                  product: ecProbe._id,
+                  quantity : 1,
+                  unitPrice : ecProbe.price,
+                  shippingHandling: 0,
+                  salesTax : 0 // TODO
+                });
+              }
+
+              // Check which service plan to add
+              switch(reqBody.webServicePlan){
+                case feBeUtils.PRODUCT_IDS["BPN_WEB_PREMIUM_MONTHLY"]:
+                  chosenWebServicePlan = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_WEB_PREMIUM_MONTHLY"]];
+                  break;
+
+                case feBeUtils.PRODUCT_IDS["BPN_WEB_ENTERPRISE_MONTHLY"]:
+                  chosenWebServicePlan = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_WEB_ENTERPRISE_MONTHLY"]];
+                  break;
+                
+                default:
+                  chosenWebServicePlan = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_WEB_FREE"]];
+              }
+
+              order.items.push({
+                product: chosenWebServicePlan._id,
+                quantity : 1,
+                unitPrice : 0,
+                shippingHandling: 0,
+                salesTax : 0 // TODO
+              });   
+
+              winston.info("CREATING ORDER", order);
+
+              OrderModel.create(order, function(err, createdOrder){
+                req.session.order = createdOrder;
+                return innerCallback(err, createdOrder);
+              });
+            });
+            
+          }
+        ],
+        function waterfallFinal(err, results){
+          if (err) { 
+            console.log(err);
+            return next(err); 
+          }
+          res.redirect('/buy/confirmation');
+        }
+      );
+    }
+  );
+
+
+  /**
 	 * CC info form POST
 	 * Connects to Braintree to verify CC info
 	 * Creates customer in Braintree Vault, then does pre-auth since we're only taking pre-orders now
 	 */
+   /*
 	app.post("/buy/verify-transaction",
 		routeUtils.middleware.ensureSecure, 
 		function (req, res) {
@@ -194,8 +443,9 @@ module.exports = function(app){
 			});
 		}
 	);
+*/
 
-	/*
+	/**
 	 * Order Confirmation Page
 	 * 
 	 */
@@ -204,7 +454,7 @@ module.exports = function(app){
 		function (req, res, next) {
 			
 			// Only grabbing the Base Station data since thats the only one that can sell out
-			ProductModel.findOne({ 'SKU': baseStationProductSKU })
+			ProductModel.findById(baseStationProductId)
 				.exec(function(err, bitponicsBaseStation){
 					if (err) { return next(err); }
 					console.log(req.session.tempUserInfo);
@@ -217,7 +467,7 @@ module.exports = function(app){
 							tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
 						};
 
-					locals.bitponicsProducts[bitponicsBaseStation.SKU] = bitponicsBaseStation;
+					locals.bitponicsProducts[bitponicsBaseStation._id] = bitponicsBaseStation;
 
 					res.render('./buy/confirmation', locals);
 				});

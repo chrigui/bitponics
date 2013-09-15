@@ -1017,6 +1017,7 @@ button.btn {
   background: #fff !important;
   color: #00e36c;
   border: 3px solid #00e36c;
+  box-shadow: 0 2px 3px 0px rgba(0,0,0,0.1);
 }
 a.btn i,
 button.btn i {
@@ -4621,8 +4622,16 @@ form .ng-invalid.ng-dirty {
 /*
  * Buy Pages
  */
+.landing-page.buy .main .page-content {
+  border-top: none;
+}
 .landing-page.buy .main .page-heading {
   margin-bottom: 0;
+}
+.landing-page.buy p.page-sub-heading {
+  font-size: 0.75em;
+  max-width: none;
+  color: #999;
 }
 .landing-page.buy .next-step-btn {
   width: 15em;
@@ -4660,7 +4669,8 @@ form .ng-invalid.ng-dirty {
   margin: 1em 0;
   width: 100%;
 }
-.landing-page.buy .order-info .web-service-layout .custom-checkbox-wrap {
+.landing-page.buy .order-info .web-service-layout .custom-checkbox-wrap,
+.landing-page.buy .order-info .add-on-layout .custom-checkbox-wrap {
   font-size: 0.75em;
 }
 .landing-page.buy .order-info .total-price {

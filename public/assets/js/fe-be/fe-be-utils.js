@@ -122,6 +122,49 @@ define(['moment'], function(moment){
     }
   };
 
+  utils.PRODUCT_TYPES = {
+    "ACCESSORY" : "accessory",
+    "HARDWARE" : "hardware",
+    "SERVICE_PLAN" : "service-plan"
+  };
+
+
+  utils.FULFILLMENT_STATUSES = {
+    /**
+     * Orders start in pending. Once payment is processed, moved to next stage
+     */
+    "PENDING" : "pending",
+    
+
+    /**
+     * Orders for physical items are marked as shipped once paid and shipped.
+     */
+    "SHIPPED" : "shipped",
+
+    
+    /**
+     * Orders for service plans, once paid, go straight to complete
+     */
+    "COMPLETE" : "complete"
+  };
+
+
+  utils.ORDER_STATUSES = {
+    "ACTIVE_CART" : "active-cart",
+    "SUBMITTED" : "submitted",
+    "PAID" : "paid",
+    "COMPLETE" : "complete"
+  };
+
+
+  utils.PRODUCT_IDS = {
+    "BPN_HARDWARE_BASE-STATION_1" : "BPN_HARDWARE_BASE-STATION_1",
+    "BPN_ACC_EC-PROBE" : "BPN_ACC_EC-PROBE",
+    "BPN_WEB_FREE" : "BPN_WEB_FREE",
+    "BPN_WEB_PREMIUM_MONTHLY" : "BPN_WEB_PREMIUM_MONTHLY",
+    "BPN_WEB_ENTERPRISE_MONTHLY" : "BPN_WEB_ENTERPRISE_MONTHLY"
+  };  
+
 
   utils.COMBINED_DEVICE_KEY_SPLITTER = "|";
 

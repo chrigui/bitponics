@@ -82,7 +82,7 @@ function (angular, domReady, feBeUtils) {
             locality: null,
             region: null,
             postalCode: null,
-            country: null
+            country: "US"
           },
           shippingSameAsBilling: true,
           shippingInfo: {
@@ -93,7 +93,7 @@ function (angular, domReady, feBeUtils) {
             locality: null,
             region: null,
             postalCode: null,
-            country: null
+            country: "US"
           }
         },
         activeOverlay : { is: undefined },
@@ -112,26 +112,28 @@ function (angular, domReady, feBeUtils) {
       'sharedDataService',
       function($scope, $filter, sharedDataService){
         $scope.sharedDataService = sharedDataService;
-        $scope.priceCollection = ['$scope.sharedDataService.baseStationQuantity','$scope.sharedDataService.priceSubtotal','$scope.sharedDataService.priceShipping','$scope.sharedDataService.priceTaxes'];
         
         $scope.updateOrderInfo = function () {
           // multiply device price by quantity
-          $scope.sharedDataService.orderInfo.priceSubtotal = $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.bitponicsProducts['HBIT0000001'].price * $scope.sharedDataService.orderInfo.baseStationQuantity; //Base Station V1 Device
+          $scope.sharedDataService.orderInfo.priceSubtotal = $scope.sharedDataService.orderInfo.priceTotal = 
+            (($scope.sharedDataService.bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_HARDWARE_BASE-STATION_1"]].price * $scope.sharedDataService.orderInfo.baseStationQuantity) + 
+            ($scope.sharedDataService.orderInfo.ecSensor ? $scope.sharedDataService.bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_ACC_EC-PROBE"]].price : 0));
           
           //add subtotals
           $scope.sharedDataService.orderInfo.priceTotal = $scope.sharedDataService.orderInfo.priceSubtotal +
             $scope.sharedDataService.orderInfo.priceTaxes + 
             $scope.sharedDataService.orderInfo.priceShipping;
-          
-          // format with currency symbol
-          $scope.sharedDataService.orderInfo.priceSubtotal = $filter('currency')($scope.sharedDataService.orderInfo.priceSubtotal, '$');
-          $scope.sharedDataService.orderInfo.priceTaxes = $filter('currency')($scope.sharedDataService.orderInfo.priceTaxes, '$');
-          $scope.sharedDataService.orderInfo.priceShipping = $filter('currency')($scope.sharedDataService.orderInfo.priceShipping, '$');
-          $scope.sharedDataService.orderInfo.priceTotal = $filter('currency')($scope.sharedDataService.orderInfo.priceTotal, '$');
-          
         }
 
-        $scope.$watchCollection('priceCollection', function () {
+        $scope.$watch("sharedDataService.orderInfo.personalInfo.country", function () {
+          if ($scope.sharedDataService.orderInfo.personalInfo.country === "US"){
+            $scope.sharedDataService.orderInfo.priceShipping = 15;
+          } else {
+            $scope.sharedDataService.orderInfo.priceShipping = 50;
+          }
+        });
+
+        $scope.$watchCollection("[sharedDataService.orderInfo.baseStationQuantity,sharedDataService.orderInfo.ecSensor,sharedDataService.orderInfo.priceSubtotal,sharedDataService.orderInfo.priceShipping,sharedDataService.orderInfo.priceTaxes]", function () {
           $scope.updateOrderInfo();
         });
 
@@ -165,6 +167,23 @@ function (angular, domReady, feBeUtils) {
       'sharedDataService',
       function($scope, sharedDataService){
         $scope.sharedDataService = sharedDataService;
+
+        $scope.$watch('sharedDataService.orderInfo.personalInfo',
+          function(){
+            if (sharedDataService.orderInfo.shippingSameAsBilling){
+              sharedDataService.orderInfo.shippingInfo = JSON.parse(JSON.stringify(sharedDataService.orderInfo.personalInfo));
+            }
+          },
+          true
+        );
+
+        $scope.$watch('sharedDataService.orderInfo.shippingSameAsBilling',
+          function(){
+            if (sharedDataService.orderInfo.shippingSameAsBilling){
+              sharedDataService.orderInfo.shippingInfo = JSON.parse(JSON.stringify(sharedDataService.orderInfo.personalInfo));
+            }
+          }
+        );
       }
     ]
   );
@@ -180,12 +199,13 @@ function (angular, domReady, feBeUtils) {
         $scope.init = function () {
           console.log('stuff')
           $scope.sharedDataService.orderInfo.baseStationQuantity = 1;
-          $scope.sharedDataService.orderInfo.webServicePlan = 'WBIT0000002';
+          $scope.sharedDataService.orderInfo.webServicePlan = 'BPN_WEB_PREMIUM_MONTHLY';
           $scope.sharedDataService.bitponicsProducts = bpn.products;
           
           // repopulate form
           if (bpn.tempUserInfo) {
             $scope.sharedDataService.orderInfo.baseStationQuantity = bpn.tempUserInfo.baseStationQuantity * 1;
+            $scope.sharedDataService.orderInfo.ecSensor = bpn.tempUserInfo.ecSensor;
             $scope.sharedDataService.orderInfo.webServicePlan = bpn.tempUserInfo.webServicePlan;
             $scope.sharedDataService.orderInfo.email = bpn.tempUserInfo.email;
             $scope.sharedDataService.orderInfo.personalInfo = bpn.tempUserInfo.personalInfo;

@@ -51,7 +51,7 @@ var mongoose   = require('mongoose'),
     growPlanInstances: {},
     users: {},
     sensorLogs: {},
-    bitponicsProducts: {}
+    products: {}
   },
   mongooseConnection;
 
@@ -263,10 +263,10 @@ async.series([
           });
         },
         function(innerCallback){
-          if (!mongooseConnection.collections['bitponicsproducts']){ return innerCallback();}
-          mongooseConnection.collections['bitponicsproducts'].drop( function(err) {
+          if (!mongooseConnection.collections['products']){ return innerCallback();}
+          mongooseConnection.collections['products'].drop( function(err) {
             if (err){ return innerCallback(err);}
-            console.log('bitponicsproducts collection dropped');
+            console.log('products collection dropped');
             innerCallback();
           });
         }
@@ -938,7 +938,7 @@ async.series([
      * Sensor Logs
      */
 
-    var dataType = 'bitponicsProducts',
+    var dataType = 'products',
       dataCount = data[dataType].length,
       decrementData = function(){
         dataCount--;
@@ -950,25 +950,25 @@ async.series([
     console.log('####### ' + dataType + ' #######');
 
     data[dataType].forEach(function(_data){
-      models.bitponicsProduct.findById(_data._id, function(err, result){
+      models.product.findById(_data._id, function(err, result){
         if (err) { console.log(err); return callback(err);}
         if (result){
           return decrementData();
         } else {
-          var dataObj = new models.bitponicsProduct({
+          var dataObj = new models.product({
             _id : _data._id,
-            SKU: _data.SKU,
             productType: _data.productType,
             name: _data.name,
             description: _data.description,
             price: _data.price,
+            billingCycle : _data.billingCycle,
             stock: _data.stock
           });
 
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][doc._id] = doc._id;
-            console.log("created bitponicsProduct");
+            console.log("created product");
             decrementData();
           });
         }

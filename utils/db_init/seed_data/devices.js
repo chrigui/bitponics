@@ -227,5 +227,17 @@ module.exports = [
 			deviceType: "506de2fe8eebf7524342cb37",
 			serial: "WD-301-NT6Q",
 			name : "Hyatt's Bitponics Device"
-		}
+		},
+    {
+      _id : "000666809f48",
+      deviceType: "506de2fe8eebf7524342cb37",
+      serial: "WD-301-C674",
+      name : "Antonio Device 2013-09-10"
+    },
+    {
+      _id : "000666809d9a",
+      deviceType: "506de2fe8eebf7524342cb37",
+      serial: "WD-301-AVZ1",
+      name : "Antonio Device 2013-09-11"
+    }
 	];

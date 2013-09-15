@@ -199,6 +199,7 @@ GrowPlanInstanceSchema.virtual('timezone')
     this.tz = timezone;
   });
 
+GrowPlanInstanceSchema.index({ users: 1 });
 GrowPlanInstanceSchema.index({ device: 1, active: 1 });
 GrowPlanInstanceSchema.index({ active: 1, 'phases.expectedEndDate' : 1 });
 

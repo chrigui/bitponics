@@ -13,9 +13,9 @@ module.exports = {
 	notification: require('./notification').model,
 	nutrient: require('./nutrient').model,
 	photo : require('./photo').model,
-	sensor: require('./sensor').model,
+	product: require('./product').model,
+  sensor: require('./sensor').model,
 	sensorLog: require('./sensorLog').model,
 	user: require('./user').model,
-	bitponicsProduct: require('./product').model,
 	utils : require('./utils')
 };

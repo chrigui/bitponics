@@ -61,7 +61,7 @@ DeviceKeySchema.virtual('combinedKey')
 UserSchema = new Schema({
   
   /**
-   * Organizations will be treated as "standard users plus XYZ".
+   * Organizations will be treated as "standard users plus some features".
    */
   isOrganization : { type : Boolean },
 
@@ -77,8 +77,8 @@ UserSchema = new Schema({
 
 
   name : {
-	    first: String
-	  , last: String
+    first: String,
+	  last: String
 	},
   
   email : { 
@@ -90,12 +90,38 @@ UserSchema = new Schema({
   phone : { type : String },
   
   address : {
-  	line1 : String,
-  	line2 : String,
-  	city : String,
-  	state : String,
-  	zip : String,
-  	country : { type: String, default: 'United States'}
+  	
+    /**
+     * Line 1
+     */
+    streetAddress : String,
+  	
+    /**
+     * Line 2
+     */
+    extendedAddress : String,
+  	
+    /**
+     * City
+     */
+    locality : String,
+
+    /** 
+     * State
+     */
+  	region : String,
+  	
+    /**
+     * Zip
+     */
+    postalCode : String,
+
+
+  	/**
+     * 2-letter country code
+     * http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+     */
+    countryCode : { type: String, default: 'US' }
   },
   
   salt: { type: String, required: true },
@@ -135,26 +161,7 @@ UserSchema = new Schema({
   	 * Private API key is a 32-char random hex string
   	 */
   	private: String
-  },
-  
-  plans : [
-  	{
-  		type : { type: String, enum: [
-			'free',
-			'serious',
-			'industrial'
-		]},
-		growPlanInstance : { type : ObjectIdSchema, ref : 'GrowPlanInstance' },
-		createdAt : { type : Date, default : Date.now },
-		payments : [
-			{
-				ts : { type : Date },
-				amount : { type : Number }
-			}
-		],
-		active : { type : Boolean, default: true }
-  	}
-  ]
+  }
 },
 { id : false });
 
@@ -234,7 +241,7 @@ UserSchema.static('createUserWithPassword', function(userProperties, password, d
 
 
 UserSchema.static('authenticate', function(email, password, done) {
-  this.findOne({ email: email }, function(err, user) {
+  this.findOne({ email: email.toLowerCase() }, function(err, user) {
       if (err) { return done(err); }
       if (!user) { return done(new Error('No user found with that email'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
