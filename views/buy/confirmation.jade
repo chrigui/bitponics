@@ -15,13 +15,7 @@ block content
 
         div(class="page-content")
 
-
           h3.sub-heading Order Overview
-          - if (tempUserInfo)
-            p You have successfully pre-ordered #{tempUserInfo.baseStationQuantity} Bitponics Base Station
-              -if (tempUserInfo.baseStationQuantity.length > 1)
-                |s.
-              -else
-                |.
-
+          - if (order)
+            p You have successfully pre-ordered the Bitponics Base Station.
             p Check your inbox for a confirmation email.

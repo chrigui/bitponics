@@ -81,6 +81,13 @@ var OrderSchema = new Schema(
 
     
     /**
+     * The request session id created when a user first starts entering items
+     * into a cart. Used for querying in case a user is not logged in and we
+     * don't have an owner on the Order
+     */
+    sessionId : { type : String, required: false },
+
+    /**
      * Signing up for the free plan still might be entered as an Order, so don't require a payment method
      */
     braintreePaymentMethodToken : { type : String, required: false },
@@ -116,6 +123,19 @@ var OrderSchema = new Schema(
       postalCode: { type : String },
       countryCode : { type : String }
     },
+
+
+    billingAddress : {
+      firstName: { type : String },
+      lastName: { type : String },
+      streetAddress: { type : String },
+      extendedAddress: { type : String },
+      locality: { type : String },
+      region: { type : String },
+      postalCode: { type : String },
+      countryCode : { type : String }
+    },
+
 
     fulfillmentStatus : {
       type : String,
@@ -177,6 +197,7 @@ OrderSchema.static('create', function(options, callback){
       ProductModel.findById(modelUtils.getDocumentIdString(orderItem.product))
       .exec(function(err, product){
         
+
         switch(product.productType){
           case feBeUtils.PRODUCT_TYPES.SERVICE_PLAN : 
 
@@ -194,7 +215,7 @@ OrderSchema.static('create', function(options, callback){
     function itemsComplete(err){
       order.save(function(err, createdOrder){
         // TODO : if status is not ACTIVE_CART, email the owner with status
-
+        console.log("CREATED CART", err, createdOrder)
         return callback(err, createdOrder);
       });
     }
@@ -203,6 +224,7 @@ OrderSchema.static('create', function(options, callback){
 
 
 OrderSchema.index({ 'user' : 1, 'status' : 1 });
+OrderSchema.index({ 'sessionId' : 1, 'status' : 1 });
 
 
 

@@ -11,11 +11,22 @@ block content
 
   section#main(role="main", class="main", ng-controller="bpn.controllers.buy.checkout.Main", ng-init="init()")
     div(id="buy", class="content-module middle")
+      
+      if (bitponicsProducts['BPN_HARDWARE_BASE-STATION_1'].stock < 1)
+        h3(class="page-heading nav-section")
+          | Pre-orders for the Bitponics Base Station have closed.
+        p.page-sub-heading We're sorry, but pre-orders for our first batch of devices have closed. We're working hard to increase capacity ASAP, so to find out when we open up pre-orders for the next batch, sign up for our newsletter:
+        div#email-sub
+          form(action="http://bitponics.us2.list-manage1.com/subscribe/post?u=68c690cb49ec37200919b6e55&amp;id=9b5ad31a92", method="post", id="mc-embedded-subscribe-form", name="mc-embedded-subscribe-form", class="validate", target="_blank")
+            input(type="email", value="", name="EMAIL", class="subscribe", id="mce-EMAIL", placeholder="Email", required)
+            input(type="submit", value="Subscribe", name="subscribe", id="mc-embedded-subscribe", class="button")
+
+      else 
         h3(class="page-heading nav-section")
           | Reserve your Bitponics Base Station
-
-        p.page-sub-heading Don't worry, we'll only charge your credit card once we ship your order. Select optional add-ons and choose your Bitponics Cloud Web Service plan. By pre-ordering a Base Station today, you're getting <b>$100 off</b> the retail price and your first <b>3 months free</b> on the Serious Grower service plan.
-        p.page-sub-heading We can currently only accept U.S. orders.
+        p.page-sub-heading Currently planned for shipment by November 2013.
+        p.page-sub-heading And don't worry, we'll only charge your credit card once we ship your order. Select optional add-ons and choose your Bitponics Cloud Web Service plan. By pre-ordering a Base Station today, you're getting <b>$100 off</b> the retail price and your first <b>3 months free</b> on the Serious Grower service plan.
+        
 
         //- Tested an alt. layout for checkout page.. didnt like it as much
         //- div(class="page-content order-info-horizontal")

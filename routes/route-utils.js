@@ -187,6 +187,14 @@ module.exports = {
               resource.createdBy.equals(userId) || 
               resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
+  },
+
+  /**
+   * Check whether a request carries a logged-in user
+   * @param {HTTP Request} req
+   */
+  isUserLoggedIn: function(req){
+    return (req.user && req.user._id);
   }
 
   

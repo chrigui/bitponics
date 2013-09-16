@@ -6,9 +6,10 @@ var async = require('async'),
 	OrderModel = require('../models/order').model,
   ProductModel = require('../models/product').model,
   UserModel = require('../models/user').model,
-	baseStationProductId = 'BPN_HARDWARE_BASE-STATION_1',
-  requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+	requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils'),
+  error = require('../lib/error'),
+  baseStationProductId = feBeUtils.PRODUCT_IDS['BPN_HARDWARE_BASE-STATION_1'];
 	
 
 module.exports = function(app){
@@ -43,26 +44,61 @@ module.exports = function(app){
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next) {
 
-			ProductModel.find({"productType" : { $ne : feBeUtils.PRODUCT_TYPES.SERVICE_PLAN }})
-				.exec(function(err, productResults){
-					if (err) { return next(err); }
-					var locals = {
-						title: 'Checkout - Bitponics',
-						className: "landing-page single-page getstarted register buy",
-						pageType: "landing-page",
-						braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
-						bitponicsProducts: {},
-						transactionError: req.session.declined ? req.session.declined : null,
-						tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
-					};
+      async.waterfall(
+        [
+          function ensureCart(innerCallback){
+            var orderQuery = { status : feBeUtils.ORDER_STATUSES.ACTIVE_CART };
 
-          productResults.forEach(function(product){
-            locals.bitponicsProducts[product._id] = product;
-          });
-					
+            // If it's a logged-in user, see if they have a cart open
+            if(routeUtils.isUserLoggedIn(req)){
+              orderQuery.owner = req.user._id;
+            } else {
+              orderQuery.sessionId = req.sessionID;
+            }
 
-					res.render('./buy/checkout', locals);
-				}
+            OrderModel.findOne(orderQuery)
+            .exec(function(err, cart){
+              if (err) { return innerCallback(err); }
+              if (cart){
+                return innerCallback(null, cart);
+              } else {
+                OrderModel.create({
+                  owner : (routeUtils.isUserLoggedIn(req) ? req.user : undefined),
+                  sessionId : req.sessionID,
+                  status : feBeUtils.ORDER_STATUSES.ACTIVE_CART
+                }, 
+                innerCallback);
+              }
+            });
+          },
+        ],
+        
+        function waterfallFinal(err, cart){
+          if (err) { return nextr(err); }          
+          ProductModel.find()
+            .exec(function(err, productResults){
+              if (err) { return next(err); }
+              var locals = {
+                title: 'Checkout - Bitponics',
+                className: "landing-page single-page getstarted register buy",
+                pageType: "landing-page",
+                braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
+                cart : cart,
+                bitponicsProducts: {},
+                transactionError : null,
+                tempUserInfo : null
+                //transactionError: req.session.declined ? req.session.declined : null,
+                //tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
+              };
+
+              productResults.forEach(function(product){
+                locals.bitponicsProducts[product._id] = product;
+              });
+
+              res.render('./buy/checkout', locals);
+            }
+          );
+        }
       );
 		}
 	);
@@ -199,6 +235,9 @@ module.exports = function(app){
               function (err, result) {
                 winston.info("createBraintreeCreditCard", err, result);
                 if (err) { return innerCallback(err); }
+                if (!result.success){
+                  return innerCallback(new error.ValidationError("Credit card failed verification"));
+                }
                 // Customer, CC, and billing address are now in the vault
                 winston.info("CREATED BRAINTREE CC", result);
                 braintreeCC = result.creditCard;
@@ -280,10 +319,10 @@ module.exports = function(app){
               order.items.push({
                 product: chosenWebServicePlan._id,
                 quantity : 1,
-                unitPrice : 0,
+                unitPrice : 0, // no immediate charge for service plans; only after activation
                 shippingHandling: 0,
                 salesTax : 0 // TODO
-              });   
+              });
 
               winston.info("CREATING ORDER", order);
 
@@ -464,6 +503,7 @@ module.exports = function(app){
 							pageType: "landing-page",
 							braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
 							bitponicsProducts: {},
+              order : (req.session.order || null),
 							tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
 						};
 
