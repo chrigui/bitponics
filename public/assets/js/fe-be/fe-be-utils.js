@@ -404,5 +404,10 @@ define(['moment'], function(moment){
     return result;
   };
 
+
+  utils.friendlyFormatObjectId = function(objectId){
+    return objectId.toString().match(new RegExp('.{1,4}', 'g')).join("-");
+  };
+
   return utils;
 });

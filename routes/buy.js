@@ -471,26 +471,27 @@ module.exports = function(app){
 	app.get('/buy/confirmation',
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next) {
+			var locals = {
+            title: 'Order Complete - Bitponics',
+            className: "landing-page single-page getstarted register buy",
+            pageType: "landing-page",
+            braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
+            bitponicsProducts: {},
+            order : null
+          };
+
+      
+      OrderModel.findById(req.query.orderId)
+      .exec(function(err, order){
+        if (err) { return next(err); }
+
+        locals.order = order;
+        locals.orderId = feBeUtils.friendlyFormatObjectId(order._id);
+
+        res.render('./buy/confirmation', locals);
+      });
+
 			
-			// Only grabbing the Base Station data since thats the only one that can sell out
-			ProductModel.findById(baseStationProductId)
-				.exec(function(err, bitponicsBaseStation){
-					if (err) { return next(err); }
-					console.log(req.session.tempUserInfo);
-					var locals = {
-							title: 'Order Complete - Bitponics',
-							className: "landing-page single-page getstarted register buy",
-							pageType: "landing-page",
-							braintreeClientSideKey: braintreeConfig.braintreeClientSideKey,
-							bitponicsProducts: {},
-              order : (req.session.order || null),
-							tempUserInfo: req.session.tempUserInfo ? req.session.tempUserInfo : null
-						};
-
-					locals.bitponicsProducts[bitponicsBaseStation._id] = bitponicsBaseStation;
-
-					res.render('./buy/confirmation', locals);
-				});
 		}
 	);
 
