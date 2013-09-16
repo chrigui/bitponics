@@ -195,7 +195,41 @@ module.exports = {
    */
   isUserLoggedIn: function(req){
     return (req.user && req.user._id);
-  }
+  },
 
-  
+
+  /**
+   * @param {HTTP Request} req
+   * @param {function(err, cart)} callback
+   */
+  getCart: function(req, callback){
+    var async = require('async'),
+        requirejs = require('../lib/requirejs-wrapper'),
+        feBeUtils = requirejs('fe-be-utils'),
+        OrderModel = require('../models/order').model;
+
+    var orderQuery = { status : feBeUtils.ORDER_STATUSES.ACTIVE_CART };
+
+    // If it's a logged-in user, see if they have a cart open
+    if(module.exports.isUserLoggedIn(req)){
+      orderQuery.owner = req.user._id;
+    } else {
+      orderQuery.sessionId = req.sessionID;
+    }
+
+    OrderModel.findOne(orderQuery)
+    .exec(function(err, cart){
+      if (err) { return callback(err); }
+      if (cart){
+        return callback(null, cart);
+      } else {
+        OrderModel.create({
+          owner : (module.exports.isUserLoggedIn(req) ? req.user : undefined),
+          sessionId : req.sessionID,
+          status : feBeUtils.ORDER_STATUSES.ACTIVE_CART
+        }, 
+        callback);
+      }
+    });
+  }
 };

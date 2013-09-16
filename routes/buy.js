@@ -47,34 +47,12 @@ module.exports = function(app){
       async.waterfall(
         [
           function ensureCart(innerCallback){
-            var orderQuery = { status : feBeUtils.ORDER_STATUSES.ACTIVE_CART };
-
-            // If it's a logged-in user, see if they have a cart open
-            if(routeUtils.isUserLoggedIn(req)){
-              orderQuery.owner = req.user._id;
-            } else {
-              orderQuery.sessionId = req.sessionID;
-            }
-
-            OrderModel.findOne(orderQuery)
-            .exec(function(err, cart){
-              if (err) { return innerCallback(err); }
-              if (cart){
-                return innerCallback(null, cart);
-              } else {
-                OrderModel.create({
-                  owner : (routeUtils.isUserLoggedIn(req) ? req.user : undefined),
-                  sessionId : req.sessionID,
-                  status : feBeUtils.ORDER_STATUSES.ACTIVE_CART
-                }, 
-                innerCallback);
-              }
-            });
+            return routeUtils.getCart(req, innerCallback);
           },
         ],
-        
+
         function waterfallFinal(err, cart){
-          if (err) { return nextr(err); }          
+          if (err) { return next(err); }          
           ProductModel.find()
             .exec(function(err, productResults){
               if (err) { return next(err); }
@@ -260,7 +238,7 @@ module.exports = function(app){
               }
             );
           },
-          function createOrder(innerCallback){
+          function placeOrder(innerCallback){
             ProductModel.find()
             .exec(function(err, productResults){
               if (err) { return innerCallback(err); }
@@ -275,15 +253,10 @@ module.exports = function(app){
                   chosenWebServicePlan;
 
               
-              order = {
-                owner : user,
-                braintreePaymentMethodToken : braintreeCC.token,
-                shippingAddress : shippingAddress,
-                items : []
-              };
+              orderItems = [];
 
               // Add a device
-              order.items.push({
+              orderItems.push({
                 product: baseStation._id,
                 quantity : 1,
                 unitPrice : baseStation.price,
@@ -293,7 +266,7 @@ module.exports = function(app){
 
               // Check whether to add the EC probe
               if (reqBody.ecSensor === 'true'){
-                order.items.push({
+                orderItems.push({
                   product: ecProbe._id,
                   quantity : 1,
                   unitPrice : ecProbe.price,
@@ -316,7 +289,7 @@ module.exports = function(app){
                   chosenWebServicePlan = bitponicsProducts[feBeUtils.PRODUCT_IDS["BPN_WEB_FREE"]];
               }
 
-              order.items.push({
+              orderItems.push({
                 product: chosenWebServicePlan._id,
                 quantity : 1,
                 unitPrice : 0, // no immediate charge for service plans; only after activation
@@ -326,20 +299,27 @@ module.exports = function(app){
 
               winston.info("CREATING ORDER", order);
 
-              OrderModel.create(order, function(err, createdOrder){
-                req.session.order = createdOrder;
-                return innerCallback(err, createdOrder);
+
+              routeUtils.getCart(req, function(err, cart){
+                cart.owner = user;
+                cart.braintreePaymentMethodToken = braintreeCC.token;
+                cart.shippingAddress = shippingAddress;
+                cart.billingAddress = billingAddress;
+                cart.items = orderItems;
+                
+                cart.submitOrder(innerCallback);
               });
             });
-            
           }
         ],
-        function waterfallFinal(err, results){
-          if (err) { 
-            console.log(err);
-            return next(err); 
+        function waterfallFinal(err, order){
+          if (err){
+            if (err.name !== "ValidationError") { return next(err); }
+            req.session.checkout = req.session.checkout || {};
+            req.session.checkout.validationError = err;
+            return res.redirect('/buy/checkout');
           }
-          res.redirect('/buy/confirmation');
+          res.redirect('/buy/confirmation?orderId=' + order._id.toString());
         }
       );
     }

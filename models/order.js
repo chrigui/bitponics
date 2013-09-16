@@ -196,20 +196,6 @@ OrderSchema.static('create', function(options, callback){
     function itemIterator(orderItem){
       ProductModel.findById(modelUtils.getDocumentIdString(orderItem.product))
       .exec(function(err, product){
-        
-
-        switch(product.productType){
-          case feBeUtils.PRODUCT_TYPES.SERVICE_PLAN : 
-
-            break;
-
-          default: 
-
-
-        }
-
-        // TODO : decrement stock counters on products
-
       });
     },
     function itemsComplete(err){
@@ -220,6 +206,21 @@ OrderSchema.static('create', function(options, callback){
       });
     }
   );
+});
+
+
+/**
+ * Advance a shopping cart into a submitted order
+ * Decrements stocks of products
+ */
+OrderSchema.method('submitOrder', function(callback){
+  var order = this;
+
+  // TODO : decrement stock counters on products
+
+  order.status = feBeUtils.ORDER_STATUSES.SUBMITTED;
+
+  order.save(callback);
 });
 
 
