@@ -8,18 +8,26 @@ block head
   script(type='text/ng-template', id='connect.html')
 
     div(class="separator-top")
+      p 
+        | Now, we need to send your device key to your Base Station and tell it how to connect to your Wifi network. 
+        | When in setup mode, the Base Station broadcasts a Wifi network named "BITPONICS". 
+        | By connecting your computer to that network, you're able to send setup information to the device. 
+      p We'll walk you through the process below. If at any time you need assistance, please contact us at our 
+        a(href="/help") help page
+        | .
       ol.list-style
         li
-          h4.page-heading-small Power your Base Station
+          h4.page-heading-small Power up your Base Station
           p 
-            | Plug your Base Station into a power outlet. The "Status" light on the top left should start rapidly blinking yellow, like so:
-            span.led-indicator.scan
+            | Plug your Base Station into a power outlet. Your Base Station has a status light located here: [TODO: insert diagram]
           p
-            | This indicates that it's scanning the available WiFi networks. Once it starts a slower green blinking, you're ready for the next step:
+            | When you first plug in your Base Station, this light will be red, indicating that it's starting up. 
+            span.led-indicator.scan
+            | Once the light switches to blue, your device has started broadcasting the "BITPONICS" network, and you're ready for the next step. 
             span.led-indicator.adhoc
         li
           h4.page-heading-small Connect to "BITPONICS"
-          p Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it.
+          p Go into your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it. This may take up to 1 minute. 
         li
           h4.page-heading-small Link Base Station
           p Once you're connected, click the button below to link your Base Station.
