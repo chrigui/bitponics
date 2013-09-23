@@ -86,16 +86,7 @@ GrowSystemSchema.static('isEquivalentTo', function(source, other){
   if (source.plantCapacity !== other.plantCapacity){
     return false;
   }
-  // existence of overallSize property
-  if ( !(
-      (source.overallSize && other.overallSize)
-      ||
-      (!source.overallSize && !other.overallSize)
-      )
-    )
-  { 
-    return false; 
-  }
+  
   // deep check of overallSize
   if (source.overallSize && other.overallSize){
     if (source.overallSize.w !== other.overallSize.w){
