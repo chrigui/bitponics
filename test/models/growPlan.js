@@ -3,6 +3,7 @@ mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
 Models = require('../../models'),
 GrowPlan = Models.growPlan,
+PhaseSchema = require('../../models/growPlan').phase.schema,
 DeviceModel = Models.device,
 NotificationModel = Models.notification,
 ModelUtils = Models.utils,
@@ -52,11 +53,7 @@ async = require('async');
     describe('.isEquivalentTo', function(){
 
       beforeEach(function(done){
-        var self = this,
-            other = sampleGrowPlans[0];
-        
-        other._id = new ObjectID();
-        self.other = new GrowPlan(other);
+        var self = this;
 
         ModelUtils.getFullyPopulatedGrowPlan(
           {_id : '506de30c8eebf7524342cb70'},
@@ -524,7 +521,69 @@ async = require('async');
         );
       }); // /returns the original GrowPlan if there haven\'t been any modifications
   
-  
+      it('updates original GrowPlan if name has been modified and owner is the solo user', function(done){
+      
+        var self = this;
+        should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+        self.sourceGrowPlan.name = "new unittest grow plan name";
+
+        GrowPlan.createNewIfUserDefinedPropertiesModified(
+          {
+            growPlan : self.sourceGrowPlan,
+            user : self.userId,
+            visibility : 'public'
+          },
+          function(err, validatedGrowPlan){
+            should.not.exist(err);
+            should.exist(validatedGrowPlan);
+            
+            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be the same");
+
+            ModelUtils.getFullyPopulatedGrowPlan(
+              {_id : validatedGrowPlan._id },
+              function(err, growPlans){
+                var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                should.exist(fullyPopulatedValidatedGrowPlan);
+
+                GrowPlan.isEquivalentTo(
+                  self.originalGrowPlan, 
+                  fullyPopulatedValidatedGrowPlan, 
+                  function(err, isEquivalent){
+                    should.not.exist(err);
+                    
+                    isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
+                    
+                    self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
+                    self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
+    
+                    // The phases should be equivalent though
+                    var phaseIterator = 0;
+                    async.eachSeries(self.originalGrowPlan.phases,
+                      function itemIterator(phase, iteratorCallback){
+                        PhaseSchema.statics.isEquivalentTo(
+                          phase, 
+                          fullyPopulatedValidatedGrowPlan.phases[phaseIterator++],
+                          function(err, isEquivalent){
+                            isEquivalent.should.equal(true, "phases should be equivalent");
+                            return iteratorCallback();
+                          }
+                        );
+                      },
+                      function loopEnd(){
+                        done();
+                      }
+                    );
+                  }
+                );
+              }
+            );   
+          }
+        );
+      }); // /returns a branched GrowPlan if name has been modified
+
+
+  /*
       it('returns a branched GrowPlan if name has been modified', function(done){
         var self = this;
         should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
@@ -541,7 +600,7 @@ async = require('async');
             should.not.exist(err);
             should.exist(validatedGrowPlan);
             
-            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(false, "_id's should be different");
+            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be be the same");
 
             ModelUtils.getFullyPopulatedGrowPlan(
               {_id : validatedGrowPlan._id },
@@ -568,7 +627,7 @@ async = require('async');
           }
         );
       }); // /returns a branched GrowPlan if name has been modified
-
+*/
 
       
       it('updates associated active GrowPlanInstances if the growPlan has been branched', function(done){

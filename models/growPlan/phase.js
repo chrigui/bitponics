@@ -85,7 +85,6 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 	// compare phaseEndDescription
 	if (source.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
 
-
   // compare growSystem, shallow
   if ( !(
       (source.growSystem && other.growSystem)
@@ -103,7 +102,6 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
       return callback(null, false);
     }
   }
-
 	// compare light, shallow
 	if (!(
 		(source.light && other.light)
@@ -132,7 +130,6 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 			return callback(null, false); 
 		}
 	}
-	
 
 	// compare actions, shallow
 	if ( !(
@@ -184,7 +181,6 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 		return callback(null, false);
 	}
 	
-
 	async.parallel(
 		[
       function growSystemComparison(innerCallback){
@@ -309,7 +305,7 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
 			}
 		],
 		function parallelComparisonEnd(err, results){
-			var allAsyncEquivalenceChecksPassed = results.every(function(result){ return result; });
+      var allAsyncEquivalenceChecksPassed = results.every(function(result){ return result; });
 			return callback(err, allAsyncEquivalenceChecksPassed);
 		}
 	);

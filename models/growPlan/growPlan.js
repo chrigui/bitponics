@@ -32,6 +32,7 @@ GrowPlanSchema = new Schema({
    */
   createdBy: { type: ObjectIdSchema, ref: 'User' },
 	
+  
   /**
    * Name
    */
@@ -63,6 +64,10 @@ GrowPlanSchema.plugin(useTimestamps);
 
 /************************** VIRTUALS ***************************/
 
+GrowPlanSchema.virtual('owner')
+.get(function () {
+    return this.createdBy;
+});
 
 /**
  * Sensors is a read-only view of all the sensors used by the GrowPlan.
@@ -270,9 +275,11 @@ GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
  * Takes a fully-populated GrowPlan object (such as is submitted from grow-plans creation page)
  * and, for all nested documents (plants, phases.actions, phases.nutrients, etc) creates them if they don't match existing DB entries.
  *
- * Then saves the whole shebang and returns it.
+ * If the submitted GP is different than the original GP retrived from the database:
+ * - If the the user is the owner of the GP and is also the sole user of it (no other users' gardens are running the GP), then simply update the original GP
+ * - else, save as a new GP as a branch the original
  * 
- * If a new GrowPlan is created, this will also update any associated GrowPlanInstances that have "trackGrowPlanUpdates == true".
+ * If any differences are detected, this will also update any associated Gardens that have "trackGrowPlanUpdates == true".
  * It will attempt to keep the GPI's on the same phase, and update their active actions, etc. And send out a Notification of things
  * that have been done.
  * 
@@ -285,119 +292,181 @@ GrowPlanSchema.static('isEquivalentTo', function(source, other, callback){
 GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedGrowPlan = options.growPlan,
       user = options.user,
+      userId = getObjectId(user),
       visibility = options.visibility,
       silentValidationFail = options.silentValidationFail,
       GrowPlanModel = this,
-      GrowPlanInstanceModel = require('../growPlanInstance').model;
+      GrowPlanInstanceModel = require('../growPlanInstance').model,
+      originalGrowPlan;
 
 
   ModelUtils.getFullyPopulatedGrowPlan( { _id: submittedGrowPlan._id }, function(err, growPlanResults){
     if (err) { return callback(err); }
 
-    var growPlanResult = growPlanResults[0];
+    originalGrowPlan = growPlanResults[0];
 
-    if (!growPlanResult){ 
+    if (!originalGrowPlan){ 
       return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
     }
 
-    GrowPlanModel.isEquivalentTo(submittedGrowPlan, growPlanResult, function(err, isEquivalent){
+    GrowPlanModel.isEquivalentTo(submittedGrowPlan, originalGrowPlan, function(err, isEquivalent){
       if (err) { return callback(err); }
 
       if (isEquivalent) { 
         // need to return a model object
-        return GrowPlanModel.findById(growPlanResult._id, callback);
+        return GrowPlanModel.findById(originalGrowPlan._id, callback);
       }
       
-      // if not equivalent, branch the  source GrowPlan
-      submittedGrowPlan._id = new ObjectId();
-      submittedGrowPlan.parentGrowPlanId = growPlanResult._id;
-      submittedGrowPlan.createdBy = user;
-      submittedGrowPlan.visibility = visibility;
-
-      async.parallel(
+      
+      async.waterfall(
         [
-          function plantsCheck(innerCallback){
-            var validatedPlants = [];
+          function checkIfSoloUser(innerCallback){
+            var originalGrowPlanCreatedById = getObjectId(originalGrowPlan.createdBy);
+            // If different user, branch it
+            if (!user.admin && !(userId.equals(originalGrowPlanCreatedById))) {
+              //console.log("FIRST TRUE", userId, originalGrowPlanCreatedById);
+              return innerCallback(null, true);
+            }
 
-            async.forEach(submittedGrowPlan.plants, 
-              function validatePlant(plant, plantCallback){
-                PlantModel.createNewIfUserDefinedPropertiesModified({
-                  plant : plant,
-                  user : user,
-                  visibility : visibility,
-                  silentValidationFail : silentValidationFail
-                },
-                function(err, validatedPlant){
-                  if (validatedPlant){
-                    validatedPlants.push(validatedPlant);    
-                  }
-                  if (silentValidationFail){
-                    return plantCallback();  
-                  }
-                  return plantCallback(err);
-                });
-              },
-              function plantLoopEnd(err){
-                submittedGrowPlan.plants = validatedPlants;
-                return innerCallback(err);
-              }
-            );
+            // else it's the original owner or admin. get the gardens using this, check their owners
+            GrowPlanInstanceModel
+            .find({growPlan : originalGrowPlan._id})
+            .select('owner users active')
+            .exec(function(err, growPlanInstanceResults){
+              if (err) { return innerCallback(err); }
+              //console.log("HAS OTHER USERS growPlanInstanceResults", originalGrowPlan._id, growPlanInstanceResults);
+              var hasOtherUsers = growPlanInstanceResults.some(function(gpi){
+                return !(originalGrowPlanCreatedById.equals(gpi.owner));
+              });
+
+              // If there are other users using the original GP, branch the submitted GP
+              //console.log("HAS OTHER USERS", hasOtherUsers);
+              return innerCallback(null, hasOtherUsers);
+            });
           },
-          function phasesCheck(innerCallback){
-            var validatedPhases = [];
+          function prepareSubdocuments(branch, innerCallback){
+            // Handle GP subdocuments
+            async.parallel(
+            [
+              function plantsCheck(innerInnerCallback){
+                var validatedPlants = [];
 
-            async.forEach(submittedGrowPlan.phases, 
-              function (phase, phaseCallback){
-                PhaseSchema.statics.createNewIfUserDefinedPropertiesModified(
-                  {
-                    phase : phase,
-                    user : user,
-                    visibility : visibility,
-                    silentValidationFail : silentValidationFail
+                async.each(submittedGrowPlan.plants, 
+                  function validatePlant(plant, plantCallback){
+                    PlantModel.createNewIfUserDefinedPropertiesModified({
+                      plant : plant,
+                      user : user,
+                      visibility : visibility,
+                      silentValidationFail : silentValidationFail
+                    },
+                    function(err, validatedPlant){
+                      if (validatedPlant){
+                        validatedPlants.push(validatedPlant);    
+                      }
+                      if (silentValidationFail){
+                        return plantCallback();  
+                      }
+                      return plantCallback(err);
+                    });
                   },
-                  function(err, validatedPhase){
-                    if (validatedPhase){
-                      validatedPhases.push(validatedPhase);
-                    }
-                    return phaseCallback(err);  
+                  function plantLoopEnd(err){
+                    submittedGrowPlan.plants = validatedPlants;
+                    return innerInnerCallback(err);
                   }
-                );            
+                );
               },
-              function phaseLoopEnd(err){
-                return innerCallback(err);
-              }
-            );
-          }
-        ],
-        function(err, results){
-          if (err) { return callback(err); }
+              function phasesCheck(innerInnerCallback){
+                var validatedPhases = [];
 
-          // at this point, everything should have valid, saved referenced documents
-          GrowPlanModel.create(submittedGrowPlan, function(err, newlyBranchedGrowPlan){
-            if (err) { return callback(err); }
+                async.eachSeries(submittedGrowPlan.phases, 
+                  function (phase, phaseCallback){
+                    PhaseSchema.statics.createNewIfUserDefinedPropertiesModified(
+                      {
+                        phase : phase,
+                        user : user,
+                        visibility : visibility,
+                        silentValidationFail : silentValidationFail
+                      },
+                      function(err, validatedPhase){
+                        if (validatedPhase){
+                          validatedPhases.push(validatedPhase);
+                        }
+                        return phaseCallback(err);  
+                      }
+                    );            
+                  },
+                  function phaseLoopEnd(err){
+                    submittedGrowPlan.phases = validatedPhases;
+                    return innerInnerCallback(err);
+                  }
+                );
+              }
+            ],
+            function subdocumentParallelFinal(err, results){
+              return innerCallback(err, branch);
+            });
+          },
+          function handleBranching(branch, innerCallback){
+            //console.log("BRANCHING", branch);
+            // at this point, everything should have valid, saved referenced documents
+
+            if (branch){
+              submittedGrowPlan._id = new ObjectId();
+              submittedGrowPlan.parentGrowPlanId = originalGrowPlan._id;
+              submittedGrowPlan.createdBy = user;
+              submittedGrowPlan.visibility = visibility;
+
+              GrowPlanModel.create(submittedGrowPlan, innerCallback);
+
+            } else {
+              GrowPlanModel.findById(originalGrowPlan._id, function(err, growPlanResult){
+                if (err) { return innerCallback(err); }
+
+                growPlanResult.name = submittedGrowPlan.name;
+                growPlanResult.description = submittedGrowPlan.description;
+                growPlanResult.visibility = submittedGrowPlan.visibility;
+                growPlanResult.plants = submittedGrowPlan.plants;
+                growPlanResult.phases = submittedGrowPlan.phases;
+                growPlanResult.save(
+                  function(err, savedGrowPlan, numberAffected){ 
+                    //console.log("SAVED EXISTING GROW PLAN", err, savedGrowPlan, numberAffected);
+                    return innerCallback(err, savedGrowPlan);
+                  }
+                );
+              });
+              
+            }
+
+          },
+          function updateGardens(savedGrowPlan, innerCallback){
+            if (err) { return innerCallback(err); }
 
             // Find all the GPI's using the old GP that are active and have "trackGrowPlanUpdates" set to true
-            GrowPlanInstanceModel.find({ growPlan : newlyBranchedGrowPlan.parentGrowPlanId, active : true, trackGrowPlanUpdates : true })
+            GrowPlanInstanceModel.find({ growPlan : savedGrowPlan.parentGrowPlanId, active : true, trackGrowPlanUpdates : true })
             .exec(function(err, growPlanInstancesToUpdate){
-              if (err) { return callback(err); }
+              if (err) { return innerCallback(err); }
 
-              async.each(
+              async.eachLimit(
                 growPlanInstancesToUpdate,
+                10,
                 function gpiIterator(growPlanInstance, iteratorCallback){
                   
                   growPlanInstance.migrateToBranchedGrowPlan(
                   {
-                    newGrowPlan : newlyBranchedGrowPlan
+                    newGrowPlan : savedGrowPlan
                   },
                   iteratorCallback
                   );
                 },
                 function loopComplete(err){
-                  return callback(err, newlyBranchedGrowPlan);
+                  return innerCallback(err, savedGrowPlan);
                 }
               );
             });
-          });
+          }
+        ],
+        function waterfallFinal(err, growPlan){
+          return callback(err, growPlan);
         }
       );
     });
