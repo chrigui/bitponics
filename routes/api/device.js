@@ -272,7 +272,7 @@ module.exports = function(app) {
 
               pendingDeviceLogs = {};
               Object.keys(tempDeviceLogs).forEach(function(key){
-                if (tempDeviceLogs[key] !== ""){
+                if ((typeof tempDeviceLogs[key] !== "undefined") && (tempDeviceLogs[key] !== "")){
                   try{
                     pendingDeviceLogs[key] = parseFloat(tempDeviceLogs[key]);
                   } catch(e){
