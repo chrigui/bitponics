@@ -239,5 +239,11 @@ module.exports = [
       deviceType: "506de2fe8eebf7524342cb37",
       serial: "WD-301-AVZ1",
       name : "Antonio Device 2013-09-11"
+    },
+    {
+      _id: "000666809e37",
+      deviceType: "506de2fe8eebf7524342cb37",
+      serial: "WD-301-SXXM",
+      name : "Grzegorz Wąs Device"
     }
 	];

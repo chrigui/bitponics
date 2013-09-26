@@ -87,8 +87,13 @@ var DeviceSchema = new Schema({
     lastConnectionAt : { type : Date },
 
 
-    sensorMap : [ SensorMapSchema ],
+    //sensorMap : [ SensorMapSchema ],
     
+    /** 
+     * List of sensors that this device type includes by default.
+     * Array of sensor codes. 
+     */
+    sensors : [ String ],
     
     /**
      * Maps the device outlets to controls
@@ -600,16 +605,15 @@ DeviceSchema.pre('save', function(next){
 });
 
 /**
- *  If sensorMap is undefine
- d then use the deviceType's default sensorMap
+ *  If sensors is undefined then use the deviceType's default sensors
  */
 DeviceSchema.pre('save', function(next){
   var device = this;
-  if(device.sensorMap && device.sensorMap.length){ return next(); }
+  if(device.sensors && device.sensors.length){ return next(); }
 
   DeviceTypeModel.findOne({ _id: device.deviceType }, function(err, deviceType){
     if (err) { return next(err); }
-    device.sensorMap = deviceType.sensorMap;
+    device.sensors = deviceType.sensors;
     next();
   });
 });

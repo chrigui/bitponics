@@ -24,6 +24,13 @@ var DeviceTypeSchema = new Schema({
 	firmwareVersion: { type: String, required: true }, //‘0.1’
 	microprocessor: { type: String },
 	sensorMap : [ SensorMapSchema ],
+
+  /** 
+   * List of sensors that this device type includes by default.
+   * Array of sensor codes. 
+   */
+  sensors : [ String ],
+  
   outputMap : [ OutputMapSchema ]
 },
 { id : false });

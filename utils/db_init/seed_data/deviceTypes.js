@@ -6,6 +6,13 @@ module.exports = [
 			name: "Bitponics Base Station 1",
 			firmwareVersion: "0.1",
 			microprocessor: "",
+      sensors : [
+        "ph",
+        "air",
+        "water",
+        "hum",
+        "lux"
+      ],
 			outputMap : [
 				{
 					outputId: "1",
