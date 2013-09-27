@@ -186,17 +186,27 @@ module.exports = function(app){
 				function(err, results){
 					if (err) { return next(err); }
 
+          locals.controls = results[1];
+          locals.growPlanInstance = results[2];
+          locals.notifications = results[3] || [];
+          locals.photos = results[4] || [];
+
+
 					var sortedSensors = [];
 					results[0].forEach(function(sensor){
 						sortedSensors[locals.sensorDisplayOrder.indexOf(sensor.code)] = sensor;
 					});
-					sortedSensors = sortedSensors.filter(function(sensor){ return sensor;});
+					sortedSensors = sortedSensors.filter(function(sensor){ 
+            // if the garden has a device, only sohw the senors that the device supports
+            if (locals.growPlanInstance.device){
+              return (locals.growPlanInstance.device.sensors.indexOf(sensor.code) >= 0);
+            } else {
+              return sensor;  
+            }
+          });
 
 					locals.sensors = sortedSensors;
-					locals.controls = results[1];
-					locals.growPlanInstance = results[2];
-					locals.notifications = results[3] || [];
-					locals.photos = results[4] || [];
+					
 
 					res.render('gardens/dashboard', locals);
 				});
