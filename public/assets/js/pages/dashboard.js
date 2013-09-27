@@ -664,7 +664,7 @@ require([
           });
         },
         link: function (scope, element, attrs, controller) {
-          $(element[0]).find('.icon-glyphlogo-new').click(function(e){
+          $(element[0]).find('.icon-glyphlogo-new').css('font-size',$(element[0]).width()/15).click(function(e){
             e.preventDefault();
             scope.$apply(function(){
               scope.sharedDataService.targetActiveDate = new Date();
