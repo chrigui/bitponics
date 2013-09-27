@@ -472,7 +472,7 @@ async.series([
             name: _data.name,
             firmwareVersion: _data.firmwareVersion,
             microprocessor: _data.microprocessor,
-            sensorMap: _data.sensorMap,
+            sensors: _data.sensors,
             outputMap : _data.outputMap
           });
 
@@ -517,7 +517,7 @@ async.series([
             serial : _data.serial,
             owner: _data.owner,
             users : _data.users,
-            sensorMap : _data.sensorMap,
+            sensors : _data.sensors,
             outputMap : _data.outputMap,
             recentSensorLogs: _data.recentSensorLogs,
             activeGrowPlanInstance : _data.activeGrowPlanInstance

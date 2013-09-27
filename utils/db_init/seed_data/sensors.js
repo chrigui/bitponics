@@ -20,7 +20,8 @@ module.exports = [
 		{
 			_id : '506de3068eebf7524342cb5b',
 			name: "Total Dissolved Solids",
-			abbrev: "TDS",
+			displayAlias: "Nutrients",
+      abbrev: "TDS",
 			unit: "parts per million",
 			code: "tds",
 			visible : false

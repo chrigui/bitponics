@@ -95,10 +95,12 @@ var DeviceSchema = new Schema({
      */
     sensors : [ String ],
     
+
     /**
      * Maps the device outlets to controls
      */
     outputMap : [ OutputMapSchema ],
+    
     
     //recentSensorLogs : [ SensorLogSchema ],
   

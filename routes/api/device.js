@@ -320,11 +320,17 @@ module.exports = function(app) {
                     return innerCallback();
                   }
                   
+                  
                   Object.keys(pendingDeviceLogs).forEach(function(key){
-                    pendingSensorLog.logs.push({
-                      sCode : key,
-                      val : pendingDeviceLogs[key]
-                    });
+                    // Make sure the device doc actually specifies that it has the sensor. If a probe isn't plugged in, device reports garbage values for it anyway. It's lovely.
+                    if (device.sensors.indexOf(key) > -1){
+                      pendingSensorLog.logs.push({
+                        sCode : key,
+                        val : pendingDeviceLogs[key]
+                      });
+                    } else {
+                      winston.info("discarding " + key + ","  + pendingDeviceLogs[key] + " for device " + device._id);
+                    }
                   });
                   
                   winston.info('/status logSensorLogs');
