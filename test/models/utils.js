@@ -444,7 +444,8 @@ describe('Model Utils', function(){
               }
             ).should.equal(true, "user.deviceKeys contains a key assigned to device._id");
 
-            result.device.owner.equals(result.user._id).should.equal(true, "device owner is user");   
+            result.device.owner.equals(result.user._id).should.equal(true, "device owner is user");
+            result.device.users.some(function(deviceUserId){ return deviceUserId.equals(result.user._id);}).should.equal(true, "user is included in device.users");
             
             var now = new Date();
             

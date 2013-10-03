@@ -816,13 +816,13 @@ module.exports.getFullyPopulatedGrowPlan = function(query, callback){
 
 /**
  * Assigns a User to a Device as an owner.
- * Pairs by assigning user to device.owner and assigning device to a User.deviceKey
+ * Pairs by assigning user to device.owner, assigning device to a User.deviceKey, and adding user to device.users list
  *
  * Designed to be called by /setup route. Assumes that the setup page echoed the available deviceKey
  * that was created or retrieved on pageload of /setup
  * 
  * @param {object} settings
- * @param {string} settings.user
+ * @param {User} settings.user
  * @param {DeviceKeySchema} settings.deviceKey : Instance from User.deviceKeys
  * @param {User} settings.device
  * @param {function(err, {device: Device, user: User})} callback 
@@ -837,7 +837,9 @@ module.exports.assignDeviceToUser = function(settings, callback){
       device = settings.device,
       deviceKey = settings.deviceKey,
       user = settings.user,
-      device;
+      device,
+      getObjectId = module.exports.getObjectId,
+      userId = getObjectId(user);
 
   async.series(
     [
@@ -849,6 +851,14 @@ module.exports.assignDeviceToUser = function(settings, callback){
           assignmentType : DeviceUtils.ROLES.OWNER
         });
         device.owner = user;
+        
+        var userAlreadyIncluded = device.users.some(function(deviceUserId){
+          return deviceUserId.equals(userId);
+        });
+
+        if (!userAlreadyIncluded){
+          device.users.push(user);
+        }
 
         device.save(innerCallback)
       },
