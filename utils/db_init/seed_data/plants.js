@@ -47,7 +47,7 @@ module.exports = [
 	},
 	{
 		_id: "507492f5fe420e210be58a8c",
-		name: "Majoram"
+		name: "Marjoram"
 	},
 	{
 		_id: "507492f5fe420e210be58a8d",
