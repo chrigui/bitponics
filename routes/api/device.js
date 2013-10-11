@@ -217,6 +217,10 @@ module.exports = function(app) {
   app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
+      // TEMP : simply return device status, don't process any data
+      var id = req.params.id.replace(/:/g,'');
+      return sendDeviceStatusResponse(req, res, next, id);
+
       var id = req.params.id.replace(/:/g,''),
           reqBody = {},
           pendingSensorLog = { ts : Date.now(), logs : []},
@@ -257,8 +261,9 @@ module.exports = function(app) {
                 mode : csvRequestBodyParts[0],
                 status : csvRequestBodyParts[1]
               };
+              pendingDeviceLogs = undefined;
             } else {
-              // [lfull ight],[air],[water],[hum],[ph],[ec/do],[wl],[custom sensor 1],[custom sensor 2(optional)]
+              // [full light],[air],[water],[hum],[ph],[ec/do],[wl],[custom sensor 1],[custom sensor 2(optional)]
               var tempDeviceLogs = {};
               tempDeviceLogs.full = csvRequestBodyParts[0];
               tempDeviceLogs.air = csvRequestBodyParts[1];
@@ -267,7 +272,7 @@ module.exports = function(app) {
               tempDeviceLogs.ph = csvRequestBodyParts[4];
               tempDeviceLogs.ec = csvRequestBodyParts[5];
               
-              // TODO : make sure device document specifies that it actually has a water level sensor
+              // devices that don't actually have a water level sensor will have this entry removed in a subsequent step
               tempDeviceLogs.wl = csvRequestBodyParts[6];
 
               pendingDeviceLogs = {};
