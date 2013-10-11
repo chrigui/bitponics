@@ -15,8 +15,7 @@ var connect    = require('connect'),
   semver  = require('semver'),
   path    = require('path'),
   Session = connect.middleware.session.Session,
-  cookie  = require('express/node_modules/cookie'),
-  s3Config = require('../config/s3-config');
+  cookie  = require('express/node_modules/cookie');
 
 module.exports = function(app){
 
@@ -84,20 +83,20 @@ module.exports = function(app){
     // by default, express adds an "X-Powered-By:ExpressJS" header. prevent that.
     app.disable('x-powered-by');
 
-    // Set the CDN options after express setup
-    // require('./express-cdn-config');
+    // Set the CDN options
+
     var options = {
       publicDir  : path.join(__dirname, '/../public')
       , viewsDir   : path.join(__dirname, '/../views')
       , domain     : 'cdn.bitponics.com'
-      , bucket     : s3Config.bucket
-      // , endpoint   : 'http://bitponics.s3.amazonaws.com/'
-      , key        : s3Config.key
-      , secret     : s3Config.secret
+      , bucket     : 'bitponics'
+      , endpoint   : 'http://bitponics.s3.amazonaws.com/'
+      , key        : 'AKIAIU5OC3NSS5DGS4RQ'
+      , secret     : '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'
       , hostname   : 'localhost'
       , port       : 80
       , ssl        : false
-      , production : app.settings.env !== 'local' ? true : false //false means we use local assets
+      , production : false //false means we use local assets
       , logger     : winston.info
     };
 
@@ -105,7 +104,12 @@ module.exports = function(app){
     var CDN = require('express-cdn')(app, options);
 
     // Add the view helper
+    // if (semver.lt(express.version, '3.0.0')) {
     app.locals({ CDN: CDN() });
+    // } else {
+    //   app.dynamicHelpers({ CDN: CDN });
+    // }
+
 
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }

@@ -12,7 +12,7 @@ block content
         div How It Works
         | <i class="icon-glyph icon-logo" aria-hidden="true"></i>
       div(class="page-content center-img")
-        != CDN('/assets/img/home/howitworks.png', { 'alt': 'How It Works' })
+        img(src="/assets/img/home/howitworks.png")
 
         p
           | Sensors continuously monitor your garden’s environment and accessories are powered directly by the Bitponics Base Station.
@@ -33,8 +33,7 @@ block content
           
           div.page-content-inner-wrapper
             div.detail-block
-              != CDN('/assets/img/home/device-side-sensor.png', { 'alt': 'Bitponics Base Station Sensor Side View' })
-              
+              img(src="/assets/img/home/device-side-sensor.png")
               p
                 | The Bitponics Base Station comes with the following sensors:
               ul
@@ -49,7 +48,7 @@ block content
                 li EC (Electrical Conductivity)
             
             div.detail-block
-              != CDN('/assets/img/home/device-side-power.png', { 'alt': 'Bitponics Base Station Power Side View' })
+              img(src="/assets/img/home/device-side-power.png")
               p The Base Station runs on standard 120v power and has 2 controllable power outlets.
 
 

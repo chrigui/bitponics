@@ -1,5 +1,5 @@
-- if (typeof(form_prefix) === 'undefined') form_prefix = '';
-- if (typeof(ng_model_prefix) === 'undefined') ng_model_prefix = '';
+- if (!form_prefix) form_prefix = "";
+	- if (!ng_model_prefix) ng_model_prefix = "";
 
 <select id="#{form_prefix}locale_timezone" name="#{form_prefix}locale_timezone" ng-model="#{ng_model_prefix}country">
 <option value="" selected="selected">- None -</option>
