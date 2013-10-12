@@ -39,6 +39,7 @@ module.exports = function(){
     winston.info(err);
     winston.error(JSON.stringify(err));
     winston.error(JSON.stringify(err.stack));
+    console.trace();
     winston.error(err.toString());
     res.status(err.status || 500);
     
