@@ -38,6 +38,7 @@ module.exports = function(){
     winston.info('In the error middleware');
     winston.info(err);
     winston.error(JSON.stringify(err));
+    winston.error(JSON.stringify(err.stack));
     winston.error(err.toString());
     res.status(err.status || 500);
     
