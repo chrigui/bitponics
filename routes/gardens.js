@@ -160,7 +160,12 @@ module.exports = function(app){
 			        				displayType : 'summary'
 			        			},
 			        			function (err, notificationDisplay){
-			        				notificationObject.displays = {
+			        				if (err) { 
+                        console.trace(); 
+                        winston.error(err);
+                        return iteratorCallback(); 
+                      }
+                      notificationObject.displays = {
 					        			summary : notificationDisplay
 					        		};
 					        		notificationsWithSummaries.push(notificationObject);
