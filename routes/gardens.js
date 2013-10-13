@@ -99,7 +99,12 @@ module.exports = function(app){
 						GrowPlanInstanceModel
 						.findById(req.params.growPlanInstanceId)
 						.exec(function(err, growPlanInstanceResult){
-							if (err) { return innerCallback(err); }
+							if (err){
+                console.trace(); 
+                winston.error(err);
+              }
+                    
+              if (err) { return innerCallback(err); }
 
 							growPlanInstanceResult = growPlanInstanceResult.toObject();
 
@@ -114,9 +119,19 @@ module.exports = function(app){
 									.populate('status.actions')
 									.populate('status.activeActions')
 									.exec(function(err, deviceResult){
-										if (err) { return innerInnerCallback(err); }
+										if (err){
+                      console.trace(); 
+                      winston.error(err);
+                    }
+
+                    if (err) { return innerInnerCallback(err); }
 										
                     deviceResult.getStatusResponse({}, function(err, deviceStatusResponse){
+                      if (err){
+                        console.trace(); 
+                        winston.error(err);
+                      }
+
                       if (err) { return innerInnerCallback(err); }
 
                       var device = deviceResult.toObject();
@@ -128,7 +143,11 @@ module.exports = function(app){
 								},
 								function getGrowPlan(innerInnerCallback){
 									ModelUtils.getFullyPopulatedGrowPlan({ _id: growPlanInstanceResult.growPlan }, function(err, growPlanResult){
-										if (err) { return innerInnerCallback(err); }
+										if (err) { 
+                      console.trace(); 
+                      winston.error(err);
+                      return innerInnerCallback(err); 
+                    }
 										
 										growPlanInstanceResult.growPlan = growPlanResult[0];
 										return innerInnerCallback();
@@ -136,6 +155,10 @@ module.exports = function(app){
 								}
 							],
 							function gpiParallelFinal(err){
+                if (err){
+                  console.trace(); 
+                  winston.error(err);
+                }
 								return innerCallback(err, growPlanInstanceResult);
 							});
 						});
