@@ -217,10 +217,6 @@ module.exports = function(app) {
   app.post('/api/devices/:id/status',
     routeUtils.middleware.ensureDeviceLoggedIn,
     function (req, res, next){
-      // TEMP : simply return device status, don't process any data
-      var id = req.params.id.replace(/:/g,'');
-      return sendDeviceStatusResponse(req, res, next, id);
-
       var id = req.params.id.replace(/:/g,''),
           reqBody = {},
           pendingSensorLog = { ts : Date.now(), logs : []},
