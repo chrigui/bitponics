@@ -2,7 +2,9 @@ var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
   ObjectIdSchema = Schema.ObjectId,
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  winston = require('winston'),
+  ImmediateActionModel;
 
 /**
  * ImmediateAction
@@ -143,8 +145,43 @@ ImmediateActionSchema.set('toJSON', {
 /*************** END SERIALIZATION *************************/
 
 
+/*************** STATIC METHODS *************************/
+/**
+ * All new instances of ImmediateAction should be created with this method.
+ * This method, by default, first checks whether we already have any existing duplicate of the submitted
+ * immediateAction that's active (expires is in the future).
+ * If so, it returns that existing ImmediateAction.
+ *
+ *
+ * @param {Object} options : Properties of the ImmmediateAction object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
+ * @param {function(err, Notification)} callback
+ */
+ImmediateActionSchema.static('create', function(options, callback){
+  var newImmediateAction = new ImmediateActionModel(options),
+      now = new Date(),
+      expires = newImmediateAction.expires;
+
+  ImmediateActionModel.findOne({
+    gpi : newImmediateAction.gpi,
+    e : { $gte : now},
+    a : newImmediateAction.action
+  })
+  .exec(function(err, immediateActionResult){
+    if (err) { return callback(err); }
+    if (immediateActionResult){
+      winston.info("RETURNING EXISTING IMMEDIATE ACTION", immediateActionResult._id);
+      immediateActionResult.e = newImmediateAction.expires;
+      immediateActionResult.save(function(err, updatedImmediateAction){
+        return callback(err, updatedImmediateAction);
+      });
+    } else {
+      newImmediateAction.save(callback);
+    }
+  });
+});
+/*************** END STATIC METHODS *************************/
 
 ImmediateActionSchema.index({ 'gpi': 1,  'e' : -1, 'ts': -1 });
 
 exports.schema = ImmediateActionSchema;
-exports.model = mongooseConnection.model('ImmediateAction', ImmediateActionSchema);
+exports.model = ImmediateActionModel = mongooseConnection.model('ImmediateAction', ImmediateActionSchema);

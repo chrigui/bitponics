@@ -271,7 +271,7 @@ module.exports.processIdealRangeViolation = function (options, callback){
 /**
  * Trigger an immediate action. Can be called manually or because of an IdealRange violation.
  *
- * If there's an associated control for the action, expires the override with the next iteration of an action cycle on the given control.
+ * If there's an assumedociated control for the action, expires the override with the next iteration of an action cycle on the given control.
  *
  * @param {object} options  
  * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel. Should have populated "owner" (just need timezone) 
@@ -408,19 +408,18 @@ module.exports.triggerImmediateAction = function (options, callback){
           [
             function createImmediateAction(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating an ImmediateAction");
-              var immediateAction = new ImmediateActionModel({
+              ImmediateActionModel.create({
                   gpi : growPlanInstance._id,
                   message : immediateActionMessage,
                   timeRequested : now,
                   action : action,
-                  // TODO : handle expires for the no-device case 
+                  // TODO : handle expires for the no-device case
                   expires : expires
+                },
+                function(err, immediateAction){
+                  notificationTriggerDetails.immediateActionId = immediateAction._id;
+                  return innerCallback(err, immediateAction);
                 });
-
-              notificationTriggerDetails.immediateActionId = immediateAction._id;
-
-              // push the log to ImmediateActionModel
-              immediateAction.save(innerCallback);
             },
             function createNotification(innerCallback){
               winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", creating Notification");
@@ -456,7 +455,7 @@ module.exports.triggerImmediateAction = function (options, callback){
             winston.info("IN triggerImmediateAction: gpi " + growPlanInstance._id + ", action " + actionId + ", device " + (device ? device._id : '') + ", in parallel final, err: " + (err ? err.toString() : '') + ", results: " + results.length);
             if (err) { return callback(err); }
             var data = {
-              immediateAction : results[0][0],
+              immediateAction : results[0],
               notification : results[1][0],
               device : results[2]
             };
