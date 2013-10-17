@@ -91,7 +91,6 @@ module.exports = function(app){
       , viewsDir   : path.join(__dirname, '/../views')
       , domain     : 'cdn.bitponics.com'
       , bucket     : s3Config.bucketCDN
-      // , endpoint   : 'http://bitponics.s3.amazonaws.com/'
       , key        : s3Config.key
       , secret     : s3Config.secret
       , hostname   : 'localhost'

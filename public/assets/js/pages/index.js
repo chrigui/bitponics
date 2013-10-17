@@ -20,7 +20,7 @@ function (angular, domReady) {
     [
       '$scope',
       function ($scope) {
-        console.log('angularized home page');
+        // 
       }
     ]
   );

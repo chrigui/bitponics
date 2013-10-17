@@ -176,5 +176,13 @@ module.exports = [
 	{
 		_id : "51a388c7a8162dbabd583f3c",
 		name : "Pepper"
+	},
+	{
+		_id : "525b183bfe4b32c573000001",
+		name : "Kale"
+	},
+	{
+		_id : "525b183dfe4b32c573000002",
+		name : "Spinach"
 	}
 ];
