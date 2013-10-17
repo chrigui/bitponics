@@ -55,7 +55,7 @@ block head
           
           
           ul(class="grid plantlist")
-            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name")
+            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="grid-cell")
               input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
@@ -74,7 +74,7 @@ block head
     h4.page-heading Select a Grow Plan
     ul(class="block-info-set grid sortlist photos separator-top")
       //- each growPlan, i in growPlans
-      li(ng-repeat="growPlan in filteredGrowPlanList")
+      li(ng-repeat="growPlan in filteredGrowPlanList", class="grid-cell")
         div.img-wrapper
           div.icon-glyph.icon-glyphlogo-new
         div.first
@@ -121,7 +121,7 @@ block head
           label.question-title Plants
           ul(class="grid plantlist hide-unchecked-items")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
+            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name", class="grid-cell")
               input(id="{{plant._id}}", 
                 type='checkbox', 
                 name="plants", 
@@ -248,7 +248,7 @@ block head
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Add a nutrient
                     ul.grid
-                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel")
+                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel", class="grid-cell")
                         input(id="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", type='checkbox', name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
                         label(for="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
                 
@@ -493,7 +493,7 @@ block head
                   h4(class="page-heading-large separator-top") Device
                   p Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
                   ul(class="grid devicelist")
-                    li(ng-repeat="device in sharedDataService.userOwnedDevices")
+                    li(ng-repeat="device in sharedDataService.userOwnedDevices", class="grid-cell")
                       input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId")
                       label.btn(ng-click="toggleDevice(device)", ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}")
                         | {{device.name}}
@@ -537,9 +537,9 @@ block content
                     | Add New Plant
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
-                ul(class="grid plantlist")
-                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    div.img-wrapper
+                ul(class="grid grid--top grid--wrapping plantlist")
+                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
+                    div.grid.grid--center.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                       img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plant._id}}.jpg", alt="{{plant.name}}")
                     dl
@@ -576,7 +576,7 @@ block content
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
                 ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -623,7 +623,7 @@ block content
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
                 ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -668,7 +668,7 @@ block content
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
                 ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -720,7 +720,7 @@ block content
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                   
                   ul(class="grid plantlist")
-                    li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
+                    li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                       div.img-wrapper
                         div.icon-glyph.icon-glyphlogo-new
                       dl

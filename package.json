@@ -28,7 +28,7 @@
 		, "nib"       : "=1.0.1"
 		, "nodetime"  : "=0.8.12"
 		, "socket.io" : "0.9"
-		, "stylus"    : "=0.37.0"
+		, "stylus"    : ">=0.37.0"
 	  	, "bootstrap-stylus": ">= 0.0.1"
 	  	, "passport": ">= 0.1.1"
 	  	, "passport-local": ">= 0.1.6"

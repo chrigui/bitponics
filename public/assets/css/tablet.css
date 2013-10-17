@@ -39,7 +39,6 @@
   display: inline;
 }
 .display-ib,
-.grid li,
 .idealRanges .hi label,
 .idealRanges .lo label {
   display: -moz-inline-stack;
@@ -201,31 +200,6 @@
 }
 .content-module.side {
   width: 100%;
-}
-/*
- * Dashboard Page
- */
-@media screen and (min-width: 60em) {
-}
-/*
- * Grow Plans Page
- */
-.grid li {
-  vertical-align: top;
-  width: 22em;
-  margin: 0.25em 0.25em 3em 0;
-}
-.idealRanges li {
-  zoom: 1;
-  max-width: 15em;
-}
-.idealRanges li:before,
-.idealRanges li:after {
-  content: "";
-  display: table;
-}
-.idealRanges li:after {
-  clear: both;
 }
 .main,
 .header {
@@ -508,6 +482,9 @@
     margin-left: -720px;
   }
 }
+/*
+ * Pricing Page
+ */
 #pricing .price .price-number,
 #pricing .price .price-type,
 #pricing .price .price-per {
@@ -611,7 +588,7 @@
   text-align: justify;
 }
 /*
- * get-started/thankyou
+ * Get Started / Thankyou
  */
 .landing-page.get-started .main {
   margin: 10em auto 0 auto;
@@ -624,6 +601,9 @@
 .landing-page.register .main .retail-price {
   margin-top: -1.5em;
 }
+/*
+ * Team Page
+ */
 .member {
   clear: both;
   margin: 0 0 1em 0;
@@ -631,6 +611,24 @@
 .member img {
   margin: 1.5em 0;
 }
+/*
+ * Grow Plans Page
+ */
+.idealRanges li {
+  zoom: 1;
+  max-width: 15em;
+}
+.idealRanges li:before,
+.idealRanges li:after {
+  content: "";
+  display: table;
+}
+.idealRanges li:after {
+  clear: both;
+}
+/*
+ * App pages
+ */
 .question {
   float: left;
   width: 40%;

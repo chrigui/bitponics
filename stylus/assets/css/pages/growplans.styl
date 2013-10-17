@@ -5,8 +5,13 @@
 .growplans
 	
 	.plantlist
+		margin .5em 0
 		padding 0
 		float left
+		.img-wrapper
+			width 15em
+			height 15em
+			overflow hidden
 
 	.btn
 		padding .5em
@@ -58,10 +63,14 @@
 
 
 	.img-wrapper
+		position relative
 		.icon-glyph.icon-glyphlogo-new
 			display block!important
 			color color-logo-green
 			font-size 4em
+			position absolute
+			top 0
+			left 0
 
 	.icon-glyph-new
 		height 1em
@@ -69,8 +78,11 @@
 		position relative
 		top -.25em
 
-	.grid .icon-glyphlogo-new
-		display block!important
+	// .grid .icon-glyphlogo-new
+	// 	display block!important
+	// 	position absolute
+	// 	top 1em
+	// 	left 1em
 
 	// dl
 	// 	font-size .85em
