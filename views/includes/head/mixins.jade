@@ -1,42 +1,79 @@
-//mixins
+//- mixins
 
 mixin requirejs(dataMain)
-  script(src='/assets/js/libs/require.js', data-main=dataMain)
+  - var dataMainVar = dataMain;
+  - var angular = CDN('/assets/js/libs/angular/1.2.0/angular.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularFlexslider = CDN('/assets/js/libs/angular-flexslider.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularMask = CDN('/assets/js/libs/angular/mask.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularResource = CDN('/assets/js/libs/angular/1.2.0/angular-resource.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularRoute = CDN('/assets/js/libs/angular/1.2.0/angular-route.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularUI = CDN('/assets/js/libs/angular/angular-ui.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularUIBootstrap = CDN('/assets/js/libs/angular/ui-bootstrap-0.5.0.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularUISelect2 = CDN('/assets/js/libs/angular/angular-ui-select2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServices = CDN('/assets/js/core/services.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var controllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var controllerNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var directives = CDN('/assets/js/core/directives.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var d3 = CDN('/assets/js/libs/d3.v2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var domReady = CDN('/assets/js/libs/requirejs/domReady.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var es5shim = CDN('/assets/js/libs/es5-shim.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var flexslider = CDN('/assets/js/libs/flexslider/jquery.flexslider-min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var feBeUtils = CDN('/assets/js/fe-be/fe-be-utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var jquery = CDN('/assets/js/libs/jquery-1.8.2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var localscroll = CDN('/assets/js/libs/jquery/jquery.localScroll.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var moment = CDN('/assets/js/libs/moment.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var overlay = CDN('/assets/js/shared/overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var scrollto = CDN('/assets/js/libs/jquery/jquery.scrollTo.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var select2 = CDN('/assets/js/libs/jquery/select2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var selectionOverlay = CDN('/assets/js/controllers/selection-overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var servicesSocket = CDN('/assets/js/services/socket.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var steps = CDN('/assets/js/libs/Steps.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var throttleDebounce = CDN('/assets/js/libs/jquery/jquery.ba-throttle-debounce.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var utils = CDN('/assets/js/shared/utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var viewModels = CDN('/assets/js/fe-be/view-models.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  //- These two scripts don't exist... never used?
+  //- //var spin = '/assets/js/libs/spin.min.js'
+  //- //var socketIO = '/socket.io/socket.io.js'
+
+  //- Dynamic data cannot be passed to CDN() as far as I can tell, so keep requirejs local for now
+  // != CDN('/assets/js/libs/require.js', { 'data-main' : '#{dataMainVar}' })
+  script(src='/assets/js/libs/require.js', 'data-main'=dataMainVar)
   script
     require.config({
       paths: {
-        'angular': '/assets/js/libs/angular/1.2.0/angular.min',
-        'angular-flexslider' : '/assets/js/libs/angular-flexslider',
-        'angular-mask' : '/assets/js/libs/angular/mask',
-        'angularResource' : '/assets/js/libs/angular/1.2.0/angular-resource.min',
-        'angularRoute' : '/assets/js/libs/angular/1.2.0/angular-route.min',
-        'angularUI' : '/assets/js/libs/angular/angular-ui.min',
-        'angularUIBootstrap' : '/assets/js/libs/angular/ui-bootstrap-0.5.0.min',
-        'angularUISelect2' : '/assets/js/libs/angular/angular-ui-select2',
-        'bpn.services' : '/assets/js/core/services',
-        'bpnApp' : '/assets/js/core/bpn',
-        'controllers' : '/assets/js/core/controllers',
-        'controller-nav' : '/assets/js/controllers/nav',
-        'directives' : '/assets/js/core/directives',
-        'd3' : '/assets/js/libs/d3.v2',
-        'domReady': '/assets/js/libs/requirejs/domReady',
-        'es5shim': '/assets/js/libs/es5-shim.min',
-        'flexslider': '/assets/js/libs/flexslider/jquery.flexslider-min',
-        'fe-be-utils': '/assets/js/fe-be/fe-be-utils',
-        'jquery' : '/assets/js/libs/jquery-1.8.2.min',
-        'localscroll': '/assets/js/libs/jquery/jquery.localScroll.min',
-        'moment': '/assets/js/libs/moment.min',
-        'overlay': '/assets/js/shared/overlay',
-        'scrollto': '/assets/js/libs/jquery/jquery.scrollTo.min',
-        'select2' : '/assets/js/libs/jquery/select2.min',
-        'selection-overlay' : '/assets/js/controllers/selection-overlay',
-        'services-socket' : '/assets/js/services/socket',
+        'angular': '#{angular}',
+        'angular-flexslider' : '#{angularFlexslider}',
+        'angular-mask' : '#{angularMask}',
+        'angularResource' : '#{angularResource}',
+        'angularRoute' : '#{angularRoute}',
+        'angularUI' : '#{angularUI}',
+        'angularUIBootstrap' : '#{angularUIBootstrap}',
+        'angularUISelect2' : '#{angularUISelect2}',
+        'bpn.services' : '#{bpnServices}',
+        'bpnApp' : '#{bpnApp}',
+        'controllers' : '#{controllers}',
+        'controller-nav' : '#{controllerNav}',
+        'directives' : '#{directives}',
+        'd3' : '#{d3}',
+        'domReady': '#{domReady}',
+        'es5shim': '#{es5shim}',
+        'flexslider': '#{flexslider}',
+        'fe-be-utils': '#{feBeUtils}',
+        'jquery' : '#{jquery}',
+        'localscroll': '#{localscroll}',
+        'moment': '#{moment}',
+        'overlay': '#{overlay}',
+        'scrollto': '#{scrollto}',
+        'select2' : '#{select2}',
+        'selection-overlay' : '#{selectionOverlay}',
+        'services-socket' : '#{servicesSocket}',
         'socket.io' : '/socket.io/socket.io',
         'spin' : '/assets/js/libs/spin.min',
-        'steps': '/assets/js/libs/Steps',
-        'throttle-debounce': '/assets/js/libs/jquery/jquery.ba-throttle-debounce.min',
-        'utils': '/assets/js/shared/utils',
-        'view-models': '/assets/js/fe-be/view-models'
+        'steps': '#{steps}',
+        'throttle-debounce': '#{throttleDebounce}',
+        'utils': '#{utils}',
+        'view-models': '#{viewModels}'
       },
       shim: { 
         'angular': { 
