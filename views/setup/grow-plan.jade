@@ -541,6 +541,7 @@ block content
                   li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
+                      img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plant._id}}.jpg", alt="{{plant.name}}")
                     dl
                       dt Type:
                       dd {{plant.name}}
