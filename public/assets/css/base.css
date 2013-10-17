@@ -1056,9 +1056,12 @@ img.page-spinner.spinner {
 .grid--1of4 > .grid-cell {
   flex: 0 0 25%;
 }
-@media $mq_small {
+@media  screen and (min-width: 20em) {
   .small-grid--fit > .grid-cell {
     flex: 1;
+  }
+  .small-grid--fit.grid--wrapping > .grid-cell {
+    flex: 1 15em;
   }
   .small-grid--full > .grid-cell {
     flex: 0 0 100%;
@@ -1073,9 +1076,32 @@ img.page-spinner.spinner {
     flex: 0 0 25%;
   }
 }
-@media $mq_medium {
+@media  screen and (min-width: 40em) {
+  .medium-grid--fit > .grid-cell {
+    flex: 1;
+  }
+  .medium-grid--fit.grid--wrapping > .grid-cell {
+    flex: 1 15em;
+  }
+  .medium-grid--full > .grid-cell {
+    flex: 0 0 100%;
+  }
+  .medium-grid--1of2 > .grid-cell {
+    flex: 0 0 50%;
+  }
+  .medium-grid--1of3 > .grid-cell {
+    flex: 0 0 33.3333%;
+  }
+  .medium-grid--1of4 > .grid-cell {
+    flex: 0 0 25%;
+  }
+}
+@media  screen and (min-width: 50em) {
   .large-grid--fit > .grid-cell {
     flex: 1;
+  }
+  .large-grid--fit.grid--wrapping > .grid-cell {
+    flex: 1 15em;
   }
   .large-grid--full > .grid-cell {
     flex: 0 0 100%;
@@ -4008,20 +4034,57 @@ button.close {
   }
 }
 .growplans .plantlist {
-  margin: 0.5em 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
   padding: 0;
-  float: left;
+}
+.growplans .plantlist .grid-cell {
+  max-width: 40em;
+  margin: 0 auto;
 }
 .growplans .plantlist .img-wrapper {
-  width: 15em;
+  position: relative;
   height: 15em;
   overflow: hidden;
+}
+.growplans .plantlist .img-wrapper img {
+  position: absolute;
+  top: 0;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  max-width: 135%;
+}
+.growplans.no-flexbox .grid-cell {
+  width: 100%;
+}
+@media  screen and (min-width: 40em) {
+}
+@media  screen and (min-width: 50em) {
+}
+@media  screen and (min-width: 65em) {
+  .growplans.no-flexbox .grid-cell {
+    width: 50%;
+  }
 }
 .growplans .btn {
   padding: 0.5em;
 }
 .growplans .overlay .btn {
   margin: 0;
+}
+.growplans .overlay .custom-checkbox-wrap {
+  bottom: 4em;
+  text-align: center;
+}
+.growplans .overlay .custom-checkbox-wrap .plant:before {
+  top: 1.1em;
+  right: 0.85em;
+}
+.growplans .overlay .img-wrapper .icon-glyph.icon-glyphlogo-new {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .growplans .edit-btn {
   height: 1em;
@@ -4068,9 +4131,6 @@ button.close {
   display: block !important;
   color: #00e36c;
   font-size: 4em;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 .growplans .icon-glyph-new {
   height: 1em;

@@ -1,3 +1,6 @@
+@import "./global/breakpoints"
+
+
 /*
  * Grid Component
  * Adapted from: 
@@ -5,6 +8,10 @@
  */
 
 .grid
+	// display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+	// display: -moz-box;          OLD - Firefox 19- (buggy but mostly works) 
+	// display: -ms-flexbox;      /* TWEENER - IE 10 */
+	// display: -webkit-flex;
 	display flex
 	width 100%
 
@@ -28,7 +35,13 @@
 
 
 .grid-cell
+	// -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
+	// -moz-box-flex: 1;         /* OLD - Firefox 19- */
+	// width: 20%;               /* For old syntax, otherwise collapses. */
+	// -webkit-flex: 1;          /* Chrome */
+	// -ms-flex: 1;              /* IE 10 */
 	flex 1
+
 
 /* Wrapping */
 .grid--wrapping 
@@ -86,9 +99,11 @@
 
 
 /* Small to medium screens */
-@media $mq_small
+@media $mq_smaller
 	.small-grid--fit > .grid-cell 
 		flex: 1;
+	.small-grid--fit.grid--wrapping > .grid-cell
+		flex 1 15em
 
 	.small-grid--full > .grid-cell 
 		flex: 0 0 100%;
@@ -103,10 +118,31 @@
 		flex: 0 0 25%
 
 
-/* Large screens */
+/* Medium screens */
 @media $mq_medium
+	.medium-grid--fit > .grid-cell 
+		flex 1
+	.medium-grid--fit.grid--wrapping > .grid-cell
+		flex 1 15em
+
+	.medium-grid--full > .grid-cell 
+		flex: 0 0 100%;
+
+	.medium-grid--1of2 > .grid-cell 
+		flex: 0 0 50%
+
+	.medium-grid--1of3 > .grid-cell 
+		flex: 0 0 33.3333%
+
+	.medium-grid--1of4 > .grid-cell 
+		flex: 0 0 25%
+
+/* Large screens */
+@media $mq_large
 	.large-grid--fit > .grid-cell 
 		flex: 1;
+	.large-grid--fit.grid--wrapping > .grid-cell
+		flex 1 15em
 
 	.large-grid--full > .grid-cell 
 		flex: 0 0 100%;

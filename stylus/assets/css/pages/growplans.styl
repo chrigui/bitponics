@@ -1,23 +1,71 @@
 @import "../libs/twitter-bootstrap"
 @import "../components/select2"
+@import "../global/breakpoints"
 
 // .landing-page.growplans
 .growplans
 	
 	.plantlist
-		margin .5em 0
+		margin-top .5em
+		margin-bottom .5em
 		padding 0
-		float left
+
+		.grid-cell
+			max-width 40em
+			margin 0 auto
+		
 		.img-wrapper
-			width 15em
+			position relative
 			height 15em
 			overflow hidden
+
+			img
+				position absolute
+				top 0
+				min-width 100%
+				min-height 100%
+				width auto
+				max-width 135%
+
+	&.no-flexbox
+		.grid-cell
+			width 100%
+
+	@media $mq_medium
+		&.no-flexbox
+			.grid-cell
+				// width 33.33333%
+
+	@media $mq_large
+		&.no-flexbox
+			.grid-cell
+				// width 50%
+
+	@media $mq_larger
+		&.no-flexbox
+			.grid-cell
+				width 50%
 
 	.btn
 		padding .5em
 
-	.overlay .btn
-		margin 0
+	.overlay 
+		.btn
+			margin 0
+
+		.custom-checkbox-wrap
+			bottom 4em
+			text-align center
+			.plant
+				&:before
+					top 1.1em
+					right .85em
+
+		.img-wrapper
+			.icon-glyph.icon-glyphlogo-new
+				position absolute
+				top 0
+				left 0
 
 	.edit-btn
 		@extends .display-ib
@@ -68,9 +116,6 @@
 			display block!important
 			color color-logo-green
 			font-size 4em
-			position absolute
-			top 0
-			left 0
 
 	.icon-glyph-new
 		height 1em
