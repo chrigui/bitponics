@@ -6,123 +6,6 @@
 	float left
 	&.side
 		width 100%
-		// margin 2em 0 0 0
-	&.middle
-		//
-// body
-// 	margin 0
- 
-.data-module
-	// @extends .display-ib
-	// width 50%
-	// margin 0.125em -2px //TODO: might need to be more flexible
-
-// .select-block
-// 	padding 0 .83em
-// 	text-align left
-
-section.header,
-section.main,
-section.footer
-	// padding 1em
-			
-
-// #logo,
-// #setup,
-// #user
-// 	float left
-// 	width 25%
-// #setup
-// 	width 35%
-// 	margin-right 10%
-// #user
-// 	padding 0
-
-// #logo
-// 	position static
-	
-
-/*
- * Dashboard Page
- */
-// .dashboard
-// 	.content-module
-// 		&.middle
-// 			width 100%
-// 			padding 100% 0 0 0 //must match container width
-// 			border 0 none
-// 			clear: both
-// 	section#header
-// 		height 1em
-// 		.sub-heading a
-// 			color color-logo-green
-// 	section.main
-// 		padding 6em 1em 1em
-
-// 		#visualizer
-// 			div.circle
-// 				top 1.5em
-// 				left 1.5em
-// 				bottom 1.5em
-// 				right 1.5em
-				
-
-// 		#controls, #reminders
-// 			float right
-
-
-@media screen and (min-width: 60em)
-	/*body
-		&:after
-			content 'large-tablet-layout'*/
-
-	// .content-module
-	// 	float left
-	// 	&.side
-	// 		width 20%
-	// 	&.middle
-	// 		//
-
-	// .data-module
-	// 	width 100%
-	// 	margin 0.125em 0
-
-
-	// /*
-	//  * Footer
-	//  */
-	// section.footer
-	// 	//position fixed
-	// 	//bottom 0
-	// 	width 100%
-		
-
-	// 	.content-module
-	// 		margin 0
-
-	// 	#date
-	// 		float left
-
-	// 	#notifications
-	// 		float right
-	// 		text-align right
-
-
-	// #logo,
-	// #setup,
-	// #user
-	// 	width 20%
-	// #setup
-	// 	width 30%
-	// 	margin-right 30%
-
-	// .dashboard
-	// 	.content-module
-	// 		&.middle
-	// 			width 60%
-	// 			padding 60% 0 0 0 //must match container width
-	// 			clear none
-
 
 /*
  * Grow Plans Page
@@ -133,35 +16,17 @@ section.footer
 		vertical-align top
 		width: 22em;
 		margin .25em .25em 3em 0
-		// min-height: 600px;
 	
-// .question
-// 	.plantlist
-// 	 	li
-// 			float none
-// 			width auto
-// 			margin 0
-// 			label
-// 				margin 0
-// 				@extends .display-ib
-
 .idealRanges {
 	li {
 		clearfix()
 		max-width 15em
 	}
 	.hi, .lo {
-		// width: 50%;
-		// float: left;
-
 		label {
 			@extends .display-ib
 		}
 
-	}
-
-	.lo {
-		// float: right;
 	}
 }
 
@@ -204,22 +69,16 @@ section.footer
 		top 0
 		z-index 1
 
-	header
-		//padding 0 2.6%
-
 	li
 		padding 0
 		margin .25em .75em 0 0
 
 		&.first
-			//visibility hidden
 			min-height auto
 			width: 19.3%;
 			margin: 0 3% 0 0;
 			padding: 0.45em 0 0 0;
 
-	h1 div, h1 span
-		//color color-logo-green
 	a 
 		color color-text-gray
 		line-height: 3em;
@@ -280,17 +139,10 @@ section.footer
 				text-align center
 				line-height 1em
 				color color-text-gray
-				// color color-logo-green
 				border-color color-text-gray
-				// border-color color-logo-green
 				background none
 
 	.social-icons
-		// width: 16%;
-		// height: 3em;
-		// overflow: hidden;
-		// margin: 0 0 0 3%;
-		//margin 0 0 0 70%
 		position absolute
 		margin 0
 		width auto
@@ -320,20 +172,15 @@ section.footer
 					top -0.025em
 
 	.elevated-item
-		//margin 0 0 0 20%
 		li
 			background transparent
 			line-height 1em
 			margin: 0;
-			a
-				//background white!important
 
 	.social-icons, .elevated-item
 		position static
 		float right
 		background transparent
-
-		// text-align right
 
 /*
  * Home Page
@@ -356,8 +203,6 @@ section.footer
 		div
 			position absolute
 			bottom 1em
-	
-	
 
 	.featured-press, .additional-press
 		margin 1.5em 0 1.5em 16%
@@ -408,7 +253,6 @@ section.footer
 		margin-bottom 1em
 
 	.main
-		//#about, #gallery, #contact, #how-it-works, #press, #buy, #pricing, #team, #details
 		.content-module, #details
 			padding-top 3.5em
 
@@ -420,7 +264,6 @@ section.footer
 			text-align center
 		img
 			min-width 1440px
-			// max-width 1460px
 			position static
 			margin 0
 			
@@ -435,12 +278,6 @@ section.footer
 			&:hover, &:active
 				color white
 				text-decoration none
-
-			// &.flex-prev
-			// 	left 1em
-
-			// &.flex-next
-			// 	right 1em
 
 	p
 		max-width 35em
@@ -470,10 +307,11 @@ section.footer
 		margin-left: -720px;
 
 
-//Pricing Page
+/*
+ * Pricing Page
+ */
 #pricing
 	.price
-		// display block
 		.price-number,.price-type,.price-per
 			display inline
 			padding 0
@@ -495,8 +333,7 @@ section.footer
 			text-align center
 			border-top 1px solid color-border-gray
 			min-height 8em
-			//display: table;
-			width: 100%;
+			width 100%
 			h2
 				margin 0
 				span
@@ -504,7 +341,6 @@ section.footer
 					
 			& > span
 				width 80%
-				// display: table-cell;
 				display inline-block
 				padding 1em 1em 0
 				font-size .85em
@@ -519,21 +355,13 @@ section.footer
 			display block
 			width 10%
 			li
-				// height auto
-				// min-height auto
-				//display block
-				
 				position relative
-				// font-size 2em
-				// min-height 3em
 				i
 					position absolute
 					top: 0;
 					margin-top: 0;
 					font-size: 3em;
 					color color-logo-green
-
-
 			.first
 				min-height 4em
 		&.tier1
@@ -552,11 +380,6 @@ section.footer
 	.center
 		margin 1em
 
-		a.btn
-			//
-		i
-			//
-
 #installs
 	p
 		float left
@@ -565,7 +388,7 @@ section.footer
 		border-top: 1px solid color-logo-green;
 		padding: 1em 0 0 0;
 	.contact-wrapper
-			display none //only displays on single-page render
+		display none //only displays on single-page render
 
 
 .app-page
@@ -582,7 +405,7 @@ section.footer
 		text-align justify
 
 /*
- * get-started/thankyou
+ * Get Started / Thankyou
  */
 .landing-page.get-started
 	.main
@@ -592,47 +415,25 @@ section.footer
 	.page-heading
 		width 100%
 		font-size: 3.5em;
-	.page-content
-		//sdfd
-
 
 .landing-page.register
 	.main
-		//margin-top 0
-
 		.retail-price
 			margin-top: -1.5em;
-			//   position relative
-			//   font-size 3em
-		  
-			//   span.dollar-sign, span.price-number
-			//     color color-logo-green
-			//   .additional-text
-			//     // font-size .333em
-			//     display inline-block
-			//     // width 2em
 
-			//     span
-			//       display block
-			//       text-align left
-
-//Team Page
+/*
+ * Team Page
+ */
 .member
 	clear both
 	margin 0 0 1em 0
 
-	// h3
-	// 	border-bottom 1px solid white
-	// 	float right
-	// 	width 50%
 	img
 		margin: 1.5em 0
 
-	// p
-	// 	float right
-	// 	width 50%
-
-//App pages
+/*
+ * App pages
+ */
 .question
 	float left
 	width 40%
