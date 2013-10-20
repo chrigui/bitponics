@@ -385,7 +385,8 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
                         phase : phase,
                         user : user,
                         visibility : visibility,
-                        silentValidationFail : silentValidationFail
+                        silentValidationFail : silentValidationFail,
+                        attemptInPlaceEdit : !branch // if we're not branching, try to update phases in-place rather than creating new ones
                       },
                       function(err, validatedPhase){
                         if (validatedPhase){

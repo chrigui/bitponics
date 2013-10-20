@@ -898,9 +898,9 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
 /**
  * Called when a GP that the GPI is tracking has been updated (aka, branched).
- * We then need to migrate this GPI to the new GrowPlan
+ * We then need to migrate this GPI to the new GrowPlan, updating all notifications, actions, etc.
+ * Can be called with the original Grow Plan when we need to refresh the notifications etc.
  *
- * Assumes that this.growPlan is a populated GrowPlan model (so that we can scan the old phase names withotu re-retrieving the old GrowPlan)
  *
  * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
  * @param {function(err)} callback
@@ -915,8 +915,9 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
       elapsedPhaseDays,
       matchingNewGrowPlanPhase;
 
-  if (!newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan))){
-    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated..."))); 
+
+  if (!newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan)) && !newGrowPlan._id.equals(getObjectId(self.growPlan))){
+    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated to a descendant of the original Grow Plan."))); 
   }
 
 

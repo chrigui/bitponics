@@ -321,6 +321,7 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
  * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
+ * @param {bool} options.attemptInPlaceEdit : passed in from GrowPlan.createNewIfUserDefinedPropertiesModified. if true: if name of phase hasn't changed, make all changes in-place. else, normal behavior.
  * @param {function(err, Phase)} callback
  */
 PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
@@ -347,6 +348,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedActions.push(validatedAction._id);
               }
               if (silentValidationFail){
+                winston.err(err);
                 return actionCallback();  
               }
               return actionCallback(err);
@@ -374,6 +376,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedActions.push(validatedAction._id);  
               }
               if (silentValidationFail){
+                winston.err(err);
                 return actionCallback();  
               }
               return actionCallback(err);
@@ -400,6 +403,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
               submittedPhase.growSystem = validatedGrowSystem._id;  
             }
             if (silentValidationFail){
+              winston.err(err);
               return innerCallback();   
             }
             return innerCallback(err);
@@ -424,6 +428,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedNutrients.push(validatedNutrient._id);
               }
               if (silentValidationFail){
+                winston.err(err);
                 return nutrientCallback();  
               }
               return nutrientCallback(err);
@@ -450,6 +455,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
               submittedPhase.light = validatedLight._id;  
             }
             if (silentValidationFail){
+              winston.err(err);
               return innerCallback();  
             }
             return innerCallback(err);
@@ -473,6 +479,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                   validatedIdealRanges.push(validatedIdealRange);
                 }
                 if (silentValidationFail){
+                  winston.err(err);
                   return idealRangeCallback();
                 }
                 return idealRangeCallback(err);  
@@ -487,11 +494,17 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
       },
     ],
     function parallelEnd(err, results){
-      // force mongoose to create a new _id
-      delete submittedPhase._id;
-      if (silentValidationFail && err){
-        return (null, null);
+      if (options.attemptInPlaceEdit){
+
+      } else {
+        // force mongoose to create a new _id
+        delete submittedPhase._id;
       }
+      
+      if (silentValidationFail && err){
+        winston.err(err);
+        return (null, null);
+      } 
       return callback(err, submittedPhase);
     }
   );
