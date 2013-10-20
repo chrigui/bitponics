@@ -321,7 +321,7 @@ PhaseSchema.static('isEquivalentTo', function(source, other, callback){
  * @param {User} options.user : used to set "createdBy" field for new objects
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
  * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
- * @param {bool} options.attemptInPlaceEdit : passed in from GrowPlan.createNewIfUserDefinedPropertiesModified. if true: if name of phase hasn't changed, make all changes in-place. else, normal behavior.
+ * @param {bool} options.attemptInPlaceEdit : passed in from GrowPlan.createNewIfUserDefinedPropertiesModified. if true: make all changes in-place (don't create a new _id). else, normal behavior.
  * @param {function(err, Phase)} callback
  */
 PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){

@@ -469,9 +469,9 @@ async = require('async');
 
       beforeEach(function(done){
         var self = this,
-            sourceGrowPlanId = "506de30c8eebf7524342cb70";
+            sourceGrowPlanId = "506de30c8eebf7524342cb70"; // All-Purpose Grow Plan
         
-        self.userId = "506de30a8eebf7524342cb6c";
+        self.userId = "506de30a8eebf7524342cb6c"; // AK, creator of GP 506de30c8eebf7524342cb70
         
         ModelUtils.getFullyPopulatedGrowPlan(
           {_id : sourceGrowPlanId },
@@ -521,71 +521,6 @@ async = require('async');
         );
       }); // /returns the original GrowPlan if there haven\'t been any modifications
   
-
-      it('updates original GrowPlan if name has been modified and owner is the solo user', function(done){
-      
-        var self = this;
-        should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
-
-        self.sourceGrowPlan.name = "new unittest grow plan name";
-
-        GrowPlan.createNewIfUserDefinedPropertiesModified(
-          {
-            growPlan : self.sourceGrowPlan,
-            user : self.userId,
-            visibility : 'public'
-          },
-          function(err, validatedGrowPlan){
-            should.not.exist(err);
-            should.exist(validatedGrowPlan);
-            
-            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be the same");
-
-            ModelUtils.getFullyPopulatedGrowPlan(
-              {_id : validatedGrowPlan._id },
-              function(err, growPlans){
-                var fullyPopulatedValidatedGrowPlan = growPlans[0];
-                should.exist(fullyPopulatedValidatedGrowPlan);
-
-                GrowPlan.isEquivalentTo(
-                  self.originalGrowPlan, 
-                  fullyPopulatedValidatedGrowPlan, 
-                  function(err, isEquivalent){
-                    should.not.exist(err);
-                    
-                    isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
-                    
-                    self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
-                    self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
-    
-                    // The phases should be equivalent though, and also retain the original id's
-                    var phaseIterator = 0;
-                    async.eachSeries(self.originalGrowPlan.phases,
-                      function itemIterator(phase, iteratorCallback){
-                        phase._id.toString().should.equal(fullyPopulatedValidatedGrowPlan.phases[phaseIterator]._id.toString(), "phases should retain original ids");
-
-                        PhaseSchema.statics.isEquivalentTo(
-                          phase, 
-                          fullyPopulatedValidatedGrowPlan.phases[phaseIterator++],
-                          function(err, isEquivalent){
-                            isEquivalent.should.equal(true, "phases should be equivalent");
-                            return iteratorCallback();
-                          }
-                        );
-                      },
-                      function loopEnd(){
-                        done();
-                      }
-                    );
-                  }
-                );
-              }
-            );   
-          }
-        );
-      }); // /updates original GrowPlan if name has been modified and owner is the solo user
-
-
 
       
       it('updates associated active GrowPlanInstances', function(done){
@@ -739,8 +674,156 @@ async = require('async');
       });
 
 
+
+      describe('branching scenario (if being updated or used by non-owner', function(){
+        beforeEach(function(){
+          var self = this;
+          self.testUserId = '50e33086a47897af3446e26e';
+        });
+
+
+        it('branches GrowPlan if name has been modified', function(done){
+      
+          var self = this;
+          should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+          self.sourceGrowPlan.name = "new unittest grow plan name";
+
+          GrowPlan.createNewIfUserDefinedPropertiesModified(
+            {
+              growPlan : self.sourceGrowPlan,
+              user : self.testUserId,
+              visibility : 'public'
+            },
+            function(err, validatedGrowPlan){
+              should.not.exist(err);
+              should.exist(validatedGrowPlan);
+              
+              
+              validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(false, "_id's should be different");
+              validatedGrowPlan.parentGrowPlanId.equals(self.originalGrowPlan._id).should.equal(true, "new GP should point to original as parent");
+
+              ModelUtils.getFullyPopulatedGrowPlan(
+                {_id : validatedGrowPlan._id },
+                function(err, growPlans){
+                  var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                  should.exist(fullyPopulatedValidatedGrowPlan);
+
+                  GrowPlan.isEquivalentTo(
+                    self.originalGrowPlan, 
+                    fullyPopulatedValidatedGrowPlan, 
+                    function(err, isEquivalent){
+                      should.not.exist(err);
+                      
+                      isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
+                      
+                      self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
+                      self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
+      
+                      // The phases should be equivalent
+                      var phaseIterator = 0;
+                      async.eachSeries(self.originalGrowPlan.phases,
+                        function itemIterator(phase, iteratorCallback){
+                          (phase._id.toString() === fullyPopulatedValidatedGrowPlan.phases[phaseIterator]._id.toString()).should.equal(false, "phases should have new ids");
+
+                          PhaseSchema.statics.isEquivalentTo(
+                            phase, 
+                            fullyPopulatedValidatedGrowPlan.phases[phaseIterator],
+                            function(err, isEquivalent){
+                              isEquivalent.should.equal(true, "phases should be equivalent");
+
+                              phaseIterator++;
+                              return iteratorCallback();
+                            }
+                          );
+                        },
+                        function loopEnd(){
+                          done();
+                        }
+                      );
+                    }
+                  );
+                }
+              );   
+            }
+          );
+        }); // /updates original GrowPlan if name has been modified and owner is the solo user
+
+      });
+      
+
+
       describe('non-branching scenario (if being updated by the sole user)', function(){
-        it('updates original phases if phase name hasn\'t been changed', function(done){
+
+
+        it('updates original GrowPlan if name has been modified', function(done){
+      
+          var self = this;
+          should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+          self.sourceGrowPlan.name = "new unittest grow plan name";
+
+          GrowPlan.createNewIfUserDefinedPropertiesModified(
+            {
+              growPlan : self.sourceGrowPlan,
+              user : self.userId,
+              visibility : 'public'
+            },
+            function(err, validatedGrowPlan){
+              should.not.exist(err);
+              should.exist(validatedGrowPlan);
+              
+              validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be the same");
+
+              ModelUtils.getFullyPopulatedGrowPlan(
+                {_id : validatedGrowPlan._id },
+                function(err, growPlans){
+                  var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                  should.exist(fullyPopulatedValidatedGrowPlan);
+
+                  GrowPlan.isEquivalentTo(
+                    self.originalGrowPlan, 
+                    fullyPopulatedValidatedGrowPlan, 
+                    function(err, isEquivalent){
+                      should.not.exist(err);
+                      
+                      isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
+                      
+                      self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
+                      self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
+      
+                      // The phases should be equivalent though, and also retain the original id's
+                      var phaseIterator = 0;
+                      async.eachSeries(self.originalGrowPlan.phases,
+                        function itemIterator(phase, iteratorCallback){
+                          phase._id.toString().should.equal(fullyPopulatedValidatedGrowPlan.phases[phaseIterator]._id.toString(), "phases should retain original ids");
+
+                          PhaseSchema.statics.isEquivalentTo(
+                            phase, 
+                            fullyPopulatedValidatedGrowPlan.phases[phaseIterator],
+                            function(err, isEquivalent){
+                              isEquivalent.should.equal(true, "phases should be equivalent");
+
+                              phaseIterator++;
+                              return iteratorCallback();
+                            }
+                          );
+                        },
+                        function loopEnd(){
+                          done();
+                        }
+                      );
+                    }
+                  );
+                }
+              );   
+            }
+          );
+        }); // /updates original GrowPlan if name has been modified and owner is the solo user
+
+
+
+        it('updates original phases', function(done){
           var self = this;
           should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
 
@@ -810,7 +893,11 @@ async = require('async');
               );   
             }
           );
-        }); // /updates original GrowPlan if name has been modified and owner is the solo user
+        }); // /updates original phases
+
+
+
+
       });
     }); // /createNewIfUserDefinedPropertiesModified
     
