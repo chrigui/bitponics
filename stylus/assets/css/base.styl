@@ -292,13 +292,18 @@ ol.list-style
 	background color-logo-green
 	color white
 	cursor pointer
+	box-shadow 0px 2px 3px 0px rgba(0, 0, 0, 0.2)
+	position relative
 
 	// &:hover
 	// 	background color-logo-green
 	// 	color white
-	// &:active
-	// 	background lighten(color-logo-green, 10%)
-	// 	color white
+	&:active
+		box-shadow 0px 1px 3px 0px rgba(0, 0, 0, 0.4)
+		top 1px
+		right -1px
+		// background lighten(color-logo-green, 10%)
+		// color white
 
 	& *
 		@extends .display-ib
@@ -346,7 +351,6 @@ a.btn, button.btn
 	background white!important
 	color color-logo-green
 	border 3px solid color-logo-green
-	box-shadow 0 2px 3px 0px rgba(0, 0, 0, 0.10)
 
 	i
 		margin: 0 0 0 .5em;
@@ -357,19 +361,6 @@ button.btn
 
 .step
 	padding 3em 0 0
-
-/*
- * Visualizer
- */
-// #visualizer
-// 	div.circle
-// 		//background-color color-logo-green
-// 		position: absolute;
-// 		top .75em
-// 		left .75em
-// 		bottom .75em
-// 		right .75em
-
 
 .ring-graph
 	svg
@@ -566,10 +557,27 @@ ul
 
 
 .page
-	//background-image url('/assets/img/home/Bitponics_Hssld_H4D_0085.jpg')
 	background-position 35% -13em
-	// background-size cover
 	background-repeat no-repeat
+
+
+/* Sticky Footer */
+.page-wrapper
+	display -webkit-box
+	-webkit-box-orient vertical
+	display box
+	box-orient vertical
+	display flex
+	min-height 100vh
+	flex-direction column
+.main
+	-webkit-box-flex 1
+	box-flex 1
+	flex 1
+	width 100%
+
+
+
 
 .main > div, header
 	//padding 2em 2.6%
@@ -736,8 +744,6 @@ img.page-spinner.spinner
 	overflow hidden
 
 	li
-		margin: 1em 1em 0 0
-
 		.btn
 			margin: 0;
 			width: 100%;
@@ -756,6 +762,13 @@ img.page-spinner.spinner
 
 	.value
 		margin 0 0 1em
+
+/*
+ *  General Close (x) btn styles
+ */
+.close
+	box-shadow none
+	background transparent
 
 
 /*

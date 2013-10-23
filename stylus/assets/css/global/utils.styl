@@ -1,8 +1,37 @@
+/*
+ * Global Vars
+ */
 med-white=#f5f5f4
 dark-gray=#333
 gray=#dfdfdf
 border-light=#999
 base-font-size=16px
+
+
+/*
+ * media_definition
+ *
+ * Allow for defining breakpoints as variable in one spot.
+ *
+ * Due to stylus issue: https://github.com/LearnBoost/stylus/issues/1038
+ * This is a mixin workaround for using media query variables. Usage:
+ *    $_media = media(screen,'and',(min-width $screen-tablet))
+ *    @media $_media
+ *      .container
+ *        max-width 728px
+ */
+media_definition(args...)
+  output = null
+  for arg in args
+    // check for tuple
+    if arg[1]
+      push(output,unquote('(%s: %s)' % (arg[0] arg[1])))
+    else
+      push(output,unquote(arg))
+
+  unquote(s('%s',output))
+
+
 
 create-triangle(dir, size, color)
   height 0
@@ -47,24 +76,3 @@ create-repeating-linear-gradient(string-args)
 // font-size($sizeValue = 1.6)
 //   font-size ($sizeValue * 10) px
 //   font-size $sizeValue rem
-
-/*
- * Allow for defining breakpoints as variable in one spot.
- *
- * Due to stylus issue: https://github.com/LearnBoost/stylus/issues/1038
- * This is a mixin workaround for using media query variables. Usage:
- *    $_media = media(screen,'and',(min-width $screen-tablet))
- *    @media $_media
- *      .container
- *        max-width 728px
- */
-media_definition(args...)
-  output = null
-  for arg in args
-    // check for tuple
-    if arg[1]
-      push(output,unquote('(%s: %s)' % (arg[0] arg[1])))
-    else
-      push(output,unquote(arg))
-
-  unquote(s('%s',output))

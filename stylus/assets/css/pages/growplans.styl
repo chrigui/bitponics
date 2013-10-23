@@ -10,14 +10,23 @@
 		margin-bottom .5em
 		padding 0
 
+		&.float
+			overflow hidden
+			border 1px dashed color-border-gray
+			li
+				margin 0 auto auto
+				float left
+
 		.grid-cell
-			max-width 40em
+			// max-width 40em
 			margin 0 auto
 		
 		.img-wrapper
 			position relative
 			height 15em
 			overflow hidden
+			max-width 40em
+			margin 0 auto
 
 			img
 				position absolute
@@ -29,7 +38,7 @@
 
 	&.no-flexbox
 		.grid-cell
-			width 100%
+			// width 100%
 
 	@media $mq_medium
 		&.no-flexbox
@@ -44,7 +53,7 @@
 	@media $mq_larger
 		&.no-flexbox
 			.grid-cell
-				width 50%
+				// width 50%
 
 	.btn
 		padding .5em

@@ -54,8 +54,8 @@ block head
           //-       label(for="{{plant._id}}", class="plant") {{plant.name}}
           
           
-          ul(class="grid plantlist")
-            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="")
+          ul(class="plantlist float")
+            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="grid-cell")
               input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
@@ -72,9 +72,9 @@ block head
   script(type='text/ng-template', id='browse.html')
 
     h4.page-heading Select a Grow Plan
-    ul(class="block-info-set grid sortlist photos separator-top")
+    ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
       //- each growPlan, i in growPlans
-      li(ng-repeat="growPlan in filteredGrowPlanList", class="")
+      li(ng-repeat="growPlan in filteredGrowPlanList", class="grid-cell")
         div.img-wrapper
           div.icon-glyph.icon-glyphlogo-new
         div.first
@@ -119,9 +119,9 @@ block head
       div(class="question-wrap-right")
         div.question
           label.question-title Plants
-          ul(class="grid plantlist hide-unchecked-items")
+          ul(class="plantlist float hide-unchecked-items")
             //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
-            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name", class="")
+            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
               input(id="{{plant._id}}", 
                 type='checkbox', 
                 name="plants", 
@@ -247,8 +247,8 @@ block head
                     a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'NutrientOverlay'")
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                       | Add a nutrient
-                    ul.grid
-                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel", class="")
+                    ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3")
+                      li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel", class="grid-cell")
                         input(id="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", type='checkbox', name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients", value="{{nutrient._id}}", checked=true)
                         label(for="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients") {{nutrient.name}} - {{nutrient.brand}}
                 
@@ -340,7 +340,7 @@ block head
                         label What time of day should the ideal range apply?
                         div(class="custom-checkbox-wrap")
                           input(id="action_control_time_{{$index}}", class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
-                          label(for="action_control_time_{{$index}}") All Day
+                          label(for="action_control_time_{{$index}}", class="idealrange-option btn") All Day
 
                         div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
                           // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
@@ -408,7 +408,7 @@ block head
                         div(ng-show="action.control")
                           div(class="custom-checkbox-wrap separator-top")
                             input(id="action_control_{{$index}}", type="checkbox", ng-model="action.isDailyControlCycle")
-                            label(for="action_control_{{$index}}") Daily                            
+                            label(for="action_control_{{$index}}", class="action-option btn") Daily                            
 
                           div(class="separator-top", ng-show="action.isDailyControlCycle")
                             label Turn {{action.control.name}} on at 
@@ -432,11 +432,11 @@ block head
                               p First, turn {{action.control.name}}
                               div(class="custom-checkbox-wrap")
                                 input(id="first_action_states_on_{{$index}}", type="radio", value="1", ng-model="action.cycle.states[0].controlValue")
-                                label(for="first_action_states_on_{{$index}}") On
+                                label(for="first_action_states_on_{{$index}}", class="action-option btn") On
 
                               div(class="custom-checkbox-wrap")
                                 input(id="first_action_states_off_{{$index}}", type="radio", value="0", ng-model="action.cycle.states[0].controlValue")
-                                label(for="first_action_states_off_{{$index}}") Off
+                                label(for="first_action_states_off_{{$index}}", class="action-option btn") Off
 
                               div 
                                 p for
@@ -451,11 +451,11 @@ block head
                               p Then turn {{action.control.name}}
                               div(class="custom-checkbox-wrap")
                                 input(id="then_action_states_on_{{$index}}", type="radio", value="1", ng-model="action.cycle.states[1].controlValue")
-                                label(for="then_action_states_on_{{$index}}") On
+                                label(for="then_action_states_on_{{$index}}", class="action-option btn") On
 
                               div(class="custom-checkbox-wrap")
                                 input(id="then_action_states_off_{{$index}}", type="radio", value="0", ng-model="action.cycle.states[1].controlValue")
-                                label(for="then_action_states_off_{{$index}}") Off
+                                label(for="then_action_states_off_{{$index}}", class="action-option btn") Off
 
                               div 
                                 p for 
@@ -492,8 +492,8 @@ block head
                 div(class="device", ng-show="selected.selectedGrowPlanPhaseSection == 4 && userOwnedDevices.length > 0")
                   h4(class="page-heading-large separator-top") Device
                   p Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
-                  ul(class="grid devicelist")
-                    li(ng-repeat="device in sharedDataService.userOwnedDevices", class="")
+                  ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 devicelist")
+                    li(ng-repeat="device in sharedDataService.userOwnedDevices", class="grid-cell")
                       input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId")
                       label.btn(ng-click="toggleDevice(device)", ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}")
                         | {{device.name}}
@@ -537,15 +537,12 @@ block content
                     | Add New Plant
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
-                ul(class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--fit plantlist")
+                ul(class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--fit small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
                   li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell grid-cell--center")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                       img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plant._id}}.jpg", alt="{{plant.name}}")
-                    //- dl
-                    //-   dt Type:
-                    //-   dd {{plant.name}}
-                    
+                        
                     div.custom-checkbox-wrap
                       input(id="search_{{plant._id}}", 
                         type='checkbox', 
@@ -576,8 +573,8 @@ block content
                     | Add New Fixture
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
 
-                ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="")
+                ul(class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--1of3 grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -623,8 +620,8 @@ block content
                     | Add New Bulb
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
-                ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="")
+                ul(class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--1of3 grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -668,8 +665,8 @@ block content
                     | Add New Grow System
                     | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                 
-                ul(class="grid plantlist")
-                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="")
+                ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
+                  li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                     div.img-wrapper
                       div.icon-glyph.icon-glyphlogo-new
                     dl
@@ -720,8 +717,8 @@ block content
                       | Add New Nutrient
                       | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
                   
-                  ul(class="grid plantlist")
-                    li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="")
+                  ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
+                    li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell")
                       div.img-wrapper
                         div.icon-glyph.icon-glyphlogo-new
                       dl
