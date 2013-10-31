@@ -15,24 +15,6 @@
 	display flex
 	width 100%
 
-/*
- * The @supports CSS rule is not currently working in Stylus, so rely on modernizr class for fallback for now.
- * 
- * Reasons for fallback:
- * - FF doesn't support all of flexbox: https://bugzilla.mozilla.org/show_bug.cgi?id=702508
- * - IE<11 is bad too.
- * 
- * We will use this once supported in Stylus:
- * - @supports not (flex-wrap: wrap) and not (-webkit-flex-wrap: wrap) 
- */
-.no-flexbox
-	.grid
-		display block
-
-	.grid-cell
-		@extends .display-ib
-		margin 0 0 0 .3ch
-
 
 .grid-cell
 	// -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
@@ -41,6 +23,7 @@
 	// -webkit-flex: 1;          /* Chrome */
 	// -ms-flex: 1;              /* IE 10 */
 	flex 1
+	margin 1em 0
 
 
 /* Wrapping */
@@ -156,3 +139,33 @@
 	.large-grid--1of4 > .grid-cell 
 		flex: 0 0 25%
 
+
+/*
+ * The @supports CSS rule is not currently working in Stylus, so rely on modernizr class for fallback for now.
+ * 
+ * Reasons for fallback:
+ * - FF doesn't support all of flexbox: https://bugzilla.mozilla.org/show_bug.cgi?id=702508
+ * - IE<11 is bad too.
+ * 
+ * We will use this once supported in Stylus:
+ * - @supports not (flex-wrap: wrap) and not (-webkit-flex-wrap: wrap) 
+ */
+.no-flexbox
+	.grid
+		display block
+
+	.grid-cell
+		@extends .display-ib
+		margin 1em -4px 1em 0
+
+	@media $mq_small
+		.small-no-flexbox-grid--1of2 > .grid-cell 
+			width 49%
+	
+	@media $mq_medium
+		.medium-no-flexbox-grid--1of3 > .grid-cell 
+			width 32.3333%
+
+	@media $mq_large
+		.large-no-flexbox-grid--1of4 > .grid-cell 
+			width 24%

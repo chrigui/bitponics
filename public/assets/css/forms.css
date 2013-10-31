@@ -271,7 +271,7 @@ input[type='radio'] + label.btn,
 input[type='checkbox'] + label.btn {
   background: #fff;
   color: #00e36c;
-  border: 3px solid #00e36c;
+  border: 1px solid #00e36c;
 }
 input[type='radio']:checked + label.btn,
 input[type='checkbox']:checked + label.btn {
@@ -293,7 +293,7 @@ input[type='checkbox']:checked + label.btn {
   width: 100%;
 }
 .question-title {
-  margin: 1.25em 0 0;
+  margin: 1.25em 0;
 }
 .dropdown-wrap {
   position: relative;
@@ -391,6 +391,7 @@ input[type='checkbox']:checked + label.btn {
   margin-left: -2em;
   display: inline-block;
   font-size: 24px;
+  height: 1em;
 }
 .custom-dropdown-wrap .dblarrow i {
   width: 0;
@@ -419,6 +420,8 @@ input[type='checkbox']:checked + label.btn {
 /*Important*/
   padding: 0.45em 1.25em 0.45em 0.45em;
   font-weight: lighter;
+  -webkit-box-shadow: 0 2px 3px 0px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 3px 0px rgba(0,0,0,0.2);
 }
 .custom-checkbox-wrap {
   position: relative;
@@ -440,8 +443,8 @@ input[type='checkbox']:checked + label.btn {
   width: 1em;
   height: 0.35em;
   background: transparent;
-  top: 0.6em;
-  right: 0.35em;
+  top: 1.1em;
+  right: 0.85em;
   border: 3px solid #fcfff4;
   border-top: none;
   border-right: none;
