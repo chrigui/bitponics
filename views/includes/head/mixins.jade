@@ -32,6 +32,7 @@ mixin requirejs(dataMain)
   - var throttleDebounce = CDN('/assets/js/libs/jquery/jquery.ba-throttle-debounce.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var utils = CDN('/assets/js/shared/utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var viewModels = CDN('/assets/js/fe-be/view-models.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var growPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   //- These two scripts don't exist... never used?
   //- //var spin = '/assets/js/libs/spin.min.js'
   //- //var socketIO = '/socket.io/socket.io.js'
@@ -73,7 +74,8 @@ mixin requirejs(dataMain)
         'steps': '#{steps}',
         'throttle-debounce': '#{throttleDebounce}',
         'utils': '#{utils}',
-        'view-models': '#{viewModels}'
+        'view-models': '#{viewModels}',
+        'growPlanService': '#{growPlanService}'
       },
       shim: { 
         'angular': { 

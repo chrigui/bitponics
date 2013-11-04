@@ -1,0 +1,267 @@
+<div data-role="page" class="page">
+  <div data-role="content" class="page-wrapper">
+    <section class="header">
+      <header>
+        <nav role="nav" ng-controller="bpn.controllers.Nav" ng-class="{'open':navMenuDisplayVisible}">
+          <ul>
+            <li class="nav-section first">
+              <h1 role="banner" class="logo icon"><a href="/" data-page-include="false">
+                   
+                  bitponics<span>&trade;</span></a><i class="icon-glyph icon-glyphlogo-new" aria-hidden="true"></i></h1>
+              <li class="nav-section app-user"><span>welcome back, </span><a href="/account/profile">Amit Kumar</a>
+                <div ng-click="toggleSettings()" class="settings"><i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
+                  <div ng-class="{'visible':settingsDisplayVisible}" class="settings-display">
+                    <h2>Settings</h2>
+                    <ul>
+                      <li><a href="/account/profile">Profile</a></li>
+                      <li><a href="/gardens">Gardens</a></li>
+                      <li><a href="/account/devices">Devices</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </li>
+            </li>
+          </ul>
+        </nav>
+      </header>
+    </section>
+    <section id="main" role="main" ng-cloak class="main">
+      <div class="content-module middle">
+        <form id="growplans" name="growplans" data-ajax="false" ng-submit="submit()" ng-controller="bpn.controllers.setup.growPlan.Main" novalidate class="steps">
+          <section ng-view></section>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.PlantOverlay" modal="sharedDataService.activeOverlay.is=='PlantOverlay'" close="close()" options="sharedDataService.modalOptions">
+              <div ng-controller="bpn.controllers.SelectionOverlay">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <h3 class="page-heading page-heading-small">Add a Plant</h3>
+                <div>
+                  <input ng-model="query" ng-change="search()" placeholder="Search..." class="search no-validate">
+                  <div ng-hide="filteredItems.length"> 
+                    <label href="#" ng-click="addPlant(this)" class="add btn">
+                      Add New Plant
+                      <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    </label>
+                  </div>
+                  <ul class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--fit small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist">
+                    <li ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name" class="grid-cell grid-cell--center">
+                      <div class="img-wrapper">
+                        <div class="icon-glyph icon-glyphlogo-new"></div><img ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plant._id}}.jpg" alt="{{plant.name}}">
+                      </div>
+                      <div class="custom-checkbox-wrap">
+                        <input id="search_{{plant._id}}" type="checkbox" name="plants" value="{{plant._id}}" ng-model="sharedDataService.selected.plants[plant._id]">
+                        <label for="search_{{plant._id}}" class="plant btn">{{plant.name}}</label>
+                      </div>
+                    </li>
+                  </ul>
+                  <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}"><a href ng-click="prevPage()">« Prev</a></li>
+                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}"><a href ng-click="setPage()" ng-bind="n + 1">1</a></li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}"><a href ng-click="nextPage()">Next »</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.FixtureOverlay" modal="sharedDataService.activeOverlay.is=='FixtureOverlay'" close="close()" options="sharedDataService.modalOptions">
+              <div ng-controller="bpn.controllers.SelectionOverlay">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <h3 class="page-heading page-heading-small">Choose a Fixture</h3>
+                <div ng-controller="overlayCtrl">
+                  <input ng-model="query" ng-change="search()" placeholder="Search..." class="search no-validate">
+                  <div ng-hide="filteredItems.length"> 
+                    <label href="#" ng-click="addFixture(this)" class="add btn">
+                      Add New Fixture
+                      <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    </label>
+                  </div>
+                  <ul class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--1of3 grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist">
+                    <li ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name" class="grid-cell">
+                      <div class="img-wrapper">
+                        <div class="icon-glyph icon-glyphlogo-new"></div>
+                      </div>
+                      <dl>
+                        <dt>Brand:</dt>
+                        <dd class="brand">{{item.brand || '--'}}</dd>
+                        <dt>Name:</dt>
+                        <dd class="name">{{item.name}}</dd>
+                        <dt>Type:</dt>
+                        <dd class="type">{{item.type}}</dd>
+                        <dt>Watts:</dt>
+                        <dd class="watts">{{item.watts}}</dd>
+                        <dt># of bulbs per fixture:</dt>
+                        <dd class="bulbs">{{item.bulbCapacity}}</dd>
+                      </dl>
+                      <input id="fixture_{{item._id}}" type="radio" name="lightFixtureOverlaySelection" value="{{item._id}}" ng-model="item" ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture._id" ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture = item">
+                      <label for="fixture_{{item._id}}" class="item btn next-step-btn">Select</label>
+                    </li>
+                  </ul>
+                  <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}"><a href ng-click="prevPage()">« Prev</a></li>
+                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}"><a href ng-click="setPage()" ng-bind="n + 1">1</a></li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}"><a href ng-click="nextPage()">Next »</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.BulbOverlay" modal="sharedDataService.activeOverlay.is=='BulbOverlay'" close="close()" options="sharedDataService.modalOptions">
+              <div ng-controller="bpn.controllers.SelectionOverlay">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <h3 class="page-heading page-heading-small">Choose a Bulb</h3>
+                <div ng-controller="overlayCtrl">
+                  <input ng-model="query" ng-change="search()" placeholder="Search..." class="search no-validate">
+                  <div ng-hide="filteredItems.length"> 
+                    <label href="#" ng-click="addBulb(this)" class="add btn">
+                      Add New Bulb
+                      <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    </label>
+                  </div>
+                  <ul class="grid grid--top grid--wrapping grid--gutters small-grid--full medium-grid--1of3 grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist">
+                    <li ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name" class="grid-cell">
+                      <div class="img-wrapper">
+                        <div class="icon-glyph icon-glyphlogo-new"></div>
+                      </div>
+                      <dl>
+                        <dt>Brand:</dt>
+                        <dd>{{item.brand || '--'}}</dd>
+                        <dt>Name:</dt>
+                        <dd>{{item.name}}</dd>
+                        <dt>Type:</dt>
+                        <dd>{{item.type}}</dd>
+                        <dt>Watts:</dt>
+                        <dd>{{item.watts}}</dd>
+                      </dl>
+                      <input id="bulb_{{item._id}}" type="radio" name="lightBulb" value="{{item._id}}" ng-model="item._id" ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb._id" ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb = item">
+                      <label for="bulb_{{item._id}}" class="item btn next-step-btn">Select</label>
+                    </li>
+                  </ul>
+                  <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}"><a href ng-click="prevPage()">« Prev</a></li>
+                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}"><a href ng-click="setPage()" ng-bind="n + 1">1</a></li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}"><a href ng-click="nextPage()">Next »</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.GrowSystemOverlay" modal="sharedDataService.activeOverlay.is=='GrowSystemOverlay'" close="close()" options="sharedDataService.modalOptions">
+              <div ng-controller="bpn.controllers.SelectionOverlay">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <h3 class="page-heading page-heading-small">Choose a Grow System</h3>
+                <div ng-controller="overlayCtrl">
+                  <input ng-model="query" ng-change="search()" placeholder="Search..." class="search no-validate">
+                  <div ng-hide="filteredItems.length"> 
+                    <label href="#" ng-click="addGrowSystem(this)" class="add btn">
+                      Add New Grow System
+                      <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    </label>
+                  </div>
+                  <ul class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist">
+                    <li ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name" class="grid-cell">
+                      <div class="img-wrapper">
+                        <div class="icon-glyph icon-glyphlogo-new"></div>
+                      </div>
+                      <dl>
+                        <dt>Name:</dt>
+                        <dd>{{item.name}}</dd>
+                        <dt>Description:</dt>
+                        <dd class="description">{{item.description}}</dd>
+                        <dt>Type:</dt>
+                        <dd>{{item.type}}</dd>
+                        <dt>Plant Capacity:</dt>
+                        <dd>{{item.plantCapacity}}</dd>
+                        <dt>Size:</dt>
+                        <dd>
+                          <div ng-show="item.overallSize.w &amp;&amp; item.overallSize.h &amp;&amp; item.overallSize.d">
+                             
+                            {{item.overallSize.w}} wide x {{item.overallSize.h}} high x {{item.overallSize.d}} deep
+                          </div>
+                          <div ng-hide="item.overallSize.w &amp;&amp; item.overallSize.h &amp;&amp; item.overallSize.d">
+                             
+                            -
+                          </div>
+                        </dd>
+                      </dl>
+                      <input id="growsystem_{{item._id}}" type="radio" name="growSystem" value="{{item._id}}" ng-model="item._id" ng-checked="item._id == sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id" ng-click="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem = item">
+                      <label for="growsystem_{{item._id}}" class="item btn next-step-btn">Select
+                      </label>
+                    </li>
+                  </ul>
+                  <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}"><a href ng-click="prevPage()">« Prev</a></li>
+                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}"><a href ng-click="setPage()" ng-bind="n + 1">1</a></li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}"><a href ng-click="nextPage()">Next »</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.NutrientOverlay" modal="sharedDataService.activeOverlay.is=='NutrientOverlay'" close="close()" options="sharedDataService.modalOptions">
+              <div ng-controller="bpn.controllers.SelectionOverlay">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <h3 class="page-heading page-heading-small">Choose a Nutrient</h3>
+                <div ng-controller="overlayCtrl">
+                  <input ng-model="query" ng-change="search()" placeholder="Search..." class="search no-validate">
+                  <div ng-hide="filteredItems.length"> 
+                    <label href="#" ng-click="addGrowSystem(this)" class="add btn">
+                      Add New Nutrient
+                      <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    </label>
+                  </div>
+                  <ul class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist">
+                    <li ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name" class="grid-cell">
+                      <div class="img-wrapper">
+                        <div class="icon-glyph icon-glyphlogo-new"></div>
+                      </div>
+                      <dl>
+                        <dt>Brand:</dt>
+                        <dd>{{item.brand}}</dd>
+                        <dt>Name:</dt>
+                        <dd>{{item.name}}</dd>
+                      </dl>
+                      <input id="nutrient_{{item._id}}" type="checkbox" name="nutrientsOverlaySelections" value="{{item._id}}" ng-model="item.selected" ng-change="toggleItemSelection(item, this)" ng-checked="sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[item._id]">
+                      <label for="nutrient_{{item._id}}" class="nutrient btn next-step-btn">Select</label>
+                    </li>
+                  </ul>
+                  <ul class="pagination">
+                    <li ng-class="{disabled: currentPage == 0}"><a href ng-click="prevPage()">« Prev</a></li>
+                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}"><a href ng-click="setPage()" ng-bind="n + 1">1</a></li>
+                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}"><a href ng-click="nextPage()">Next »</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div ng-controller="bpn.controllers.setup.growPlan.ActivationOverlay" modal="sharedDataService.activeOverlay.is=='ActivationOverlay'" close="close()" options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }">
+              <div class="overlay-contain">
+                <div ng-click="close()" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                <div ng-show="!sharedDataService.submit.error">
+                  <h3 class="page-heading page-heading-small">Garden Activated</h3>
+                  <p>
+                     
+                    Your garden is all set up! Visit your garden's <a href="/gardens/{{sharedDataService.createdGrowPlanInstanceId}}" class="link">dashboard </a>to view your progress, monitor sensor readings and control any connected accessories.
+                  </p>
+                </div>
+                <div ng-show="sharedDataService.submit.error">
+                  <h3 class="page-heading page-heading-small error">Garden Error</h3>
+                  <p class="error">There was a technical problem and your garden was not set up.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+    <section id="footer" ng-cloak="" class="footer">
+      <div>
+         
+        bitponics &copy; 2013 <a href="/about" class="footer-link">About</a><a href="/returns" class="footer-link">Return Policy</a><a href="/privacy" class="footer-link">Privacy Policy</a>
+      </div>
+    </section>
+  </div>
+</div>

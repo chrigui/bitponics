@@ -1,10 +1,10 @@
-require([
+define([
   'angular',
   'domReady',
   'view-models',
   'moment',
   'fe-be-utils',
-  '/assets/js/services/grow-plan.js',
+  'growPlanService',
   'es5shim',
   'angularRoute',
   'angularUI',
@@ -20,6 +20,7 @@ require([
     var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers']).run(
 
       function($rootScope) {
+
         /**
          * Debugging Tools
          *
@@ -447,7 +448,7 @@ require([
         'sharedDataService',
         function ($scope, $filter, GrowPlanModel, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
-
+          
           //$scope.lights = bpn.lights;
           //$scope.lightFixtures = bpn.lightFixtures;
           //$scope.lightBulbs = bpn.lightBulbs;
@@ -737,5 +738,7 @@ require([
   	domReady(function () {
       angular.bootstrap(document, ['bpn.apps.setup.growPlan']);
     });
+
+    return growPlanApp;
   }
 );

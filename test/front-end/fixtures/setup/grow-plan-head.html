@@ -1,0 +1,452 @@
+<title>Grow Plans</title>
+<meta charset="UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+<script type="text/ng-template" id="filter.html">
+  <h4 class="page-heading">Ready to set up your grow plan?</h4>
+  <div class="separator-top">
+    <div class="question">
+      <h5 class="question-title">What kind of hydroponic system would you like to use?</h5>
+      <select ui-select2="sharedDataService.growSystemSelectOptions" ng-model="selectedGrowSystem">
+        <option value=""></option>
+        <option ng-repeat="growSystem in sharedDataService.growSystems" value="{{growSystem._id}}">{{growSystem.name}}</option>
+      </select>
+    </div>
+    <div class="question-wrap-right">
+      <div class="question">
+        <h5 class="question-title">What plants would you like to grow?</h5>
+        <ul class="plantlist float">
+          <li ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name" class="grid-cell">
+            <input id="{{plant._id}}" type="checkbox" name="plants" ng-model="sharedDataService.selected.plants[plant._id]">
+            <label for="{{plant._id}}" class="plant btn">
+               
+              {{plant.name}}
+              <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+            </label>
+          </li>
+        </ul>
+        <label ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'" class="add btn">
+           
+          Add
+          <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="step-footer separator-top"><a href="browse" class="btn next-step-btn">
+      Next Step
+      <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i></a></div>
+</script>
+<script type="text/ng-template" id="browse.html">
+  <h4 class="page-heading">Select a Grow Plan</h4>
+  <ul class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top">
+    <li ng-repeat="growPlan in filteredGrowPlanList" class="grid-cell">
+      <div class="img-wrapper">
+        <div class="icon-glyph icon-glyphlogo-new"></div>
+      </div>
+      <div class="first">
+        <h5 class="label">Name</h5>
+        <div class="value">{{growPlan.name}}</div>
+      </div>
+      <div>
+        <h5 class="label">Number of Phases</h5>
+        <div class="value">{{growPlan.phases.length}}</div>
+      </div>
+      <div>
+        <h5 class="label">Overall Time Span</h5>
+        <div class="value">{{growPlan.overallTimeSpan || 'Open ended'}}</div>
+      </div>
+      <div class="last">
+        <h5 class="label">Created by</h5>
+        <div ng-show="growPlan.createdBy[0].name.first" class="value">{{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}</div>
+        <div ng-show="!growPlan.createdBy[0].name.first" class="value">Bitponics</div>
+      </div><a href="customize/{{growPlan._id}}" class="btn">Select</a>
+    </li>
+  </ul>
+</script>
+<script type="text/ng-template" id="customize-overview.html">
+  <h4 class="page-heading">Customize your grow plan</h4>
+  <div class="separator-top">
+    <div class="question">
+      <label for="gpedit_name" class="question-title">Grow Plan Name</label>
+      <input id="gpedit_name" type="text" name="gpedit_name" ng-model="sharedDataService.selectedGrowPlan.name">
+    </div>
+    <div class="question">
+      <label for="gpi_name" class="question-title">Your Garden Name</label>
+      <input type="text" id="gpi_name" name="gpi_name" ng-model="sharedDataService.growPlanInstance.name">
+    </div>
+    <div class="question-wrap-right">
+      <div class="question">
+        <label class="question-title">Plants</label>
+        <ul class="plantlist float hide-unchecked-items">
+          <!--textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")-->
+          <li ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name">
+            <input id="{{plant._id}}" type="checkbox" name="plants" ng-model="sharedDataService.selected.plants[plant._id]" ng-checked="sharedDataService.selected.plants[plant._id]">
+            <label for="{{plant._id}}" class="plant btn">
+               
+              {{plant.name}}
+              <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+            </label>
+          </li>
+        </ul>
+        <label ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'" class="add btn">
+           
+          Add
+          <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+        </label>
+      </div>
+    </div>
+    <div class="question clear-l">
+      <label for="gpedit_description" class="question-title">Description</label>
+      <textarea name="gpedit_description" ng-model="sharedDataService.selectedGrowPlan.description" rows="8"></textarea>
+    </div>
+  </div>
+  <div class="step-footer separator-top"><a href="customize/{{sharedDataService.selectedGrowPlan._id}}/details" class="btn next-step-btn">
+      Next Step
+      <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i></a></div>
+</script>
+<script type="text/ng-template" id="customize-details.html">
+  <h4 class="page-heading">Your grow plan</h4>
+  <div class="Phases">
+    <div>
+      <section class="separator-top">
+        <h5 class="question-title">Total grow plan duration  </h5>
+        <h4 class="page-heading-large seamless-input-wrap">
+          <input type="number" readonly name="expectedGrowPlanDuration" id="expectedGrowPlanDuration" value="expectedGrowPlanDuration" ng-model="expectedGrowPlanDuration" class="seamless-input no-disable"><span>Days</span>
+        </h4>
+        <h5 class="starting-day question-title seamless-input-wrap page-heading-small">I am starting on day
+          <input type="number" ng-model="sharedDataService.growPlanInstance.currentGrowPlanDay" min="0" max="{{expectedGrowPlanDuration}}" class="seamless-input-with-bg date-duration text-align-c no-disable">
+        </h5>
+      </section>
+      <section class="separator-top">
+        <h5 class="question-title">Phases</h5>
+        <ul class="phase-tabs">
+          <li ng-repeat="phase in sharedDataService.selectedGrowPlan.phases" ng-class="{selected: sharedDataService.selectedGrowPlan.currentVisiblePhase == phase}" ng-click="setCurrentVisiblePhase(phase)" class="btn inverse-btn">{{ phase.name || 'New Phase' }}
+            <div ng-click="removePhase($index)" class="remove icon"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+          </li>
+          <li ng-click="addPhase()" class="btn inverse-btn">Add New Phase
+            <div class="add icon"><i class="icon-glyph-new icon-01_-" aria-hidden="true"></i></div>
+          </li>
+        </ul>
+        <div class="phase-slider">
+          <h4 class="page-heading-large seamless-input-wrap"><span>{{ sharedDataService.selectedGrowPlan.currentVisiblePhase.name || 'New Phase' }} lasts for</span>
+            <input name="expectedNumberOfDays" value="1" type="number" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.expectedNumberOfDays" ng-change="setExpectedGrowPlanDuration()" min="1" class="seamless-input-with-bg date-duration text-align-c no-disable"><span>days</span>
+          </h4>
+          <section>
+            <div class="phaseName">
+              <label>Phase Name</label>
+              <input type="text" placeholder="Give this phase a name..." ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.name">
+            </div>
+            <div class="phaseDescription">
+              <label>Phase Description</label>
+              <textarea placeholder="Write a phase description..." ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.description"></textarea>
+            </div>
+            <div class="phaseEndDescription">
+              <label>Phase End Description</label>
+              <textarea placeholder="This phase is over when..." ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.phaseEndDescription"></textarea>
+            </div>
+            <ul class="phase-tabs separator-top">
+              <li ng-repeat="phaseSection in growPlanPhaseSectionUITabs" ng-class="{selected: selected.selectedGrowPlanPhaseSection == $index}" ng-click="setCurrentPhaseSectionTab($index)" class="btn inverse-btn">{{ phaseSection }}</li>
+            </ul>
+            <div ng-show="selected.selectedGrowPlanPhaseSection == 0" class="growSystem">
+              <!--select(ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem._id", ng-options="growSystem._id as growSystem.name for growSystem in growSystems")-->
+              <div class="question">
+                <h4 class="page-heading-large separator-top">System</h4><a href ng-click="sharedDataService.activeOverlay.is = 'GrowSystemOverlay'" class="edit-btn">
+                  <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  Choose a different grow system</a>
+                <label>Name</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name">
+                <label>Description</label>
+                <textarea ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.description"></textarea>
+                <label>Type</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.type">
+                <label>Reservoir Size (gallons)</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.reservoirSize">
+                <label>Plant Capacity</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.plantCapacity">
+                <h7>Size (feet)</h7>
+                <input type="text" placeholder="W" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.w">
+                <input type="text" placeholder="H" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.h">
+                <input type="text" placeholder="D" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.overallSize.d">
+              </div>
+              <div class="growMedium question">
+                <h4 class="page-heading-large separator-top">Grow Medium</h4>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growMedium">
+              </div>
+              <div class="nutrients question">
+                <h4 class="page-heading-large separator-top">Nutrients</h4><a href ng-click="sharedDataService.activeOverlay.is = 'NutrientOverlay'" class="edit-btn">
+                  <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  Add a nutrient</a>
+                <ul class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3">
+                  <li ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel" class="grid-cell">
+                    <input id="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients" type="checkbox" name="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients" value="{{nutrient._id}}" checked>
+                    <label for="gpedit_{{sharedDataService.selectedGrowPlan.currentVisiblePhase._id}}_nutrients">{{nutrient.name}} - {{nutrient.brand}}</label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div ng-show="selected.selectedGrowPlanPhaseSection == 1" class="light">
+              <div class="question">
+                <h4 class="page-heading-large separator-top">Fixture</h4><a href ng-click="sharedDataService.activeOverlay.is = 'FixtureOverlay'" class="edit-btn">
+                  <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  Choose a different fixture</a>
+                <label>Brand</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand">
+                <label>Name</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.name">
+                <label>Type</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.type">
+                <label>Watts</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.watts">
+                <label># of bulbs per fixture</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.bulbCapacity">
+                <label># of fixtures</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity">
+              </div>
+              <div class="question">
+                <h4 class="page-heading-large separator-top">Bulbs</h4><a href ng-click="sharedDataService.activeOverlay.is = 'BulbOverlay'" class="edit-btn">
+                   
+                  <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  Choose a different bulb</a>
+                <label>Brand</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand">
+                <label>Name</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.name">
+                <label>Type</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.type">
+                <label>Watts</label>
+                <input type="text" ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts" value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.watts">
+              </div>
+            </div>
+            <div ng-show="selected.selectedGrowPlanPhaseSection == 2" class="idealRanges">
+              <h4 class="page-heading-large separator-top">Ideal Sensor Ranges</h4>
+              <p>
+                Here's where you describe the ideal values for your sensors throughout this phase. If your sensor readings get out of range,
+                we'll send you an alert. You can also specify an accessory to trigger on or off, and even specify the time of day 
+                that the ideal range should apply.
+              </p>
+              <ul>
+                <li>
+                  <label ng-click="addIdealRange(sharedDataService.selectedGrowPlan.currentVisiblePhase);" class="add btn">
+                     
+                    Add
+                    <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  </label>
+                </li>
+                <li ng-repeat="idealRange in sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges" class="question">
+                  <div ng-click="removeIdealRange($parent.$index, $index);" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                  <div>
+                    <!--label {{sensors[idealRange.sCode].name}}-->
+                    <div class="custom-dropdown-wrap">
+                      <select ng-model="idealRange.sCode" ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name" class="custom-dropdown">
+                        <option value="">Select Sensor</option>
+                      </select>
+                      <div class="dblarrow"><i></i></div>
+                    </div>
+                  </div>
+                  <div class="separator-top">
+                    <label>Trigger the following accessory (optional):</label>
+                    <div class="custom-dropdown-wrap">
+                      <select ng-model="idealRange.actionBelowMin.control" ng-options="control._id as control.name for (controlKey,control) in controls" class="custom-dropdown">
+                        <option value="">None</option>
+                      </select>
+                      <div class="dblarrow"><i></i></div>
+                    </div>
+                  </div>
+                  <div class="hi separator-top">
+                    <label>High</label>
+                    <input type="number" ng-model="idealRange.valueRange.max" class="no-disable"><span>{{sensors[idealRange.sCode].unit}}</span>
+                    <textarea placeholder="Describe the triggered action." ng-model="idealRange.actionBelowMin.description"></textarea>
+                  </div>
+                  <div class="lo separator-top">
+                    <label>Low</label>
+                    <input type="number" ng-model="idealRange.valueRange.min" class="no-disable"><span>{{sensors[idealRange.sCode].unit}}</span>
+                    <textarea placeholder="Describe the triggered action." ng-model="idealRange.actionBelowMin.description"></textarea>
+                  </div>
+                  <div class="separator-top">
+                    <label>What time of day should the ideal range apply?</label>
+                    <div class="custom-checkbox-wrap">
+                      <input id="action_control_time_{{$index}}" type="checkbox" ng-model="idealRange.noApplicableTimeSpan" ng-click="toggleIdealRangeApplicableTimeSpan(this)" class="no-disable">
+                      <label for="action_control_time_{{$index}}" class="idealrange-option btn">All Day</label>
+                    </div>
+                    <div ng-hide="idealRange.noApplicableTimeSpan" class="idealRange-applicableTimePicker">
+                      <!-- TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)-->
+                      <label class="idealRangeStartTime">Start Time</label>
+                      <div class="custom-dropdown-wrap">
+                        <select ng-required="!idealRange.noApplicableTimeSpan" ng-model="idealRange.applicableTimeSpan.startTime" ng-options="time.ms as time.str for time in timesOfDayList" class="custom-dropdown">
+                          <option value="">Select</option>
+                        </select>
+                        <div class="dblarrow"><i></i></div>
+                      </div>
+                      <label class="idealRangeEndTime">End Time
+                        <div class="custom-dropdown-wrap">
+                          <select ng-required="!idealRange.noApplicableTimeSpan" ng-model="idealRange.applicableTimeSpan.endTime" ng-options="time.ms as time.str for time in timesOfDayList" class="custom-dropdown">
+                            <option value="">Select</option>
+                          </select>
+                          <div class="dblarrow"><i></i></div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div ng-show="selected.selectedGrowPlanPhaseSection == 3" class="actions">
+              <h4 class="page-heading-large separator-top">Actions</h4>
+              <p>
+                Here's where you set schedules for actions to take throughout the phase. You can create on/off cycles for accessories or just schedule simple notifications
+                for yourself. If you specify an accessory and have it connected to your Bitponics device, we'll simply trigger its cycles automatically. 
+                If you don't have a specified accessory connected to your device, instead we'll send you an email notification whenever an action should take place.
+              </p>
+              <ul>
+                <li class="add">
+                  <label ng-click="addAction(sharedDataService.selectedGrowPlan.currentVisiblePhase);" class="add btn">
+                     
+                    Add
+                    <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  </label>
+                </li>
+                <li ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel" class="question">
+                  <div ng-click="removeAction($parent.$index, $index);" class="close btn"><i class="icon-glyph-new icon-28_x" aria-hidden="true"></i></div>
+                  <div>
+                    <label>Description</label>
+                    <textarea placeholder="Describe the action." ng-model="action.description"></textarea>
+                  </div>
+                  <div class="separator-top">
+                    <label>Trigger the following accessory (optional):</label>
+                    <div class="custom-dropdown-wrap">
+                      <select ng-model="action.control" ng-options="control._id as control.name for (controlKey,control) in controls" class="custom-dropdown no-disable">
+                        <option value="">None</option>
+                      </select>
+                      <div class="dblarrow"><i></i></div>
+                    </div>
+                  </div>
+                  <div class="separator-top">
+                    <label>Is the action repeating?</label>
+                    <div class="custom-dropdown-wrap">
+                      <select ng-model="action.scheduleType" class="custom-dropdown">
+                        <option value="">Select</option>
+                        <option value="phaseStart">Once at the start of the phase</option>
+                        <option value="phaseEnd">Once at the end of the phase</option>
+                        <option value="repeat">Repeat throughout the phase</option>
+                      </select>
+                      <div class="dblarrow"><i></i></div>
+                    </div>
+                  </div>
+                  <div ng-show="action.scheduleType != 'repeat'"></div>
+                  <div ng-show="action.scheduleType == 'repeat'">
+                    <div ng-show="action.control">
+                      <div class="custom-checkbox-wrap separator-top">
+                        <input id="action_control_{{$index}}" type="checkbox" ng-model="action.isDailyControlCycle">
+                        <label for="action_control_{{$index}}" class="action-option btn">Daily                            </label>
+                      </div>
+                      <div ng-show="action.isDailyControlCycle" class="separator-top">
+                        <label>Turn {{action.control.name}} on at </label>
+                        <div class="custom-dropdown-wrap">
+                          <select ng-model="action.dailyOnTime" ng-options="time.ms as time.str for time in timesOfDayList" class="custom-dropdown">
+                            <option value="">Select</option>
+                          </select>
+                          <div class="dblarrow"><i></i></div>
+                        </div>
+                        <label>Turn {{action.control.name}} off at </label>
+                        <div class="custom-dropdown-wrap">
+                          <select ng-model="action.dailyOffTime" ng-options="time.ms as time.str for time in timesOfDayList" class="custom-dropdown">
+                            <option value="">Select</option>
+                          </select>
+                          <div class="dblarrow"><i></i></div>
+                        </div>
+                      </div>
+                      <div ng-show="!action.isDailyControlCycle" class="separator-top">
+                        <div>Repeating actions have alternating on/off states.</div>
+                        <div> 
+                          <p>First, turn {{action.control.name}}</p>
+                          <div class="custom-checkbox-wrap">
+                            <input id="first_action_states_on_{{$index}}" type="radio" value="1" ng-model="action.cycle.states[0].controlValue">
+                            <label for="first_action_states_on_{{$index}}" class="action-option btn">On</label>
+                          </div>
+                          <div class="custom-checkbox-wrap">
+                            <input id="first_action_states_off_{{$index}}" type="radio" value="0" ng-model="action.cycle.states[0].controlValue">
+                            <label for="first_action_states_off_{{$index}}" class="action-option btn">Off</label>
+                          </div>
+                          <div> 
+                            <p>for</p>
+                            <input type="number" ng-model="action.cycle.states[0].duration" value="1">
+                            <div class="custom-dropdown-wrap">
+                              <select ng-model="action.cycle.states[0].durationType" ng-options="durationType for durationType in actionDurationTypeOptions" value="{{actionDurationTypeOptions[1]}}" class="custom-dropdown">
+                                <option value="">Select</option>
+                              </select>
+                              <div class="dblarrow"><i></i></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div> 
+                          <p>Then turn {{action.control.name}}</p>
+                          <div class="custom-checkbox-wrap">
+                            <input id="then_action_states_on_{{$index}}" type="radio" value="1" ng-model="action.cycle.states[1].controlValue">
+                            <label for="then_action_states_on_{{$index}}" class="action-option btn">On</label>
+                          </div>
+                          <div class="custom-checkbox-wrap">
+                            <input id="then_action_states_off_{{$index}}" type="radio" value="0" ng-model="action.cycle.states[1].controlValue">
+                            <label for="then_action_states_off_{{$index}}" class="action-option btn">Off</label>
+                          </div>
+                          <div> 
+                            <p>for </p>
+                            <input type="number" ng-model="action.cycle.states[1].duration" value="1">
+                            <div class="custom-dropdown-wrap">
+                              <select ng-model="action.cycle.states[1].durationType" ng-options="durationType for durationType in actionDurationTypeOptions" value="{{actionDurationTypeOptions[1]}}" class="custom-dropdown">
+                                <option value="">Select</option>
+                              </select>
+                              <div class="dblarrow"><i></i></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div ng-show="!action.control">
+                      <div class="separator-top"> 
+                        <label>Every:</label>
+                        <input type="number" ng-model="action.overallDuration" value="1">
+                        <div class="custom-dropdown-wrap">
+                          <select ng-model="action.overallDurationType" ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions" value="{{actionDurationTypeOptions[0]}}" class="custom-dropdown">
+                            <option value="">Select</option>
+                          </select>
+                          <div class="dblarrow"><i></i></div>
+                        </div>
+                      </div>
+                      <div ng-show="action.overallDurationType == 'days'">
+                        <label>At </label>
+                        <div class="custom-dropdown-wrap">
+                          <select ng-model="action.offsetTimeOfDay" ng-options="time.ms as time.str for time in timesOfDayList" class="custom-dropdown">
+                            <option value="">Select</option>
+                          </select>
+                          <div class="dblarrow"><i></i></div>
+                        </div>
+                      </div>
+                      <label class="separator-top">Send me the following message:
+                        <textarea ng-model="action.message" placeholder="It's time to..."></textarea>
+                      </label>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div ng-show="selected.selectedGrowPlanPhaseSection == 4 &amp;&amp; userOwnedDevices.length &gt; 0" class="device">
+              <h4 class="page-heading-large separator-top">Device</h4>
+              <p>Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.</p>
+              <ul class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 devicelist">
+                <li ng-repeat="device in sharedDataService.userOwnedDevices" class="grid-cell">
+                  <input type="radio" name="device" value="{{device._id}}" ng-model="sharedDataService.selected.deviceId">
+                  <label ng-click="toggleDevice(device)" ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}" class="btn">{{device.name}}</label>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="step-footer separator-top">
+    <input id="growplans_activate" type="submit" value="Activate Grow Plan" ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success"><img src="/assets/img/spinner.svg" ng-show="sharedDataService.submit.updateInProgress &amp;&amp; !sharedDataService.submit.success" ng-animate="{show: 'fade-in', hide:'fade-out'}" class="spinner">
+  </div>
+</script>

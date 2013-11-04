@@ -51,3 +51,8 @@ scss/.sass-cache/*
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
 .idea/workspace.xml
+
+.agignore
+bower_components
+/selenium
+/coverage
