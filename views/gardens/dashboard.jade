@@ -61,7 +61,24 @@ block content
                   - if (userCanModify === true)
                     div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
                       a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.growPlanInstance.device._id}}/calibrate") Calibrate
-                
+                  
+                  div(data-bpn-directives-manual-entry-form, 
+                      data-sensor-unit="sensor.unit", 
+                      data-sensor-code="sensor.code", 
+                      data-sensor-logs="sharedDataService.activeDate.sensorLogs",
+                      class="manual-entry-form")
+                    
+                    div(class="custom-checkbox-wrap")
+                      input(id="{{sensorCode}}_manual_entry_toggle", 
+                        type="checkbox",
+                        name="{{sensorCode}}_manual_entry_toggle")
+                      label(ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
+                    
+                    div(ng-show="manualEntryMode")
+                      form(action="", ng-submit="submit()")
+                        input(ng-model="manualEntry", id="{{sensorCode}}_manual_input", size="5", class="display-ib")
+                        span  {{sensorUnit}}
+                        input(type="submit", value="Record")
 
       div.content-module.middle.separator-top
         div(ng-controller="bpn.controllers.dashboard.PhasesGraph")

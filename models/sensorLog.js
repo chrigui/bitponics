@@ -1,9 +1,11 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
-	Schema = mongoose.Schema,
-	ObjectIdSchema = Schema.ObjectId,
-	SensorLogModel,
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+    mongooseTypes = require('mongoose-types'),
+    Schema = mongoose.Schema,
+    ObjectIdSchema = Schema.ObjectId,
+    SensorLogModel,
+    requirejs = require('../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils'),
+    mongooseConnection = require('../config/mongoose-connection').defaultConnection;
 
 
 /**
@@ -68,7 +70,19 @@ var SensorLogSchema = new Schema({
     /**
      * logs
      */
-    l : [ SensorReadingSchema ]
+    l : [ SensorReadingSchema ],
+
+    /*
+     * Type of log: manual vs. device
+     */
+    t: { 
+      type: String,
+      enum : [
+        feBeUtils.sensorLogTypes.MANUAL,
+        feBeUtils.sensorLogTypes.DEVICE,
+        feBeUtils.sensorLogTypes.EXTERNAL
+      ]
+    }
 },
 { id : false });
 
@@ -96,6 +110,14 @@ SensorLogSchema.virtual('timestamp')
     this.ts = timestamp;
   });
 
+SensorLogSchema.virtual('type')
+  .get(function () {
+    return this.t;
+  })
+  .set(function(type){
+    this.t = type;
+  });
+
 /*************** SERIALIZATION *************************/
 
 /**
@@ -115,6 +137,7 @@ SensorLogSchema.set('toObject', {
       delete ret.l;
       delete ret.ts;
       delete ret.d;
+      delete ret.t;
     }
   }
 });

@@ -955,7 +955,75 @@ require([
     });
 
 
+    dashboardApp.directive('bpnDirectivesManualEntryForm', function() { 
+      return {
+        restrict : "EA",
+        replace : true,
+        scope : {
+          sensorUnit : "=",
+          sensorCode : "=",
+          sensorLogs : "="
+        },
+        // template : '<div class="manual-entry-form {{sensorCode}}"></div>',
+        controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
 
+          // $scope.sharedDataService.manualEntryMode = false;
+          $scope.manualEntryMode = false;
+          
+          $scope.toggleManualEntry = function(){
+            $scope.manualEntryMode = $scope.manualEntryMode ? false : true;
+            if ($scope.sharedDataService) {
+              $scope.sharedDataService.manualEntryMode = $scope.manualEntryMode;
+            }
+          };
+
+          $scope.toggleUnitType = function(){
+            console.log('toggleUnitType');
+          };
+
+          $scope.submit = function(){
+            if ($scope.manualEntryMode != '') {
+              console.log('$scope.manualEntry', $scope.manualEntry);
+              console.log('should validate here');
+              $http({
+                method: 'post',
+                headers: {
+                  'bpn-manual-log-entry': 'true'
+                },
+                url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
+                data: {
+                  sensorLog: {
+                    gpi: $scope.sharedDataService.growPlanInstance._id,
+                    timestamp: new Date(),
+                    logs: [
+                      {
+                        val: $scope.manualEntry,
+                        sCode: $scope.sensorCode
+                      }
+                    ],
+                    type: 'manual'
+                  }
+                }
+              })
+              .success(function(data, status, headers, config) {
+                console.log('success')
+              })
+              .error(function(data, status, headers, config) {
+                console.log('error')
+              });
+            }
+          };
+
+        },
+        link: function (scope, element, attrs, controller) { 
+          console.log('scope.manualEntryMode', scope.manualEntryMode);
+          console.log('scope.sensorUnit', scope.sensorCode);
+          console.log('scope.sensorCode', scope.sensorCode);
+          console.log('scope.sensorLogs', scope.sensorLogs);
+        }
+      }
+    });
 
     dashboardApp.filter('controlValueToWord', function() {
       return function(input, lowercase) {

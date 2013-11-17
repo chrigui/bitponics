@@ -270,8 +270,11 @@ module.exports = function(app) {
    */
   app.post('/api/gardens/:id/sensor-logs', function (req, res, next){
     var response = {
-      status : undefined
-    };
+        status : undefined
+      },
+      manualLogEntry = req.headers['bpn-manual-log-entry'];
+
+    console.log(req.headers);
 
     if (!req.body.sensorLog){
       response = {
@@ -291,17 +294,31 @@ module.exports = function(app) {
         return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
-      ModelUtils.logSensorLog(
-        {
-          pendingSensorLog : req.body.sensorLog, 
-          growPlanInstance : growPlanInstance, 
-          user : req.user 
-        },
-        function(err){
-          if (err) { return next(err); }
-          return res.send({ status : "success" });
-        }
-      );
+      if (manualLogEntry != 'true') {
+        ModelUtils.logSensorLog(
+          {
+            pendingSensorLog : req.body.sensorLog, 
+            growPlanInstance : growPlanInstance, 
+            user : req.user 
+          },
+          function(err){
+            if (err) { return next(err); }
+            return res.send({ status : "success" });
+          }
+        );
+      } else {
+        ModelUtils.logManualSensorLog(
+          {
+            pendingSensorLog : req.body.sensorLog, 
+            growPlanInstance : growPlanInstance, 
+            user : req.user 
+          },
+          function(err){
+            if (err) { return next(err); }
+            return res.send({ status : "success" });
+          }
+        );
+      }
     });
   });
 

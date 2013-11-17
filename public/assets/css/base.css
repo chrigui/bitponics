@@ -108,6 +108,9 @@
 .right-0 {
   right: 0;
 }
+.no-margin {
+  margin: 0;
+}
 .no-margin-bottom {
   margin-bottom: 0;
 }
@@ -968,9 +971,6 @@ img.page-spinner.spinner {
 }
 .overlay .search {
   margin: 1em 0 0;
-}
-.overlay .btn {
-  margin: 1em;
 }
 .overlay .pagination {
   text-align: center;
@@ -2094,6 +2094,12 @@ img.page-spinner.spinner {
   height: 100%;
   width: auto;
 }
+.dashboard .btn {
+  padding: 0.5em;
+}
+.dashboard .manual-entry-form .btn {
+  margin-bottom: 1em;
+}
 .circle {
   margin: 1.5em 0;
 }
@@ -2438,6 +2444,13 @@ li
   border-radius: 0;
   -webkit-box-shadow: none;
   box-shadow: none;
+}
+.undefined .icon-glyph-new,
+.app-page .icon-glyph-new {
+  height: 1em;
+  font-size: 0.75em;
+  position: relative;
+  top: -0.25em;
 }
 @media screen and (min-width: 40em) {
   .undefined .main .page-heading,

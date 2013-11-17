@@ -186,6 +186,14 @@ define(['moment'], function(moment){
     ]
   };
 
+  /**
+   * Type of sensor log: manual through UI or device sent
+   */
+  utils.sensorLogTypes = {
+    'MANUAL': 'manual',
+    'DEVICE': 'device',
+    'EXTERNAL': 'external'
+  };
   
   /**
    * Checks whether the provided string matches the ObjectId format.
