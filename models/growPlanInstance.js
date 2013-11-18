@@ -897,7 +897,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
 
 /**
- * Called when a GP that the GPI is tracking has been updated (aka, branched).
+ * Called when a GP that the GPI is tracking has been updated (meaning either edited or branched).
  * We then need to migrate this GPI to the new GrowPlan, updating all notifications, actions, etc.
  * Can be called with the original Grow Plan when we need to refresh the notifications etc.
  *
@@ -905,7 +905,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
  * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
  * @param {function(err)} callback
  */
-GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, callback){
+GrowPlanInstanceSchema.method("migrateToGrowPlan", function(options, callback){
   var self = this,
       NotificationModel = require('./notification').model,
       newGrowPlan = options.newGrowPlan,
@@ -916,8 +916,13 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
       matchingNewGrowPlanPhase;
 
 
-  if (!newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan)) && !newGrowPlan._id.equals(getObjectId(self.growPlan))){
-    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated to a descendant of the original Grow Plan."))); 
+  if (!newGrowPlan._id.equals(getObjectId(self.growPlan))
+      &&
+      !(newGrowPlan.parentGrowPlanId && 
+        newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan))
+      )
+    ){
+    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated to a the updated original Grow Plan or a descendent of it."))); 
   }
 
 
@@ -933,9 +938,16 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
     // First, try to find the equivalent phase in the new GrowPlan to transition the GPI to
     // Matching : match on name only...anything else might result in unexpected
     // behavior from the perspective of the user
-    matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
-      return newPhase.name === activeGrowPlanPhase.name;
-    })[0];
+    if (originalGrowPlan._id.equals(newGrowPlan._id)){
+      matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
+        return newPhase._id.equals(activeGrowPlanPhase._id);
+      })[0];
+    } else {
+      matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
+        return newPhase.name === activeGrowPlanPhase.name;
+      })[0];
+    }
+    
 
     if (!matchingNewGrowPlanPhase){
       // Notify the user that there was a GrowPlan update that we couldn't automatically handle
@@ -965,7 +977,7 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
         save : false
       }, function(err){
         self.growPlanMigrations.push({
-          oldGrowPlan : newGrowPlan.parentGrowPlanId,
+          oldGrowPlan : newGrowPlan.parentGrowPlanId || newGrowPlan,
           newGrowPlan : newGrowPlan,
           ts : now
         });
