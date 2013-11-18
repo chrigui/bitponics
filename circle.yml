@@ -25,7 +25,7 @@ dependencies:
 
 test:
   override:
-    - ./node_modules/.bin/mocha --reporter tap --recursive --timeout 15000
+    - ./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 $(find test/* -path test/front-end -prune -o -name \"*.js\" -print)
 
 deployment:
   production:
