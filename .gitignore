@@ -56,3 +56,4 @@ scss/.sass-cache/*
 bower_components
 /selenium
 /coverage
+units.html
