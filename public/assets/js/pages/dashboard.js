@@ -123,6 +123,7 @@ require([
             .success(function(data, status, headers, config) {
               sharedData.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
               sharedData.dateDataCache[dateKey].latestSensorLogs = data.data[0];
+              console.log(sharedData.dateDataCache[dateKey].latestSensorLogs)
               sharedData.dateDataCache[dateKey].loaded = true;
               deferred.resolve(data);
             })
