@@ -320,11 +320,12 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       
       async.waterfall(
         [
-          function checkIfSoloUser(innerCallback){
+          function decideOnBranching(innerCallback){
             var originalGrowPlanCreatedById = getObjectId(originalGrowPlan.createdBy);
-            // If different user, branch it
+            
+            // If different user and non-admin, branch it
             if (!user.admin && !(userId.equals(originalGrowPlanCreatedById))) {
-              //console.log("FIRST TRUE", userId, originalGrowPlanCreatedById);
+              //console.log("NOT BRANCHING FIRST TRUE", userId, originalGrowPlanCreatedById);
               return innerCallback(null, true);
             }
 
@@ -420,30 +421,45 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
               GrowPlanModel.create(submittedGrowPlan, innerCallback);
 
             } else {
-              GrowPlanModel.findById(originalGrowPlan._id, function(err, growPlanResult){
-                if (err) { return innerCallback(err); }
-
-                growPlanResult.name = submittedGrowPlan.name;
-                growPlanResult.description = submittedGrowPlan.description;
-                growPlanResult.visibility = submittedGrowPlan.visibility;
-                growPlanResult.plants = submittedGrowPlan.plants;
-                growPlanResult.phases = submittedGrowPlan.phases;
-                growPlanResult.save(
-                  function(err, savedGrowPlan, numberAffected){ 
-                    //console.log("SAVED EXISTING GROW PLAN", err, savedGrowPlan, numberAffected);
-                    return innerCallback(err, savedGrowPlan);
-                  }
-                );
-              });
               
-            }
+              // If not branching, store the previous version in history and update the current
+              async.parallel([
+                function saveHistory(innerInnerCallback){
+                  var GrowPlanHistoryModel = require('../growPlanHistory').model;
+                  GrowPlanHistoryModel.create({
+                    growPlanId : originalGrowPlan._id,
+                    growPlanObject : originalGrowPlan
+                  }, innerInnerCallback);
+                },
+                function saveGrowPlan(innerInnerCallback){
+                  GrowPlanModel.findById(originalGrowPlan._id, function(err, growPlanResult){
+                    if (err) { return innerCallback(err); }
 
+                    growPlanResult.name = submittedGrowPlan.name;
+                    growPlanResult.description = submittedGrowPlan.description;
+                    growPlanResult.visibility = submittedGrowPlan.visibility;
+                    growPlanResult.plants = submittedGrowPlan.plants;
+                    growPlanResult.phases = submittedGrowPlan.phases;
+                    growPlanResult.save(
+                      function(err, savedGrowPlan, numberAffected){ 
+                        //console.log("SAVED EXISTING GROW PLAN", err, savedGrowPlan, numberAffected);
+                        return innerInnerCallback(err, savedGrowPlan);
+                      }
+                    );
+                  });    
+                }
+              ],
+              function nonBranchingParallelEnd(err, results){
+                // pass the savedGrowPlan to the callback. will be the result of the 2nd parallel result
+                return innerCallback(err, results[1]);
+              });
+            }
           },
           function updateGardens(savedGrowPlan, innerCallback){
             if (err) { return innerCallback(err); }
 
             // Find all the GPI's using the old GP that are active and have "trackGrowPlanUpdates" set to true
-            GrowPlanInstanceModel.find({ growPlan : savedGrowPlan.parentGrowPlanId, active : true, trackGrowPlanUpdates : true })
+            GrowPlanInstanceModel.find({ growPlan : submittedGrowPlan._id, active : true, trackGrowPlanUpdates : true })
             .exec(function(err, growPlanInstancesToUpdate){
               if (err) { return innerCallback(err); }
 
@@ -452,7 +468,7 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
                 10,
                 function gpiIterator(growPlanInstance, iteratorCallback){
                   
-                  growPlanInstance.migrateToBranchedGrowPlan(
+                  growPlanInstance.migrateToGrowPlan(
                   {
                     newGrowPlan : savedGrowPlan
                   },

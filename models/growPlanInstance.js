@@ -497,6 +497,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
 
 /**
  * Activate a grow plan phase on a grow plan instance.
+ * Expire existing actions/notifications and activate new ones
  * 
  * Assumes it's passed a phase from gpi.growPlan
  *
@@ -521,7 +522,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       growPlanInstancePhase,
       actionsWithDeviceControl = [],
       prevPhase,
-      owner;
+      owner,
+      isPhaseReactivation = false;
   
   // First, populate growPlan, owner, device
   // then, set the phase properties & save the gpi
@@ -571,10 +573,13 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
           growPlanPhase = growPlan.phases.filter(function(item){ return item._id.equals(phaseId);})[0];
 
-          // Deactivate the previous phase, and check to make sure we don't activate the already-active phase
+          // Scan garden's past & current phases
+          // if we find that we're reactivating the current phase, cool
+          // if we find a different phase as the currently-active one, deactivate it
           growPlanInstance.phases.forEach(function(phase){
             if (phase.phase.equals(phaseId) && phase.active){
               growPlanInstancePhase = phase;
+              isPhaseReactivation = true;
             } else {
               if (phase.active == true){
                 prevPhase = phase;
@@ -673,7 +678,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   return immediateAction.action.control.equals(action.control);
                 })){
                   immediateActionsToExpire.push(immediateAction);
-                } 
+                }
               });
 
               async.forEach(immediateActionsToExpire, 
@@ -697,7 +702,12 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       // Trigger notifications for the just-ended phase 
       function triggerPhaseEndNotifications(innerCallback){
-        if (!(prevPhase && prevPhase.phaseEndActions)){ return innerCallback(); }
+        // If no endActions, or we're simply re-activating the current phase, don't send any phase-end notifications
+        if (
+          !(prevPhase && prevPhase.phaseEndActions) 
+          || 
+          (isPhaseReactivation)
+        ){ return innerCallback(); }
 
         ActionModel
         .find()
@@ -714,7 +724,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
               NotificationModel.create(
               {
                 users : growPlanInstance.users,
-                gpi : growPlanInstance,
+                gpi : growPlanInstance._id,
                 timeToSend : now,
                 type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
                 trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_END_ACTION,
@@ -722,8 +732,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   phaseName : prevPhase.name,
                   actionId : action._id,
                   gpPhaseId : prevPhase._id
-                }//,
-                //title : i18nKeys.get('Time for the following action', action.description)
+                }
               },
               iteratorCallback);
             },
@@ -748,20 +757,24 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
           async.forEach(
             actionResults, 
             function(action, iteratorCallback){
+              // Prevent notification if it's a phase reactivation and there's no action repeat (meaning it's a one-off phase start action). User's already started phase, so these wouldn't make sense to send at this point
+              if (isPhaseReactivation && !action.cycle.repeat){
+                return iteratorCallback();
+              }
+
               var notificationsToSave = [],
                 actionNotification = {
                   users : growPlanInstance.users,
-                  gpi : growPlanInstance,
+                  gpi : growPlanInstance._id,
                   timeToSend : now,
-                  type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
+                  type : undefined, // will be set below
                   trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
                   triggerDetails : {
                     phaseName : growPlanPhase.name,
                     actionId : action._id,
                     gpPhaseId : growPlanPhase._id,
                     handledByDeviceControl : false
-                  },
-                  //title : i18nKeys.get('Time for the following action', action.description)
+                  }
                 };
 
               notificationsToSave.push(actionNotification);
@@ -774,100 +787,49 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
                   ){
                     actionNotification.type = feBeUtils.NOTIFICATION_TYPES.INFO;
                     actionNotification.triggerDetails.handledByDeviceControl = true;
-                    //actionNotification.body = i18nKeys.get('Since you have a control connected', action.control.name);
               } 
+
               // else it either doesn't require a control, or device doesn't have the required control
               else {
                 actionNotification.type = feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED;
                 
                 if (action.cycle.repeat){
-                  actionNotification.body = i18nKeys.get("Has repeating cycle");
                   
                   // cycles with repeat=true are required to have 2 states (through validation rules)
                   var states = action.cycle.states,
-                      overallDurationObject = action.getOverallCycleDurationObject();
+                      overallDurationObject = action.getOverallCycleDurationObject(),
+                      actionRepeatNotificationTemplate = {
+                        users : growPlanInstance.users,
+                        growPlanInstance : growPlanInstance._id,
+                        timeToSend : undefined,
+                        trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
+                        triggerDetails : {
+                          phaseName : growPlanPhase.name,
+                          actionId : action._id,
+                          gpPhaseId : growPlanPhase._id
+                        },
+                        repeat : {
+                          durationType : overallDurationObject.durationType,
+                          duration : overallDurationObject.duration,
+                          timezone : owner.timezone
+                        },
+                        type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+                      },
+                      actionRepeatNotificationState0,
+                      actionRepeatNotificationState1;
                   
-                  if (states[0].durationType && !states[1].durationType){
-                    // state 0 has a duration and state 1 does not
-                    notificationsToSave.push({
-                      users : growPlanInstance.users,
-                      growPlanInstance : growPlanInstance,
-                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
-                      triggerDetails : {
-                        phaseName : growPlanPhase.name,
-                        actionId : action._id,
-                        gpPhaseId : growPlanPhase._id,
-                        cycleStateIndex : 1
-                      },
-                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
-                      repeat : {
-                        durationType : overallDurationObject.durationType,
-                        duration : overallDurationObject.duration,
-                        timezone : owner.timezone
-                      },
-                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
-                    });
-                  } else if (!states[0].durationType && states[1].durationType){
-                    // state 0 does not have a duration and state 1 does
-                    notificationsToSave.push({
-                      users : growPlanInstance.users,
-                      growPlanInstance : growPlanInstance,
-                      timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
-                      triggerDetails : {
-                        phaseName : growPlanPhase.name,
-                        actionId : action._id,
-                        gpPhaseId : growPlanPhase._id,
-                        cycleStateIndex : 0
-                      },
-                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
-                      repeat : {
-                        durationType : overallDurationObject.durationType,
-                        duration : overallDurationObject.duration,
-                        timezone : owner.timezone
-                      },
-                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
-                    });
-                  } else if (states[0].durationType && states[1].durationType){
-                    // both states have durations
-                    notificationsToSave.push({
-                      users : growPlanInstance.users,
-                      growPlanInstance : growPlanInstance,
-                      timeToSend : nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType),
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
-                      triggerDetails : {
-                        phaseName : growPlanPhase.name,
-                        actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
-                      },
-                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[1].message),
-                      repeat : {
-                        durationType : overallDurationObject.durationType,
-                        duration : overallDurationObject.duration,
-                        timezone : owner.timezone
-                      },
-                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
-                    });
+                  if (states[0].durationType){
+                    actionRepeatNotificationState1 = JSON.parse(JSON.stringify(actionRepeatNotificationTemplate));
+                    actionRepeatNotificationState1.timeToSend = nowAsMilliseconds + ActionModel.convertDurationToMilliseconds(states[0].duration, states[0].durationType);
+                    actionRepeatNotificationState1.triggerDetails.cycleStateIndex = 1;
+                    notificationsToSave.push(actionRepeatNotificationState1);
+                  }
 
-                    notificationsToSave.push({
-                      users : growPlanInstance.users,
-                      growPlanInstance : growPlanInstance,
-                      timeToSend : now,
-                      trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION,
-                      triggerDetails : {
-                        phaseName : growPlanPhase.name,
-                        actionId : action._id,
-                        gpPhaseId : growPlanPhase._id
-                      },
-                      //title : i18nKeys.get('As part of the following action', action.description, action.cycle.states[0].message),
-                      repeat : {
-                        durationType : overallDurationObject.durationType,
-                        duration : overallDurationObject.duration,
-                        timezone : owner.timezone
-                      },
-                      type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
-                    });
+                  if (states[1].durationType){
+                    actionRepeatNotificationState0 = JSON.parse(JSON.stringify(actionRepeatNotificationTemplate));
+                    actionRepeatNotificationState0.timeToSend = now;
+                    actionRepeatNotificationState0.triggerDetails.cycleStateIndex = 0;
+                    notificationsToSave.push(actionRepeatNotificationState0);
                   }
                 }
               }
@@ -897,15 +859,16 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
 
 /**
- * Called when a GP that the GPI is tracking has been updated (aka, branched).
+ * Called when a GP that the GPI is tracking has been updated (meaning either edited or branched).
  * We then need to migrate this GPI to the new GrowPlan, updating all notifications, actions, etc.
  * Can be called with the original Grow Plan when we need to refresh the notifications etc.
  *
  *
  * @param {GrowPlanModel} options.newGrowPlan : Should be a GrowPlanModel or fully-populated GP, not just an id
+ * @param {ObjectId} options.newGrowPlanPhaseId : TODO. Allow the target phase to be specified
  * @param {function(err)} callback
  */
-GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, callback){
+GrowPlanInstanceSchema.method("migrateToGrowPlan", function(options, callback){
   var self = this,
       NotificationModel = require('./notification').model,
       newGrowPlan = options.newGrowPlan,
@@ -916,8 +879,13 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
       matchingNewGrowPlanPhase;
 
 
-  if (!newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan)) && !newGrowPlan._id.equals(getObjectId(self.growPlan))){
-    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated to a descendant of the original Grow Plan."))); 
+  if (!newGrowPlan._id.equals(getObjectId(self.growPlan))
+      &&
+      !(newGrowPlan.parentGrowPlanId && 
+        newGrowPlan.parentGrowPlanId.equals(getObjectId(self.growPlan))
+      )
+    ){
+    return callback(new Error(i18nKeys.get("A GrowPlanInstanece can only be migrated to a the updated original Grow Plan or a descendent of it."))); 
   }
 
 
@@ -933,25 +901,30 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
     // First, try to find the equivalent phase in the new GrowPlan to transition the GPI to
     // Matching : match on name only...anything else might result in unexpected
     // behavior from the perspective of the user
-    matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
-      return newPhase.name === activeGrowPlanPhase.name;
-    })[0];
+    if (originalGrowPlan._id.equals(newGrowPlan._id)){
+      matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
+        return newPhase._id.equals(activeGrowPlanPhase._id);
+      })[0];
+    } else {
+      matchingNewGrowPlanPhase = newGrowPlan.phases.filter(function(newPhase){
+        return newPhase.name === activeGrowPlanPhase.name;
+      })[0];
+    }
+    
 
     if (!matchingNewGrowPlanPhase){
-      // Notify the user that there was a GrowPlan update that we couldn't automatically handle
+      // Notify the user that there was a GrowPlan update that we couldn't automatically handle, so they're still on the old Grow Plan
       NotificationModel.create(
       {
         users : self.users,
-        gpi : self,
+        gpi : self._id,
         timeToSend : now,
         type : feBeUtils.NOTIFICATION_TYPES.INFO,
         trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
         triggerDetails : {
           newGrowPlanId : newGrowPlan._id,
           migrationSuccessful : false
-        },
-        title : i18nKeys.get('Grow Plan Updated, failed migration title'),
-        body : i18nKeys.get('Grow Plan Updated, failed migration body')
+        }
       }, 
       callback);
 
@@ -965,7 +938,7 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
         save : false
       }, function(err){
         self.growPlanMigrations.push({
-          oldGrowPlan : newGrowPlan.parentGrowPlanId,
+          oldGrowPlan : newGrowPlan.parentGrowPlanId || newGrowPlan,
           newGrowPlan : newGrowPlan,
           ts : now
         });
@@ -976,16 +949,14 @@ GrowPlanInstanceSchema.method("migrateToBranchedGrowPlan", function(options, cal
           NotificationModel.create(
           {
             users : self.users,
-            gpi : self,
+            gpi : self._id,
             timeToSend : now,
             type : feBeUtils.NOTIFICATION_TYPES.INFO,
             trigger : feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE,
             triggerDetails : {
               newGrowPlanId : newGrowPlan._id,
               migrationSuccessful : true
-            },
-            title : i18nKeys.get('Grow Plan Updated, automatic migration title'),
-            body : i18nKeys.get('Grow Plan Updated, automatic migration body')
+            }
           }, 
           callback);
         });  

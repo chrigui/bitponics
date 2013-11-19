@@ -4,6 +4,7 @@ module.exports = {
 	device: require('./device').model,
 	deviceType: require('./deviceType').model,
 	growPlan: require('./growPlan').growPlan.model,
+  growPlanHistory: require('./growPlanHistory').model,
 	growPlanInstance: require('./growPlanInstance').model,
 	growSystem: require('./growSystem').model,
 	plant: require('./plant').model,
