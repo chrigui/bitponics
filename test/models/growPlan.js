@@ -9,7 +9,9 @@ NotificationModel = Models.notification,
 ModelUtils = Models.utils,
 should = require('should'),
 sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans'),
-async = require('async');
+async = require('async'),
+requirejs = require('../../lib/requirejs-wrapper'),
+feBeUtils = requirejs('fe-be-utils');
 
 
 /*
@@ -541,7 +543,7 @@ async = require('async');
 
 
 
-      describe('branching scenario (if being updated or used by non-owner', function(){
+      describe('branching scenario (if being updated or used by non-owner or it has multiple active gardens)', function(){
       
         beforeEach(function(){
           var self = this;
@@ -616,16 +618,19 @@ async = require('async');
           );
         }); // /updates original GrowPlan if name has been modified and owner is the solo user
 
-      });
+        
+      }); // /branching scenario (if being updated or used by non-owner...)
       
 
 
-      describe('non-branching scenario (if being updated by the sole user)', function(){
+      describe('non-branching scenario (if being updated for a solo user)', function(){
 
 
-        it('updates original GrowPlan if name has been modified', function(done){
+        
+        it('updates GrowPlan in-place and stores original in history', function(done){
       
-          var self = this;
+          var self = this,
+              testStartedAt = new Date();
           should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
 
           self.sourceGrowPlan.name = "new unittest grow plan name";
@@ -642,59 +647,86 @@ async = require('async');
               
               validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(true, "_id's should be the same");
 
-              ModelUtils.getFullyPopulatedGrowPlan(
-                {_id : validatedGrowPlan._id },
-                function(err, growPlans){
-                  var fullyPopulatedValidatedGrowPlan = growPlans[0];
-                  should.exist(fullyPopulatedValidatedGrowPlan);
+              async.parallel([
+                function checkHistory(innerCallback){
+                  var GrowPlanHistoryModel = Models.growPlanHistory;
 
-                  GrowPlan.isEquivalentTo(
-                    self.originalGrowPlan, 
-                    fullyPopulatedValidatedGrowPlan, 
-                    function(err, isEquivalent){
-                      should.not.exist(err);
-                      
-                      isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
-                      
-                      self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
-                      self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
-      
-                      // The phases should be equivalent though, and also retain the original id's
-                      var phaseIterator = 0;
-                      async.eachSeries(self.originalGrowPlan.phases,
-                        function itemIterator(phase, iteratorCallback){
-                          phase._id.toString().should.equal(fullyPopulatedValidatedGrowPlan.phases[phaseIterator]._id.toString(), "phases should retain original ids");
+                  GrowPlanHistoryModel
+                  .find({growPlanId : self.originalGrowPlan._id, createdAt : { $gte : testStartedAt }})
+                  .exec(function(err, historyResults){
+                    should.not.exist(err);
+                    should.exist(historyResults[0], "should have GrowPlanHistory result");
 
-                          PhaseSchema.statics.isEquivalentTo(
-                            phase, 
-                            fullyPopulatedValidatedGrowPlan.phases[phaseIterator],
-                            function(err, isEquivalent){
-                              isEquivalent.should.equal(true, "phases should be equivalent");
+                    GrowPlan.isEquivalentTo(
+                      self.originalGrowPlan, 
+                      historyResults[0].growPlanObject,
+                      function(err, isEquivalent){
+                        isEquivalent.should.equal(true, "original should be stored in history");
+                        return innerCallback();
+                      }
+                    );  
+                  });
+                  
+                },
+                function checkUpdate(innerCallback){
+                  ModelUtils.getFullyPopulatedGrowPlan(
+                    {_id : validatedGrowPlan._id },
+                    function(err, growPlans){
+                      var fullyPopulatedValidatedGrowPlan = growPlans[0];
+                      should.exist(fullyPopulatedValidatedGrowPlan);
 
-                              phaseIterator++;
-                              return iteratorCallback();
+                      GrowPlan.isEquivalentTo(
+                        self.originalGrowPlan, 
+                        fullyPopulatedValidatedGrowPlan,
+                        function(err, isEquivalent){
+                          should.not.exist(err);
+                          
+                          isEquivalent.should.equal(false, "originalGrowPlan and result growPlan should not be equivalent");
+                          
+                          self.originalGrowPlan.name.should.not.equal(self.sourceGrowPlan.name);
+                          self.originalGrowPlan.name.should.not.equal(fullyPopulatedValidatedGrowPlan.name);
+          
+                          // The phases should be equivalent though, and also retain the original id's
+                          var phaseIterator = 0;
+                          async.eachSeries(self.originalGrowPlan.phases,
+                            function itemIterator(phase, iteratorCallback){
+                              phase._id.toString().should.equal(fullyPopulatedValidatedGrowPlan.phases[phaseIterator]._id.toString(), "phases should retain original ids");
+
+                              PhaseSchema.statics.isEquivalentTo(
+                                phase, 
+                                fullyPopulatedValidatedGrowPlan.phases[phaseIterator],
+                                function(err, isEquivalent){
+                                  isEquivalent.should.equal(true, "phases should be equivalent");
+
+                                  phaseIterator++;
+                                  return iteratorCallback();
+                                }
+                              );
+                            },
+                            function loopEnd(){
+                              innerCallback();
                             }
                           );
-                        },
-                        function loopEnd(){
-                          done();
                         }
                       );
                     }
                   );
                 }
-              );   
+              ],
+              function parallelEnd(err, results){
+                done();
+              });
             }
           );
-        }); // /updates original GrowPlan if name has been modified and owner is the solo user
+        }); // /updates original GrowPlan
 
 
 
-        it('updates original phases', function(done){
+        it('makes phase changes in-place on original phases', function(done){
           var self = this;
           should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
 
-          var newAction = {
+          var newAction = { 
             description: "do something unit testy"
           };
 
@@ -742,7 +774,7 @@ async = require('async');
 
                                 fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions[fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions.length - 1].description.should.equal(newAction.description)
                               } else {
-                                isEquivalent.should.equal(true, "phases should be equivalent");  
+                                isEquivalent.should.equal(true, "other phases should be equivalent");  
                               }
                               
                               phaseIterator++;
@@ -764,7 +796,7 @@ async = require('async');
 
 
   
-        it('updates associated active GrowPlanInstances', function(done){
+        it('updates associated active GrowPlanInstances without devices', function(done){
           // grab a GrowPlan that has a GPI already associated with it
           // set the GPI.trackGrowPlanUpdates = true
           // store the GPI id
@@ -782,7 +814,7 @@ async = require('async');
               sourceGrowPlanId = "506de30c8eebf7524342cb70",
               growPlanInstanceId = "51a7b69ca3b04db08057e047",
               GrowPlanInstanceModel = Models.growPlanInstance,
-              now = new Date();
+              testStartedAt = new Date();
           
           self.userId = "506de30a8eebf7524342cb6c";
           
@@ -841,23 +873,22 @@ async = require('async');
                         updatedGrowPlanInstance.growPlan.equals(updatedGrowPlan._id).should.equal(true, "GPI should still reference the original GrowPlan"); 
 
                         // Should contain a migration entry
-                        var migrationEntry = updatedGrowPlanInstance.growPlanMigrations[0];
+                        var migrationEntry = updatedGrowPlanInstance.growPlanMigrations[updatedGrowPlanInstance.growPlanMigrations.length - 1];
                         should.exist(migrationEntry, "GPI should have a migration entry");
                         migrationEntry.oldGrowPlan.equals(sourceGrowPlanId).should.equal(true, "migrationEntry.oldGrowPlan should reference original GP");
                         migrationEntry.newGrowPlan.equals(updatedGrowPlan._id).should.equal(true, "migrationEntry.newGrowPlan should reference updated GP");
-                        migrationEntry.ts.valueOf().should.be.above(now.valueOf(), "migrationEntry timestamp should be after the start of this test");
+                        migrationEntry.ts.valueOf().should.be.above(testStartedAt.valueOf(), "migrationEntry timestamp should be after the start of this test");
 
-                        // GPI's active phase should be something
+                        // GPI's active phase should be the same
                         var originalActiveGPIPhase = self.originalGrowPlanInstance.phases.filter(function(phase) { return phase.active; })[0];
 
-                        console.log(updatedGrowPlanInstance.phases);
                         var updatedGrowPlanInstanceOriginalActiveGPIPhase = updatedGrowPlanInstance.phases.filter(function(phase) { return phase._id.toString() === originalActiveGPIPhase._id; })[0];
 
-                        updatedGrowPlanInstanceOriginalActiveGPIPhase.active.should.equal(false, "Previous phase should be inactivated");
+                        updatedGrowPlanInstanceOriginalActiveGPIPhase.active.should.equal(true, "Previously active phase should remain activate");
 
-                        var currentActiveGPIPhase = updatedGrowPlanInstance.phases.filter(function(phase) { return !!phase.active; })[0];
-                        should.exist(currentActiveGPIPhase, "Updated GPI should have an active phase");
-                        updatedGrowPlan.phases.some(function(gpPhase){ return gpPhase._id.equals(currentActiveGPIPhase.phase);}).should.equal(true, "GPI should have an active phase that's in the updated GrowPlan")
+                        //var currentActiveGPIPhase = updatedGrowPlanInstance.phases.filter(function(phase) { return !!phase.active; })[0];
+                        //should.exist(currentActiveGPIPhase, "Updated GPI should have an active phase");
+                        //updatedGrowPlan.phases.some(function(gpPhase){ return gpPhase._id.equals(currentActiveGPIPhase.phase);}).should.equal(true, "GPI should have an active phase that's in the updated GrowPlan")
                         
                         // GPI's device's actions should be updated to remove the light action
                         
@@ -866,6 +897,7 @@ async = require('async');
                     },
                     function checkDevice(innerCallback){
                       return innerCallback();
+                      
                       /*
                       DeviceModel.findById(self.originalGrowPlanInstance.device)
                       .exec(function(err, device){
@@ -879,11 +911,16 @@ async = require('async');
                     function checkNotifications(innerCallback){
                       NotificationModel.find({
                         gpi : self.originalGrowPlanInstance._id,
-                        createdAt : { $gte : now }
+                        createdAt : { $gte : testStartedAt }
                       }).exec(function(err, notifications){
                         should.not.exist(err);
                         should.exist(notifications);
                         notifications.length.should.be.above(0, "There should be some notifications triggered");
+                        
+                        notifications.some(function(notification){ 
+                          return ( notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.GROW_PLAN_UPDATE && notification.triggerDetails.migrationSuccessful === true);
+                        }).should.equal(true, "should have a successful grow plan update notification");
+
                         return innerCallback();
                       });
                     }
@@ -895,9 +932,13 @@ async = require('async');
               });       
             }
           );
-        }); // /updates associated active GrowPlanInstances
+        }); // /updates associated active GrowPlanInstances without devices
 
-      }); // /non-branching scenario (if being updated by the sole user)
+
+
+      }); // /non-branching scenario (if being updated for a solo user)
+
+    
 
     }); // /createNewIfUserDefinedPropertiesModified
     
