@@ -274,8 +274,6 @@ module.exports = function(app) {
       },
       manualLogEntry = req.headers['bpn-manual-log-entry'];
 
-    console.log(req.headers);
-
     if (!req.body.sensorLog){
       response = {
         status : "error",

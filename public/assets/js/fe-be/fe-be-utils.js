@@ -187,13 +187,16 @@ define(['moment'], function(moment){
   };
 
   /**
+   * NOT USING (NOT DIFFERENTIATING SENSOR LOGS)
    * Type of sensor log: manual through UI or device sent
+   * 
+   * 
    */
-  utils.sensorLogTypes = {
-    'MANUAL': 'manual',
-    'DEVICE': 'device',
-    'EXTERNAL': 'external'
-  };
+  // utils.sensorLogTypes = {
+  //   'MANUAL': 'manual',
+  //   'DEVICE': 'device',
+  //   'EXTERNAL': 'external'
+  // };
   
   /**
    * Checks whether the provided string matches the ObjectId format.
@@ -415,6 +418,14 @@ define(['moment'], function(moment){
 
   utils.friendlyFormatObjectId = function(objectId){
     return objectId.toString().match(new RegExp('.{1,4}', 'g')).join("-");
+  };
+
+  utils.getSensorCodesAndBaseUnit = function(sensors){
+    var sensorsObj = {};
+    sensors.forEach(function(sensor){
+      sensorsObj[sensor.code] = { val: null, unit: sensor.unit };
+    });
+    return sensorsObj;
   };
 
   return utils;

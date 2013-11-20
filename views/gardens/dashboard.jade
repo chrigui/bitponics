@@ -30,8 +30,8 @@ block content
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code]") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
-            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
+            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
+            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
@@ -50,8 +50,8 @@ block content
                   div(class="overlay-data clearfix")
                     div.left
                       h4 Last Reading ({{sensor.unit}})
-                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
-                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") ----
+                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
+                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") ----
                       h5.reading-time {{sharedDataService.activeDate.latestSensorLogs.timestamp | date:'short' }}
                     div.right(ng-show="idealRanges[sensor.code]")
                       h4 Ideal Range ({{sensor.unit}})

@@ -73,16 +73,17 @@ var SensorLogSchema = new Schema({
     l : [ SensorReadingSchema ],
 
     /*
+     * NOT USING
      * Type of log: manual vs. device
      */
-    t: { 
-      type: String,
-      enum : [
-        feBeUtils.sensorLogTypes.MANUAL,
-        feBeUtils.sensorLogTypes.DEVICE,
-        feBeUtils.sensorLogTypes.EXTERNAL
-      ]
-    }
+    // t: { 
+    //   type: String,
+    //   enum : [
+    //     feBeUtils.sensorLogTypes.MANUAL,
+    //     feBeUtils.sensorLogTypes.DEVICE,
+    //     feBeUtils.sensorLogTypes.EXTERNAL
+    //   ]
+    // }
 },
 { id : false });
 

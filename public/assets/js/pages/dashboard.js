@@ -122,8 +122,7 @@ require([
             )
             .success(function(data, status, headers, config) {
               sharedData.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
-              sharedData.dateDataCache[dateKey].latestSensorLogs = data.data[0];
-              console.log(sharedData.dateDataCache[dateKey].latestSensorLogs)
+              sharedData.dateDataCache[dateKey].latestSensorLogs = viewModels.initLatestSensorLogsViewModel(data.data);
               sharedData.dateDataCache[dateKey].loaded = true;
               deferred.resolve(data);
             })
@@ -189,11 +188,12 @@ require([
                   notifications = data.notifications,
                   photos = data.photos,
                   dateDataCache;
+              console.log('sensorLog coming from update?', sensorLog);
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
                 dateDataCache = sharedData.getDateDataCache(sensorLog.timestamp);
-                dateDataCache.sensorLogs.push(sensorLog);
-                dateDataCache.latestSensorLogs = sensorLog;
+                dateDataCache.sensorLogs.unshift(sensorLog);
+                dateDataCache.latestSensorLogs = viewModels.initLatestSensorLogsViewModel(dateDataCache.sensorLogs);
               }
               if (deviceStatus) {
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
@@ -365,9 +365,9 @@ require([
               sensorTimestamp;
 
             if (sensorLog){
-               sensorValue = sensorLog[sensorCode];
-               sensorTimestamp = sensorLog.timestamp;
-               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
+               sensorValue = sensorLog[sensorCode].val;
+               sensorTimestamp = sensorLog[sensorCode].timestamp;
+               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog[sensorCode].timestamp));
             }
 
             // Determine whether we need to add the "warning" class
