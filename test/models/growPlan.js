@@ -772,7 +772,11 @@ feBeUtils = requirejs('fe-be-utils');
                               if (phaseIterator === 0){
                                 isEquivalent.should.equal(false, "first phase should not be equivalent");
 
-                                fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions[fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions.length - 1].description.should.equal(newAction.description)
+                                var hasNewAction = fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions.some(function(action){
+                                  return action.description === newAction.description;
+                                });
+
+                                hasNewAction.should.equal(true, "newAction should exist in action array");
                               } else {
                                 isEquivalent.should.equal(true, "other phases should be equivalent");  
                               }

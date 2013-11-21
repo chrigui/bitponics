@@ -670,8 +670,8 @@ describe('Action', function(){
 
       action.save(function(err){
         should.exist(err);
-        console.log(err.message);
-        err.errors['cycle.states'].type.should.equal('Invalid number of cycle states. Cycles have 1 or 2 states (on/off).');
+        console.log(err);
+        err.errors['cycle.states'].message.should.equal('Invalid number of cycle states. Cycles have 1 or 2 states (on/off).');
         done();
       });
     });
@@ -689,7 +689,7 @@ describe('Action', function(){
       action.save(function(err){
         should.exist(err);
         console.log(err);
-        err.errors.control.type.should.equal('An action with a control must define a cycle with 1 or 2 control states');
+        err.errors.control.message.should.equal('An action with a control must define a cycle with 1 or 2 control states');
         done();
       });
     });
