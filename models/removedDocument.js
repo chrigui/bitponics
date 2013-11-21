@@ -1,5 +1,5 @@
 /**
- * All "deleted" docs get sent here, for later recovery if necessary.
+ * All "Removed" docs get sent here, for later recovery if necessary.
  */
 
  var mongoose = require('mongoose'),
@@ -15,9 +15,9 @@
   mongooseConnection = require('../config/mongoose-connection').defaultConnection;
   
 
-var removedDocumentModel,
+var RemovedDocumentModel,
 	
-removedDocumentSchema = new Schema({
+RemovedDocumentSchema = new Schema({
 
 	/**
    * Name of the mongo collection the document came from
@@ -26,7 +26,7 @@ removedDocumentSchema = new Schema({
 	
 
   /**
-   * ObjectId of removed document. Stored separately to allow querying.
+   * ObjectId of Removed document. Stored separately to allow querying.
    */
   documentId : { type : ObjectIdSchema },
 
@@ -44,13 +44,13 @@ removedDocumentSchema = new Schema({
 },
 { id : false });
 
-removedDocumentSchema.plugin(useTimestamps);
+RemovedDocumentSchema.plugin(useTimestamps);
 
 
-removedDocumentSchema.index({ documentId: 1  });
+RemovedDocumentSchema.index({ documentId: 1  });
 
-removedDocumentModel = mongooseConnection.model('removedDocument', removedDocumentSchema);
-exports.schema = removedDocumentSchema;
-exports.model = removedDocumentModel;
+RemovedDocumentModel = mongooseConnection.model('RemovedDocument', RemovedDocumentSchema);
+exports.schema = RemovedDocumentSchema;
+exports.model = RemovedDocumentModel;
 
 

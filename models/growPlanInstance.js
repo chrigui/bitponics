@@ -188,7 +188,7 @@ var GrowPlanInstanceSchema = new Schema({
 { id : false });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
-
+GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 GrowPlanInstanceSchema.virtual('timezone')
@@ -288,6 +288,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     }
   );
 });
+
+
 /******************* END STATIC METHODS  ***************************/
 
 

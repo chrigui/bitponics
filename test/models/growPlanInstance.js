@@ -253,6 +253,40 @@ feBeUtils = requirejs('fe-be-utils');
     });
 
 
+    describe('.remove', function(){
+      it('removed the specified docs from the collection and inserts them into the removedDocuments collection', function(done){
+        var RemovedDocumentModel = require('../../models/removedDocument').model;
+
+        GrowPlanInstance.create({
+          growPlan : '506de2ff8eebf7524342cb3a',
+          owner : '506de30a8eebf7524342cb6c',
+          active : false
+        },
+        function(err, gpi){
+          should.not.exist(err);
+          should.exist(gpi);
+          
+          GrowPlanInstance.remove({ "_id" : gpi._id}, function(err){
+            should.not.exist(err);
+
+            RemovedDocumentModel.findOne({
+              collectionName : GrowPlanInstance.collection,
+              documentId : gpi._id
+            }).exec(function(err, removedDocument){
+              should.not.exist(err);
+              should.exist(removedDocument);
+
+              console.log(removedDocument);
+
+              should.exist(removedDocument.documentObject);
+
+              return done();
+            });
+          });
+        });
+      });
+    });
+
     describe('#activate', function(){
       
     }); // /#activate
