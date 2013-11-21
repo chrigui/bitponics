@@ -5,6 +5,7 @@
  */
 $screen-smaller = 20em
 $screen-small = 30em
+$screen-small-height = 50em
 $screen-medium = 40em
 $screen-large = 50em
 $screen-larger = 65em
@@ -14,6 +15,7 @@ $screen-larger = 65em
  */
 $mq_smaller = media_definition(screen,'and',(min-width $screen-smaller))
 $mq_small = media_definition(screen,'and',(min-width $screen-small))
+$mq_small_height = media_definition(screen,'and',(max-height $screen-small-height))
 $mq_medium = media_definition(screen,'and',(min-width $screen-medium))
 $mq_large = media_definition(screen,'and',(min-width $screen-large))
 $mq_larger = media_definition(screen,'and',(min-width $screen-larger))

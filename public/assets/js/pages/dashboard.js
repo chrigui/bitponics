@@ -235,8 +235,8 @@ require([
         'sharedDataService',
         function ($scope, $http, $q, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
-          $scope.controls = bpn.controls;
-          $scope.sensors = bpn.sensors;
+          $scope.controls = bpn.pageData.controls;
+          $scope.sensors = bpn.pageData.sensors;
           
           
 
@@ -599,7 +599,7 @@ require([
       ]
     );
 
-    dashboardApp.controller('bpn.controllers.dashboardApp.ControlOverlay',
+    dashboardApp.controller('bpn.controllers.dashboard.ControlOverlay',
       [
         '$scope',
         '$http',
@@ -628,6 +628,39 @@ require([
             .error(function(data, status, headers, config) {
             });
           }
+        }
+      ]
+    );
+    
+    dashboardApp.controller('bpn.controllers.dashboard.ManualLog',
+      [
+        '$scope',
+        '$http',
+        'sharedDataService',
+        function($scope, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.filterForJournalEntries = function(log){
+            return !!log['journal'];
+          };
+
+        }
+      ]
+    );
+
+    dashboardApp.controller('bpn.controllers.dashboard.ManualLogOverlay',
+      [
+        '$scope',
+        '$http',
+        'sharedDataService',
+        function($scope, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.manualEntryMode = true;
+          $scope.sensors = bpn.pageData.sensors;
+          
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
         }
       ]
     );
@@ -903,8 +936,6 @@ require([
           // well as populated scope to work with
           // element is a jQuery wrapper on the element
 
-          console.log(scope.sensorCode);
-          console.log(scope.sensorLogs);
           var sensorReadings = scope.sensorLogs.map(function(sensorLog){
             return sensorLog[scope.sensorCode];
           });
@@ -912,7 +943,6 @@ require([
             return (typeof sensorReading === 'number');
           });
           sensorReadings = sensorReadings.reverse();
-          console.log(sensorReadings);
           
           if (!sensorReadings.length){
             element.hide();
@@ -961,15 +991,17 @@ require([
         restrict : "EA",
         replace : true,
         scope : {
-          sensorUnit : "=",
-          sensorCode : "=",
-          sensorLogs : "="
+          sensorUnit : "=?",
+          sensorCode : "=?",
+          sensors : "=?",
+          close : "=?",
+          manualEntry : "=?"
         },
         // template : '<div class="manual-entry-form {{sensorCode}}"></div>',
         controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
           $scope.sharedDataService = sharedDataService;
 
-          // $scope.sharedDataService.manualEntryMode = false;
+          $scope.manualEntry = $scope.manualEntry ? $scope.manualEntry : {};
           $scope.manualEntryMode = false;
           
           $scope.toggleManualEntry = function(){
@@ -984,34 +1016,58 @@ require([
           };
 
           $scope.submit = function(){
-            if ($scope.manualEntryMode != '') {
-              console.log('$scope.manualEntry', $scope.manualEntry);
-              console.log('should validate here');
+            var valid = true,
+                dataObj = {},
+                sensors = Object.keys($scope.manualEntry),
+                sensorlogsArray = [],
+                journalEntry = $scope.manualEntry['journal'];
+
+            //remove journal from obj so not in sensor logs
+            delete $scope.manualEntry['journal'];
+
+            for (var i = 0; i < sensors.length; i++) {
+              if ($scope.manualEntry[sensors[i]]) {
+                console.log($scope.manualEntry[sensors[i]]);
+                // $scope.manualEntryMode[$scope.sensorCode] != '' && angular.isNumber(parseFloat($scope.manualEntry))
+
+                //construct sensor logs array for dataObj
+                sensorlogsArray.push({
+                  val: $scope.manualEntry[sensors[i]],
+                  sCode: sensors[i]
+                });
+              }
+            }
+
+            //construct dataObj for server
+            dataObj = {
+              sensorLog: {
+                gpi: $scope.sharedDataService.growPlanInstance._id,
+                timestamp: new Date(),
+                logs: sensorlogsArray
+              }
+            }
+
+            //add journal if present for this update
+            if (journalEntry) {
+              dataObj.sensorLog.journal = journalEntry;
+            }
+            
+            if (valid) {
               $http({
                 method: 'post',
                 headers: {
                   'bpn-manual-log-entry': 'true'
                 },
                 url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
-                data: {
-                  sensorLog: {
-                    gpi: $scope.sharedDataService.growPlanInstance._id,
-                    timestamp: new Date(),
-                    logs: [
-                      {
-                        val: $scope.manualEntry,
-                        sCode: $scope.sensorCode
-                      }
-                    ],
-                    type: 'manual'
-                  }
-                }
+                data: dataObj
               })
               .success(function(data, status, headers, config) {
-                console.log('success')
+                console.log('success');
+                if ($scope.close) $scope.close();
               })
               .error(function(data, status, headers, config) {
-                console.log('error')
+                console.log('error');
+
               });
             }
           };
@@ -1024,6 +1080,24 @@ require([
           console.log('scope.sensorLogs', scope.sensorLogs);
         }
       }
+    });
+
+    dashboardApp.directive('smartFloat', function() {
+      return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+          ctrl.$parsers.unshift(function(viewValue) {
+            var FLOAT_REGEXP = /^\-?\d+((\.|\,)\d+)?$/;
+            if (FLOAT_REGEXP.test(viewValue)) {
+              ctrl.$setValidity('float', true);
+              return parseFloat(viewValue.replace(',', '.'));
+            } else {
+              ctrl.$setValidity('float', false);
+              return undefined;
+            }
+          });
+        }
+      };
     });
 
     dashboardApp.filter('controlValueToWord', function() {

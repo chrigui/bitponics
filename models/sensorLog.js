@@ -73,17 +73,10 @@ var SensorLogSchema = new Schema({
     l : [ SensorReadingSchema ],
 
     /*
-     * NOT USING
-     * Type of log: manual vs. device
+     * Journal entry
+     * Allows for free-form text to be attached to sensor updates
      */
-    // t: { 
-    //   type: String,
-    //   enum : [
-    //     feBeUtils.sensorLogTypes.MANUAL,
-    //     feBeUtils.sensorLogTypes.DEVICE,
-    //     feBeUtils.sensorLogTypes.EXTERNAL
-    //   ]
-    // }
+    j: { type: String }
 },
 { id : false });
 
@@ -111,12 +104,12 @@ SensorLogSchema.virtual('timestamp')
     this.ts = timestamp;
   });
 
-SensorLogSchema.virtual('type')
+SensorLogSchema.virtual('journal')
   .get(function () {
-    return this.t;
+    return this.j;
   })
-  .set(function(type){
-    this.t = type;
+  .set(function(journal){
+    this.j = journal;
   });
 
 /*************** SERIALIZATION *************************/

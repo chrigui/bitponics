@@ -240,7 +240,6 @@ function (angular, domReady, feBeUtils) {
     };
   });
 
-
   domReady(function () {
     angular.bootstrap(document, ['bpn.apps.buy.checkout']);
   });

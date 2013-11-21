@@ -225,7 +225,7 @@ module.exports = function(app) {
       if (limit > 200) { limit = 200; }
 
     	query.sort('-ts');
-    	query.select('ts l'); // don't need to get the gpi in this query. already know it!
+    	query.select('ts l j'); // don't need to get the gpi in this query. already know it!
 
     	// TODO : Localize start/end date based on owner's timezone?
       if (startDate){
