@@ -1,0 +1,15 @@
+/*
+ * Global Vars
+ */
+/*
+ * media_definition
+ *
+ * Allow for defining breakpoints as variable in one spot.
+ *
+ * Due to stylus issue: https://github.com/LearnBoost/stylus/issues/1038
+ * This is a mixin workaround for using media query variables. Usage:
+ *    $_media = media(screen,'and',(min-width $screen-tablet))
+ *    @media $_media
+ *      .container
+ *        max-width 728px
+ */

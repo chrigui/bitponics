@@ -1,0 +1,22 @@
+/**
+ * TODO : this isn't actually fading...just causing a delay on hide/show
+ */
+.fade-in-setup,
+.fade-out-setup {
+  -webkit-transition: 0.7s linear opacity;
+  -moz-transition: 0.7s linear opacity;
+  -o-transition: 0.7s linear opacity;
+  transition: 0.7s linear opacity;
+}
+.fade-in-setup {
+  opacity: 0;
+}
+.fade-out-setup {
+  opacity: 1;
+}
+.fade-in-setup.fade-in-start {
+  opacity: 1;
+}
+.fade-out-setup.fade-out-start {
+  opacity: 0;
+}
