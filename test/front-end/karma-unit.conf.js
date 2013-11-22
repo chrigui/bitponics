@@ -21,7 +21,7 @@ module.exports = function(config) {
     frameworks: ['jasmine', 'requirejs'],
     reporters: ['progress', 'html'],
     htmlReporter: {
-      outputFile: 'tests/units.html'
+      outputFile: 'test/front-end/unit-test-results.html'
     },
     preprocessors: {
       '**/*.html': []
