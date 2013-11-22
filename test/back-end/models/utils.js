@@ -12,21 +12,21 @@
  */
 
 describe('Model Utils', function(){
-	var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+	var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
   ObjectID = require('mongodb').ObjectID,
-  ImmediateAction = require('../../models/immediateAction').model,
-  GrowPlanInstance = require('../../models/growPlanInstance').model,
-  Device = require('../../models/device'),
-  SensorLogModel = require('../../models/sensorLog').model,
+  ImmediateAction = require('../../../models/immediateAction').model,
+  GrowPlanInstance = require('../../../models/growPlanInstance').model,
+  Device = require('../../../models/device'),
+  SensorLogModel = require('../../../models/sensorLog').model,
   DeviceModel = Device.model,
   DeviceUtils = Device.utils,
-  ModelUtils = require('../../models/utils'),
+  ModelUtils = require('../../../models/utils'),
   should = require('should'),
-  User = require('../../models/user').model,
+  User = require('../../../models/user').model,
   async = require('async'),
   getObjectId = ModelUtils.getObjectId,
-  i18nKeys = require('../../i18n/keys'),
-  requirejs = require('../../lib/requirejs-wrapper'),
+  i18nKeys = require('../../../i18n/keys'),
+  requirejs = require('../../../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils');
 
 

@@ -1,16 +1,16 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
+Models = require('../../../models'),
 GrowPlan = Models.growPlan,
-PhaseSchema = require('../../models/growPlan').phase.schema,
+PhaseSchema = require('../../../models/growPlan').phase.schema,
 DeviceModel = Models.device,
 NotificationModel = Models.notification,
 ModelUtils = Models.utils,
 should = require('should'),
-sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans'),
+sampleGrowPlans = require('../../../utils/db_init/seed_data/growPlans'),
 async = require('async'),
-requirejs = require('../../lib/requirejs-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
 

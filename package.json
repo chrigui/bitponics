@@ -75,6 +75,6 @@
     "karma-html-reporter": "~0.1.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 $(find test/* -path test/front-end -prune -o -name \"*.js\" -print)"
+    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 ./test/back-end"
   }
 }

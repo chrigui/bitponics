@@ -1,6 +1,7 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
-  SensorLog = require('../../models/sensorLog'),
+  ObjectID = require('mongodb').ObjectID,
+  HarvestLog = require('../../../models/harvestLog'),
   should = require('should');
 
 
@@ -15,20 +16,21 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('SensorLog', function(){
+describe('HarvestLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new HarvestLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
 
-    var result = sensorLog.toObject();
+    var result = log.toObject();
 
     // only friendly 'logs' should exist
     result.should.not.have.property('l');
@@ -39,26 +41,27 @@ describe('SensorLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      log.should.not.have.property('s');
-      log.should.not.have.property('v');
-      log.should.have.property('sCode');
-      log.should.have.property('val');
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var sensorLog = new SensorLog.model({
+    var log = new HarvestLog.model({
+      gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          sCode : 'vis',
-          val : 1234
+          plant : "50749839ab364e2a9fffd4f0", // dill
+          weight : 10 // grams
         }
       ]
     });
 
-    var result = sensorLog.toJSON();
+    var result = log.toJSON();
 
     // only friendly 'logs' should exist
     result.should.not.have.property('l');
@@ -69,12 +72,11 @@ describe('SensorLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      log.should.not.have.property('s');
-      log.should.not.have.property('v');
-      log.should.have.property('sCode');
-      log.should.have.property('val');
+      log.should.not.have.property('p');
+      log.should.not.have.property('w');
+      log.should.have.property('plant');
+      log.should.have.property('weight');
     });
-
   });
 
 });

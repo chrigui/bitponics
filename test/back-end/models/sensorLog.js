@@ -1,7 +1,6 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
-  ObjectID = require('mongodb').ObjectID,
-  TagLog = require('../../models/tagLog'),
+  SensorLog = require('../../../models/sensorLog'),
   should = require('should');
 
 
@@ -16,21 +15,20 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('TagLog', function(){
+describe('SensorLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new TagLog.model({
-      gpi : new ObjectID(),
+    var sensorLog = new SensorLog.model({
       ts : Date.now(),
       logs : [
         {
-          val : "my garden journal entry",
-          tags: ["journal"]
+          sCode : 'vis',
+          val : 1234
         }
       ]
     });
 
-    var result = log.toObject();
+    var result = sensorLog.toObject();
 
     // only friendly 'logs' should exist
     result.should.not.have.property('l');
@@ -41,28 +39,26 @@ describe('TagLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
+      log.should.not.have.property('s');
       log.should.not.have.property('v');
-      log.should.not.have.property('t');
+      log.should.have.property('sCode');
       log.should.have.property('val');
-      log.should.have.property('tags');
-      log.tags.should.include("journal");
     });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new TagLog.model({
-      gpi : new ObjectID(),
+    var sensorLog = new SensorLog.model({
       ts : Date.now(),
       logs : [
         {
-          val : "my garden journal entry",
-          tags: ["journal"]
+          sCode : 'vis',
+          val : 1234
         }
       ]
     });
 
-    var result = log.toJSON();
+    var result = sensorLog.toJSON();
 
     // only friendly 'logs' should exist
     result.should.not.have.property('l');
@@ -73,12 +69,12 @@ describe('TagLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
+      log.should.not.have.property('s');
       log.should.not.have.property('v');
-      log.should.not.have.property('t');
+      log.should.have.property('sCode');
       log.should.have.property('val');
-      log.should.have.property('tags');
-      log.tags.should.include("journal");
     });
+
   });
 
 });

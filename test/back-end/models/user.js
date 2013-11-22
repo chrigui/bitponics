@@ -1,7 +1,7 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
-  braintreeConfig = require('../../config/braintree-config').setEnvironment('ci'),
-  User = require('../../models/user').model,
+  braintreeConfig = require('../../../config/braintree-config').setEnvironment('ci'),
+  User = require('../../../models/user').model,
   should = require('should');
 
 

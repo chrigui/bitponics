@@ -1,9 +1,9 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
-  Plant = require('../../models/plant'),
+  Plant = require('../../../models/plant'),
   should = require('should'),
   moment = require('moment'),
-  i18nKeys = require('../../i18n/keys');
+  i18nKeys = require('../../../i18n/keys');
 
 
 /*

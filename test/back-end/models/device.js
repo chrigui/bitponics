@@ -1,13 +1,13 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
-Device = require('../../models/device'),
+Models = require('../../../models'),
+Device = require('../../../models/device'),
 DeviceModel = Device.model,
 ModelUtils = Models.utils,
 should = require('should'),
-timezone = require('../../lib/timezone-wrapper'),
-requirejs = require('../../lib/requirejs-wrapper'),
+timezone = require('../../../lib/timezone-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
 

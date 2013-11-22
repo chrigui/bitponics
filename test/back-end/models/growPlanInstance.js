@@ -1,14 +1,14 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
-GrowPlanInstance = require('../../models/growPlanInstance').model,
-GrowPlan = require('../../models/growPlan').growPlan.model,
-Device = require('../../models/device').model,
+Models = require('../../../models'),
+GrowPlanInstance = require('../../../models/growPlanInstance').model,
+GrowPlan = require('../../../models/growPlan').growPlan.model,
+Device = require('../../../models/device').model,
 should = require('should'),
-sampleGrowPlanInstances = require('../../utils/db_init/seed_data/growPlanInstances'),
+sampleGrowPlanInstances = require('../../../utils/db_init/seed_data/growPlanInstances'),
 async = require('async'),
-requirejs = require('../../lib/requirejs-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
 
@@ -255,7 +255,7 @@ feBeUtils = requirejs('fe-be-utils');
 
     describe('.remove', function(){
       it('removed the specified docs from the collection and inserts them into the removedDocuments collection', function(done){
-        var RemovedDocumentModel = require('../../models/removedDocument').model;
+        var RemovedDocumentModel = require('../../../models/removedDocument').model;
 
         GrowPlanInstance.create({
           growPlan : '506de2ff8eebf7524342cb3a',
