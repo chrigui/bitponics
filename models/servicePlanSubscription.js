@@ -51,6 +51,7 @@ var ServicePlanSubscriptionSchema = new Schema(
 );
 
 ServicePlanSubscriptionSchema.plugin(useTimestamps);
+ServicePlanSubscriptionSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 ServicePlanSubscriptionSchema.index({ 'owner' : 1 });

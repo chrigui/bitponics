@@ -14,6 +14,13 @@ requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
 
+var createInstance = function(callback){
+  GrowPlan.create({
+    name : Date.now().toString(),
+    description : Date.now().toString()
+  }, callback);
+};
+
 /*
  * Mocha Test
  *
@@ -45,6 +52,9 @@ feBeUtils = requirejs('fe-be-utils');
     afterEach(function(done){
     	done();
     });
+
+
+    require('../shared-tests').remove(GrowPlan, createInstance);
 
 
     describe('#getPhaseAndDayFromStartDay(numberOfDays)', function(){

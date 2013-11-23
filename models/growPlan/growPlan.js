@@ -60,6 +60,7 @@ GrowPlanSchema = new Schema({
 { id : false });
 
 GrowPlanSchema.plugin(useTimestamps);
+GrowPlanSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /************************** VIRTUALS ***************************/

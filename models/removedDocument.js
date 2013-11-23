@@ -28,7 +28,7 @@ RemovedDocumentSchema = new Schema({
   /**
    * ObjectId of Removed document. Stored separately to allow querying.
    */
-  documentId : { type : ObjectIdSchema },
+  documentId : { type : String },
 
 
   /**
@@ -47,7 +47,7 @@ RemovedDocumentSchema = new Schema({
 RemovedDocumentSchema.plugin(useTimestamps);
 
 
-RemovedDocumentSchema.index({ documentId: 1  });
+RemovedDocumentSchema.index({ collectionName:1, documentId: 1  });
 
 RemovedDocumentModel = mongooseConnection.model('RemovedDocument', RemovedDocumentSchema);
 exports.schema = RemovedDocumentSchema;

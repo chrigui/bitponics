@@ -7,6 +7,12 @@ var mongooseConnection = require('../../../config/mongoose-connection').open('te
   timezone = require('../../../lib/timezone-wrapper');
 
 
+var createInstance = function(callback){
+  Action.model.create({
+    description : (Date.now()).toString()
+  }, callback);
+};
+
 /*
  * Mocha Test
  *
@@ -19,6 +25,10 @@ var mongooseConnection = require('../../../config/mongoose-connection').open('te
  */
 
 describe('Action', function(){
+
+
+  require('../shared-tests').remove(Action.model, createInstance);
+
 
   describe('virtual overallCycleTimespan property', function(){
     it('returns an accurate timespan of 0 for a single-state no-control cycle', function(done){

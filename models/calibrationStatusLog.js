@@ -84,6 +84,7 @@ CalibrationStatusLogSchema.virtual('message')
     this.msg = message;
   });
 
+CalibrationStatusLogSchema.plugin(mongoosePlugins.recoverableRemove);
 
 /*************** SERIALIZATION *************************/
 

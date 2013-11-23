@@ -36,7 +36,7 @@ GrowPlanHistorySchema = new Schema({
 { id : false });
 
 GrowPlanHistorySchema.plugin(useTimestamps);
-
+GrowPlanHistorySchema.plugin(mongoosePlugins.recoverableRemove);
 
 GrowPlanHistoryModel = mongooseConnection.model('GrowPlanHistory', GrowPlanHistorySchema);
 exports.schema = GrowPlanHistorySchema;

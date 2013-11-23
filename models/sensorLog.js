@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
     mongooseTypes = require('mongoose-types'),
+    mongoosePlugins = require('../lib/mongoose-plugins'),
     Schema = mongoose.Schema,
     ObjectIdSchema = Schema.ObjectId,
     SensorLogModel,
@@ -85,6 +86,8 @@ var SensorLogSchema = new Schema({
     }
 },
 { id : false });
+
+SensorLogSchema.plugin(mongoosePlugins.recoverableRemove);
 
 SensorLogSchema.virtual('logs')
 	.get(function () {

@@ -188,7 +188,16 @@ var GrowPlanInstanceSchema = new Schema({
 { id : false });
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
-GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove);
+GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove, {
+  callback : function(err, removedDocumentResults, callback){
+    if (err) { return callback(err); }
+
+    console.log("IN GPI REMOVE CALLBACK args", arguments);
+    console.log("IN GPI REMOVE CALLBACK", removedDocumentResults);
+
+    return callback(err, removedDocumentResults); 
+  }
+});
 
 
 GrowPlanInstanceSchema.virtual('timezone')
@@ -614,6 +623,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       function getDeviceControllableActions(innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
+        console.log('getDocumentIdString(growPlanInstance.device)', getDocumentIdString(growPlanInstance.device));
         DeviceModel.findById(getDocumentIdString(growPlanInstance.device), function (err, deviceResult){
           if (err) { return innerCallback(err); }
 
