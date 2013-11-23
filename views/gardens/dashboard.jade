@@ -13,7 +13,7 @@ block content
         
   section#main(role="main", class="main")
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
-    div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main")
+    div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
       h2.page-heading {{sharedDataService.growPlanInstance.name}}
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
@@ -120,7 +120,7 @@ block content
                 div.tags(ng-repeat="tag in log.logs[0].tags")) {{tag}}}
 
           div(ng-controller="bpn.controllers.dashboard.ManualLogOverlay", modal="sharedDataService.activeOverlay=='ManualLogOverlay'", close="close()", options="sharedDataService.modalOptions")
-            div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+            div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Log Entry

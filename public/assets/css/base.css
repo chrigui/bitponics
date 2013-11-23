@@ -1168,7 +1168,7 @@ img.page-spinner.spinner {
   padding: 1em 2em 1em;
 }
 .overlay.fade {
-  transition: opacity 0.1s ease-out;
+  transition: opacity 0.1s ease-out, top 0.1s ease-out;
 }
 .overlay .close {
   position: fixed;

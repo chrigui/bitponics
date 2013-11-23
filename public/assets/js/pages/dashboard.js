@@ -15,7 +15,8 @@ require([
   'controller-nav',
   'overlay',
   'flexslider',
-  'angular-flexslider'
+  'angular-flexslider',
+  'throttle-debounce'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
@@ -41,6 +42,7 @@ require([
             dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
             socket : socket,
             activeOverlay : undefined,
+            activeOverlayPositionTop : undefined,
             modalOptions : {
               backdrop: true,
               backdropFade: true,
@@ -251,6 +253,14 @@ require([
 
           initSocket();
           
+
+          /*
+           * Overlay positioning
+           */
+          sharedData.setActiveOverlay = function(overlayName) {
+            // sharedDataService.activeOverlayPositionTop
+
+          }
 
           return sharedData;
         }
@@ -1144,20 +1154,43 @@ require([
         }
       }
     });
-
-    dashboardApp.directive('smartFloat', function() {
+      
+    dashboardApp.directive('bpnDirectivesSmartOverlay', function($window, $timeout) {
       return {
-        require: 'ngModel',
-        link: function(scope, elm, attrs, ctrl) {
-          ctrl.$parsers.unshift(function(viewValue) {
-            var FLOAT_REGEXP = /^\-?\d+((\.|\,)\d+)?$/;
-            if (FLOAT_REGEXP.test(viewValue)) {
-              ctrl.$setValidity('float', true);
-              return parseFloat(viewValue.replace(',', '.'));
-            } else {
-              ctrl.$setValidity('float', false);
-              return undefined;
-            }
+        controller: function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
+          $scope.$watch('sharedDataService.activeOverlay', function (newVal, oldVal) {
+            $scope.sharedDataService.activeOverlayPositionTop = angular.element($window)[0].scrollY;
+            $scope.setOverlayPosition();
+          });
+
+          $scope.setOverlayPosition = function() {
+            $.throttle(1000, $timeout(function() {
+              console.log($element.parents('.page:first').siblings('.overlay:first').length);
+              var overlay = $element.parents('.page:first').siblings('.overlay:first'),
+                  overlayHeight = overlay.height(),
+                  topValue = $scope.sharedDataService.activeOverlayPositionTop,
+                  windowHeight = angular.element($window).height(),
+                  padding = 144;
+              if (overlay.length > 0) {
+                console.log('overlayHeight', overlayHeight)
+                console.log('windowHeight', windowHeight)
+                console.log('topValue', topValue)
+                console.log('padding', padding)
+                // console.log('windowHeight - topValue + padding', windowHeight - topValue + padding)
+                console.log('windowHeight > overlayHeight + padding', windowHeight > overlayHeight + padding)
+                if ((windowHeight > overlayHeight + padding)) {
+                  overlay.css({ top: topValue + padding });
+                  $scope.$apply(); 
+                }
+              }
+            }, 500));
+          };
+
+        },
+        link: function(scope, element, attrs, controller) {
+          angular.element($window).bind("scroll", function() {
+            scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
+            scope.setOverlayPosition();
           });
         }
       };
