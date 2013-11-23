@@ -110,19 +110,21 @@ block content
 
             button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log
               | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
-            p(ng-hide="(sharedDataService.activeDate.sensorLogs | filter:filterForJournalEntries).length > 0")
-              | Journal your progress and enter any sensor data you want to record.
+            p(ng-hide="(sharedDataService.recentTextLogs.length) > 0")
+              | Journal your progress and enter any sensor data you want to record manually.
             
-            h2(class="page-heading-small", ng-show="(sharedDataService.activeDate.sensorLogs | filter:filterForJournalEntries).length > 0") Recent Logs
+            h2(class="page-heading-small", ng-show="(sharedDataService.recentTextLogs.length) > 0") Recent Logs
             ul
-              li(ng-repeat="log in sharedDataService.activeDate.sensorLogs | filter:filterForJournalEntries") {{log.journal}}
+              li(ng-repeat="log in sharedDataService.recentTextLogs")
+                p.text {{log.logs[0].val}}
+                div.tags(ng-repeat="tag in log.logs[0].tags")) {{tag}}}
 
           div(ng-controller="bpn.controllers.dashboard.ManualLogOverlay", modal="sharedDataService.activeOverlay=='ManualLogOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Log Entry
-              h4(class="page-heading-small") {{sharedDataService.activeDate.date | date:'shortDate'}}
+              h4(class="page-heading-small no-margin") {{sharedDataService.activeDate.date | date:'shortDate'}}
               
               div(data-bpn-directives-manual-entry-form, 
                   data-close="close",

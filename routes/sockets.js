@@ -235,11 +235,13 @@ module.exports = function(app){
                     .exec(function(err, deviceResult){
                       if (err) { return innerCallback(err);}
 
-                      deviceResult.getStatusResponse({}, function(err, deviceStatusResponse){
-                        var deviceStatus = deviceResult.toObject().status;
-                        deviceStatus.outputValues = deviceStatusResponse.states;
-                        return innerCallback(err, deviceStatus);
-                      });
+                      if(deviceResult) {
+                        deviceResult.getStatusResponse({}, function(err, deviceStatusResponse){
+                          var deviceStatus = deviceResult.toObject().status;
+                          deviceStatus.outputValues = deviceStatusResponse.states;
+                          return innerCallback(err, deviceStatus);
+                        });
+                      }
                     });
                   },
                   function getNotifications(innerCallback){
@@ -262,7 +264,7 @@ module.exports = function(app){
                   if (err) { return handleSocketError(err); }
 
                   var sensorLog = results[0][0],
-                      textLog = results[0][1],
+                      textLog = results[1][0],
                       deviceStatus = results[2],
                       notifications = results[3],
                       photos = results[4],

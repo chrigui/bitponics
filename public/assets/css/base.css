@@ -1234,16 +1234,12 @@ img.page-spinner.spinner {
 }
 @media  screen and (min-width: 50em) {
   .overlay {
-    position: fixed;
     top: 10%;
     left: 25%;
     width: 40%;
   }
 }
 @media  screen and (max-height: 50em) {
-  .overlay {
-    position: absolute;
-  }
 }
 /*
  * Grid

@@ -138,23 +138,21 @@ require([
            *
            * @return {Promise}
            */
-          sharedData.getTextLogsByDate = function (dateKey) {
-            var dateMoment = moment(dateKey),
-                deferred = $q.defer();
+          sharedData.getRecentTextLogs = function () {
+            var deferred = $q.defer();
 
             $http.get(
               '/api/gardens/' + sharedData.growPlanInstance._id + '/text-logs',
               {
                 params : {
-                  "start-date" : dateMoment.startOf("day").format(),
-                  "end-date" : dateMoment.endOf("day").format()
+                  "limit" : 3
                 }
               }
             )
             .success(function(data, status, headers, config) {
-              sharedData.dateDataCache[dateKey].textLogs = data.data;
+              sharedData.recentTextLogs = data.data;
               // sharedData.dateDataCache[dateKey].latestTextLogs = viewModels.initLatestSensorLogsViewModel(data.data);
-              sharedData.dateDataCache[dateKey].loaded = true;
+              sharedData.recentTextLogs.loaded = true;
               deferred.resolve(data);
             })
             .error(function(data, status, headers, config) {
@@ -215,6 +213,7 @@ require([
 
             socket.on('update', function(data){
               var sensorLog = data.sensorLog,
+                  textLog = data.textLog,
                   deviceStatus = data.deviceStatus,
                   notifications = data.notifications,
                   photos = data.photos,
@@ -226,11 +225,11 @@ require([
                 dateDataCache.sensorLogs.unshift(sensorLog);
                 dateDataCache.latestSensorLogs = viewModels.initLatestSensorLogsViewModel(dateDataCache.sensorLogs);
               }
+              console.log('textLog');
+              console.log(textLog);
               if (textLog){
                 textLog = textLog;
-                dateDataCache = sharedData.getDateDataCache(textLog.timestamp);
-                dateDataCache.textLogs.unshift(textLog);
-                // dateDataCache.textLogs = viewModels.initLatestSensorLogsViewModel(dateDataCache.sensorLogs);
+                sharedData.recentTextLogs.unshift(textLog);
               }
               if (deviceStatus) {
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
@@ -296,9 +295,12 @@ require([
             });
           }
 
-          
-          
+          /*
+           * Get recent text log entries
+           */
+          $scope.sharedDataService.getRecentTextLogs();
 
+          console.log($scope.sharedDataService.recentTextLogs);
           /**
            * Display data (sensor logs) for the provided date
            *
