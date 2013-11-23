@@ -30,8 +30,8 @@ block content
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code]") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
-            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code]") ----
+            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
+            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") ----
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
@@ -50,8 +50,8 @@ block content
                   div(class="overlay-data clearfix")
                     div.left
                       h4 Last Reading ({{sensor.unit}})
-                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}
-                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code]}}") ----
+                      div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
+                      div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") ----
                       h5.reading-time {{sharedDataService.activeDate.latestSensorLogs.timestamp | date:'short' }}
                     div.right(ng-show="idealRanges[sensor.code]")
                       h4 Ideal Range ({{sensor.unit}})
@@ -66,6 +66,7 @@ block content
                       data-sensor-unit="sensor.unit", 
                       data-sensor-code="sensor.code", 
                       data-sensor-logs="sharedDataService.activeDate.sensorLogs",
+                      data-close="close",
                       class="manual-entry-form")
                     
                     div(class="custom-checkbox-wrap")
@@ -74,9 +75,9 @@ block content
                         name="{{sensorCode}}_manual_entry_toggle")
                       label(ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
                     
-                    div(ng-show="manualEntryMode")
+                    div(ng-show="manualSensorEntryMode")
                       form(action="", ng-submit="submit()")
-                        input(ng-model="manualEntry", id="{{sensorCode}}_manual_input", size="5", class="display-ib")
+                        input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="display-ib half-width", type="number", step="any",required)
                         span  {{sensorUnit}}
                         input(type="submit", value="Record")
 
@@ -105,54 +106,90 @@ block content
                         
     
       div.content-module.side.separator-top
-        div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls")
-          h2.page-heading-small Accessories
-          div(ng-repeat="controlAction in sharedDataService.growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-            h3 {{controlAction.control.name}}
-            div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
-            div
-              div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
-                div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
-                  div(class="close btn", ng-click="close()")
-                    | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-                  h3(class="page-heading page-heading-small") {{controlAction.control.name}}
-                  div(class="overlay-data", ng-show="controlAction.baseCycle.states.length > 1")
-                    div(ng-show="controlAction.isDailyControlCycle")
+          div.manual-entry-container(ng-controller="bpn.controllers.dashboard.ManualLog")
 
-                      div.left
-                        h4 Turns on at
-                        div.separator-top {{controlAction.dailyOnTime | timeOfDayFromMilliseconds}}
-                      div.right
-                        h4 Turns off at
-                        div.separator-top {{controlAction.dailyOffTime | timeOfDayFromMilliseconds}}
-                    
-                    div(ng-hide="controlAction.isDailyControlCycle")
-                      div.left
-                        h4 {{controlAction.baseCycle.states[0].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[0].durationType}})
-                        div.separator-top {{controlAction.baseCycle.states[0].duration}}
-                      div.right
-                        h4 {{controlAction.baseCycle.states[1].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[1].durationType}})
-                        div.separator-top {{controlAction.baseCycle.states[1].duration}}
-                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length <= 1")
-                    h4 This control does not cycle.
-                  div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")
-                    h4 This cycle has been overridden.
-                  p.clear-b
-                    {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
-                  - if (userCanModify === true)
-                    div.separator-top
-                      a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
-                      a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
-                      a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
-                      img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+            button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log
+              | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            p(ng-hide="(sharedDataService.recentTextLogs.length) > 0")
+              | Journal your progress and enter any sensor data you want to record manually.
+            
+            h2(class="page-heading-small", ng-show="(sharedDataService.recentTextLogs.length) > 0") Recent Logs
+            ul
+              li(ng-repeat="log in sharedDataService.recentTextLogs")
+                p.text {{log.logs[0].val}}
+                div.tags(ng-repeat="tag in log.logs[0].tags")) {{tag}}}
 
-        div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications")
-          h2.page-heading-small Notifications
-          div(ng-repeat="notification in pastNotifications", class="past")
-            //- input(type="checkbox", model="notification._id", id="notification._id")
-            label(for="notification._id")
-              div.date {{notification.timeToSend | friendlyDate }}
-              div.title {{notification.displays.summary}}
+          div(ng-controller="bpn.controllers.dashboard.ManualLogOverlay", modal="sharedDataService.activeOverlay=='ManualLogOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3(class="page-heading page-heading-small") Log Entry
+              h4(class="page-heading-small no-margin") {{sharedDataService.activeDate.date | date:'shortDate'}}
+              
+              div(data-bpn-directives-manual-entry-form, 
+                  data-close="close",
+                  class="manual-entry-form",
+                  data-sensors="sharedDataService.sensors")
+
+                div
+                  form(action="", ng-submit="submit()")
+                    textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width")
+                    div(ng-repeat="sensor in sensors")
+                      input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="display-ib half-width", type="number", step="any")
+                      span  {{sensor.unit}}
+                    input(type="submit", value="Record")
+              
+            
+            
+
+          div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls", ng-hide="!sharedDataService.growPlanInstance.device") 
+            h2.page-heading-small Accessories
+            div(ng-repeat="controlAction in sharedDataService.growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+              h3 {{controlAction.control.name}}
+              div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
+              div
+                div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
+                  div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+                    div(class="close btn", ng-click="close()")
+                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                    h3(class="page-heading page-heading-small") {{controlAction.control.name}}
+                    div(class="overlay-data", ng-show="controlAction.baseCycle.states.length > 1")
+                      div(ng-show="controlAction.isDailyControlCycle")
+
+                        div.left
+                          h4 Turns on at
+                          div.separator-top {{controlAction.dailyOnTime | timeOfDayFromMilliseconds}}
+                        div.right
+                          h4 Turns off at
+                          div.separator-top {{controlAction.dailyOffTime | timeOfDayFromMilliseconds}}
+                      
+                      div(ng-hide="controlAction.isDailyControlCycle")
+                        div.left
+                          h4 {{controlAction.baseCycle.states[0].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[0].durationType}})
+                          div.separator-top {{controlAction.baseCycle.states[0].duration}}
+                        div.right
+                          h4 {{controlAction.baseCycle.states[1].controlValue | controlValueToWord}} cycle ({{controlAction.baseCycle.states[1].durationType}})
+                          div.separator-top {{controlAction.baseCycle.states[1].duration}}
+                    div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length <= 1")
+                      h4 This control does not cycle.
+                    div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")
+                      h4 This cycle has been overridden.
+                    p.clear-b
+                      {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
+                    - if (userCanModify === true)
+                      div.separator-top
+                        a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
+                        a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
+                        a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
+                        img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+
+          div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications", ng-hide="!sharedDataService.growPlanInstance.device")
+            h2.page-heading-small Notifications
+            div(ng-repeat="notification in pastNotifications", class="past")
+              //- input(type="checkbox", model="notification._id", id="notification._id")
+              label(for="notification._id")
+                div.date {{notification.timeToSend | friendlyDate }}
+                div.title {{notification.displays.summary}}
           
 
   svg(height='0')

@@ -190,6 +190,34 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
   /**
+   * 
+   *
+   * 
+   */
+  viewModels.initLatestSensorLogsViewModel = function (sensorLogViewModel){
+    var sensorDataObj = utils.getSensorCodesAndBaseUnit(bpn.pageData.sensors);
+    console.log('sensorLogViewModel', sensorLogViewModel);
+    sensorLogViewModel.some(function(sensorLog){
+      Object.keys(sensorDataObj).forEach(function(code){
+        if(sensorDataObj[code].val == null && sensorLog[code] != null){
+          sensorDataObj[code].val = sensorLog[code];
+          sensorDataObj[code].timestamp = sensorLog.timestamp;
+        }
+      });
+      Object.keys(sensorDataObj).every(function(code){
+        // console.log('[every] sensorDataObj[code].val', sensorDataObj[code].val);
+        // console.log('[every] code', code);
+        // console.log('[every] sensorDataObj[code]', sensorDataObj[code]);
+        return sensorDataObj[code].val != null;
+      });
+    });
+
+    // console.log('sensorDataObj', sensorDataObj);
+    return sensorDataObj;
+  };
+
+
+  /**
    * Adds/calculates properties necessary for UI presentation
    *
    * Converts sensor readings array to a hash, keyed by sensor code

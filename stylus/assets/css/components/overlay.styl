@@ -1,13 +1,17 @@
+@import "helpers"
+@import "./global/breakpoints"
+
 .overlay
-	// position absolute
-	position fixed
-	top 5%
+	position absolute
+	height auto
 	left 5%
 	right 5%
+	// top 10%
+	// left 25%
 	background white
 	border 3px solid color-border-gray
 	width 90%
-	height 90%
+	// height 90%
 	// min-height 720px
 	z-index 1050
 	overflow scroll
@@ -89,3 +93,15 @@
 	&.dead-end
 		.close
 			display none
+
+@media $mq_large
+	.overlay
+		// position fixed
+		top 10%
+		left 25%
+		width 40%
+
+@media $mq_small_height
+	.overlay
+		// position: absolute;
+		

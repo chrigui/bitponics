@@ -70,19 +70,7 @@ var SensorLogSchema = new Schema({
     /**
      * logs
      */
-    l : [ SensorReadingSchema ],
-
-    /*
-     * Type of log: manual vs. device
-     */
-    t: { 
-      type: String,
-      enum : [
-        feBeUtils.sensorLogTypes.MANUAL,
-        feBeUtils.sensorLogTypes.DEVICE,
-        feBeUtils.sensorLogTypes.EXTERNAL
-      ]
-    }
+    l : [ SensorReadingSchema ]
 },
 { id : false });
 
@@ -110,13 +98,6 @@ SensorLogSchema.virtual('timestamp')
     this.ts = timestamp;
   });
 
-SensorLogSchema.virtual('type')
-  .get(function () {
-    return this.t;
-  })
-  .set(function(type){
-    this.t = type;
-  });
 
 /*************** SERIALIZATION *************************/
 

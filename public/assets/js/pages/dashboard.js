@@ -122,9 +122,37 @@ require([
             )
             .success(function(data, status, headers, config) {
               sharedData.dateDataCache[dateKey].sensorLogs = viewModels.initSensorLogsViewModel(data.data);
-              sharedData.dateDataCache[dateKey].latestSensorLogs = data.data[0];
-              console.log(sharedData.dateDataCache[dateKey].latestSensorLogs)
+              sharedData.dateDataCache[dateKey].latestSensorLogs = viewModels.initLatestSensorLogsViewModel(data.data);
               sharedData.dateDataCache[dateKey].loaded = true;
+              deferred.resolve(data);
+            })
+            .error(function(data, status, headers, config) {
+              deferred.reject(data);
+            });
+
+            return deferred.promise;
+          };
+
+          /**
+           * Returns a an angular promise
+           *
+           * @return {Promise}
+           */
+          sharedData.getRecentTextLogs = function () {
+            var deferred = $q.defer();
+
+            $http.get(
+              '/api/gardens/' + sharedData.growPlanInstance._id + '/text-logs',
+              {
+                params : {
+                  "limit" : 3
+                }
+              }
+            )
+            .success(function(data, status, headers, config) {
+              sharedData.recentTextLogs = data.data;
+              // sharedData.dateDataCache[dateKey].latestTextLogs = viewModels.initLatestSensorLogsViewModel(data.data);
+              sharedData.recentTextLogs.loaded = true;
               deferred.resolve(data);
             })
             .error(function(data, status, headers, config) {
@@ -185,15 +213,23 @@ require([
 
             socket.on('update', function(data){
               var sensorLog = data.sensorLog,
+                  textLog = data.textLog,
                   deviceStatus = data.deviceStatus,
                   notifications = data.notifications,
                   photos = data.photos,
                   dateDataCache;
+              console.log('sensorLog coming from update?', sensorLog);
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
                 dateDataCache = sharedData.getDateDataCache(sensorLog.timestamp);
-                dateDataCache.sensorLogs.push(sensorLog);
-                dateDataCache.latestSensorLogs = sensorLog;
+                dateDataCache.sensorLogs.unshift(sensorLog);
+                dateDataCache.latestSensorLogs = viewModels.initLatestSensorLogsViewModel(dateDataCache.sensorLogs);
+              }
+              console.log('textLog');
+              console.log(textLog);
+              if (textLog){
+                textLog = textLog;
+                sharedData.recentTextLogs.unshift(textLog);
               }
               if (deviceStatus) {
                 viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
@@ -235,8 +271,8 @@ require([
         'sharedDataService',
         function ($scope, $http, $q, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
-          $scope.controls = bpn.controls;
-          $scope.sensors = bpn.sensors;
+          $scope.controls = bpn.pageData.controls;
+          $scope.sensors = bpn.pageData.sensors;
           
           
 
@@ -259,9 +295,12 @@ require([
             });
           }
 
-          
-          
+          /*
+           * Get recent text log entries
+           */
+          $scope.sharedDataService.getRecentTextLogs();
 
+          console.log($scope.sharedDataService.recentTextLogs);
           /**
            * Display data (sensor logs) for the provided date
            *
@@ -365,9 +404,9 @@ require([
               sensorTimestamp;
 
             if (sensorLog){
-               sensorValue = sensorLog[sensorCode];
-               sensorTimestamp = sensorLog.timestamp;
-               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog.timestamp));
+               sensorValue = sensorLog[sensorCode].val;
+               sensorTimestamp = sensorLog[sensorCode].timestamp;
+               idealRange = $scope.getIdealRangeForSensor(sensor, new Date(sensorLog[sensorCode].timestamp));
             }
 
             // Determine whether we need to add the "warning" class
@@ -599,7 +638,7 @@ require([
       ]
     );
 
-    dashboardApp.controller('bpn.controllers.dashboardApp.ControlOverlay',
+    dashboardApp.controller('bpn.controllers.dashboard.ControlOverlay',
       [
         '$scope',
         '$http',
@@ -628,6 +667,47 @@ require([
             .error(function(data, status, headers, config) {
             });
           }
+        }
+      ]
+    );
+    
+    dashboardApp.controller('bpn.controllers.dashboard.ManualLog',
+      [
+        '$scope',
+        '$http',
+        'sharedDataService',
+        function($scope, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.filterForJournalEntries = function(log){
+            return !!log['journal'] && log['journal'].length > 0;
+          };
+
+          $scope.getRecentJournalEntries = function(){
+
+            for (var i = 0; i < 5; i++) {
+              // var  = sharedDataService.getSensorLogsByDate();
+
+            }
+          };
+
+        }
+      ]
+    );
+
+    dashboardApp.controller('bpn.controllers.dashboard.ManualLogOverlay',
+      [
+        '$scope',
+        '$http',
+        'sharedDataService',
+        function($scope, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.manualSensorEntryMode = true;
+          $scope.sensors = bpn.pageData.sensors;
+          
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
         }
       ]
     );
@@ -903,8 +983,6 @@ require([
           // well as populated scope to work with
           // element is a jQuery wrapper on the element
 
-          console.log(scope.sensorCode);
-          console.log(scope.sensorLogs);
           var sensorReadings = scope.sensorLogs.map(function(sensorLog){
             return sensorLog[scope.sensorCode];
           });
@@ -912,7 +990,6 @@ require([
             return (typeof sensorReading === 'number');
           });
           sensorReadings = sensorReadings.reverse();
-          console.log(sensorReadings);
           
           if (!sensorReadings.length){
             element.hide();
@@ -961,21 +1038,25 @@ require([
         restrict : "EA",
         replace : true,
         scope : {
-          sensorUnit : "=",
-          sensorCode : "=",
-          sensorLogs : "="
+          sensorUnit : "=?",
+          sensorCode : "=?",
+          sensors : "=?",
+          close : "=?",
+          manualSensorEntry : "=?",
+          manualTextEntry : "=?"
         },
         // template : '<div class="manual-entry-form {{sensorCode}}"></div>',
         controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
           $scope.sharedDataService = sharedDataService;
 
-          // $scope.sharedDataService.manualEntryMode = false;
-          $scope.manualEntryMode = false;
+          $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
+          $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
+          $scope.manualSensorEntryMode = false;
           
           $scope.toggleManualEntry = function(){
-            $scope.manualEntryMode = $scope.manualEntryMode ? false : true;
+            $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
             if ($scope.sharedDataService) {
-              $scope.sharedDataService.manualEntryMode = $scope.manualEntryMode;
+              $scope.sharedDataService.manualSensorEntryMode = $scope.manualSensorEntryMode;
             }
           };
 
@@ -984,34 +1065,75 @@ require([
           };
 
           $scope.submit = function(){
-            if ($scope.manualEntryMode != '') {
-              console.log('$scope.manualEntry', $scope.manualEntry);
-              console.log('should validate here');
+            var valid = true,
+                sensorDataObj = {},
+                textDataObj = {},
+                sensors = Object.keys($scope.manualSensorEntry),
+                text = $scope.manualTextEntry,
+                sensorlogsArray = [];
+
+            for (var i = 0; i < sensors.length; i++) {
+              if ($scope.manualSensorEntry[sensors[i]]) {
+                console.log($scope.manualSensorEntry[sensors[i]]);
+                // $scope.manualSensorEntryMode[$scope.sensorCode] != '' && angular.isNumber(parseFloat($scope.manualSensorEntry))
+
+                //construct sensor logs array for dataObj
+                sensorlogsArray.push({
+                  val: $scope.manualSensorEntry[sensors[i]],
+                  sCode: sensors[i]
+                });
+              }
+            }
+
+            //construct sensorDataObj for server
+            sensorDataObj = {
+              sensorLog: {
+                gpi: $scope.sharedDataService.growPlanInstance._id,
+                timestamp: new Date(),
+                logs: sensorlogsArray
+              }
+            };
+
+            //construct textDataObj for server
+            textDataObj = {
+              textLog: {
+                gpi: $scope.sharedDataService.growPlanInstance._id,
+                timestamp: new Date(),
+                logs: [{
+                  val: text,
+                  tags: []
+                }]
+              }
+            };
+            
+            if (valid) {
               $http({
                 method: 'post',
                 headers: {
                   'bpn-manual-log-entry': 'true'
                 },
                 url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
-                data: {
-                  sensorLog: {
-                    gpi: $scope.sharedDataService.growPlanInstance._id,
-                    timestamp: new Date(),
-                    logs: [
-                      {
-                        val: $scope.manualEntry,
-                        sCode: $scope.sensorCode
-                      }
-                    ],
-                    type: 'manual'
-                  }
-                }
+                data: sensorDataObj
               })
               .success(function(data, status, headers, config) {
-                console.log('success')
+                console.log('success');
+                if ($scope.close) $scope.close();
               })
               .error(function(data, status, headers, config) {
-                console.log('error')
+                console.log('error');
+
+              });
+
+              $http({
+                method: 'post',
+                url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/text-logs',
+                data: textDataObj
+              })
+              .success(function(data, status, headers, config) {
+                console.log('success');
+              })
+              .error(function(data, status, headers, config) {
+                console.log('error');
               });
             }
           };
@@ -1019,11 +1141,26 @@ require([
         },
         link: function (scope, element, attrs, controller) { 
           console.log('scope.manualEntryMode', scope.manualEntryMode);
-          console.log('scope.sensorUnit', scope.sensorCode);
-          console.log('scope.sensorCode', scope.sensorCode);
-          console.log('scope.sensorLogs', scope.sensorLogs);
         }
       }
+    });
+
+    dashboardApp.directive('smartFloat', function() {
+      return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+          ctrl.$parsers.unshift(function(viewValue) {
+            var FLOAT_REGEXP = /^\-?\d+((\.|\,)\d+)?$/;
+            if (FLOAT_REGEXP.test(viewValue)) {
+              ctrl.$setValidity('float', true);
+              return parseFloat(viewValue.replace(',', '.'));
+            } else {
+              ctrl.$setValidity('float', false);
+              return undefined;
+            }
+          });
+        }
+      };
     });
 
     dashboardApp.filter('controlValueToWord', function() {
