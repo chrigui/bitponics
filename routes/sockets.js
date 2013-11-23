@@ -3,6 +3,7 @@ var DeviceModel = require('../models/device').model,
     CalibrationLogModel = require('../models/calibrationLog').model,
     GrowPlanInstanceModel = require('../models/growPlanInstance').model,
     SensorLogModel = require('../models/sensorLog').model,
+    TextLogModel = require('../models/textLog').model,
     NotificationModel = require('../models/notification').model,
     UserModel = require('../models/user').model,
     PhotoModel = require('../models/photo').model,
@@ -205,6 +206,14 @@ module.exports = function(app){
                     .limit(1)
                     .exec(innerCallback);
                   },
+                  function getTextLogs(innerCallback){
+                    TextLogModel.find({
+                      gpi : growPlanInstanceId,
+                      ts : { $gte : lastChecked }
+                    })
+                    .limit(1)
+                    .exec(innerCallback);
+                  },
                   function getDeviceStatus(innerCallback){
                     if (!growPlanInstance.device){
                       return innerCallback();
@@ -253,15 +262,19 @@ module.exports = function(app){
                   if (err) { return handleSocketError(err); }
 
                   var sensorLog = results[0][0],
-                      deviceStatus = results[1],
-                      notifications = results[2],
-                      photos = results[3],
+                      textLog = results[0][1],
+                      deviceStatus = results[2],
+                      notifications = results[3],
+                      photos = results[4],
                       responseData;
 
-                  if (sensorLog || deviceStatus || notifications.length){
+                  if (sensorLog || textLog || deviceStatus || notifications.length){
                     responseData = {};
                     if (sensorLog){
                       responseData.sensorLog = sensorLog;
+                    }
+                    if (textLog){
+                      responseData.textLog = textLog;
                     }
                     if (deviceStatus){
                       responseData.deviceStatus = deviceStatus;

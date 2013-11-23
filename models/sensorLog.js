@@ -70,13 +70,7 @@ var SensorLogSchema = new Schema({
     /**
      * logs
      */
-    l : [ SensorReadingSchema ],
-
-    /*
-     * Journal entry
-     * Allows for free-form text to be attached to sensor updates
-     */
-    j: { type: String }
+    l : [ SensorReadingSchema ]
 },
 { id : false });
 
@@ -104,13 +98,6 @@ SensorLogSchema.virtual('timestamp')
     this.ts = timestamp;
   });
 
-SensorLogSchema.virtual('journal')
-  .get(function () {
-    return this.j;
-  })
-  .set(function(journal){
-    this.j = journal;
-  });
 
 /*************** SERIALIZATION *************************/
 

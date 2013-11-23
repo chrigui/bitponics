@@ -163,9 +163,9 @@ var GrowPlanInstanceSchema = new Schema({
 	recentSensorLogs: [SensorLogSchema],
 	
 	/**
-	 * Tag Logs for the past 24 hours
+	 * Text Logs for the past 24 hours
 	 */
-	recentTagLogs: [{
+	recentTextLogs: [{
 		ts: { type: Date, required: true, default: Date.now },
 		logs : [{
 			val: { type: String, required: true },
@@ -989,7 +989,7 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
 
-	this.recentTagLogs.forEach(function(log){
+	this.recentTextLogs.forEach(function(log){
 		if (log.ts < cutoff) { logsToRemove.push(log); }
 	});
 
