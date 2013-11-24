@@ -225,9 +225,7 @@ module.exports = function(app) {
       // cap the limit at 200
       if (limit > 200) { limit = 200; }
 
-    	query.sort('-ts');
-    	query.select('ts l'); // don't need to get the gpi in this query. already know it!
-
+    	
     	// TODO : Localize start/end date based on owner's timezone?
       if (startDate){
     		startDate = moment(startDate).toDate();
@@ -242,14 +240,21 @@ module.exports = function(app) {
     	}
 
     	query.count(function(err, count){
-    		if (err) { return next(err); }
+  		  if (err) { return next(err); }
 
-    		query.limit(limit);
+    	  // Cast the query to a find() operation so we can limit/skip/sort/select
+        query.find();
+
+      	query.limit(limit);
     		if (skip){
     			query.skip(skip);
     		}
 
-    		query.find().exec(function(err, sensorLogResults){
+        // Sort & field selection have to occur outside of a .count()
+        query.sort('-ts');
+        query.select('ts l'); // don't need to get the gpi in this query. already know it!
+
+    		query.exec(function(err, sensorLogResults){
     			if (err) { return next(err);}
 
     			response.data = sensorLogResults;//sensorLogResults.map(function(sensorLog){ return sensorLog.toObject(); });
@@ -354,9 +359,7 @@ module.exports = function(app) {
       // cap the limit at 200
       if (limit > 200) { limit = 200; }
 
-      query.sort('-ts');
-      query.select('ts l'); // don't need to get the gpi in this query. already know it!
-
+      
       // TODO : Localize start/end date based on owner's timezone?
       if (startDate){
         startDate = moment(startDate).toDate();
@@ -370,12 +373,19 @@ module.exports = function(app) {
       query.count(function(err, count){
         if (err) { return next(err); }
 
+        // Cast the query to a find() operation so we can limit/skip/sort/select
+        query.find();
+
         query.limit(limit);
         if (skip){
           query.skip(skip);
         }
 
-        query.find().exec(function(err, textLogResults){
+        // Sort & field selection have to occur outside of a .count()
+        query.sort('-ts');
+        query.select('ts l'); // don't need to get the gpi in this query. already know it!
+
+        query.exec(function(err, textLogResults){
           if (err) { return next(err);}
 
           response.data = textLogResults;
