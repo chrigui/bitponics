@@ -211,7 +211,7 @@ module.exports = function(app){
 				};
 
 		GrowPlanInstanceModel.find()
-		.select('owner _id device active startDate')
+		.select('owner _id device active startDate name')
 		.populate('owner', '_id name')
 		.exec(function(err, growPlanInstanceResults){
 			if (err) { return next(err);}
