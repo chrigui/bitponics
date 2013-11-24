@@ -222,4 +222,21 @@ module.exports = function(app){
 	});
 
 
+  app.get('/admin/grow-plans', function(req, res, next){
+    var GrowPlanModel = require('../models/growPlan').growPlan.model,
+        locals = {
+          title: 'Bitponics Admin | Grow Plans',
+          growPlans : []
+        };
+
+    GrowPlanModel.find()
+    .select('createdBy _id name active activeGardenCount')
+    .populate('createdBy', '_id name')
+    .exec(function(err, growPlanResults){
+      if (err) { return next(err);}
+
+      locals.growPlans = growPlanResults;
+      res.render('admin/grow-plans', locals);
+    });
+  });
 };

@@ -289,16 +289,16 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     function(err, results){
       if (err) { return callback(err); }
 
-      gpi.save(function(err, createdGrowPlan){
+      gpi.save(function(err, createdGarden){
         if (err) { return callback(err); }
 
-        winston.info('Created new gpi for user ' + createdGrowPlan.owner + ' gpi id ' + createdGrowPlan._id);
+        winston.info('Created new gpi for user ' + createdGarden.owner + ' gpi id ' + createdGarden._id);
        
         if (!options.active){
-          return callback(err, createdGrowPlan);
+          return callback(err, createdGarden);
         }
          
-        return createdGrowPlan.activate({ 
+        return createdGarden.activate({ 
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
@@ -480,6 +480,7 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
  * @param {ObjectId|string=} options.activePhaseId : optional. The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance. If not present,
  *                                                   the first phase will be activated.
  * @param {Number=}          options.activePhaseDay : optional. Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
+ * @param {function(err, gpi)} callback
  */
 GrowPlanInstanceSchema.method('activate', function(options, callback) {
 	var gpi = this,
@@ -507,7 +508,14 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           gpiWithActivePhase.pairWithDevice({
             deviceId : getDocumentIdString(gpiWithActivePhase.device)
           },
-          innerCallback);
+          function(err, pairResult){
+            return innerCallback(err, pairResult ? pairResult.growPlanInstance : undefined);
+          });
+        },
+        function incrementGrowPlanActivationCount(activatedGPI, innerCallback){
+          GrowPlanModel.findByIdAndUpdate(activatedGPI.growPlan, { $inc: { activeGardenCount: 1 }}, function (err) {
+            return innerCallback(err, activatedGPI);
+          });
         }
       ],
       function(err, activatedGPI){

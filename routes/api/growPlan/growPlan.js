@@ -1,4 +1,5 @@
 var GrowPlanModel = require('../../../models/growPlan').growPlan.model,
+    GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
     ActionModel = require('../../../models/action').model,
     UserModel = require('../../../models/user').model,
     LightFixtureModel = require('../../../models/lightFixture').model,
@@ -186,6 +187,30 @@ module.exports = function(app) {
         return res.send(growPlanResult);
       });
 	  }
+  );
+
+
+  /*
+   * Get number of gardens using Grow Plan, optionally forcing a refresh of the count calculation
+   *
+   * @param req.forceRefresh {bool}
+   */
+  app.get('/api/grow-plans/:id/active-garden-count', 
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      
+      if (req.params.forceRefresh){
+
+      }
+      // TEMP: for now, always recalculate
+      GrowPlanInstanceModel.count({ growPlan : req.params.id, active : true }, function(err, count){
+        if (err) { return next(err); }
+        GrowPlanModel.findByIdAndUpdate(req.params.id, { activeGardenCount : count }, function(err){
+          if (err) { return next(err); }
+          return res.send({ activeGardenCount : count});
+        });
+      });
+    }
   );
 
   

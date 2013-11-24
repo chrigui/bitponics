@@ -46,6 +46,8 @@ GrowPlanSchema = new Schema({
 	
 
   phases: [PhaseSchema],
+
+  activeGardenCount : { type : Number, default : 0 },
 	
   
   visibility : { 
