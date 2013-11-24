@@ -1,7 +1,7 @@
 var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  TagLog = require('../../../models/tagLog'),
+  TextLog = require('../../../models/textLog'),
   should = require('should');
 
 
@@ -16,10 +16,10 @@ var mongooseConnection = require('../../../config/mongoose-connection').open('te
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('TagLog', function(){
+describe('TextLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new TagLog.model({
+    var log = new TextLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
@@ -51,7 +51,7 @@ describe('TagLog', function(){
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new TagLog.model({
+    var log = new TextLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [

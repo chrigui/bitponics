@@ -56,7 +56,7 @@ var TextLogSchema = new Schema({
 },
 { id : false });
 
-TagLogSchema.plugin(mongoosePlugins.recoverableRemove);
+TextLogSchema.plugin(mongoosePlugins.recoverableRemove);
 
 TextLogSchema.virtual('logs')
   .get(function(){
