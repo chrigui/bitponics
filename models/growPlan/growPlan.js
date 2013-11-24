@@ -46,6 +46,8 @@ GrowPlanSchema = new Schema({
 	
 
   phases: [PhaseSchema],
+
+  activeGardenCount : { type : Number, default : 0 },
 	
   
   visibility : { 
@@ -60,6 +62,7 @@ GrowPlanSchema = new Schema({
 { id : false });
 
 GrowPlanSchema.plugin(useTimestamps);
+GrowPlanSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /************************** VIRTUALS ***************************/

@@ -26,7 +26,7 @@ var NutrientSchema = new Schema({
 { id : false });
 
 NutrientSchema.plugin(useTimestamps);
-
+NutrientSchema.plugin(mongoosePlugins.recoverableRemove);
 
 /*********************** STATIC METHODS **************************/
 

@@ -1,7 +1,7 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  HarvestLog = require('../../models/harvestLog'),
+  TagLog = require('../../../models/tagLog'),
   should = require('should');
 
 
@@ -16,16 +16,16 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
  * your code should be done executing so Mocha runs to test properly.
  */
 
-describe('HarvestLog', function(){
+describe('TagLog', function(){
 
   it('uses only friendly property names in toObject result', function(){
-    var log = new HarvestLog.model({
+    var log = new TagLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          plant : "50749839ab364e2a9fffd4f0", // dill
-          weight : 10 // grams
+          val : "my garden journal entry",
+          tags: ["journal"]
         }
       ]
     });
@@ -41,22 +41,23 @@ describe('HarvestLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      log.should.not.have.property('p');
-      log.should.not.have.property('w');
-      log.should.have.property('plant');
-      log.should.have.property('weight');
+      log.should.not.have.property('v');
+      log.should.not.have.property('t');
+      log.should.have.property('val');
+      log.should.have.property('tags');
+      log.tags.should.include("journal");
     });
 
   });
 
   it('uses only friendly property names in toJSON result', function(){
-    var log = new HarvestLog.model({
+    var log = new TagLog.model({
       gpi : new ObjectID(),
       ts : Date.now(),
       logs : [
         {
-          plant : "50749839ab364e2a9fffd4f0", // dill
-          weight : 10 // grams
+          val : "my garden journal entry",
+          tags: ["journal"]
         }
       ]
     });
@@ -72,10 +73,11 @@ describe('HarvestLog', function(){
     result.should.have.property('timestamp');
 
     result.logs.forEach(function(log){
-      log.should.not.have.property('p');
-      log.should.not.have.property('w');
-      log.should.have.property('plant');
-      log.should.have.property('weight');
+      log.should.not.have.property('v');
+      log.should.not.have.property('t');
+      log.should.have.property('val');
+      log.should.have.property('tags');
+      log.tags.should.include("journal");
     });
   });
 

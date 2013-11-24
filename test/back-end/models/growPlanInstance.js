@@ -1,16 +1,24 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
-GrowPlanInstance = require('../../models/growPlanInstance').model,
-GrowPlan = require('../../models/growPlan').growPlan.model,
-Device = require('../../models/device').model,
+Models = require('../../../models'),
+GrowPlanInstance = require('../../../models/growPlanInstance').model,
+GrowPlan = require('../../../models/growPlan').growPlan.model,
+Device = require('../../../models/device').model,
 should = require('should'),
-sampleGrowPlanInstances = require('../../utils/db_init/seed_data/growPlanInstances'),
+sampleGrowPlanInstances = require('../../../utils/db_init/seed_data/growPlanInstances'),
 async = require('async'),
-requirejs = require('../../lib/requirejs-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
+
+var createInstance = function(callback){
+  GrowPlanInstance.create({
+    growPlan : '506de2ff8eebf7524342cb3a',
+    owner : '506de30a8eebf7524342cb6c',
+    active : false
+  }, callback);
+};
 
 /*
  * Mocha Test
@@ -45,6 +53,9 @@ feBeUtils = requirejs('fe-be-utils');
     });
 
 
+    require('../shared-tests').remove(GrowPlanInstance, createInstance);
+
+    
     describe('.create', function(){
       
       it('returns an error if options.growPlan is not specified', function(done){

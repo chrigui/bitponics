@@ -211,7 +211,7 @@ module.exports = function(app){
 				};
 
 		GrowPlanInstanceModel.find()
-		.select('owner _id device active startDate')
+		.select('owner _id device active startDate name')
 		.populate('owner', '_id name')
 		.exec(function(err, growPlanInstanceResults){
 			if (err) { return next(err);}
@@ -222,4 +222,21 @@ module.exports = function(app){
 	});
 
 
+  app.get('/admin/grow-plans', function(req, res, next){
+    var GrowPlanModel = require('../models/growPlan').growPlan.model,
+        locals = {
+          title: 'Bitponics Admin | Grow Plans',
+          growPlans : []
+        };
+
+    GrowPlanModel.find()
+    .select('createdBy _id name active activeGardenCount')
+    .populate('createdBy', '_id name')
+    .exec(function(err, growPlanResults){
+      if (err) { return next(err);}
+
+      locals.growPlans = growPlanResults;
+      res.render('admin/grow-plans', locals);
+    });
+  });
 };

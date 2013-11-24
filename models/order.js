@@ -49,6 +49,7 @@ var OrderItemSchema = new Schema(
   { id : false }
 );
 
+OrderItemSchema.plugin(mongoosePlugins.recoverableRemove);
 
 OrderItemSchema.virtual('subtotal')
   .get(function(){

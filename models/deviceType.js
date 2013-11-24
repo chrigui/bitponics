@@ -36,6 +36,7 @@ var DeviceTypeSchema = new Schema({
 { id : false });
 
 DeviceTypeSchema.plugin(useTimestamps);
+DeviceTypeSchema.plugin(mongoosePlugins.recoverableRemove);
 
 exports.schema = DeviceTypeSchema;
 exports.model = mongooseConnection.model('DeviceType', DeviceTypeSchema);

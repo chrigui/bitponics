@@ -25,6 +25,7 @@ var PlantSchema = new Schema({
 { id : false });
 
 PlantSchema.plugin(useTimestamps);
+PlantSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /*********************** STATIC METHODS **************************/

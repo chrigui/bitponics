@@ -15,6 +15,7 @@ var ControlSchema = new Schema({
 { id : false });
 
 ControlSchema.plugin(useTimestamps);
+ControlSchema.plugin(mongoosePlugins.recoverableRemove);
 
 exports.schema = ControlSchema;
 exports.model = mongooseConnection.model('Control', ControlSchema);

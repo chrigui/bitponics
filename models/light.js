@@ -29,6 +29,7 @@ var LightSchema = new Schema({
 { id : false });
 
 LightSchema.plugin(useTimestamps);
+LightSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /*********************** STATIC METHODS **************************/

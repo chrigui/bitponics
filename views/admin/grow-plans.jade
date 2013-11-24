@@ -1,0 +1,37 @@
+extends ../layout
+
+block head
+	mixin requirejs("/assets/js/pages/admin/grow-plans")
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading All Gardens
+		div.separator-top(ng-cloak, ng-controller="bpn.controllers.admin.growPlans.Main")
+			ul(class="block-info-set grid content-module") 
+				li(ng-repeat="growPlan in growPlans", ng-click="")
+					div.first
+						h5.label Name
+						div.value {{growPlan.name}}
+					div
+						h5.label Created By
+						div.value.ww-break-word {{growPlan.createdBy.name.full}}
+					div
+						h5.label ID
+						div.value.ww-break-word {{growPlan._id}}
+					div
+						h5.label Active Garden Count
+						div.value.ww-break-word {{growPlan.activeGardenCount}}
+					a.btn(href="/grow-plans/{{growPlan._id}}") Details Page
+					a.btn(ng-click="refreshActiveGardenCount(growPlan)") Refresh Active Garden Count
+					a.btn(ng-click="delete(growPlan)") Delete
+
+
+block footer-scripts
+	script
+		bpn.pageData.growPlans = !{JSON.stringify(growPlans)};

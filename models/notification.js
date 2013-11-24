@@ -32,7 +32,7 @@ Object.keys(feBeUtils.NOTIFICATION_TRIGGERS).forEach(function(key){
     compiledNotificationTemplates[keyValue][templateType] = ejs.compile(fs.readFileSync(path.join(notificationTemplateDirectory, keyValue, templateType + ".ejs"), 'utf8'));
     //console.log("COMPLETED COMPILING " + keyValue + " " + templateType);
   });
-});;
+});
 
 
 /*************** Validate ******************************/
@@ -252,7 +252,7 @@ var NotificationSchema = new Schema({
 { id : false });
 
 NotificationSchema.plugin(useTimestamps);
-
+NotificationSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 NotificationSchema.virtual('users')

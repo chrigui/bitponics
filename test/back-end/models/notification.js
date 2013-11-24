@@ -1,11 +1,11 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  Notification = require('../../models/notification'),
-  Device = require('../../models/device'),
+  Notification = require('../../../models/notification'),
+  Device = require('../../../models/device'),
   should = require('should'),
   async = require('async'),
-  requirejs = require('../../lib/requirejs-wrapper'),
+  requirejs = require('../../../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils');
 
 

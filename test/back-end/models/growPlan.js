@@ -1,18 +1,25 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
+Models = require('../../../models'),
 GrowPlan = Models.growPlan,
-PhaseSchema = require('../../models/growPlan').phase.schema,
+PhaseSchema = require('../../../models/growPlan').phase.schema,
 DeviceModel = Models.device,
 NotificationModel = Models.notification,
 ModelUtils = Models.utils,
 should = require('should'),
-sampleGrowPlans = require('../../utils/db_init/seed_data/growPlans'),
+sampleGrowPlans = require('../../../utils/db_init/seed_data/growPlans'),
 async = require('async'),
-requirejs = require('../../lib/requirejs-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
+
+var createInstance = function(callback){
+  GrowPlan.create({
+    name : Date.now().toString(),
+    description : Date.now().toString()
+  }, callback);
+};
 
 /*
  * Mocha Test
@@ -45,6 +52,9 @@ feBeUtils = requirejs('fe-be-utils');
     afterEach(function(done){
     	done();
     });
+
+
+    require('../shared-tests').remove(GrowPlan, createInstance);
 
 
     describe('#getPhaseAndDayFromStartDay(numberOfDays)', function(){
@@ -772,7 +782,11 @@ feBeUtils = requirejs('fe-be-utils');
                               if (phaseIterator === 0){
                                 isEquivalent.should.equal(false, "first phase should not be equivalent");
 
-                                fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions[fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions.length - 1].description.should.equal(newAction.description)
+                                var hasNewAction = fullyPopulatedValidatedGrowPlan.phases[phaseIterator].actions.some(function(action){
+                                  return action.description === newAction.description;
+                                });
+
+                                hasNewAction.should.equal(true, "newAction should exist in action array");
                               } else {
                                 isEquivalent.should.equal(true, "other phases should be equivalent");  
                               }

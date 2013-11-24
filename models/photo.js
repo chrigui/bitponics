@@ -52,6 +52,7 @@ var PhotoSchema = new Schema({
 
 PhotoSchema.plugin(mongoosePlugins.useTimestamps);
 PhotoSchema.plugin(mongoosePlugins.visibility);
+PhotoSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 PhotoSchema.index({ 'gpi' : 1, 'date': -1 });

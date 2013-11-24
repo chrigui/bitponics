@@ -1,15 +1,21 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
-Device = require('../../models/device'),
+Models = require('../../../models'),
+Device = require('../../../models/device'),
 DeviceModel = Device.model,
 ModelUtils = Models.utils,
 should = require('should'),
-timezone = require('../../lib/timezone-wrapper'),
-requirejs = require('../../lib/requirejs-wrapper'),
+timezone = require('../../../lib/timezone-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
+var createInstance = function(callback){
+  DeviceModel.create({
+    _id : (Date.now()).toString().substr(1), // need a 12-digit rando
+    serial : (Date.now()).toString()
+  }, callback);
+};
 
 /*
  * Mocha Test
@@ -42,6 +48,9 @@ feBeUtils = requirejs('fe-be-utils');
     afterEach(function(done){
     	done();
     });
+
+    
+    require('../shared-tests').remove(DeviceModel, createInstance);
 
 
     describe('#refreshStatus', function(){
@@ -146,7 +155,8 @@ feBeUtils = requirejs('fe-be-utils');
         DeviceModel.findById("0006667211cf")
         .exec(function(err, deviceResult){
           should.not.exist(err);
-
+          should.exist(deviceResult);
+          
           deviceResult.getStatusResponse(
             {
               date : next7am

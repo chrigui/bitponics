@@ -9,7 +9,13 @@ define([
 				'$resource', 
 				function ($resource) {
 					return $resource('/api/grow-plans/:id', 
-						{ id: '@_id'}
+						{ id: '@_id'},
+            {
+              refreshActiveGardenCount: { 
+                method: 'GET', 
+                url: '/api/grow-plans/:id/active-garden-count'
+              }
+            }
 					);
 				}
 			]

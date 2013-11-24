@@ -14,7 +14,9 @@ var mongoose = require('mongoose'),
   utils = require('./utils'),
   getObjectId = utils.getObjectId,
   getDocumentIdString = utils.getDocumentIdString,
-  SensorLogSchema = require('./sensorLog').schema,
+  SensorLog = require('./sensorLog'),
+  SensorLogSchema = SensorLog.schema,
+  SensorLogModel = SensorLog.model,
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
@@ -187,8 +189,27 @@ var GrowPlanInstanceSchema = new Schema({
 },
 { id : false });
 
-GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
+GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove, {
+  callback : function(err, removedDocumentResults, callback){
+    if (err) { return callback(err); }
+
+    console.log("IN GPI REMOVE CALLBACK args", arguments);
+    
+    // Remove associated documents (various logs)
+    var ids = removedDocumentResults.map(function(doc) { return doc._id; });
+
+    async.parallel([
+      function removeSensorLogs(innerCallback){
+        SensorLogModel.remove({'gpi' : { $in: ids }}, innerCallback);    
+      }
+    ],
+    function parallelRemoveCallback(err){
+      return callback(err, removedDocumentResults);
+    });
+  }
+});
 
 
 GrowPlanInstanceSchema.virtual('timezone')
@@ -268,16 +289,16 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     function(err, results){
       if (err) { return callback(err); }
 
-      gpi.save(function(err, createdGrowPlan){
+      gpi.save(function(err, createdGarden){
         if (err) { return callback(err); }
 
-        winston.info('Created new gpi for user ' + createdGrowPlan.owner + ' gpi id ' + createdGrowPlan._id);
+        winston.info('Created new gpi for user ' + createdGarden.owner + ' gpi id ' + createdGarden._id);
        
         if (!options.active){
-          return callback(err, createdGrowPlan);
+          return callback(err, createdGarden);
         }
          
-        return createdGrowPlan.activate({ 
+        return createdGarden.activate({ 
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
@@ -288,6 +309,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     }
   );
 });
+
+
 /******************* END STATIC METHODS  ***************************/
 
 
@@ -457,6 +480,7 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
  * @param {ObjectId|string=} options.activePhaseId : optional. The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance. If not present,
  *                                                   the first phase will be activated.
  * @param {Number=}          options.activePhaseDay : optional. Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
+ * @param {function(err, gpi)} callback
  */
 GrowPlanInstanceSchema.method('activate', function(options, callback) {
 	var gpi = this,
@@ -484,7 +508,14 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           gpiWithActivePhase.pairWithDevice({
             deviceId : getDocumentIdString(gpiWithActivePhase.device)
           },
-          innerCallback);
+          function(err, pairResult){
+            return innerCallback(err, pairResult ? pairResult.growPlanInstance : undefined);
+          });
+        },
+        function incrementGrowPlanActivationCount(activatedGPI, innerCallback){
+          GrowPlanModel.findByIdAndUpdate(activatedGPI.growPlan, { $inc: { activeGardenCount: 1 }}, function (err) {
+            return innerCallback(err, activatedGPI);
+          });
         }
       ],
       function(err, activatedGPI){
@@ -612,6 +643,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       function getDeviceControllableActions(innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
+        console.log('getDocumentIdString(growPlanInstance.device)', getDocumentIdString(growPlanInstance.device));
         DeviceModel.findById(getDocumentIdString(growPlanInstance.device), function (err, deviceResult){
           if (err) { return innerCallback(err); }
 

@@ -6,7 +6,7 @@
  *
  * http://visionmedia.github.com/mocha/, search for '“root” level hooks'
  */
-var mongooseConnection = require('../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../config/mongoose-connection').open('test'),
 	  exec = require('child_process').exec,
  	  winston = require('winston');
 

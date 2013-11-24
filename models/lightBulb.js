@@ -28,7 +28,7 @@ var LightBulbSchema = new Schema({
 { id : false });
 
 LightBulbSchema.plugin(useTimestamps);
-
+LightBulbSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /*********************** STATIC METHODS **************************/

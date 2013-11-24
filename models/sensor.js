@@ -29,6 +29,7 @@ var SensorSchema = new Schema({
   { id : false });
 
 SensorSchema.plugin(useTimestamps);
+SensorSchema.plugin(mongoosePlugins.recoverableRemove);
 
 exports.schema = SensorSchema;
 exports.model = mongooseConnection.model('Sensor', SensorSchema);
