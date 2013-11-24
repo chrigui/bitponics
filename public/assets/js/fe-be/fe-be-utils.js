@@ -187,16 +187,33 @@ define(['moment'], function(moment){
   };
 
   /**
-   * NOT USING (NOT DIFFERENTIATING SENSOR LOGS)
-   * Type of sensor log: manual through UI or device sent
-   * 
-   * 
+   * Sensor reading units
    */
-  // utils.sensorLogTypes = {
-  //   'MANUAL': 'manual',
-  //   'DEVICE': 'device',
-  //   'EXTERNAL': 'external'
-  // };
+  utils.UNITS = {
+    'FULL': { 'LUMENS': 'Lumens' },
+    'HUM': { 'PERCENTAGE': 'Percentage' },
+    'AIR': { 'CELSIUS': 'Celsius', 'FAHRENHEIT': 'Fahrenheit' },
+    'WL': { 'CENTIMETERS': 'Centimeters', 'INCHES': 'Inches' },
+    'PH': { 'PH': 'pH' },
+    'EC': { 'MICROSIEMENS': 'Microsiemens' },
+    'WATER': { 'CELSIUS': 'Celsius', 'FAHRENHEIT': 'Fahrenheit' },
+    'LUX': { 'LMM2': 'lm/(m^2)' }
+  };
+
+  /**
+   * Abbreviations
+   */
+  utils.ABREVs = {
+    'LUMENS': 'lm',
+    'PERCENTAGE': '%',
+    'CELSIUS': 'C',
+    'FAHRENHEIT': 'F',
+    'CENTIMETERS': 'cm',
+    'INCHES': 'in',
+    'PH': 'pH',
+    'MICROSIEMENS': 'µS',
+    'LMM2': 'lm/(m^2)'
+  };
   
   /**
    * Checks whether the provided string matches the ObjectId format.
@@ -427,6 +444,14 @@ define(['moment'], function(moment){
     });
     return sensorsObj;
   };
+
+  // utils.convertUnit = function(unit, value) {
+  //   var sensorsObj = {};
+  //   sensors.forEach(function(sensor){
+  //     sensorsObj[sensor.code] = { val: null, unit: sensor.unit };
+  //   });
+  //   return sensorsObj;
+  // };
 
   return utils;
 });

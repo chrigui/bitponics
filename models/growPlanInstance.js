@@ -152,9 +152,19 @@ var GrowPlanInstanceSchema = new Schema({
     }
   ],
 
-	// not in use yet, but this will be how a user configures the view on their Dashboard
+
 	settings : {
-		visibleSensors : []
+		visibleSensors : [],
+    units: {
+      full: { type: String, enum: [ feBeUtils.UNITS.FULL.LUMENS ], default : feBeUtils.UNITS.FULL.LUMENS },
+      hum: { type: String, enum: [ feBeUtils.UNITS.HUM.PERCENTAGE ], default : feBeUtils.UNITS.HUM.PERCENTAGE },
+      air: { type: String, enum: [ feBeUtils.UNITS.AIR.CELSIUS, feBeUtils.UNITS.AIR.FAHRENHEIT], default: feBeUtils.UNITS.AIR.CELSIUS },
+      wl: { type: String, enum: [ feBeUtils.UNITS.WL.CENTIMETERS, feBeUtils.UNITS.WL.INCHES], default: feBeUtils.UNITS.WL.CENTIMETERS },
+      ph: { type: String, enum: [ feBeUtils.UNITS.PH.PH ], default: feBeUtils.UNITS.PH.PH },
+      ec: { type: String, enum: [ feBeUtils.UNITS.EC.MICROSIEMENS ], default: feBeUtils.UNITS.EC.MICROSIEMENS },
+      water: { type: String, enum: [ feBeUtils.UNITS.AIR.CELSIUS, feBeUtils.UNITS.AIR.FAHRENHEIT], default: feBeUtils.UNITS.AIR.CELSIUS },
+      lux: { type: String, enum: [ feBeUtils.UNITS.LUX.LMM2 ], default: feBeUtils.UNITS.LUX.LMM2 }
+    }
 	},
 	
 	/**
