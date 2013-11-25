@@ -91,6 +91,8 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                     a(href="/gardens") Gardens
                   li
                     a(href="/account/devices") Devices
+                  li
+                    a(href="/logout") Log Out
   
   if !!pageType && pageType == 'landing-page'  
     button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")

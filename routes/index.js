@@ -273,7 +273,7 @@ module.exports = function(app){
 	app.get('/logout', function (req, res) {
 		req.session.regenerate(function(){
 			req.logout()
-			res.redirect('/login')  
+			res.redirect('/')  
 		});
 	});
 
