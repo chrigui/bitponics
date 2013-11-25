@@ -17,6 +17,10 @@ var mongoose = require('mongoose'),
   SensorLog = require('./sensorLog'),
   SensorLogSchema = SensorLog.schema,
   SensorLogModel = SensorLog.model,
+  HarvestLogModel = require('./harvestLog').model,
+  ImmediateActionModel = require('./immediateAction').model,
+  NotificationModel = require('./notification').model,
+  TextLogModel = require('./textLog').model,
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
@@ -191,18 +195,31 @@ var GrowPlanInstanceSchema = new Schema({
 
 
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+
 GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove, {
   callback : function(err, removedDocumentResults, callback){
     if (err) { return callback(err); }
 
-    console.log("IN GPI REMOVE CALLBACK args", arguments);
+    winston.info("IN GPI REMOVE CALLBACK args " + JSON.stringify(arguments));
     
     // Remove associated documents (various logs)
     var ids = removedDocumentResults.map(function(doc) { return doc._id; });
 
     async.parallel([
       function removeSensorLogs(innerCallback){
-        SensorLogModel.remove({'gpi' : { $in: ids }}, innerCallback);    
+        SensorLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeHarvestLogs(innerCallback){
+        HarvestLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeImmediateActions(innerCallback){
+        ImmediateActionModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeNotifications(innerCallback){
+        NotificationModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeTextLogs(innerCallback){
+        TextLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
       }
     ],
     function parallelRemoveCallback(err){
