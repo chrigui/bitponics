@@ -199,6 +199,53 @@ module.exports = {
 
 
   /**
+   * Utility method for processing photo uploads.
+   * We have multiple routes that a user can upload a photo at 
+   * (gardens, growPlans, growSystems, etc)
+   * 
+   * Process by uploading it to S3 and storing a 
+   * Photo document
+   *
+   * Returns a JSON response
+   * 
+   * @param {File} req.files.photo
+   * @param {feBeUtils.VISIBILITY_OPTIONS} req.body.private=
+   * @param {[String]} req.body.tags=
+   * @param {ObjectId} req.body.gpi=
+   */
+  processPhotoUpload : function(req, res, next){
+    var PhotoModel = require('../models/photo').model,
+      async = require('async'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils'),
+      photo = req.files.photo,
+      now = new Date();
+
+
+    // to send the photo back as the response:
+    //res.sendfile(req.files.photo.path);
+
+    PhotoModel.createAndStorePhoto(
+      {
+        owner : req.user,
+        originalFileName : photo.name,
+        name : photo.name,
+        contentType : photo.type,
+        date : photo.lastModifiedDate || (new Date()),
+        size : photo.size,
+        tags : req.body.tags,
+        gpi : req.body.garden,
+        visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC),
+        streamPath : photo.path
+      },
+      function(err, photo){
+        if (err) { return next(err); }
+        return module.exports.sendJSONResponse(res, 200, { data : photo });       
+      }
+    );
+  },
+
+  /**
    * @param {HTTP Request} req
    * @param {function(err, cart)} callback
    */

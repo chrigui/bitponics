@@ -7,6 +7,9 @@ var mongoose = require('mongoose'),
   feBeUtils = requirejs('fe-be-utils'),
   mongoosePlugins = require('../lib/mongoose-plugins'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  async = require('async'),
+  gm = require('gm').subClass({ imageMagick: true }),
+  tmpDirectory = require('path').join(__dirname, '/../tmp/'),
   PhotoModel;
 
 
@@ -14,8 +17,13 @@ var mongoose = require('mongoose'),
  * Photo
  */
 var PhotoSchema = new Schema({
-	/**
-	 * The GrowPlanInstance
+	
+  /**
+	 * The GrowPlanInstance. Optional. A denormalized convenience property to
+   * make querying for a garden's photos easier.
+   * 
+   * TODO: this concept should be generalized. Make it a "referencedDocumentId" or something
+   * to allow for pointing to docs from other collections
 	 */
 	gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
@@ -38,7 +46,7 @@ var PhotoSchema = new Schema({
 
 
   /**
-   * user-define-able name
+   * User-definable name
    */
   name : { type : String },
 
@@ -46,7 +54,13 @@ var PhotoSchema = new Schema({
   /**
    * Number of bytes of the original photo
    */
-  size : { type : Number }
+  size : { type : Number },
+
+  
+  /**
+   * Number of bytes of the thumbnail (150x150 max)
+   */
+  thumbnailSize : { type : Number }
 },
 { id : false });
 
@@ -103,7 +117,7 @@ PhotoSchema.set('toJSON', {
  */
 PhotoSchema.static("createAndStorePhoto",  function(options, callback){
   if (options.contentType.indexOf("image") !== 0){
-    return callback(new Error("Invalid photo conten type " + options.contentType));
+    return callback(new Error("Invalid photo content type " + options.contentType));
   }
 
   var s3Config = require('../config/s3-config'),
@@ -124,37 +138,108 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       tags : options.tags || [],
       gpi : options.gpi,
       visibility : (options.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
-    }),
-    knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
-    knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath),
-    knoxHeaders = {
-      'Content-Type': photo.type, 
-      'x-amz-acl': 'private'
-    };
+    });
+    
 
-    if (options.size){
-      knoxHeaders["Content-Length"] = options.size;
-    }
+    async.parallel(
+      [
+        function uploadOriginal(innerCallback){
+          var knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
+            knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath),
+            knoxHeaders = {
+              'Content-Type': photo.type, 
+              'x-amz-acl': 'private'
+            };
 
-    console.log("PHOTO DATE", options.date, photo.date);
+          if (options.size){
+            knoxHeaders["Content-Length"] = options.size;
+          }
 
-    knoxClient[knoxMethod](
-      knoxMethodArgument,
-      s3Config.photoPathPrefix + photo._id.toString(), 
-      knoxHeaders, 
-      function(err, result) {
-        console.log("RETURNED FROM S3, err:", err, ", statusCode: ", result.status);
-        if (err) { return callback(err);  }
-      
-        if (result.statusCode !== 200) {
-          return callback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+          knoxClient[knoxMethod](
+            knoxMethodArgument,
+            s3Config.photoPathPrefix + photo._id.toString(), 
+            knoxHeaders, 
+            function(err, result) {
+              winston.info("RETURNED FROM S3, err:", err, ", statusCode: ", result.statusCode);
+
+              if (err) { return innerCallback(err);  }
+            
+              if (result.statusCode !== 200) {
+                return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+              }
+
+              return innerCallback();
+            }
+          );
+        },
+        function createAndUploadThumbnail(innerCallback){
+
+          var intermediateGM,
+              thumbnailGM;
+
+          var filesizeCallback = function(err, value){
+            if (err) { return innerCallback(err);  }
+
+            console.log("THUMBNAIL FILESIZE : ", value);
+
+            // value is returned in format "724B", need to parse int to get byte number
+            photo.thumbnailSize = parseInt(value, 10);
+            
+            knoxClient.putStream(
+              thumbnailGM.stream(),
+              s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+              {
+                'Content-Type': photo.type, 
+                'x-amz-acl': 'private',
+                'Content-Length' : photo.thumbnailSize
+              }, 
+              function(err, result) {
+                console.log('returned from thumbnail s3 upload', err, result);
+
+                if (err) { return innerCallback(err);  }
+              
+                if (result.statusCode !== 200) {
+                  return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+                }
+
+                return innerCallback();
+              }
+            );
+          };
+
+          // Constructor is lenient in parsing stream vs path vs buffer. 2nd arg is optional and is only used for filetype inference, so it should handle undefined fine
+          // https://github.com/aheckmann/gm#constructor
+          if (typeof options.stream !== 'undefined'){
+            intermediateGM = gm(options.stream, options.originalFileName)
+          } else {
+            intermediateGM = gm(options.streamPath)
+          }
+          
+          // Resize to create thumbnail, but don't scale up smaller images
+          // http://stackoverflow.com/questions/14705152/thumbnails-from-graphics-magick-without-upscaling
+          intermediateGM
+          .resize(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT, ">")
+          .gravity('Center')
+          // use a white background rather than transparent. If we're dealing with a jpg, transparent gets rendered as black. No thanks mister.
+          .background('#fff')
+          .extent(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT);
+          
+          // Finalize the processing so that we can get the proper filesize
+          thumbnailGM = gm(intermediateGM.stream(), options.originalFileName);
+          
+          thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
         }
+      ],
+      function(err, results){
+        console.log("PHOTO PARALLEL END", err, results);
 
-        if (knoxMethod === 'putFile' && !options.preserveStreamPath){
+        if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
           // Delete the file from disk
           fs.unlink(options.streamPath);
         }
-        
+
+        if (err) { return callback(err);}
+
         return photo.save(callback);
       }
     );

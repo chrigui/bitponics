@@ -3,6 +3,9 @@ define(['moment'], function(moment){
   var utils = (this.bpn.utils = this.bpn.utils || {});
 
 
+
+  utils.PHOTO_THUMBNAIL_SIZE = { WIDTH : 150, HEIGHT: 150 };
+
   /**
    *
    * @type {Array}

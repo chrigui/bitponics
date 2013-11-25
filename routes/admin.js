@@ -174,34 +174,9 @@ module.exports = function(app){
 	 * Process an uploaded photo by uploading it to S3 and storing a 
 	 * Photo document
 	 */
-	app.post('/admin/photos/upload', function (req, res, next){
-		var PhotoModel = require('../models/photo').model,
-			photo = req.files.photo,
-			now = new Date();
-
-
-		// to send the photo back as the response:
-		//res.sendfile(req.files.photo.path);
-
-		PhotoModel.createAndStorePhoto(
-			{
-				owner : req.user,
-				originalFileName : photo.name,
-				name : photo.name,
-				contentType : photo.type,
-				date : photo.lastModifiedDate || (new Date()),
-				size : photo.size,
-				visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC),
-				streamPath : photo.path
-			},
-			function(err, photo){
-				if (err) { return next(err); }
-				return routeUtils.sendJSONResponse(res, 200, { data : photo });				
-			}
-		);
-	});
-
+	app.post('/admin/photos/upload', routeUtils.processPhotoUpload);
 	
+  
 
 	app.get('/admin/gardens', function(req, res, next){
 		var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
