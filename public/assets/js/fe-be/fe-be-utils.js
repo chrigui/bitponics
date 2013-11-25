@@ -190,30 +190,90 @@ define(['moment'], function(moment){
    * Sensor reading units
    */
   utils.UNITS = {
-    'FULL': { 'LUMENS': 'Lumens' },
-    'HUM': { 'PERCENTAGE': 'Percentage' },
-    'AIR': { 'CELSIUS': 'Celsius', 'FAHRENHEIT': 'Fahrenheit' },
-    'WL': { 'CENTIMETERS': 'Centimeters', 'INCHES': 'Inches' },
-    'PH': { 'PH': 'pH' },
-    'EC': { 'MICROSIEMENS': 'Microsiemens' },
-    'WATER': { 'CELSIUS': 'Celsius', 'FAHRENHEIT': 'Fahrenheit' },
-    'LUX': { 'LMM2': 'lm/(m^2)' }
+    'FULL': { 
+      units : {
+        'LUMENS': {
+          displayName: 'Lumens',
+          abbrev: 'lm'
+        }
+      }
+    },
+    'HUM': { 
+      units : {
+        'PERCENTAGE': {
+          displayName: 'Percentage',
+          abbrev: '%'
+        }
+      }
+    },
+    'AIR': { 
+      units : {
+        'CELSIUS': {
+          displayName: 'Celsius',
+          abbrev: 'C'
+        }, 
+        'FAHRENHEIT': {
+          displayName: 'Fahrenheit',
+          abbrev: 'F'
+        }
+      },
+      convertFrom: utils.convertFromCelsiusToFahrenheit,
+      convertTo: utils.convertToCelsiusFromFahrenheit
+    },
+    'WL': { 
+      units : {
+        'CENTIMETERS': {
+          displayName: 'Centimeters',
+          abbrev: 'cm'
+        }, 
+        'INCHES': {
+          displayName: 'Inches',
+          abbrev: 'in'
+        }
+      },
+      convertFrom: utils.convertFromCentimetersToInches,
+      convertTo: utils.convertToCentimetersFromInches
+    },
+    'PH': { 
+      units : {
+        'PH': {
+          displayName: 'pH',
+          abbrev: 'pH'
+        }
+      }
+    },
+    'EC': { 
+      units : {
+        'MICROSIEMENS': {
+          displayName: 'Microsiemens',
+          abbrev: 'µS'
+        }
+      }
+    },
+    'WATER': { 
+      units : {
+        'CELSIUS': {
+          displayName: 'Celsius',
+          abbrev: 'C'
+        }, 
+        'FAHRENHEIT': {
+          displayName: 'Fahrenheit',
+          abbrev: 'F'
+        }
+      },
+      convertFrom: utils.convertFromCelsiusToFahrenheit,
+      convertTo: utils.convertToCelsiusFromFahrenheit
+    },
+    'LUX': { 
+      units : {
+        'LMM2': {
+          displayName: 'lm/(m^2)',
+          abbrev: 'lm/(m^2)'
+        }
+      }
+    }
   };
 
-  /**
-   * Abbreviations
-   */
-  utils.ABREVs = {
-    'LUMENS': 'lm',
-    'PERCENTAGE': '%',
-    'CELSIUS': 'C',
-    'FAHRENHEIT': 'F',
-    'CENTIMETERS': 'cm',
-    'INCHES': 'in',
-    'PH': 'pH',
-    'MICROSIEMENS': 'µS',
-    'LMM2': 'lm/(m^2)'
-  };
   
   /**
    * Checks whether the provided string matches the ObjectId format.
@@ -445,13 +505,25 @@ define(['moment'], function(moment){
     return sensorsObj;
   };
 
-  // utils.convertUnit = function(unit, value) {
-  //   var sensorsObj = {};
-  //   sensors.forEach(function(sensor){
-  //     sensorsObj[sensor.code] = { val: null, unit: sensor.unit };
-  //   });
-  //   return sensorsObj;
-  // };
+  utils.convertFromCelsiusToFahrenheit = function(value) {
+    var newValue = value;
+    return newValue;
+  };
+  
+  utils.convertFromCelsiusToFahrenheit = function(value) {
+    var newValue = value;
+    return newValue;
+  };
+  
+  utils.convertFromCentimetersToInches = function(value) {
+    var newValue = value;
+    return newValue;
+  };
+
+  utils.convertToCentimetersFromInches = function(value) {
+    var newValue = value;
+    return newValue;
+  };
 
   return utils;
 });

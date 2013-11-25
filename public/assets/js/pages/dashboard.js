@@ -53,8 +53,11 @@ require([
             sensors : bpn.pageData.sensors,
             growPlanInstance : bpn.pageData.growPlanInstance,
             controlHash : {},
-            photos : bpn.pageData.photos
+            photos : bpn.pageData.photos,
+            units : feBeUtils.UNITS
           };
+
+          console.log(feBeUtils.UNITS);
 
           sharedData.controls.forEach(function(control){
             sharedData.controlHash[control._id] = control;
@@ -1055,14 +1058,14 @@ require([
           manualSensorEntry : "=?",
           manualTextEntry : "=?"
         },
-        // template : '<div class="manual-entry-form {{sensorCode}}"></div>',
-        controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
+        controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
 
           $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
           $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
           $scope.manualSensorEntryMode = false;
-          
+          $scope.sensors = Object.keys($scope.manualSensorEntry);
+
           $scope.toggleManualEntry = function(){
             $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
             if ($scope.sharedDataService) {
@@ -1070,23 +1073,32 @@ require([
             }
           };
 
-          $scope.toggleUnitType = function(){
-            console.log('toggleUnitType');
+          $scope.changeUnit = function(sensorCode, value) {
+            var oldUnit = sharedDataService.growPlanInstance.settings.units[sensorCode],
+                oldValue = value,
+                newUnit,
+                newValue;
+
+            // Object.keys(sharedDataService.units[sensorCode]).forEach(function(unitName){
+            //   if (feBeUtils.units[sensorCode][unitName]) {}
+            // });
+            
+            console.log('toggleUnitType for ' + sensorCode);
+            console.log('has current unit of ' + oldUnit);
+            console.log('will change to ' + newUnit);
+
           };
 
           $scope.submit = function(){
             var valid = true,
                 sensorDataObj = {},
                 textDataObj = {},
-                sensors = Object.keys($scope.manualSensorEntry),
+                sensors = $scope.sensors,
                 text = $scope.manualTextEntry,
                 sensorlogsArray = [];
 
-            for (var i = 0; i < sensors.length; i++) {
-              if ($scope.manualSensorEntry[sensors[i]]) {
-                console.log($scope.manualSensorEntry[sensors[i]]);
-                // $scope.manualSensorEntryMode[$scope.sensorCode] != '' && angular.isNumber(parseFloat($scope.manualSensorEntry))
-
+            for (var i = 0; i < $scope.sensors.length; i++) {
+              if ($scope.manualSensorEntry[$scope.sensors[i]]) {
                 //construct sensor logs array for dataObj
                 sensorlogsArray.push({
                   val: $scope.manualSensorEntry[sensors[i]],
@@ -1117,6 +1129,7 @@ require([
             };
             
             if (valid) {
+              //TODO: convert to $resource's
               $http({
                 method: 'post',
                 headers: {
@@ -1150,7 +1163,7 @@ require([
 
         },
         link: function (scope, element, attrs, controller) { 
-          console.log('scope.manualEntryMode', scope.manualEntryMode);
+          
         }
       }
     });
@@ -1165,19 +1178,12 @@ require([
 
           $scope.setOverlayPosition = function() {
             $.throttle(1000, $timeout(function() {
-              console.log($element.parents('.page:first').siblings('.overlay:first').length);
               var overlay = $element.parents('.page:first').siblings('.overlay:first'),
                   overlayHeight = overlay.height(),
                   topValue = $scope.sharedDataService.activeOverlayPositionTop,
                   windowHeight = angular.element($window).height(),
                   padding = 144;
               if (overlay.length > 0) {
-                console.log('overlayHeight', overlayHeight)
-                console.log('windowHeight', windowHeight)
-                console.log('topValue', topValue)
-                console.log('padding', padding)
-                // console.log('windowHeight - topValue + padding', windowHeight - topValue + padding)
-                console.log('windowHeight > overlayHeight + padding', windowHeight > overlayHeight + padding)
                 if ((windowHeight > overlayHeight + padding)) {
                   overlay.css({ top: topValue + padding });
                   $scope.$apply(); 

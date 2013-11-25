@@ -156,14 +156,14 @@ var GrowPlanInstanceSchema = new Schema({
 	settings : {
 		visibleSensors : [],
     units: {
-      full: { type: String, enum: [ feBeUtils.UNITS.FULL.LUMENS ], default : feBeUtils.UNITS.FULL.LUMENS },
-      hum: { type: String, enum: [ feBeUtils.UNITS.HUM.PERCENTAGE ], default : feBeUtils.UNITS.HUM.PERCENTAGE },
-      air: { type: String, enum: [ feBeUtils.UNITS.AIR.CELSIUS, feBeUtils.UNITS.AIR.FAHRENHEIT], default: feBeUtils.UNITS.AIR.CELSIUS },
-      wl: { type: String, enum: [ feBeUtils.UNITS.WL.CENTIMETERS, feBeUtils.UNITS.WL.INCHES], default: feBeUtils.UNITS.WL.CENTIMETERS },
-      ph: { type: String, enum: [ feBeUtils.UNITS.PH.PH ], default: feBeUtils.UNITS.PH.PH },
-      ec: { type: String, enum: [ feBeUtils.UNITS.EC.MICROSIEMENS ], default: feBeUtils.UNITS.EC.MICROSIEMENS },
-      water: { type: String, enum: [ feBeUtils.UNITS.AIR.CELSIUS, feBeUtils.UNITS.AIR.FAHRENHEIT], default: feBeUtils.UNITS.AIR.CELSIUS },
-      lux: { type: String, enum: [ feBeUtils.UNITS.LUX.LMM2 ], default: feBeUtils.UNITS.LUX.LMM2 }
+      FULL: { type: String, enum: [ feBeUtils.UNITS.FULL.units.LUMENS.displayName ], default : feBeUtils.UNITS.FULL.units.LUMENS.displayName },
+      HUM: { type: String, enum: [ feBeUtils.UNITS.HUM.units.PERCENTAGE.displayName ], default : feBeUtils.UNITS.HUM.units.PERCENTAGE.displayName },
+      AIR: { type: String, enum: [ feBeUtils.UNITS.AIR.units.CELSIUS.displayName, feBeUtils.UNITS.AIR.units.FAHRENHEIT.displayName], default: feBeUtils.UNITS.AIR.units.CELSIUS.displayName },
+      WL: { type: String, enum: [ feBeUtils.UNITS.WL.units.CENTIMETERS.displayName, feBeUtils.UNITS.WL.units.INCHES.displayName], default: feBeUtils.UNITS.WL.units.CENTIMETERS.displayName },
+      PH: { type: String, enum: [ feBeUtils.UNITS.PH.units.PH.displayName ], default: feBeUtils.UNITS.PH.units.PH.displayName },
+      EC: { type: String, enum: [ feBeUtils.UNITS.EC.units.MICROSIEMENS.displayName ], default: feBeUtils.UNITS.EC.units.MICROSIEMENS.displayName },
+      WATER: { type: String, enum: [ feBeUtils.UNITS.AIR.units.CELSIUS.displayName, feBeUtils.UNITS.AIR.units.FAHRENHEIT.displayName], default: feBeUtils.UNITS.AIR.units.CELSIUS.displayName },
+      LUX: { type: String, enum: [ feBeUtils.UNITS.LUX.units.LMM2.displayName ], default: feBeUtils.UNITS.LUX.units.LMM2.displayName }
     }
 	},
 	

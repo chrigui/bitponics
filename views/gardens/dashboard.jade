@@ -78,7 +78,15 @@ block content
                     div(ng-show="manualSensorEntryMode")
                       form(action="", ng-submit="submit()")
                         input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="display-ib half-width", type="number", step="any",required)
-                        span  {{sensorUnit}}
+                        span.sensor-unit {{sensorUnit}}
+                        {{sharedDataService.units[sensorCode.toUpperCase()]}}
+                        div.custom-dropdown-wrap
+                          select(class="custom-dropdown", 
+                            ng-model="manualSensorEntry[sensorCode].unit", 
+                            ng-options="key as key for (key , value) in sharedDataService.units[sensorCode.toUpperCase()].units",
+                            ng-init="sharedDataService.growPlanInstance.settings.units[sensorCode]")
+                          .dblarrow
+                            i
                         input(type="submit", value="Record")
 
       div.content-module.middle.separator-top
