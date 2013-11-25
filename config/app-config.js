@@ -95,7 +95,7 @@ module.exports = function(app){
       , secret     : s3Config.secret
       , hostname   : 'localhost'
       , port       : 80
-      , ssl        : false
+      , ssl        : true
       , production : app.settings.env !== 'local' ? true : false //false means we use local assets
       , logger     : winston.info
     };
