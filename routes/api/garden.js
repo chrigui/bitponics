@@ -7,6 +7,8 @@ var GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
     ImmediateActionModel = require('../../models/immediateAction').model,
     moment = require('moment'),
     ModelUtils = require('../../models/utils'),
+    getObjectId =  ModelUtils.getObjectId,
+    getDocumentIdString = ModelUtils.getDocumentIdString,
     winston = require('winston'),
     async = require('async'),
     routeUtils = require('../route-utils'),
@@ -75,11 +77,7 @@ module.exports = function(app) {
 	      startDate: req.body.startDate,
 	      endDate: req.body.endDate,
 	      active: req.body.active,
-	      phases: req.body.phases,
-	      recentSensorLogs: req.body.recentSensorLogs,
-	      controlLogs: req.body.controlLogs,
-	      images: req.body.images,
-	      genericLogs: req.body.genericLogs
+	      phases: req.body.phases
 	    });
 	    growPlanInstance.save(function (err) {
 	      if (err) { return next(err); }
@@ -116,7 +114,13 @@ module.exports = function(app) {
 
 
   /**
-   * Update a growPlanInstance
+   * Update a garden
+   * All properties are optional
+   * Undefined properties are left unchanged.
+   * To delete a property, it should be assigned null.
+   *
+   * @param req.body.device {string} Pair/Unpair a device with this garden
+   * @param req.body.active {bool} Activate/Deactivate this garden
    *
    * jQuery.ajax({
    *     url: "/api/gardens/503a86812e57c70000000001",
@@ -133,24 +137,77 @@ module.exports = function(app) {
    * });
    */
   app.put('/api/gardens/:id', function (req, res, next){
-    return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
+    
+    GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       
       if (!routeUtils.checkResourceModifyAccess(growPlanInstance, req.user)){
       	return res.send(401, "Only grow plan instance owner may modify a grow plan instance.");
       }
 
-      if(req.body.users){ growPlanInstance.users = req.body.users; }
-      if(req.body.device){ growPlanInstance.device = req.body.device; }
-      if(req.body.startDate){ growPlanInstance.startDate = req.body.startDate; }
-      if(req.body.endDate){ growPlanInstance.endDate = req.body.endDate; }
-      if(req.body.active){ growPlanInstance.active = req.body.active; }
-      if(req.body.phases){ growPlanInstance.phases = req.body.phases; }
+      // Handle simple top-level updates first
+      // Then more complex updates after an initial save
+
+      if (typeof req.body.users !== 'undefined'){
+        growPlanInstance.users = req.body.users;
+      }
       
-      
+      if (typeof req.body.timezone !== 'undefined'){
+        growPlanInstance.timezone = req.body.timezone;
+      }
+
+      if (typeof req.body.phases !== 'undefined'){
+        growPlanInstance.phases = req.body.phases;
+      }
+
+      if (typeof req.body.visibility !== 'undefined'){
+        growPlanInstance.visibility = req.body.visibility;
+      }
+
+      if (typeof req.body.settings !== 'undefined'){
+        growPlanInstance.settings = req.body.settings; 
+      }
 
       return growPlanInstance.save(function (err) {
         if (err) { return next(err); }
-        return res.send(growPlanInstance);
+        
+        async.waterfall(
+        [
+          function checkDevice(innerCallback){
+            if (typeof req.body.device === 'undefined'){ return innerCallback(); }
+
+            // check whether it's a new assignment and if so, call gpi.pairWithDevice
+            if (req.body.device === null){
+              return growPlanInstance.unpairDevice(innerCallback);
+            } else if (getDocumentIdString(req.body.device) !== getDocumentIdString(growPlanInstance.device)){
+              growPlanInstance.pairWithDevice({
+                deviceId : getDocumentIdString(req.body.device),
+                saveGrowPlanInstance : true
+              }, function(err, pairResult){
+                return innerCallback(err, pairResult.growPlanInstance);
+              });
+            } else {
+              return innerCallback(null, growPlanInstance);
+            }
+          },
+          function checkActive(updatedGPI, innerCallback){
+            if (typeof req.body.active === 'undefined'){ return innerCallback(null, updatedGPI); }
+
+            // Check whether we're changing active state
+            if (req.body.active === growPlanInstance.active){ return innerCallback(null, updatedGPI); }
+
+            // if we're here, we're changing active state
+            if (req.body.active){
+              growPlanInstance.activate({}, innerCallback);
+            } else {
+              growPlanInstance.deactivate(innerCallback);
+            }
+          }
+        ],
+        function waterfallEnd(err, finalGrowPlanInstance){
+          if (err) { return next(err); }
+
+          return res.send(finalGrowPlanInstance);  
+        });
       });
     });
   });
@@ -298,31 +355,17 @@ module.exports = function(app) {
         return res.send(401, "Only the grow plan instance owner may modify a grow plan instance.");
       }
 
-      if (manualLogEntry != 'true') {
-        ModelUtils.logSensorLog(
-          {
-            pendingSensorLog : req.body.sensorLog, 
-            growPlanInstance : growPlanInstance, 
-            user : req.user 
-          },
-          function(err){
-            if (err) { return next(err); }
-            return res.send({ status : "success" });
-          }
-        );
-      } else {
-        ModelUtils.logManualSensorLog(
-          {
-            pendingSensorLog : req.body.sensorLog, 
-            growPlanInstance : growPlanInstance, 
-            user : req.user 
-          },
-          function(err){
-            if (err) { return next(err); }
-            return res.send({ status : "success" });
-          }
-        );
-      }
+      ModelUtils.logSensorLog(
+        {
+          pendingSensorLog : req.body.sensorLog, 
+          growPlanInstance : growPlanInstance, 
+          user : req.user 
+        },
+        function(err){
+          if (err) { return next(err); }
+          return res.send({ status : "success" });
+        }
+      );
     });
   });
 

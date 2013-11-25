@@ -160,57 +160,6 @@ module.exports.logSensorLog = function (options, callback){
   );
 };
 
-/**
- * logManualSensorLog : Log a sensorLog from manual user entry to the sensorLog collection and growPlanInstance.recentSensorLogs.
- * Verify against IdealRanges and trigger Actions if necessary.
- *
- * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema.
- * @param options.growPlanInstance {GrowPlan}: GrowPlanInstance model instance on which to log this to recentSensorLogs.
- */
-module.exports.logManualSensorLog = function (options, callback){
-  var GrowPlanModel = require('./growPlan').growPlan.model,
-      async = require('async'),
-      SensorLogModel = require('./sensorLog').model,
-      requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils');
-
-  var pendingSensorLog = options.pendingSensorLog,
-      growPlanInstance = options.growPlanInstance,
-      device = options.device,
-      user = options.user,
-      timezone = user.timezone,
-      activeGrowPlanInstancePhase;
-
-  if (growPlanInstance){
-    activeGrowPlanInstancePhase = growPlanInstance.phases.filter(function(phase){ return phase.active; })[0];
-    pendingSensorLog.gpi = growPlanInstance._id;
-  }
-
-  if (!(pendingSensorLog instanceof SensorLogModel)) {
-    pendingSensorLog = new SensorLogModel(pendingSensorLog);
-  }
-
-  if (!pendingSensorLog.ts){
-    pendingSensorLog.ts = new Date();
-  }
-  
-  async.parallel(
-    [
-    function saveToGPI(innerCallback){
-      if (!growPlanInstance) { return innerCallback();}
-      //growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
-      //growPlanInstance.save(innerCallback);
-      innerCallback();
-    },
-    function saveSensorLog(innerCallback){
-      pendingSensorLog.save(innerCallback);
-    }
-    ], 
-    function parallelFinal(err, result){
-      return callback(err);
-    }
-  );
-};
 
 
 

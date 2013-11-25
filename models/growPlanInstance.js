@@ -163,23 +163,6 @@ var GrowPlanInstanceSchema = new Schema({
 		visibleSensors : []
 	},
 	
-	/**
-	 * Sensor logs for the past 24 hours.
-	 */
-	recentSensorLogs: [SensorLogSchema],
-	
-	/**
-	 * Text Logs for the past 24 hours
-	 */
-	recentTextLogs: [{
-		ts: { type: Date, required: true, default: Date.now },
-		logs : [{
-			val: { type: String, required: true },
-			tags: { type : [String]}
-		}]
-	}],
-
-
 	visibility : { 
     type: String, 
     enum: [
@@ -486,6 +469,40 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
       }
     );
   });
+});
+
+
+/**
+ * Unpair device from this grow plan instance.
+ * 
+ * @param {function(err, growPlanInstance)} callback
+ */
+GrowPlanInstanceSchema.method('unpairDevice', function(callback) {
+  var gpi = this;
+
+  if (!gpi.device){ return callback(null, gpi); }
+
+  gpi.device = undefined;
+
+  async.parallel(
+    [
+      function saveGPI(innerCallback){
+        gpi.save(innerCallback);
+      },
+      function updateDevice(innerCallback){
+        DeviceModel.update(
+          { 
+            "_id" : deviceResult._id
+          }, 
+          { "$unset": { "activeGrowPlanInstance": 1 } }, 
+          innerCallback
+        );
+      }
+    ],
+    function parallelEnd(err, results){
+      return callback(err, results[0]);
+    }
+  );
 });
 
 
@@ -1117,19 +1134,6 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 		cutoff = now - (1000 * 60 * 2), // now - 2 hours
 		logsToRemove = [];
 	
-
-	this.recentSensorLogs.forEach(function(log){
-		if (log.ts < cutoff) { logsToRemove.push(log); }
-	});
-
-	this.recentTextLogs.forEach(function(log){
-		if (log.ts < cutoff) { logsToRemove.push(log); }
-	});
-
-	logsToRemove.forEach(function(log){
-		log.remove();
-	});
-
 	done();
 });
 
