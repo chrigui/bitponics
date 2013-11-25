@@ -27,7 +27,7 @@ var createInstance = function(callback){
 describe('Action', function(){
 
 
-  require('../shared-tests').remove(Action.model, createInstance);
+  require('../test-utils').sharedTests.remove(Action.model, createInstance);
 
 
   describe('virtual overallCycleTimespan property', function(){

@@ -50,7 +50,7 @@ var createInstance = function(callback){
     });
 
     
-    require('../shared-tests').remove(DeviceModel, createInstance);
+    require('../test-utils').sharedTests.remove(DeviceModel, createInstance);
 
 
     describe('#refreshStatus', function(){

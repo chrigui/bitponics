@@ -49,6 +49,7 @@ GrowPlanSchema = new Schema({
 
   activeGardenCount : { type : Number, default : 0 },
 	
+  completedGardenCount : { type : Number, default : 0 },
   
   visibility : { 
     type: String, 

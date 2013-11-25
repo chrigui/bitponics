@@ -319,8 +319,8 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
-        function(err){
-          return callback(err, gpi);
+        function(err, activatedGPI){
+          return callback(err, activatedGPI);
         });
       });
     }
@@ -905,6 +905,90 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
     }
   );
 });
+
+
+
+
+/**
+ * Deactivate an existing grow plan instance. 
+ * Expire any actions/notifications
+ * If there's a device, unset the device's activeGrowPlanInstance property
+ *
+ * @param {function(err, gpi)} callback
+ */
+GrowPlanInstanceSchema.method('deactivate', function(callback) {
+  var gpi = this,
+      now = new Date();
+
+    gpi.active = false;
+    gpi.endDate = now;
+    gpi.phases.forEach(function(phase){
+      if (phase.active){
+        phase.endDate = now;
+      }
+    });
+    
+    gpi.save(function (err){
+      if (err) { return callback(err);}
+
+      async.parallel([
+        function expireNotifications(innerCallback){
+          NotificationModel.expireAllGrowPlanInstanceNotifications(
+            gpi._id,
+            innerCallback
+          );
+        },
+        function expireImmediateActions(innerCallback){
+          ImmediateActionModel.update(
+            {
+              'gpi' : gpi._id,
+              'e' : { $gte: now }
+            },
+            {
+              $set : {
+                'e' : now
+              }
+            },
+            { multi : true },
+            innerCallback
+          );
+        },
+        function updateDevice(innerCallback){
+          if (!gpi.device){ return innerCallback(); }
+
+          DeviceModel.findByIdAndUpdate(
+            getDocumentIdString(gpi.device),
+            {
+              $unset : { 
+                'activeGrowPlanInsance' : 1 
+              },
+              $set : {
+                'status.expires' : now
+              }
+            },
+            innerCallback
+          );
+        },
+        function updateGrowPlanCounts(innerCallback){
+          GrowPlanModel.findByIdAndUpdate(
+            gpi.growPlan, 
+            { 
+              $inc: { 
+                activeGardenCount: -1,
+                completedGardenCount: 1
+              }
+            }, 
+            innerCallback
+          );
+        }
+      ],
+      function(err){
+        return callback(err);
+      }
+    );
+  });
+});
+
 
 
 /**

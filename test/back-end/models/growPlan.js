@@ -54,7 +54,7 @@ var createInstance = function(callback){
     });
 
 
-    require('../shared-tests').remove(GrowPlan, createInstance);
+    require('../test-utils').sharedTests.remove(GrowPlan, createInstance);
 
 
     describe('#getPhaseAndDayFromStartDay(numberOfDays)', function(){

@@ -7,8 +7,10 @@ module.exports = {};
  *
  * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
  *      the device's recentSensorLogs
- * @param options.growPlanInstance {GrowPlan}: optional. GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
+ * @param options.growPlanInstance {GrowPlanInstance}: optional. GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
  * @param options.device {Device} : optional. Device Model instance on which to log this to recentSensorLogs
+ * @param options.user {User} Only needs the timezone property populated.
+ * @param callback {function(err)}
  */
 module.exports.logSensorLog = function (options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
