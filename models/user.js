@@ -163,9 +163,10 @@ UserSchema = new Schema({
   	private: String
   }
 },
-{ id : false });
+{ id : false, toObject : { virtuals: true }, toJSON : { virtuals : true } });
 
 UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+UserSchema.plugin(mongoosePlugins.recoverableRemove);
 
 UserSchema.virtual('name.full')
 	.get(function () {

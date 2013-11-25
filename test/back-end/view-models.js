@@ -1,7 +1,7 @@
-var mongooseConnection = require('../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../config/mongoose-connection').open('test'),
 	should = require('should'),
-  requirejs = require('../lib/requirejs-wrapper'),
-  Models = require('../models'),
+  requirejs = require('../../lib/requirejs-wrapper'),
+  Models = require('../../models'),
   Action = Models.action,
   ModelUtils = Models.utils,
   viewModels = requirejs('view-models');

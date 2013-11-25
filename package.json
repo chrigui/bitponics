@@ -23,7 +23,7 @@
     "mailparser": "=0.3.6",
     "mkdirp": ">= 0.0.1",
     "mongodb": "=1.3.19",
-    "mongoose": "=3.6.20",
+    "mongoose": "=3.8.1",
     "mongoose-types": ">=1.0",
     "nib": "=1.0.1",
     "nodetime": "=0.8.12",
@@ -75,6 +75,6 @@
     "karma-html-reporter": "~0.1.1"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 $(find test/* -path test/front-end -prune -o -name \"*.js\" -print)"
+    "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 ./test/back-end"
   }
 }

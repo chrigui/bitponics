@@ -1,16 +1,27 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 mongoose = require('mongoose'),
 ObjectID = require('mongodb').ObjectID,
-Models = require('../../models'),
-GrowPlanInstance = require('../../models/growPlanInstance').model,
-GrowPlan = require('../../models/growPlan').growPlan.model,
-Device = require('../../models/device').model,
+Models = require('../../../models'),
+GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
+GrowPlan = require('../../../models/growPlan').growPlan.model,
+ModelUtils = require('../../../models/utils'),
+SensorLogModel = require('../../../models/sensorLog').model,
+NotificationModel = require('../../../models/notification').model,
+Device = require('../../../models/device').model,
 should = require('should'),
-sampleGrowPlanInstances = require('../../utils/db_init/seed_data/growPlanInstances'),
+sampleGrowPlanInstances = require('../../../utils/db_init/seed_data/growPlanInstances'),
 async = require('async'),
-requirejs = require('../../lib/requirejs-wrapper'),
+requirejs = require('../../../lib/requirejs-wrapper'),
 feBeUtils = requirejs('fe-be-utils');
 
+
+var createInstance = function(callback){
+  GrowPlanInstanceModel.create({
+    growPlan : '506de2ff8eebf7524342cb3a',
+    owner : '506de30a8eebf7524342cb6c',
+    active : false
+  }, callback);
+};
 
 /*
  * Mocha Test
@@ -45,10 +56,13 @@ feBeUtils = requirejs('fe-be-utils');
     });
 
 
+    require('../test-utils').sharedTests.remove(GrowPlanInstanceModel, createInstance);
+
+    
     describe('.create', function(){
       
       it('returns an error if options.growPlan is not specified', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           owner : '506de30a8eebf7524342cb6c',
           active : true
         },
@@ -60,7 +74,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('returns an error if options.owner is not specified', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           active : true
         },
@@ -72,7 +86,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('returns an error if an invalid options.growPlan is specified', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : 'not a valid objectId',
           owner : '506de30a8eebf7524342cb6c',
           active : true
@@ -85,7 +99,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('returns a GrowPlanInstance if valid options are specified', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
           active : false
@@ -93,7 +107,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.not.exist(gpi.active);
           
           // Since active was false, all phases should be inactive
@@ -109,7 +123,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('returns a GrowPlanInstance if valid options are specified, and activates as specified', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
           active : true
@@ -117,7 +131,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
           // Since phaseId and activePhaseDay weren't specified, they 
           // should be set to the first day of the first phase
@@ -140,7 +154,7 @@ feBeUtils = requirejs('fe-be-utils');
 
       
       it('activates specified phase if options.activePhaseId is defined', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
           active : true,
@@ -149,7 +163,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
           // Since phaseId and activePhaseDay weren't specified, they 
           // should be set to the first day of the first phase
@@ -175,7 +189,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('activates specified phase and day if options.activePhaseId options.activePhaseDay are defined', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
           active : true,
@@ -185,7 +199,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
           // Since phaseId and activePhaseDay weren't specified, they 
           // should be set to the first day of the first phase
@@ -215,7 +229,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('activates specified device if options.device is defined', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
           device : '0006667288ae',
@@ -224,7 +238,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi, 'gpi should be returned from create');
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
           should.exist(gpi.device);
 
@@ -239,7 +253,7 @@ feBeUtils = requirejs('fe-be-utils');
 
 
       it('returns an error if GPI owner does not own the specified device', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a',
           owner : '506de30a8eebf7524342cb6c',
           device : '0006668033ae',
@@ -263,9 +277,68 @@ feBeUtils = requirejs('fe-be-utils');
     }); // /#activatePhase
 
 
+    describe('#deactivate', function(){
+      beforeEach(function(done){
+        var self = this;
+        GrowPlanInstanceModel.create({
+          growPlan : '506de2ff8eebf7524342cb3a',
+          owner : '506de30a8eebf7524342cb6c',
+          active : true
+        }, function(err, gpi){
+          self.gpi = gpi;
+          self.mocks = {
+            user : {
+              timezone : self.gpi.tz
+            }
+          };
+
+          return done();
+          
+        });
+      });
+
+      it('sets active to false and updates all associated documents', function(done){
+        var self = this;
+        should.exist(self.gpi, 'gpi should exist');
+        
+        NotificationModel.find({ gpi : self.gpi._id })
+        .exec(function(err, notifications){
+          var hasSomeActiveNotifications = notifications.some(function(notification){
+            return notification.tts;
+          });
+
+          hasSomeActiveNotifications.should.equal(true, "before deactivation, should have some active notifiactions");
+
+          self.gpi.deactivate(function(err){
+            should.not.exist(err, "error deactivating");
+
+            GrowPlanInstanceModel.findById(self.gpi._id, function(err, updatedGPI){
+              should.not.exist(err);
+              updatedGPI.active.should.equal(false, "gpi.active should be false after deactivation");
+
+              NotificationModel.find(
+                { 
+                  gpi : self.gpi._id, 
+                  'tts': {
+                    $exists : true 
+                  }
+                })
+              .exec(function(err, updatedNotifications){
+                updatedNotifications.length.should.equal(0, "after deactivation, should not have any active notifications");
+
+                done();  
+              });
+            });
+          });
+        });
+      });
+    });
+
+
+
     describe('#getPhaseDay', function(){
       it('retrieves expected day of a growPlanInstance phase, offset by phase.startedOnDay', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
           active : true,
@@ -275,7 +348,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
         
           var today = new Date(),
@@ -293,7 +366,7 @@ feBeUtils = requirejs('fe-be-utils');
       });
 
       it('handles extended phases', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
           active : true,
@@ -303,7 +376,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
         
           var today = new Date(),
@@ -324,7 +397,7 @@ feBeUtils = requirejs('fe-be-utils');
 
     describe('#mergePhaseDaySummary', function(){
       it('adds specified phaseDaySummary to the phase data at the index corresponding to phase day', function(done){
-        GrowPlanInstance.create({
+        GrowPlanInstanceModel.create({
           growPlan : '506de2ff8eebf7524342cb3a', // Tomato Grow Plan
           owner : '506de30a8eebf7524342cb6c',
           active : true,
@@ -334,7 +407,7 @@ feBeUtils = requirejs('fe-be-utils');
         function(err, gpi){
           should.not.exist(err);
           should.exist(gpi);
-          gpi.should.be.an.instanceof(GrowPlanInstance);
+          gpi.should.be.an.instanceof(GrowPlanInstanceModel);
           should.exist(gpi.active);
         
           var today = new Date(),
@@ -368,7 +441,7 @@ feBeUtils = requirejs('fe-be-utils');
           function(err, updatedGrowPlanInstance){
             should.not.exist(err);
             should.exist(updatedGrowPlanInstance);
-            gpi.should.be.an.instanceof(GrowPlanInstance);
+            gpi.should.be.an.instanceof(GrowPlanInstanceModel);
 
             var retrievedGpiPhase = updatedGrowPlanInstance.getPhaseByGrowPlanPhaseId("506de3048eebf7524342cb4f"),
                 retrievedPhaseDaySummary = retrievedGpiPhase.daySummaries[phaseDay];

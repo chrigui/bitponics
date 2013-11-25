@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
   mongooseTypes = require('mongoose-types'),
+  mongoosePlugins = require('../lib/mongoose-plugins'),
   Schema = mongoose.Schema,
   ObjectIdSchema = Schema.ObjectId,
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
@@ -60,6 +61,7 @@ var ImmediateActionSchema = new Schema({
   },
   { id : false });
 
+ImmediateActionSchema.plugin(mongoosePlugins.recoverableRemove);
 
 ImmediateActionSchema.virtual('growPlanInstance')
   .get(function(){

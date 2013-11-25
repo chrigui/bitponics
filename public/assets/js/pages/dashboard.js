@@ -17,7 +17,7 @@ require([
   'flexslider',
   'angular-flexslider',
   'throttle-debounce',
-  'gardenService'
+  'bpn.services.garden'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';

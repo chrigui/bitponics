@@ -32,7 +32,7 @@ var LightFixtureSchema = new Schema({
 { id : false });
 
 LightFixtureSchema.plugin(useTimestamps);
-
+LightFixtureSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /*********************** STATIC METHODS **************************/

@@ -14,7 +14,13 @@ var mongoose = require('mongoose'),
   utils = require('./utils'),
   getObjectId = utils.getObjectId,
   getDocumentIdString = utils.getDocumentIdString,
-  SensorLogSchema = require('./sensorLog').schema,
+  SensorLog = require('./sensorLog'),
+  SensorLogSchema = SensorLog.schema,
+  SensorLogModel = SensorLog.model,
+  HarvestLogModel = require('./harvestLog').model,
+  ImmediateActionModel = require('./immediateAction').model,
+  NotificationModel = require('./notification').model,
+  TextLogModel = require('./textLog').model,
   i18nKeys = require('../i18n/keys'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils'),
@@ -167,23 +173,6 @@ var GrowPlanInstanceSchema = new Schema({
     }
 	},
 	
-	/**
-	 * Sensor logs for the past 24 hours.
-	 */
-	recentSensorLogs: [SensorLogSchema],
-	
-	/**
-	 * Text Logs for the past 24 hours
-	 */
-	recentTextLogs: [{
-		ts: { type: Date, required: true, default: Date.now },
-		logs : [{
-			val: { type: String, required: true },
-			tags: { type : [String]}
-		}]
-	}],
-
-
 	visibility : { 
     type: String, 
     enum: [
@@ -197,8 +186,40 @@ var GrowPlanInstanceSchema = new Schema({
 },
 { id : false });
 
+
 GrowPlanInstanceSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
 
+GrowPlanInstanceSchema.plugin(mongoosePlugins.recoverableRemove, {
+  callback : function(err, removedDocumentResults, callback){
+    if (err) { return callback(err); }
+
+    winston.info("IN GPI REMOVE CALLBACK args " + JSON.stringify(arguments));
+    
+    // Remove associated documents (various logs)
+    var ids = removedDocumentResults.map(function(doc) { return doc._id; });
+
+    async.parallel([
+      function removeSensorLogs(innerCallback){
+        SensorLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeHarvestLogs(innerCallback){
+        HarvestLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeImmediateActions(innerCallback){
+        ImmediateActionModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeNotifications(innerCallback){
+        NotificationModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      },
+      function removeTextLogs(innerCallback){
+        TextLogModel.remove({'gpi' : { $in: ids }}, innerCallback);
+      }
+    ],
+    function parallelRemoveCallback(err){
+      return callback(err, removedDocumentResults);
+    });
+  }
+});
 
 
 GrowPlanInstanceSchema.virtual('timezone')
@@ -278,26 +299,28 @@ GrowPlanInstanceSchema.static('create', function(options, callback) {
     function(err, results){
       if (err) { return callback(err); }
 
-      gpi.save(function(err, createdGrowPlan){
+      gpi.save(function(err, createdGarden){
         if (err) { return callback(err); }
 
-        winston.info('Created new gpi for user ' + createdGrowPlan.owner + ' gpi id ' + createdGrowPlan._id);
+        winston.info('Created new gpi for user ' + createdGarden.owner + ' gpi id ' + createdGarden._id);
        
         if (!options.active){
-          return callback(err, createdGrowPlan);
+          return callback(err, createdGarden);
         }
          
-        return createdGrowPlan.activate({ 
+        return createdGarden.activate({ 
           activePhaseId : options.activePhaseId,
           activePhaseDay : options.activePhaseDay        
         },
-        function(err){
-          return callback(err, gpi);
+        function(err, activatedGPI){
+          return callback(err, activatedGPI);
         });
       });
     }
   );
 });
+
+
 /******************* END STATIC METHODS  ***************************/
 
 
@@ -460,6 +483,40 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
 
 
 /**
+ * Unpair device from this grow plan instance.
+ * 
+ * @param {function(err, growPlanInstance)} callback
+ */
+GrowPlanInstanceSchema.method('unpairDevice', function(callback) {
+  var gpi = this;
+
+  if (!gpi.device){ return callback(null, gpi); }
+
+  gpi.device = undefined;
+
+  async.parallel(
+    [
+      function saveGPI(innerCallback){
+        gpi.save(innerCallback);
+      },
+      function updateDevice(innerCallback){
+        DeviceModel.update(
+          { 
+            "_id" : deviceResult._id
+          }, 
+          { "$unset": { "activeGrowPlanInstance": 1 } }, 
+          innerCallback
+        );
+      }
+    ],
+    function parallelEnd(err, results){
+      return callback(err, results[0]);
+    }
+  );
+});
+
+
+/**
  * Activate an existing grow plan instance. If there's a device, update the device's activeGrowPlanInstance property
  * and remove the device from any other GPI's that are using it. 
  *
@@ -467,6 +524,7 @@ GrowPlanInstanceSchema.method('pairWithDevice', function(options, callback) {
  * @param {ObjectId|string=} options.activePhaseId : optional. The _id of a growPlan.phase. If present, sets the active phase on the grow plan instance. If not present,
  *                                                   the first phase will be activated.
  * @param {Number=}          options.activePhaseDay : optional. Indicates the number of days into the active phase. Used to offset gpi.phases.expectedEndDate
+ * @param {function(err, gpi)} callback
  */
 GrowPlanInstanceSchema.method('activate', function(options, callback) {
 	var gpi = this,
@@ -494,7 +552,14 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           gpiWithActivePhase.pairWithDevice({
             deviceId : getDocumentIdString(gpiWithActivePhase.device)
           },
-          innerCallback);
+          function(err, pairResult){
+            return innerCallback(err, pairResult ? pairResult.growPlanInstance : undefined);
+          });
+        },
+        function incrementGrowPlanActivationCount(activatedGPI, innerCallback){
+          GrowPlanModel.findByIdAndUpdate(activatedGPI.growPlan, { $inc: { activeGardenCount: 1 }}, function (err) {
+            return innerCallback(err, activatedGPI);
+          });
         }
       ],
       function(err, activatedGPI){
@@ -622,6 +687,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       function getDeviceControllableActions(innerCallback){
         if (!growPlanInstance.device){ return innerCallback(); }
+        console.log('getDocumentIdString(growPlanInstance.device)', getDocumentIdString(growPlanInstance.device));
         DeviceModel.findById(getDocumentIdString(growPlanInstance.device), function (err, deviceResult){
           if (err) { return innerCallback(err); }
 
@@ -868,6 +934,90 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 });
 
 
+
+
+/**
+ * Deactivate an existing grow plan instance. 
+ * Expire any actions/notifications
+ * If there's a device, unset the device's activeGrowPlanInstance property
+ *
+ * @param {function(err, gpi)} callback
+ */
+GrowPlanInstanceSchema.method('deactivate', function(callback) {
+  var gpi = this,
+      now = new Date();
+
+    gpi.active = false;
+    gpi.endDate = now;
+    gpi.phases.forEach(function(phase){
+      if (phase.active){
+        phase.endDate = now;
+      }
+    });
+    
+    gpi.save(function (err){
+      if (err) { return callback(err);}
+
+      async.parallel([
+        function expireNotifications(innerCallback){
+          NotificationModel.expireAllGrowPlanInstanceNotifications(
+            gpi._id,
+            innerCallback
+          );
+        },
+        function expireImmediateActions(innerCallback){
+          ImmediateActionModel.update(
+            {
+              'gpi' : gpi._id,
+              'e' : { $gte: now }
+            },
+            {
+              $set : {
+                'e' : now
+              }
+            },
+            { multi : true },
+            innerCallback
+          );
+        },
+        function updateDevice(innerCallback){
+          if (!gpi.device){ return innerCallback(); }
+
+          DeviceModel.findByIdAndUpdate(
+            getDocumentIdString(gpi.device),
+            {
+              $unset : { 
+                'activeGrowPlanInsance' : 1 
+              },
+              $set : {
+                'status.expires' : now
+              }
+            },
+            innerCallback
+          );
+        },
+        function updateGrowPlanCounts(innerCallback){
+          GrowPlanModel.findByIdAndUpdate(
+            gpi.growPlan, 
+            { 
+              $inc: { 
+                activeGardenCount: -1,
+                completedGardenCount: 1
+              }
+            }, 
+            innerCallback
+          );
+        }
+      ],
+      function(err){
+        return callback(err);
+      }
+    );
+  });
+});
+
+
+
 /**
  * Called when a GP that the GPI is tracking has been updated (meaning either edited or branched).
  * We then need to migrate this GPI to the new GrowPlan, updating all notifications, actions, etc.
@@ -994,19 +1144,6 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 		cutoff = now - (1000 * 60 * 2), // now - 2 hours
 		logsToRemove = [];
 	
-
-	this.recentSensorLogs.forEach(function(log){
-		if (log.ts < cutoff) { logsToRemove.push(log); }
-	});
-
-	this.recentTextLogs.forEach(function(log){
-		if (log.ts < cutoff) { logsToRemove.push(log); }
-	});
-
-	logsToRemove.forEach(function(log){
-		log.remove();
-	});
-
 	done();
 });
 

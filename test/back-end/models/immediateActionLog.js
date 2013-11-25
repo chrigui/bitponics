@@ -1,7 +1,7 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
   ObjectID = require('mongodb').ObjectID,
-  ImmediateAction = require('../../models/immediateAction'),
+  ImmediateAction = require('../../../models/immediateAction'),
   should = require('should');
 
 

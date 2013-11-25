@@ -164,7 +164,7 @@ var DeviceSchema = new Schema({
   { id : false });
 
 DeviceSchema.plugin(useTimestamps);
-
+DeviceSchema.plugin(mongoosePlugins.recoverableRemove);
 
 DeviceSchema.virtual('timezone')
   .get(function(){

@@ -174,34 +174,9 @@ module.exports = function(app){
 	 * Process an uploaded photo by uploading it to S3 and storing a 
 	 * Photo document
 	 */
-	app.post('/admin/photos/upload', function (req, res, next){
-		var PhotoModel = require('../models/photo').model,
-			photo = req.files.photo,
-			now = new Date();
-
-
-		// to send the photo back as the response:
-		//res.sendfile(req.files.photo.path);
-
-		PhotoModel.createAndStorePhoto(
-			{
-				owner : req.user,
-				originalFileName : photo.name,
-				name : photo.name,
-				contentType : photo.type,
-				date : photo.lastModifiedDate || (new Date()),
-				size : photo.size,
-				visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC),
-				streamPath : photo.path
-			},
-			function(err, photo){
-				if (err) { return next(err); }
-				return routeUtils.sendJSONResponse(res, 200, { data : photo });				
-			}
-		);
-	});
-
+	app.post('/admin/photos/upload', routeUtils.processPhotoUpload);
 	
+  
 
 	app.get('/admin/gardens', function(req, res, next){
 		var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
@@ -211,7 +186,7 @@ module.exports = function(app){
 				};
 
 		GrowPlanInstanceModel.find()
-		.select('owner _id device active startDate')
+		.select('owner _id device active startDate name')
 		.populate('owner', '_id name')
 		.exec(function(err, growPlanInstanceResults){
 			if (err) { return next(err);}
@@ -222,4 +197,21 @@ module.exports = function(app){
 	});
 
 
+  app.get('/admin/grow-plans', function(req, res, next){
+    var GrowPlanModel = require('../models/growPlan').growPlan.model,
+        locals = {
+          title: 'Bitponics Admin | Grow Plans',
+          growPlans : []
+        };
+
+    GrowPlanModel.find()
+    .select('createdBy _id name active activeGardenCount')
+    .populate('createdBy', '_id name')
+    .exec(function(err, growPlanResults){
+      if (err) { return next(err);}
+
+      locals.growPlans = growPlanResults;
+      res.render('admin/grow-plans', locals);
+    });
+  });
 };

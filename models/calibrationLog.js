@@ -53,6 +53,7 @@ CalibrationLogSchema.virtual('type')
     this.t = type;
   });
 
+CalibrationLogSchema.plugin(mongoosePlugins.recoverableRemove);
 
   /*************** SERIALIZATION *************************/
 

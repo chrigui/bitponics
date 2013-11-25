@@ -1,11 +1,17 @@
-var mongooseConnection = require('../../config/mongoose-connection').open('test'),
+var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
 	mongoose = require('mongoose'),
-  Action = require('../../models/action'),
+  Action = require('../../../models/action'),
   should = require('should'),
   moment = require('moment'),
-  i18nKeys = require('../../i18n/keys'),
-  timezone = require('../../lib/timezone-wrapper');
+  i18nKeys = require('../../../i18n/keys'),
+  timezone = require('../../../lib/timezone-wrapper');
 
+
+var createInstance = function(callback){
+  Action.model.create({
+    description : (Date.now()).toString()
+  }, callback);
+};
 
 /*
  * Mocha Test
@@ -19,6 +25,10 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
  */
 
 describe('Action', function(){
+
+
+  require('../test-utils').sharedTests.remove(Action.model, createInstance);
+
 
   describe('virtual overallCycleTimespan property', function(){
     it('returns an accurate timespan of 0 for a single-state no-control cycle', function(done){
@@ -670,8 +680,8 @@ describe('Action', function(){
 
       action.save(function(err){
         should.exist(err);
-        console.log(err.message);
-        err.errors['cycle.states'].type.should.equal('Invalid number of cycle states. Cycles have 1 or 2 states (on/off).');
+        console.log(err);
+        err.errors['cycle.states'].message.should.equal('Invalid number of cycle states. Cycles have 1 or 2 states (on/off).');
         done();
       });
     });
@@ -689,7 +699,7 @@ describe('Action', function(){
       action.save(function(err){
         should.exist(err);
         console.log(err);
-        err.errors.control.type.should.equal('An action with a control must define a cycle with 1 or 2 control states');
+        err.errors.control.message.should.equal('An action with a control must define a cycle with 1 or 2 control states');
         done();
       });
     });

@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
     mongooseTypes = require('mongoose-types'),
+    mongoosePlugins = require('../lib/mongoose-plugins'),
     Schema = mongoose.Schema,
     ObjectIdSchema = Schema.ObjectId,
   	mongooseConnection = require('../config/mongoose-connection').defaultConnection;
@@ -60,6 +61,8 @@ var HarvestLogSchema = new Schema({
     l : [HarvestReadingSchema]
 },
 { id : false });
+
+HarvestLogSchema.plugin(mongoosePlugins.recoverableRemove);
 
 HarvestLogSchema.virtual('logs')
     .get(function () {

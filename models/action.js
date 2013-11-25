@@ -80,6 +80,7 @@ ActionSchema = new Schema({
 { id : false });
 
 ActionSchema.plugin(useTimestamps);
+ActionSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /**
