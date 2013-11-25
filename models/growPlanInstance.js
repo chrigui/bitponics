@@ -156,14 +156,14 @@ var GrowPlanInstanceSchema = new Schema({
 	settings : {
 		visibleSensors : [],
     units: {
-      FULL: { type: String, enum: [ feBeUtils.UNITS.FULL.units.LUMENS.displayName ], default : feBeUtils.UNITS.FULL.units.LUMENS.displayName },
-      HUM: { type: String, enum: [ feBeUtils.UNITS.HUM.units.PERCENTAGE.displayName ], default : feBeUtils.UNITS.HUM.units.PERCENTAGE.displayName },
-      AIR: { type: String, enum: [ feBeUtils.UNITS.AIR.units.CELSIUS.displayName, feBeUtils.UNITS.AIR.units.FAHRENHEIT.displayName], default: feBeUtils.UNITS.AIR.units.CELSIUS.displayName },
-      WL: { type: String, enum: [ feBeUtils.UNITS.WL.units.CENTIMETERS.displayName, feBeUtils.UNITS.WL.units.INCHES.displayName], default: feBeUtils.UNITS.WL.units.CENTIMETERS.displayName },
-      PH: { type: String, enum: [ feBeUtils.UNITS.PH.units.PH.displayName ], default: feBeUtils.UNITS.PH.units.PH.displayName },
-      EC: { type: String, enum: [ feBeUtils.UNITS.EC.units.MICROSIEMENS.displayName ], default: feBeUtils.UNITS.EC.units.MICROSIEMENS.displayName },
-      WATER: { type: String, enum: [ feBeUtils.UNITS.AIR.units.CELSIUS.displayName, feBeUtils.UNITS.AIR.units.FAHRENHEIT.displayName], default: feBeUtils.UNITS.AIR.units.CELSIUS.displayName },
-      LUX: { type: String, enum: [ feBeUtils.UNITS.LUX.units.LMM2.displayName ], default: feBeUtils.UNITS.LUX.units.LMM2.displayName }
+      FULL: { type: String, enum: [ feBeUtils.UNITS.FULL.units[0].id ], default : feBeUtils.UNITS.FULL.units[0].id },
+      HUM: { type: String, enum: [ feBeUtils.UNITS.HUM.units[0].id ], default : feBeUtils.UNITS.HUM.units[0].id },
+      AIR: { type: String, enum: [ feBeUtils.UNITS.AIR.units[0].id, feBeUtils.UNITS.AIR.units[1].id], default: feBeUtils.UNITS.AIR.units[0].id },
+      WL: { type: String, enum: [ feBeUtils.UNITS.WL.units[0].id, feBeUtils.UNITS.WL.units[1].id], default: feBeUtils.UNITS.WL.units[0].id },
+      PH: { type: String, enum: [ feBeUtils.UNITS.PH.units[0].id ], default: feBeUtils.UNITS.PH.units[0].id },
+      EC: { type: String, enum: [ feBeUtils.UNITS.EC.units[0].id ], default: feBeUtils.UNITS.EC.units[0].id },
+      WATER: { type: String, enum: [ feBeUtils.UNITS.AIR.units[0].id, feBeUtils.UNITS.AIR.units[1].id], default: feBeUtils.UNITS.AIR.units[0].id },
+      LUX: { type: String, enum: [ feBeUtils.UNITS.LUX.units[0].id ], default: feBeUtils.UNITS.LUX.units[0].id }
     }
 	},
 	

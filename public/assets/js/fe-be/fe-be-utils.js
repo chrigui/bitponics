@@ -191,87 +191,113 @@ define(['moment'], function(moment){
    */
   utils.UNITS = {
     'FULL': { 
-      units : {
-        'LUMENS': {
+      units : [
+        {
+          id: 'LUMENS',
           displayName: 'Lumens',
           abbrev: 'lm'
         }
-      }
+      ],
+      convertFrom: utils.noop,
+      convertTo: utils.noop
     },
-    'HUM': { 
-      units : {
-        'PERCENTAGE': {
+    'HUM': {
+      units : [
+        {
+          id: 'PERCENTAGE',
           displayName: 'Percentage',
           abbrev: '%'
         }
-      }
+      ],
+      convertFrom: utils.noop,
+      convertTo: utils.noop
     },
     'AIR': { 
-      units : {
-        'CELSIUS': {
+      units : [
+        {
+          id: 'CELSIUS',
           displayName: 'Celsius',
-          abbrev: 'C'
-        }, 
-        'FAHRENHEIT': {
+          abbrev: 'C°'
+        },
+        {
+          id: 'FAHRENHEIT',
           displayName: 'Fahrenheit',
-          abbrev: 'F'
+          abbrev: 'F°'
         }
-      },
+      ],
       convertFrom: utils.convertFromCelsiusToFahrenheit,
       convertTo: utils.convertToCelsiusFromFahrenheit
     },
     'WL': { 
-      units : {
-        'CENTIMETERS': {
+      units : [
+        {
+          id: 'CENTIMETERS',
           displayName: 'Centimeters',
           abbrev: 'cm'
-        }, 
-        'INCHES': {
+        },
+        {
+          id: 'INCHES',
           displayName: 'Inches',
           abbrev: 'in'
         }
-      },
+      ],
       convertFrom: utils.convertFromCentimetersToInches,
       convertTo: utils.convertToCentimetersFromInches
     },
     'PH': { 
-      units : {
-        'PH': {
+      units : [
+        {
+          id: 'PH',
           displayName: 'pH',
           abbrev: 'pH'
         }
-      }
+      ],
+      convertFrom: utils.noop,
+      convertTo: utils.noop
     },
     'EC': { 
-      units : {
-        'MICROSIEMENS': {
+      units : [
+        {
+          id: 'MICROSIEMENS',
           displayName: 'Microsiemens',
           abbrev: 'µS'
         }
-      }
+      ],
+      convertFrom: utils.noop,
+      convertTo: utils.noop
     },
     'WATER': { 
-      units : {
-        'CELSIUS': {
+      units : [
+        {
+          id: 'CELSIUS',
           displayName: 'Celsius',
-          abbrev: 'C'
-        }, 
-        'FAHRENHEIT': {
+          abbrev: 'C°'
+        },
+        {
+          id: 'FAHRENHEIT',
           displayName: 'Fahrenheit',
-          abbrev: 'F'
+          abbrev: 'F°'
         }
-      },
+      ],
       convertFrom: utils.convertFromCelsiusToFahrenheit,
       convertTo: utils.convertToCelsiusFromFahrenheit
     },
     'LUX': { 
-      units : {
-        'LMM2': {
+      units : [
+        {
+          id: 'LMM2',
           displayName: 'lm/(m^2)',
           abbrev: 'lm/(m^2)'
         }
-      }
+      ],
+      convertFrom: utils.noop,
+      convertTo: utils.noop
     }
+  };
+
+  utils.UNITS.system = {
+      'METRIC': ['CELSIUS', 'CENTIMETERS'],
+      'US': ['FAHRENHEIT', 'INCHES']
   };
 
   
@@ -524,6 +550,8 @@ define(['moment'], function(moment){
     var newValue = value;
     return newValue;
   };
+
+  utils.noop = function() {};
 
   return utils;
 });

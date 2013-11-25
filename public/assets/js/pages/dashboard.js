@@ -16,7 +16,8 @@ require([
   'overlay',
   'flexslider',
   'angular-flexslider',
-  'throttle-debounce'
+  'throttle-debounce',
+  'gardenService'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
@@ -27,10 +28,11 @@ require([
 
     dashboardApp.factory('sharedDataService', 
       [
+        'GardenModel',
         'bpn.services.socket',
         '$http',
         '$q',
-        function(socket, $http, $q){
+        function(GardenModel, socket, $http, $q){
           
           /**
            * All the properties this service will expose
@@ -54,10 +56,11 @@ require([
             growPlanInstance : bpn.pageData.growPlanInstance,
             controlHash : {},
             photos : bpn.pageData.photos,
-            units : feBeUtils.UNITS
+            units : feBeUtils.UNITS,
+            gardenModel : new GardenModel(bpn.pageData.growPlanInstance)
           };
 
-          console.log(feBeUtils.UNITS);
+          console.log(sharedData.gardenModel);
 
           sharedData.controls.forEach(function(control){
             sharedData.controlHash[control._id] = control;
@@ -223,15 +226,14 @@ require([
                   notifications = data.notifications,
                   photos = data.photos,
                   dateDataCache;
-              console.log('sensorLog coming from update?', sensorLog);
+              
               if (sensorLog){
                 sensorLog = viewModels.initSensorLogViewModel(sensorLog);
                 dateDataCache = sharedData.getDateDataCache(sensorLog.timestamp);
                 dateDataCache.sensorLogs.unshift(sensorLog);
                 dateDataCache.latestSensorLogs = viewModels.initLatestSensorLogsViewModel(dateDataCache.sensorLogs);
               }
-              console.log('textLog');
-              console.log(textLog);
+              
               if (textLog){
                 textLog = textLog;
                 sharedData.recentTextLogs.unshift(textLog);
@@ -255,15 +257,6 @@ require([
           }
 
           initSocket();
-          
-
-          /*
-           * Overlay positioning
-           */
-          sharedData.setActiveOverlay = function(overlayName) {
-            // sharedDataService.activeOverlayPositionTop
-
-          }
 
           return sharedData;
         }
@@ -516,6 +509,39 @@ require([
       ]
     );
 
+
+    dashboardApp.controller('bpn.controllers.dashboard.SettingsOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+
+          $scope.completeGarden = function() {
+            
+          }
+          
+          $scope.deleteGarden = function() {
+
+          }
+
+          // $scope.setToMetric = function() {
+
+          // }
+          
+          /*
+           * Save Settings to GardenModel
+           */
+          $scope.submit = function() {
+            sharedDataService.gardenModel.$save();
+          }
+        }
+      ]
+    );
 
     dashboardApp.controller('bpn.controllers.dashboard.SensorDetailOverlay',
       [
@@ -1053,7 +1079,7 @@ require([
         scope : {
           sensorUnit : "=?",
           sensorCode : "=?",
-          sensors : "=?",
+          sensorName : "=?",
           close : "=?",
           manualSensorEntry : "=?",
           manualTextEntry : "=?"
@@ -1064,7 +1090,7 @@ require([
           $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
           $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
           $scope.manualSensorEntryMode = false;
-          $scope.sensors = Object.keys($scope.manualSensorEntry);
+          $scope.sensorUnits = sharedDataService.units;
 
           $scope.toggleManualEntry = function(){
             $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
@@ -1089,16 +1115,20 @@ require([
 
           };
 
+          $scope.hasMultipleUnits = function (sensorCode) {
+            return $scope.sensorUnits[sensorCode.toUpperCase()].units.length > 1;
+          };
+
           $scope.submit = function(){
             var valid = true,
                 sensorDataObj = {},
                 textDataObj = {},
-                sensors = $scope.sensors,
+                sensors = Object.keys($scope.manualSensorEntry),
                 text = $scope.manualTextEntry,
                 sensorlogsArray = [];
 
-            for (var i = 0; i < $scope.sensors.length; i++) {
-              if ($scope.manualSensorEntry[$scope.sensors[i]]) {
+            for (var i = 0; i < sensors.length; i++) {
+              if ($scope.manualSensorEntry[sensors[i]]) {
                 //construct sensor logs array for dataObj
                 sensorlogsArray.push({
                   val: $scope.manualSensorEntry[sensors[i]],
@@ -1147,17 +1177,19 @@ require([
 
               });
 
-              $http({
-                method: 'post',
-                url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/text-logs',
-                data: textDataObj
-              })
-              .success(function(data, status, headers, config) {
-                console.log('success');
-              })
-              .error(function(data, status, headers, config) {
-                console.log('error');
-              });
+              if(text) {
+                $http({
+                  method: 'post',
+                  url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/text-logs',
+                  data: textDataObj
+                })
+                .success(function(data, status, headers, config) {
+                  console.log('success');
+                })
+                .error(function(data, status, headers, config) {
+                  console.log('error');
+                });
+              }
             }
           };
 

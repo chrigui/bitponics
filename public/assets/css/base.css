@@ -1,4 +1,5 @@
-.full-width {
+.full-width,
+.dashboard .sensor-reading-group {
   width: 100%;
 }
 .half-width {
@@ -47,10 +48,10 @@
 .no-flexbox .grid-cell,
 .featured-press a,
 .additional-press a,
-.dashboard .content-module,
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .dashboard .overlay.photo img,
+.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -66,7 +67,8 @@
 .display-t {
   display: table;
 }
-.clear-b {
+.clear-b,
+.dashboard .sensor-reading-group {
   clear: both;
 }
 .clear-l {
@@ -86,7 +88,9 @@
 .clearfix:after {
   clear: both;
 }
-.float-l {
+.float-l,
+.dashboard .manual-entry-form .sensor-reading-unit,
+.dashboard .manual-entry-form .sensor-reading-value {
   float: left;
 }
 .float-r {
@@ -940,7 +944,8 @@ img.page-spinner.spinner {
 /*
  * Overlay
  */
-.full-width {
+.full-width,
+.dashboard .sensor-reading-group {
   width: 100%;
 }
 .half-width {
@@ -984,10 +989,10 @@ img.page-spinner.spinner {
 .no-flexbox .grid-cell,
 .featured-press a,
 .additional-press a,
-.dashboard .content-module,
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .dashboard .overlay.photo img,
+.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -1003,7 +1008,8 @@ img.page-spinner.spinner {
 .display-t {
   display: table;
 }
-.clear-b {
+.clear-b,
+.dashboard .sensor-reading-group {
   clear: both;
 }
 .clear-l {
@@ -1023,7 +1029,9 @@ img.page-spinner.spinner {
 .clearfix:after {
   clear: both;
 }
-.float-l {
+.float-l,
+.dashboard .manual-entry-form .sensor-reading-unit,
+.dashboard .manual-entry-form .sensor-reading-value {
   float: left;
 }
 .float-r {
@@ -2145,12 +2153,6 @@ img.page-spinner.spinner {
 .dashboard.app-page .page-heading {
   font-size: 2.25em;
 }
-.dashboard .content-module.middle {
-  width: 60%;
-}
-.dashboard .content-module.side {
-  width: 20%;
-}
 .dashboard .data-module .main-heading.right {
   right: 0.75em;
   text-align: right;
@@ -2318,14 +2320,63 @@ img.page-spinner.spinner {
 .dashboard .btn {
   padding: 0.5em;
 }
+.dashboard .manual-entry-form .sensor-reading-date.page-heading-small {
+  font-size: 0.85em;
+}
 .dashboard .manual-entry-form .btn {
   margin-bottom: 1em;
+}
+.dashboard .manual-entry-form textarea {
+  margin: 1em 0;
+}
+.dashboard .manual-entry-form .sensor-reading-unit {
+  margin: 0.5em;
+}
+.dashboard .manual-entry-form .custom-dropdown-wrap {
+  margin: 0;
+}
+.dashboard .manual-entry-form select.custom-dropdown {
+  font-size: 0.85em;
+  height: 2.425em;
+  width: 3.5em;
+}
+.dashboard .manual-entry-form input[type="submit"] {
+  clear: both;
+  width: 50%;
+  margin-left: 0;
+}
+.garden-settings {
+  height: 2em;
 }
 .circle {
   margin: 1.5em 0;
 }
 .circle svg {
   max-width: 100%;
+}
+@media  screen and (min-width: 65em) {
+  .dashboard header {
+    clear: both;
+    overflow: hidden;
+  }
+  .dashboard .content-module.middle {
+    width: 60%;
+  }
+  .dashboard .content-module.side {
+    width: 20%;
+  }
+  .dashboard h2.page-heading {
+    float: left;
+    width: 75%;
+  }
+  .dashboard .garden-settings {
+    float: right;
+    height: 1em;
+  }
+  .dashboard .garden-settings i {
+    cursor: pointer;
+    font-size: 2.75em;
+  }
 }
 /*
  * Profile Page
@@ -2590,6 +2641,7 @@ li
   border-width: 1px 0 0;
   padding-top: 0.25em;
   margin-top: 0.25em;
+  width: 100%;
 }
 .undefined .dropdown,
 .app-page .dropdown {
@@ -2685,6 +2737,9 @@ li
     left: 25%;
     right: 25%;
     width: 50%;
+  }
+  .separator-top {
+    width: auto;
   }
 }
 /*

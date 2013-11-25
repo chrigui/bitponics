@@ -14,7 +14,48 @@ block content
   section#main(role="main", class="main")
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
-      h2.page-heading {{sharedDataService.growPlanInstance.name}}
+      header
+        h2.page-heading {{sharedDataService.growPlanInstance.name}}
+        div(class="garden-settings", ng-click="sharedDataService.activeOverlay = 'SettingsOverlay'")
+          | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
+
+      div
+        div(modal="sharedDataService.activeOverlay=='SettingsOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+            div(class="close btn", ng-click="close()")
+              | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+            h3(class="page-heading page-heading-small") Garden Settings
+            form(ng-controller="bpn.controllers.dashboard.SettingsOverlay", ng-submit="submit()")
+              
+              //- div(class="custom-checkbox-wrap")
+              //-   input(id="{{sensorCode}}_settings_unit_toggle", 
+              //-     type="checkbox",
+              //-     name="{{sensorCode}}_settings_unit_toggle",
+              //-     checked="isMetric")
+              //-   label(ng-click="toggleMetric()", for="{{sensorCode}}_settings_unit_toggle", class="btn no-margin") Metric
+
+              div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
+                div(data-bpn-directives-manual-entry-form, 
+                  data-sensor-unit="sensor.unit", 
+                  data-sensor-code="sensor.code",
+                  data-sensor-name="sensor.name",
+                  data-close="close",
+                  class="manual-entry-form")
+                  
+                  div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
+                  div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
+                    select(class="custom-dropdown", 
+                      ng-model="sharedDataService.growPlanInstance.settings.units[sensorCode.toUpperCase()]", 
+                      ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
+                    .dblarrow
+                      i
+
+              button(class="complete-garden btn", ng-click="completeGarden()") Complete garden
+
+              button(class="delete-garden btn", ng-click="deleteGarden()") Delete garden
+
+              input(type="submit", value="Save")
+
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
 
@@ -77,14 +118,13 @@ block content
                     
                     div(ng-show="manualSensorEntryMode")
                       form(action="", ng-submit="submit()")
-                        input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="display-ib half-width", type="number", step="any",required)
-                        span.sensor-unit {{sensorUnit}}
-                        {{sharedDataService.units[sensorCode.toUpperCase()]}}
-                        div.custom-dropdown-wrap
-                          select(class="custom-dropdown", 
-                            ng-model="manualSensorEntry[sensorCode].unit", 
-                            ng-options="key as key for (key , value) in sharedDataService.units[sensorCode.toUpperCase()].units",
-                            ng-init="sharedDataService.growPlanInstance.settings.units[sensorCode]")
+                        input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any",required)
+                        div(ng-hide="hasMultipleUnits(sensorCode)", class="sensor-reading-unit")
+                          span.sensor-unit {{sensorUnit}}
+                        div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
+                          select(class="custom-dropdown no-margin", 
+                            ng-model="sharedDataService.growPlanInstance.settings.units[sensorCode.toUpperCase()]", 
+                            ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
                           .dblarrow
                             i
                         input(type="submit", value="Record")
@@ -131,20 +171,27 @@ block content
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-              h3(class="page-heading page-heading-small") Log Entry
-              h4(class="page-heading-small no-margin") {{sharedDataService.activeDate.date | date:'shortDate'}}
               
               div(data-bpn-directives-manual-entry-form, 
                   data-close="close",
-                  class="manual-entry-form",
-                  data-sensors="sharedDataService.sensors")
+                  class="manual-entry-form")
+
+                h3(class="page-heading page-heading-small") Log Entry
+                h4(class="sensor-reading-date page-heading-small") {{sharedDataService.activeDate.date | date:'shortDate'}}
 
                 div
                   form(action="", ng-submit="submit()")
                     textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width")
-                    div(ng-repeat="sensor in sensors")
-                      input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="display-ib half-width", type="number", step="any")
-                      span  {{sensor.unit}}
+                    div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
+                      input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any")
+                      div(ng-hide="hasMultipleUnits(sensor.code)", class="sensor-reading-unit")
+                        span.sensor-unit {{sensor.unit}}
+                      div(ng-show="hasMultipleUnits(sensor.code)", class="sensor-reading-unit custom-dropdown-wrap")
+                        select(class="custom-dropdown no-margin", 
+                          ng-model="sharedDataService.growPlanInstance.settings.units[sensor.code.toUpperCase()]", 
+                          ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensor.code.toUpperCase()].units")
+                        .dblarrow
+                          i
                     input(type="submit", value="Record")
               
             

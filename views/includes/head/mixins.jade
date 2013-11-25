@@ -33,6 +33,7 @@ mixin requirejs(dataMain)
   - var utils = CDN('/assets/js/shared/utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var viewModels = CDN('/assets/js/fe-be/view-models.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var growPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var gardenService = CDN('/assets/js/services/garden.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   //- These two scripts don't exist... never used?
   //- //var spin = '/assets/js/libs/spin.min.js'
   //- //var socketIO = '/socket.io/socket.io.js'
@@ -75,7 +76,8 @@ mixin requirejs(dataMain)
         'throttle-debounce': '#{throttleDebounce}',
         'utils': '#{utils}',
         'view-models': '#{viewModels}',
-        'growPlanService': '#{growPlanService}'
+        'growPlanService': '#{growPlanService}',
+        'gardenService': '#{gardenService}'
       },
       shim: { 
         'angular': { 

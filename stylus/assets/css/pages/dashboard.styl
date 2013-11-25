@@ -1,19 +1,10 @@
 @import "../components/select2"
+@import "../global/breakpoints"
 
 .dashboard
 	
 	&.app-page .page-heading 
 		font-size 2.25em
-
-	.content-module
-		@extends .display-ib
-		&.middle
-			// position relative
-			// padding 100% 0 0 0 //must match container width
-			// height 0
-			width 60%
-		&.side
-			width 20%
 
 	.data-module
 
@@ -200,9 +191,47 @@
 	.btn
 		padding: 0.5em;
 
+	.sensor-reading-group
+		@extends .clear-b
+		@extends .full-width
+
 	.manual-entry-form
+
+		.sensor-reading-date.page-heading-small
+			// @extends .no-margin
+			// @extends .position-a
+			// top 2em
+			// right 2em
+			font-size .85em
+
 		.btn
 			margin-bottom 1em
+
+		textarea
+			margin 1em 0
+
+		.sensor-reading-unit, .sensor-reading-value
+			@extends .float-l
+
+		.sensor-reading-unit
+			margin .5em
+
+		.custom-dropdown-wrap
+			margin 0
+
+		select.custom-dropdown
+			font-size .85em
+			height 2.425em
+			width 3.5em
+
+		input[type="submit"]
+			clear: both;
+			width: 50%;
+			margin-left: 0;
+
+.garden-settings
+	height 2em
+
 
 
 .circle
@@ -210,3 +239,30 @@
 	svg
 		max-width 100%
 
+/* Large screens */
+@media $mq_larger
+	.dashboard
+
+		header
+			clear both
+			overflow hidden
+
+		.content-module
+			@extends .display-ib
+			&.middle
+				// position relative
+				// padding 100% 0 0 0 //must match container width
+				// height 0
+				width 60%
+			&.side
+				width 20%
+		h2.page-heading
+			float left
+			width 75%
+		
+		.garden-settings
+			float right
+			height 1em
+			i
+				cursor pointer
+				font-size 2.75em

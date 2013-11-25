@@ -221,8 +221,6 @@ input.inline {
 input,
 textarea {
   margin-top: 0;
-  background-color: #eaeaea;
-  border: none;
   padding: 0.75em;
   color: #999;
 }
@@ -230,14 +228,15 @@ input:valid,
 textarea:valid,
 input:invalid,
 textarea:invalid {
-  background-color: #eaeaea;
-  border: 1px solid #fff;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  -webkit-box-shadow: inset 0 0.15em 0.35em -1px #eaeaea;
+  box-shadow: inset 0 0.15em 0.35em -1px #eaeaea;
 }
 input:focus,
 textarea:focus {
-  background-color: #fff;
-  color: #000;
-  border: 1px solid #eaeaea;
+  outline: none;
+  border: 1px solid #00e36c;
 }
 input[type=submit] {
   background: #fff;
@@ -310,13 +309,15 @@ input[type='checkbox']:checked + label.btn {
 }
 .seamless-input,
 .seamless-input-with-bg {
-  border: 0 none;
+  border: 1px solid #fff;
   color: #000;
   background: none;
   width: 2.35em;
   display: inline;
   padding: 0.25em 0;
   margin: 0 0.25em 0 0;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
 .seamless-input::-webkit-outer-spin-button,
 .seamless-input::-webkit-inner-spin-button {
@@ -329,6 +330,12 @@ input[type='checkbox']:checked + label.btn {
 .seamless-input-with-bg {
   background-color: #00e36c !important;
   color: #fff !important;
+}
+.seamless-input:focus,
+.seamless-input-with-bg:focus {
+  border: 1px solid #fff;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 .dropdown {
   position: absolute;
@@ -397,6 +404,7 @@ input[type='checkbox']:checked + label.btn {
   display: inline-block;
   font-size: 24px;
   height: 1em;
+  pointer-events: none;
 }
 .custom-dropdown-wrap .dblarrow i {
   width: 0;
