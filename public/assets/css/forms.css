@@ -609,3 +609,18 @@ input[type='checkbox']:checked + label.btn {
 .amazon input {
   border: 0 none !important;
 }
+.photo-upload {
+  overflow: hidden;
+  position: relative;
+}
+.photo-upload input[type="file"] {
+  font-size: 200px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+  z-index: 2;
+  cursor: pointer;
+}

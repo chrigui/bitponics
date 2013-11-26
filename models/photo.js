@@ -22,10 +22,20 @@ var PhotoSchema = new Schema({
 	 * The GrowPlanInstance. Optional. A denormalized convenience property to
    * make querying for a garden's photos easier.
    * 
-   * TODO: this concept should be generalized. Make it a "referencedDocumentId" or something
-   * to allow for pointing to docs from other collections
-	 */
+   */
 	gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
+
+  
+  /**
+   * TODO: concept of ref'ed docs should be generalized rather than just having 'gpi'
+   *
+  referencedDocuments : [
+    {
+      collectionName : { type : String },
+      documentId : { type : String }
+    }
+  ],
+  */
 
   tags : [ String ],
 
@@ -69,7 +79,8 @@ PhotoSchema.plugin(mongoosePlugins.visibility);
 PhotoSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
-PhotoSchema.index({ 'gpi' : 1, 'date': -1 });
+PhotoSchema.index({ 'gpi' : 1, 'date': -1 }, { sparse : true });
+//PhotoSchema.index({ 'referencedDocuments.documentId' : 1, 'date': -1 }, { sparse : true });
 
 
 
@@ -180,8 +191,6 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
           var filesizeCallback = function(err, value){
             if (err) { return innerCallback(err);  }
 
-            console.log("THUMBNAIL FILESIZE : ", value);
-
             // value is returned in format "724B", need to parse int to get byte number
             photo.thumbnailSize = parseInt(value, 10);
             
@@ -194,8 +203,6 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
                 'Content-Length' : photo.thumbnailSize
               }, 
               function(err, result) {
-                console.log('returned from thumbnail s3 upload', err, result);
-
                 if (err) { return innerCallback(err);  }
               
                 if (result.statusCode !== 200) {
@@ -231,9 +238,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
         }
       ],
       function(err, results){
-        console.log("PHOTO PARALLEL END", err, results);
-
-        if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
+         if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
           // Delete the file from disk
           fs.unlink(options.streamPath);
         }
