@@ -16,8 +16,8 @@ block content
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
       header
         h2.page-heading {{sharedDataService.gardenModel.name}}
-        div(class="garden-settings", ng-click="sharedDataService.activeOverlay = 'SettingsOverlay'")
-          | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
+        //- div(class="garden-settings", ng-click="sharedDataService.activeOverlay = 'SettingsOverlay'")
+        //-   | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
 
       div
         div(modal="sharedDataService.activeOverlay=='SettingsOverlay'", close="close()", options="sharedDataService.modalOptions")
@@ -116,7 +116,7 @@ block content
                       input(id="{{sensorCode}}_manual_entry_toggle", 
                         type="checkbox",
                         name="{{sensorCode}}_manual_entry_toggle")
-                      label(ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
+                      label(ng-hide="manualSensorEntryMode", ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
                     
                     div(ng-show="manualSensorEntryMode")
                       form(action="", ng-submit="submit()")

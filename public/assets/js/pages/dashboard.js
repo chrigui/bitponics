@@ -17,7 +17,8 @@ require([
   'flexslider',
   'angular-flexslider',
   'throttle-debounce',
-  'bpn.services.garden'
+  'bpn.services.garden',
+  'bpn.services.nav'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
@@ -59,8 +60,6 @@ require([
             units : feBeUtils.UNITS,
             gardenModel : new GardenModel(bpn.pageData.growPlanInstance)
           };
-
-          console.log(sharedData.gardenModel);
 
           sharedData.controls.forEach(function(control){
             sharedData.controlHash[control._id] = control;
@@ -275,12 +274,21 @@ require([
         '$http',
         '$q',
         'sharedDataService',
-        function ($scope, $http, $q, sharedDataService) {
+        'NavService',
+        function ($scope, $http, $q, sharedDataService, NavService) {
           $scope.sharedDataService = sharedDataService;
           $scope.controls = bpn.pageData.controls;
           $scope.sensors = bpn.pageData.sensors;
           
-          
+          /*
+           * Open garden settings overlay from nav settings
+           */
+          $scope.$watch( function () { return NavService.openGardenSettingsOverlay; }, function (oldData, newData) {
+            if (newData) {
+              $scope.sharedDataService.activeOverlay = 'SettingsOverlay';
+              // NavService.openGardenSettingsOverlay = false;
+            }
+          }, true);
 
           /**
            *
@@ -514,13 +522,19 @@ require([
       [
         '$scope',
         'sharedDataService',
-        function($scope, sharedDataService){
+        'NavService',
+        '$rootScope',
+        function($scope, sharedDataService, NavService, $rootScope){
           $scope.sharedDataService = sharedDataService;
 
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
 
+          $rootScope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+          
           $scope.completeGarden = function() {
             sharedDataService.gardenModel.$complete();
           }
@@ -529,10 +543,6 @@ require([
             sharedDataService.gardenModel.$delete();
           }
 
-          // $scope.setToMetric = function() {
-
-          // }
-          
           /*
            * Save Settings to GardenModel
            */
@@ -1089,8 +1099,10 @@ require([
 
           $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
           $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
-          $scope.manualSensorEntryMode = false;
           $scope.sensorUnits = sharedDataService.units;
+
+          //if no device on garden, then just show the manual sensor entry forms
+          $scope.manualSensorEntryMode = !$scope.sharedDataService.gardenModel.device;
 
           $scope.toggleManualEntry = function(){
             $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
