@@ -22,10 +22,12 @@ block content
       div
         div(modal="sharedDataService.activeOverlay=='SettingsOverlay'", close="close()", options="sharedDataService.modalOptions")
           div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
-            div(class="close btn", ng-click="close()")
-              | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
-            h3(class="page-heading page-heading-small") Garden Settings
+            
             form(ng-controller="bpn.controllers.dashboard.SettingsOverlay")
+
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+              h3(class="page-heading page-heading-small") Garden Settings
               
               //- div(class="custom-checkbox-wrap")
               //-   input(id="{{sensorCode}}_settings_unit_toggle", 
