@@ -1251,9 +1251,16 @@ require([
     });
 
     dashboardApp.filter('friendlyDate', function() {
-      return function(input) {
-        var val = moment(input).calendar()
-        return val.charAt(0).toUpperCase() + val.slice(1);
+      return function(input, format) {
+        var val = moment(input).calendar();
+
+        console.log('format', arguments);
+        if (format === 'lowercase'){
+          return val.charAt(0).toLowerCase() + val.slice(1);  
+        } else {
+          return val.charAt(0).toUpperCase() + val.slice(1);  
+        }
+        
       }
     });
 

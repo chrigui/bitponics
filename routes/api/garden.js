@@ -136,7 +136,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/gardens/:id', function (req, res, next){
+  app.post('/api/gardens/:id', function (req, res, next){
     
     GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
       

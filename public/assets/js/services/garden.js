@@ -11,15 +11,17 @@ define([
 					return $resource('/api/gardens/:id', 
 						{ id: '@_id'},
 						{
-							updateSettings: { method:'PUT', isArray: false, transformRequest: function (data, headersGetter) {
-				                var result = data.settings,
-				                	json = JSON.stringify({ settings: result });
-				                return json;
-			        	    }},
+							updateSettings: { method:'POST', isArray: false, transformRequest: function (data, headersGetter) {
+	                var result = data.settings,
+	                	json = JSON.stringify({ settings: result });
+	                return json;
+        	    }},
 
-			        	    complete: { method:'POST', isArray: false },
+        	    complete: { method:'POST', isArray: false, transformRequest: function(data, headersGetter){
+                return JSON.stringify({active : false });
+              }},
 
-			        	    delete: { method:'DELETE', isArray: false }
+        	    delete: { method:'DELETE', isArray: false }
 			        	    
 						}
 					);

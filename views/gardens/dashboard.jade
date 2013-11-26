@@ -29,6 +29,8 @@ block content
                 | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Garden Settings
               
+              h2(ng-show="sharedDataService.gardenModel.endDate") This garden was marked complete {{sharedDataService.gardenModel.endDate | friendlyDate:'lowercase'}}
+              
               //- div(class="custom-checkbox-wrap")
               //-   input(id="{{sensorCode}}_settings_unit_toggle", 
               //-     type="checkbox",
@@ -36,27 +38,31 @@ block content
               //-     checked="isMetric")
               //-   label(ng-click="toggleMetric()", for="{{sensorCode}}_settings_unit_toggle", class="btn no-margin") Metric
 
-              div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
-                div(data-bpn-directives-manual-entry-form, 
-                  data-sensor-unit="sensor.unit", 
-                  data-sensor-code="sensor.code",
-                  data-sensor-name="sensor.name",
-                  data-close="close",
-                  class="manual-entry-form")
-                  
-                  div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
-                  div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
-                    select(class="custom-dropdown", 
-                      ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
-                      ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
-                    .dblarrow
-                      i
+              div(ng-hide="sharedDataService.gardenModel.endDate")
+                div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
+                  div(data-bpn-directives-manual-entry-form, 
+                    data-sensor-unit="sensor.unit", 
+                    data-sensor-code="sensor.code",
+                    data-sensor-name="sensor.name",
+                    data-close="close",
+                    class="manual-entry-form")
+                    
+                    div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
+                    div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
+                      select(class="custom-dropdown", 
+                        ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
+                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
+                      .dblarrow
+                        i
 
-              button(class="complete-garden btn", ng-click="completeGarden()") Complete garden
+                button(
+                  class="complete-garden btn",
+                  ng-show="sharedDataService.gardenModel.active",
+                  ng-click="completeGarden()") Complete garden
 
-              button(class="delete-garden btn", ng-click="deleteGarden()") Delete garden
+                button(class="delete-garden btn", ng-click="deleteGarden()") Delete garden
 
-              input(type="submit", value="Save", ng-click="submit()")
+                input(type="submit", value="Save", ng-click="submit()")
 
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
