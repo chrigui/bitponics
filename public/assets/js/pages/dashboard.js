@@ -10,7 +10,7 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  'services-socket',
+  'bpn.services.socket',
   'selection-overlay',
   'controller-nav',
   'overlay',
