@@ -146,8 +146,27 @@ block content
           
           ul(class="grid photos centered", ng-show="sharedDataService.photos.length > 0") 
             li.photo(ng-repeat="photo in sharedDataService.photos", ng-click="open(photo._id, $index)")
-              img(ng-src="{{photo.url}}")
-              
+              img(ng-src="{{photo.thumbnailUrl}}")
+          
+            li.photo
+              lvl-file-upload(
+                 auto-upload='true'
+                 choose-file-button-text='Choose files'
+                 upload-url='/api/gardens/{{sharedDataService.gardenModel._id}}/photos'
+                 max-files='5'
+                 max-file-size-mb='5'
+                 get-additional-data='getData(files)'
+                 on-done='done(files, data)'
+                 on-progress='progress(percentDone)'
+                 on-error='error(files, type, msg)')
+              //- https://coderwall.com/p/4etjja
+              //-form.photo-upload(action="/gardens/{{sharedDataService.gardenModel._id}}/photos", method="POST")
+                div upload photo
+                | <i class="icon-glyph-new icon-17_photos" aria-hidden="true"></i>
+                //- http://stackoverflow.com/questions/17922557/angularjs-how-to-check-for-changes-in-file-input-fields
+                input(type="file", name="photo", accept="image/*", onchange="angular.element(this).scope().photoInputChanged(this)")
+                
+
           div
             div(modal="sharedDataService.activeOverlay==('PhotoLogsOverlay')", close="close()", options="modalOptions")
               div(class="overlay-contain")
