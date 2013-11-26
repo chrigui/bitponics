@@ -238,11 +238,33 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    *
    * Adds the following properties:
    * url
+   * thumbnailUrl
    */
   viewModels.initPhotoViewModel = function (photo){
     photo.url = '/photos/' + photo._id;
     photo.thumbnailUrl = '/photos/' + photo._id + '/' + utils.PHOTO_THUMBNAIL_SIZE.WIDTH;
     return photo;
+  };
+
+
+  /**
+   * Sorts according to date & initializes extra props
+   *
+   */
+  viewModels.initPhotosViewModel = function (photos){
+    photos = photos.sort(function(a, b){
+      if (a.date < b.date){
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+    photos.forEach(function(photo){
+      viewModels.initPhotoViewModel(photo);
+    });
+    
+    return photos;
   };
 
 

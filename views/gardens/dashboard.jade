@@ -141,24 +141,27 @@ block content
         div(ng-controller="bpn.controllers.dashboard.PhasesGraph")
           div(data-bpn-directives-phases-graph)
 
-        div(class="full-width", ng-controller="bpn.controllers.dashboard.PhotoLogs")
+        div(class="full-width", ng-controller="bpn.controllers.dashboard.Photos")
           //- ordered from new to old
           
           ul(class="grid photos centered", ng-show="sharedDataService.photos.length > 0") 
-            li.photo(ng-repeat="photo in sharedDataService.photos", ng-click="open(photo._id, $index)")
+            li.photo(ng-repeat="photo in sharedDataService.photos | orderBy:predicate:date", ng-click="open(photo._id, $index)")
               img(ng-src="{{photo.thumbnailUrl}}")
           
             li.photo
+              img.spinner(src="/assets/img/spinner.svg", ng-show="uploadInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
               lvl-file-upload(
-                 auto-upload='true'
-                 choose-file-button-text='Choose files'
-                 upload-url='/api/gardens/{{sharedDataService.gardenModel._id}}/photos'
-                 max-files='5'
-                 max-file-size-mb='5'
-                 get-additional-data='getData(files)'
-                 on-done='done(files, data)'
-                 on-progress='progress(percentDone)'
-                 on-error='error(files, type, msg)')
+                ng-hide="uploadInProgress",
+                auto-upload='true',
+                choose-file-button-text='Choose files',
+                upload-url='/api/gardens/{{sharedDataService.gardenModel._id}}/photos',
+                max-files='5',
+                max-file-size-mb='5',
+                get-additional-data='getData(files)',
+                on-done='done(files, data)',
+                on-progress='progress(percentDone)',
+                on-error='error(files, type, msg)')
+
               //- https://coderwall.com/p/4etjja
               //-form.photo-upload(action="/gardens/{{sharedDataService.gardenModel._id}}/photos", method="POST")
                 div upload photo
@@ -168,7 +171,7 @@ block content
                 
 
           div
-            div(modal="sharedDataService.activeOverlay==('PhotoLogsOverlay')", close="close()", options="modalOptions")
+            div(modal="sharedDataService.activeOverlay==('PhotosOverlay')", close="close()", options="modalOptions")
               div(class="overlay-contain")
                 div(class="close btn", ng-click="close()")
                   | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>

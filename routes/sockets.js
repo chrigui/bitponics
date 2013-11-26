@@ -253,9 +253,9 @@ module.exports = function(app){
                     .exec(innerCallback);
                   },
                   function getPhotos(innerCallback){
-                    NotificationModel.find({
+                    PhotoModel.find({
                       gpi : growPlanInstanceId,
-                      ts : { $gte : lastChecked }
+                      createdAt : { $gte : lastChecked }
                     })
                     .exec(innerCallback);
                   }

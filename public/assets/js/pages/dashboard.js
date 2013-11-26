@@ -72,7 +72,7 @@ require([
           });
 
 
-          sharedData.photos.forEach(viewModels.initPhotoViewModel);
+          viewModels.initPhotosViewModel(sharedData.photos);
 
           viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
 
@@ -247,10 +247,10 @@ require([
                 });
               }
               if (photos){
-                var newPhotos = photos.forEach(viewModels.initPhotoViewModel);
+                photos.forEach(viewModels.initPhotoViewModel);
 
-                newPhotos.forEach(function(photo){
-                  sharedData.photos.unshift(photo);
+                photos.forEach(function(photo){
+                  sharedData.photos.push(photo);
                 });
               }
             });
@@ -344,39 +344,6 @@ require([
           });
 
 
-          $scope.progress = function(percentDone) {
-                  console.log("progress: " + percentDone + "%");
-            };
-       
-            $scope.done = function(files, data) {
-                  console.log("upload complete");
-                  console.log("data: " + JSON.stringify(data));
-                  writeFiles(files);
-            };
-       
-            $scope.getData = function(files) { 
-                  //this data will be sent to the server with the files
-                  return {msg: "from the client", date: new Date()};
-            };
-       
-            $scope.error = function(files, type, msg) {
-                  console.log("Upload error: " + msg);
-                  console.log("Error type:" + type);
-                  writeFiles(files);
-            }
-       
-            function writeFiles(files) 
-            {
-                  console.log('Files')
-                  for (var i = 0; i < files.length; i++) {
-                        console.log('\t' + files[i].name);
-                  }
-            }
-            
-          $scope.photoInputChanged = function(e){
-            console.log('photoInputChange', e);
-            e.form.submit();
-          };
           
           // To have a continually-updating time:
           setInterval(function(){
@@ -488,7 +455,7 @@ require([
       ]
     );
 
-    dashboardApp.controller('bpn.controllers.dashboard.PhotoLogs',
+    dashboardApp.controller('bpn.controllers.dashboard.Photos',
       [
         '$scope',
         'sharedDataService',
@@ -500,9 +467,11 @@ require([
           };
 
           $scope.open = function(photoId, index){
-            // $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay-' + photoId;
-            $scope.startAt = $scope.sharedDataService.photos.length - index;
-            $scope.sharedDataService.activeOverlay = 'PhotoLogsOverlay';
+            // $scope.sharedDataService.activeOverlay = 'PhotosOverlay-' + photoId;
+            //$scope.startAt = $scope.sharedDataService.photos.length - index;
+            console.log('index', index);
+            $scope.startAt = index;
+            $scope.sharedDataService.activeOverlay = 'PhotosOverlay';
             $anchorScroll();
           };
 
@@ -510,6 +479,36 @@ require([
             $scope.sharedDataService.activeOverlay = undefined;
           };
 
+          $scope.progress = function(percentDone) {
+            console.log("progress: " + percentDone + "%");
+            $scope.uploadInProgress = true;
+          };
+     
+          $scope.done = function(files, data) {
+            console.log("upload complete");
+            console.log("data: " + JSON.stringify(data));
+            writeFiles(files);
+            $scope.uploadInProgress = false;
+          };
+     
+          $scope.getData = function(files) { 
+            //this data will be sent to the server with the files
+            return {msg: "from the client", date: new Date()};
+          };
+     
+          $scope.error = function(files, type, msg) {
+            console.log("Upload error: " + msg);
+            console.log("Error type:" + type);
+            writeFiles(files);
+          }
+     
+          function writeFiles(files) 
+          {
+            console.log('Files')
+            for (var i = 0; i < files.length; i++) {
+                  console.log('\t' + files[i].name);
+            }
+          }
         }
       ]
     );
@@ -797,6 +796,7 @@ require([
         }
       ]
     );
+
 
     dashboardApp.directive('bpnDirectivesPhasesGraph', function() {
       return {
