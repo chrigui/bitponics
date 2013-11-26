@@ -208,39 +208,49 @@ module.exports = {
    *
    * Returns a JSON response
    * 
-   * @param {File} req.files.photo
-   * @param {feBeUtils.VISIBILITY_OPTIONS} req.body.private=
-   * @param {[String]} req.body.tags=
-   * @param {ObjectId} req.body.gpi=
+   * @param {[File]} req.files
+   * @param {feBeUtils.VISIBILITY_OPTIONS=} req.body.visibility
+   * @param {[String]=} req.body.tags
+   * @param {ObjectId=} req.body.gpi
    */
   processPhotoUpload : function(req, res, next){
     var PhotoModel = require('../models/photo').model,
       async = require('async'),
       requirejs = require('../lib/requirejs-wrapper'),
       feBeUtils = requirejs('fe-be-utils'),
-      photo = req.files.photo,
-      now = new Date();
-
+      filesKeys = Object.keys(req.files),
+      now = new Date(),
+      responseData = [];
 
     // to send the photo back as the response:
     //res.sendfile(req.files.photo.path);
 
-    PhotoModel.createAndStorePhoto(
-      {
-        owner : req.user,
-        originalFileName : photo.name,
-        name : photo.name,
-        contentType : photo.type,
-        date : photo.lastModifiedDate || (new Date()),
-        size : photo.size,
-        tags : req.body.tags,
-        gpi : req.body.garden,
-        visibility : (req.body.private ? feBeUtils.VISIBILITY_OPTIONS.PRIVATE : feBeUtils.VISIBILITY_OPTIONS.PUBLIC),
-        streamPath : photo.path
+    async.each(filesKeys, 
+      function fileIterator(fileKey, iteratorCallback){
+        var photo = req.files[fileKey];
+
+        PhotoModel.createAndStorePhoto(
+        {
+          owner : req.user,
+          originalFileName : photo.name,
+          name : photo.name,
+          contentType : photo.type,
+          date : photo.lastModifiedDate || (new Date()),
+          size : photo.size,
+          tags : req.body.tags,
+          gpi : req.body.gpi,
+          visibility : req.body.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
+          streamPath : photo.path
+        },
+        function(err, photo){
+          if (err) { return iteratorCallback(err); }
+          responseData.push(photo);
+          return iteratorCallback();
+        });
       },
-      function(err, photo){
+      function fileLoopEnd(err){
         if (err) { return next(err); }
-        return module.exports.sendJSONResponse(res, 200, { data : photo });       
+        return module.exports.sendJSONResponse(res, 200, { data : responseData });
       }
     );
   },

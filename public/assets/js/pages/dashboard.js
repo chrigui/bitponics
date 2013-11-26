@@ -18,14 +18,15 @@ require([
   'angular-flexslider',
   'throttle-debounce',
   'bpn.services.garden',
-  'bpn.services.nav'
+  'bpn.services.nav',
+  'lvl.directives.fileUpload'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
 
 
     // var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider', 'ngRoute']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload']);
 
     dashboardApp.factory('sharedDataService', 
       [
@@ -291,7 +292,7 @@ require([
           }, true);
 
           /**
-           *
+           * Trigger an action on a control
            */
           $scope.triggerImmediateAction = function(currentControlAction, actionId){
             currentControlAction.updateInProgress = true;
@@ -304,8 +305,10 @@ require([
               }
             )
             .success(function(data, status, headers, config) {
+              currentControlAction.updateInProgress = false;
             })
             .error(function(data, status, headers, config) {
+              currentControlAction.updateInProgress = false;
             });
           }
 
@@ -340,6 +343,40 @@ require([
             $scope.displayDate($scope.sharedDataService.targetActiveDate);
           });
 
+
+          $scope.progress = function(percentDone) {
+                  console.log("progress: " + percentDone + "%");
+            };
+       
+            $scope.done = function(files, data) {
+                  console.log("upload complete");
+                  console.log("data: " + JSON.stringify(data));
+                  writeFiles(files);
+            };
+       
+            $scope.getData = function(files) { 
+                  //this data will be sent to the server with the files
+                  return {msg: "from the client", date: new Date()};
+            };
+       
+            $scope.error = function(files, type, msg) {
+                  console.log("Upload error: " + msg);
+                  console.log("Error type:" + type);
+                  writeFiles(files);
+            }
+       
+            function writeFiles(files) 
+            {
+                  console.log('Files')
+                  for (var i = 0; i < files.length; i++) {
+                        console.log('\t' + files[i].name);
+                  }
+            }
+            
+          $scope.photoInputChanged = function(e){
+            console.log('photoInputChange', e);
+            e.form.submit();
+          };
           
           // To have a continually-updating time:
           setInterval(function(){
@@ -1263,9 +1300,16 @@ require([
     });
 
     dashboardApp.filter('friendlyDate', function() {
-      return function(input) {
-        var val = moment(input).calendar()
-        return val.charAt(0).toUpperCase() + val.slice(1);
+      return function(input, format) {
+        var val = moment(input).calendar();
+
+        console.log('format', arguments);
+        if (format === 'lowercase'){
+          return val.charAt(0).toLowerCase() + val.slice(1);  
+        } else {
+          return val.charAt(0).toUpperCase() + val.slice(1);  
+        }
+        
       }
     });
 

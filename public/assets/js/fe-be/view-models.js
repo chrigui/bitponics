@@ -241,6 +241,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initPhotoViewModel = function (photo){
     photo.url = '/photos/' + photo._id;
+    photo.thumbnailUrl = '/photos/' + photo._id + '/' + utils.PHOTO_THUMBNAIL_SIZE.WIDTH;
     return photo;
   };
 

@@ -20,9 +20,15 @@ mixin requirejs(dataMain)
   - var es5shim = CDN('/assets/js/libs/es5-shim.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var flexslider = CDN('/assets/js/libs/flexslider/jquery.flexslider-min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var feBeUtils = CDN('/assets/js/fe-be/fe-be-utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var gardenService = CDN('/assets/js/services/garden.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var growPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var jquery = CDN('/assets/js/libs/jquery-1.8.2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var localscroll = CDN('/assets/js/libs/jquery/jquery.localScroll.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var lvlServicesFileUploader = CDN('/assets/js/libs/angular/lvl-xhr-post.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var lvlServicesUUID = CDN('/assets/js/libs/angular/lvl-uuid.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var lvlDirectivesFileUpload = CDN('/assets/js/libs/angular/lvl-file-upload.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var moment = CDN('/assets/js/libs/moment.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var navService = CDN('/assets/js/services/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var overlay = CDN('/assets/js/shared/overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var scrollto = CDN('/assets/js/libs/jquery/jquery.scrollTo.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var select2 = CDN('/assets/js/libs/jquery/select2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -32,9 +38,7 @@ mixin requirejs(dataMain)
   - var throttleDebounce = CDN('/assets/js/libs/jquery/jquery.ba-throttle-debounce.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var utils = CDN('/assets/js/shared/utils.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var viewModels = CDN('/assets/js/fe-be/view-models.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var growPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var gardenService = CDN('/assets/js/services/garden.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var navService = CDN('/assets/js/services/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+
   //- These two scripts don't exist... never used?
   //- //var spin = '/assets/js/libs/spin.min.js'
   //- //var socketIO = '/socket.io/socket.io.js'
@@ -54,6 +58,9 @@ mixin requirejs(dataMain)
         'angularUIBootstrap' : '#{angularUIBootstrap}',
         'angularUISelect2' : '#{angularUISelect2}',
         'bpn.services' : '#{bpnServices}',
+        'bpn.services.growPlan' : '#{growPlanService}',
+        'bpn.services.garden' : '#{gardenService}',
+        'bpn.services.nav' : '#{navService}',
         'bpnApp' : '#{bpnApp}',
         'controllers' : '#{controllers}',
         'controller-nav' : '#{controllerNav}',
@@ -63,8 +70,12 @@ mixin requirejs(dataMain)
         'es5shim': '#{es5shim}',
         'flexslider': '#{flexslider}',
         'fe-be-utils': '#{feBeUtils}',
+        'growPlanService': '#{growPlanService}',
         'jquery' : '#{jquery}',
         'localscroll': '#{localscroll}',
+        'lvl.services.fileUploader': '#{lvlServicesFileUploader}',
+        'lvl.services.uuid': '#{lvlServicesUUID}',
+        'lvl.directives.fileUpload': '#{lvlDirectivesFileUpload}',
         'moment': '#{moment}',
         'overlay': '#{overlay}',
         'scrollto': '#{scrollto}',
@@ -76,11 +87,7 @@ mixin requirejs(dataMain)
         'steps': '#{steps}',
         'throttle-debounce': '#{throttleDebounce}',
         'utils': '#{utils}',
-        'view-models': '#{viewModels}',
-        'growPlanService': '#{growPlanService}',
-        'bpn.services.growPlan' : '#{growPlanService}',
-        'bpn.services.garden' : '#{gardenService}',
-        'bpn.services.nav' : '#{navService}'
+        'view-models': '#{viewModels}'
       },
       shim: { 
         'angular': { 
