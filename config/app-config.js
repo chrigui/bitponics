@@ -89,7 +89,7 @@ module.exports = function(app){
     var options = {
       publicDir  : path.join(__dirname, '/../public')
       , viewsDir   : path.join(__dirname, '/../views')
-      , domain     : 'cdn.bitponics.com'
+      , domain     : 'd1hhgm2blhd45d.cloudfront.net'
       , bucket     : s3Config.bucketCDN
       , key        : s3Config.key
       , secret     : s3Config.secret

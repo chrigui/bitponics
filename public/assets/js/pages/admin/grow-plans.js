@@ -8,7 +8,7 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  'services-socket',
+  'bpn.services.socket',
   'controller-nav',
   'bpn.services.growPlan'
 ],

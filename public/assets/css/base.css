@@ -2997,7 +2997,7 @@ input[type='checkbox']:checked + label.btn {
   max-width: 100%;
 }
 @media  screen and (min-width: 65em) {
-  .dashboard header {
+  .dashboard .main header {
     clear: both;
     overflow: hidden;
   }

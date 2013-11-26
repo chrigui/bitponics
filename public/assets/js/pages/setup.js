@@ -4,7 +4,7 @@ require([
   'angularResource',
   'es5shim',
   'angularUI',
-  'services-socket',
+  'bpn.services.socket',
   'angular-mask',
   'controller-nav'
 ],
