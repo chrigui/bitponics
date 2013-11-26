@@ -15,7 +15,7 @@ block content
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
       header
-        h2.page-heading {{sharedDataService.growPlanInstance.name}}
+        h2.page-heading {{sharedDataService.gardenModel.name}}
         div(class="garden-settings", ng-click="sharedDataService.activeOverlay = 'SettingsOverlay'")
           | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
 
@@ -25,7 +25,7 @@ block content
             div(class="close btn", ng-click="close()")
               | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
             h3(class="page-heading page-heading-small") Garden Settings
-            form(ng-controller="bpn.controllers.dashboard.SettingsOverlay", ng-submit="submit()")
+            form(ng-controller="bpn.controllers.dashboard.SettingsOverlay")
               
               //- div(class="custom-checkbox-wrap")
               //-   input(id="{{sensorCode}}_settings_unit_toggle", 
@@ -45,7 +45,7 @@ block content
                   div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
                   div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
                     select(class="custom-dropdown", 
-                      ng-model="sharedDataService.growPlanInstance.settings.units[sensorCode.toUpperCase()]", 
+                      ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
                       ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
                     .dblarrow
                       i
@@ -54,7 +54,7 @@ block content
 
               button(class="delete-garden btn", ng-click="deleteGarden()") Delete garden
 
-              input(type="submit", value="Save")
+              input(type="submit", value="Save", ng-click="submit()")
 
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
@@ -101,7 +101,7 @@ block content
                   div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
                   - if (userCanModify === true)
                     div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
-                      a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.growPlanInstance.device._id}}/calibrate") Calibrate
+                      a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.gardenModel.device._id}}/calibrate") Calibrate
                   
                   div(data-bpn-directives-manual-entry-form, 
                       data-sensor-unit="sensor.unit", 
@@ -123,7 +123,7 @@ block content
                           span.sensor-unit {{sensorUnit}}
                         div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
                           select(class="custom-dropdown no-margin", 
-                            ng-model="sharedDataService.growPlanInstance.settings.units[sensorCode.toUpperCase()]", 
+                            ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
                             ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
                           .dblarrow
                             i
@@ -188,7 +188,7 @@ block content
                         span.sensor-unit {{sensor.unit}}
                       div(ng-show="hasMultipleUnits(sensor.code)", class="sensor-reading-unit custom-dropdown-wrap")
                         select(class="custom-dropdown no-margin", 
-                          ng-model="sharedDataService.growPlanInstance.settings.units[sensor.code.toUpperCase()]", 
+                          ng-model="sharedDataService.gardenModel.settings.units[sensor.code.toUpperCase()]", 
                           ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensor.code.toUpperCase()].units")
                         .dblarrow
                           i
@@ -197,9 +197,9 @@ block content
             
             
 
-          div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls", ng-hide="!sharedDataService.growPlanInstance.device") 
+          div#controls.controls(ng-controller="bpn.controllers.dashboard.Controls", ng-hide="!sharedDataService.gardenModel.device") 
             h2.page-heading-small Accessories
-            div(ng-repeat="controlAction in sharedDataService.growPlanInstance.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+            div(ng-repeat="controlAction in sharedDataService.gardenModel.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
               h3 {{controlAction.control.name}}
               div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
               div
@@ -230,7 +230,7 @@ block content
                     div(class="overlay-data", ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1")
                       h4 This cycle has been overridden.
                     p.clear-b
-                      {{controlAction.control.name}} is currently {{sharedDataService.growPlanInstance.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
+                      {{controlAction.control.name}} is currently {{sharedDataService.gardenModel.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
                     - if (userCanModify === true)
                       div.separator-top
                         a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
@@ -238,7 +238,7 @@ block content
                         a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
                         img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
-          div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications", ng-hide="!sharedDataService.growPlanInstance.device")
+          div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications", ng-hide="!sharedDataService.gardenModel.device")
             h2.page-heading-small Notifications
             div(ng-repeat="notification in pastNotifications", class="past")
               //- input(type="checkbox", model="notification._id", id="notification._id")

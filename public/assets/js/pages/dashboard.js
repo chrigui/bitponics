@@ -522,11 +522,11 @@ require([
           };
 
           $scope.completeGarden = function() {
-            
+            sharedDataService.gardenModel.$complete();
           }
           
           $scope.deleteGarden = function() {
-
+            sharedDataService.gardenModel.$delete();
           }
 
           // $scope.setToMetric = function() {
@@ -537,7 +537,7 @@ require([
            * Save Settings to GardenModel
            */
           $scope.submit = function() {
-            sharedDataService.gardenModel.$save();
+            sharedDataService.gardenModel.$updateSettings();
           }
         }
       ]

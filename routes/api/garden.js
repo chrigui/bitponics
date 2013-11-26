@@ -173,7 +173,7 @@ module.exports = function(app) {
         async.waterfall(
         [
           function checkDevice(innerCallback){
-            if (typeof req.body.device === 'undefined'){ return innerCallback(); }
+            if (typeof req.body.device === 'undefined'){ return innerCallback(null, growPlanInstance); }
 
             // check whether it's a new assignment and if so, call gpi.pairWithDevice
             if (req.body.device === null){
@@ -191,7 +191,7 @@ module.exports = function(app) {
           },
           function checkActive(updatedGPI, innerCallback){
             if (typeof req.body.active === 'undefined'){ return innerCallback(null, updatedGPI); }
-
+            
             // Check whether we're changing active state
             if (req.body.active === growPlanInstance.active){ return innerCallback(null, updatedGPI); }
 
