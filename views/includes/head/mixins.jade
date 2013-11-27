@@ -11,6 +11,7 @@ mixin requirejs(dataMain)
   - var angularUI = CDN('/assets/js/libs/angular/angular-ui.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularUIBootstrap = CDN('/assets/js/libs/angular/ui-bootstrap-0.5.0.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularUISelect2 = CDN('/assets/js/libs/angular/angular-ui-select2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnDirectivesGraphs = CDN('/assets/js/shared/bpn-graphs.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServices = CDN('/assets/js/core/services.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var controllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -59,6 +60,7 @@ mixin requirejs(dataMain)
         'angularUI' : '#{angularUI}',
         'angularUIBootstrap' : '#{angularUIBootstrap}',
         'angularUISelect2' : '#{angularUISelect2}',
+        'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
         'bpn.services' : '#{bpnServices}',
         'bpn.services.growPlan' : '#{growPlanService}',
         'bpn.services.garden' : '#{gardenService}',

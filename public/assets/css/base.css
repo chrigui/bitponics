@@ -46,13 +46,13 @@
 .page-content.center-img img,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.notifications input[type="checkbox"],
+.notifications label,
 .split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
 .growplans .edit-btn,
 .growplans #growplans_activate,
@@ -989,13 +989,13 @@ img.page-spinner.spinner {
 .display-ib,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.notifications input[type="checkbox"],
+.notifications label,
 .split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
 .growplans .edit-btn,
 .growplans #growplans_activate,
@@ -1389,6 +1389,102 @@ img.page-spinner.spinner {
 /*
  * Split Layout
  */
+.dashboard.app-page .page-heading,
+.grow-plans.app-page .page-heading {
+  font-size: 2.25em;
+}
+.data-module .main-heading.right {
+  right: 0.75em;
+  text-align: right;
+}
+.data-module.phase-info {
+  height: 3.2em;
+}
+.data-module.phase-info .phase-name {
+  position: absolute;
+  top: 0.5em;
+  font-size: 1em;
+  left: 0.5em;
+  text-transform: none;
+}
+.data-module.phase-info .phase-day {
+  position: absolute;
+  top: 1.5em;
+  font-size: 1em;
+  left: 0.5em;
+  text-transform: none;
+}
+.data-module .sensor-value {
+  font-size: 3em;
+  text-align: left;
+  left: 0.25em;
+  position: relative;
+}
+.data-module .sensor-type .icon-glyph {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: -0.25em;
+  right: -0.25em;
+}
+.page-heading-small {
+  color: #999;
+  border-bottom: 1px solid #d8d8d8;
+  padding-bottom: 0.5em;
+}
+.page-heading-small.time {
+  font-size: 1em;
+}
+.page-heading-small .spinner {
+  float: right;
+}
+.controls .page-heading-small {
+  margin-bottom: 0;
+}
+.control h3 {
+  text-align: left;
+  color: #999;
+  font-size: 0.85em;
+}
+.control .icon-glyph-new {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  top: 38%;
+  font-size: 1.5em;
+}
+.notifications .upcoming {
+  color: #00e36c;
+}
+.notifications .smaller {
+  font-size: 1em;
+  border: none;
+}
+.notifications .date {
+  font-size: 0.75em;
+}
+.notifications .title {
+  font-size: 1em;
+  margin: 0 0 1em;
+}
+.notifications input[type="checkbox"] {
+  opacity: 1;
+  margin: 1em 1em 0 0;
+  height: 1em;
+  width: 1em;
+  font-size: 1em;
+}
+.notifications label {
+  position: relative;
+  top: 0.75em;
+  margin: 0;
+}
+.date {
+  margin-bottom: 0;
+  border: 0 none;
+  position: relative;
+}
 @media  screen and (min-width: 65em) {
   .split-layout.main header {
     clear: both;
@@ -2213,8 +2309,6 @@ img.page-spinner.spinner {
 .display-ib,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
 .growplans .edit-btn,
 .growplans #growplans_activate,
@@ -2806,103 +2900,6 @@ input[type='checkbox']:checked + label.btn {
   filter: alpha(opacity=0);
   z-index: 2;
   cursor: pointer;
-}
-.dashboard.app-page .page-heading {
-  font-size: 2.25em;
-}
-.dashboard .data-module .main-heading.right {
-  right: 0.75em;
-  text-align: right;
-}
-.dashboard .data-module.phase-info {
-  height: 3.2em;
-}
-.dashboard .data-module.phase-info .phase-name {
-  position: absolute;
-  top: 0.5em;
-  font-size: 1em;
-  left: 0.5em;
-  text-transform: none;
-}
-.dashboard .data-module.phase-info .phase-day {
-  position: absolute;
-  top: 1.5em;
-  font-size: 1em;
-  left: 0.5em;
-  text-transform: none;
-}
-.dashboard .data-module .sensor-value {
-  font-size: 3em;
-  text-align: left;
-  left: 0.25em;
-  position: relative;
-}
-.dashboard .data-module .sensor-type .icon-glyph {
-  width: 60px;
-  height: 60px;
-  position: absolute;
-  top: -0.25em;
-  right: -0.25em;
-}
-.dashboard .page-heading-small {
-  color: #999;
-  border-bottom: 1px solid #d8d8d8;
-  padding-bottom: 0.5em;
-}
-.dashboard .page-heading-small.time {
-  font-size: 1em;
-}
-.dashboard .page-heading-small .spinner {
-  float: right;
-}
-.dashboard .controls .page-heading-small {
-  margin-bottom: 0;
-}
-.dashboard .control h3 {
-  text-align: left;
-  color: #999;
-  font-size: 0.85em;
-}
-.dashboard .control .icon-glyph-new {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  vertical-align: middle;
-  top: 38%;
-  font-size: 1.5em;
-}
-.dashboard .notifications .upcoming {
-  color: #00e36c;
-}
-.dashboard .notifications .smaller {
-  font-size: 1em;
-  border: none;
-}
-.dashboard .notifications .date {
-  font-size: 0.75em;
-}
-.dashboard .notifications .title {
-  font-size: 1em;
-  margin: 0 0 1em;
-}
-.dashboard .notifications input[type="checkbox"] {
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-  margin: 1em 1em 0 0;
-  height: 1em;
-  width: 1em;
-  font-size: 1em;
-}
-.dashboard .notifications label {
-  position: relative;
-  top: 0.75em;
-  margin: 0;
-}
-.dashboard .date {
-  margin-bottom: 0;
-  border: 0 none;
-  position: relative;
 }
 .dashboard .overlay {
   top: 8em;

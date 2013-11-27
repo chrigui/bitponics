@@ -11,12 +11,13 @@ require([
   'angularUIBootstrap',
   'selection-overlay',
   'overlay',
-  'controller-nav'
+  'controller-nav',
+  'bpn.directives.graphs'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
+    var growPlanApp = angular.module('bpn.apps.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'bpn.directives.graphs']).run(
       [
         '$rootScope',
         function($rootScope) {
@@ -130,8 +131,16 @@ require([
 				}
 			]
 		);
-
-	
+    
+    growPlanApp.controller('bpn.controllers.growPlan.PhasesGraph',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          
+        }
+      ]
+    );
 
 		growPlanApp.controller('bpn.controllers.growPlan.PlantOverlay',
     	[
