@@ -233,7 +233,7 @@ block content
               h3 {{controlAction.control.name}}
               div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
               div
-                div(ng-controller="bpn.controllers.dashboardApp.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
+                div(ng-controller="bpn.controllers.dashboard.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
                   div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
                     div(class="close btn", ng-click="close()")
                       | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>

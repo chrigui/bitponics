@@ -15,21 +15,22 @@ function (angular, domReady, feBeUtils) {
   'use strict';
 
   var outletApp = angular.module('bpn.apps.account.outletMap', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
-
-    function($rootScope) {
-      /**
-       * Debugging Tools
-       *
-       * Allows you to execute debug functions from the view
-       */
-      $rootScope.log = function(variable) {
-        console.log(variable);
-      };
-      $rootScope.alert = function(text) {
-        alert(text);
-      };
-    
-    }
+    ['$rootScope',
+      function($rootScope) {
+        /**
+         * Debugging Tools
+         *
+         * Allows you to execute debug functions from the view
+         */
+        $rootScope.log = function(variable) {
+          console.log(variable);
+        };
+        $rootScope.alert = function(text) {
+          alert(text);
+        };
+      
+      }
+    ]
   );
 
   // outletApp.factory('DeviceLoader', 
@@ -119,10 +120,10 @@ function (angular, domReady, feBeUtils) {
       function ($scope, $filter, sharedDataService, DeviceModel) {
       	$scope.sharedDataService = sharedDataService;
 
-		$scope.setCurrentVisibleOutput = function (index) {
-			$scope.sharedDataService.currentVisibleOutput = index;
-			$scope.sharedDataService.activeOverlay.is = 'ControlOverlay';
-		};
+    		$scope.setCurrentVisibleOutput = function (index) {
+    			$scope.sharedDataService.currentVisibleOutput = index;
+    			$scope.sharedDataService.activeOverlay.is = 'ControlOverlay';
+    		};
       }
     ]
   );

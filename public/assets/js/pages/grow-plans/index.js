@@ -17,21 +17,22 @@ require([
     'use strict';
 
     var growPlanApp = angular.module('bpn.apps.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
-
-      function($rootScope) {
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-      
-      }
+      [
+        '$rootScope',
+        function($rootScope) {
+          /**
+           * Debugging Tools
+           *
+           * Allows you to execute debug functions from the view
+           */
+          $rootScope.log = function(variable) {
+            console.log(variable);
+          };
+          $rootScope.alert = function(text) {
+            alert(text);
+          };
+        }
+      ]
     );
 
 		growPlanApp.config(
@@ -105,17 +106,14 @@ require([
 				'$q',
 		    function(GrowPlanModel, sharedDataService, $route, $q) {
 		  		return function() {
-            console.log('yo');
-		  			var selectedGrowPlanId = $route.current.params.growPlanId;
+            var selectedGrowPlanId = $route.current.params.growPlanId;
 
 		  			if ((sharedDataService.selectedGrowPlan instanceof GrowPlanModel)
 		  					&& 
 		  					(sharedDataService.selectedGrowPlan._id.toString() === selectedGrowPlanId)) {
-		  				console.log('returning existing selectedGrowPlan');
 		  				return sharedDataService.selectedGrowPlan;
 		  			} else {
 		  				var delay = $q.defer();
-			    		console.log('growPlanLoader doin its thing', $route.current.params.growPlanId)
 			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
 			    			function (growPlan) {
 			    				viewModels.initGrowPlanViewModel(growPlan);

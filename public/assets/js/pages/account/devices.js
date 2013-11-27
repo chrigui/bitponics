@@ -12,22 +12,25 @@ require([
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var devicesApp = angular.module('bpn.apps.account.devices', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
+  var devicesApp = angular.module('bpn.apps.account.devices', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']).run(
 
-    function($rootScope) {
-      /**
-       * Debugging Tools
-       *
-       * Allows you to execute debug functions from the view
-       */
-      $rootScope.log = function(variable) {
-        console.log(variable);
-      };
-      $rootScope.alert = function(text) {
-        alert(text);
-      };
+    [ 
+      '$rootScope', 
+      function($rootScope) {
+        /**
+         * Debugging Tools
+         *
+         * Allows you to execute debug functions from the view
+         */
+        $rootScope.log = function(variable) {
+          console.log(variable);
+        };
+        $rootScope.alert = function(text) {
+          alert(text);
+        };
     
-    }
+      }
+    ]
   );
 
   devicesApp.factory('sharedDataService', function(){
