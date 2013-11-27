@@ -198,16 +198,17 @@ module.exports = function(app){
           
 					locals.growSystems = growSystems;
 					locals.plants = plants;
+					locals.controls = controls;
 					locals.userOwnedDevices = userOwnedDevices;
 					locals.lights = lights;
 					locals.lightFixtures = lightFixtures;
 					locals.lightBulbs = lightBulbs;
 					locals.nutrients = nutrients;
           
-					//convert controls into obj with id as keys
-					controls.forEach(function (item, index) {
-						locals.controls[item._id] = item;
-					});
+					// //convert controls into obj with id as keys
+					// controls.forEach(function (item, index) {
+					// 	locals.controls[item._id] = item;
+					// });
           
 					//convert sensors into obj with id as keys
 					sensors.forEach(function (item, index) {

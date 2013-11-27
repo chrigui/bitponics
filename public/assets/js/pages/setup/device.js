@@ -13,7 +13,7 @@ require([
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
+  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ngRoute', 'bpn.services', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
     [
       '$rootScope',
       function($rootScope) {

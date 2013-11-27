@@ -7,74 +7,40 @@ block head
 
   script(type='text/ng-template', id='customize-overview.html')
 
-    header
-      h2.page-heading Customize your {{sharedDataService.selectedGrowPlan.name}} Grow Plan
+    h4.page-heading Customize your grow plan
+    div.separator-top
+      div.question
+        label(for="gpedit_name", class="question-title") Grow Plan Name
+        input(id="gpedit_name", type='text', name="gpedit_name", ng-model="sharedDataService.selectedGrowPlan.name")
+      
 
-    div#sensors.sensors.content-module.side.separator-top
-
-      h2.page-heading-small.date 
-        | Edit Sensors
-
-      div.data-module.phase-info
-        div.phase-name {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Phase
-        //- div.phase-day Day {{sharedDataService.activeDate.dayOfPhase}}
-
-      div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}}")
-        h3.main-heading
-          | {{sensor.abbrev}}
-        div.sensor-data
-          div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
-          div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") ----
-        div(class="sensor-type icon {{sensor.code}}")
-          | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
-          div.sensor.screen-reader-text {{sensor.code}}
-
-
-    div.content-module.middle.separator-top
-      div(ng-controller="bpn.controllers.growPlan.PhasesGraph")
-        p.half-width.centered Navigate between phases by clicking on the rings of the graph.
-        div(data-bpn-directives-navigation-phases-graph)
-
-
-    div(class="content-module side separator-top", accordion)
-      div(class="device", id="device", accordion-group, heading="Device")
-        ul(class="grid grid--wrapping devicelist")
-          li(class="grid-cell") Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
-          li(class="grid-cell", ng-repeat="device in sharedDataService.userOwnedDevices")
-            label.btn(ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}")
-              input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId", ng-change="toggleDevice(device)")
-              | {{device.name}}
-
-      div(id="controls", class="controls", accordion-group, heading="Accessories")
-        div(class="grid grid--wrapping")
-          //- ng-hide="!sharedDataService.selectedGrowPlan.device")
+      //- div.question
+      //-   label(class="question-title", for="gpi_name") Your Garden Name
+      //-   input(type='text', id="gpi_name", name="gpi_name", ng-model="sharedDataService.growPlanInstance.name")
           
-          div(ng-repeat="control in sharedDataService.controls", class="control icon-glyph icon-{{control.className}} grid-cell") 
-            p {{control.name}}
-            
-          h2.page-heading-small Active Accessories
-          div(ng-repeat="controlAction in sharedDataService.selectedGrowPlan.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-            h3 {{controlAction.control.name}}
-            div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
 
+      div(class="question-wrap-right")
+        div.question
+          label.question-title Plants
+          ul(class="grid plantlist")
+            //textarea(id="gpedit_plants", type='text', name="gpedit_plants", value="#{growPlanDefault.plants}")
+            li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
+              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
+              label(for="{{plant._id}}", class="plant btn") 
+                {{plant.name}}
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
 
+          label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
+            | Add
+            | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
-
-
-
-
-  script(type='text/ng-template', id="template/accordion/accordion.html")
-
-    div(class="accordion", ng-transclude)
-
-  script(type='text/ng-template', id="template/accordion/accordion-group.html")
-  
-    div(class="accordion-group")
-      div(class="accordion-heading")
-        a(class="accordion-toggle", ng-click="isOpen = !isOpen", accordion-transclude="heading")
-          {{heading}}
-      div(class="accordion-body", collapse="!isOpen")
-        div(class="accordion-inner", ng-transclude)
+      div(class="question clear-l")
+        label(for="gpedit_description", class="question-title") Description
+        textarea(name="gpedit_description", ng-model="sharedDataService.selectedGrowPlan.description", rows="8")
+    
+    div(class="step-footer separator-top")
+      a(class="btn next-step-btn", href="{{sharedDataService.selectedGrowPlan._id}}/details") Next Step
+        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
 
   
   script(type='text/ng-template', id='customize-details.html')
@@ -449,7 +415,8 @@ block content
       header
         include ../includes/nav/main
   
-  section#main(ng-cloak, role="main", class="main split-layout")
+  section#main(role="main", class="main", ng-cloak)
+    div.content-module.middle
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.controllers.growPlan.Main", novalidate)
         
         section(ng-view)

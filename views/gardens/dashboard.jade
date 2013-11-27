@@ -11,7 +11,7 @@ block content
       header
         include ../includes/nav/main
         
-  section#main(role="main", class="main")
+  section#main(role="main", class="main split-layout")
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
       header
@@ -150,7 +150,7 @@ block content
         div(class="full-width", ng-controller="bpn.controllers.dashboard.Photos")
           //- ordered from new to old
           
-          ul(class="grid photos centered", ng-show="sharedDataService.photos.length > 0") 
+          ul(class="grid photos centered") 
             li.photo(ng-repeat="photo in sharedDataService.photos | orderBy:predicate:date", ng-click="open(photo._id, $index)")
               img(ng-src="{{photo.thumbnailUrl}}", if-thumbnail-404="{{photo.url}}")
           

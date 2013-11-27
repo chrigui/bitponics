@@ -46,14 +46,14 @@
 .page-content.center-img img,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.notifications input[type="checkbox"],
+.notifications label,
+.split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -989,14 +989,14 @@ img.page-spinner.spinner {
 .display-ib,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.notifications input[type="checkbox"],
+.notifications label,
+.split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -1384,6 +1384,121 @@ img.page-spinner.spinner {
 @media  screen and (min-width: 50em) {
   .no-flexbox .large-no-flexbox-grid--1of4 > .grid-cell {
     width: 24%;
+  }
+}
+/*
+ * Split Layout
+ */
+.dashboard.app-page .page-heading,
+.grow-plans.app-page .page-heading {
+  font-size: 2.25em;
+}
+.data-module .main-heading.right {
+  right: 0.75em;
+  text-align: right;
+}
+.data-module.phase-info {
+  height: 3.2em;
+}
+.data-module.phase-info .phase-name {
+  position: absolute;
+  top: 0.5em;
+  font-size: 1em;
+  left: 0.5em;
+  text-transform: none;
+}
+.data-module.phase-info .phase-day {
+  position: absolute;
+  top: 1.5em;
+  font-size: 1em;
+  left: 0.5em;
+  text-transform: none;
+}
+.data-module .sensor-value {
+  font-size: 3em;
+  text-align: left;
+  left: 0.25em;
+  position: relative;
+}
+.data-module .sensor-type .icon-glyph {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: -0.25em;
+  right: -0.25em;
+}
+.page-heading-small {
+  color: #999;
+  border-bottom: 1px solid #d8d8d8;
+  padding-bottom: 0.5em;
+}
+.page-heading-small.time {
+  font-size: 1em;
+}
+.page-heading-small .spinner {
+  float: right;
+}
+.controls .page-heading-small {
+  margin-bottom: 0;
+}
+.control h3 {
+  text-align: left;
+  color: #999;
+  font-size: 0.85em;
+}
+.control .icon-glyph-new {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  top: 38%;
+  font-size: 1.5em;
+}
+.notifications .upcoming {
+  color: #00e36c;
+}
+.notifications .smaller {
+  font-size: 1em;
+  border: none;
+}
+.notifications .date {
+  font-size: 0.75em;
+}
+.notifications .title {
+  font-size: 1em;
+  margin: 0 0 1em;
+}
+.notifications input[type="checkbox"] {
+  opacity: 1;
+  margin: 1em 1em 0 0;
+  height: 1em;
+  width: 1em;
+  font-size: 1em;
+}
+.notifications label {
+  position: relative;
+  top: 0.75em;
+  margin: 0;
+}
+.date {
+  margin-bottom: 0;
+  border: 0 none;
+  position: relative;
+}
+@media  screen and (min-width: 65em) {
+  .split-layout.main header {
+    clear: both;
+    overflow: hidden;
+  }
+  .split-layout .content-module.middle {
+    width: 60%;
+  }
+  .split-layout .content-module.side {
+    width: 20%;
+  }
+  .split-layout h2.page-heading {
+    float: left;
+    width: 75%;
   }
 }
 /*
@@ -2194,10 +2309,7 @@ img.page-spinner.spinner {
 .display-ib,
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
-.dashboard .notifications input[type="checkbox"],
-.dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -2789,103 +2901,6 @@ input[type='checkbox']:checked + label.btn {
   z-index: 2;
   cursor: pointer;
 }
-.dashboard.app-page .page-heading {
-  font-size: 2.25em;
-}
-.dashboard .data-module .main-heading.right {
-  right: 0.75em;
-  text-align: right;
-}
-.dashboard .data-module.phase-info {
-  height: 3.2em;
-}
-.dashboard .data-module.phase-info .phase-name {
-  position: absolute;
-  top: 0.5em;
-  font-size: 1em;
-  left: 0.5em;
-  text-transform: none;
-}
-.dashboard .data-module.phase-info .phase-day {
-  position: absolute;
-  top: 1.5em;
-  font-size: 1em;
-  left: 0.5em;
-  text-transform: none;
-}
-.dashboard .data-module .sensor-value {
-  font-size: 3em;
-  text-align: left;
-  left: 0.25em;
-  position: relative;
-}
-.dashboard .data-module .sensor-type .icon-glyph {
-  width: 60px;
-  height: 60px;
-  position: absolute;
-  top: -0.25em;
-  right: -0.25em;
-}
-.dashboard .page-heading-small {
-  color: #999;
-  border-bottom: 1px solid #d8d8d8;
-  padding-bottom: 0.5em;
-}
-.dashboard .page-heading-small.time {
-  font-size: 1em;
-}
-.dashboard .page-heading-small .spinner {
-  float: right;
-}
-.dashboard .controls .page-heading-small {
-  margin-bottom: 0;
-}
-.dashboard .control h3 {
-  text-align: left;
-  color: #999;
-  font-size: 0.85em;
-}
-.dashboard .control .icon-glyph-new {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  vertical-align: middle;
-  top: 38%;
-  font-size: 1.5em;
-}
-.dashboard .notifications .upcoming {
-  color: #00e36c;
-}
-.dashboard .notifications .smaller {
-  font-size: 1em;
-  border: none;
-}
-.dashboard .notifications .date {
-  font-size: 0.75em;
-}
-.dashboard .notifications .title {
-  font-size: 1em;
-  margin: 0 0 1em;
-}
-.dashboard .notifications input[type="checkbox"] {
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-  margin: 1em 1em 0 0;
-  height: 1em;
-  width: 1em;
-  font-size: 1em;
-}
-.dashboard .notifications label {
-  position: relative;
-  top: 0.75em;
-  margin: 0;
-}
-.dashboard .date {
-  margin-bottom: 0;
-  border: 0 none;
-  position: relative;
-}
 .dashboard .overlay {
   top: 8em;
   left: 25%;
@@ -3009,20 +3024,6 @@ input[type='checkbox']:checked + label.btn {
   max-width: 100%;
 }
 @media  screen and (min-width: 65em) {
-  .dashboard .main header {
-    clear: both;
-    overflow: hidden;
-  }
-  .dashboard .content-module.middle {
-    width: 60%;
-  }
-  .dashboard .content-module.side {
-    width: 20%;
-  }
-  .dashboard h2.page-heading {
-    float: left;
-    width: 75%;
-  }
   .dashboard .garden-settings {
     float: right;
     height: 1em;
@@ -5224,7 +5225,25 @@ button.close {
   margin: 2em 0 2em;
   clear: both;
 }
-.my-accordion {
+.growplans div[data-bpn-directives-navigation-phases-graph] {
+  width: 75%;
+}
+.growplans .controls .grid--wrapping > .grid-cell {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 1 5em;
+  -ms-flex: 1 5em;
+  flex: 1 5em;
+  font-size: 0.85em;
+  padding: 4em 0 0;
+  line-height: 1;
+  font-weight: normal;
+  margin: 0 0 1em;
+  max-width: 5em;
+}
+.accordion {
   -webkit-transition: 0.25s linear all;
   -webkit-transition: 0.25s linear all;
   -moz-transition: 0.25s linear all;
@@ -5235,14 +5254,14 @@ button.close {
   -ms-filter: none;
   filter: none;
 }
-.my-accordion.ng-hide {
+.accordion.ng-hide {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
   height: 0;
 }
-.my-accordion.ng-hide-add,
-.my-accordion.ng-hide-remove {
+.accordion.ng-hide-add,
+.accordion.ng-hide-remove {
 /* this needs to be here to make it visible during the animation
      since the .ng-hide class is already on the element rendering
      it as hidden. */
