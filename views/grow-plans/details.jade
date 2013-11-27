@@ -28,11 +28,11 @@ block head
               input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
 
           label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
             | Add
-            | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+            | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
       div(class="question clear-l")
         label(for="gpedit_description", class="question-title") Description
@@ -77,10 +77,11 @@ block head
                   ng-class="{selected: sharedDataService.selectedGrowPlan.currentVisiblePhase == phase}", 
                   ng-click="setCurrentVisiblePhase(phase)") {{ phase.name || 'New Phase' }}
                 div(class="remove icon", ng-click="removePhase($index)")
-                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true" ng-hide="sharedDataService.selectedGrowPlan.currentVisiblePhase == phase"></i>
+                  | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-show="sharedDataService.selectedGrowPlan.currentVisiblePhase == phase"></i>
               li(class="btn inverse-btn", ng-click="addPhase()") Add New Phase
                 div(class="add icon")
-                  | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                  | <i class="icon-glyph-new icon-__64_plus_00e36c" aria-hidden="true"></i>
 
             div(class="phase-slider")
               h4(class="page-heading-large seamless-input-wrap")
@@ -120,7 +121,7 @@ block head
                   div.question
                     h4(class="page-heading-large separator-top") System
                     a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'GrowSystemOverlay'")
-                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different grow system
                     label Name
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem.name")
@@ -144,7 +145,7 @@ block head
                   div(class="nutrients question")
                     h4(class="page-heading-large separator-top") Nutrients
                     a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'NutrientOverlay'")
-                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Add a nutrient
                     ul.grid
                       li(ng-repeat="nutrient in sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel")
@@ -156,7 +157,7 @@ block head
                   div.question
                     h4(class="page-heading-large separator-top") Fixture
                     a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'FixtureOverlay'")
-                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different fixture
                     label Brand
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture.brand")
@@ -173,7 +174,7 @@ block head
                   div.question
                     h4(class="page-heading-large separator-top") Bulbs
                     a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'BulbOverlay'") 
-                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different bulb
                     label Brand
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb.brand")
@@ -193,11 +194,11 @@ block head
                     li
                       label(class="add btn", ng-click="addIdealRange(sharedDataService.selectedGrowPlan.currentVisiblePhase);") 
                         | Add
-                        | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                        | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
                     li(class="question", ng-repeat="idealRange in sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges")
                       div(class="close btn", ng-click="removeIdealRange($parent.$index, $index);")
-                        | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                        | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
 
 
                       //- div(class="sensor-type icon {{idealRange.sCode}}")
@@ -268,11 +269,11 @@ block head
                     li.add
                       label(class="add btn", ng-click="addAction(sharedDataService.selectedGrowPlan.currentVisiblePhase);") 
                         | Add
-                        | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                        | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
                     li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel")
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
-                        | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                        | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
 
                       div
                         label Description
@@ -426,14 +427,14 @@ block content
           div(ng-controller="bpn.controllers.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay.is=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Add a Plant
               div
                 input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
                 div(ng-hide="filteredItems.length") 
                   label(href="#", class="add btn", ng-click="addPlant(this)")
                     | Add New Plant
-                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
@@ -457,14 +458,14 @@ block content
           div(ng-controller="bpn.controllers.growPlan.FixtureOverlay", modal="sharedDataService.activeOverlay.is=='FixtureOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Choose a Fixture
               div(ng-controller="overlayCtrl")
                 input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
                 div(ng-hide="filteredItems.length") 
                   label(href="#", class="add btn", ng-click="addFixture(this)")
                     | Add New Fixture
-                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
@@ -503,14 +504,14 @@ block content
           div(ng-controller="bpn.controllers.growPlan.BulbOverlay", modal="sharedDataService.activeOverlay.is=='BulbOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Choose a Bulb
               div(ng-controller="overlayCtrl")
                 input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
                 div(ng-hide="filteredItems.length") 
                   label(href="#", class="add btn", ng-click="addBulb(this)")
                     | Add New Bulb
-                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
@@ -547,14 +548,14 @@ block content
           div(ng-controller="bpn.controllers.growPlan.GrowSystemOverlay", modal="sharedDataService.activeOverlay.is=='GrowSystemOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Choose a Grow System
               div(ng-controller="overlayCtrl")
                 input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
                 div(ng-hide="filteredItems.length") 
                   label(href="#", class="add btn", ng-click="addGrowSystem(this)")
                     | Add New Grow System
-                    | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                    | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                 
                 ul(class="grid plantlist")
                   li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
@@ -598,14 +599,14 @@ block content
           div(ng-controller="bpn.controllers.growPlan.NutrientOverlay", modal="sharedDataService.activeOverlay.is=='NutrientOverlay'", close="close()", options="sharedDataService.modalOptions")
               div(ng-controller="bpn.controllers.SelectionOverlay")
                 div(class="close btn", ng-click="close()")
-                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
                 h3(class="page-heading page-heading-small") Choose a Nutrient
                 div(ng-controller="overlayCtrl")
                   input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
                   div(ng-hide="filteredItems.length") 
                     label(href="#", class="add btn", ng-click="addGrowSystem(this)")
                       | Add New Nutrient
-                      | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                   
                   ul(class="grid plantlist")
                     li(ng-repeat="item in pagedItems[currentPage] | orderBy:sortingOrder:name")
@@ -636,7 +637,7 @@ block content
           div(ng-controller="bpn.controllers.growPlan.ActivationOverlay", modal="sharedDataService.activeOverlay.is=='ActivationOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               div(ng-show="!sharedDataService.submit.error")
                 h3(class="page-heading page-heading-small") Garden Activated
                 p 

@@ -22,11 +22,11 @@ block content
       div
         div(modal="sharedDataService.activeOverlay=='SettingsOverlay'", close="close()", options="sharedDataService.modalOptions")
           div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
-            
+
             form(ng-controller="bpn.controllers.dashboard.SettingsOverlay")
 
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Garden Settings
               
               h2(ng-show="sharedDataService.gardenModel.endDate") This garden was marked complete {{sharedDataService.gardenModel.endDate | friendlyDate:'lowercase'}}
@@ -93,7 +93,7 @@ block content
             div(modal="sharedDataService.activeOverlay=='SensorOverlay'+sensor.abbrev", close="close()", options="sharedDataService.modalOptions")
               div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
                 div(class="close btn", ng-click="close()")
-                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
                 h3(class="page-heading page-heading-small") {{sensor.name}}
                 div(ng-controller="bpn.controllers.dashboard.SensorDetailOverlay")
                   div(class="overlay-data clearfix")
@@ -122,7 +122,7 @@ block content
                       input(id="{{sensorCode}}_manual_entry_toggle", 
                         type="checkbox",
                         name="{{sensorCode}}_manual_entry_toggle")
-                      label(ng-hide="manualSensorEntryMode", ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
+                      label(ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
                     
                     div(ng-show="manualSensorEntryMode")
                       form(action="", ng-submit="submit()")
@@ -174,7 +174,7 @@ block content
             div(modal="sharedDataService.activeOverlay==('PhotosOverlay')", close="close()", options="modalOptions")
               div(class="overlay-contain")
                 div(class="close btn", ng-click="close()")
-                  | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                  | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
                 div
                   div(data-flex-slider, flex-slider-slides="photo in sharedDataService.photos", startAt="{{startAt}}", touch="true", animation="slide")
                     li
@@ -187,7 +187,7 @@ block content
           div.manual-entry-container(ng-controller="bpn.controllers.dashboard.ManualLog")
 
             button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log
-              | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+              | <i class="icon-glyph-new icon-__64_plus_00e36c" aria-hidden="true"></i>
             p(ng-hide="(sharedDataService.recentTextLogs.length) > 0")
               | Journal your progress and enter any sensor data you want to record manually.
             
@@ -200,7 +200,7 @@ block content
           div(ng-controller="bpn.controllers.dashboard.ManualLogOverlay", modal="sharedDataService.activeOverlay=='ManualLogOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               
               div(data-bpn-directives-manual-entry-form, 
                   data-close="close",
@@ -236,7 +236,7 @@ block content
                 div(ng-controller="bpn.controllers.dashboard.ControlOverlay", modal="sharedDataService.activeOverlay=='ControlOverlay'+controlAction.control.name", close="close()", options="sharedDataService.modalOptions")
                   div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
                     div(class="close btn", ng-click="close()")
-                      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+                      | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
                     h3(class="page-heading page-heading-small") {{controlAction.control.name}}
                     div(class="overlay-data", ng-show="controlAction.baseCycle.states.length > 1")
                       div(ng-show="controlAction.isDailyControlCycle")
