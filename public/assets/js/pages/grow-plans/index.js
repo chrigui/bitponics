@@ -716,6 +716,31 @@ require([
         }
       ]
     );
+    
+    /*
+     * Showcase phase graph so users know to interact there first
+     */
+    growPlanApp.directive('bpnDirectivesShowcaseReveal', function() {
+      return {
+        restrict : "EA",
+        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+        },
+        link: function (scope, element, attrs, controller) {
+          scope.el = $(element[0]);
+          scope.fadeSides = function (inout) {
+            var sideOpacity = inout == 'in' ? 1 : .25,
+                phaseOpacity = 1;
+            scope.el.find('#phases').css({ opacity: phaseOpacity });
+            scope.el.find('.side').css({ opacity: sideOpacity });
+          };
+          scope.fadeSides('out');
+          scope.el.on('click', function() {
+            scope.fadeSides('in');
+          });
+        }
+      }
+    });
   	
   	domReady(function () {
       angular.bootstrap(document, ['bpn.apps.growPlan']);

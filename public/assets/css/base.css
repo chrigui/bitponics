@@ -5228,6 +5228,18 @@ button.close {
 .growplans div[data-bpn-directives-navigation-phases-graph] {
   width: 75%;
 }
+.growplans .ring-graph .good {
+  fill: #00e36c;
+}
+.growplans .ring-graph .active {
+  fill: #00b656;
+}
+.growplans .ring-graph .add-phase {
+  fill: #00e36c;
+  opacity: 0.25;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
+  filter: alpha(opacity=25);
+}
 .growplans .controls .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
@@ -5242,6 +5254,13 @@ button.close {
   font-weight: normal;
   margin: 0 0 1em;
   max-width: 5em;
+}
+.growplans .side {
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
 }
 .accordion {
   -webkit-transition: 0.25s linear all;

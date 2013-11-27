@@ -14,7 +14,7 @@ block content
   section#main(role="main", class="main split-layout")
     img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
     div(ng-cloak, ng-controller="bpn.controllers.dashboard.Main", data-bpn-directives-smart-overlay)
-      header
+      header.separator-bottom 
         h2.page-heading {{sharedDataService.gardenModel.name}}
         //- div(class="garden-settings", ng-click="sharedDataService.activeOverlay = 'SettingsOverlay'")
         //-   | <i class="icon-glyph icon-glyph-new icon-19_settings" aria-hidden="true"></i>
@@ -71,7 +71,7 @@ block content
                 input(type="submit", value="Save", ng-click="submit()")
 
 
-      div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
+      div#sensors.sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
 
         h2.page-heading-small.date 
           | {{sharedDataService.activeDate.date | date:'longDate'}}
@@ -143,7 +143,7 @@ block content
                             i
                         input(type="submit", value="Record")
 
-      div.content-module.middle.separator-top
+      div.content-module.middle
         div(ng-controller="bpn.controllers.dashboard.PhasesGraph")
           div(data-bpn-directives-phases-graph)
 
@@ -189,7 +189,7 @@ block content
 
                         
     
-      div.content-module.side.separator-top
+      div.content-module.side
           div.manual-entry-container(ng-controller="bpn.controllers.dashboard.ManualLog")
 
             button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log

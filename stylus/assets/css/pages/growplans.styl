@@ -256,8 +256,19 @@
 		margin 2em 0 2em
 		clear both
 
+	
 	div[data-bpn-directives-navigation-phases-graph]
 		width 75%
+
+	.ring-graph
+		.good
+			fill: color-bg-green
+		.active
+			fill: darken(color-bg-green, 20%)
+		.add-phase
+			fill: color-bg-green
+			opacity: .25
+
 	.controls
 		.grid--wrapping > .grid-cell
 			flex 1 5em
@@ -268,7 +279,8 @@
 			margin: 0 0 1em;
 			max-width: 5em;
 
-
+	.side
+		transition opacity .5s linear
 	/*
 	 * Split layout Overrides
 	 */
