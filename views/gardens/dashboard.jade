@@ -39,6 +39,13 @@ block content
               //-   label(ng-click="toggleMetric()", for="{{sensorCode}}_settings_unit_toggle", class="btn no-margin") Metric
 
               div(ng-hide="sharedDataService.gardenModel.endDate")
+                label
+                  | Garden Name
+                  input(type="text", ng-model="sharedDataService.gardenModel.name", ng-change="updateName()")
+
+                div
+                  | Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+
                 div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                   div(data-bpn-directives-manual-entry-form, 
                     data-sensor-unit="sensor.unit", 
@@ -60,7 +67,6 @@ block content
                   ng-show="sharedDataService.gardenModel.active",
                   ng-click="completeGarden()") Complete garden
 
-                button(class="delete-garden btn", ng-click="deleteGarden()") Delete garden
 
                 input(type="submit", value="Save", ng-click="submit()")
 

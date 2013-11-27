@@ -55,7 +55,7 @@ require([
             },
             controls : bpn.pageData.controls,
             sensors : bpn.pageData.sensors,
-            growPlanInstance : bpn.pageData.growPlanInstance,
+            //growPlanInstance : bpn.pageData.growPlanInstance,
             controlHash : {},
             photos : bpn.pageData.photos,
             units : feBeUtils.UNITS,
@@ -74,9 +74,9 @@ require([
 
           viewModels.initPhotosViewModel(sharedData.photos);
 
-          viewModels.initGrowPlanInstanceViewModel(sharedData.growPlanInstance, sharedData.controlHash);
+          viewModels.initGrowPlanInstanceViewModel(sharedData.gardenModel, sharedData.controlHash);
 
-
+          console.log(sharedData.gardenModel);
 
 
           /**
@@ -93,7 +93,7 @@ require([
            */
           sharedData.getGrowPlanInstancePhaseFromDate = function (date) {
             var dateMoment = moment(date),
-              growPlanInstancePhases = sharedData.growPlanInstance.phases,
+              growPlanInstancePhases = sharedData.gardenModel.phases,
               i,
               phaseStart;
 
@@ -120,7 +120,7 @@ require([
                 deferred = $q.defer();
 
             $http.get(
-              '/api/gardens/' + sharedData.growPlanInstance._id + '/sensor-logs',
+              '/api/gardens/' + sharedData.gardenModel._id + '/sensor-logs',
               {
                 params : {
                   "start-date" : dateMoment.startOf("day").format(),
@@ -150,7 +150,7 @@ require([
             var deferred = $q.defer();
 
             $http.get(
-              '/api/gardens/' + sharedData.growPlanInstance._id + '/text-logs',
+              '/api/gardens/' + sharedData.gardenModel._id + '/text-logs',
               {
                 params : {
                   "limit" : 3
@@ -217,7 +217,7 @@ require([
           var initSocket = function (){
             socket.connect('/latest-grow-plan-instance-data');
 
-            socket.emit('ready', { growPlanInstanceId : sharedData.growPlanInstance._id });
+            socket.emit('ready', { growPlanInstanceId : sharedData.gardenModel._id });
 
             socket.on('update', function(data){
               var sensorLog = data.sensorLog,
@@ -239,7 +239,7 @@ require([
                 sharedData.recentTextLogs.unshift(textLog);
               }
               if (deviceStatus) {
-                viewModels.initDeviceViewModel(sharedData.growPlanInstance.device, deviceStatus, sharedData.controlHash);
+                viewModels.initDeviceViewModel(sharedData.gardenModel.device, deviceStatus, sharedData.controlHash);
               }
               if (notifications){
                 notifications.forEach(function(notification){
@@ -298,7 +298,7 @@ require([
             currentControlAction.updateInProgress = true;
 
             $http.post(
-              '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions',
+              '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/immediate-actions',
               {
                 actionId : actionId,
                 message : "Triggered from dashboard"
@@ -579,6 +579,10 @@ require([
             sharedDataService.gardenModel.$delete();
           }
 
+          $scope.updateName = function(){
+            sharedDataService.gardenModel.$updateName();
+          };
+
           /*
            * Save Settings to GardenModel
            */
@@ -596,7 +600,7 @@ require([
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           $scope.idealRanges = {}
-          $scope.sharedDataService.growPlanInstance.activePhase.phase.idealRanges.forEach(function(idealRange) {
+          $scope.sharedDataService.gardenModel.activePhase.phase.idealRanges.forEach(function(idealRange) {
             $scope.idealRanges[idealRange.sCode] = idealRange;
           });
 
@@ -740,7 +744,7 @@ require([
             currentControlAction.updateInProgress = true;
 
             $http.post(
-              '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/immediate-actions?expire=true',
+              '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/immediate-actions?expire=true',
               {
                 actionId : currentControlAction._id,
                 message : "Triggered from dashboard"
@@ -838,8 +842,8 @@ require([
             });
           });
 
-          scope.$watch('sharedDataService.growPlanInstance.phases', function (newVal, oldVal) {
-            var phases = scope.sharedDataService.growPlanInstance.phases,
+          scope.$watch('sharedDataService.gardenModel.phases', function (newVal, oldVal) {
+            var phases = scope.sharedDataService.gardenModel.phases,
               phaseCount = phases.length,
               outerMargin = 80,
               width = $(element[0]).width() - (outerMargin * 2),
@@ -1149,7 +1153,7 @@ require([
           };
 
           $scope.changeUnit = function(sensorCode, value) {
-            var oldUnit = sharedDataService.growPlanInstance.settings.units[sensorCode],
+            var oldUnit = sharedDataService.gardenModel.settings.units[sensorCode],
                 oldValue = value,
                 newUnit,
                 newValue;
@@ -1189,7 +1193,7 @@ require([
             //construct sensorDataObj for server
             sensorDataObj = {
               sensorLog: {
-                gpi: $scope.sharedDataService.growPlanInstance._id,
+                gpi: $scope.sharedDataService.gardenModel._id,
                 timestamp: new Date(),
                 logs: sensorlogsArray
               }
@@ -1198,7 +1202,7 @@ require([
             //construct textDataObj for server
             textDataObj = {
               textLog: {
-                gpi: $scope.sharedDataService.growPlanInstance._id,
+                gpi: $scope.sharedDataService.gardenModel._id,
                 timestamp: new Date(),
                 logs: [{
                   val: text,
@@ -1214,7 +1218,7 @@ require([
                 headers: {
                   'bpn-manual-log-entry': 'true'
                 },
-                url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/sensor-logs',
+                url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/sensor-logs',
                 data: sensorDataObj
               })
               .success(function(data, status, headers, config) {
@@ -1229,7 +1233,7 @@ require([
               if(text) {
                 $http({
                   method: 'post',
-                  url: '/api/gardens/' + $scope.sharedDataService.growPlanInstance._id + '/text-logs',
+                  url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/text-logs',
                   data: textDataObj
                 })
                 .success(function(data, status, headers, config) {
