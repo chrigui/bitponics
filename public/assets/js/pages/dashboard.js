@@ -958,13 +958,13 @@ require([
           };
 
           $scope.iconMap = {
-            'seedlingheatmat' : 'icon-18_seedling',
-            'humidifier' : 'icon-02_airtemperature',
-            'airconditioner' : 'icon-02_airtemperature',
-            'heater' : 'icon-02_airtemperature',
-            'fan' : 'icon-10_fan',
-            'waterpump' : 'icon-27_waterpump',
-            'light' : 'icon-12_light'
+            'seedlingheatmat' : 'icon-__96_heatmat_00e36c',
+            'humidifier' : 'icon-__98_humidifier_00e36c',
+            'airconditioner' : 'icon-__92_ac_00e36c',
+            'heater' : 'icon-__94_heater_00e36c',
+            'fan' : 'icon-__83_fan_00e36c',
+            'waterpump' : 'icon-__88_waterpump_00e36c',
+            'light' : 'icon-__100_light_accessory_00e36c'
           }
 
 

@@ -38,6 +38,14 @@
 			left: 0.25em;
 			position relative
 
+		.sensor-type
+			.icon-glyph
+				width: 60px;
+				height: 60px;
+				position: absolute;
+				top: -.25em;
+				right: -.25em;
+
 	select
 		// margin 0
 
@@ -107,6 +115,9 @@
 
 	.overlay
 		top 8em
+		// top 10%
+		left 25%
+		width 40%
 		overflow hidden
 
 		&.photo
@@ -195,6 +206,14 @@
 	.sensor-reading-group
 		@extends .clear-b
 		@extends .full-width
+
+	.manual-entry-container
+		.btn
+			i
+				font-size: 1.25em;
+				position: relative;
+				top: .12em;
+				left: -.5em;
 
 	.manual-entry-form
 

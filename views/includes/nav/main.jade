@@ -5,7 +5,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
         a(href="/", data-page-include="false") 
           | bitponics
           span &trade;
-        | <i class="icon-glyph icon-glyphlogo-new" aria-hidden="true"></i>
+        | <i class="icon-glyph icon-glyphlogo-new icon-__63_logo_white" aria-hidden="true"></i>
       - var pageType = pageType || null;
       if !!pageType && pageType == 'landing-page'  
 
@@ -56,17 +56,17 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                 div
                   | Facebook
                 a(href="https://www.facebook.com/Bitponics", data-page-include="false", target="_blank")
-                  | <i class="icon-glyph icon-glyphfc-webicon-facebook" aria-hidden="true"></i>
+                  | <i class="icon-glyph icon-__51_facebook_white" aria-hidden="true"></i>
               li
                 div 
                   | Twitter
                 a(href="https://www.twitter.com/bitponics", data-page-include="false", target="_blank")
-                  | <i class="icon-glyph icon-glyphfc-webicon-twitter" aria-hidden="true"></i>
+                  | <i class="icon-glyph icon-__52_twitter_white" aria-hidden="true"></i>
               li 
                 div 
                   | Email
                 a(href="contact", data-page-include="false")
-                  | <i class="icon-glyph icon-glyphmail" aria-hidden="true"></i>
+                  | <i class="icon-glyph icon-__53_email_white" aria-hidden="true"></i>
 
       if !pageType || pageType == 'app-page'
         if user && user.name
@@ -97,7 +97,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
   if !!pageType && pageType == 'landing-page'  
     button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")
       span Menu
-      //- i(class="icon-glyph-new icon-01_-", aria-hidden="true", ng-hide="navMenuDisplayVisible")
+      //- i(class="icon-glyph-new icon-__60_plus_white", aria-hidden="true", ng-hide="navMenuDisplayVisible")
       i(class="font-style-normal", aria-hidden="true", ng-hide="navMenuDisplayVisible") &#9776;
-      i(class="icon-glyph-new icon-28_x", aria-hidden="true", ng-show="navMenuDisplayVisible")
+      i(class="icon-glyph-new icon-__72_x_999999", aria-hidden="true", ng-show="navMenuDisplayVisible")
       
