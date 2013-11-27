@@ -18,22 +18,23 @@ define([
     'use strict';
 
     var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers']).run(
+      [
+        '$rootScope',
+        function($rootScope) {
 
-      function($rootScope) {
-
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-      
-      }
+          /**
+           * Debugging Tools
+           *
+           * Allows you to execute debug functions from the view
+           */
+          $rootScope.log = function(variable) {
+            console.log(variable);
+          };
+          $rootScope.alert = function(text) {
+            alert(text);
+          };
+        }  
+      ]
     );
 
 		growPlanApp.config(

@@ -14,21 +14,22 @@ function (angular, domReady, feBeUtils) {
   'use strict';
 
   var checkoutApp = angular.module('bpn.apps.buy.checkout', ['ngResource', 'ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
-
-    function($rootScope) {
-      /**
-       * Debugging Tools
-       *
-       * Allows you to execute debug functions from the view
-       */
-      $rootScope.log = function(variable) {
-        console.log(variable);
-      };
-      $rootScope.alert = function(text) {
-        alert(text);
-      };
-    
-    }
+    [
+      '$rootScope',
+      function($rootScope) {
+        /**
+         * Debugging Tools
+         *
+         * Allows you to execute debug functions from the view
+         */
+        $rootScope.log = function(variable) {
+          console.log(variable);
+        };
+        $rootScope.alert = function(text) {
+          alert(text);
+        };
+      }  
+    ]
   );
 
   // checkoutApp.config(
