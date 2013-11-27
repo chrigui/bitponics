@@ -1,3 +1,7 @@
+/*
+ * Phase Graph
+ * - supports being data-backed by a growPlan or growPlanInstance
+ */
 define(['angular', 'jquery', 'd3'],
   function (angular, $) {
     angular.module('bpn.directives.graphs', [])
@@ -9,12 +13,22 @@ define(['angular', 'jquery', 'd3'],
         controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
           $scope.sharedDataService = sharedDataService;
           
+          //get phases depending on where graph is being used (garden dashboard vs. grow-plan detail)
+          if ($scope.sharedDataService.growPlanInstance.phases) { 
+            $scope.phases = $scope.sharedDataService.growPlanInstance.phases;
+          } else if($scope.sharedDataService.selectedGrowPlan.phases) {
+            $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
+          }
+          
           $scope.getDaySummaryClass = function(data){
-            var className = data.data.status;
-            if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
-              className += " active";
+            if(data.data.status){
+              var className = data.data.status;
+              if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                className += " active";
+              }
+              return className;
             }
-            return className;
+            return " active good";
           }
 
           $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
@@ -41,8 +55,8 @@ define(['angular', 'jquery', 'd3'],
             });
           });
 
-          scope.$watch('sharedDataService.growPlanInstance.phases', function (newVal, oldVal) {
-            var phases = scope.sharedDataService.growPlanInstance.phases,
+          scope.$watch('phases', function (newVal, oldVal) {
+            var phases = scope.phases,
               phaseCount = phases.length,
               outerMargin = 80,
               width = $(element[0]).width() - (outerMargin * 2),
@@ -80,9 +94,9 @@ define(['angular', 'jquery', 'd3'],
               phaseGroup = svg.append('svg:g')
                 .classed(className, true)
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
-
+              
               var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phase.daySummaries));
+                .data(equalPie(phase.daySummaries || [{}]));
 
               allArcs
                 .enter()
