@@ -141,14 +141,14 @@ mixin requirejs(dataMain)
 mixin overlayTemplate(toggleVarName, itemsArray, headingText, itemText, classNames)
   div(ng-hide="!#{toggleVarName}", class="overlay #{classNames}")
     div(class="close btn", ng-click="toggleOverlay('#{toggleVarName}')")
-      | <i class="icon-glyph-new icon-28_x" aria-hidden="true"></i>
+      | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
     h3.page-heading Add a #{itemText}
     div(ng-controller="overlayCtrl")
       input(class="search no-validate", ng-model="query", ng-change="search()", placeholder="Search...")
       div(ng-hide="filteredItems.length") 
         label(href="#", class="add btn", ng-click="addPlant(this)")
           | Add New #{itemText}
-          | <i class="icon-glyph-new icon-01_-" aria-hidden="true"></i>
+          | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
       ul.pagination
         li(ng-class="{disabled: currentPage == 0}")
           a(href, ng-click="prevPage()") « Prev

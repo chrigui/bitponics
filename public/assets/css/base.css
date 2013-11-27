@@ -1166,6 +1166,7 @@ img.page-spinner.spinner {
 .overlay {
   position: absolute;
   height: auto;
+  top: 8em;
   left: 5%;
   right: 5%;
   background: #fff;
@@ -1241,11 +1242,6 @@ img.page-spinner.spinner {
   display: none;
 }
 @media  screen and (min-width: 50em) {
-  .overlay {
-    top: 10%;
-    left: 25%;
-    width: 40%;
-  }
 }
 @media  screen and (max-height: 50em) {
 }
@@ -1450,16 +1446,17 @@ img.page-spinner.spinner {
 }
 .social-icons li a,
 .social-icons li i {
-  font-size: 1.4em;
+  font-size: 1.1em;
 }
 .social-icons li i {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 0.65em;
+  left: 0.225em;
 }
-.social-icons i.icon-glyphmail {
-  left: -0.09em;
-  top: -0.025em;
+.social-icons li i.icon-__51_facebook_white {
+  font-size: 1.3em;
+  top: 0.5em;
+  left: 0.125em;
 }
 #how-it-works p {
   text-align: left;
@@ -2180,6 +2177,13 @@ img.page-spinner.spinner {
   left: 0.25em;
   position: relative;
 }
+.dashboard .data-module .sensor-type .icon-glyph {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: -0.25em;
+  right: -0.25em;
+}
 .dashboard .page-heading-small {
   color: #999;
   border-bottom: 1px solid #d8d8d8;
@@ -2242,6 +2246,8 @@ img.page-spinner.spinner {
 }
 .dashboard .overlay {
   top: 8em;
+  left: 25%;
+  width: 40%;
   overflow: hidden;
 }
 .dashboard .overlay.photo {
@@ -2319,6 +2325,12 @@ img.page-spinner.spinner {
 }
 .dashboard .btn {
   padding: 0.5em;
+}
+.dashboard .manual-entry-container .btn i {
+  font-size: 1.25em;
+  position: relative;
+  top: 0.12em;
+  left: -0.5em;
 }
 .dashboard .manual-entry-form .sensor-reading-date.page-heading-small {
   font-size: 0.85em;
@@ -2666,8 +2678,8 @@ li
   display: inline-block;
   cursor: pointer;
 }
-.undefined .app-user .settings .icon-19_settings,
-.app-page .app-user .settings .icon-19_settings {
+.undefined .app-user .settings .icon-__71_settings_999999,
+.app-page .app-user .settings .icon-__71_settings_999999 {
   color: #999;
   right: 0;
   top: 0;
@@ -4402,11 +4414,6 @@ button.close {
   top: 1.1em;
   right: 0.85em;
 }
-.growplans .overlay .img-wrapper .icon-glyph.icon-glyphlogo-new {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
 .growplans .edit-btn {
   height: 1em;
   padding-left: 1em;
@@ -4448,16 +4455,16 @@ button.close {
 .growplans .img-wrapper {
   position: relative;
 }
-.growplans .img-wrapper .icon-glyph.icon-glyphlogo-new {
-  display: block !important;
-  color: #00e36c;
-  font-size: 4em;
+.growplans .img-wrapper .icon-glyph {
+  height: 5em;
+  width: 5em;
+  background-position: -1em 0;
 }
 .growplans .icon-glyph-new {
   height: 1em;
-  font-size: 0.75em;
+  font-size: 1.25em;
   position: relative;
-  top: -0.25em;
+  top: 0.15em;
 }
 .growplans #growplans_activate {
   clear: both;
