@@ -579,6 +579,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
  * @param {ObjectId|string} options.phaseId : (required) phaseId of the growPlan.phase
  * @param {Number=} options.phaseDay : (optional) Number of days into the phase. Used to offset phase.expectedEndDate
  * @param {bool=} options.save : (optional) Indicates whether the GrowPlanInstance should be saved in the end (should be false if caller will execute a save)
+ * @param {function(err, GrowPlanInstance)} callback
  */
 GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   var Action = require('./action'),
@@ -705,7 +706,11 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
       function saveGPI(innerCallback){
         // At this point, the growPlanInstance is done being edited.
         if (options.save) {
-          return growPlanInstance.save(innerCallback);
+          return growPlanInstance.save(function(err, updatedGrowPlanInstance){
+            // update the outer scope's growPlanInstance
+            growPlanInstance = updatedGrowPlanInstance;
+            return innerCallback();
+          });
         } else {
           return innerCallback();
         }

@@ -15,7 +15,7 @@ module.exports = function(app){
 	require('./device')(app);
 	//TODO require('./deviceType')(app);
 	require('./growPlan')(app);
-	require('./garden')(app);
+	require('./gardens')(app);
 	require('./growSystem')(app);
 	require('./light')(app);
   require('./lightBulb')(app);

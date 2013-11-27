@@ -19,8 +19,7 @@ var mongoose = require('mongoose'),
 var PhotoSchema = new Schema({
 	
   /**
-	 * The GrowPlanInstance. Optional. A denormalized convenience property to
-   * make querying for a garden's photos easier.
+	 * The GrowPlanInstance. Optional. 
    * 
    */
 	gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},

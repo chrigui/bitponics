@@ -21,7 +21,13 @@ define([
                 return JSON.stringify({active : false });
               }},
 
-        	    delete: { method:'DELETE', isArray: false }
+        	    delete: { method:'DELETE', isArray: false },
+
+              updateName : { method : 'POST', isArray: false, transformRequest: function(data, headersGetter){
+                return JSON.stringify({
+                  name : data.name
+                });
+              }}
 			        	    
 						}
 					);
