@@ -146,7 +146,7 @@ block content
           
           ul(class="grid photos centered", ng-show="sharedDataService.photos.length > 0") 
             li.photo(ng-repeat="photo in sharedDataService.photos | orderBy:predicate:date", ng-click="open(photo._id, $index)")
-              img(ng-src="{{photo.thumbnailUrl}}")
+              img(ng-src="{{photo.thumbnailUrl}}", if-thumbnail-404="{{photo.url}}")
           
             li.photo
               img.spinner(src="/assets/img/spinner.svg", ng-show="uploadInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")

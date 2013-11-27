@@ -1303,7 +1303,6 @@ require([
       return function(input, format) {
         var val = moment(input).calendar();
 
-        console.log('format', arguments);
         if (format === 'lowercase'){
           return val.charAt(0).toLowerCase() + val.slice(1);  
         } else {
@@ -1325,6 +1324,18 @@ require([
         return feBeUtils.getTimeOfDayFromMilliseconds(input);
       };
     });
+
+
+    dashboardApp.directive('ifThumbnail404', function() {
+      return {
+        link: function(scope, element, attrs) {
+          element.bind('error', function() {
+            element.attr('src', attrs.ifThumbnail404);
+          });
+        }
+      }
+    });
+    
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);
