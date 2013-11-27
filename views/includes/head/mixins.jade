@@ -4,6 +4,7 @@ mixin requirejs(dataMain)
   - var dataMainVar = dataMain;
   - var angular = CDN('/assets/js/libs/angular/1.2.0/angular.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularFlexslider = CDN('/assets/js/libs/angular-flexslider.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularAnimate = CDN('/assets/js/libs/angular/1.2.0/angular-animate.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularMask = CDN('/assets/js/libs/angular/mask.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularResource = CDN('/assets/js/libs/angular/1.2.0/angular-resource.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularRoute = CDN('/assets/js/libs/angular/1.2.0/angular-route.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -52,6 +53,7 @@ mixin requirejs(dataMain)
         'angular': '#{angular}',
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
+        'angularAnimate' : '#{angularAnimate}',
         'angularResource' : '#{angularResource}',
         'angularRoute' : '#{angularRoute}',
         'angularUI' : '#{angularUI}',
@@ -95,6 +97,9 @@ mixin requirejs(dataMain)
           exports: 'angular' 
         }, 
         'angularResource': { 
+          deps: [ 'angular' ] 
+        }, 
+        'angularAnimate': { 
           deps: [ 'angular' ] 
         },
         'angularRoute': { 

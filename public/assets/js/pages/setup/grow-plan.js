@@ -12,12 +12,13 @@ define([
   'angularUISelect2',
   'selection-overlay',
   'overlay',
-  'controller-nav'
+  'controller-nav',
+  'angularAnimate'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers']).run(
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers', 'ngAnimate']).run(
       [
         '$rootScope',
         function($rootScope) {
@@ -46,11 +47,11 @@ define([
     			$locationProvider.hashPrefix = '!';
 
 			    $routeProvider
-			    	.when('/', {
-			        controller: 'bpn.controllers.setup.growPlan.Filter',
-			        templateUrl: 'filter.html'
-			      })
-			      .when('/browse', {
+			    	// .when('/', {
+			     //    controller: 'bpn.controllers.setup.growPlan.Filter',
+			     //    templateUrl: 'filter.html'
+			     //  })
+			      .when('/', {
 			        controller: 'bpn.controllers.setup.growPlan.Browse',
 			        templateUrl: 'browse.html'
 			      })
@@ -112,9 +113,6 @@ define([
 
           formatResult : function(object, container, query){
             var growSystem = angular.element(object.element).scope().growSystem;
-            console.log(growSystem);
-
-
             return '<div style="float:left;width:30%"><img style="width:100%" src="http://placekitten.com/200/200"/></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
           }
         }
@@ -167,8 +165,8 @@ define([
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
 
     			$scope.close = function(){
-    				// TODO : update the growPlan's from sharedDataService.selected.plants
 						$scope.sharedDataService.activeOverlay.is = undefined;
+            $scope.sharedDataService.updatefilteredGrowPlans();
     			};
     		}
     	]
@@ -322,6 +320,7 @@ define([
     		'sharedDataService',
     		function($scope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
+          $scope.showFilter = false;
     		}
     	]
   	);
@@ -461,7 +460,7 @@ define([
           $scope.plantQuery = '';
           //$scope.growSystems = bpn.growSystems;
           //$scope.selectedGrowPlan = {}; 
-          $scope.selectedGrowSystem = undefined;
+          // $scope.selectedGrowSystem = undefined;
           $scope.currentGrowPlanDay = 0;
           $scope.growPlans = bpn.growPlans;
           $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
@@ -513,9 +512,9 @@ define([
 
           $scope.updateSelectedGrowSystem = function () {
             // $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
-            if ($scope.sharedDataService.selectedPlants && $scope.sharedDataService.selectedPlants.length) {
-              $scope.updatefilteredGrowPlans();
-            }
+            // if ($scope.sharedDataService.selectedPlants && $scope.sharedDataService.selectedPlants.length) {
+              // $scope.updatefilteredGrowPlans();
+            // }
           };
 
           $scope.addPlant = function (obj) {
@@ -546,6 +545,9 @@ define([
           //     }
           // };
 
+          $scope.$watch('sharedDataService.selectedGrowSystem', function () {
+            $scope.updatefilteredGrowPlans();
+          });
 
           $scope.$watch('sharedDataService.selected.plants', function(){
             $scope.sharedDataService.selectedPlants= [];
@@ -639,7 +641,7 @@ define([
               $scope.sharedDataService.selectedGrowPlan.plants = $scope.sharedDataService.selectedPlants;
               $scope.sharedDataService.selectedGrowPlan.plants.sort(function (a, b) { return a.name < b.name; });
             }
-          };
+          };        
 
           $scope.updatefilteredGrowPlans = function () {
             var selectedPlantIds = $scope.sharedDataService.selectedPlants.map(function (plant) { return plant._id }),
@@ -648,52 +650,14 @@ define([
             //hit API with params to filter grow plans
             $scope.filteredGrowPlanList = GrowPlanModel.query({
               plants:selectedPlantIds,
-              growSystem:$scope.selectedGrowSystem
-              // growSystem: $scope.selectedGrowSystem._id
+              growSystem:$scope.sharedDataService.selectedGrowSystem
             }, function () {
               //add default to end of filtered grow plan array
               $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
             });
           };
 
-          
-          // $scope.toggleOverlay = function (overlayMetaData) {
-          //   $scope.overlayMetaData = overlayMetaData;
-          //   switch (overlayMetaData.type) {
-          //     //case 'plant':
-          //       //$scope.overlayItems = $scope.filteredPlantList;
-          //       // $scope.overlayItemKey = "plants";
-          //       //break;
-          //     //case 'fixture':
-          //       //$scope.overlayItems = $scope.lightFixtures;
-          //       // $scope.overlayItemKey = "lightFixture";
-          //       //break;
-          //     //case 'bulb':
-          //       //$scope.overlayItems = $scope.lightBulbs;
-          //       // $scope.overlayItemKey = "lightBulb";
-          //       //break;
-          //     case 'growSystem':
-          //       $scope.overlayItems = $scope.growSystems;
-          //       // $scope.overlayItemKey = "growSystem";
-          //       break;
-          //     case 'nutrient':
-          //       $scope.overlayItems = $scope.nutrients;
-          //       // $scope.overlayItemKey = "nutrients";
-          //       break;
-          //     default:
-          //       $scope.overlayItems = [];
-          //       // $scope.overlayItemKey = '';
-          //       break;
-          //   }
-          //   if ($scope.overlayStates[$scope.overlayMetaData.type]) {
-          //     $scope.overlayItems = [];
-          //     $scope.overlayStates[$scope.overlayMetaData.type] = false;
-          //   } else {
-          //     // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
-          //     $scope.$broadcast('newOverlay');
-          //     $scope.overlayStates[$scope.overlayMetaData.type] = true;
-          //   }
-          // };
+          $scope.sharedDataService.updatefilteredGrowPlans = $scope.updatefilteredGrowPlans;
 
           $scope.submit = function (e) {
 

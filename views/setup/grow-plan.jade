@@ -2,104 +2,76 @@ extends ../layout
 
 block head
   base(href="/setup/grow-plan/")
-
-  script
-    $(document).bind("mobileinit", function(){
-      //$.mobile.autoInitializePage = false;
-      $.mobile.page.prototype.options.keepNative = "textarea, input[type=checkbox], input[type=radio], input[type=text], input[type=submit], input.search, select";
-      $.mobile.ajaxLinksEnabled = false;
-    });
   
   mixin requirejs("/assets/js/pages/setup/grow-plan")
 
-  script(type='text/ng-template', id='filter.html')
-  
-    h4.page-heading Ready to set up your grow plan?
-    .separator-top
-        
-      .question
-        h5.question-title What kind of hydroponic system would you like to use?
-        
-        select(ui-select2="sharedDataService.growSystemSelectOptions", ng-model="selectedGrowSystem")
-          option(value="")
-          option(ng-repeat="growSystem in sharedDataService.growSystems", value="{{growSystem._id}}") {{growSystem.name}}
-          
-        //-.custom-dropdown-wrap
-        //-  select(class="custom-dropdown", ng-model="selectedGrowSystem", ng-options="growSystem._id as growSystem.name for growSystem in sharedDataService.growSystems | orderBy:name")
-        //-    option(value="") Select
-        //-  .dblarrow
-        //-    i
-
-        //- div.dropdown-wrap
-        //-   ul(class="dropdown initial")
-        //-     li.select
-        //-       label Select
-        //-     li(ng-repeat="system in growSystems | orderBy:name")
-        //-       input(id="{{system._id}}", type='radio', name="growSystem", value="{{system._id}}", ng-model="selected.growSystem", ng-change="updateSelectedGrowSystem()")
-        //-       label(for="{{system._id}}") {{system.name}}
-
-      .question-wrap-right
-        .question
-          h5.question-title What plants would you like to grow?
-          //- input(class="search no-validate", ng-model="plantQuery", on-focus="focused=true", on-blur="focused=false", ng-change="filterPlantList()", placeholder="Search...")
-          //- div(ng-hide="filteredPlantList.length") 
-          //-   label(href="#", class="add btn", ng-click="addPlant()") Add
-          
-          //- div.dropdown-wrap
-          //-   ul(id="plant_list", class="dropdown initial sortlist", ng-class="{open: focused}")
-          //-     li.select
-          //-       label Select
-          //-     li(ng-repeat="plant in filteredPlantList | orderBy:name")
-          //-       input(id="{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]", ng-change="updateSelectedPlants()")
-          //-       label(for="{{plant._id}}", class="plant") {{plant.name}}
-          
-          
-          ul(class="plantlist float")
-            li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="grid-cell")
-              input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
-              label(for="{{plant._id}}", class="plant btn") 
-                {{plant.name}}
-                | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true"></i>
-
-          label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
-            | Add
-            | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
-    
-    .step-footer.separator-top
-      a(class="btn next-step-btn", href="browse") Next Step
-        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-
   script(type='text/ng-template', id='browse.html')
 
-    h4.page-heading Select a Grow Plan
+    //filter
+    section(class="filterable", ng-hide)
+
+      h4(class="page-heading float-l half-width") Select a Grow Plan
+      div(class="btn float-r", ng-click="showFilter = !showFilter") Filter
+      
+      div(id="filter_questions", class="my-accordion clear-b", ng-show="showFilter")
+        div.separator-top
+        .question
+          h5.question-title What kind of hydroponic system would you like to use?
+          
+          select(ui-select2="sharedDataService.growSystemSelectOptions", ng-model="sharedDataService.selectedGrowSystem")
+            option(value="")
+            option(ng-repeat="growSystem in sharedDataService.growSystems", value="{{growSystem._id}}") {{growSystem.name}}
+
+        .question-wrap-right
+          .question
+            h5.question-title What plants would you like to grow?
+            
+            ul(class="plantlist float")
+              li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="grid-cell")
+                input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
+                label(for="{{plant._id}}", class="plant btn") 
+                  {{plant.name}}
+                  | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
+
+            label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
+              | Add
+              | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
+      
+        .clear-b
+
+    //end filter
+
+
+
     ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
       //- each growPlan, i in growPlans
-      li(ng-repeat="growPlan in filteredGrowPlanList", class="grid-cell")
+      li(ng-repeat="growPlan in filteredGrowPlanList", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
         div.img-wrapper
           div.icon-glyph.icon-__62_logo_00e36c
         div.first
-          h5.label Name
+          //- h5.label Name
           div.value {{growPlan.name}}
-        div
-          h5.label Number of Phases
-          div.value {{growPlan.phases.length}}
-        div
-          h5.label Overall Time Span
-          div.value {{growPlan.overallTimeSpan || 'Open ended'}}
+        //- div
+        //-   h5.label Number of Phases
+        //-   div.value {{growPlan.phases.length}}
+        //- div
+        //-   h5.label Overall Time Span
+        //-   div.value {{growPlan.overallTimeSpan.expectedNumberOfDays || 'Open ended'}}
         //- div
         //-   h5.label In use by
         //-   div.value *TODO*
-        div.last
-          h5.label Created by
-          div(class="value", ng-show="growPlan.createdBy[0].name.first") {{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}
-          div(class="value", ng-show="!growPlan.createdBy[0].name.first") Bitponics
+        //- div.last
+        //-   h5.label Created by
+        //-   div(class="value", ng-show="growPlan.createdBy[0].name.first") {{growPlan.createdBy[0].name.first}} {{growPlan.createdBy[0].name.last}}
+        //-   div(class="value", ng-show="!growPlan.createdBy[0].name.first") Bitponics
 
         //- div.info
         //-   div(class="gplist_description") {{growPlan.description}}
         //-input(id="gplist_input_{{growPlan._id}}", type='radio', name="growplans", value="{{growPlan._id}}", ng-model="sharedDataService.selectedGrowPlan", ng-change="setSelectedGrowPlan()")
         //-label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-        a.btn(href="customize/{{growPlan._id}}") Select
+        //- a.btn(href="customize/{{growPlan._id}}") Select
+        a.btn(href="/grow-plans/{{growPlan._id}}") Select
   
 
   script(type='text/ng-template', id='customize-overview.html')
