@@ -1,0 +1,20 @@
+/* Large screens */
+@media $mq_larger
+	.split-layout
+
+		&.main header
+			clear both
+			overflow hidden
+
+		.content-module
+			@extends .display-ib
+			&.middle
+				// position relative
+				// padding 100% 0 0 0 //must match container width
+				// height 0
+				width 60%
+			&.side
+				width 20%
+		h2.page-heading
+			float left
+			width 75%

@@ -46,6 +46,7 @@
 .page-content.center-img img,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
@@ -53,7 +54,6 @@
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -989,6 +989,7 @@ img.page-spinner.spinner {
 .display-ib,
 .overlay .pagination li,
 .no-flexbox .grid-cell,
+.split-layout .content-module,
 .featured-press a,
 .additional-press a,
 .custom-checkbox-wrap label,
@@ -996,7 +997,6 @@ img.page-spinner.spinner {
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -1384,6 +1384,25 @@ img.page-spinner.spinner {
 @media  screen and (min-width: 50em) {
   .no-flexbox .large-no-flexbox-grid--1of4 > .grid-cell {
     width: 24%;
+  }
+}
+/*
+ * Split Layout
+ */
+@media  screen and (min-width: 65em) {
+  .split-layout.main header {
+    clear: both;
+    overflow: hidden;
+  }
+  .split-layout .content-module.middle {
+    width: 60%;
+  }
+  .split-layout .content-module.side {
+    width: 20%;
+  }
+  .split-layout h2.page-heading {
+    float: left;
+    width: 75%;
   }
 }
 /*
@@ -2197,7 +2216,6 @@ img.page-spinner.spinner {
 .dashboard .notifications input[type="checkbox"],
 .dashboard .notifications label,
 .dashboard .overlay.photo img,
-.dashboard .content-module,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -3009,20 +3027,6 @@ input[type='checkbox']:checked + label.btn {
   max-width: 100%;
 }
 @media  screen and (min-width: 65em) {
-  .dashboard .main header {
-    clear: both;
-    overflow: hidden;
-  }
-  .dashboard .content-module.middle {
-    width: 60%;
-  }
-  .dashboard .content-module.side {
-    width: 20%;
-  }
-  .dashboard h2.page-heading {
-    float: left;
-    width: 75%;
-  }
   .dashboard .garden-settings {
     float: right;
     height: 1em;
@@ -5224,7 +5228,7 @@ button.close {
   margin: 2em 0 2em;
   clear: both;
 }
-.my-accordion {
+.accordion {
   -webkit-transition: 0.25s linear all;
   -webkit-transition: 0.25s linear all;
   -moz-transition: 0.25s linear all;
@@ -5235,14 +5239,14 @@ button.close {
   -ms-filter: none;
   filter: none;
 }
-.my-accordion.ng-hide {
+.accordion.ng-hide {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
   height: 0;
 }
-.my-accordion.ng-hide-add,
-.my-accordion.ng-hide-remove {
+.accordion.ng-hide-add,
+.accordion.ng-hide-remove {
 /* this needs to be here to make it visible during the animation
      since the .ng-hide class is already on the element rendering
      it as hidden. */
