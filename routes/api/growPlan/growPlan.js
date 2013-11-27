@@ -33,7 +33,7 @@ module.exports = function(app) {
     
     if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
       filter = true;
-      plants = plants.split(',');
+      plants = typeof plants === 'object' ? plants : plants.split(',');
       growSystem = growSystem.split(',');
     }else if(!!id){
       full = true;
