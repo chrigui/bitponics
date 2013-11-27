@@ -1,34 +1,114 @@
 /*
- * Phase Graph
- * - supports being data-backed by a growPlan or growPlanInstance
+ * Phase Graphs
+ * - bpnDirectivesNavigationPhasesGraph -> UI for navigating through grow plan details
+ * - bpnDirectivesPhasesGraph -> original phase graph on Dashboard
  */
 define(['angular', 'jquery', 'd3'],
   function (angular, $) {
     angular.module('bpn.directives.graphs', [])
-    .directive('bpnDirectivesPhasesGraph', function() {
+    
+
+    /*
+     * Grow Plan navigation phase graph
+     */
+    .directive('bpnDirectivesNavigationPhasesGraph', function() {
       return {
         restrict : "EA",
-        template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new"></div></div>',
+        template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
         replace : true,
         controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
           $scope.sharedDataService = sharedDataService;
-          
-          //get phases depending on where graph is being used (garden dashboard vs. grow-plan detail)
-          if ($scope.sharedDataService.growPlanInstance.phases) { 
-            $scope.phases = $scope.sharedDataService.growPlanInstance.phases;
-          } else if($scope.sharedDataService.selectedGrowPlan.phases) {
-            $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
-          }
+          $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
+        },
+        link: function (scope, element, attrs, controller) {
+          $(element[0]).find('.icon-glyphlogo-new').css('font-size',$(element[0]).width()/15)
+
+          scope.$watch('phases', function (newVal, oldVal) {
+            var phases = scope.phases,
+              phaseCount = phases.length,
+              outerMargin = 80,
+              width = $(element[0]).width() - (outerMargin * 2),
+              height = width,
+              radius = width / 2,
+              innerWhitespaceRadius = radius / (phaseCount + 1),
+              // sum of all arcSpans must fit between outer boundary and inner whitespace
+              arcSpan = (radius - innerWhitespaceRadius) / phaseCount,
+              arcMargin = 0,
+              colorScale = d3.scale.category20c(),
+              equalPie = d3.layout.pie();
+
+
+            // disable data sorting & force all slices to be the same size
+            equalPie
+              .sort(null)
+              .value(function (d) {
+                return 1;
+              });
+
+            var svg = d3.select(element[0])
+              .append('svg:svg')
+              .attr('width', width)
+              .attr('height', height);
+
+            phases.forEach(function(phase, index) {
+              var arcNumber = (phaseCount - index - 1),
+                arc = d3.svg.arc(),
+                className = 'phase' + index,
+                phaseGroup;
+
+              arc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+                .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+
+              phaseGroup = svg.append('svg:g')
+                .classed(className, true)
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
+              
+              var allArcs = phaseGroup.selectAll('path')
+                .data(equalPie([{}])); //empty ring
+
+              allArcs
+                .enter()
+                .append('svg:g')
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('class', ' active good');
+
+              allArcs
+                .on('click', function (d, i) {
+
+                  scope.$apply(function(){
+                      //navigation
+                      scope.sharedDataService.selectedPhase = index;
+                  });
+                  
+                });
+
+            });
+          });
+        }
+      };
+    })
+    
+
+
+    /*
+     * Dashboard Phase Graph
+     */
+    .directive('bpnDirectivesPhasesGraph', function() {
+      return {
+        restrict : "EA",
+        template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
+        replace : true,
+        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.phases = $scope.sharedDataService.growPlanInstance.phases;
           
           $scope.getDaySummaryClass = function(data){
-            if(data.data.status){
-              var className = data.data.status;
-              if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
-                className += " active";
-              }
-              return className;
+            var className = data.data.status;
+            if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+              className += " active";
             }
-            return " active good";
+            return className;
           }
 
           $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
@@ -96,7 +176,7 @@ define(['angular', 'jquery', 'd3'],
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
               
               var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phase.daySummaries || [{}]));
+                .data(equalPie(phase.daySummaries));
 
               allArcs
                 .enter()
@@ -107,6 +187,7 @@ define(['angular', 'jquery', 'd3'],
 
               allArcs
                 .on('click', function (d, i) {
+                  
                   // Have to wrap this in a scope.$apply call because it occurs outside of the 
                   // Angular lifecycle, need to tell angular that it should refresh itself
                   scope.$apply(function(){

@@ -4,7 +4,6 @@ require([
   'view-models',
   'moment',
   'fe-be-utils',
-  '/assets/js/services/grow-plan.js',
   'es5shim',
   'angularRoute',
   'angularUI',
@@ -12,7 +11,8 @@ require([
   'selection-overlay',
   'overlay',
   'controller-nav',
-  'bpn.directives.graphs'
+  'bpn.directives.graphs',
+  'bpn.services.growPlan'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
@@ -65,8 +65,9 @@ require([
 
 
 		growPlanApp.factory('sharedDataService', function(){
-			return {
+			var sharedData = {
 				selectedGrowPlan : {},
+        selectedPhase : 0, //default to first
 				plants : bpn.plants,
 				lightFixtures : bpn.lightFixtures,
 				lightBulbs : bpn.lightBulbs,
@@ -97,6 +98,13 @@ require([
           updateInProgress : false
         }
 			};
+
+      // Transform the data into viewModel-friendly formats
+      sharedData.controls.forEach(function (control) {
+        viewModels.initControlViewModel(control);
+      });
+
+      return sharedData;
 		});
 
 		growPlanApp.factory('GrowPlanLoader', 
@@ -137,7 +145,7 @@ require([
         '$scope',
         'sharedDataService',
         function($scope, sharedDataService){
-          
+
         }
       ]
     );

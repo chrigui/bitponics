@@ -8,12 +8,16 @@ block head
   script(type='text/ng-template', id='customize-overview.html')
 
     header
-      h2.page-heading {{sharedDataService.selectedGrowPlan.name}}
+      h2.page-heading Customize your {{sharedDataService.selectedGrowPlan.name}} Grow Plan
 
     div#sensors.sensors.content-module.side.separator-top
 
       h2.page-heading-small.date 
-        | {{Date.now().toString() | date:'longDate'}}
+        | Edit Sensors
+
+      div.data-module.phase-info
+        div.phase-name {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Phase
+        //- div.phase-day Day {{sharedDataService.activeDate.dayOfPhase}}
 
       div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}}")
         h3.main-heading
@@ -28,15 +32,30 @@ block head
 
     div.content-module.middle.separator-top
       div(ng-controller="bpn.controllers.growPlan.PhasesGraph")
-        div(data-bpn-directives-phases-graph)
+        p.half-width.centered Navigate between phases by clicking on the rings of the graph.
+        div(data-bpn-directives-navigation-phases-graph)
 
 
-    div.content-module.side.separator-top
-      div#controls.controls(ng-hide="!sharedDataService.selectedGrowPlan.device") 
-        h2.page-heading-small Accessories
-        div(ng-repeat="controlAction in sharedDataService.selectedGrowPlan.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
-          h3 {{controlAction.control.name}}
-          div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
+    div(class="content-module side separator-top", accordion)
+      div(class="device", id="device", accordion-group, heading="Device")
+        ul(class="grid grid--wrapping devicelist")
+          li(class="grid-cell") Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
+          li(class="grid-cell", ng-repeat="device in sharedDataService.userOwnedDevices")
+            label.btn(ng-class="{on:sharedDataService.selected.deviceId == device._id, off: sharedDataService.selected.deviceId != device._id}")
+              input(type='radio', name="device", value="{{device._id}}", ng-model="sharedDataService.selected.deviceId", ng-change="toggleDevice(device)")
+              | {{device.name}}
+
+      div(id="controls", class="controls", accordion-group, heading="Accessories")
+        div(class="grid grid--wrapping")
+          //- ng-hide="!sharedDataService.selectedGrowPlan.device")
+          
+          div(ng-repeat="control in sharedDataService.controls", class="control icon-glyph icon-{{control.className}} grid-cell") 
+            p {{control.name}}
+            
+          h2.page-heading-small Active Accessories
+          div(ng-repeat="controlAction in sharedDataService.selectedGrowPlan.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
+            h3 {{controlAction.control.name}}
+            div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
 
 
 
@@ -44,9 +63,18 @@ block head
 
 
 
+  script(type='text/ng-template', id="template/accordion/accordion.html")
 
+    div(class="accordion", ng-transclude)
 
-
+  script(type='text/ng-template', id="template/accordion/accordion-group.html")
+  
+    div(class="accordion-group")
+      div(class="accordion-heading")
+        a(class="accordion-toggle", ng-click="isOpen = !isOpen", accordion-transclude="heading")
+          {{heading}}
+      div(class="accordion-body", collapse="!isOpen")
+        div(class="accordion-inner", ng-transclude)
 
   
   script(type='text/ng-template', id='customize-details.html')
@@ -674,3 +702,4 @@ block footer-scripts
     bpn.lightFixtures = !{JSON.stringify(lightFixtures)};
     bpn.lightBulbs = !{JSON.stringify(lightBulbs)};
     bpn.nutrients = !{JSON.stringify(nutrients)};
+    bpn.userOwnedDevices = [{"__v":17934,"_id":"000666809ef6","activeGrowPlanInstance":"51d39ef20868570200000ca0","createdAt":"2013-09-05T03:00:23.511Z","deviceType":"506de2fe8eebf7524342cb37","lastConnectionAt":"2013-10-14T18:15:24.863Z","name":"Jack's Bitponics Device","owner":"506de3098eebf7524342cb66","sensorMap":[{"sensor":"506de3068eebf7524342cb59","inputId":"ph"},{"sensor":"506de3068eebf7524342cb5a","inputId":"ec"},{"sensor":"506de3078eebf7524342cb5d","inputId":"air"},{"sensor":"506de3078eebf7524342cb5e","inputId":"water"},{"sensor":"506de3078eebf7524342cb5f","inputId":"hum"},{"sensor":"506de3088eebf7524342cb61","inputId":"lux"},{"sensor":"506de3088eebf7524342cb62","inputId":"ir"},{"sensor":"506de3088eebf7524342cb63","inputId":"full"},{"sensor":"506de3098eebf7524342cb64","inputId":"vis"}],"serial":"WD-301-TPRP","updatedAt":"2013-10-13T04:00:07.230Z","status":{"expires":"2014-10-11T16:42:10.139Z","activeActions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"],"immediateActions":[],"actions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"]},"tz":"America/New_York","outputMap":[{"outputId":"1","control":"506de2fd8eebf7524342cb32"},{"outputId":"2","control":"506de2fc8eebf7524342cb2d"}],"sensors":["ph","air","water","hum","full","ec"],"userAssignmentLogs":[{"user":"506de3098eebf7524342cb66","assignmentType":"owner","_id":"51d397830868570200000c32","ts":"2013-07-03T03:16:19.895Z","id":"51d397830868570200000c32"}],"users":[],"timezone":"America/New_York"},{"__v":17934,"_id":"000666809ef61111","activeGrowPlanInstance":"51d39ef20868570200000ca0","createdAt":"2013-09-05T03:00:23.511Z","deviceType":"506de2fe8eebf7524342cb37","lastConnectionAt":"2013-10-14T18:15:24.863Z","name":"Bitponics Device #2","owner":"506de3098eebf7524342cb66","sensorMap":[{"sensor":"506de3068eebf7524342cb59","inputId":"ph"},{"sensor":"506de3068eebf7524342cb5a","inputId":"ec"},{"sensor":"506de3078eebf7524342cb5d","inputId":"air"},{"sensor":"506de3078eebf7524342cb5e","inputId":"water"},{"sensor":"506de3078eebf7524342cb5f","inputId":"hum"},{"sensor":"506de3088eebf7524342cb61","inputId":"lux"},{"sensor":"506de3088eebf7524342cb62","inputId":"ir"},{"sensor":"506de3088eebf7524342cb63","inputId":"full"},{"sensor":"506de3098eebf7524342cb64","inputId":"vis"}],"serial":"WD-301-TPRP","updatedAt":"2013-10-13T04:00:07.230Z","status":{"expires":"2014-10-11T16:42:10.139Z","activeActions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"],"immediateActions":[],"actions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"]},"tz":"America/New_York","outputMap":[{"outputId":"1","control":"506de2fd8eebf7524342cb32"},{"outputId":"2","control":"506de2fc8eebf7524342cb2d"}],"sensors":["ph","air","water","hum","full","ec"],"userAssignmentLogs":[{"user":"506de3098eebf7524342cb66","assignmentType":"owner","_id":"51d397830868570200000c32","ts":"2013-07-03T03:16:19.895Z","id":"51d397830868570200000c32"}],"users":[],"timezone":"America/New_York"},{"__v":17934,"_id":"000666809ef62222","activeGrowPlanInstance":"51d39ef20868570200000ca0","createdAt":"2013-09-05T03:00:23.511Z","deviceType":"506de2fe8eebf7524342cb37","lastConnectionAt":"2013-10-14T18:15:24.863Z","name":"Jack's Very First Bitponics Device","owner":"506de3098eebf7524342cb66","sensorMap":[{"sensor":"506de3068eebf7524342cb59","inputId":"ph"},{"sensor":"506de3068eebf7524342cb5a","inputId":"ec"},{"sensor":"506de3078eebf7524342cb5d","inputId":"air"},{"sensor":"506de3078eebf7524342cb5e","inputId":"water"},{"sensor":"506de3078eebf7524342cb5f","inputId":"hum"},{"sensor":"506de3088eebf7524342cb61","inputId":"lux"},{"sensor":"506de3088eebf7524342cb62","inputId":"ir"},{"sensor":"506de3088eebf7524342cb63","inputId":"full"},{"sensor":"506de3098eebf7524342cb64","inputId":"vis"}],"serial":"WD-301-TPRP","updatedAt":"2013-10-13T04:00:07.230Z","status":{"expires":"2014-10-11T16:42:10.139Z","activeActions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"],"immediateActions":[],"actions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"]},"tz":"America/New_York","outputMap":[{"outputId":"1","control":"506de2fd8eebf7524342cb32"},{"outputId":"2","control":"506de2fc8eebf7524342cb2d"}],"sensors":["ph","air","water","hum","full","ec"],"userAssignmentLogs":[{"user":"506de3098eebf7524342cb66","assignmentType":"owner","_id":"51d397830868570200000c32","ts":"2013-07-03T03:16:19.895Z","id":"51d397830868570200000c32"}],"users":[],"timezone":"America/New_York"},{"__v":17934,"_id":"000666809ef63333","activeGrowPlanInstance":"51d39ef20868570200000ca0","createdAt":"2013-09-05T03:00:23.511Z","deviceType":"506de2fe8eebf7524342cb37","lastConnectionAt":"2013-10-14T18:15:24.863Z","name":"Jack's #1","owner":"506de3098eebf7524342cb66","sensorMap":[{"sensor":"506de3068eebf7524342cb59","inputId":"ph"},{"sensor":"506de3068eebf7524342cb5a","inputId":"ec"},{"sensor":"506de3078eebf7524342cb5d","inputId":"air"},{"sensor":"506de3078eebf7524342cb5e","inputId":"water"},{"sensor":"506de3078eebf7524342cb5f","inputId":"hum"},{"sensor":"506de3088eebf7524342cb61","inputId":"lux"},{"sensor":"506de3088eebf7524342cb62","inputId":"ir"},{"sensor":"506de3088eebf7524342cb63","inputId":"full"},{"sensor":"506de3098eebf7524342cb64","inputId":"vis"}],"serial":"WD-301-TPRP","updatedAt":"2013-10-13T04:00:07.230Z","status":{"expires":"2014-10-11T16:42:10.139Z","activeActions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"],"immediateActions":[],"actions":["506de2f08eebf7524342cb26","506de2f18eebf7524342cb27"]},"tz":"America/New_York","outputMap":[{"outputId":"1","control":"506de2fd8eebf7524342cb32"},{"outputId":"2","control":"506de2fc8eebf7524342cb2d"}],"sensors":["ph","air","water","hum","full","ec"],"userAssignmentLogs":[{"user":"506de3098eebf7524342cb66","assignmentType":"owner","_id":"51d397830868570200000c32","ts":"2013-07-03T03:16:19.895Z","id":"51d397830868570200000c32"}],"users":[],"timezone":"America/New_York"}];
