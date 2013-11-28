@@ -70,7 +70,8 @@ require([
         selectedPhase : 0, //default to first
 				plants : bpn.plants,
 				lightFixtures : bpn.lightFixtures,
-				lightBulbs : bpn.lightBulbs,
+        lightBulbs : bpn.lightBulbs,
+				lights : bpn.lights,
 				growSystems : bpn.growSystems,
 				nutrients : bpn.nutrients,
 				controls : bpn.controls,
@@ -332,11 +333,15 @@ require([
     		function($scope, growPlan, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
 					
-          $scope.$watch('sharedDataService.growPlanInstance.name', function(){
-            if (!$scope.sharedDataService.growPlanInstance.name){
-              $scope.sharedDataService.growPlanInstance.name = "My " + $scope.sharedDataService.selectedGrowPlan.name + " Garden";
-            }
-          });
+          // $scope.$watch('sharedDataService.growPlanInstance.name', function(){
+          //   if (!$scope.sharedDataService.growPlanInstance.name){
+          //     $scope.sharedDataService.growPlanInstance.name = "My " + $scope.sharedDataService.selectedGrowPlan.name + " Garden";
+          //   }
+          // });
+
+          $scope.applyNameChange = function () {
+            console.log(this);
+          };
 
           $scope.updateSelectedGrowPlanPlants(true);
         }

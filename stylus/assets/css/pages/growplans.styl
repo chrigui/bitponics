@@ -17,6 +17,20 @@
 				margin 0 auto auto
 				float left
 
+		&.small-float
+			overflow hidden
+			margin 0
+			li
+				font-size .85em
+				float left
+
+				.btn
+					margin 0 0.5em 1em
+
+					&.add
+						border 1px solid color-logo-green
+
+
 		.grid-cell
 			// max-width 40em
 			margin 0 auto
@@ -258,16 +272,16 @@
 
 	
 	div[data-bpn-directives-navigation-phases-graph]
-		width 75%
+		width 60%
 
 	.ring-graph
 		.good
-			fill: color-bg-green
+			fill: color-bg-light-green
 		.active
-			fill: darken(color-bg-green, 20%)
+			fill: color-bg-green
 		.add-phase
 			fill: color-bg-green
-			opacity: .25
+			opacity: .35
 
 	.controls
 		.grid--wrapping > .grid-cell
@@ -279,6 +293,16 @@
 			margin: 0 0 1em;
 			max-width: 5em;
 
+	.grow-systems, .lights, .nutrients
+		.grid--wrapping > .grid-cell
+			flex 1 50%
+			font-size: .85em;
+			padding: 0;
+			line-height: 1;
+			font-weight: normal;
+			margin: 0 0 1em;
+			max-width: 50%;
+
 	.side
 		transition opacity .5s linear
 	/*
@@ -286,7 +310,34 @@
 	 */
 	// 
 
+	.grow-plan-customize
+		h2.page-heading
+			@extends .float-l
+			max-width 49%
 
+			.garden-name
+				position relative
+				
+
+
+
+		ul.plantlist
+			@extends .float-r
+
+		h2.page-heading [contenteditable]
+			outline none
+			border-bottom 1px dashed color-logo-green
+			white-space nowrap
+			font-style italic
+
+		#phases
+			.page-heading-small
+				@extends .text-align-c
+				float none
+			.circle
+				margin-top 0
+				svg
+					max-width 100%
 	
 
 /*

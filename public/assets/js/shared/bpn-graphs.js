@@ -60,7 +60,6 @@ define(['angular', 'jquery', 'd3'],
           $(element[0]).find('.icon-glyphlogo-new').css('font-size',$(element[0]).width()/15)
           console.log(scope.sharedDataService.selectedGrowPlan.phases.length);
           scope.$watch('scope.sharedDataService.selectedGrowPlan.phases.length', function (newVal, oldVal) {
-            debugger;
             var phases = scope.phases,
               phaseCount = phases.length,
               outerMargin = 0,

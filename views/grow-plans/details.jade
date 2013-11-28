@@ -7,10 +7,24 @@ block head
 
   script(type='text/ng-template', id='customize-overview.html')
 
-    div(data-bpn-directives-showcase-reveal)
+    div(class="grow-plan-customize", data-bpn-directives-showcase-reveal)
       header.separator-bottom 
         h2.page-heading
-          | Customize your <span content-editable>{{sharedDataService.selectedGrowPlan.name}}</span> Grow Plan
+          | <span class="garden-name" ng-model="sharedDataService.selectedGrowPlan.name" contenteditable ng-blur="applyNameChange()" spellcheck="false">
+          | {{sharedDataService.selectedGrowPlan.name}}
+          | </span>
+          //- | <i class="icon-glyph-new icon-__90_pencil_00e36c" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
+
+        ul(class="plantlist small-float")
+          li(ng-repeat="plant in sharedDataService.selectedGrowPlan.plants | orderBy:name")
+            input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
+            label(for="{{plant._id}}", class="plant btn") 
+              {{plant.name}}
+              | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
+          li
+            label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
+              | Add
+              | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
       div(id="sensors", class="sensors content-module side")
         h2.page-heading-small.date Edit Sensors
@@ -30,9 +44,12 @@ block head
 
       div(id="phases", class="content-module middle")
         div(ng-controller="bpn.controllers.growPlan.PhasesGraph")
-          h2.text-align-c.date Edit Phases
+          h2.page-heading-small.date Edit Phases
           div(data-bpn-directives-navigation-phases-graph)
-          p.half-width.centered Navigate between phases by clicking on the rings of the graph.
+          p.half-width.centered Use the rings to navigate between phases.
+          div.phaseDescription
+            label Phase Description
+            textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].description")
 
 
       div(id="controls", class="content-module side")
@@ -57,6 +74,39 @@ block head
               div(ng-repeat="controlAction in sharedDataService.selectedGrowPlan.device.status.activeActions", class="control {{controlAction.control.className} icon-glyph icon-{{controlAction.control.className}", data-control-key="{{controlAction.control.name}}") 
                 h3 {{controlAction.control.name}}
                 div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
+
+        h2.page-heading-small.date Edit Garden
+        div(accordion)
+          div(class="grow-systems", id="grow-systems", accordion-group, heading="Grow System")
+            ul(class="grid grid--wrapping growsystemlist")
+              li(class="grid-cell", ng-repeat="growSystem in sharedDataService.growSystems")
+                label.btn
+                  input(
+                      type="radio", 
+                      value="growSystem._id",
+                      ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].growSystem")
+                  | {{growSystem.name}}
+
+          div(class="lights", id="lights", accordion-group, heading="Lights")
+            ul(class="grid grid--wrapping lightlist")
+              li(class="grid-cell", ng-repeat="light in sharedDataService.lights")
+                label.btn
+                  input(
+                      type="radio", 
+                      value="{{light._id}}",
+                      ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].light")
+                  | {{light._id}}
+
+          div(class="nutrients", id="nutrients", accordion-group, heading="Nutrients")
+            ul(class="grid grid--wrapping nutrientlist")
+              li(class="grid-cell", ng-repeat="nutrient in sharedDataService.nutrients")
+                label.btn
+                  input(
+                      type="radio", 
+                      value="{{nutrient._id}}",
+                      ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].nutrients")
+                  | {{nutrient.name}} by {{nutrient.brand}}
+
 
 
 
@@ -459,7 +509,7 @@ block content
 
         div
           div(ng-controller="bpn.controllers.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay.is=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
-            div(ng-controller="bpn.controllers.SelectionOverlay")
+            div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Add a Plant
@@ -470,15 +520,20 @@ block content
                     | Add New Plant
                     | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                 
-                ul(class="grid plantlist")
-                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name")
-                    img(src="/assets/img/placeholders/placeholder_plant.jpg", alt="{{plant.name}}")
-                    dl
-                      dt Type:
-                      dd {{plant.name}}
-                    input(id="search_{{plant._id}}", type='checkbox', name="plants", value="{{plant._id}}", ng-model="sharedDataService.selected.plants[plant._id]")
-                    label(for="search_{{plant._id}}", class="plant btn next-step-btn") Select
-                      //- | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+                ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 plantlist")
+                  li(ng-repeat="plant in pagedItems[currentPage] | orderBy:sortingOrder:name", class="grid-cell grid-cell--center")
+                    div.img-wrapper
+                      div.icon-glyph.icon-__62_logo_00e36c
+                      img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plant._id}}.jpg", alt="{{plant.name}}")
+                        
+                    div.custom-checkbox-wrap
+                      input(id="search_{{plant._id}}", 
+                        type='checkbox', 
+                        name="plants", 
+                        value="{{plant._id}}", 
+                        ng-model="sharedDataService.selected.plants[plant._id]"
+                      )
+                      label(for="search_{{plant._id}}", class="plant btn") {{plant.name}}
                 
                 ul.pagination
                   li(ng-class="{disabled: currentPage == 0}")

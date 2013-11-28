@@ -92,10 +92,12 @@
 }
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
-.dashboard .manual-entry-form .sensor-reading-value {
+.dashboard .manual-entry-form .sensor-reading-value,
+.growplans .grow-plan-customize h2.page-heading {
   float: left;
 }
-.float-r {
+.float-r,
+.growplans .grow-plan-customize ul.plantlist {
   float: right;
 }
 .float-n {
@@ -129,7 +131,8 @@
 .lowercase {
   text-transform: lowercase;
 }
-.text-align-c {
+.text-align-c,
+.growplans .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -1035,10 +1038,12 @@ img.page-spinner.spinner {
 }
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
-.dashboard .manual-entry-form .sensor-reading-value {
+.dashboard .manual-entry-form .sensor-reading-value,
+.growplans .grow-plan-customize h2.page-heading {
   float: left;
 }
-.float-r {
+.float-r,
+.growplans .grow-plan-customize ul.plantlist {
   float: right;
 }
 .float-n {
@@ -1072,7 +1077,8 @@ img.page-spinner.spinner {
 .lowercase {
   text-transform: lowercase;
 }
-.text-align-c {
+.text-align-c,
+.growplans .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -1492,13 +1498,10 @@ img.page-spinner.spinner {
   }
   .split-layout .content-module.middle {
     width: 60%;
+    padding: 0 1em;
   }
   .split-layout .content-module.side {
     width: 20%;
-  }
-  .split-layout h2.page-heading {
-    float: left;
-    width: 75%;
   }
 }
 /*
@@ -2348,10 +2351,12 @@ img.page-spinner.spinner {
 }
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
-.dashboard .manual-entry-form .sensor-reading-value {
+.dashboard .manual-entry-form .sensor-reading-value,
+.growplans .grow-plan-customize h2.page-heading {
   float: left;
 }
-.float-r {
+.float-r,
+.growplans .grow-plan-customize ul.plantlist {
   float: right;
 }
 .float-n {
@@ -2385,7 +2390,8 @@ img.page-spinner.spinner {
 .lowercase {
   text-transform: lowercase;
 }
-.text-align-c {
+.text-align-c,
+.growplans .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -5014,6 +5020,20 @@ button.close {
   margin: 0 auto auto;
   float: left;
 }
+.growplans .plantlist.small-float {
+  overflow: hidden;
+  margin: 0;
+}
+.growplans .plantlist.small-float li {
+  font-size: 0.85em;
+  float: left;
+}
+.growplans .plantlist.small-float li .btn {
+  margin: 0 0.5em 1em;
+}
+.growplans .plantlist.small-float li .btn.add {
+  border: 1px solid #00e36c;
+}
 .growplans .plantlist .grid-cell {
   margin: 0 auto;
 }
@@ -5226,19 +5246,19 @@ button.close {
   clear: both;
 }
 .growplans div[data-bpn-directives-navigation-phases-graph] {
-  width: 75%;
+  width: 60%;
 }
 .growplans .ring-graph .good {
-  fill: #00e36c;
+  fill: #cbffd1;
 }
 .growplans .ring-graph .active {
-  fill: #00b656;
+  fill: #00e36c;
 }
 .growplans .ring-graph .add-phase {
   fill: #00e36c;
-  opacity: 0.25;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
-  filter: alpha(opacity=25);
+  opacity: 0.35;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=35)";
+  filter: alpha(opacity=35);
 }
 .growplans .controls .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
@@ -5255,12 +5275,50 @@ button.close {
   margin: 0 0 1em;
   max-width: 5em;
 }
+.growplans .grow-systems .grid--wrapping > .grid-cell,
+.growplans .lights .grid--wrapping > .grid-cell,
+.growplans .nutrients .grid--wrapping > .grid-cell {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 1 50%;
+  -ms-flex: 1 50%;
+  flex: 1 50%;
+  font-size: 0.85em;
+  padding: 0;
+  line-height: 1;
+  font-weight: normal;
+  margin: 0 0 1em;
+  max-width: 50%;
+}
 .growplans .side {
   -webkit-transition: opacity 0.5s linear;
   -moz-transition: opacity 0.5s linear;
   -o-transition: opacity 0.5s linear;
   -ms-transition: opacity 0.5s linear;
   transition: opacity 0.5s linear;
+}
+.growplans .grow-plan-customize h2.page-heading {
+  max-width: 49%;
+}
+.growplans .grow-plan-customize h2.page-heading .garden-name {
+  position: relative;
+}
+.growplans .grow-plan-customize h2.page-heading [contenteditable] {
+  outline: none;
+  border-bottom: 1px dashed #00e36c;
+  white-space: nowrap;
+  font-style: italic;
+}
+.growplans .grow-plan-customize #phases .page-heading-small {
+  float: none;
+}
+.growplans .grow-plan-customize #phases .circle {
+  margin-top: 0;
+}
+.growplans .grow-plan-customize #phases .circle svg {
+  max-width: 100%;
 }
 .accordion {
   -webkit-transition: 0.25s linear all;

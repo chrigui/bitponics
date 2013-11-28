@@ -51,6 +51,10 @@ block head
         div.first
           //- h5.label Name
           div.value {{growPlan.name}}
+        div.plants
+          ul(class="plantlist small-float")
+            li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
+              label(class="plant btn", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}
