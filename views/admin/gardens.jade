@@ -13,7 +13,7 @@ block content
 	section#main(role="main", class="main")
 		h2.page-heading All Gardens
 		div.separator-top(ng-cloak, ng-controller="bpn.controllers.admin.gardens.Main")
-			ul(class="block-info-set grid content-module") 
+			ul(class="block-info-set content-module") 
 				li(ng-repeat="garden in gardens", ng-click="")
 					div.first
 						h5.label Name
@@ -33,35 +33,9 @@ block content
 					div
 						h5.label Device
 							div.value {{garden.device}}
-					a.btn(href="/gardens/{{garden._id}}") Dashboard
+					a.btn(href="/gardens/{{garden._id}}", target="_blank") Dashboard
 					a.btn(ng-click="deleteGarden(garden)") Delete
 
-
-			//-ul(class="block-info-set grid photos content-module")
-				each gpi in growPlanInstances
-					li
-						div.first
-							h5.label Name
-							div.value {{garden.name} 
-						div
-							h5.label Owner
-							div.value.ww-break-word {{garden.owner.name.full} 
-						div
-							h5.label ID
-							div.value.ww-break-word {{garden._id} 
-						div
-							h5.label Active
-							div.value {{garden.active}
-						div
-							h5.label Start Date
-							div.value {{garden.friendlyStartDate}
-						div
-							h5.label Device
-							- if (gpi.device)
-								div.value {{garden.device}
-							- else 
-								div.value None
-						a.btn(href="/gardens/{{garden._id}") Dashboard
 
 block footer-scripts
 	script
