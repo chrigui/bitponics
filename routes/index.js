@@ -26,6 +26,11 @@ module.exports = function(app){
 	  res.render('index', locals);
 	});
 
+  
+  app.get('/help', function (req, res){  
+    res.redirect('http://help.bitponics.com');
+  });
+
 	app.get('/about', function (req, res){
 	  var locals = {
     	title: "About",
