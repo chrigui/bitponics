@@ -1209,6 +1209,17 @@ require([
       }
     });
 
+
+    dashboardApp.filter('sensorValueDisplay', function() {
+      return function(input) {
+        if (typeof input === 'undefined' || input === null) {
+          return "----"
+        } else {
+          return input;
+        }
+      }
+    });
+
     dashboardApp.filter('photoDate', function() {
       return function(input) {
         var val = moment(input).format("MMMM Do YYYY, h:mm a");

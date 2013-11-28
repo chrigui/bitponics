@@ -28,7 +28,7 @@ block content
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Garden Settings
-              
+               
               h2(ng-show="sharedDataService.gardenModel.endDate") This garden was marked complete {{sharedDataService.gardenModel.endDate | friendlyDate:'lowercase'}}
               
               //- div(class="custom-checkbox-wrap")
@@ -38,7 +38,7 @@ block content
               //-     checked="isMetric")
               //-   label(ng-click="toggleMetric()", for="{{sensorCode}}_settings_unit_toggle", class="btn no-margin") Metric
 
-              div(ng-hide="sharedDataService.gardenModel.endDate")
+              div(ng-hide="sharedDataService.gardenModel.endDate", class="content-module")
                 label
                   | Name
                   input(type="text", ng-model="sharedDataService.gardenModel.name", ng-change="updateName()")
@@ -102,8 +102,7 @@ block content
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
-            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") ----
+            div.sensor-value {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val | sensorValueDisplay}}
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
