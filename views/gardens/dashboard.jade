@@ -28,7 +28,7 @@ block content
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               h3(class="page-heading page-heading-small") Garden Settings
-              
+               
               h2(ng-show="sharedDataService.gardenModel.endDate") This garden was marked complete {{sharedDataService.gardenModel.endDate | friendlyDate:'lowercase'}}
               
               //- div(class="custom-checkbox-wrap")
@@ -38,13 +38,25 @@ block content
               //-     checked="isMetric")
               //-   label(ng-click="toggleMetric()", for="{{sensorCode}}_settings_unit_toggle", class="btn no-margin") Metric
 
-              div(ng-hide="sharedDataService.gardenModel.endDate")
+              div(ng-hide="sharedDataService.gardenModel.endDate", class="content-module")
                 label
-                  | Garden Name
+                  | Name
                   input(type="text", ng-model="sharedDataService.gardenModel.name", ng-change="updateName()")
 
                 div
-                  | Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+                  span Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+
+                  button(
+                    class="complete-garden btn",
+                    ng-show="sharedDataService.gardenModel.nextGrowPlanPhase",
+                    ng-click="advancePhase()") Advance garden to the {{sharedDataService.gardenModel.nextGrowPlanPhase.name}} phase
+
+                button(
+                  class="complete-garden btn",
+                  ng-show="sharedDataService.gardenModel.active",
+                  ng-click="completeGarden()") Mark garden as complete
+
+                h4 Measurement Unit Preferences
 
                 div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                   div(data-bpn-directives-manual-entry-form, 
@@ -58,18 +70,23 @@ block content
                     div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
                       select(class="custom-dropdown", 
                         ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
-                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
+                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units",
+                        ng-change="updateSettings()")
                       .dblarrow
                         i
 
-                button(
-                  class="complete-garden btn",
-                  ng-show="sharedDataService.gardenModel.active",
-                  ng-click="completeGarden()") Complete garden
+                
 
-
-                input(type="submit", value="Save", ng-click="submit()")
-
+        div(modal="sharedDataService.activeOverlay=='AdvancePhaseOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.dashboard.AdvancePhaseOverlay", class="overlay-contain")
+            h3 Onward!
+            p Keep in mind that time only moves forward. You won't be able to revert back once you advance to the next phase of your Grow Plan.
+            button(
+              class="btn warning"
+              ng-click="close()") Stay on the {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+            button(
+              class="btn"
+              ng-click="advancePhase()") Advance to the {{sharedDataService.gardenModel.nextGrowPlanPhase.name}} phase
 
       div#sensors.sensors.content-module.side(ng-controller="bpn.controllers.dashboard.DayOverview")
 
@@ -85,8 +102,7 @@ block content
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
-            div.sensor-value(ng-show="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
-            div.sensor-value(ng-hide="sharedDataService.activeDate.latestSensorLogs[sensor.code].val") ----
+            div.sensor-value {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val | sensorValueDisplay}}
           div(class="sensor-type icon {{sensor.code}}")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
