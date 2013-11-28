@@ -25,7 +25,7 @@ define(['angular', 'lvl.services.fileUploader', 'lvl.services.uuid'],
                 onDone: '&',
                 onError: '&'
             },
-            template: '<span>' +
+            template: '<span class="icon-glyph icon-__65_camera_00e36c">' +
                 '<input type="file" style="opacity:0" />' +
                 '<label class="{{ chooseFileButtonStyle }}" ng-click="choose()">{{chooseFileButtonText}}</label>' +
                 '<button class="{{ uploadFileButtonStyle }}" ng-show="showUploadButton" ng-click="upload()">{{uploadFileButtonText}}</button>' +

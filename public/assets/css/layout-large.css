@@ -8,6 +8,9 @@
 .landing-page.buy .shipping-info p.postal-code-group input {
   width: 50%;
 }
+.auto-width {
+  width: auto;
+}
 .quarter-width {
   width: 25%;
 }
