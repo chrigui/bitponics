@@ -40,11 +40,23 @@ block content
 
               div(ng-hide="sharedDataService.gardenModel.endDate")
                 label
-                  | Garden Name
+                  | Name
                   input(type="text", ng-model="sharedDataService.gardenModel.name", ng-change="updateName()")
 
                 div
-                  | Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+                  span Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+
+                  button(
+                    class="complete-garden btn",
+                    ng-show="sharedDataService.gardenModel.nextGrowPlanPhase",
+                    ng-click="advancePhase()") Advance garden to the {{sharedDataService.gardenModel.nextGrowPlanPhase.name}} phase
+
+                button(
+                  class="complete-garden btn",
+                  ng-show="sharedDataService.gardenModel.active",
+                  ng-click="completeGarden()") Mark garden as complete
+
+                h4 Measurement Unit Preferences
 
                 div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                   div(data-bpn-directives-manual-entry-form, 
@@ -58,18 +70,23 @@ block content
                     div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
                       select(class="custom-dropdown", 
                         ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
-                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
+                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units",
+                        ng-change="updateSettings()")
                       .dblarrow
                         i
 
-                button(
-                  class="complete-garden btn",
-                  ng-show="sharedDataService.gardenModel.active",
-                  ng-click="completeGarden()") Complete garden
+                
 
-
-                input(type="submit", value="Save", ng-click="submit()")
-
+        div(modal="sharedDataService.activeOverlay=='AdvancePhaseOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.dashboard.AdvancePhaseOverlay", class="overlay-contain")
+            h3 Onward!
+            p Keep in mind that time only moves forward. You won't be able to revert back once you advance to the next phase of your Grow Plan.
+            button(
+              class="btn warning"
+              ng-click="close()") Stay on the {{sharedDataService.gardenModel.activePhase.phase.name}} phase
+            button(
+              class="btn"
+              ng-click="advancePhase()") Advance to the {{sharedDataService.gardenModel.nextGrowPlanPhase.name}} phase
 
       div#sensors.sensors.content-module.side.separator-top(ng-controller="bpn.controllers.dashboard.DayOverview")
 

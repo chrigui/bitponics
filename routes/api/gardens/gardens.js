@@ -233,8 +233,7 @@ module.exports = function(app) {
       }
 
       growPlanInstance.activatePhase({
-        phaseId : matchingNewGrowPlanPhase._id,
-        phaseDay : elapsedPhaseDays,
+        phaseId : req.body.growPlanPhaseId,
         save : true
       }, function(err, updatedGrowPlanInstance){
         return res.send(updatedGrowPlanInstance);

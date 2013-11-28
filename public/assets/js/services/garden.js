@@ -27,7 +27,18 @@ define([
                 return JSON.stringify({
                   name : data.name
                 });
-              }}
+              }},
+
+              advancePhase : { 
+                url: '/api/gardens/:id/activate-phase',
+                method : 'POST', 
+                isArray: false, 
+                transformRequest: function(data, headersGetter){
+                  return JSON.stringify({
+                    growPlanPhaseId : data.nextGrowPlanPhase._id
+                  });
+                }
+              },
 			        	    
 						}
 					);

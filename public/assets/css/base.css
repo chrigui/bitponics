@@ -514,6 +514,9 @@ ol.list-style {
   background: #fff;
   color: #00e36c;
 }
+.btn.warning {
+  color: #fac400;
+}
 .link {
   color: #00e36c;
   background: #fff;
@@ -535,6 +538,10 @@ button.btn {
   background: #fff !important;
   color: #00e36c;
   border: 3px solid #00e36c;
+}
+a.btn.warning,
+button.btn.warning {
+  border-color: #fac400;
 }
 a.btn i,
 button.btn i {

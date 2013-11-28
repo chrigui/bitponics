@@ -11,6 +11,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * phases[].phase
    * phases[].calculatedStartDate : phase.startDate or the projected startDate the phase would have started in the past or future
    * activePhase
+   * nextGrowPlanPhase
    * device.status.activeActions[].control
    * device.status.activeActions[].outputId
    * 
@@ -144,6 +145,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       }
 
   	});
+
+    // Populate nextGrowPlanPhase. Used for "advance to next phase" button. Fine if it's undefined.
+    growPlanInstance.nextGrowPlanPhase = growPlanInstance.growPlan.phases[growPlanInstance.growPlan.phases.indexOf(growPlanInstance.activePhase.phase) + 1];
 
     
     if (growPlanInstance.device){

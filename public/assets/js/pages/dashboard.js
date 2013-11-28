@@ -558,10 +558,11 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.SettingsOverlay',
       [
         '$scope',
+        '$timeout',
         'sharedDataService',
         'NavService',
         '$rootScope',
-        function($scope, sharedDataService, NavService, $rootScope){
+        function($scope, $timeout, sharedDataService, NavService, $rootScope){
           $scope.sharedDataService = sharedDataService;
 
           $scope.close = function(){
@@ -587,12 +588,41 @@ require([
           /*
            * Save Settings to GardenModel
            */
-          $scope.submit = function() {
+          $scope.updateSettings = function() {
             sharedDataService.gardenModel.$updateSettings();
+          }
+
+          $scope.advancePhase = function(e){
+            $scope.close();
+            $timeout(function(){
+              sharedDataService.activeOverlay = "AdvancePhaseOverlay";
+            }, 200);
           }
         }
       ]
     );
+
+
+    dashboardApp.controller('bpn.controllers.dashboard.AdvancePhaseOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        '$rootScope',
+        function($scope, sharedDataService, $rootScope){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.advancePhase = function(e){
+            $scope.sharedDataService.gardenModel.$advancePhase({},
+              function(){
+                console.log('success');
+                window.location.href = window.location.href;
+              }
+            );
+          }
+        }
+      ]
+    );
+
 
     dashboardApp.controller('bpn.controllers.dashboard.SensorDetailOverlay',
       [
