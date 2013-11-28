@@ -5,6 +5,9 @@
 .half-width {
   width: 50%;
 }
+.auto-width {
+  width: auto;
+}
 .quarter-width {
   width: 25%;
 }
@@ -54,6 +57,7 @@
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
 .dashboard .overlay.photo img,
+.dashboard .grid.photos,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -963,6 +967,9 @@ img.page-spinner.spinner {
 .half-width {
   width: 50%;
 }
+.auto-width {
+  width: auto;
+}
 .quarter-width {
   width: 25%;
 }
@@ -1007,6 +1014,7 @@ img.page-spinner.spinner {
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
 .dashboard .overlay.photo img,
+.dashboard .grid.photos,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -2283,6 +2291,9 @@ img.page-spinner.spinner {
 .half-width {
   width: 50%;
 }
+.auto-width {
+  width: auto;
+}
 .quarter-width {
   width: 25%;
 }
@@ -2320,6 +2331,7 @@ img.page-spinner.spinner {
 .custom-checkbox-wrap label,
 .custom-checkbox-wrap label:after,
 .dashboard .overlay.photo img,
+.dashboard .grid.photos,
 .growplans .edit-btn,
 .growplans #growplans_activate,
 .growplans .spinner,
@@ -2991,6 +3003,9 @@ input[type='checkbox']:checked + label.btn {
 }
 .dashboard .grid li img {
   height: 100%;
+  width: auto;
+}
+.dashboard .grid.photos {
   width: auto;
 }
 .dashboard .btn {
