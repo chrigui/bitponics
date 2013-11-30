@@ -1,7 +1,8 @@
 define([
-	'bpn.services'
+	'bpn.services',
+	'mixpanel'
 	], 
-	function (bpnServices) {
+	function (bpnServices, mixpanel) {
 		'use strict';
 
 		// http://stackoverflow.com/questions/10713708/tracking-google-analytics-page-views-with-angular-js

@@ -34,6 +34,7 @@ mixin requirejs(dataMain)
   - var lvlServicesFileUploader = CDN('/assets/js/libs/angular/lvl-xhr-post.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var lvlServicesUUID = CDN('/assets/js/libs/angular/lvl-uuid.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var lvlDirectivesFileUpload = CDN('/assets/js/libs/angular/lvl-file-upload.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var mixpanel = CDN('/assets/js/libs/mixpanel.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var moment = CDN('/assets/js/libs/moment.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var overlay = CDN('/assets/js/shared/overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var scrollto = CDN('/assets/js/libs/jquery/jquery.scrollTo.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -86,6 +87,7 @@ mixin requirejs(dataMain)
         'lvl.services.fileUploader': '#{lvlServicesFileUploader}',
         'lvl.services.uuid': '#{lvlServicesUUID}',
         'lvl.directives.fileUpload': '#{lvlDirectivesFileUpload}',
+        'mixpanel': '#{mixpanel}',
         'moment': '#{moment}',
         'overlay': '#{overlay}',
         'scrollto': '#{scrollto}',
@@ -126,6 +128,9 @@ mixin requirejs(dataMain)
         },
         'jquery': { 
           exports : '$'
+        },
+        'mixpanel': { 
+          exports : 'mixpanel'
         },
         'socket.io': {
           exports: 'io'
