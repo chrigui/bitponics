@@ -14,7 +14,8 @@ define([
 	'angular',
 	'controllers',
   'controller-nav',
-	'bpn.services',
+	'bpn.filters',
+  'bpn.services',
   'bpn.services.analytics',
 	'directives'
 	], 
@@ -23,7 +24,7 @@ define([
 
 		return angular.module(
 			'bpn', 
-			['bpn.controllers', 'bpn.directives', 'bpn.services']).run(
+			['bpn.controllers', 'bpn.directives', 'bpn.filters', 'bpn.services']).run(
       [
         '$rootScope',
         'bpn.services.analytics',

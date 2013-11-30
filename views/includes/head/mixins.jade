@@ -12,6 +12,7 @@ mixin requirejs(dataMain)
   - var angularUIBootstrap = CDN('/assets/js/libs/angular/ui-bootstrap-0.5.0.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularUISelect2 = CDN('/assets/js/libs/angular/angular-ui-select2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectivesGraphs = CDN('/assets/js/shared/bpn-graphs.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnFilters = CDN('/assets/js/core/filters.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServices = CDN('/assets/js/core/services.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesAnalytics = CDN('/assets/js/services/analytics.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesDevice = CDN('/assets/js/services/device.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -64,6 +65,7 @@ mixin requirejs(dataMain)
         'angularUISelect2' : '#{angularUISelect2}',
         'bpn' : '#{bpnApp}',
         'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
+        'bpn.filters' : '#{bpnFilters}',
         'bpn.services' : '#{bpnServices}',
         'bpn.services.analytics' : '#{bpnServicesAnalytics}',
         'bpn.services.device' : '#{bpnServicesDevice}',

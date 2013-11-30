@@ -25,7 +25,7 @@ block content
       div(ng-show="key && !pairingComplete", class="separator-top")
         h4.page-heading-small Your Device Key
         p For the next step, a new browser window will open. You will be asked to copy/paste this key, so keep this window open.
-        input#serial.serial(ng-model="key", name="key", readonly, select-on-click)
+        input#serial.serial(ng-model="key", name="key", readonly, bpn-directives-select-on-click)
         a(href, type='submit', class="btn next-step-btn", ng-click="openWifiPairingPage()") Open the device pairing page.
 
       div(ng-show="pairingPending && !pairingComplete")

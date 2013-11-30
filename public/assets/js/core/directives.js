@@ -1,3 +1,8 @@
+/**
+ * Create top-level directives module
+ * 
+ * Include common shared directives
+ */
 define(['angular'], 
 	function(angular) { 
 		'use strict'; 
@@ -21,6 +26,24 @@ define(['angular'],
           uppercase(scope[attrs.ngModel]); 
         }
       };
+    });
+
+    bpnDirectives.directive('bpnDirectivesSelectOnClick', function () {
+      return function (scope, element, attrs) {
+          element.click(function () {
+              element.select();
+          });
+      };
+    });
+
+    bpnDirectives.directive('bpnDirectivesIfThumbnail404', function() {
+      return {
+        link: function(scope, element, attrs) {
+          element.bind('error', function() {
+            element.attr('src', attrs.ifThumbnail404);
+          });
+        }
+      }
     });
 
     return bpnDirectives;
