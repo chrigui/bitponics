@@ -11,22 +11,21 @@ require([
   'angularUI',
   'angularUIBootstrap',
   'bpn',
+  'bpn.directives.graphs',
+  'bpn.services.garden',
   'bpn.services.socket',
   'selection-overlay',
   'overlay',
   'flexslider',
   'angular-flexslider',
   'throttle-debounce',
-  'bpn.services.garden',
-  'bpn.services.nav',
-  'lvl.directives.fileUpload',
-  'bpn.directives.graphs'
+  'lvl.directives.fileUpload'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels) {
     'use strict';
 
 
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['bpn', 'ui', 'ui.bootstrap', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload', 'bpn.directives.graphs']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['bpn', 'ui', 'ui.bootstrap', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload']);
 
     dashboardApp.factory('sharedDataService', 
       [
@@ -1145,43 +1144,7 @@ require([
       }
     });
       
-    dashboardApp.directive('bpnDirectivesSmartOverlay', function($window, $timeout) {
-      return {
-        controller: function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
-          $scope.$watch('sharedDataService.activeOverlay', function (newVal, oldVal) {
-            $scope.sharedDataService.activeOverlayPositionTop = angular.element($window)[0].scrollY;
-            $scope.setOverlayPosition();
-          });
-
-          $scope.setOverlayPosition = function() {
-            $.throttle(1000, $timeout(function() {
-              var overlay = $element.parents('.page:first').siblings('.overlay:first'),
-                  overlayHeight = overlay.height(),
-                  topValue = $scope.sharedDataService.activeOverlayPositionTop,
-                  windowHeight = angular.element($window).height(),
-                  padding = 144;
-              if (overlay.length > 0) {
-                if ((windowHeight > overlayHeight + padding)) {
-                  overlay.css({ top: topValue + padding });
-                  $scope.$apply(); 
-                }
-              }
-            }, 500));
-          };
-
-        },
-        link: function(scope, element, attrs, controller) {
-          angular.element($window).bind("scroll", function() {
-            scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
-            scope.setOverlayPosition();
-          });
-        }
-      };
-    });
-
     
-
-
 
     domReady(function () {
       angular.bootstrap(document, ['bpn.apps.dashboard']);

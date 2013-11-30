@@ -3,15 +3,13 @@
  * - bpnDirectivesNavigationPhasesGraph -> UI for navigating through grow plan details
  * - bpnDirectivesPhasesGraph -> original phase graph on Dashboard
  */
-define(['angular', 'jquery', 'd3'],
-  function (angular, $) {
-    angular.module('bpn.directives.graphs', [])
+define(['bpn.directives', 'jquery', 'd3'],
+  function (bpnDirectives, $ ) {
     
-
     /*
      * Grow Plan navigation phase graph
      */
-    .directive('bpnDirectivesNavigationPhasesGraph', function() {
+    bpnDirectives.directive('bpnDirectivesNavigationPhasesGraph', function() {
       return {
         restrict : "EA",
         template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
@@ -155,14 +153,14 @@ define(['angular', 'jquery', 'd3'],
           });
         }
       };
-    })
+    });
     
 
 
     /*
      * Dashboard Phase Graph
      */
-    .directive('bpnDirectivesPhasesGraph', function() {
+    bpnDirectives.directive('bpnDirectivesPhasesGraph', function() {
       return {
         restrict : "EA",
         template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
