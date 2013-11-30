@@ -13,7 +13,6 @@ define([
   'bpn',
   'selection-overlay',
   'overlay',
-  'controller-nav',
   'angularAnimate'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {

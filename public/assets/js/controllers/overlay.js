@@ -1,6 +1,6 @@
 define(
 	[
-  	'controllers'
+  	'bpn.controllers'
 	],
   function (bpnControllers) {
     'use strict';

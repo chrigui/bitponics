@@ -17,9 +17,9 @@ mixin requirejs(dataMain)
   - var bpnServicesAnalytics = CDN('/assets/js/services/analytics.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesDevice = CDN('/assets/js/services/device.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var controllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var controllerNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var directives = CDN('/assets/js/core/directives.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnControllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnControllersNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnDirectives = CDN('/assets/js/core/directives.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var d3 = CDN('/assets/js/libs/d3.v2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var domReady = CDN('/assets/js/libs/requirejs/domReady.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var es5shim = CDN('/assets/js/libs/es5-shim.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -64,6 +64,9 @@ mixin requirejs(dataMain)
         'angularUIBootstrap' : '#{angularUIBootstrap}',
         'angularUISelect2' : '#{angularUISelect2}',
         'bpn' : '#{bpnApp}',
+        'bpn.controllers' : '#{bpnControllers}',
+        'bpn.controllers.nav' : '#{bpnControllersNav}',
+        'bpn.directives' : '#{bpnDirectives}',
         'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
         'bpn.filters' : '#{bpnFilters}',
         'bpn.services' : '#{bpnServices}',
@@ -73,9 +76,6 @@ mixin requirejs(dataMain)
         'bpn.services.garden' : '#{gardenService}',
         'bpn.services.nav' : '#{navService}',
         'bpn.services.socket' : '#{servicesSocket}',
-        'controllers' : '#{controllers}',
-        'controller-nav' : '#{controllerNav}',
-        'directives' : '#{directives}',
         'd3' : '#{d3}',
         'domReady': '#{domReady}',
         'es5shim': '#{es5shim}',

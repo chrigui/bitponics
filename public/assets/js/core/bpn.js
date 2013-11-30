@@ -12,12 +12,12 @@
  */
 define([
 	'angular',
-	'controllers',
-  'controller-nav',
-	'bpn.filters',
+	'bpn.controllers',
+  'bpn.controllers.nav',
+	'bpn.directives',
+  'bpn.filters',
   'bpn.services',
-  'bpn.services.analytics',
-	'directives'
+  'bpn.services.analytics'
 	], 
 	function (angular) {
 		'use strict';

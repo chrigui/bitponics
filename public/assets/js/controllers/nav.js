@@ -1,6 +1,6 @@
 define(
 	[
-  	'controllers',
+  	'bpn.controllers',
     'bpn.services.nav'
 	],
   function (bpnControllers, NavService) {
