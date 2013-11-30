@@ -6,33 +6,14 @@ require([
   'angularUI',
   'bpn.services.socket',
   'angular-mask',
-  'controller-nav'
+  'bpn'
 ],
 function (angular, domReady) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup', ['ui.mask', 'ngResource', 'bpn.controllers', 'bpn.services']);
+  var setupApp = angular.module('bpn.apps.setup', ['bpn', 'ui.mask', 'ngResource']);
 
 
-  // http://stackoverflow.com/a/15253892/117331
-  setupApp.directive('uppercase', function() {
-     return {
-       priority: 200, // give it higher priority than the input mask
-       require: 'ngModel',
-       link: function(scope, element, attrs, modelCtrl) {
-          var uppercase = function(inputValue) {
-             var upperCased = inputValue.toUpperCase()
-             if(upperCased !== inputValue) {
-                modelCtrl.$setViewValue(upperCased);
-                modelCtrl.$render();
-              }         
-              return upperCased;
-           }
-           modelCtrl.$parsers.push(uppercase);
-           uppercase(scope[attrs.ngModel]); 
-       }
-     };
-  });
 
   setupApp.controller('bpn.controllers.setup.Main',
     [
