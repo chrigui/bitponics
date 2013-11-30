@@ -7,6 +7,46 @@ section#footer.footer(ng-cloak="")
 
     
 
+- if (user && user._id)
+  script(id="IntercomSettingsScriptTag")
+    window.intercomSettings = {
+      app_id: "0c40a940658cd131a6d92882bf8fcc7230d93338"
+      , widget: {
+        activator: ".intercom-trigger"
+      }
+      , email:  "#{user.email}"
+      , user_id : "#{user._id.toString()}"
+      , user_hash: "#{intercomSecureModeHash(user._id)}"
+      // dates need to be unix timestamps
+      , created_at: #{parseInt(user.createdAt.getTime()/1000, 10)}
+      // arbitrary additional user data can be sent. underscore word separators.
+      // https://www.intercom.io/apps/0c40a940658cd131a6d92882bf8fcc7230d93338/install/code#onboarding_step_install
+      , is_organization : #{user.isOrganization || false}
+      , active : #{user.active || false }
+      , locale_lang : "#{user.locale.lang }"
+      , locale_territory : "#{user.locale.territory }"
+    };
+
+  script
+    (function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://static.intercomcdn.com/intercom.v1.js';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}};})()
+
+script(type="text/javascript")
+  window.raiseIntercomDialog = function(message) {
+    var $ = window.$;
+
+    if (!$)
+      return;
+    }
+
+    $("#IntercomTab").click();
+    if (!$('#IntercomNewMessageContainer').is(':visible')) {
+      $('.new_message').click();
+    }
+    $('#newMessageBody').focus();
+    if (message) {
+      return $('#newMessageBody').text(message);
+    }
+  };
 
 //- TODO : conditionalize the google analytics script to only appear when on production
 script(type="text/javascript")

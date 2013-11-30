@@ -94,7 +94,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                   li
                     a(href="/account/devices") Devices
                   li
-                    a(href="/help") Help
+                    a(class="intercom-trigger", href="mailto:0c40a940658cd131a6d92882bf8fcc7230d93338@incoming.intercom.io") Help
   
   if !!pageType && pageType == 'landing-page'  
     button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")

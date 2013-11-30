@@ -16,7 +16,9 @@ var connect    = require('connect'),
   path    = require('path'),
   Session = connect.middleware.session.Session,
   cookie  = require('express/node_modules/cookie'),
-  s3Config = require('../config/s3-config');
+  s3Config = require('../config/s3-config'),
+  intercomConfig = require('../config/intercom-config'),
+  crypto = require('crypto');
 
 module.exports = function(app){
 
@@ -105,6 +107,15 @@ module.exports = function(app){
 
     // Add the view helper
     app.locals({ CDN: CDN() });
+
+
+    // Method for views to generate intercom.io hash
+    app.locals({
+      intercomSecureModeHash : function(str) { 
+        return crypto.createHmac('sha256', intercomConfig.secretKey).update(str.toString()).digest('hex');
+      }
+    });
+
 
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }
