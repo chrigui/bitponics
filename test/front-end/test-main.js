@@ -25,7 +25,7 @@ requirejs.config({
         'angularUIBootstrap' : './assets/js/libs/angular/ui-bootstrap-0.5.0.min.js?v=1383102804480',
         'angularUISelect2' : './assets/js/libs/angular/angular-ui-select2.js?v=1383102804480',
         'bpn.services' : './assets/js/core/services.js?v=1383102804480',
-        'bpnApp' : './assets/js/core/bpn.js?v=1383102804480',
+        'bpn' : './assets/js/core/bpn.js?v=1383102804480',
         'controllers' : './assets/js/core/controllers.js?v=1383102804480',
         'controller-nav' : './assets/js/controllers/nav.js?v=1383102804480',
         'directives' : './assets/js/core/directives.js?v=1383102804480',

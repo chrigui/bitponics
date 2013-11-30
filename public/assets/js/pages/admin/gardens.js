@@ -8,14 +8,14 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
+  'bpn',
   'bpn.services.socket',
-  'controller-nav',
   'bpn.services.garden'
 ],
   function (angular, domReady, moment, feBeUtils) {
     'use strict';
 
-    var adminGardensApp = angular.module('bpn.apps.admin.gardens', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'ngRoute']);
+    var adminGardensApp = angular.module('bpn.apps.admin.gardens', ['bpn', 'ui', 'ui.bootstrap', 'ngRoute']);
 
     adminGardensApp.controller('bpn.controllers.admin.gardens.Main', 
       [

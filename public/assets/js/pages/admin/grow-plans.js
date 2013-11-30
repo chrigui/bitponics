@@ -8,14 +8,14 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
+  'bpn',
   'bpn.services.socket',
-  'controller-nav',
   'bpn.services.growPlan'
 ],
   function (angular, domReady, moment, feBeUtils) {
     'use strict';
 
-    var app = angular.module('bpn.apps.admin.growPlans', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'ngRoute']);
+    var app = angular.module('bpn.apps.admin.growPlans', ['bpn', 'ui', 'ui.bootstrap', 'ngRoute']);
 
     app.controller('bpn.controllers.admin.growPlans.Main', 
       [

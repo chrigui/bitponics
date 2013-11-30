@@ -13,6 +13,8 @@ mixin requirejs(dataMain)
   - var angularUISelect2 = CDN('/assets/js/libs/angular/angular-ui-select2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectivesGraphs = CDN('/assets/js/shared/bpn-graphs.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServices = CDN('/assets/js/core/services.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServicesAnalytics = CDN('/assets/js/services/analytics.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServicesDevice = CDN('/assets/js/services/device.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var controllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var controllerNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -60,13 +62,15 @@ mixin requirejs(dataMain)
         'angularUI' : '#{angularUI}',
         'angularUIBootstrap' : '#{angularUIBootstrap}',
         'angularUISelect2' : '#{angularUISelect2}',
+        'bpn' : '#{bpnApp}',
         'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
         'bpn.services' : '#{bpnServices}',
+        'bpn.services.analytics' : '#{bpnServicesAnalytics}',
+        'bpn.services.device' : '#{bpnServicesDevice}',
         'bpn.services.growPlan' : '#{growPlanService}',
         'bpn.services.garden' : '#{gardenService}',
         'bpn.services.nav' : '#{navService}',
         'bpn.services.socket' : '#{servicesSocket}',
-        'bpnApp' : '#{bpnApp}',
         'controllers' : '#{controllers}',
         'controller-nav' : '#{controllerNav}',
         'directives' : '#{directives}',

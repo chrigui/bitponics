@@ -7,30 +7,13 @@ require([
   'angularRoute',
   'angularUI',
   'angularUIBootstrap',
-  'overlay',
-  'controller-nav'
+  'bpn',
+  'overlay'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var checkoutApp = angular.module('bpn.apps.buy.checkout', ['ngResource', 'ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
-    [
-      '$rootScope',
-      function($rootScope) {
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-      }  
-    ]
-  );
+  var checkoutApp = angular.module('bpn.apps.buy.checkout', ['bpn', 'ngResource', 'ngRoute', 'ui', 'ui.bootstrap']);
 
   // checkoutApp.config(
   //   [

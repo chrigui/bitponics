@@ -10,6 +10,7 @@ define([
   'angularUI',
   'angularUIBootstrap',
   'angularUISelect2',
+  'bpn',
   'selection-overlay',
   'overlay',
   'controller-nav',
@@ -18,25 +19,7 @@ define([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'bpn.services', 'bpn.controllers', 'ngAnimate']).run(
-      [
-        '$rootScope',
-        function($rootScope) {
-
-          /**
-           * Debugging Tools
-           *
-           * Allows you to execute debug functions from the view
-           */
-          $rootScope.log = function(variable) {
-            console.log(variable);
-          };
-          $rootScope.alert = function(text) {
-            alert(text);
-          };
-        }  
-      ]
-    );
+    var growPlanApp = angular.module('bpn.apps.setup.growPlan', ['bpn', 'ngRoute', 'ui', 'ui.bootstrap', 'ui.select2', 'ngAnimate']);
 
 		growPlanApp.config(
 			[

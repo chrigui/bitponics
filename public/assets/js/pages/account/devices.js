@@ -6,33 +6,14 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  'overlay',
-  'controller-nav'
+  'bpn',
+  'overlay'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var devicesApp = angular.module('bpn.apps.account.devices', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']).run(
-
-    [ 
-      '$rootScope', 
-      function($rootScope) {
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-    
-      }
-    ]
-  );
-
+  var devicesApp = angular.module('bpn.apps.account.devices', ['bpn', 'ngResource', 'ui', 'ui.bootstrap']);
+ 
   devicesApp.factory('sharedDataService', function(){
       return {
         activeOverlay : { is: undefined },

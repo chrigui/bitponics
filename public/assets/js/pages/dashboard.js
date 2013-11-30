@@ -10,9 +10,9 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
+  'bpn',
   'bpn.services.socket',
   'selection-overlay',
-  'controller-nav',
   'overlay',
   'flexslider',
   'angular-flexslider',
@@ -26,8 +26,7 @@ require([
     'use strict';
 
 
-    // var dashboardApp = angular.module('bpn.apps.dashboard', ['ngResource', 'bpn.services']);
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload', 'bpn.directives.graphs']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['bpn', 'ui', 'ui.bootstrap', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload', 'bpn.directives.graphs']);
 
     dashboardApp.factory('sharedDataService', 
       [

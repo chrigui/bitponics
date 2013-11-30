@@ -16,7 +16,7 @@ block head
       div(id="filter_questions", class="accordion clear-b", ng-show="showFilter")
         div.separator-top
         .question
-          h5.question-title What kind of hydroponic system would you like to use?
+          h5.question-title Filter by grow system
           
           select(ui-select2="sharedDataService.growSystemSelectOptions", ng-model="sharedDataService.selectedGrowSystem")
             option(value="")
@@ -24,7 +24,7 @@ block head
 
         .question-wrap-right
           .question
-            h5.question-title What plants would you like to grow?
+            h5.question-title Filter by plants
             
             ul(class="plantlist float")
               li(ng-repeat="plant in sharedDataService.selectedPlants | orderBy:name", class="grid-cell")
@@ -54,7 +54,9 @@ block head
         div.plants
           ul(class="plantlist small-float")
             li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
-              label(class="plant btn", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}
+              span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}
+        div
+          h5 Used by {{growPlan.activeGardenCount}} gardens
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}

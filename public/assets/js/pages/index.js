@@ -10,12 +10,13 @@ require([
   'flexslider',
   'throttle-debounce',
   'angular-flexslider',
-  'controller-nav'
+  'bpn'
 ],
 function (angular, domReady) {
   'use strict';
 
-  var homePageApp = angular.module('bpn.apps.homepage', ['bpn.controllers', 'angular-flexslider']);
+  var homePageApp = angular.module('bpn.apps.homepage', ['bpn', 'angular-flexslider']);
+  
   homePageApp.controller('bpn.controllers.homepage.Main',
     [
       '$scope',

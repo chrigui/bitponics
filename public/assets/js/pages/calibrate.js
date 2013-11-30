@@ -7,14 +7,14 @@ require([
   'angularUI',
   'angularUIBootstrap',
   'es5shim',
+  'bpn',
   'bpn.services.socket',
-  'overlay',
-  'controller-nav'
+  'overlay'
   ],
 function (angular, domReady, moment, feBeUtils) {
   'use strict';
 
-  var calibrateApp = angular.module('bpn.apps.calibrate', ['ngRoute', 'ui', 'ui.bootstrap', 'bpn.controllers', 'bpn.services']);
+  var calibrateApp = angular.module('bpn.apps.calibrate', ['bpn', 'ngRoute', 'ui', 'ui.bootstrap']);
 
 
   calibrateApp.config(

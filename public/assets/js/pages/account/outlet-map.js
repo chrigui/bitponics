@@ -6,32 +6,15 @@ require([
   'es5shim',
   'angularUI',
   'angularUIBootstrap',
-  '/assets/js/services/device.js',
+  'bpn',
+  'bpn.services.device',
   'selection-overlay',
-  'overlay',
-  'controller-nav'
+  'overlay'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var outletApp = angular.module('bpn.apps.account.outletMap', ['ngResource', 'ui', 'ui.bootstrap', 'bpn.services', 'bpn.controllers']).run(
-    ['$rootScope',
-      function($rootScope) {
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-      
-      }
-    ]
-  );
+  var outletApp = angular.module('bpn.apps.account.outletMap', ['bpn', 'ngResource', 'ui', 'ui.bootstrap']);
 
   // outletApp.factory('DeviceLoader', 
   //     [

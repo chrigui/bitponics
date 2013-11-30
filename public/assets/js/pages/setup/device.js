@@ -8,29 +8,12 @@ require([
   'angularUI',
   'angularUIBootstrap',
   'overlay',
-  'controller-nav'
+  'bpn'
 ],
 function (angular, domReady, feBeUtils) {
   'use strict';
 
-  var setupApp = angular.module('bpn.apps.setup.device', ['ngResource', 'ngRoute', 'bpn.services', 'ui', 'ui.bootstrap', 'bpn.controllers']).run(
-    [
-      '$rootScope',
-      function($rootScope) {
-        /**
-         * Debugging Tools
-         *
-         * Allows you to execute debug functions from the view
-         */
-        $rootScope.log = function(variable) {
-          console.log(variable);
-        };
-        $rootScope.alert = function(text) {
-          alert(text);
-        };
-      }  
-    ]
-  );
+  var setupApp = angular.module('bpn.apps.setup.device', ['bpn', 'ngResource', 'ngRoute', 'ui', 'ui.bootstrap']);
 
   setupApp.config(
     [
