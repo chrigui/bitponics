@@ -45,8 +45,9 @@ var GrowSystemSchema = new Schema({
 },
 { id : false });
 
-GrowSystemSchema.plugin(useTimestamps);
+GrowSystemSchema.plugin(mongoosePlugins.useTimestamps);
 GrowSystemSchema.plugin(mongoosePlugins.recoverableRemove);
+GrowSystemSchema.plugin(mongoosePlugins.photos);
 
 
 GrowSystemSchema.virtual('reservoirSizeWithUnits')

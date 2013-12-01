@@ -254,7 +254,7 @@ module.exports = function(app){
                   },
                   function getPhotos(innerCallback){
                     PhotoModel.find({
-                      gpi : growPlanInstanceId,
+                      "ref.documentId" : growPlanInstanceId,
                       createdAt : { $gte : lastChecked }
                     })
                     .exec(innerCallback);

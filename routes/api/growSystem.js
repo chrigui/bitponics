@@ -1,6 +1,7 @@
 var GrowSystemModel = require('../../models/growSystem').model,
     winston = require('winston'),
-    routeUtils = require('../route-utils');
+    routeUtils = require('../route-utils'),
+    apiUtils = require('./utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -10,7 +11,12 @@ var GrowSystemModel = require('../../models/growSystem').model,
 module.exports = function(app) {
 
    //List grow_systems
-  app.get('/api/grow_systems', 
+  app.get('/api/grow-systems', 
+    apiUtils.query({
+      model : GrowSystemModel
+    })
+  );
+    /*
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    return GrowSystemModel.find(function (err, growSystems) {
@@ -19,6 +25,7 @@ module.exports = function(app) {
 	    });
 	  }
   );
+*/
 
   /*
    * Create single growSystem
@@ -34,7 +41,7 @@ module.exports = function(app) {
    *    console.log("Post resposne:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/grow_systems',
+  app.post('/api/grow-systems',
   	routeUtils.middleware.ensureLoggedIn, 
   	function (req, res, next){
 	    var growSystem;
@@ -66,7 +73,7 @@ module.exports = function(app) {
    *     console.dir(jqXHR);
    * });
    */
-  app.get('/api/grow_systems/:id', 
+  app.get('/api/grow-systems/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
@@ -94,7 +101,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.put('/api/grow_systems/:id', 
+  app.put('/api/grow-systems/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
 	    return GrowSystemModel.findById(req.params.id, function (err, growSystem) {
@@ -123,7 +130,7 @@ module.exports = function(app) {
    *     }
    * });
    */
-  app.delete('/api/grow_systems/:id', 
+  app.delete('/api/grow-systems/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	routeUtils.middleware.ensureUserIsAdmin,
   	function (req, res, next){
@@ -136,4 +143,18 @@ module.exports = function(app) {
 	    });
 	  }
   );
+
+
+  /**
+   * Add photos to the grow system
+   *
+   * @param {[File]} req.files
+   * @param {feBeUtils.VISIBILITY_OPTIONS=} req.body.visibility
+   * @param {[String]=} req.body.tags
+   * @param {ObjectId=} req.body.ref.documentId
+   */
+  app.post('/api/grow-systems/:id/photos', apiUtils.photoPost({
+    refModel : GrowSystemModel
+  }));
+
 };

@@ -8,6 +8,8 @@ var mongoose = require('mongoose'),
   mongoosePlugins = require('../lib/mongoose-plugins'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
   async = require('async'),
+  ModelUtils = require('./utils'),
+  getObjectId =  ModelUtils.getObjectId,
   gm = require('gm').subClass({ imageMagick: true }),
   tmpDirectory = require('path').join(__dirname, '/../tmp/'),
   PhotoModel;
@@ -22,28 +24,29 @@ var PhotoSchema = new Schema({
 	 * The GrowPlanInstance. Optional. 
    * 
    */
-	gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
+	//gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
 
   
   /**
-   * TODO: concept of ref'ed docs should be generalized rather than just having 'gpi'
-   *
-  referencedDocuments : [
-    {
-      collectionName : { type : String },
-      documentId : { type : String }
-    }
-  ],
-  */
+   * concept of ref'ed doc should be generalized rather than just having 'gpi'
+   */
+  ref : 
+  {
+    collectionName : { type : String },
+    documentId : { type : String }
+  },
+
 
   tags : [ String ],
 
   owner : { type: ObjectIdSchema, ref: 'User', required: true },
 
+  
   originalFileName : { type : String },
 
+  
   /**
-   * User-assignable date
+   * User-assignable date of creation, defaults to now
    */
   date : { type : Date, default : Date.now },
 
@@ -68,6 +71,7 @@ var PhotoSchema = new Schema({
   
   /**
    * Number of bytes of the thumbnail (150x150 max)
+
    */
   thumbnailSize : { type : Number }
 },
@@ -78,9 +82,23 @@ PhotoSchema.plugin(mongoosePlugins.visibility);
 PhotoSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
-PhotoSchema.index({ 'gpi' : 1, 'date': -1 }, { sparse : true });
-//PhotoSchema.index({ 'referencedDocuments.documentId' : 1, 'date': -1 }, { sparse : true });
+PhotoSchema.index({ 'ref.documentId' : 1, 'date': -1 }, { sparse : true });
 
+
+PhotoSchema.virtual('gpi')
+  .get(function(){
+    if (this.ref && this.ref.collectionName === 'growplaninstances'){
+      return this.ref.documentId;
+    } else {
+      return undefined;
+    }
+  })
+  .set(function(gpi){
+    this.ref = {
+      'collectionName' : 'growplaninstances',
+      'documentId' : getObjectId(gpi)
+     }
+  });
 
 
 /*************** SERIALIZATION *************************/
@@ -119,8 +137,10 @@ PhotoSchema.set('toJSON', {
  * @param options.date
  * @param options.size
  * @param options.visibility
- * @param options.tags
- * @param options.gpi
+ * @param {string[]} options.tags
+ * @param {ObjectId=} [options.gpi]
+ * @param {string=} [options.ref.collectionName]
+ * @param {string=} [options.ref.documentId]
  * @param {Stream} options.stream : optional. If set, this is used to stream to S3
  * @param {string} options.streamPath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
  * @param {bool=} options.preserveStreamPath : optional. If true, file at options.streamPath is left alone after upload. If omitted or false, file is deleted after uplaod.
@@ -146,10 +166,19 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       date : options.date || now,
       size : options.size,
       tags : options.tags || [],
-      gpi : options.gpi,
       visibility : (options.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
     });
     
+    if (options.ref){
+      photo.ref = {
+        collectionName : options.ref.collectionName,
+        documentId : options.ref.documentId
+      }  
+    }
+
+    if (options.gpi){
+      photo.gpi = options.gpi;
+    }
 
     async.parallel(
       [
@@ -236,7 +265,8 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
           thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
         }
       ],
-      function(err, results){
+      function(err){
+         console.log('photo series fiinsh');
          if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
           // Delete the file from disk
           fs.unlink(options.streamPath);
@@ -244,7 +274,30 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
         if (err) { return callback(err);}
 
-        return photo.save(callback);
+        // If we're here, the photo's good to go
+        async.parallel([
+          function(innerCallback){
+            console.log('saving phot');
+            return photo.save(innerCallback);
+          },
+          function(innerCallback){
+            if (!photo.ref.collectionName){ return innerCallback(); }
+            
+            var refModel = ModelUtils.getModelFromCollectionName(photo.ref.collectionName);
+            console.log('refmodel', photo.ref.collectionName, refModel);
+            if(!refModel.schema.path('photos')){
+              console.log('no ref.photos');
+              return innerCallback();
+            }
+
+            refModel.findById(photo.ref.documentId, function(err, refDocumentResult){
+              refDocumentResult.photos.push(photo._id);
+              return refDocumentResult.save(innerCallback);
+            });
+          }
+        ], function(err, results){
+          return callback(err, results[0]);
+        });
       }
     );
   }

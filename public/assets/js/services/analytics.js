@@ -6,7 +6,6 @@ define([
 		'use strict';
 
 		// http://stackoverflow.com/questions/10713708/tracking-google-analytics-page-views-with-angular-js
-		
 		return bpnServices.service('bpn.services.analytics', [
 	    '$rootScope', '$window', '$location', function($rootScope, $window, $location) {
 	      var track = function() {

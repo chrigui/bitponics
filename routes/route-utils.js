@@ -212,6 +212,8 @@ module.exports = {
    * @param {feBeUtils.VISIBILITY_OPTIONS=} req.body.visibility
    * @param {[String]=} req.body.tags
    * @param {ObjectId=} req.body.gpi
+   * @param {string} req.body.ref.collectionName
+   * @param {string} req.body.ref.documentId
    */
   processPhotoUpload : function(req, res, next){
     var PhotoModel = require('../models/photo').model,
@@ -239,6 +241,7 @@ module.exports = {
           size : photo.size,
           tags : req.body.tags,
           gpi : req.body.gpi,
+          ref : req.body.ref,
           visibility : req.body.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
           streamPath : photo.path
         },

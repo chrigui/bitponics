@@ -1,6 +1,7 @@
 var async = require('async'),
 	winston = require('winston'),
 	routeUtils = require('./route-utils'),
+  mongoose = require('mongoose'),
 	ModelUtils = require('../models/utils'),
 	PhotoModel = require('../models/photo').model,
 	GrowPlanInstanceModel = require('../models/growPlanInstance').model,
@@ -24,7 +25,7 @@ module.exports = function(app){
 			[
 				function checkAuth(innerCallback){
 					PhotoModel.findById(req.params.photoId)
-					.select('owner gpi visibility')
+					.select('owner ref.documentId visibility')
 					.lean()
 					.exec(function(err, photoResult){
 						if (err) { return innerCallback(err); }
@@ -39,14 +40,14 @@ module.exports = function(app){
 							return innerCallback(null, true);
 						}
 						
-            // if that returns false, maybe the user has access by being a member of the garden
-						if (photoResult.gpi){
-							GrowPlanInstanceModel.findById(photoResult.gpi)
-							.select('owner users visibility')
+            // if that returns false, maybe the user has access by being a member of the referenced resource
+						if (photoResult.ref.collectionName){
+	            ModelUtils.getModelFromCollectionName(photoResult.ref.collectionName).findById(photoResult.ref.documentId)
+              .select('owner users visibility')
 							.lean()
-							.exec(function(err, growPlanInstanceResult){
+							.exec(function(err, referenceDocumentResult){
 								if (err) { return innerCallback(err); }
-								return innerCallback(null, routeUtils.checkResourceReadAccess(growPlanInstanceResult, req.user));
+								return innerCallback(null, routeUtils.checkResourceReadAccess(referenceDocumentResult, req.user));
 							});
 						} 
 						else {
