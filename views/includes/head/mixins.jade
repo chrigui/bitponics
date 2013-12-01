@@ -22,6 +22,7 @@ mixin requirejs(dataMain)
   - var bpnServicesDevice = CDN('/assets/js/services/device.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesGardenService = CDN('/assets/js/services/garden.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesGrowPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServicesGrowSystem = CDN('/assets/js/services/grow-system.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesNav = CDN('/assets/js/services/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesSocket = CDN('/assets/js/services/socket.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var d3 = CDN('/assets/js/libs/d3.v2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -75,6 +76,7 @@ mixin requirejs(dataMain)
         'bpn.services.device' : '#{bpnServicesDevice}',
         'bpn.services.garden' : '#{bpnServicesGardenService}',
         'bpn.services.growPlan' : '#{bpnServicesGrowPlanService}',
+        'bpn.services.growSystem' : '#{bpnServicesGrowSystem}',
         'bpn.services.nav' : '#{bpnServicesNav}',
         'bpn.services.socket' : '#{bpnServicesSocket}',
         'd3' : '#{d3}',

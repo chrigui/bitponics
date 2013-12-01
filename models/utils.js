@@ -971,7 +971,6 @@ module.exports.getModelFromCollectionName = function(collectionName) {
   var mongoose = require('mongoose'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
   modelNames = mongooseConnection.modelNames();
-console.log('modelnames', modelNames)
   if (!module.exports.getModelFromCollectionName.cachedMap){
     module.exports.getModelFromCollectionName.cachedMap = {};
 
@@ -980,7 +979,6 @@ console.log('modelnames', modelNames)
       module.exports.getModelFromCollectionName.cachedMap[model.collection.name] = model;
     });
   }
-  console.log('cachedMap', module.exports.getModelFromCollectionName.cachedMap);
 
   return module.exports.getModelFromCollectionName.cachedMap[collectionName];
 };

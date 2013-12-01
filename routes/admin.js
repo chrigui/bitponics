@@ -214,4 +214,23 @@ module.exports = function(app){
       res.render('admin/grow-plans', locals);
     });
   });
+
+
+  app.get('/admin/grow-systems', function(req, res, next){
+    var GrowSystemModel = require('../models/growSystem').model,
+        locals = {
+          title: 'Bitponics Admin | Grow Systems',
+          growSystems : []
+        };
+
+    GrowSystemModel.find()
+    .select('createdBy _id name active photos')
+    .populate('createdBy', '_id name')
+    .exec(function(err, results){
+      if (err) { return next(err);}
+
+      locals.growSystems = results;
+      res.render('admin/grow-systems', locals);
+    });
+  });
 };

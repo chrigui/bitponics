@@ -1,0 +1,51 @@
+extends ../layout
+
+block head
+	mixin requirejs("/assets/js/pages/admin/grow-systems")
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading All Grow Systems
+		div.separator-top(ng-cloak, ng-controller="bpn.controllers.admin.growSystems.Main")
+			ul(class="block-info-set content-module") 
+				li(ng-repeat="growSystem in growSystems", ng-click="")
+					div.first
+						h5.label Name
+						div.value {{growSystem.name}}
+					div
+						h5.label Created By
+						div.value.ww-break-word {{growSystem.createdBy.name.full}}
+					div
+						h5.label ID
+						div.value.ww-break-word {{growSystem._id}}
+					div
+						h5.label Photo
+						div.value.ww-break-word {{growSystem.photos}}
+							
+							img(ng-show="growSystem.photos[0]", ng-src="/photos/{{growSystem.photos[0]}}/150")
+
+							div
+								img.spinner(src="/assets/img/spinner.svg", ng-show="uploadInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+								lvl-file-upload(
+									ng-hide="uploadInProgress",
+									auto-upload='true',
+									choose-file-button-text='Choose files',
+									upload-url='/api/grow-systems/{{growSystem._id}}/photos',
+									max-files='5',
+									max-file-size-mb='5',
+									get-additional-data='getData(files)',
+									on-done='done(files, data)',
+									on-progress='progress(percentDone)',
+									on-error='error(files, type, msg)')
+					a.btn(ng-click="delete(growPlan)") Delete
+
+
+block footer-scripts
+	script
+		bpn.pageData.growSystems = !{JSON.stringify(growSystems)};

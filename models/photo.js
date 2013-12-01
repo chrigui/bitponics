@@ -266,8 +266,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
         }
       ],
       function(err){
-         console.log('photo series fiinsh');
-         if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
+        if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
           // Delete the file from disk
           fs.unlink(options.streamPath);
         }
@@ -277,16 +276,13 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
         // If we're here, the photo's good to go
         async.parallel([
           function(innerCallback){
-            console.log('saving phot');
             return photo.save(innerCallback);
           },
           function(innerCallback){
             if (!photo.ref.collectionName){ return innerCallback(); }
             
             var refModel = ModelUtils.getModelFromCollectionName(photo.ref.collectionName);
-            console.log('refmodel', photo.ref.collectionName, refModel);
             if(!refModel.schema.path('photos')){
-              console.log('no ref.photos');
               return innerCallback();
             }
 
