@@ -94,8 +94,9 @@ define([
           placeholder: "Select",
 
           formatResult : function(object, container, query){
-            var growSystem = angular.element(object.element).scope().growSystem;
-            return '<div style="float:left;width:30%"><img style="width:100%" src="http://placekitten.com/200/200"/></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
+            var growSystem = angular.element(object.element).scope().growSystem,
+            html = '<div style="float:left;width:30%"><img style="width:100%" src="/photos/' + (growSystem.photos[0] || '') + '/200" /></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
+            return html;
           }
         }
 			};

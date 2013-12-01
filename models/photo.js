@@ -70,7 +70,7 @@ var PhotoSchema = new Schema({
 
   
   /**
-   * Number of bytes of the thumbnail (150x150 max)
+   * Number of bytes of the thumbnail (200x200 max)
 
    */
   thumbnailSize : { type : Number }

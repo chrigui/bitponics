@@ -4,7 +4,7 @@ define(['moment'], function(moment){
 
 
 
-  utils.PHOTO_THUMBNAIL_SIZE = { WIDTH : 150, HEIGHT: 150 };
+  utils.PHOTO_THUMBNAIL_SIZE = { WIDTH : 200, HEIGHT: 200 };
 
   /**
    *
