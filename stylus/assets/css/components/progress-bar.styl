@@ -1,0 +1,32 @@
+@import "../global/colors"
+
+.progress-bar 
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+	margin-bottom: 1em;
+
+	ol
+		display: table-row;
+		
+		li
+			display: table-cell;
+			border-right: 1px solid #fff
+			background: color-bg-light-green
+			text-align center
+			color #fff
+
+			&:last-of-type
+				border-right none
+
+			&.complete
+				text-decoration line-through
+				opacity .8
+
+			&.complete, &.active
+				background-color: color-bg-green
+
+			.number
+				color inherit
+
+

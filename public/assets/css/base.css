@@ -5048,6 +5048,38 @@ button.close {
     background-position: 100% -21px !important;
   }
 }
+.progress-bar {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  margin-bottom: 1em;
+}
+.progress-bar ol {
+  display: table-row;
+}
+.progress-bar ol li {
+  display: table-cell;
+  border-right: 1px solid #fff;
+  background: #cbffd1;
+  text-align: center;
+  color: #fff;
+}
+.progress-bar ol li:last-of-type {
+  border-right: none;
+}
+.progress-bar ol li.complete {
+  text-decoration: line-through;
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+}
+.progress-bar ol li.complete,
+.progress-bar ol li.active {
+  background-color: #00e36c;
+}
+.progress-bar ol li .number {
+  color: inherit;
+}
 .growplans .plantlist {
   margin-top: 0.5em;
   margin-bottom: 0.5em;

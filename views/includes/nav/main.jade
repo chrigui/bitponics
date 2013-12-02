@@ -95,10 +95,12 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                   li
                     a(class="intercom-trigger", href="mailto:0c40a940658cd131a6d92882bf8fcc7230d93338@incoming.intercom.io") Help
   
+  
   if !!pageType && pageType == 'landing-page'  
     button.toggle-menu(ng-cloak, ng-click="toggleNavMenu()")
       span Menu
       //- i(class="icon-glyph-new icon-__60_plus_white", aria-hidden="true", ng-hide="navMenuDisplayVisible")
       i(class="font-style-normal", aria-hidden="true", ng-hide="navMenuDisplayVisible") &#9776;
       i(class="icon-glyph-new icon-__72_x_999999", aria-hidden="true", ng-show="navMenuDisplayVisible")
-      
+  
+    | hello

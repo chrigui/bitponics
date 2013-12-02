@@ -498,7 +498,18 @@ block content
   section#main(role="main", class="main", ng-cloak)
     div.content-module.middle
       form(id="growplans", name="growplans", class='steps', data-ajax="false", ng-submit="submit()", ng-controller="bpn.controllers.setup.growPlan.Main", novalidate)
-        
+        section.progress-bar()
+          ol
+            li.active 
+              span.number 1.
+              |  Select Grow Plan
+            li.future 
+              span.number 2.
+              |  Customize Grow Plan
+            li.future 
+              span.number 3.
+              |  Activate Garden
+
         section(ng-view)
         
         //- Overlay Templates
