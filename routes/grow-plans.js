@@ -46,7 +46,7 @@ module.exports = function(app){
 				userGrowPlans : [],
 				communityGrowPlans : [],
 				className: "grow-plans gardens app-page single-page",
-    			pageType: "app-page"
+  			pageType: "app-page"
 			};
 			async.parallel(
 				[
@@ -81,11 +81,11 @@ module.exports = function(app){
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
-				title : 'Bitponics - Grow Plan',
+				title : 'Bitponics - Grow Plans',
 				user : req.user,
 				growPlan : undefined,
 				className: "grow-plans growplans garden app-page",
-        		pageType: 'app-page',
+    		pageType: 'app-page',
 				//message : req.flash('info') //TODO: this isn't coming thru
 				growSystems: {},
 				plants: {},
@@ -95,131 +95,111 @@ module.exports = function(app){
 				sensors: {}
 			};
 
-
-			async.parallel(
-				[
-					function parallel1(callback){
-						//get all grow systems
-						GrowSystemModel.find({}, callback);
-					},
-					function parallel2(callback){
-						//get all plants
-						PlantModel.find({}, '_id name', callback);
-					},
-					function parallel3(callback){
-						//get all controls
-						ControlModel.find({}, callback);
-					},
-					function parallel4(callback){
-						//get all grow plans and populate
-						async.series(
-							[
-								function (innerCallback) {									
-									// First, verify that the user can see this
-									GrowPlanModel.findById(req.params.id)
-										.exec(function(err, growPlan){
-											if (err) { return next(err); }
-											if (!growPlan){ return next(new Error('Invalid grow plan id'));}
-											if (!routeUtils.checkResourceReadAccess(growPlan, req.user)){
-							          			return res.send(401, "This garden is private. You must be the owner to view it.");
-							          		}
-							          		if (!routeUtils.checkResourceModifyAccess(growPlan, req.user)){
-							          			return res.send(401, "This garden is private. You must be the owner to modify it.");
-							          		}
-
-							          		locals.growPlan = growPlan;
-							          		innerCallback();
-							        	});
-
-
-								},
-								function (innerCallback) {
-									var actionIds = [];
-									// locals.growPlans.forEach(function(growPlan) {
-										locals.growPlan.phases.forEach(function(phase) {
-											phase.idealRanges.forEach(function(idealRange, i) {
-												actionIds.push(idealRange.actionAboveMax);
-												actionIds.push(idealRange.actionBelowMin);
-											});
-										});
-									// });
-									ActionModel.find({})
-										.where('_id').in(actionIds)
-										.exec(function (err, actions) {
-											if (err) { return innerCallback(err); }
-											actions.forEach(function(item, index) {
-												locals.actions[item._id] = item;
-											});
-											innerCallback();
-										});
-								}
-							],
-							function (err, result) {
-								callback();
-							}
-						);
-					},
-					function parallel5(callback){
-						// Get the devices that the user owns
-						DeviceModel.find({owner : req.user._id}, callback);
-					},
-					function parallel6(callback){
-						// Get all sensors
-						SensorModel.find({}, callback);
-					},
-					function parallel7(callback){
-						// Get all lights
-						LightModel.find({}, callback);
-					},
-					function parallel8(callback){
-						// Get all lights
-						LightFixtureModel.find({}, callback);
-					},
-					function parallel9(callback){
-						// Get all lights
-						LightBulbModel.find({}, callback);
-					},
-					function parallel10(callback){
-						// Get all lights
-						NutrientModel.find({}, callback);
-					}
-				],
-				function parallelFinal(err, result){
-					if (err) { return next(err); }
-					var growSystems = result[0],
-						plants = result[1],
-						controls = result[2],
-						userOwnedDevices = result[4],
-						sensors = result[5],
-						lights = result[6],
-						lightFixtures = result[7],
-						lightBulbs = result[8],
-						nutrients = result[9];
+      // First, verify that the user can see this
+      GrowPlanModel.findById(req.params.id)
+      .exec(function(err, growPlan){
+        if (err) { return next(err); }
+        if (!growPlan){ return next(new Error('Invalid grow plan id'));}
+        if (!routeUtils.checkResourceReadAccess(growPlan, req.user)){
+          return res.send(401, "This grow plan is private. You must be the owner to view it.");
+        }
+               
+        locals.growPlan = growPlan;
+        
+        async.parallel(
+        [
+          function parallel1(callback){
+            //get all grow systems
+            GrowSystemModel.find({}, callback);
+          },
+          function parallel2(callback){
+            //get all plants
+            PlantModel.find({}, '_id name', callback);
+          },
+          function parallel3(callback){
+            //get all controls
+            ControlModel.find({}, callback);
+          },
+          function parallel4(callback){
+            // populate grow plan actions
+            var actionIds = [];
+            locals.growPlan.phases.forEach(function(phase) {
+              phase.idealRanges.forEach(function(idealRange, i) {
+                actionIds.push(idealRange.actionAboveMax);
+                actionIds.push(idealRange.actionBelowMin);
+              });
+            });
+            ActionModel.find({})
+            .where('_id').in(actionIds)
+            .exec(function (err, actions) {
+              if (err) { return callback(err); }
+              actions.forEach(function(item, index) {
+                locals.actions[item._id] = item;
+              });
+              callback();
+            });
+          },
+          function parallel5(callback){
+            // Get the devices that the user owns
+            DeviceModel.find({owner : req.user._id}, callback);
+          },
+          function parallel6(callback){
+            // Get all sensors
+            SensorModel.find({}, callback);
+          },
+          function parallel7(callback){
+            // Get all lights
+            LightModel.find({}, callback);
+          },
+          function parallel8(callback){
+            // Get all lights
+            LightFixtureModel.find({}, callback);
+          },
+          function parallel9(callback){
+            // Get all lights
+            LightBulbModel.find({}, callback);
+          },
+          function parallel10(callback){
+            // Get all lights
+            NutrientModel.find({}, callback);
+          }
+        ],
+        function parallelFinal(err, result){
+          if (err) { return next(err); }
+          var growSystems = result[0],
+            plants = result[1],
+            controls = result[2],
+            userOwnedDevices = result[4],
+            sensors = result[5],
+            lights = result[6],
+            lightFixtures = result[7],
+            lightBulbs = result[8],
+            nutrients = result[9];
           
-					locals.growSystems = growSystems;
-					locals.plants = plants;
-					locals.controls = controls;
-					locals.userOwnedDevices = userOwnedDevices;
-					locals.lights = lights;
-					locals.lightFixtures = lightFixtures;
-					locals.lightBulbs = lightBulbs;
-					locals.nutrients = nutrients;
+          locals.growSystems = growSystems;
+          locals.plants = plants;
+          locals.controls = controls;
+          locals.userOwnedDevices = userOwnedDevices;
+          locals.lights = lights;
+          locals.lightFixtures = lightFixtures;
+          locals.lightBulbs = lightBulbs;
+          locals.nutrients = nutrients;
           
-					// //convert controls into obj with id as keys
-					// controls.forEach(function (item, index) {
-					// 	locals.controls[item._id] = item;
-					// });
+          // //convert controls into obj with id as keys
+          // controls.forEach(function (item, index) {
+          //  locals.controls[item._id] = item;
+          // });
           
-					//convert sensors into obj with id as keys
-					sensors.forEach(function (item, index) {
-						locals.sensors[item.code] = item;
-					});
+          //convert sensors into obj with id as keys
+          sensors.forEach(function (item, index) {
+            locals.sensors[item.code] = item;
+          });
 
-	          		res.render('grow-plans/details', locals);
-			      	
-				}
-			);
-      	});
+          return res.render('grow-plans/details', locals);
+        });
+      });
+    }
+  );
 
 	
 	
