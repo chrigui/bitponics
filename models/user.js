@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
+	mongooseTypes = require('../lib/mongoose-types-wrapper'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
@@ -17,8 +17,6 @@ var mongoose = require('mongoose'),
   async = require('async'),
   requirejs = require('../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils');
-
-mongooseTypes.loadTypes(mongoose); // loads types Email and Url (https://github.com/bnoguchi/mongoose-types)
 
 
 /**

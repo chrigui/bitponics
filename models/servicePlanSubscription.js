@@ -3,7 +3,6 @@
  */
 
 var mongoose = require('mongoose'),
-  mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
   ObjectIdSchema = Schema.ObjectId,
   mongoosePlugins = require('../lib/mongoose-plugins'),

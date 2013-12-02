@@ -1,7 +1,6 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
-	useTimestamps = mongoosePlugins.useTimestamps,
+  useTimestamps = mongoosePlugins.useTimestamps,
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
 	GrowPlanModel = require('./growPlan').growPlan.model,

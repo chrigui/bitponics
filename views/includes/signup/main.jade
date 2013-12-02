@@ -1,14 +1,15 @@
 section#main(role="main", class="main")
 	div(class="page-content")
 		h3(class="page-heading nav-section")
-			| Register for your bitponics account.
-		ul
-			li Create your own grow plans and apply them to your gardens
-			li Get access to preorder offers
-			li Receive news and announcements
-		form(id="register-form", method="POST", action="/signup")
+			| Sign up for your bitponics account
+		div Just enter an email and password, and you'll be ready to get started.
+		form.register-form(id="register-form", method="POST", action="/signup")
 			label(for="email") Email
 			input(id="email", name="email", type="email", autofocus="autofocus", required) 
 			label(for="password") Password
 			input(id="password", name="password", type="password", required) 
+			
+			input.unstyled(id="newsletter", type="checkbox", name="newsletter")
+			label.inline(for="newsletter") Sign up for the Bitponics newsletter
+			
 			input(type="submit", value="Submit")

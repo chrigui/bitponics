@@ -1,5 +1,4 @@
 var mongoose = require('mongoose'),
-	mongooseTypes = require('mongoose-types'),
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,

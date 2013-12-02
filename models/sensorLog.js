@@ -1,5 +1,4 @@
 var mongoose = require('mongoose'),
-    mongooseTypes = require('mongoose-types'),
     mongoosePlugins = require('../lib/mongoose-plugins'),
     Schema = mongoose.Schema,
     ObjectIdSchema = Schema.ObjectId,

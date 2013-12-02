@@ -272,6 +272,16 @@ input[type=checkbox] {
   width: 0;
   margin: 0;
 }
+input[type=radio].unstyled,
+input[type=checkbox].unstyled {
+  display: inline;
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
+  height: auto;
+  width: auto;
+  margin: 0;
+}
 input[type='radio'] + label.btn,
 input[type='checkbox'] + label.btn {
   background: #fff;
@@ -611,6 +621,9 @@ input[type='checkbox']:checked + label.btn {
 }
 .amazon input {
   border: 0 none !important;
+}
+.register-form input[type=submit] {
+  margin-top: 0.5em;
 }
 .photo-upload {
   overflow: hidden;

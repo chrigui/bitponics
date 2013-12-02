@@ -4,7 +4,6 @@
 
  
 var mongoose = require('mongoose'),
-  mongooseTypes = require('mongoose-types'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,

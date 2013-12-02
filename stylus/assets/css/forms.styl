@@ -72,6 +72,13 @@ input[type=radio], input[type=checkbox]
 	width 0
 	margin 0
 
+	&.unstyled 
+		display inline
+		opacity 1
+		height auto
+		width auto
+		margin 0		
+
 input[type='radio'] + label.btn,
 input[type='checkbox'] + label.btn
 	background white
@@ -442,6 +449,10 @@ input[type='checkbox']:checked + label.btn
 	input
 		border 0 none!important
 
+
+.register-form
+	input[type=submit]
+		margin-top .5em
 
 .photo-upload
 	overflow hidden
