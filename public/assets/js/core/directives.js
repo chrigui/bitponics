@@ -30,7 +30,7 @@ define(['angular'],
     });
 
 
-    bpnDirectives.directive('bpnDirectivesSelectOnClick', function () {
+     bpnDirectives.directive('bpnDirectivesSelectOnClick', function () {
       return function (scope, element, attrs) {
           element.click(function () {
               element.select();
@@ -50,39 +50,59 @@ define(['angular'],
     });
 
 
-    bpnDirectives.directive('bpnDirectivesSmartOverlay', function($window, $timeout) {
-      return {
-        controller: function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
-          $scope.$watch('sharedDataService.activeOverlay', function (newVal, oldVal) {
-            $scope.sharedDataService.activeOverlayPositionTop = angular.element($window)[0].scrollY;
-            $scope.setOverlayPosition();
-          });
+    bpnDirectives.directive('bpnDirectivesSmartOverlay', [
+      '$window',
+      '$timeout',
+      function($window, $timeout) {
+        return {
+          controller: function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
+            $scope.$watch('sharedDataService.activeOverlay', function (newVal, oldVal) {
+              $scope.sharedDataService.activeOverlayPositionTop = angular.element($window)[0].scrollY;
+              $scope.setOverlayPosition();
+            });
 
-          $scope.setOverlayPosition = function() {
-            $.throttle(1000, $timeout(function() {
-              var overlay = $element.parents('.page:first').siblings('.overlay:first'),
-                  overlayHeight = overlay.height(),
-                  topValue = $scope.sharedDataService.activeOverlayPositionTop,
-                  windowHeight = angular.element($window).height(),
-                  padding = 144;
-              if (overlay.length > 0) {
-                if ((windowHeight > overlayHeight + padding)) {
-                  overlay.css({ top: topValue + padding });
-                  $scope.$apply(); 
+            $scope.setOverlayPosition = function() {
+              $.throttle(1000, $timeout(function() {
+                var overlay = $element.parents('.page:first').siblings('.overlay:first'),
+                    overlayHeight = overlay.height(),
+                    topValue = $scope.sharedDataService.activeOverlayPositionTop,
+                    windowHeight = angular.element($window).height(),
+                    padding = 144;
+                if (overlay.length > 0) {
+                  if ((windowHeight > overlayHeight + padding)) {
+                    overlay.css({ top: topValue + padding });
+                    $scope.$apply(); 
+                  }
                 }
-              }
-            }, 500));
-          };
+              }, 500));
+            };
 
-        },
-        link: function(scope, element, attrs, controller) {
-          angular.element($window).bind("scroll", function() {
-            scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
-            scope.setOverlayPosition();
-          });
+          },
+          link: function(scope, element, attrs, controller) {
+            angular.element($window).bind("scroll", function() {
+              scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
+              scope.setOverlayPosition();
+            });
+          }
+        };
+      }
+    ]);
+
+    
+    bpnDirectives.directive('bpnDirectivesIntercomTrigger', [
+      '$timeout',
+      function($timeout) {
+        return {
+          link: function(scope, element, attrs) {
+            // TODO: this isn't working. investigate
+            $timeout(function(){
+              element.addClass('.intercom-trigger');
+              window.Intercom('reattach_activator');
+            }, 10);
+          }
         }
-      };
-    });
+      }
+    ]);
 
 
     return bpnDirectives;

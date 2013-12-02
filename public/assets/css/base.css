@@ -31,7 +31,7 @@
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header input {
+.growplans .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -61,7 +61,7 @@
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
-.growplans #growplans_activate,
+.growplans .header-action,
 .growplans .spinner,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
@@ -995,7 +995,7 @@ img.page-spinner.spinner {
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header input {
+.growplans .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -1020,7 +1020,7 @@ img.page-spinner.spinner {
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
-.growplans #growplans_activate,
+.growplans .header-action,
 .growplans .spinner,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
@@ -2321,7 +2321,7 @@ img.page-spinner.spinner {
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header input {
+.growplans .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -2339,7 +2339,7 @@ img.page-spinner.spinner {
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
-.growplans #growplans_activate,
+.growplans .header-action,
 .growplans .spinner,
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
@@ -5159,7 +5159,7 @@ button.close {
   position: relative;
   top: 0.15em;
 }
-.growplans #growplans_activate {
+.growplans .header-action {
   clear: both;
 }
 .growplans .spinner {
@@ -5361,10 +5361,11 @@ button.close {
   max-width: 80%;
   clear: left;
 }
-.growplans .grow-plan-customize header input {
-  bottom: -0.5em;
+.growplans .grow-plan-customize header .header-action {
+  top: 0;
   right: 0;
   font-size: 1em;
+  margin: 0;
 }
 .growplans .grow-plan-customize h2.page-heading [contenteditable],
 .growplans .grow-plan-customize btn[contenteditable] {

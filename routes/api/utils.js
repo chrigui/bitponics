@@ -22,6 +22,7 @@ module.exports = {
    * @param {Number} [req.params.skip]
    * @param {Number} [req.params.limit=200]
    * @param {string=} [req.params.sort]
+   * @param {string=} [req.params.search] String search term. Should usually be used to query fuzzy match on "name" field.
    *
    * Response:
    * @param {Array[model]} data

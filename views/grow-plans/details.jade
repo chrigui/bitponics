@@ -26,7 +26,7 @@ block head
               | Add
               | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
         
-        input(id="growplans_activate", type="submit", value="Save", ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success")
+        input.header-action(type="submit", ng-value="sharedDataService.pageMode == 'default' ? 'Save' : 'Activate garden'", ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success")
 
       div(id="sensors", class="sensors content-module side")
         h2.page-heading-small.date Edit Sensors
@@ -815,6 +815,23 @@ block content
                 p.error
                   | There was a technical problem and your garden was not set up.
         
+        div
+          div(ng-controller="bpn.controllers.growPlan.SaveOverlay", modal="sharedDataService.activeOverlay.is=='SaveOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+            div(class="overlay-contain")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
+              div(ng-show="!sharedDataService.submit.error")
+                h3(class="page-heading page-heading-small") Grow Plan Updated
+                p 
+                  | Your grow plan has been updated! Visit your 
+                  a(class="link", href="/gardens") gardens
+                  |  page to make sure your gardens are reflecting the updates.
+              div(ng-show="sharedDataService.submit.error")
+                h3(class="page-heading page-heading-small error") Error saving changes
+                p.error
+                  | There was a technical problem while attempting to save your changes. We're sorry for disrupting your flow. Feel free to 
+                  span(data-bpn-directives-intercom-trigger) contact us
+                  |  and let's see if we can help.
 
         //- End Overlay Templates
         

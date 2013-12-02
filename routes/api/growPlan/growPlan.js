@@ -217,33 +217,31 @@ module.exports = function(app) {
   /*
    * Update a grow plan
    *
-   * To test:
-   * jQuery.ajax({
-   *     url: "/api/grow-plans/${id}",
-   *     type: "PUT",
-   *     data: {
-   *       "title": "New Grow Plan Title"
-   *     },
-   *     success: function (data, textStatus, jqXHR) {
-   *         console.log("Post response:");
-   *         console.dir(data);
-   *         console.log(textStatus);
-   *         console.dir(jqXHR);
-   *     }
-   * });
+   * 
    */
-  app.put('/api/grow-plans/:id', 
+  app.post('/api/grow-plans/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
-	    return GrowPlanModel.findById(req.params.id, function (err, growPlanResult) {
-	      if (err) { return next(err); }
+	    console.log("got some grow plan PUT!", JSON.stringify(req.body));
+      
+      GrowPlanModel.createNewIfUserDefinedPropertiesModified(
+        {
+          growPlan : req.body,
+          user : req.user,
+          visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
+          silentValidationFail : true
+        },
+        function(err, validatedGrowPlan){
+          winston.info("UPDATING GROW PLAN, err:" + JSON.stringify(err) + ", " + req.params.id + " " + validatedGrowPlan._id);
 
-	      
-	      return growPlanResult.save(function (err, updatedGrowPlan) {
-	        if (err) { return next(err); }
-	        return res.send(updatedGrowPlan);
-	      });
-	    });
+          if (err) { 
+            result.status = 'error';
+            result.errors = [err.message];
+            return res.json(500, result);
+          }
+          return res.json(validatedGrowPlan);
+        }
+      );
 	  }
   );
 

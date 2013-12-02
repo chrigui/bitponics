@@ -12,7 +12,7 @@ define([
 						{ id: '@_id'},
             {
               refreshActiveGardenCount: { 
-                method: 'GET', 
+                method: 'GET',
                 url: '/api/grow-plans/:id/active-garden-count'
               }
             }
