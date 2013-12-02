@@ -4504,10 +4504,6 @@ button.close {
 .accordion-group {
   margin-bottom: 2px;
   border: 1px solid #e5e5e5;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
 }
 .accordion-heading {
   border-bottom: 0;

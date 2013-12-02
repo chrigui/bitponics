@@ -506,7 +506,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     delete growPlan.plantsViewModel;
 
     growPlan.phases = growPlan.phases.filter(function(phase){
-      return phase.name !== 'Add Phase';
+      return (phase.name !== 'Add Phase' && phase.name !== 'Untitled');
     });
 
     growPlan.phases.forEach(function(phase, index){

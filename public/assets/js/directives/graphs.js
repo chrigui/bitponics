@@ -139,8 +139,11 @@ define(['bpn.directives', 'jquery', 'd3'],
                       //phase navigation
 
                       scope.getClasses(null, index); //set active class
+                      
+                      scope.sharedDataService.selectedPhase = index;
+
                       if (phase.name !== scope.phaseAddString) { //filter out add phase ring
-                        scope.sharedDataService.selectedPhase = index;
+                        
                       } else {
                         var newPhaseObj = {
                           _id: index.toString() + '-' + (Date.now().toString()),
@@ -149,7 +152,7 @@ define(['bpn.directives', 'jquery', 'd3'],
                           name: "Untitled"
                         };
                         scope.sharedDataService.selectedGrowPlan.phases.splice(phaseCount - 1, 0, newPhaseObj);
-
+                        
                       }
 
                   });

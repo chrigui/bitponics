@@ -239,7 +239,17 @@ module.exports = function(app) {
             result.errors = [err.message];
             return res.json(500, result);
           }
-          return res.json(validatedGrowPlan);
+
+          ModelUtils.getFullyPopulatedGrowPlan({_id : validatedGrowPlan._id}, function(err, fullyPopulatedGrowPlans){
+            if (err) { 
+              result.status = 'error';
+              result.errors = [err.message];
+              return res.json(500, result);
+            }
+
+            return res.json(fullyPopulatedGrowPlans[0]);
+          })
+          
         }
       );
 	  }

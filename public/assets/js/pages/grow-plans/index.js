@@ -372,8 +372,9 @@ require([
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
           };
 
-          $scope.setCurrentVisiblePhase = function (phase) {
+          $scope.setCurrentVisiblePhase = function (phase, index) {
             $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
+            $scope.sharedDataService.selectedPhase = index;
           };
 
           $scope.setCurrentPhaseSectionTab = function (index) {
@@ -732,10 +733,11 @@ require([
               $scope.sharedDataService.submit.updateInProgress = true;
               
               submittedGrowPlan.$save(
-                function(){
-                  console.log('success');
+                function(returnedGrowPlan){
+                  console.log('success', arguments);
                   $scope.sharedDataService.submit.success = true;
                   $scope.sharedDataService.submit.updateInProgress = false;
+                  //$scope.sharedDataService.selectedGrowPlan = viewModels.initGrowPlanViewModel(returnedGrowPlan);
                   $scope.sharedDataService.activeOverlay = { is: 'SaveOverlay' };
                 }, function(){
                   $scope.sharedDataService.submit.error = true;

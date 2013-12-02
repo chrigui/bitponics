@@ -51,13 +51,14 @@ block head
           div.phaseName
             label Phase Name
             input(class="display-ib", type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name")
-            label(class="btn plant no-margin")
-              | <i ng-click="removePhase(sharedDataService.selectedPhase)" class="icon-glyph-new icon-__73_x_white" aria-hidden="true"></i>
 
           
           div.phaseDescription
             label Phase Description
             textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].description")
+
+
+          a.btn.warning.no-margin(ng-click="removePhase(sharedDataService.selectedPhase)") Remove {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Phase
 
 
       div(id="controls", class="content-module side")
@@ -235,7 +236,7 @@ block head
               li(ng-repeat="phase in sharedDataService.selectedGrowPlan.phases", 
                   class="btn inverse-btn", 
                   ng-class="{selected: sharedDataService.selectedGrowPlan.currentVisiblePhase == phase}", 
-                  ng-click="setCurrentVisiblePhase(phase)") {{ phase.name || 'New Phase' }}
+                  ng-click="setCurrentVisiblePhase(phase, $index)") {{ phase.name || 'New Phase' }}
                 div(class="remove icon", ng-click="removePhase($index)")
                   | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true" ng-hide="sharedDataService.selectedGrowPlan.currentVisiblePhase == phase"></i>
                   | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-show="sharedDataService.selectedGrowPlan.currentVisiblePhase == phase"></i>
