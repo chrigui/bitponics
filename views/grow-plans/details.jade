@@ -7,7 +7,7 @@ block head
 
   script(type='text/ng-template', id='customize-overview.html')
 
-    div(class="grow-plan-customize", data-bpn-directives-showcase-reveal)
+    div(class="grow-plan-customize", data-bpn-directives-showcase-reveal, data-bpn-directives-smart-overlay)
       header.separator-bottom 
         h2.page-heading
           | <span class="garden-name" ng-model="sharedDataService.selectedGrowPlan.name" contenteditable ng-blur="applyNameChange()" spellcheck="false">
