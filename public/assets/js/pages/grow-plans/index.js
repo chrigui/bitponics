@@ -17,7 +17,7 @@ require([
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
 
-    var growPlanApp = angular.module('bpn.apps.growPlan', ['bpn', 'ngRoute', 'ui', 'ui.bootstrap', 'bpn.directives.graphs']);
+    var growPlanApp = angular.module('bpn.apps.growPlan', ['bpn', 'ngRoute', 'ui', 'ui.bootstrap']);
 
 		growPlanApp.config(
 			[
