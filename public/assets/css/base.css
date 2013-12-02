@@ -5321,7 +5321,8 @@ button.close {
 }
 .growplans .grow-systems .grid--wrapping > .grid-cell,
 .growplans .lights .grid--wrapping > .grid-cell,
-.growplans .nutrients .grid--wrapping > .grid-cell {
+.growplans .nutrients .grid--wrapping > .grid-cell,
+.growplans .ideal-ranges .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -o-box-flex: 1;
@@ -5338,7 +5339,8 @@ button.close {
 }
 .growplans .grow-systems .grid--wrapping > .grid-cell .btn,
 .growplans .lights .grid--wrapping > .grid-cell .btn,
-.growplans .nutrients .grid--wrapping > .grid-cell .btn {
+.growplans .nutrients .grid--wrapping > .grid-cell .btn,
+.growplans .ideal-ranges .grid--wrapping > .grid-cell .btn {
   margin: 0 1em 1em 0;
 }
 .growplans .side {

@@ -11,12 +11,29 @@ var mongoose = require('mongoose'),
 	bcrypt = require('bcrypt'),
 	winston = require('winston'),
 	timezone = require('../lib/timezone-wrapper'),	
-	verificationEmailDomain = 'bitponics.com',
 	EmailConfig = require('../config/email-config'),
   mongooseConnection = require('../config/mongoose-connection').defaultConnection,
   async = require('async'),
   requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils');
+  feBeUtils = requirejs('fe-be-utils'),
+  ejs = require('../config/ejs-config'),
+  fs = require('fs'),
+  path = require('path'),
+  
+  // emailVariables is passed in by a function call later in the startup process
+  emailVariables = {
+    appDomain : undefined,
+    appUrl : undefined,
+    secureAppUrl : undefined
+  },
+  emailTemplates = require('email-templates'),
+  emailTemplatesDir = path.join(__dirname, '/../views/emails'),
+  welcomeEmailTemplateDirectory = path.join(__dirname, '/../views/emails/welcome'),
+  compiledWelcomeEmailBody = {
+    html :  ejs.compile(fs.readFileSync(path.join(welcomeEmailTemplateDirectory, "email-body-html.ejs"), 'utf8')),
+    text : ejs.compile(fs.readFileSync(path.join(welcomeEmailTemplateDirectory, "email-body-text.ejs"), 'utf8'))
+  };
+
 
 
 /**
@@ -444,8 +461,7 @@ UserSchema.pre('save', true, function(next, done){
  */
 UserSchema.pre('save', true, function(next, done){
 	var user = this,
-		token = "",
-		verifyUrl = "";
+		token = "";
 
 	next();
 
@@ -460,33 +476,52 @@ UserSchema.pre('save', true, function(next, done){
 		
 		token = buf.toString('hex');
 		user.activationToken = user.activationToken || token;
-		verifyUrl = 'http://' + verificationEmailDomain + '/register?verify=' + user.activationToken;
-
+		
 	  //send activation email if not activated user
 		if(user.active && user.sentEmail){ return done(); }
 			
 		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
 
-		// setup e-mail data with unicode symbols
-		var mailOptions = {
-		    from: "accounts@bitponics.com", // sender address
-		    to: user.email, // can be list of receivers
-		    subject: "Bitponics Accounts", // Subject line
-		    text: "Welcome to Bitponics!", // plaintext body
-		    html: '<b>Welcome to the Bitponics Beta!</b><p><a href="' + verifyUrl + '">Verify your account.</a></p>' // html body
-		}
+		var welcomeEmailTemplateLocals = {
+      verifyUrl : (emailVariables.secureAppUrl + '/register?verify=' + user.activationToken)
+    };
 
-		// send mail with defined transport object
-		emailTransport.sendMail(mailOptions, function(err, response){
-		    if(err){ return done(err); }
-		    winston.info("Message sent: " + response.message);
-		    emailTransport.close(); // this is probably not necessary when sending through amazonSES API but whatever
+    var emailTemplateLocals = {
+      emailSubject : "Get started with Bitponics",
+      emailBodyHtml : compiledWelcomeEmailBody.html(welcomeEmailTemplateLocals),
+      emailBodyText : compiledWelcomeEmailBody.text(welcomeEmailTemplateLocals),
+      subscriptionPreferencesUrl : emailVariables.secureAppUrl + "/account/profile",
+      appUrl : emailVariables.appUrl,
+      secureAppUrl : emailVariables.secureAppUrl
+    };
 
-			user.sentEmail = true;
-			console.log('user in sendMail callback: ');
-			console.log(user);
-		    done();
-		});
+    emailTemplates(emailTemplatesDir, function(err, runEmailTemplate){
+      if (err) { return done(err); }
+      
+      runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
+      
+        if (err) { return done(err); }
+
+        var mailOptions = {
+          from: "accounts@bitponics.com",
+          to: user.email,
+          subject: emailTemplateLocals.emailSubject,
+          text: finalEmailText,
+          html: finalEmailHtml
+        };
+
+        emailTransport.sendMail(mailOptions, function(err, response){
+          if(err){ return done(err); }
+          winston.info("Email sent: " + response.message);
+          user.sentEmail = true;
+          done();
+        });
+      });
+    });
+
+    
+
+
 	});
 });
 /***************** END MIDDLEWARE **********************/
@@ -502,8 +537,12 @@ UserSchema.index({ 'apiKey.public': 1 });
 
 User = mongooseConnection.model('User', UserSchema);
 
-module.exports.setVerificationEmailDomain = function(domain){
-	verificationEmailDomain = domain;
+module.exports.setEmailVariables = function(appConfig){
+	emailVariables = {
+    appUrl : appConfig.appUrl,
+    secureAppUrl : appConfig.secureAppUrl,
+    appDomain : appConfig.appDomain
+  };
 };
 
 module.exports.schema = UserSchema;

@@ -77,6 +77,6 @@ module.exports = function(app, callback) {
   require('./braintree-config').setEnvironment(app.settings.env);
 
 	// This has to occur after the connection has been set up
-	require('../models/user').setVerificationEmailDomain(appDomain);	
+	require('../models/user').setEmailVariables(app.config);	
 };
 

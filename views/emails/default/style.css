@@ -26,7 +26,7 @@ body, #bodyTable, #bodyCell{height:100% !important; margin:0; padding:0; width:1
 * @theme page
 */
 body, #bodyTable{
-	/*@editable*/ background-color:#DEE0E2;
+	/*@editable*/ background-color:#fff;
 }
 
 /**
@@ -143,7 +143,7 @@ h4{
 * @theme header
 */
 #templatePreheader{
-	/*@editable*/ background-color:#F4F4F4;
+	/*@editable*/ background-color:#fff;
 	/*@editable*/ border-bottom:1px solid #CCCCCC;
 }
 
@@ -178,7 +178,7 @@ h4{
 * @theme header
 */
 #templateHeader{
-	/*@editable*/ background-color:#F4F4F4;
+	/*@editable*/ background-color:#fff;
 	/*@editable*/ border-top:1px solid #FFFFFF;
 	/*@editable*/ border-bottom:1px solid #CCCCCC;
 }
@@ -223,7 +223,7 @@ h4{
 * @tip Set the background color and borders for your email's body area.
 */
 #templateBody{
-	/*@editable*/ background-color:#F4F4F4;
+	/*@editable*/ background-color:#fff;
 	/*@editable*/ border-top:1px solid #FFFFFF;
 	/*@editable*/ border-bottom:1px solid #CCCCCC;
 }
@@ -282,7 +282,7 @@ h4{
 * @theme footer
 */
 #templateFooter{
-	/*@editable*/ background-color:#F4F4F4;
+	/*@editable*/ background-color:#fff;
 	/*@editable*/ border-top:1px solid #FFFFFF;
 }
 
