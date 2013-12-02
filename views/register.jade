@@ -14,9 +14,10 @@ block content
 
         h3.sub-heading #{message}
         - if (typeof link != 'undefined')
-            a(href="#{link}") Log in
-            span 
-                | and get started!
+            p
+                  a(href="#{link}", class="btn") Log in
+                  span 
+                      | and create your first grow plan!
 
         div(class="page-content")
 

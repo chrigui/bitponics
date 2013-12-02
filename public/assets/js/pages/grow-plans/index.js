@@ -327,16 +327,6 @@ require([
           };
 
           $scope.updateSelectedGrowPlanPlants(true);
-        }
-    	]
-  	);
-
-  	growPlanApp.controller('bpn.controllers.growPlan.CustomizeDetails',
-    	[
-    		'$scope',
-    		'sharedDataService',
-    		function($scope, sharedDataService){
-    			$scope.sharedDataService = sharedDataService;
 
     			$scope.init = function(){
     				//$scope.expectedGrowPlanDuration = $scope.sharedDataService.selectedGrowPlan.phases.reduce(function (prev, cur) { return prev.expectedNumberOfDays + cur.expectedNumberOfDays;});
@@ -381,12 +371,15 @@ require([
           };
 
           $scope.removePhase = function (index) {
-            $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
-            $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
+            if($scope.sharedDataService.selectedGrowPlan.phases.length > 1) {
+              $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
+              $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
+            }
           };
 
-          $scope.addIdealRange = function (phase) {
-            var newIdealRange = {
+          $scope.addIdealRange = function (index) {
+            var phase = $scope.sharedDataService.selectedGrowPlan.phases[index],
+                newIdealRange = {
                 _id:phase.idealRanges.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
                 valueRange:{
                   min:0,
@@ -397,23 +390,28 @@ require([
             phase.idealRanges.unshift(newIdealRange);
           };
 
-          $scope.addAction = function (phase) {
-            var newAction = {
-                _id:phase.actions.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
-                cycle: { offset: { duration: 0, durationType: null } }
-              };
+          $scope.addAction = function (index) {
+            var phase = $scope.sharedDataService.selectedGrowPlan.phases[index],
+                newAction = {
+                  _id:phase.actions.length.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
+                  cycle: { offset: { duration: 0, durationType: null } }
+                };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
             phase.actionsViewModel.unshift(viewModels.initActionViewModel(newAction));
           };
 
           $scope.removeIdealRange = function (phaseIndex, idealRangeIndex) {
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges.splice(idealRangeIndex, 1);
+            var phase = $scope.sharedDataService.selectedGrowPlan.phases[index];
+            phase.idealRanges.splice(idealRangeIndex, 1);
           };
 
           $scope.removeAction = function (phaseIndex, actionIndex) {
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actions.splice(actionIndex, 1);
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel.splice(actionIndex, 1)
+            var phase = $scope.sharedDataService.selectedGrowPlan.phases[index];
+            phase.actions.splice(actionIndex, 1);
+            if (phase.actionsViewModel) {
+              phase.actionsViewModel.splice(actionIndex, 1)
+            }
           };
 
     			$scope.init();
@@ -729,6 +727,38 @@ require([
         }
       }
     });
+
+    // growPlanApp.directive('contenteditable', function() {
+    //   return {
+    //     restrict: 'A', // only activate on element attribute
+    //     require: '?ngModel', // get a hold of NgModelController
+    //     link: function(scope, element, attrs, ngModel) {
+    //       if(!ngModel) return; // do nothing if no ng-model
+   
+    //       // Specify how UI should be updated
+    //       ngModel.$render = function() {
+    //         element.html(ngModel.$viewValue || '');
+    //       };
+   
+    //       // Listen for change events to enable binding
+    //       element.on('blur keyup change', function() {
+    //         scope.$apply(read);
+    //       });
+    //       read(); // initialize
+   
+    //       // Write data to the model
+    //       function read() {
+    //         var html = element.html();
+    //         // When we clear the content editable the browser leaves a <br> behind
+    //         // If strip-br attribute is provided then we strip this out
+    //         if( attrs.stripBr && html == '<br>' ) {
+    //           html = '';
+    //         }
+    //         ngModel.$setViewValue(html);
+    //       }
+    //     }
+    //   };
+    // });
   	
   	domReady(function () {
       angular.bootstrap(document, ['bpn.apps.growPlan']);

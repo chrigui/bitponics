@@ -9,14 +9,15 @@ define(['bpn.directives', 'jquery', 'd3'],
     /*
      * Grow Plan navigation phase graph
      */
-    bpnDirectives.directive('bpnDirectivesNavigationPhasesGraph', function() {
+    bpnDirectives.directive('bpnDirectivesNavigationPhasesGraph', function(sharedDataService) {
       return {
         restrict : "EA",
         template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
         replace : true,
-        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
+        controller : function ($scope, $element, $attrs, $transclude){
           $scope.sharedDataService = sharedDataService;
           $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
+          $scope.phaseAddString = "Add Phase";
           $scope.getClasses = function(data, index){
             var className = 'good';
             // if (index == 0){ //first ring
@@ -31,9 +32,9 @@ define(['bpn.directives', 'jquery', 'd3'],
             if (index == $scope.sharedDataService.selectedPhase) {
               className += " active"; 
             }
-            console.log(index);
-            console.log($scope.sharedDataService.selectedPhase);
-            return className;
+            // console.log('index', index);
+            // console.log('$scope.sharedDataService.selectedPhase in getCLasses',$scope.sharedDataService.selectedPhase);
+            return className; 
           };
 
           $scope.$watch("sharedDataService.selectedPhase", function(newVal){
@@ -53,11 +54,16 @@ define(['bpn.directives', 'jquery', 'd3'],
           });
 
 
+
         },
         link: function (scope, element, attrs, controller) {
-          $(element[0]).find('.icon-glyphlogo-new').css('font-size',$(element[0]).width()/15)
-          console.log(scope.sharedDataService.selectedGrowPlan.phases.length);
-          scope.$watch('scope.sharedDataService.selectedGrowPlan.phases.length', function (newVal, oldVal) {
+
+          $(element[0]).find('.icon-glyphlogo-new').css('font-size', $(element[0]).width()/15);
+
+          scope.phases.push({ name: scope.phaseAddString });
+
+          scope.$watch(function(){ return sharedDataService.selectedGrowPlan.phases; }, function (newVal, oldVal) {
+            console.log('$watch3: scope.sharedDataService.selectedGrowPlan.phases.length', scope.sharedDataService.selectedGrowPlan.phases.length);
             var phases = scope.phases,
               phaseCount = phases.length,
               outerMargin = 0,
@@ -77,13 +83,15 @@ define(['bpn.directives', 'jquery', 'd3'],
               .value(function (d) {
                 return 1;
               });
-
+            
             var svg = d3.select(element[0])
+            var svgChild = svg.select('svg').remove();
+            svg = d3.select(element[0])
               .append('svg:svg')
               .attr('width', width)
               .attr('height', height);
 
-            phases.push({ name: 'Add Phase' });
+            // phases.push({ name: 'Add Phase' });
 
             phases.forEach(function(phase, index) {
               var arcNumber = ((phaseCount + 1) - index - 1),
@@ -113,6 +121,8 @@ define(['bpn.directives', 'jquery', 'd3'],
               scope.allArcs
                 .append("svg:text")
                 .attr("fill", function(d, i) { return '#ffffff'; } )
+                // .style({ 'fill': 'white', 'font-size': '20px'})
+                // .attr("stroke", function(d, i) { return '#00F5A3'; } )
                 .attr("transform", function(d) {
                   //we have to make sure to set these before calling arc.centroid
                   d.innerRadius = 0;
@@ -129,28 +139,32 @@ define(['bpn.directives', 'jquery', 'd3'],
                       //phase navigation
 
                       scope.getClasses(null, index); //set active class
-
-                      if (index < phaseCount) { //filter out add phase ring
+                      if (phase.name !== scope.phaseAddString) { //filter out add phase ring
                         scope.sharedDataService.selectedPhase = index;
-
                       } else {
-                        scope.sharedDataService.selectedGrowPlan.phases.push({
+                        var newPhaseObj = {
                           _id: index.toString() + '-' + (Date.now().toString()),
                           actionsViewModel:[],
                           idealRanges:[],
-                          name: "New Phase",
-                        });
+                          name: "Untitled"
+                        };
+                        scope.sharedDataService.selectedGrowPlan.phases.splice(phaseCount - 1, 0, newPhaseObj);
+
                       }
 
                   });
                   
                 });
 
+              scope.allArcs.select('text').on('click', function(d, i) {
+                console.log('clicked text');
+              });
+
 
             });
-
+            // debugger;
             // phases = null;
-          });
+          }, true);
         }
       };
     });

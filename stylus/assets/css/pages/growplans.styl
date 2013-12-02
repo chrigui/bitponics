@@ -21,7 +21,7 @@
 			overflow hidden
 			margin 0
 			li
-				font-size .85em
+				font-size .75em
 				float left
 
 				.btn
@@ -276,12 +276,15 @@
 
 	.ring-graph
 		.good
-			fill: color-bg-light-green
+			fill: color-light-green
 		.active
 			fill: color-bg-green
 		.add-phase
-			fill: color-bg-green
-			opacity: .35
+			fill: color-light-green
+			opacity: .45
+
+		text
+			font-size 1em
 
 	.controls
 		.grid--wrapping > .grid-cell
@@ -293,7 +296,7 @@
 			margin: 0 0 1em;
 			max-width: 5em;
 
-	.grow-systems, .lights, .nutrients
+	.grow-systems, .lights, .nutrients, .ideal-ranges
 		.grid--wrapping > .grid-cell
 			flex 1 50%
 			font-size: .85em;
@@ -302,6 +305,9 @@
 			font-weight: normal;
 			margin: 0 0 1em;
 			max-width: 50%;
+
+			.btn
+				margin 0 1em 1em 0
 
 	.side
 		transition opacity .5s linear
@@ -314,6 +320,7 @@
 		h2.page-heading
 			@extends .float-l
 			max-width 49%
+			clear left
 
 			.garden-name
 				position relative
@@ -322,13 +329,28 @@
 
 
 		ul.plantlist
-			@extends .float-r
+			@extends .float-l
+			max-width 80%
+			clear left
+		
+		header 
+			@extends .position-r
+			input
+				@extends .position-a
+				bottom: -.5em;
+				right: 0;
+				font-size 1em
 
-		h2.page-heading [contenteditable]
+		h2.page-heading [contenteditable], btn[contenteditable]
 			outline none
 			border-bottom 1px dashed color-logo-green
 			white-space nowrap
 			font-style italic
+
+		.seamless-input
+			background: color-logo-green
+			color: white;
+			border: none;
 
 		#phases
 			.page-heading-small
