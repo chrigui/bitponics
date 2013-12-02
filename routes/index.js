@@ -148,11 +148,16 @@ module.exports = function(app){
     				pageType: "app-page"
 				};
 
-			if (redirect){
-				locals.formAction += '?redirect=' + redirect;
-			}
+			// if user is already logged in
+      if (routeUtils.isUserLoggedIn(req)){
+        return res.redirect(req.query.redirect || '/dashboard');
+      } 
+      
+      if (redirect){
+        locals.formAction += '?redirect=' + redirect;
+      }
 
-			res.render('login', locals);
+      return res.render('login', locals);  
 		}
 	);
 
