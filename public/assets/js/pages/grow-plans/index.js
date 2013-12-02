@@ -71,9 +71,10 @@ require([
     					deviceId : undefined
     				},
     				modalOptions : {
-    			    backdropFade: true,
-    			    dialogFade: true,
-    			    dialogClass : 'overlay'
+              backdrop: true,
+              backdropFade: true,
+              dialogFade: true,
+              dialogClass : 'overlay'
     			  },
             growPlanInstance : {
               name : '',
@@ -136,6 +137,21 @@ require([
         'sharedDataService',
         function($scope, sharedDataService){
 
+        }
+      ]
+    );
+
+    growPlanApp.controller('bpn.controllers.growPlan.SensorDetailOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+
+          $scope.close = function(){
+            console.log('close sensor overlay')
+            $scope.sharedDataService.activeOverlay.is = undefined;
+          };
         }
       ]
     );
@@ -336,16 +352,17 @@ require([
     		'sharedDataService',
     		function($scope, growPlan, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
+          $scope.idealRanges = [];
 					
-          // $scope.$watch('sharedDataService.growPlanInstance.name', function(){
-          //   if (!$scope.sharedDataService.growPlanInstance.name){
-          //     $scope.sharedDataService.growPlanInstance.name = "My " + $scope.sharedDataService.selectedGrowPlan.name + " Garden";
-          //   }
-          // });
+          $scope.$watch('sharedDataService.selectedPhase', function(newValue){
+            $scope.sharedDataService.selectedGrowPlan.phases[$scope.sharedDataService.selectedPhase].idealRanges.forEach(function(idealRange) {
+              $scope.idealRanges[idealRange.sCode] = idealRange;
+            });
+          });
 
-          $scope.applyNameChange = function () {
-            console.log(this);
-          };
+          // $scope.applyNameChange = function () {
+          //   console.log(this);
+          // };
 
           $scope.updateSelectedGrowPlanPlants(true);
 
@@ -372,14 +389,14 @@ require([
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
           };
 
-          $scope.setCurrentVisiblePhase = function (phase, index) {
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
-            $scope.sharedDataService.selectedPhase = index;
-          };
+          // $scope.setCurrentVisiblePhase = function (phase, index) {
+          //   $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
+          //   $scope.sharedDataService.selectedPhase = index;
+          // };
 
-          $scope.setCurrentPhaseSectionTab = function (index) {
-            $scope.selected.selectedGrowPlanPhaseSection = index;
-          };
+          // $scope.setCurrentPhaseSectionTab = function (index) {
+          //   $scope.selected.selectedGrowPlanPhaseSection = index;
+          // };
 
           $scope.addPhase = function () {
             var existingPhaseLength = $scope.sharedDataService.selectedGrowPlan.phases.length,
@@ -645,45 +662,6 @@ require([
               $scope.filteredGrowPlanList.splice($scope.filteredGrowPlanList.length, 0, growPlanDefault);
             });
           };
-
-          
-          // $scope.toggleOverlay = function (overlayMetaData) {
-          //   $scope.overlayMetaData = overlayMetaData;
-          //   switch (overlayMetaData.type) {
-          //     //case 'plant':
-          //       //$scope.overlayItems = $scope.filteredPlantList;
-          //       // $scope.overlayItemKey = "plants";
-          //       //break;
-          //     //case 'fixture':
-          //       //$scope.overlayItems = $scope.lightFixtures;
-          //       // $scope.overlayItemKey = "lightFixture";
-          //       //break;
-          //     //case 'bulb':
-          //       //$scope.overlayItems = $scope.lightBulbs;
-          //       // $scope.overlayItemKey = "lightBulb";
-          //       //break;
-          //     case 'growSystem':
-          //       $scope.overlayItems = $scope.growSystems;
-          //       // $scope.overlayItemKey = "growSystem";
-          //       break;
-          //     case 'nutrient':
-          //       $scope.overlayItems = $scope.nutrients;
-          //       // $scope.overlayItemKey = "nutrients";
-          //       break;
-          //     default:
-          //       $scope.overlayItems = [];
-          //       // $scope.overlayItemKey = '';
-          //       break;
-          //   }
-          //   if ($scope.overlayStates[$scope.overlayMetaData.type]) {
-          //     $scope.overlayItems = [];
-          //     $scope.overlayStates[$scope.overlayMetaData.type] = false;
-          //   } else {
-          //     // $scope.$broadcast('newOverlay', [itemKey, $scope.overlayItems]);
-          //     $scope.$broadcast('newOverlay');
-          //     $scope.overlayStates[$scope.overlayMetaData.type] = true;
-          //   }
-          // };
 
           $scope.submit = function (e) {
             console.log('search', $location.search());

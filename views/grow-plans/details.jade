@@ -22,7 +22,7 @@ block head
               {{plant.name}}
               | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
           li
-            label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
+            label(class="add btn", ng-click="sharedDataService.activeOverlay = 'PlantOverlay'") 
               | Add
               | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
         
@@ -32,14 +32,34 @@ block head
         h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} 
           br
           | Sensor Ranges
-        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}}")
+        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
             div.sensor-value ----
-          div(class="sensor-type icon {{sensor.code}}")
+          div.sensor-ranges
+              div(ng-show="idealRanges[sensor.code].valueRange.min") Min
+              div {{idealRanges[sensor.code].valueRange.min}}
+              div(ng-show="idealRanges[sensor.code].valueRange.max") Max
+              div {{idealRanges[sensor.code].valueRange.max}}
+          div(class="sensor-type icon {{sensor.code}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
             div.sensor.screen-reader-text {{sensor.code}}
+
+          div
+            div(modal="sharedDataService.activeOverlay=='SensorOverlay'+sensor.abbrev", close="close()", options="sharedDataService.modalOptions")
+              div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+                div(class="close btn", ng-click="close()")
+                  | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true" ng-click="close()"></i>
+                h3(class="page-heading page-heading-small") {{sensor.name}}
+                div(ng-controller="bpn.controllers.growPlan.SensorDetailOverlay")
+                  div(class="overlay-data clearfix")
+                    h4 Ideal Range ({{sensor.unit}})
+                    div.separator-top
+                      label(for="{{sensor.code}}_min", class="") Min
+                      input(id="{{sensor.code}}_min", type="number", ng-model="idealRanges[sensor.code].valueRange.min", size="6", step="any")
+                      label(for="{{sensor.code}}_min", class="") Max
+                      input(id="{{sensor.code}}_min", type="number", ng-model="idealRanges[sensor.code].valueRange.max", size="6", step="any")
 
 
       div(id="phases", class="content-module middle")
@@ -281,7 +301,7 @@ block head
                 div(class="growSystem", ng-show="selected.selectedGrowPlanPhaseSection == 0")
                   div.question
                     h4(class="page-heading-large separator-top") System
-                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'GrowSystemOverlay'")
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'GrowSystemOverlay'")
                       | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different grow system
                     label Name
@@ -305,7 +325,7 @@ block head
 
                   div(class="nutrients question")
                     h4(class="page-heading-large separator-top") Nutrients
-                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'NutrientOverlay'")
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'NutrientOverlay'")
                       | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Add a nutrient
                     ul.grid
@@ -317,7 +337,7 @@ block head
                   //- h6 Light
                   div.question
                     h4(class="page-heading-large separator-top") Fixture
-                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'FixtureOverlay'")
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'FixtureOverlay'")
                       | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different fixture
                     label Brand
@@ -334,7 +354,7 @@ block head
                     input(type="text", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity", value="sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixtureQuantity")
                   div.question
                     h4(class="page-heading-large separator-top") Bulbs
-                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay.is = 'BulbOverlay'") 
+                    a(href, class="edit-btn", ng-click="sharedDataService.activeOverlay = 'BulbOverlay'") 
                       | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
                       | Choose a different bulb
                     label Brand
@@ -595,7 +615,7 @@ block content
         //- Overlay Templates
 
         div
-          div(ng-controller="bpn.controllers.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay.is=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.growPlan.PlantOverlay", modal="sharedDataService.activeOverlay=='PlantOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -631,7 +651,7 @@ block content
                     a(href, ng-click="nextPage()") Next »
 
         div
-          div(ng-controller="bpn.controllers.growPlan.FixtureOverlay", modal="sharedDataService.activeOverlay.is=='FixtureOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.growPlan.FixtureOverlay", modal="sharedDataService.activeOverlay=='FixtureOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -677,7 +697,7 @@ block content
 
 
         div
-          div(ng-controller="bpn.controllers.growPlan.BulbOverlay", modal="sharedDataService.activeOverlay.is=='BulbOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.growPlan.BulbOverlay", modal="sharedDataService.activeOverlay=='BulbOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -721,7 +741,7 @@ block content
 
 
         div
-          div(ng-controller="bpn.controllers.growPlan.GrowSystemOverlay", modal="sharedDataService.activeOverlay.is=='GrowSystemOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.growPlan.GrowSystemOverlay", modal="sharedDataService.activeOverlay=='GrowSystemOverlay'", close="close()", options="sharedDataService.modalOptions")
             div(ng-controller="bpn.controllers.SelectionOverlay")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -772,7 +792,7 @@ block content
 
       
         div
-          div(ng-controller="bpn.controllers.growPlan.NutrientOverlay", modal="sharedDataService.activeOverlay.is=='NutrientOverlay'", close="close()", options="sharedDataService.modalOptions")
+          div(ng-controller="bpn.controllers.growPlan.NutrientOverlay", modal="sharedDataService.activeOverlay=='NutrientOverlay'", close="close()", options="sharedDataService.modalOptions")
               div(ng-controller="bpn.controllers.SelectionOverlay")
                 div(class="close btn", ng-click="close()")
                   | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -810,7 +830,7 @@ block content
                     li(ng-class="{disabled: currentPage == pagedItems.length - 1}")
                       a(href, ng-click="nextPage()") Next »
         div
-          div(ng-controller="bpn.controllers.growPlan.ActivationOverlay", modal="sharedDataService.activeOverlay.is=='ActivationOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+          div(ng-controller="bpn.controllers.growPlan.ActivationOverlay", modal="sharedDataService.activeOverlay=='ActivationOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
@@ -826,7 +846,7 @@ block content
                   | There was a technical problem and your garden was not set up.
         
         div
-          div(ng-controller="bpn.controllers.growPlan.SaveOverlay", modal="sharedDataService.activeOverlay.is=='SaveOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+          div(ng-controller="bpn.controllers.growPlan.SaveOverlay", modal="sharedDataService.activeOverlay=='SaveOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
