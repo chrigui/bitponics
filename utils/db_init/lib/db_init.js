@@ -51,7 +51,8 @@ var mongoose   = require('mongoose'),
     growPlanInstances: {},
     users: {},
     sensorLogs: {},
-    products: {}
+    products: {},
+    photos : {}
   },
   mongooseConnection;
 
@@ -267,6 +268,14 @@ async.series([
           mongooseConnection.collections['products'].drop( function(err) {
             if (err){ return innerCallback(err);}
             console.log('products collection dropped');
+            innerCallback();
+          });
+        },
+        function(innerCallback){
+          if (!mongooseConnection.collections['photos']){ return innerCallback();}
+          mongooseConnection.collections['photos'].drop( function(err) {
+            if (err){ return innerCallback(err);}
+            console.log('photos collection dropped');
             innerCallback();
           });
         }
@@ -679,7 +688,8 @@ async.series([
             type: _data.type,
             reservoirSize: _data.reservoirSize,
             plantCapacity: _data.plantCapacity,
-            overallSize : _data.overallSize
+            overallSize : _data.overallSize,
+            photos : _data.photos
           });
           dataObj.save(function (err, doc) {
             if (err) { console.log(err); return callback(err);}
@@ -935,7 +945,7 @@ async.series([
 
   function(callback){
     /**
-     * Sensor Logs
+     * Products
      */
 
     var dataType = 'products',
@@ -969,6 +979,51 @@ async.series([
             if (err) { console.log(err); return callback(err);}
             savedObjectIds[dataType][doc._id] = doc._id;
             console.log("created product");
+            decrementData();
+          });
+        }
+      });
+    });
+  },
+
+  function(callback){
+    /**
+     * Photos
+     */
+
+    var dataType = 'photos',
+      dataCount = data[dataType].length,
+      decrementData = function(){
+        dataCount--;
+        if (dataCount === 0){
+          callback();
+        }
+      };
+
+    console.log('####### ' + dataType + ' #######');
+
+    data[dataType].forEach(function(_data){
+      models.photo.findById(_data._id, function(err, result){
+        if (err) { console.log(err); return callback(err);}
+        if (result){
+          return decrementData();
+        } else {
+          var dataObj = new models.photo({
+            _id : _data._id,
+            owner : _data.owner,
+            originalFileName : _data.originalFileName,
+            type : _data.type,
+            size : _data.size,
+            visibility : _data.visibility,
+            date : _data.date,
+            tags : _data.tags,
+            ref : _data.ref
+          });
+
+          dataObj.save(function (err, doc) {
+            if (err) { console.log(err); return callback(err);}
+            savedObjectIds[dataType][doc._id] = doc._id;
+            console.log("created photo");
             decrementData();
           });
         }
