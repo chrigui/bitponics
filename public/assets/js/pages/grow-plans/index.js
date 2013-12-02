@@ -725,7 +725,7 @@ require([
 
             } else {
               // TODO : save the grow plan only, no garden activation
-console.log('$scope.sharedDataService.selectedGrowPlan', $scope.sharedDataService.selectedGrowPlan)
+
               var submittedGrowPlan = viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan);
               submittedGrowPlan = new GrowPlanModel(submittedGrowPlan);
               
