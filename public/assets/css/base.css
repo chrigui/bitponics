@@ -26,10 +26,12 @@
 .fixed {
   position: fixed;
 }
-.position-r {
+.position-r,
+.growplans .grow-plan-customize header {
   position: relative;
 }
-.position-a {
+.position-a,
+.growplans .grow-plan-customize header input {
   position: absolute;
 }
 .display-b {
@@ -97,11 +99,11 @@
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
-.growplans .grow-plan-customize h2.page-heading {
+.growplans .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist {
   float: left;
 }
-.float-r,
-.growplans .grow-plan-customize ul.plantlist {
+.float-r {
   float: right;
 }
 .float-n {
@@ -988,10 +990,12 @@ img.page-spinner.spinner {
 .fixed {
   position: fixed;
 }
-.position-r {
+.position-r,
+.growplans .grow-plan-customize header {
   position: relative;
 }
-.position-a {
+.position-a,
+.growplans .grow-plan-customize header input {
   position: absolute;
 }
 .display-b {
@@ -1054,11 +1058,11 @@ img.page-spinner.spinner {
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
-.growplans .grow-plan-customize h2.page-heading {
+.growplans .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist {
   float: left;
 }
-.float-r,
-.growplans .grow-plan-customize ul.plantlist {
+.float-r {
   float: right;
 }
 .float-n {
@@ -2312,10 +2316,12 @@ img.page-spinner.spinner {
 .fixed {
   position: fixed;
 }
-.position-r {
+.position-r,
+.growplans .grow-plan-customize header {
   position: relative;
 }
-.position-a {
+.position-a,
+.growplans .grow-plan-customize header input {
   position: absolute;
 }
 .display-b {
@@ -2371,11 +2377,11 @@ img.page-spinner.spinner {
 .float-l,
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
-.growplans .grow-plan-customize h2.page-heading {
+.growplans .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist {
   float: left;
 }
-.float-r,
-.growplans .grow-plan-customize ul.plantlist {
+.float-r {
   float: right;
 }
 .float-n {
@@ -5060,7 +5066,7 @@ button.close {
   margin: 0;
 }
 .growplans .plantlist.small-float li {
-  font-size: 0.85em;
+  font-size: 0.75em;
   float: left;
 }
 .growplans .plantlist.small-float li .btn {
@@ -5284,16 +5290,19 @@ button.close {
   width: 60%;
 }
 .growplans .ring-graph .good {
-  fill: #cbffd1;
+  fill: #92ed00;
 }
 .growplans .ring-graph .active {
   fill: #00e36c;
 }
 .growplans .ring-graph .add-phase {
-  fill: #00e36c;
-  opacity: 0.35;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=35)";
-  filter: alpha(opacity=35);
+  fill: #92ed00;
+  opacity: 0.45;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=45)";
+  filter: alpha(opacity=45);
+}
+.growplans .ring-graph text {
+  font-size: 1em;
 }
 .growplans .controls .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
@@ -5327,6 +5336,11 @@ button.close {
   margin: 0 0 1em;
   max-width: 50%;
 }
+.growplans .grow-systems .grid--wrapping > .grid-cell .btn,
+.growplans .lights .grid--wrapping > .grid-cell .btn,
+.growplans .nutrients .grid--wrapping > .grid-cell .btn {
+  margin: 0 1em 1em 0;
+}
 .growplans .side {
   -webkit-transition: opacity 0.5s linear;
   -moz-transition: opacity 0.5s linear;
@@ -5336,15 +5350,31 @@ button.close {
 }
 .growplans .grow-plan-customize h2.page-heading {
   max-width: 49%;
+  clear: left;
 }
 .growplans .grow-plan-customize h2.page-heading .garden-name {
   position: relative;
 }
-.growplans .grow-plan-customize h2.page-heading [contenteditable] {
+.growplans .grow-plan-customize ul.plantlist {
+  max-width: 80%;
+  clear: left;
+}
+.growplans .grow-plan-customize header input {
+  bottom: -0.5em;
+  right: 0;
+  font-size: 1em;
+}
+.growplans .grow-plan-customize h2.page-heading [contenteditable],
+.growplans .grow-plan-customize btn[contenteditable] {
   outline: none;
   border-bottom: 1px dashed #00e36c;
   white-space: nowrap;
   font-style: italic;
+}
+.growplans .grow-plan-customize .seamless-input {
+  background: #00e36c;
+  color: #fff;
+  border: none;
 }
 .growplans .grow-plan-customize #phases .page-heading-small {
   float: none;
