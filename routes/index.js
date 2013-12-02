@@ -293,7 +293,8 @@ module.exports = function(app){
 		  var UserModel = require('../models/user').model,
 			  	locals = {
 			  		title: 'Welcome to Bitponics!',
-			      message: 'Thanks for signing up. Check your email.',
+			      header: 'Thank you.',
+            message: 'Thanks for signing up. Check your email.',
 			      className: "landing-page single-page getstarted register",
     				pageType: "landing-page"
 			    };
@@ -308,7 +309,8 @@ module.exports = function(app){
 							user.sentEmail = true; //if we get here, this should be true
 							user.save( function(err, user){
 								if (err) { return next(err); }
-								locals.message = 'Your registration was successfull.';
+								locals.header =  "All set!";
+                locals.message = 'Your account is now verified.';
 								locals.link = '/login?redirect=/setup/grow-plan';
 								// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
 								locals.user = user;
@@ -326,7 +328,8 @@ module.exports = function(app){
 	    } else if(req.query.status == 'abandon') { //user cancelled preorder process mid-way
 		    locals.message = 'Issues preordering the device?';
 		  } else { //user just signed up, tell them to check email to verify
-		  	locals.title=  'Register';
+		  	locals.header =  "Thanks for signing up!";
+        locals.message = "We've sent you an activation email. Click the activation link and then you'll be ready to get started.";
 		  }
 
 		  return res.render('register', locals);

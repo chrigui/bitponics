@@ -9,15 +9,12 @@ block content
 
   section#main(role="main", class="main")
     div(id="register", class="content-module middle")
-        h3(class="page-heading nav-section")
-            | Thank you.
+        h3(class="page-heading nav-section") #{header}
 
         h3.sub-heading #{message}
         - if (typeof link != 'undefined')
             p
-                  a(href="#{link}", class="btn") Log in
-                  span 
-                      | and create your first grow plan!
+                  a(href="#{link}", class="btn") Set up your first garden
 
         div(class="page-content")
 
