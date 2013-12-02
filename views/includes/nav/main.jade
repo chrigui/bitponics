@@ -71,7 +71,6 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
       if !pageType || pageType == 'app-page'
         if user && user.name
           li(class="nav-section app-user")
-            span welcome back, 
             a(href="/account/profile")
               if user.name.full != ''
                | #{user.name.full}

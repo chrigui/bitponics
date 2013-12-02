@@ -40,7 +40,9 @@ block content
 								div.value None
 						
 						a.btn(href="/gardens/#{gpi._id}") Dashboard
-
+		- else
+			p Looks like you haven't set up a garden yet.
+			a.btn(href="/setup/grow-plan") Set up your first garden
 		h2.page-heading.clear-b Community Member Gardens
 		div.separator-top
 			p Coming soon...
