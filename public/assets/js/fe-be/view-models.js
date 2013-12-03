@@ -280,9 +280,10 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * phases[].idealRanges[].noApplicableTimeSpan
    * phases[].actionsViewModel
    * phases[].nutrientsViewModel
+   * phases[].idealRangesBySensor
    * currentVisiblePhase
    */
-  viewModels.initGrowPlanViewModel = function (growPlan){
+  viewModels.initGrowPlanViewModel = function (growPlan, sensors){
     var initActionViewModel = viewModels.initActionViewModel;
 
 		growPlan.plantsViewModel = {};
@@ -291,10 +292,20 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 		});
 
     growPlan.phases.forEach(function(phase, index){
+      phase.idealRangesBySensor = {};
+      Object.keys(sensors).forEach(function(sensorKey){
+        phase.idealRangesBySensor[sensorKey] = {
+          sCode : sensorKey,
+          noApplicableTimeSpan : true
+        };
+      });
+
       phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
         if (!idealRange.applicableTimeSpan){
           idealRange.noApplicableTimeSpan = true;
         }
+
+        phase.idealRangesBySensor[idealRange.sCode] = idealRange;
       });
 
       phase.actionsViewModel = [];
@@ -511,10 +522,19 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     });
 
     growPlan.phases.forEach(function(phase, index){
-      
+
+      Object.keys(phase.idealRangesBySensor).forEach(function(sensorKey){
+        var idealRange = phase.idealRangesBySensor[sensorKey];
+        if (phase.idealRanges.indexOf(idealRange) < 0){
+          phase.idealRanges.push(idealRange);
+        }
+      });
+
+      phase.idealRangesBySensor = undefined;
+
       // Clean up unpopulated placeholder idealRanges
       phase.idealRanges = phase.idealRanges.filter(function(idealRange){ 
-        return (typeof idealRange.valueRange.min !== 'undefined' || typeof idealRange.valueRange.max !== 'undefined');
+        return (typeof idealRange.valueRange !== 'undefined' && (idealRange.valueRange.min !== 'undefined' || typeof idealRange.valueRange.max !== 'undefined'));
       });
 
       phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
@@ -522,6 +542,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
           idealRange.applicableTimespan = undefined;
         }
       });
+
+      
 
       phase.actions = [];
       phase.phaseEndActions = [];

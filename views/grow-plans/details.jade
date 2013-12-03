@@ -32,12 +32,12 @@ block head
         h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name}} 
           br
           | Sensor Ranges
-        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}} {{idealRanges[sensor.code].valueRange ? '' : 'empty'}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
+        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}} {{sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].valueRange ? '' : 'empty'}}", ng-click="triggerSensorOverlay(sensor)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
             
-            div.sensor-value {{idealRanges[sensor.code].valueRange | valueRangeDisplay }}
+            div.sensor-value {{sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].valueRange | valueRangeDisplay }}
           
           div(class="sensor-type icon {{sensor.code}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
             | <i class="icon-glyph icon-glyph-new icon-{{sensor.code}}" aria-hidden="true"></i>
@@ -58,11 +58,11 @@ block head
                     div(class="hi separator-top")
                       label 
                         span.label If {{sensor.name}} goes above...
-                        input(class="no-disable", type="number", ng-model="idealRanges[sensor.code].valueRange.max", size="6")
+                        input(class="no-disable", type="number", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].valueRange.max", size="6")
                         span {{sensor.unit}}
                       label 
                         span.label ...take the following action (optional):
-                        textarea(placeholder="Describe what action to take if the value goes above the max.", ng-model="idealRanges[sensor.code].actionAboveMax.description")
+                        textarea(placeholder="Describe what action to take if the value goes above the max.", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].actionAboveMax.description")
                       //- div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
                       //-     label Trigger the following accessory (optional):
                       //-     div.custom-dropdown-wrap
@@ -74,32 +74,32 @@ block head
                     div(class="lo separator-top")
                       label 
                         span.label If {{sensor.name}} goes below...
-                        input(class="no-disable", type="number", ng-model="idealRanges[sensor.code].valueRange.min", size="6")
+                        input(class="no-disable", type="number", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].valueRange.min", size="6")
                         span {{sensor.unit}}
                       label 
                         span.label ...take the following action (optional):
-                        textarea(placeholder="Describe what action to take if the value goes below the min.", ng-model="idealRanges[sensor.code].actionBelowMin.description")
+                        textarea(placeholder="Describe what action to take if the value goes below the min.", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].actionBelowMin.description")
                       //- div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
 
 
                     div.separator-top
                       label What time of day should the ideal range apply?
                       div(class="custom-checkbox-wrap left-orient")
-                        input(id="action_control_time_{{$index}}", class="no-disable", type="checkbox", ng-model="idealRanges[sensor.code].noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(idealRanges[sensor.code])")
+                        input(id="action_control_time_{{$index}}", class="no-disable", type="checkbox", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code])")
                         label(for="action_control_time_{{$index}}") All Day
 
-                      div.idealRange-applicableTimePicker(ng-hide="idealRanges[sensor.code].noApplicableTimeSpan")
+                      div.idealRange-applicableTimePicker(ng-hide="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].noApplicableTimeSpan")
                         // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
                         label.idealRangeStartTime Start Time
                         div.custom-dropdown-wrap
-                          select(class="custom-dropdown", ng-required="!idealRanges[sensor.code].noApplicableTimeSpan", ng-model="idealRanges[sensor.code].applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                          select(class="custom-dropdown", ng-required="!sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].noApplicableTimeSpan", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
                             option(value="") Select
                           div(class="dblarrow")
                             i
 
                         label.idealRangeEndTime End Time
                           div.custom-dropdown-wrap
-                            select(class="custom-dropdown", ng-required="!idealRanges[sensor.code].noApplicableTimeSpan", ng-model="idealRanges[sensor.code].applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
+                            select(class="custom-dropdown", ng-required="!sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].noApplicableTimeSpan", ng-model="sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRangesBySensor[sensor.code].applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
                               option(value="") Select
                             div(class="dblarrow")
                               i

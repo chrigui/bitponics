@@ -129,10 +129,11 @@ module.exports = function(app){
               var actionIds = [];
               locals.growPlan.phases.forEach(function(phase) {
                 phase.idealRanges.forEach(function(idealRange, i) {
-                  actionIds.push(idealRange.actionAboveMax);
-                  actionIds.push(idealRange.actionBelowMin);
+                  if (idealRange.actionAboveMax){ actionIds.push(idealRange.actionAboveMax);}
+                  if (idealRange.actionBelowMin) { actionIds.push(idealRange.actionBelowMin); }
                 });
               });
+              console.log('actionIds', actionIds);
               ActionModel.find({})
               .where('_id').in(actionIds)
               .exec(function (err, actions) {

@@ -121,7 +121,7 @@ require([
               var delay = $q.defer();
 			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
 			    			function (growPlan) {
-			    				viewModels.initGrowPlanViewModel(growPlan);
+			    				viewModels.initGrowPlanViewModel(growPlan, sharedDataService.sensors);
 			    				sharedDataService.selectedGrowPlan = growPlan;
 			      			delay.resolve(sharedDataService.selectedGrowPlan);
 			    			}, 
@@ -153,10 +153,10 @@ require([
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
 
-          $scope.close = function(){
-            console.log('close sensor overlay')
-            $scope.sharedDataService.activeOverlay.is = undefined;
-          };
+          // $scope.close = function(){
+          //   console.log('close sensor overlay')
+          //   $scope.sharedDataService.activeOverlay = undefined;
+          // };
         }
       ]
     );
@@ -175,10 +175,10 @@ require([
     				}
   				);
 
-    			$scope.close = function(){
-    				// TODO : update the growPlan's from sharedDataService.selected.plants
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
+    		// 	$scope.close = function(){
+    		// 		// TODO : update the growPlan's from sharedDataService.selected.plants
+						// $scope.sharedDataService.activeOverlay = undefined;
+    		// 	};
     		}
     	]
   	);
@@ -198,9 +198,9 @@ require([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
+    		// 	$scope.close = function(){
+						// $scope.sharedDataService.activeOverlay = undefined;
+    		// 	};
     		}
     	]
   	);
@@ -220,9 +220,9 @@ require([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
+    		// 	$scope.close = function(){
+						// $scope.sharedDataService.activeOverlay = undefined;
+    		// 	};
     		}
     	]
   	);
@@ -242,9 +242,9 @@ require([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
+    		// 	$scope.close = function(){
+						// $scope.sharedDataService.activeOverlay = undefined;
+    		// 	};
     		}
     	]
   	);
@@ -274,9 +274,9 @@ require([
     				$scope.close();
     			};
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
+    		// 	$scope.close = function(){
+						// $scope.sharedDataService.activeOverlay = undefined;
+    		// 	};
     		}
     	]
   	);
@@ -307,9 +307,6 @@ require([
           //   console.log('open it!');
           // };
 
-          $scope.close = function(){
-            $scope.sharedDataService.activeOverlay.is = undefined;
-          };
         }
       ]
     );
@@ -322,9 +319,6 @@ require([
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
     
-          $scope.close = function(){
-            $scope.sharedDataService.activeOverlay.is = undefined;
-          };
         }
       ]
     );
@@ -556,7 +550,7 @@ require([
 
           $scope.triggerSensorOverlay = function(sensor){
             $scope.sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev;
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges;
+            console.log($scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges);
           }
 
           // $scope.updateSelectedPlants = function(){
@@ -707,15 +701,13 @@ require([
                   },
                   complete: function() {
                     $scope.$apply(function() {
-                      $scope.sharedDataService.activeOverlay = { is: 'ActivationOverlay' };
+                      $scope.sharedDataService.activeOverlay = 'ActivationOverlay';
                     });
                   }
                 });
               }
 
             } else {
-              // TODO : save the grow plan only, no garden activation
-
               var submittedGrowPlan = viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan);
               submittedGrowPlan = new GrowPlanModel(submittedGrowPlan);
               
