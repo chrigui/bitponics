@@ -1237,16 +1237,6 @@ img.page-spinner.spinner {
   font-weight: bold;
   font-size: 1.25em;
 }
-.overlay input[type='radio']:checked + label,
-.overlay input[type='checkbox']:checked + label {
-  color: #fff !important;
-  background: #00e36c !important;
-}
-.overlay input[type='radio']+ label,
-.overlay input[type='checkbox'] + label {
-  color: #00e36c !important;
-  background: #fff !important;
-}
 .overlay .overlay-contain {
   position: relative;
 }
@@ -1453,7 +1443,18 @@ img.page-spinner.spinner {
   right: -0.25em;
 }
 .data-module .sensor-type .icon-glyph.icon-air {
-  right: -0.4em;
+  right: -0.5em;
+}
+.overlay .overlay-contain .sensor-detail-overlay label .label {
+  display: block;
+  font-size: 1em;
+}
+.overlay .overlay-contain .sensor-detail-overlay label input {
+  display: inline;
+}
+.overlay .overlay-contain .sensor-detail-overlay .custom-checkbox-wrap {
+  bottom: auto;
+  text-align: left;
 }
 .page-heading-small {
   color: #999;
@@ -2777,8 +2778,8 @@ input[type='checkbox']:checked + label.btn {
   width: 1em;
   height: 0.35em;
   background: transparent;
-  top: 1.1em;
-  right: 0.85em;
+  top: 0.6em;
+  right: 0.35em;
   border: 3px solid #fcfff4;
   border-top: none;
   border-right: none;
@@ -2795,15 +2796,21 @@ input[type='checkbox']:checked + label.btn {
   height: 2em;
   margin: 0 0 0 1em;
   vertical-align: middle;
-  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
-  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
-  background: #00e36c;
+  -webkit-box-shadow: inset 1px 1px 1px #00e36c, 1px 1px 1px #00e36c;
+  box-shadow: inset 1px 1px 1px #00e36c, 1px 1px 1px #00e36c;
+  background: #fff;
 }
 .custom-checkbox-wrap input[type="checkbox"]:checked + label:before,
 .custom-checkbox-wrap input[type="radio"]:checked + label:before {
   opacity: 1;
   -ms-filter: none;
   filter: none;
+}
+.custom-checkbox-wrap input[type="checkbox"]:checked + label:after,
+.custom-checkbox-wrap input[type="radio"]:checked + label:after {
+  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
+  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
+  background: #00e36c;
 }
 .custom-checkbox-wrap.left-orient label {
   padding-left: 2.35em;
