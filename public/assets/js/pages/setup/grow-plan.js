@@ -57,50 +57,60 @@ define([
 		);
 
 
-		growPlanApp.factory('sharedDataService', function(){
-			return {
-				selectedGrowPlan : {},
-				plants : bpn.plants,
-				lightFixtures : bpn.lightFixtures,
-				lightBulbs : bpn.lightBulbs,
-				growSystems : bpn.growSystems,
-				nutrients : bpn.nutrients,
-				controls : bpn.controls,
-        sensors : bpn.sensors,
-        userOwnedDevices : bpn.userOwnedDevices,
-				filteredPlantList : angular.copy(bpn.plants),
-				selectedPlants : [],
-				activeOverlay : { is: undefined },
-				selected: {
-					plants : {},
-					deviceId : undefined
-				},
-				modalOptions : {
-			    backdropFade: true,
-			    dialogFade: true,
-			    dialogClass : 'overlay'
-			  },
-        growPlanInstance : {
-          name : '',
-          currentGrowPlanDay : 0
-        },
-        submit : {
-          error : false,
-          success : false,
-          updateInProgress : false
-        },
-        growSystemSelectOptions : {
-          width: '100%',
-          placeholder: "Select",
+		growPlanApp.factory('sharedDataService', [
+      '$rootScope',
+      function($rootScope){
+			
+        var sharedData = {
+          selectedGrowPlan : {},
+          plants : bpn.plants,
+          lightFixtures : bpn.lightFixtures,
+          lightBulbs : bpn.lightBulbs,
+          growSystems : bpn.growSystems,
+          nutrients : bpn.nutrients,
+          controls : bpn.controls,
+          sensors : bpn.sensors,
+          userOwnedDevices : bpn.userOwnedDevices,
+          filteredPlantList : angular.copy(bpn.plants),
+          selectedPlants : [],
+          activeOverlay : { is: undefined },
+          selected: {
+            plants : {},
+            deviceId : undefined
+          },
+          modalOptions : {
+            backdropFade: true,
+            dialogFade: true,
+            dialogClass : 'overlay'
+          },
+          growPlanInstance : {
+            name : '',
+            currentGrowPlanDay : 0
+          },
+          submit : {
+            error : false,
+            success : false,
+            updateInProgress : false
+          },
+          growSystemSelectOptions : {
+            width: '100%',
+            placeholder: "Select",
 
-          formatResult : function(object, container, query){
-            var growSystem = angular.element(object.element).scope().growSystem,
-            html = '<div style="float:left;width:30%"><img style="width:100%" src="/photos/' + (growSystem.photos[0] || '') + '/200" /></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
-            return html;
+            formatResult : function(object, container, query){
+              var growSystem = angular.element(object.element).scope().growSystem,
+              html = '<div style="float:left;width:30%"><img style="width:100%" src="/photos/' + (growSystem.photos[0] || '') + '/200" /></div><div style="float:right;width:65%;">' + growSystem.name + '</div><div style="clear:both;"></div>';
+              return html;
+            }
           }
-        }
-			};
-		});
+        };
+
+        $rootScope.close = function(){
+          sharedData.activeOverlay = undefined;
+        };
+
+        return sharedData;
+		  }
+    ]);
 
 		growPlanApp.factory('GrowPlanLoader', 
 			[

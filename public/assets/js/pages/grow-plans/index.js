@@ -50,7 +50,8 @@ require([
 		growPlanApp.factory('sharedDataService', 
       [
         '$location',
-        function($location){
+        '$rootScope',
+        function($location, $rootScope){
     			var sharedData = {
     				selectedGrowPlan : {},
             selectedPhase : 0, //default to first
@@ -93,6 +94,10 @@ require([
           });
 
           sharedData.pageMode = ($location.search()['setup'] ? 'setup' : 'default');
+
+          $rootScope.close = function(){
+            sharedData.activeOverlay = undefined;
+          };
 
           return sharedData;
     		}
