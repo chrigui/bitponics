@@ -5411,9 +5411,8 @@ button.close {
 .growplans .grow-plan-customize h2.page-heading [contenteditable],
 .growplans .grow-plan-customize btn[contenteditable] {
   outline: none;
-  border-bottom: 1px dashed #00e36c;
+  border-bottom: 1px dotted #00e36c;
   white-space: nowrap;
-  font-style: italic;
 }
 .growplans .grow-plan-customize .seamless-input {
   background: #00e36c;

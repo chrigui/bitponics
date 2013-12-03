@@ -7,6 +7,17 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
   viewModels = requirejs('view-models');
 
 describe('ViewModels', function(){
+  before(function(done){
+    var self = this;
+
+    Models.sensor.find().exec(function(err, sensorResults){
+      self.sensors = {};
+      sensorResults.forEach(function(sensor){
+        self.sensors[sensor.code] = sensor;
+      });
+      done();
+    });
+  });
   it('converts a single-state Action server model to a viewmodel and back to an equivalent Action server model', function(done){
     Action.findById('506de2fb8eebf7524342cb28', function(err, actionResult){
       should.exist(actionResult);
@@ -56,11 +67,14 @@ describe('ViewModels', function(){
   });
 
   it('converts a Grow Plan server model to a viewmodel and back to an equivalent Grow Plan server model', function(done){
+    var self = this;
+    console.log('self.sensors', self.sensors);
+
     ModelUtils.getFullyPopulatedGrowPlan({_id: '506de30c8eebf7524342cb70'}, function(err, growPlans){
       should.exist(growPlans[0]);
       var growPlan = growPlans[0],
           originalGrowPlan = JSON.parse(JSON.stringify(growPlan)),
-        viewModel = viewModels.initGrowPlanViewModel(growPlan),
+        viewModel = viewModels.initGrowPlanViewModel(growPlan, self.sensors),
         viewModelConvertedToServerModel = viewModels.compileGrowPlanViewModelToServerModel(viewModel);
 
       Models.growPlan.isEquivalentTo(originalGrowPlan, viewModelConvertedToServerModel, function(err, isEquivalent){
