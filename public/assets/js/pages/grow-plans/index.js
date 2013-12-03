@@ -721,12 +721,12 @@ require([
                   $scope.sharedDataService.submit.success = true;
                   $scope.sharedDataService.submit.updateInProgress = false;
                   //$scope.sharedDataService.selectedGrowPlan = viewModels.initGrowPlanViewModel(returnedGrowPlan);
-                  $scope.sharedDataService.activeOverlay = { is: 'SaveOverlay' };
+                  $scope.sharedDataService.activeOverlay = 'SaveOverlay';
                 }, function(){
                   $scope.sharedDataService.submit.error = true;
                   $scope.sharedDataService.submit.success = false;
                   $scope.sharedDataService.submit.updateInProgress = false;
-                  $scope.sharedDataService.activeOverlay = { is: 'SaveOverlay' };
+                  $scope.sharedDataService.activeOverlay = 'SaveOverlay';
                 }
               );
             }
