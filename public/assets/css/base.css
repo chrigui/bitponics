@@ -66,8 +66,7 @@
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number],
-.growplans .grow-plan-customize .sensors .sensor-ranges > div {
+.growplans .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -1026,8 +1025,7 @@ img.page-spinner.spinner {
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number],
-.growplans .grow-plan-customize .sensors .sensor-ranges > div {
+.growplans .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -1448,11 +1446,14 @@ img.page-spinner.spinner {
   position: relative;
 }
 .data-module .sensor-type .icon-glyph {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   position: absolute;
   top: -0.25em;
   right: -0.25em;
+}
+.data-module .sensor-type .icon-glyph.icon-air {
+  right: -0.4em;
 }
 .page-heading-small {
   color: #999;
@@ -2346,8 +2347,7 @@ img.page-spinner.spinner {
 .growplans .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number],
-.growplans .grow-plan-customize .sensors .sensor-ranges > div {
+.growplans .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -5419,11 +5419,9 @@ button.close {
 .growplans .grow-plan-customize #phases .circle svg {
   max-width: 100%;
 }
-.growplans .grow-plan-customize .sensors .sensor-ranges {
-  position: absolute;
-  bottom: 0;
-  right: 0.5em;
-  font-size: 0.65em;
+.growplans .grow-plan-customize .sensors .sensor-value {
+  font-size: 2em;
+  top: 0.25em;
 }
 .accordion {
   -webkit-transition: 0.25s linear all;

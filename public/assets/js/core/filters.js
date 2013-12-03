@@ -1,4 +1,4 @@
-define(['angular'], 
+define(['angular', 'throttle-debounce'], 
 	function(angular) { 
 		'use strict';
 		
@@ -60,6 +60,27 @@ define(['angular'],
         return feBeUtils.getTimeOfDayFromMilliseconds(input);
       };
     });
+
+
+    bpnFilters.filter('valueRangeDisplay', function() {
+      return function(valueRange) {
+        var result = '';
+        
+        if (!valueRange){
+          return "----";
+        }
+
+        if (typeof valueRange.min !== 'undefined'){
+          result += valueRange.min;
+        }
+        result += " - ";
+        if (typeof valueRange.max !== 'undefined'){
+          result += valueRange.max;
+        }
+        return result;
+      };
+    });
+    
 
 
 		return bpnFilters;
