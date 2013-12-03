@@ -505,11 +505,18 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     }
     delete growPlan.plantsViewModel;
 
+    // Clean up unpopulated placeholder phases
     growPlan.phases = growPlan.phases.filter(function(phase){
       return (phase.name !== 'Add Phase' && phase.name !== 'Untitled');
     });
 
     growPlan.phases.forEach(function(phase, index){
+      
+      // Clean up unpopulated placeholder idealRanges
+      phase.idealRanges = phase.idealRanges.filter(function(idealRange){ 
+        return (typeof idealRange.valueRange.min !== 'undefined' || typeof idealRange.valueRange.max !== 'undefined');
+      });
+
       phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
         if (idealRange.noApplicableTimespan){
           idealRange.applicableTimespan = undefined;

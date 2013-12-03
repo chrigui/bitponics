@@ -29,15 +29,15 @@ define(['bpn.directives', 'jquery', 'd3'],
             if (index == $scope.phases.length - 1) { //"add phase" ring (last)
               className += " add-phase"; 
             }
-            if (index == $scope.sharedDataService.selectedPhase) {
+            if (index == $scope.sharedDataService.selectedPhaseIndex) {
               className += " active"; 
             }
             // console.log('index', index);
-            // console.log('$scope.sharedDataService.selectedPhase in getCLasses',$scope.sharedDataService.selectedPhase);
+            // console.log('$scope.sharedDataService.selectedPhaseIndex in getCLasses',$scope.sharedDataService.selectedPhaseIndex);
             return className; 
           };
 
-          $scope.$watch("sharedDataService.selectedPhase", function(newVal){
+          $scope.$watch("sharedDataService.selectedPhaseIndex", function(newVal){
             d3.select($element[0]).selectAll('path')
             .attr('class', $scope.getClasses)
             .each(function(d, i){
@@ -140,7 +140,7 @@ define(['bpn.directives', 'jquery', 'd3'],
 
                       scope.getClasses(null, index); //set active class
                       
-                      scope.sharedDataService.selectedPhase = index;
+                      scope.sharedDataService.selectedPhaseIndex = index;
 
                       if (phase.name !== scope.phaseAddString) { //filter out add phase ring
                         

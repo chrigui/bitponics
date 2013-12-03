@@ -29,10 +29,10 @@ block head
         input.header-action(type="submit", ng-value="sharedDataService.pageMode == 'default' ? 'Save' : 'Activate garden'", ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success")
 
       div(id="sensors", class="sensors content-module side")
-        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} 
+        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name}} 
           br
           | Sensor Ranges
-        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
+        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}} {{idealRanges[sensor.code].valueRange ? '' : 'empty'}}", ng-click="sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
@@ -64,6 +64,12 @@ block head
                         span.label ...take the following action (optional):
                         textarea(placeholder="Describe what action to take if the value goes above the max.", ng-model="idealRanges[sensor.code].actionAboveMax.description")
                       //- div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
+                      //-     label Trigger the following accessory (optional):
+                      //-     div.custom-dropdown-wrap
+                      //-       select(class="custom-dropdown", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
+                      //-         option(value="") None
+                      //-       div(class="dblarrow")
+                      //-         i
 
                     div(class="lo separator-top")
                       label 
@@ -101,25 +107,25 @@ block head
 
       div(id="phases", class="content-module middle")
         div(ng-controller="bpn.controllers.growPlan.PhasesGraph")
-          h2.page-heading-small.date Edit {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name + ' Phase' || 'Phases'}}
+          h2.page-heading-small.date Edit {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name + ' Phase' || 'Phases'}}
           div(data-bpn-directives-navigation-phases-graph)
           p.half-width.centered Use the rings to navigate between phases.
 
           div.phaseName
             label Phase Name
-            input(class="display-ib", type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name")
+            input(class="display-ib", type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name")
 
           
           div.phaseDescription
             label Phase Description
-            textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].description")
+            textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].description")
 
 
-          a.btn.warning.no-margin(ng-click="removePhase(sharedDataService.selectedPhase)") Remove {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Phase
+          a.btn.warning.no-margin(ng-click="removePhase(sharedDataService.selectedPhaseIndex)") Remove {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name}} Phase
 
 
       div(id="controls", class="content-module side")
-        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Schedules
+        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name}} Schedules
         div(accordion)
           div(ng-show="sharedDataService.userOwnedDevices.length", class="device", id="device", accordion-group, heading="Device")
             ul(class="grid grid--wrapping devicelist")
@@ -141,7 +147,7 @@ block head
                 h3 {{controlAction.control.name}}
                 div(data-bpn-directives-control-action-graph, data-control-action="controlAction", custom-click="sharedDataService.activeOverlay = 'ControlOverlay'+controlAction.control.name")
 
-        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].name}} Garden
+        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].name}} Garden
         div(accordion)
           div(class="grow-systems", id="grow-systems", accordion-group, heading="Grow System")
             ul(class="grid grid--wrapping growsystemlist")
@@ -150,7 +156,7 @@ block head
                     id="{{growSystem._id}}",
                     type="radio", 
                     value="{{growSystem._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].growSystem")
+                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].growSystem")
                 label(for="{{growSystem._id}}", class="btn")
                   | {{growSystem.name}}
 
@@ -161,7 +167,7 @@ block head
                     id="{{light._id}}",
                     type="radio", 
                     value="{{light._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].light")
+                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].light")
                 label(for="{{light._id}}", class="btn")
                   | {{light._id}}
 
@@ -172,75 +178,9 @@ block head
                     id="{{nutrient._id}}",
                     type="radio", 
                     value="{{nutrient._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].nutrient")
+                    ng-model="sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex].nutrient")
                 label(for="{{nutrient._id}}", class="btn")
                   | {{nutrient.name}} by {{nutrient.brand}}
-
-        //- h2.page-heading-small.date Edit Ideal Ranges
-        //- div(accordion)
-        //-   div(class="ideal-ranges", id="ideal-ranges", accordion-group, heading="Ideal Ranges")
-        //-     ul(class="grid grid--wrapping idealrangeslist")
-        //-       li
-        //-         label(class="add btn", ng-click="addIdealRange(sharedDataService.selectedPhase)") 
-        //-           | Add
-        //-           | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
-              //- li(class="question closed", ng-repeat="idealRange in sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhase].idealRanges")
-              //-   div(class="close btn", ng-click="removeIdealRange($parent.$index, $index);")
-              //-     | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
-
-              //-   div
-              //-     //label {{sensors[idealRange.sCode].name}}
-              //-     div.custom-dropdown-wrap
-              //-       select(class="custom-dropdown", ng-model="idealRange.sCode", ng-options="sensor.code as sensor.name for (sensorKey,sensor) in sensors | orderBy:name")
-              //-         option(value="") Select Sensor
-              //-       div(class="dblarrow")
-              //-         i
-                
-              //-   div.separator-top
-              //-     label Trigger the following accessory (optional):
-              //-     div.custom-dropdown-wrap
-              //-       select(class="custom-dropdown", ng-model="idealRange.actionBelowMin.control", ng-options="control._id as control.name for (controlKey,control) in controls")
-              //-         option(value="") None
-              //-       div(class="dblarrow")
-              //-         i
-
-              //-   div(class="hi separator-top")
-              //-     label High
-              //-     input(class="no-disable", type="number", ng-model="idealRange.valueRange.max")
-              //-     span {{sensors[idealRange.sCode].unit}}
-              //-     textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-              //-     //- div(ng-show="idealRange.actionAboveMax.control") Turn {{controls[idealRange.actionAboveMax.control].name}} to {{idealRange.actionAboveMax.singleStateValue}}
-
-              //-   div(class="lo separator-top")
-              //-     label Low
-              //-     input(class="no-disable", type="number", ng-model="idealRange.valueRange.min")
-              //-     span {{sensors[idealRange.sCode].unit}}
-              //-     textarea(placeholder="Describe the triggered action.", ng-model="idealRange.actionBelowMin.description")
-              //-     //- div(ng-show="idealRange.actionBelowMin.control") Turn {{controls[idealRange.actionBelowMin.control].name}} to {{idealRange.actionBelowMin.singleStateValue}}
-
-
-              //-   div.separator-top
-              //-     label What time of day should the ideal range apply?
-              //-     div(class="custom-checkbox-wrap")
-              //-       input(id="action_control_time_{{$index}}", class="no-disable", type="checkbox", ng-model="idealRange.noApplicableTimeSpan", ng-click="toggleIdealRangeApplicableTimeSpan(this)")
-              //-       label(for="action_control_time_{{$index}}") All Day
-
-              //-     div.idealRange-applicableTimePicker(ng-hide="idealRange.noApplicableTimeSpan")
-              //-       // TODO: figure out how initialize values when idealRange.applicableTimeSpan is undefined (and leave them alone when it is defined)
-              //-       label.idealRangeStartTime Start Time
-              //-       div.custom-dropdown-wrap
-              //-         select(class="custom-dropdown", ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.startTime", ng-options="time.ms as time.str for time in timesOfDayList")
-              //-           option(value="") Select
-              //-         div(class="dblarrow")
-              //-           i
-
-              //-       label.idealRangeEndTime End Time
-              //-         div.custom-dropdown-wrap
-              //-           select(class="custom-dropdown", ng-required="!idealRange.noApplicableTimeSpan", ng-model="idealRange.applicableTimeSpan.endTime", ng-options="time.ms as time.str for time in timesOfDayList")
-              //-             option(value="") Select
-              //-           div(class="dblarrow")
-              //-             i
-                
 
 
 

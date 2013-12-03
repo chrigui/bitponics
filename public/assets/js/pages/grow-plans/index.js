@@ -54,7 +54,7 @@ require([
         function($location, $rootScope){
     			var sharedData = {
     				selectedGrowPlan : {},
-            selectedPhase : 0, //default to first
+            selectedPhaseIndex : 0, //default to first
     				plants : bpn.plants,
     				lightFixtures : bpn.lightFixtures,
             lightBulbs : bpn.lightBulbs,
@@ -359,8 +359,8 @@ require([
     			$scope.sharedDataService = sharedDataService;
           $scope.idealRanges = [];
 					
-          $scope.$watch('sharedDataService.selectedPhase', function(newValue){
-            $scope.sharedDataService.selectedGrowPlan.phases[$scope.sharedDataService.selectedPhase].idealRanges.forEach(function(idealRange) {
+          $scope.$watch('sharedDataService.selectedPhaseIndex', function(newValue){
+            $scope.sharedDataService.selectedGrowPlan.phases[$scope.sharedDataService.selectedPhaseIndex].idealRanges.forEach(function(idealRange) {
               $scope.idealRanges[idealRange.sCode] = idealRange;
             });
           });
@@ -396,7 +396,7 @@ require([
 
           // $scope.setCurrentVisiblePhase = function (phase, index) {
           //   $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
-          //   $scope.sharedDataService.selectedPhase = index;
+          //   $scope.sharedDataService.selectedPhaseIndex = index;
           // };
 
           // $scope.setCurrentPhaseSectionTab = function (index) {
@@ -552,6 +552,12 @@ require([
             $scope.$$childHead.search();
             obj.query = "";
           };
+
+
+          $scope.triggerSensorOverlay = function(sensor){
+            $scope.sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev;
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges;
+          }
 
           // $scope.updateSelectedPlants = function(){
           //     $scope.sharedDataService.selectedPlants = [];

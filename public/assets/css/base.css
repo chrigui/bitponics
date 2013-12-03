@@ -340,6 +340,9 @@ label {
 .data-module a:active {
   color: #fff;
 }
+.data-module.empty {
+  background-color: #cbffd1;
+}
 .data-module.warning {
   background-color: #fac400;
 }
