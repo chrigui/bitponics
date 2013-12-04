@@ -5360,6 +5360,21 @@ button.close {
   margin: 0 0 1em;
   max-width: 5em;
 }
+.growplans .controls .icon-glyph {
+  opacity: 0.5;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+  -webkit-transition: 0.5s all ease;
+  -moz-transition: 0.5s all ease;
+  -o-transition: 0.5s all ease;
+  -ms-transition: 0.5s all ease;
+  transition: 0.5s all ease;
+}
+.growplans .controls .icon-glyph.has-action {
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
+}
 .growplans .grow-systems .grid--wrapping > .grid-cell,
 .growplans .lights .grid--wrapping > .grid-cell,
 .growplans .nutrients .grid--wrapping > .grid-cell,

@@ -147,17 +147,22 @@ require([
       ]
     );
 
-    growPlanApp.controller('bpn.controllers.growPlan.SensorDetailOverlay',
+    growPlanApp.controller('bpn.controllers.growPlan.SensorOverlay',
       [
         '$scope',
         'sharedDataService',
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
+        }
+      ]
+    );
 
-          // $scope.close = function(){
-          //   console.log('close sensor overlay')
-          //   $scope.sharedDataService.activeOverlay = undefined;
-          // };
+    growPlanApp.controller('bpn.controllers.growPlan.ActionOverlay',
+      [
+        '$scope',
+        'sharedDataService',
+        function($scope, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
         }
       ]
     );
@@ -170,16 +175,11 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.plants',
+    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.plants',
     				function(newValue, oldValue){
     					$scope.close();
     				}
   				);
-
-    		// 	$scope.close = function(){
-    		// 		// TODO : update the growPlan's from sharedDataService.selected.plants
-						// $scope.sharedDataService.activeOverlay = undefined;
-    		// 	};
     		}
     	]
   	);
@@ -193,15 +193,11 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.lightFixtures;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.light.fixture',
+    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.light.fixture',
     				function(newValue, oldValue){
     					$scope.close();
     				}
   				);
-
-    		// 	$scope.close = function(){
-						// $scope.sharedDataService.activeOverlay = undefined;
-    		// 	};
     		}
     	]
   	);
@@ -215,15 +211,11 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.lightBulbs;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.light.bulb',
+    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.light.bulb',
     				function(newValue, oldValue){
     					$scope.close();
     				}
   				);
-
-    		// 	$scope.close = function(){
-						// $scope.sharedDataService.activeOverlay = undefined;
-    		// 	};
     		}
     	]
   	);
@@ -237,15 +229,11 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.growSystems;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.growSystem',
+    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.growSystem',
     				function(newValue, oldValue){
     					$scope.close();
     				}
   				);
-
-    		// 	$scope.close = function(){
-						// $scope.sharedDataService.activeOverlay = undefined;
-    		// 	};
     		}
     	]
   	);
@@ -259,7 +247,7 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.nutrients;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel',
+    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.nutrientsViewModel',
     				function(newValue, oldValue){
     					$scope.close();
     				}
@@ -267,17 +255,13 @@ require([
 
     			$scope.toggleItemSelection = function(nutrient, input){
     				if (nutrient.selected) {
-    					sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id] = nutrient;
+    					sharedDataService.selectedGrowPlan.focusedPhase.nutrientsViewModel[nutrient._id] = nutrient;
     				} else {
-    					delete sharedDataService.selectedGrowPlan.currentVisiblePhase.nutrientsViewModel[nutrient._id];
+    					delete sharedDataService.selectedGrowPlan.focusedPhase.nutrientsViewModel[nutrient._id];
     				}
 
     				$scope.close();
     			};
-
-    		// 	$scope.close = function(){
-						// $scope.sharedDataService.activeOverlay = undefined;
-    		// 	};
     		}
     	]
   	);
@@ -389,8 +373,8 @@ require([
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
           };
 
-          // $scope.setCurrentVisiblePhase = function (phase, index) {
-          //   $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase = phase;
+          // $scope.setfocusedPhase = function (phase, index) {
+          //   $scope.sharedDataService.selectedGrowPlan.focusedPhase = phase;
           //   $scope.sharedDataService.selectedPhaseIndex = index;
           // };
 
@@ -406,13 +390,13 @@ require([
                 idealRanges:[]
               };
             $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
-            $scope.setCurrentVisiblePhase(phase);
+            $scope.setfocusedPhase(phase);
           };
 
           $scope.removePhase = function (index) {
             if($scope.sharedDataService.selectedGrowPlan.phases.length > 1) {
               $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
-              $scope.setCurrentVisiblePhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
+              $scope.setfocusedPhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
             }
           };
 
@@ -560,7 +544,11 @@ require([
 
 
           $scope.triggerSensorOverlay = function(sensor){
-            $scope.sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev;
+            $scope.sharedDataService.activeOverlay = 'SensorOverlay' + sensor.abbrev;
+          }
+
+          $scope.triggerActionOverlay = function(action){
+            $scope.sharedDataService.activeOverlay = 'ActionOverlay' + action._id;
           }
 
           // $scope.updateSelectedPlants = function(){
