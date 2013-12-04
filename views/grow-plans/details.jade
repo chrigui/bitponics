@@ -159,17 +159,17 @@ block head
                         div(class="overlay-data clearfix")
                             div
                               label Description
-                              textarea(placeholder="Describe the action.", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].description")
+                                textarea(placeholder="Describe the action.", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].description")
 
                               div
-                                div(class="custom-checkbox-wrap separator-top")
+                                div(class="custom-checkbox-wrap")
                                   input(
                                     id="action_{{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id]._id}}_daily", 
                                     type="checkbox", 
                                     ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].isDailyControlCycle")
                                   label(for="action_{{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id]._id}}_daily") Daily
 
-                                div(class="separator-top", ng-show="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].isDailyControlCycle")
+                                div(class="", ng-show="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].isDailyControlCycle")
                                   label Turn {{control.name}} on at 
                                     div.custom-dropdown-wrap
                                       select(class="custom-dropdown", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].dailyOnTime", ng-options="time.ms as time.str for time in timesOfDayList")
@@ -184,10 +184,10 @@ block head
                                       div(class="dblarrow")
                                         i
 
-                                div(class="separator-top", ng-show="!sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].isDailyControlCycle")
-                                  div {{control.name}} should cycle on/off throughout the phase on the following schedule:
+                                div(class="", ng-show="!sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].isDailyControlCycle")
+                                  p {{control.name}} should cycle on/off throughout the phase on the following schedule:
                                   
-                                  div
+                                  div.separator-top
                                     p First, turn {{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].control.name}}
                                     div(class="custom-checkbox-wrap")
                                       input(
@@ -205,16 +205,16 @@ block head
                                         ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[0].controlValue")
                                       label(for="action_{{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id]._id}}_first_off") Off
 
-                                    div
-                                      p for
-                                      input(type="number", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[0].duration", value="1")
+                                    div.action-duration
+                                      label for
+                                        input(type="number", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[0].duration", value="1")
                                       div.custom-dropdown-wrap
                                         select(class="custom-dropdown", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[0].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
                                           option(value="") Select
                                         div(class="dblarrow")
                                           i
                                     
-                                  div 
+                                  div.separator-top 
                                     p Then turn {{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].control.name}}
                                     div(class="custom-checkbox-wrap")
                                       input(
@@ -232,9 +232,9 @@ block head
                                         ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[1].controlValue")
                                       label(for="action_{{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id]._id}}_then_off") Off
 
-                                    div 
-                                      p for 
-                                      input(type="number", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[1].duration", value="1")
+                                    div.action-duration
+                                      label for 
+                                        input(type="number", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[1].duration", value="1")
                                       div.custom-dropdown-wrap
                                         select(class="custom-dropdown", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id].cycle.states[1].durationType", ng-options="durationType for durationType in actionDurationTypeOptions", value="{{actionDurationTypeOptions[1]}}")
                                           option(value="") Select
