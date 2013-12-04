@@ -350,7 +350,7 @@ block head
                         | Add
                         | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
 
-                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel")
+                    li(class="question", ng-repeat="action in sharedDataService.selectedGrowPlan.currentVisiblePhase.actionViewModels")
                       div(class="close btn", ng-click="removeAction($parent.$index, $index);")
                         | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
 

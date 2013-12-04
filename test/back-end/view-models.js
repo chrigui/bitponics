@@ -58,9 +58,6 @@ describe('ViewModels', function(){
           actionViewModel = viewModels.initActionViewModel(actionResult),
         viewModelConvertedToServerModel = viewModels.compileActionViewModelToServerModel(actionViewModel);
       
-      console.log(JSON.stringify(originalActionResult));
-      console.log(JSON.stringify(viewModelConvertedToServerModel));
-
       Action.isEquivalentTo(originalActionResult, viewModelConvertedToServerModel).should.be.true;
       done();
     });
@@ -68,8 +65,7 @@ describe('ViewModels', function(){
 
   it('converts a Grow Plan server model to a viewmodel and back to an equivalent Grow Plan server model', function(done){
     var self = this;
-    console.log('self.sensors', self.sensors);
-
+    
     ModelUtils.getFullyPopulatedGrowPlan({_id: '506de30c8eebf7524342cb70'}, function(err, growPlans){
       should.exist(growPlans[0]);
       var growPlan = growPlans[0],
@@ -84,4 +80,31 @@ describe('ViewModels', function(){
     });
   });
 
+  // it('handles multiple Grow Plan viewmodel conversions without corruption', function(done){
+  //   var self = this;
+    
+  //   ModelUtils.getFullyPopulatedGrowPlan({_id: '506de30c8eebf7524342cb70'}, function(err, growPlans){
+  //     should.exist(growPlans[0]);
+      
+
+  //     var growPlan = growPlans[0],
+  //       originalGrowPlan = JSON.parse(JSON.stringify(growPlan)),
+  //       viewModel = viewModels.initGrowPlanViewModel(growPlan, self.sensors),
+  //       viewModelConvertedToServerModel = viewModels.compileGrowPlanViewModelToServerModel(viewModel);
+
+  //     Models.growPlan.isEquivalentTo(originalGrowPlan, viewModelConvertedToServerModel, function(err, isEquivalent){
+  //       isEquivalent.should.be.true;
+
+  //       var serverToServer = viewModels.compileGrowPlanViewModelToServerModel(viewModelConvertedToServerModel);
+            
+  //           //viewToServer2 = viewModels.compileGrowPlanViewModelToServerModel(serverToView2);
+
+  //       Models.growPlan.isEquivalentTo(originalGrowPlan, serverToServer, function(err, isEquivalent){
+  //         isEquivalent.should.be.true;
+  //         done();
+  //       });
+        
+  //     });
+  //   });
+  //});
 });

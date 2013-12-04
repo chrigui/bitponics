@@ -99,6 +99,7 @@ require([
             sharedData.activeOverlay = undefined;
           };
 
+
           return sharedData;
     		}
       ]
@@ -401,7 +402,7 @@ require([
             var existingPhaseLength = $scope.sharedDataService.selectedGrowPlan.phases.length,
               phase = {
                 _id:existingPhaseLength.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
-                actionsViewModel:[],
+                actionViewModels:[],
                 idealRanges:[]
               };
             $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
@@ -436,7 +437,7 @@ require([
                 };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
-            phase.actionsViewModel.unshift(viewModels.initActionViewModel(newAction));
+            phase.actionViewModels.unshift(viewModels.initActionViewModel(newAction));
           };
 
           $scope.removeIdealRange = function (phaseIndex, idealRangeIndex) {
@@ -447,8 +448,8 @@ require([
           $scope.removeAction = function (phaseIndex, actionIndex) {
             var phase = $scope.sharedDataService.selectedGrowPlan.phases[index];
             phase.actions.splice(actionIndex, 1);
-            if (phase.actionsViewModel) {
-              phase.actionsViewModel.splice(actionIndex, 1)
+            if (phase.actionViewModels) {
+              phase.actionViewModels.splice(actionIndex, 1)
             }
           };
 
@@ -529,6 +530,16 @@ require([
             return list;
           };
 
+
+          $scope.refreshFocusedPhase = function(){
+            if ($scope.sharedDataService.selectedGrowPlan.phases){
+              $scope.sharedDataService.selectedGrowPlan.focusedPhase = $scope.sharedDataService.selectedGrowPlan.phases[$scope.sharedDataService.selectedPhaseIndex];
+            }
+          };
+          $scope.$watch('sharedDataService.selectedPhaseIndex', $scope.refreshFocusedPhase);
+          $scope.$watch('sharedDataService.selectedGrowPlan', $scope.refreshFocusedPhase);
+
+
           $scope.updateSelectedGrowSystem = function () {
             // $scope.selectedGrowSystem = $filter('filter')($scope.growSystems, { _id: $scope.selected.growSystem })[0];
             if ($scope.sharedDataService.selectedPlants && $scope.sharedDataService.selectedPlants.length) {
@@ -550,7 +561,6 @@ require([
 
           $scope.triggerSensorOverlay = function(sensor){
             $scope.sharedDataService.activeOverlay='SensorOverlay'+sensor.abbrev;
-            console.log($scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.idealRanges);
           }
 
           // $scope.updateSelectedPlants = function(){
@@ -732,8 +742,10 @@ require([
         }
       ]
     );
+
+
     
-    /*
+    /**
      * Showcase phase graph so users know to interact there first
      */
     growPlanApp.directive('bpnDirectivesShowcaseReveal', function() {

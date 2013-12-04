@@ -278,7 +278,9 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * Sets the following properties:
    * plantsViewModel
    * phases[].idealRanges[].noApplicableTimeSpan
-   * phases[].actionsViewModel
+   * phases[].actionViewModels
+   * phases[].actionViewModelsByControl
+   * phases[].actionViewModelsNoControl
    * phases[].nutrientsViewModel
    * phases[].idealRangesBySensor
    * currentVisiblePhase
@@ -308,12 +310,29 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         phase.idealRangesBySensor[idealRange.sCode] = idealRange;
       });
 
-      phase.actionsViewModel = [];
+      phase.actionViewModels = [];
       phase.actions.forEach(function(action){
-        phase.actionsViewModel.push(initActionViewModel(action, 'phaseStart'));
+        phase.actionViewModels.push(initActionViewModel(action, 'phaseStart'));
       });
       phase.phaseEndActions.forEach(function(action){
-        phase.actionsViewModel.push(initActionViewModel(action, 'phaseEnd'));
+        phase.actionViewModels.push(initActionViewModel(action, 'phaseEnd'));
+      });
+
+      phase.actionViewModelsByControl = {};
+      var actionsWithControl = phase.actionViewModels.filter(function(actionViewModel){
+        return (!!(actionViewModel.control));
+      });
+      actionsWithControl.forEach(function(action){
+        phase.actionViewModelsByControl[action.control] = action;
+      });
+
+
+      phase.actionViewModelsNoControl = [];
+      var actionsWithNoControl = phase.actionViewModels.filter(function(actionViewModel){
+        return (!(actionViewModel.control));
+      });
+      actionsWithNoControl.forEach(function(action){
+        phase.actionViewModelsNoControl.push(action);
       });
 
       phase.nutrientsViewModel = {};
@@ -324,7 +343,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     });
 
 
-    growPlan.currentVisiblePhase = growPlan.phases[0];
+    growPlan.focusedPhase = growPlan.phases[0];
 
     return growPlan;
   };
@@ -523,12 +542,15 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     growPlan.phases.forEach(function(phase, index){
 
-      Object.keys(phase.idealRangesBySensor).forEach(function(sensorKey){
-        var idealRange = phase.idealRangesBySensor[sensorKey];
-        if (phase.idealRanges.indexOf(idealRange) < 0){
-          phase.idealRanges.push(idealRange);
-        }
-      });
+      if (phase.idealRangesBySensor){
+        Object.keys(phase.idealRangesBySensor).forEach(function(sensorKey){
+          var idealRange = phase.idealRangesBySensor[sensorKey];
+          if (phase.idealRanges.indexOf(idealRange) < 0){
+            phase.idealRanges.push(idealRange);
+          }
+        });  
+      }
+      
 
       phase.idealRangesBySensor = undefined;
 
@@ -543,12 +565,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         }
       });
 
-      
 
       phase.actions = [];
       phase.phaseEndActions = [];
 
-      phase.actionsViewModel.forEach(function(actionViewModel){
+      var compileAndAssignAction = function(actionViewModel){
         switch(actionViewModel.scheduleType){
           case 'phaseStart':
           case 'repeat':
@@ -558,21 +579,38 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
             phase.phaseEndActions.push(viewModels.compileActionViewModelToServerModel(actionViewModel));
             break;
         }
-      });
+      };
 
-      delete phase.actionsViewModel;
+      if (phase.actionViewModelsByControl){
+        Object.keys(phase.actionViewModelsByControl).forEach(function(controlKey){
+          var actionViewModel = phase.actionViewModelsByControl[controlKey];
+          compileAndAssignAction(actionViewModel);
+        });
 
+        phase.actionViewModelsByControl = undefined;
+      }
 
+      if (phase.actionViewModelsNoControl){
+        phase.actionViewModelsNoControl.forEach(compileAndAssignAction);
+
+        phase.actionViewModelsNoControl = undefined;
+      }
+
+      phase.actionViewModels = undefined;
+
+      
       phase.nutrients = [];
-	    for (key in phase.nutrientsViewModel){
-	    	if (phase.nutrientsViewModel.hasOwnProperty(key)){
-	    		phase.nutrients.push(phase.nutrientsViewModel[key]);
-	    	}
-	    }
-	    delete phase.nutrientsViewModel;
+	    if (phase.nutrientsViewModel){
+        for (key in phase.nutrientsViewModel){
+          if (phase.nutrientsViewModel.hasOwnProperty(key)){
+            phase.nutrients.push(phase.nutrientsViewModel[key]);
+          }
+        }
+        delete phase.nutrientsViewModel;  
+      }
     });
 
-    growPlan.currentVisiblePhase = undefined;
+    growPlan.focusedPhase = undefined;
 
     return growPlan;
   };

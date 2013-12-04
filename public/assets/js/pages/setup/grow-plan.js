@@ -384,7 +384,7 @@ define([
             var existingPhaseLength = $scope.sharedDataService.selectedGrowPlan.phases.length,
               phase = {
                 _id:existingPhaseLength.toString() + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new IdealRange
-                actionsViewModel:[],
+                actionViewModels:[],
                 idealRanges:[]
               };
             $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
@@ -415,7 +415,7 @@ define([
               };
             // Unshift to make it show up first
             phase.actions.unshift(newAction);
-            phase.actionsViewModel.unshift(viewModels.initActionViewModel(newAction));
+            phase.actionViewModels.unshift(viewModels.initActionViewModel(newAction));
           };
 
           $scope.removeIdealRange = function (phaseIndex, idealRangeIndex) {
@@ -424,7 +424,7 @@ define([
 
           $scope.removeAction = function (phaseIndex, actionIndex) {
             $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actions.splice(actionIndex, 1);
-            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actionsViewModel.splice(actionIndex, 1)
+            $scope.sharedDataService.selectedGrowPlan.currentVisiblePhase.actionViewModels.splice(actionIndex, 1)
           };
 
     			$scope.init();

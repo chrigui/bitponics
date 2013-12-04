@@ -147,7 +147,7 @@ define(['bpn.directives', 'jquery', 'd3'],
                       } else {
                         var newPhaseObj = {
                           _id: index.toString() + '-' + (Date.now().toString()),
-                          actionsViewModel:[],
+                          actionViewModels:[],
                           idealRanges:[],
                           name: "Untitled"
                         };
