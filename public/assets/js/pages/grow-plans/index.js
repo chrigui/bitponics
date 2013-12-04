@@ -444,6 +444,7 @@ require([
             
             if (control){
               newAction.control = control;
+              
               newAction.cycle.states[0] = {
                 controlValue : 1,
                 duration: 1,
@@ -454,11 +455,12 @@ require([
                 duration: 1,
                 durationType : 'hours'
               };
-              viewModels.initActionViewModel(newAction);
+
+              viewModels.initActionViewModel(newAction, 'phaseStart');
 
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] = newAction;
             } else {
-              viewModels.initActionViewModel(newAction);
+              viewModels.initActionViewModel(newAction, 'phaseStart');
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.push(newAction);
             }
 
