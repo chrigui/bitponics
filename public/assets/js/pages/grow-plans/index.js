@@ -272,26 +272,6 @@ require([
         'sharedDataService',
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
-          
-          // $scope.$watch('sharedDataService.activeOverlay',
-          //   function(newValue, oldValue) {
-          //     console.log('watched var')
-          //     if (newValue == 'ActivationOverlay') {
-          //       $scope.open();
-          //     }
-          //   }
-          // );
-
-          // $scope.open = function(){
-          //   // var d = $dialog.dialog($scope.sharedDataService.modalOptions);
-          //   // d.open().then(function(result){
-          //   //   if(result){
-          //   //     alert('dialog closed with result: ' + result);
-          //   //   }
-          //   // });
-          //   console.log('open it!');
-          // };
-
         }
       ]
     );
@@ -443,6 +423,68 @@ require([
   	);
 
 
+
+    growPlanApp.controller('bpn.controllers.growPlan.Actions',
+      [
+        '$scope',
+        '$filter',
+        'sharedDataService',
+        function ($scope, $filter, sharedDataService) {
+          $scope.sharedDataService = sharedDataService;
+
+          
+          /**
+           * @param {Control=} [control] (optional)
+           */
+          $scope.addAction = function (control) {
+            var newAction = {
+                _id: "new_action" + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
+                cycle: { offset: { duration: 0, durationType: null }, states : [] }
+              };
+            
+            if (control){
+              newAction.control = control;
+              newAction.cycle.states[0] = {
+                controlValue : 1,
+                duration: 1,
+                durationType : 'hours'
+              };
+              newAction.cycle.states[1] = {
+                controlValue : 0,
+                duration: 1,
+                durationType : 'hours'
+              };
+              viewModels.initActionViewModel(newAction);
+
+              $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] = newAction;
+            } else {
+              viewModels.initActionViewModel(newAction);
+              $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.push(newAction);
+            }
+
+            return newAction;
+          };
+
+
+          /**
+           * Pop up the overlay for the action. 
+           * If action isn't defined, create one
+           * 
+           * @param {ActionViewModel} action
+           * @param {Control} [control]
+           */
+          $scope.triggerActionOverlay = function(action, control){
+            console.log('triggering');
+            if (!action){
+              action = $scope.addAction(control);
+            }
+            $scope.sharedDataService.activeOverlay = 'ActionOverlay' + action._id;
+          }
+        }
+      ]
+    );
+
+
     growPlanApp.controller('bpn.controllers.growPlan.Main',
       [
         '$scope',
@@ -547,9 +589,7 @@ require([
             $scope.sharedDataService.activeOverlay = 'SensorOverlay' + sensor.abbrev;
           }
 
-          $scope.triggerActionOverlay = function(action){
-            $scope.sharedDataService.activeOverlay = 'ActionOverlay' + action._id;
-          }
+          
 
           // $scope.updateSelectedPlants = function(){
           //     $scope.sharedDataService.selectedPlants = [];

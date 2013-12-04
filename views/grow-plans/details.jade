@@ -139,7 +139,7 @@ block head
 
 
           div(class="controls", accordion-group, heading="Accessory Timers")
-            div(class="grid grid--wrapping")
+            div(class="grid grid--wrapping", ng-controller="bpn.controllers.growPlan.Actions")
               //- ng-hide="!sharedDataService.selectedGrowPlan.device")
               
               div(
@@ -250,57 +250,62 @@ block head
 
 
 
-          div(class="reminders", accordion-group, heading="Reminders")      
-            div(ng-repeat="action in sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl", class="action", ng-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id") 
-              h3 {{action.description}}
-              div(data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
+          div(class="reminders", accordion-group, heading="Reminders")
+            div(ng-controller="bpn.controllers.growPlan.Actions")
+              div(
+                ng-repeat="action in sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl", 
+                class="action", 
+                ng-click="triggerActionOverlay(action)") 
+                
+                h3 {{action.description}}
+                div(data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
 
-            
-              div
-                div(modal="sharedDataService.activeOverlay=='ActionOverlay'+action._id", close="close()", options="sharedDataService.modalOptions")
-                  div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
-                    div(class="close btn", ng-click="close()")
-                      | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true" ng-click="close()"></i>
-                    h3(class="page-heading page-heading-small") Action Reminder
-                    div(ng-controller="bpn.controllers.growPlan.ActionOverlay", class="action-overlay")
-                      div(class="overlay-data clearfix")
-                        div
-                          label Description
-                          textarea(placeholder="Describe the action.", ng-model="action.description")
+              
+                div
+                  div(modal="sharedDataService.activeOverlay=='ActionOverlay'+action._id", close="close()", options="sharedDataService.modalOptions")
+                    div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
+                      div(class="close btn", ng-click="close()")
+                        | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true" ng-click="close()"></i>
+                      h3(class="page-heading page-heading-small") Action Reminder
+                      div(ng-controller="bpn.controllers.growPlan.ActionOverlay", class="action-overlay")
+                        div(class="overlay-data clearfix")
+                          div
+                            label Description
+                            textarea(placeholder="Describe the action.", ng-model="action.description")
 
-                        div.separator-top
-                          label When should the reminder be sent?
-                          div.custom-dropdown-wrap
-                            select(class="custom-dropdown", ng-model="action.scheduleType")
-                              option(value="") Select
-                              option(value="phaseStart") Once at the start of the phase
-                              option(value="phaseEnd") Once at the end of the phase
-                              option(value="repeat") Repeat throughout the phase
-                            div(class="dblarrow")
-                              i
-
-                        div(ng-show="action.scheduleType != 'repeat'")
-
-                        div(ng-show="action.scheduleType == 'repeat'")
-                          div.separator-top 
-                            label Every:
-                            input(type="number", ng-model="action.overallDuration", value="1")
+                          div.separator-top
+                            label When should the reminder be sent?
                             div.custom-dropdown-wrap
-                              select(class="custom-dropdown", ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+                              select(class="custom-dropdown", ng-model="action.scheduleType")
                                 option(value="") Select
+                                option(value="phaseStart") Once at the start of the phase
+                                option(value="phaseEnd") Once at the end of the phase
+                                option(value="repeat") Repeat throughout the phase
                               div(class="dblarrow")
                                 i
 
-                          div(ng-show="action.overallDurationType == 'days'")
-                            label At 
-                            div.custom-dropdown-wrap
-                              select(class="custom-dropdown", ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
-                                option(value="") Select
-                              div(class="dblarrow")
-                                i
+                          div(ng-show="action.scheduleType != 'repeat'")
 
-                          label.separator-top Send me the following message:
-                            textarea(ng-model="action.message", placeholder="It's time to...")
+                          div(ng-show="action.scheduleType == 'repeat'")
+                            div.separator-top 
+                              label Every:
+                              input(type="number", ng-model="action.overallDuration", value="1")
+                              div.custom-dropdown-wrap
+                                select(class="custom-dropdown", ng-model="action.overallDurationType", ng-options="durationType for durationType in actionWithNoAccessoryDurationTypeOptions", value="{{actionDurationTypeOptions[0]}}")
+                                  option(value="") Select
+                                div(class="dblarrow")
+                                  i
+
+                            div(ng-show="action.overallDurationType == 'days'")
+                              label At 
+                              div.custom-dropdown-wrap
+                                select(class="custom-dropdown", ng-model="action.offsetTimeOfDay", ng-options="time.ms as time.str for time in timesOfDayList")
+                                  option(value="") Select
+                                div(class="dblarrow")
+                                  i
+
+                            label.separator-top Send me the following message:
+                              textarea(ng-model="action.message", placeholder="It's time to...")
 
 
 
@@ -314,40 +319,40 @@ block head
 
 
 
-        h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Supplies
-        div(accordion)
-          div(class="grow-systems", id="grow-systems", accordion-group, heading="Grow System")
-            ul(class="grid grid--wrapping growsystemlist")
-              li(class="grid-cell", ng-repeat="growSystem in sharedDataService.growSystems")
-                input(
-                    id="{{growSystem._id}}",
-                    type="radio", 
-                    value="{{growSystem._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.focusedPhase.growSystem")
-                label(for="{{growSystem._id}}", class="btn")
-                  | {{growSystem.name}}
+        //- h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Supplies
+        //- div(accordion)
+        //-   div(class="grow-systems", id="grow-systems", accordion-group, heading="Grow System")
+        //-     ul(class="grid grid--wrapping growsystemlist")
+        //-       li(class="grid-cell", ng-repeat="growSystem in sharedDataService.growSystems")
+        //-         input(
+        //-             id="{{growSystem._id}}",
+        //-             type="radio", 
+        //-             value="{{growSystem._id}}",
+        //-             ng-model="sharedDataService.selectedGrowPlan.focusedPhase.growSystem")
+        //-         label(for="{{growSystem._id}}", class="btn")
+        //-           | {{growSystem.name}}
 
-          div(class="lights", id="lights", accordion-group, heading="Lights")
-            ul(class="grid grid--wrapping lightlist")
-              li(class="grid-cell", ng-repeat="light in sharedDataService.lights")
-                input(
-                    id="{{light._id}}",
-                    type="radio", 
-                    value="{{light._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.focusedPhase.light")
-                label(for="{{light._id}}", class="btn")
-                  | {{light._id}}
+        //-   div(class="lights", id="lights", accordion-group, heading="Lights")
+        //-     ul(class="grid grid--wrapping lightlist")
+        //-       li(class="grid-cell", ng-repeat="light in sharedDataService.lights")
+        //-         input(
+        //-             id="{{light._id}}",
+        //-             type="radio", 
+        //-             value="{{light._id}}",
+        //-             ng-model="sharedDataService.selectedGrowPlan.focusedPhase.light")
+        //-         label(for="{{light._id}}", class="btn")
+        //-           | {{light._id}}
 
-          div(class="nutrients", id="nutrients", accordion-group, heading="Nutrients")
-            ul(class="grid grid--wrapping nutrientlist")
-              li(class="grid-cell", ng-repeat="nutrient in sharedDataService.nutrients")
-                input(
-                    id="{{nutrient._id}}",
-                    type="radio", 
-                    value="{{nutrient._id}}",
-                    ng-model="sharedDataService.selectedGrowPlan.focusedPhase.nutrient")
-                label(for="{{nutrient._id}}", class="btn")
-                  | {{nutrient.name}} by {{nutrient.brand}}
+        //-   div(class="nutrients", id="nutrients", accordion-group, heading="Nutrients")
+        //-     ul(class="grid grid--wrapping nutrientlist")
+        //-       li(class="grid-cell", ng-repeat="nutrient in sharedDataService.nutrients")
+        //-         input(
+        //-             id="{{nutrient._id}}",
+        //-             type="radio", 
+        //-             value="{{nutrient._id}}",
+        //-             ng-model="sharedDataService.selectedGrowPlan.focusedPhase.nutrient")
+        //-         label(for="{{nutrient._id}}", class="btn")
+        //-           | {{nutrient.name}} by {{nutrient.brand}}
 
 
 
