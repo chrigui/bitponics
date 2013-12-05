@@ -87,7 +87,7 @@ module.exports = function(app) {
               if(typeof value2 != 'number'){ value2 = 0; }
               return value1 + value2
             });
-            console.log('gpObjects:'+gpo.overallTimeSpan);
+            //console.log('gpObjects:'+gpo.overallTimeSpan);
             gpObjects.push(gpo);
             
           });

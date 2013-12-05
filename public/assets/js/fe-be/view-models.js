@@ -276,6 +276,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * Adds/calculates properties necessary for UI presentation
    *
    * Sets the following properties:
+   * focusedPhase
    * plantsViewModel
    * phases[].idealRanges[].noApplicableTimeSpan
    * phases[].actionViewModels
@@ -283,7 +284,6 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * phases[].actionViewModelsNoControl
    * phases[].nutrientsViewModel
    * phases[].idealRangesBySensor
-   * currentVisiblePhase
    */
   viewModels.initGrowPlanViewModel = function (growPlan, sensors){
     var initActionViewModel = viewModels.initActionViewModel;

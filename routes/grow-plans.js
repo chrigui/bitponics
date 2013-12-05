@@ -133,7 +133,7 @@ module.exports = function(app){
                   if (idealRange.actionBelowMin) { actionIds.push(idealRange.actionBelowMin); }
                 });
               });
-              console.log('actionIds', actionIds);
+              //console.log('actionIds', actionIds);
               ActionModel.find({})
               .where('_id').in(actionIds)
               .exec(function (err, actions) {

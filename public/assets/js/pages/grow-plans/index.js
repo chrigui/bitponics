@@ -122,7 +122,7 @@ require([
               var delay = $q.defer();
 			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
 			    			function (growPlan) {
-			    				viewModels.initGrowPlanViewModel(growPlan, sharedDataService.sensors);
+			    				//viewModels.initGrowPlanViewModel(growPlan, sharedDataService.sensors);
 			    				sharedDataService.selectedGrowPlan = growPlan;
 			      			delay.resolve(sharedDataService.selectedGrowPlan);
 			    			}, 
@@ -476,7 +476,6 @@ require([
            * @param {Control} [control]
            */
           $scope.triggerActionOverlay = function(action, control){
-            console.log('triggering');
             if (!action){
               action = $scope.addAction(control);
             }
@@ -709,18 +708,17 @@ require([
           };
 
           $scope.submit = function (e) {
-            console.log('search', $location.search());
-
+            
             if (sharedDataService.pageMode === 'setup') {
               if ($scope.sharedDataService.selectedGrowPlan) {
                 var dataToSubmit = {
-                  submittedGrowPlan : viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan),
+                  submittedGrowPlan : viewModels.compileGrowPlanViewModelToServerModel(angular.copy($scope.sharedDataService.selectedGrowPlan)),
                   growPlanInstance : $scope.sharedDataService.growPlanInstance,
                   deviceId : $scope.sharedDataService.selected.deviceId
                 };
 
                 $scope.sharedDataService.submit.updateInProgress = true;
-                console.log(dataToSubmit);
+                //console.log(dataToSubmit);
 
                 $.ajax({
                   url: '/setup/grow-plan',
@@ -748,12 +746,10 @@ require([
               }
 
             } else {
-              var submittedGrowPlan = viewModels.compileGrowPlanViewModelToServerModel($scope.sharedDataService.selectedGrowPlan);
-              submittedGrowPlan = new GrowPlanModel(submittedGrowPlan);
               
               $scope.sharedDataService.submit.updateInProgress = true;
               
-              submittedGrowPlan.$save(
+              $scope.sharedDataService.selectedGrowPlan.$save(
                 function(returnedGrowPlan){
                   console.log('success', arguments);
                   $scope.sharedDataService.submit.success = true;
