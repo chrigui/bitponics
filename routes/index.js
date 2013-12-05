@@ -4,7 +4,8 @@ var User = require('../models/user').model,
 	passport = require('passport'),
 	querystring = require('querystring'),
 	http = require('http'),
-	verificationEmailDomain = 'bitponics.com';
+	verificationEmailDomain = 'bitponics.com',
+  mixpanel = require('../lib/mixpanel-wrapper');
 
 module.exports = function(app){
 
@@ -28,6 +29,7 @@ module.exports = function(app){
 
   
   app.get('/help', function (req, res){  
+    mixpanel.track(req.user, "help");  
     res.redirect('http://help.bitponics.com');
   });
 
@@ -95,9 +97,7 @@ module.exports = function(app){
 	});
 
 	app.get('/get-started', function (req, res){
-		winston.info('req.error');
-		winston.info(req.error);
-	  var locals = {
+		var locals = {
     	title: "Get Started",
     	className: "landing-page single-page get-started",
     	pageType: "landing-page"
@@ -148,8 +148,10 @@ module.exports = function(app){
     				pageType: "app-page"
 				};
 
+
 			// if user is already logged in
       if (routeUtils.isUserLoggedIn(req)){
+        mixpanel.increment(req.user, "logins");
         return res.redirect(req.query.redirect || '/dashboard');
       } 
       
@@ -171,6 +173,10 @@ module.exports = function(app){
 			      req.flash('error', info.message);
 			      return res.redirect('/login')
 			    }
+
+          mixpanel.track(user, "login", { redirect: req.query.redirect });
+          mixpanel.increment(user, "logins");
+
 			    req.logIn(user, function(err) {
 			      if (err) { return next(err); }
 			      return res.redirect(req.query.redirect || '/dashboard');
@@ -212,6 +218,9 @@ module.exports = function(app){
 					}
 					// return next(err);
 				} else {
+
+          mixpanel.track(user, "signup");
+
 					req.logIn(user, function(err) {
 				    if (err) { return next(err); }
 				  	res.redirect('/register');
@@ -221,7 +230,9 @@ module.exports = function(app){
 
 
 			if(req.param('newsletter') != 'undefined'){
-				/*
+				mixpanel.track(user, "newsletter signup");
+
+        /*
 				 * Sign user up for email newsletter if they check the checkbox
 				 */
 
@@ -281,8 +292,10 @@ module.exports = function(app){
 	);
 		
 	app.get('/logout', function (req, res) {
-		req.session.regenerate(function(){
-			req.logout()
+		mixpanel.track(req.user, "logout");
+
+    req.session.regenerate(function(){
+    	req.logout();
 			res.redirect('/')  
 		});
 	});
@@ -305,7 +318,8 @@ module.exports = function(app){
 			    };
 
 		  if(req.query.verify){ //user coming back to verify account
-		    return UserModel.findOne({ activationToken: req.query.verify }, 
+		    mixpanel.track(user, "activate registration");
+        return UserModel.findOne({ activationToken: req.query.verify }, 
 		    	function (err, user) {
 			    	if (err) { return next(err); }
 			    	console.log(user)

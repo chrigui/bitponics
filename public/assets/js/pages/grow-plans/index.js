@@ -1,3 +1,9 @@
+/**
+ * Main file for /grow-plans/:id
+ *
+ * Depends on following globals:
+ * - bpn
+ */
 require([
   'angular',
   'domReady',
@@ -410,7 +416,8 @@ require([
         '$scope',
         '$filter',
         'sharedDataService',
-        function ($scope, $filter, sharedDataService) {
+        'bpn.services.analytics',
+        function ($scope, $filter, sharedDataService, analytics) {
           $scope.sharedDataService = sharedDataService;
 
           
@@ -418,12 +425,15 @@ require([
            * @param {Control=} [control] (optional)
            */
           $scope.addAction = function (control) {
+            
             var newAction = {
                 _id: "new_action" + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
                 cycle: { offset: { duration: 0, durationType: 'days' }, states : [] }
               };
             
             if (control){
+              
+
               newAction.control = control;
               
               newAction.cycle.states[0] = {
@@ -440,9 +450,15 @@ require([
               viewModels.initActionViewModel(newAction, 'phaseStart');
 
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] = newAction;
+
+              analytics.track("customize grow plan", { action : "add timer", control: control.name });
             } else {
+              
+
               viewModels.initActionViewModel(newAction, 'phaseStart');
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.push(newAction);
+
+              analytics.track("customize grow plan", { action : "add reminder" });
             }
 
             return newAction;
@@ -475,7 +491,8 @@ require([
         '$filter',
         'GrowPlanModel',
         'sharedDataService',
-        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService) {
+        'bpn.services.analytics',
+        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics) {
           $scope.sharedDataService = sharedDataService;
 
           //$scope.lights = bpn.lights;
@@ -570,6 +587,8 @@ require([
 
           $scope.triggerSensorOverlay = function(sensor){
             $scope.sharedDataService.activeOverlay = 'SensorOverlay' + sensor.abbrev;
+
+            analytics.track("customize grow plan", { action : "edit sensor range", sensor: sensor.abbrev });
           }
 
           
@@ -730,6 +749,8 @@ require([
                     });
                   }
                 });
+
+                analytics.track("customize grow plan", { action : "activate garden" });
               }
 
             } else {
@@ -755,6 +776,8 @@ require([
                   $scope.sharedDataService.activeOverlay = 'SaveOverlay';
                 }
               );
+
+              analytics.track("customize grow plan", { action : "save" });
             }
           };
         }

@@ -1,4 +1,11 @@
-
+/**
+ * Central analytics service
+ * Controls google analytics and mixpanel
+ *
+ * Depends on the following globals:
+ * - _gaq
+ * - mixpanel
+ */
 define([
 	'bpn.services'
 	], 
@@ -12,16 +19,30 @@ define([
       '$location',
       '$document',
       function($rootScope, $window, $location, $document) {
-	      var track = function() {
-	        console.log("LOGGING PAGEVIEW: " + $location.path());
+	      var trackPageView = function() {
+	        console.log("TRACKING PAGEVIEW: " + $window.location.pathname);
           
-          $window._gaq.push(['_trackPageview', $location.path()]);
+          $window._gaq.push(['_trackPageview', $window.location.pathname]);
 
-          $window.mixpanel.track("page viewed", {'page name': $window.document.title, 'url' : $location.path() });
+          $window.mixpanel.track("page viewed", {'page name': $window.document.title, 'url' : $window.location.pathname });
 	      };
-	      $rootScope.$on('$viewContentLoaded', track);
+	      $rootScope.$on('$viewContentLoaded', trackPageView);
 
-                
+        
+        var track = function(eventName, props){
+          console.log("TRACKING EVENT: " + eventName, props);
+          $window.mixpanel.track(eventName, props);
+        };
+
+        var increment = function(numericProperty){
+          console.log("TRACKING INCREMENT: " + numericProperty);
+          $window.mixpanel.people.increment(numericProperty);
+        };
+
+        return {
+          track : track,
+          increment : increment
+        }
 	    }
 	  ]);
 	}
