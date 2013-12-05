@@ -650,3 +650,6 @@ input[type='checkbox']:checked + label.btn {
   z-index: 2;
   cursor: pointer;
 }
+label.newsletter.inline {
+  margin-left: 0.5em;
+}
