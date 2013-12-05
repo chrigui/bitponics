@@ -18,7 +18,6 @@ var connect    = require('connect'),
   cookie  = require('express/node_modules/cookie'),
   s3Config = require('../config/s3-config'),
   intercomConfig = require('../config/intercom-config'),
-  mixpanel = require('../lib/mixpanel-wrapper'),
   crypto = require('crypto');
 
 module.exports = function(app){
@@ -118,8 +117,6 @@ module.exports = function(app){
     });
 
 
-    // Expose mixpanel token to views
-    app.locals({ mixpanelToken: require('../config/mixpanel-config').token });
 
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }
