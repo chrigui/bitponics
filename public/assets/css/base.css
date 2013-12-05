@@ -2782,7 +2782,7 @@ input[type='checkbox']:checked + label.btn {
   height: 0.35em;
   background: transparent;
   top: 50%;
-  right: 0.85em;
+  right: 0.35em;
   margin-top: -0.5em;
   border: 3px solid #fcfff4;
   border-top: none;
@@ -5147,6 +5147,9 @@ button.close {
 .growplans .overlay .custom-checkbox-wrap {
   bottom: 4em;
   text-align: center;
+}
+.growplans .overlay .custom-checkbox-wrap .plant:before {
+  right: 0.85em;
 }
 .growplans .overlay .action-overlay .custom-checkbox-wrap {
   bottom: auto;
