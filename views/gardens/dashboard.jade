@@ -144,9 +144,9 @@ block content
                       input(id="{{sensorCode}}_manual_entry_toggle", 
                         type="checkbox",
                         name="{{sensorCode}}_manual_entry_toggle")
-                      label(ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
+                      label(ng-show="sharedDataService.gardenModel.device", ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
                     
-                    div(ng-show="manualSensorEntryMode")
+                    div(ng-show="!sharedDataService.gardenModel.device || manualSensorEntryMode && sharedDataService.gardenModel.device")
                       form(action="", ng-submit="submit()")
                         input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any",required)
                         div(ng-hide="hasMultipleUnits(sensorCode)", class="sensor-reading-unit")
