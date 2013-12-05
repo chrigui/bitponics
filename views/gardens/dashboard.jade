@@ -233,9 +233,9 @@ block content
 
                 div
                   form(action="", ng-submit="submit()")
-                    textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width")
+                    textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width", placeholder="How are your plants doing today?")
                     div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
-                      input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any")
+                      input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any", placeholder="{{sensor.name}}")
                       div(ng-hide="hasMultipleUnits(sensor.code)", class="sensor-reading-unit")
                         span.sensor-unit {{sensor.unit}}
                       div(ng-show="hasMultipleUnits(sensor.code)", class="sensor-reading-unit custom-dropdown-wrap")
