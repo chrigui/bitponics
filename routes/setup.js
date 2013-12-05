@@ -145,6 +145,7 @@ module.exports = function(app){
 									.populate('phases.actions')
 									.populate('phases.growSystem')
 									.populate('phases.phaseEndActions')
+                  .populate('createdBy', 'name')
 									.exec(function(err, gps){
 										if (err) { return innerCallback(err); }
 										locals.growPlans = gps;

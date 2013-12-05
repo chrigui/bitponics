@@ -31,7 +31,7 @@ block head
               input(id="{{plant._id}}", type='checkbox', name="plants", ng-model="sharedDataService.selected.plants[plant._id]")
               label(for="{{plant._id}}", class="plant btn") 
                 {{plant.name}}
-                | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
+                | <i class="icon-glyph-new icon-__73_x_white" aria-hidden="true" ng-click=""></i>
 
           label(class="add btn", ng-click="sharedDataService.activeOverlay.is = 'PlantOverlay'") 
             | Add
@@ -45,18 +45,18 @@ block head
 
     ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
       //- each growPlan, i in growPlans
-      li(ng-repeat="growPlan in filteredGrowPlanList", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+      li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:'-activeGardenCount'", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
         div.img-wrapper
           div.icon-glyph.icon-__62_logo_00e36c
         div.first
           //- h5.label Name
           div.value {{growPlan.name}}
-        div.plants
+        p.plants
           ul(class="plantlist small-float")
             li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
-              span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}
-        div
-          h5 Used by {{growPlan.activeGardenCount}} gardens
+              span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
+        p Used by {{growPlan.activeGardenCount}} gardens
+        p(ng-show="growPlan.createdBy.name") Created by {{growPlan.createdBy.name.full}}
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}

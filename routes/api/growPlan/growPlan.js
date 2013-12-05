@@ -27,98 +27,52 @@ module.exports = function(app) {
   	function (req, res, next){
     var filter = false,
         full = false,
-        id = req.query.id,
         plants = req.query.plants,
         growSystem = req.query.growSystem;
     
-    if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
-      filter = true;
-      plants = typeof plants === 'object' ? plants : plants.split(',');
-      growSystem = growSystem.split(',');
-    }else if(!!id){
-      full = true;
+    // if(!!plants && !!growSystem && typeof plants !== 'undefined' && typeof growSystem !== 'undefined'){
+    //   filter = true;
+    //   plants = typeof plants === 'object' ? plants : plants.split(',');
+    //   growSystem = growSystem.split(',');
+    // }else if(!!id){
+    //   full = true;
+    // }
+
+
+    var query = GrowPlanModel.find();
+
+    if (plants){
+      console.log('plants', plants)
+      plants = typeof plants === 'object' ? plants : plants.split(',');  
+      query.where('plants').in(plants);
     }
 
-    if(!filter && !full) { //return all grow plans
+    query.where('_id').ne(allPurposeGrowPlanId)
+    query.select('name description phases.expectedNumberOfDays createdBy activeGardenCount')
+    .populate('createdBy', 'name')
+    .lean()
+    .exec(function (err, growPlans) {
+      if (err) { return next(err); }
       
-      return GrowPlanModel.find(function (err, growPlans) {
-        if (err) { return next(err); }
-        return res.send(growPlans);
-      });
+      var userIds = [],
+          gpObjects = [],
+          overallTimeSpan = 0;
 
-    } else if (filter) { //filter on plants and growsystem
-
-      return GrowPlanModel
-        .find(
-          {
-            $or: [
-              { plants: { $in: plants } },
-              { phases: {
-                  $elemMatch: {
-                    growSystem: { $in: growSystem }
-                  }
-                }
-              }
-            ],
-            _id: {
-              $ne: allPurposeGrowPlanId
-            }
-          },
-          {
-            'name': 1,
-            //description: 1,
-            'phases.expectedNumberOfDays': 1,
-            'createdBy': 1
-          }
-        ).exec(function (err, growPlans) {
-          if (err) { return next(err); }
-          
-          var userIds = [],
-              gpObjects = [],
-              overallTimeSpan = 0;
-
-          growPlans.forEach(function(gp){
-            var gpo = gp.toObject();
-            userIds.push(gp.createdBy);
-            gpo.overallTimeSpan = gpo.phases.reduce(function(prev, curr){
-              var value1 = prev.expectedNumberOfDays,
-                  value2 = curr.expectedNumberOfDays;
-              if(typeof value1 != 'number'){ value1 = 0; }
-              if(typeof value2 != 'number'){ value2 = 0; }
-              return value1 + value2
-            });
-            //console.log('gpObjects:'+gpo.overallTimeSpan);
-            gpObjects.push(gpo);
-            
-          });
-          
-          UserModel.find().where('_id').in(userIds).select('name').exec(function (err, users){
-            gpObjects.forEach(function(gp){
-              gp.createdBy = users.filter(function(user){ 
-                return user._id.toString() == gp.createdBy.toString()
-              });
-            });
-
-            return res.send(gpObjects);
-          });
-
-          
+      growPlans.forEach(function(gp){
+        var gpo = gp;//.toObject();
+        userIds.push(gp.createdBy);
+        gpo.overallTimeSpan = gpo.phases.reduce(function(prev, curr){
+          var value1 = prev.expectedNumberOfDays,
+              value2 = curr.expectedNumberOfDays;
+          if(typeof value1 != 'number'){ value1 = 0; }
+          if(typeof value2 != 'number'){ value2 = 0; }
+          return value1 + value2
         });
-
-    } else if (full) { //return single growplan with all data populated
-      ModelUtils.getFullyPopulatedGrowPlan( { _id: id }, function(err, growPlanResults){
-        if (err) { return callback(err); }
-
-        var growPlanResult = growPlanResults[0];
-
-        if (!growPlanResult){ 
-          return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
-        }
-
-        return res.send(growPlanResult);
-
+        gpObjects.push(gpo);
+        
       });
-    }
+      return res.send(gpObjects);
+    });
   });
 
   /*

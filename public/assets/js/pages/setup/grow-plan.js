@@ -554,6 +554,7 @@ define([
               $scope.sharedDataService.selectedGrowPlan.plants = $scope.sharedDataService.selectedPlants;
             }
 
+            $scope.updatefilteredGrowPlans();  
           }, true);
 
           $scope.updateSelected = {
