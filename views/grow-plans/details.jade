@@ -111,15 +111,19 @@ block head
           div(data-bpn-directives-navigation-phases-graph)
           p.half-width.centered Use the rings to navigate between phases.
 
-          div.phaseName
+          div.phase-name
             label Phase Name
             input(class="display-ib", type="text", placeholder="Give this phase a name...", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.name")
 
           
-          div.phaseDescription
-            label Phase Description
+          div.phase-description
+            label {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase Description
             textarea(placeholder="Write a phase description...", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.description")
 
+          p.phase-duration
+            label {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase should last
+              input(type="number", size="4", placeholder="", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.expectedNumberOfDays", min="0", max="365") 
+              | days
 
           a.btn.warning.no-margin(ng-click="removePhase(sharedDataService.selectedPhaseIndex)") Remove {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase
 
@@ -997,16 +1001,30 @@ block content
                   | There was a technical problem and your garden was not set up.
         
         div
-          div(ng-controller="bpn.controllers.growPlan.SaveOverlay", modal="sharedDataService.activeOverlay=='SaveOverlay'", close="close()", options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+          div(
+            ng-controller="bpn.controllers.growPlan.SaveOverlay", 
+            modal="sharedDataService.activeOverlay=='SaveOverlay'", 
+            close="close()", 
+            options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
+            
             div(class="overlay-contain")
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               div(ng-show="!sharedDataService.submit.error")
-                h3(class="page-heading page-heading-small") Grow Plan Updated
-                p 
-                  | Your grow plan has been updated! Visit your 
-                  a(class="link", href="/gardens") gardens
-                  |  page to make sure your gardens are reflecting the updates.
+                
+                
+                div(ng-show="sharedDataService.originalGrowPlanId === sharedDataService.selectedGrowPlan._id")
+                  h3(class="page-heading page-heading-small") Grow Plan Updated
+                  p Your grow plan has been updated! Your 
+                    a(class="link", href="/gardens") gardens
+                    |  should now reflect the new updates. Happy growing!
+                div(ng-show="sharedDataService.originalGrowPlanId !== sharedDataService.selectedGrowPlan._id")
+                  h3(class="page-heading page-heading-small") You just contributed to the exploration of gardening knowledge!
+                  p We created you your very own branch of this grow plan. Now the community can learn how your changes help plant growth.
+                  p Any gardens that were using the original have been migrated to your new branch.
+                  p  
+                    a.btn(class="link", href="/grow-plans/{{sharedDataService.selectedGrowPlan._id}}", ng-click="loadGrowPlanPage()") Visit your new grow plan page
+                  
               div(ng-show="sharedDataService.submit.error")
                 h3(class="page-heading page-heading-small error") Error saving changes
                 p.error

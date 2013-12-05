@@ -276,14 +276,18 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * Adds/calculates properties necessary for UI presentation
    *
    * Sets the following properties:
-   * focusedPhase
-   * plantsViewModel
-   * phases[].idealRanges[].noApplicableTimeSpan
-   * phases[].actionViewModels
-   * phases[].actionViewModelsByControl
-   * phases[].actionViewModelsNoControl
-   * phases[].nutrientsViewModel
-   * phases[].idealRangesBySensor
+   * - focusedPhase
+   * - plantsViewModel
+   * - phases[].actionViewModels
+   * - phases[].actionViewModelsByControl
+   * - phases[].actionViewModelsNoControl
+   * - phases[].nutrientsViewModel
+   * - phases[].idealRangesBySensor
+   * - phases[].idealRangesBySensor.noApplicableTimeSpan
+   * 
+   * Unsets the following properties:
+   * - phases[].idealRanges (TODO once we remove the dependency in dashboard)
+   * - phases[].actions (TODO once we remove the dependency in dashboard)
    */
   viewModels.initGrowPlanViewModel = function (growPlan, sensors){
     var initActionViewModel = viewModels.initActionViewModel;
@@ -309,6 +313,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
         phase.idealRangesBySensor[idealRange.sCode] = idealRange;
       });
+
+
 
       phase.actionViewModels = [];
       phase.actions.forEach(function(action){
@@ -542,6 +548,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
     growPlan.phases.forEach(function(phase, index){
 
+      // Populate idealRanges from idealRangesBySensor
+      phase.idealRanges = [];
       if (phase.idealRangesBySensor){
         Object.keys(phase.idealRangesBySensor).forEach(function(sensorKey){
           var idealRange = phase.idealRangesBySensor[sensorKey];
@@ -551,7 +559,6 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         });  
       }
       
-
       phase.idealRangesBySensor = undefined;
 
       // Clean up unpopulated placeholder idealRanges

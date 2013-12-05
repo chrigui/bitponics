@@ -97,6 +97,7 @@ LightBulbSchema.static('createNewIfUserDefinedPropertiesModified', function(opti
       ],
       function(err, validatedLightBulb){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedLightBulb);
         }
         return callback(err, validatedLightBulb);

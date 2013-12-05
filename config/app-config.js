@@ -18,7 +18,6 @@ var connect    = require('connect'),
   cookie  = require('express/node_modules/cookie'),
   s3Config = require('../config/s3-config'),
   intercomConfig = require('../config/intercom-config'),
-  mixpanel = require('../lib/mixpanel-wrapper'),
   crypto = require('crypto');
 
 module.exports = function(app){
@@ -55,6 +54,7 @@ module.exports = function(app){
     // http://expressjs.com/guide.html#proxies
     app.enable('trust proxy');
 
+    
     // If we've got a device request or an HMAC-authed request, need the raw body
     app.use (function(req, res, next) {
       var contentType = req.headers['content-type'] || '',
@@ -78,6 +78,7 @@ module.exports = function(app){
       }
     });
 
+    
     app.use(express.bodyParser());
     app.use(express.methodOverride());
 
@@ -118,8 +119,6 @@ module.exports = function(app){
     });
 
 
-    // Expose mixpanel token to views
-    app.locals({ mixpanelToken: require('../config/mixpanel-config').token });
 
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }
@@ -338,5 +337,11 @@ module.exports = function(app){
 	    io.enable('browser client gzip');          // gzip the file
 	    io.set('log level', 1);
     });
+  });
+
+  // Expose user to the view templates
+  app.use (function(req, res, next) {
+    res.locals.user = req.user;
+    next();
   });
 };

@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
   feBeUtils = requirejs('fe-be-utils'),
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  winston = require('winston');
 
 var PlantSchema = new Schema({
 	name: { type: String, required: true },
@@ -86,6 +87,7 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
       ],
       function(err, validatedPlant){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedPlant);
         }
         return callback(err, validatedPlant);

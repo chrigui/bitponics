@@ -538,6 +538,7 @@ ol.list-style {
 .btn.warning,
 .btn-composite.warning {
   color: #fac400;
+  font-weight: bold;
 }
 .btn-composite {
   background-color: #fff;
@@ -718,11 +719,7 @@ body {
 }
 div,
 p,
-span,
-a,
-a:visited,
-a:hover,
-a:active {
+span {
   color: #999;
 }
 section {
@@ -2981,6 +2978,9 @@ input[type='checkbox']:checked + label.btn {
   filter: alpha(opacity=0);
   z-index: 2;
   cursor: pointer;
+}
+label.newsletter.inline {
+  margin-left: 0.5em;
 }
 .dashboard .overlay {
   top: 8em;
@@ -5247,8 +5247,13 @@ button.close {
   width: 2em;
   margin: 1em;
 }
-.growplans .phaseDescription {
+.growplans .phase-description {
   margin: 0 0 2em 0;
+}
+.growplans .phase-duration input {
+  display: inline;
+  width: 5em;
+  margin: 0 1em;
 }
 .growplans .phase-tabs {
   list-style: none;

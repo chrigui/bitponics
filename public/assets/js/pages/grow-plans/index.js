@@ -1,3 +1,9 @@
+/**
+ * Main file for /grow-plans/:id
+ *
+ * Depends on following globals:
+ * - bpn
+ */
 require([
   'angular',
   'domReady',
@@ -49,9 +55,10 @@ require([
 
 		growPlanApp.factory('sharedDataService', 
       [
+        '$route',
         '$location',
         '$rootScope',
-        function($location, $rootScope){
+        function($route, $location, $rootScope){
     			var sharedData = {
     				selectedGrowPlan : {},
             selectedPhaseIndex : 0, //default to first
@@ -66,7 +73,7 @@ require([
             userOwnedDevices : bpn.userOwnedDevices,
     				filteredPlantList : angular.copy(bpn.plants),
     				selectedPlants : [],
-    				activeOverlay : { is: undefined },
+    				activeOverlay : undefined,
     				selected: {
     					plants : {},
     					deviceId : undefined
@@ -92,6 +99,8 @@ require([
           sharedData.controls.forEach(function (control) {
             viewModels.initControlViewModel(control);
           });
+
+          
 
           sharedData.pageMode = ($location.search()['setup'] ? 'setup' : 'default');
 
@@ -122,7 +131,6 @@ require([
               var delay = $q.defer();
 			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
 			    			function (growPlan) {
-			    				//viewModels.initGrowPlanViewModel(growPlan, sharedDataService.sensors);
 			    				sharedDataService.selectedGrowPlan = growPlan;
 			      			delay.resolve(sharedDataService.selectedGrowPlan);
 			    			}, 
@@ -175,11 +183,6 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.plants',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
     		}
     	]
   	);
@@ -193,11 +196,6 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.lightFixtures;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.light.fixture',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
     		}
     	]
   	);
@@ -211,11 +209,6 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.lightBulbs;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.light.bulb',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
     		}
     	]
   	);
@@ -229,11 +222,6 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.growSystems;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.growSystem',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
     		}
     	]
   	);
@@ -247,11 +235,6 @@ require([
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.nutrients;
     			
-    			$scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.nutrientsViewModel',
-    				function(newValue, oldValue){
-    					$scope.close();
-    				}
-  				);
 
     			$scope.toggleItemSelection = function(nutrient, input){
     				if (nutrient.selected) {
@@ -280,10 +263,14 @@ require([
     growPlanApp.controller('bpn.controllers.growPlan.SaveOverlay',
       [
         '$scope',
+        '$window',
         'sharedDataService',
-        function($scope, sharedDataService){
+        function($scope, $window, sharedDataService){
           $scope.sharedDataService = sharedDataService;
     
+          $scope.loadGrowPlanPage = function(){
+            $window.location.href = '/grow-plans/' + $scope.sharedDataService.selectedGrowPlan._id;
+          }
         }
       ]
     );
@@ -429,7 +416,8 @@ require([
         '$scope',
         '$filter',
         'sharedDataService',
-        function ($scope, $filter, sharedDataService) {
+        'bpn.services.analytics',
+        function ($scope, $filter, sharedDataService, analytics) {
           $scope.sharedDataService = sharedDataService;
 
           
@@ -437,12 +425,15 @@ require([
            * @param {Control=} [control] (optional)
            */
           $scope.addAction = function (control) {
+            
             var newAction = {
                 _id: "new_action" + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
-                cycle: { offset: { duration: 0, durationType: null }, states : [] }
+                cycle: { offset: { duration: 0, durationType: 'days' }, states : [] }
               };
             
             if (control){
+              
+
               newAction.control = control;
               
               newAction.cycle.states[0] = {
@@ -459,9 +450,15 @@ require([
               viewModels.initActionViewModel(newAction, 'phaseStart');
 
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] = newAction;
+
+              analytics.track("customize grow plan", { action : "add timer", control: control.name });
             } else {
+              
+
               viewModels.initActionViewModel(newAction, 'phaseStart');
               $scope.sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.push(newAction);
+
+              analytics.track("customize grow plan", { action : "add reminder" });
             }
 
             return newAction;
@@ -490,10 +487,12 @@ require([
       [
         '$scope',
         '$location',
+        '$route',
         '$filter',
         'GrowPlanModel',
         'sharedDataService',
-        function ($scope, $location, $filter, GrowPlanModel, sharedDataService) {
+        'bpn.services.analytics',
+        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics) {
           $scope.sharedDataService = sharedDataService;
 
           //$scope.lights = bpn.lights;
@@ -588,6 +587,8 @@ require([
 
           $scope.triggerSensorOverlay = function(sensor){
             $scope.sharedDataService.activeOverlay = 'SensorOverlay' + sensor.abbrev;
+
+            analytics.track("customize grow plan", { action : "edit sensor range", sensor: sensor.abbrev });
           }
 
           
@@ -707,6 +708,11 @@ require([
             });
           };
 
+
+          $scope.$watch('sharedDataService.activeOverlay', function(newValue, oldValue){
+            console.log('sharedDataService.activeOverlay', oldValue, newValue, new Date());
+          })
+
           $scope.submit = function (e) {
             
             if (sharedDataService.pageMode === 'setup') {
@@ -743,26 +749,35 @@ require([
                     });
                   }
                 });
+
+                analytics.track("customize grow plan", { action : "activate garden" });
               }
 
             } else {
               
               $scope.sharedDataService.submit.updateInProgress = true;
               
+              $scope.originalGrowPlan = angular.copy($scope.sharedDataService.selectedGrowPlan);
+
+              $scope.sharedDataService.originalGrowPlanId = $route.current.params.growPlanId;            
+
               $scope.sharedDataService.selectedGrowPlan.$save(
                 function(returnedGrowPlan){
-                  console.log('success', arguments);
+                  console.log('successfully saved grow plan', returnedGrowPlan);
                   $scope.sharedDataService.submit.success = true;
                   $scope.sharedDataService.submit.updateInProgress = false;
-                  //$scope.sharedDataService.selectedGrowPlan = viewModels.initGrowPlanViewModel(returnedGrowPlan);
                   $scope.sharedDataService.activeOverlay = 'SaveOverlay';
+
                 }, function(){
+                  console.log('error saving grow plan', arguments);
                   $scope.sharedDataService.submit.error = true;
                   $scope.sharedDataService.submit.success = false;
                   $scope.sharedDataService.submit.updateInProgress = false;
                   $scope.sharedDataService.activeOverlay = 'SaveOverlay';
                 }
               );
+
+              analytics.track("customize grow plan", { action : "save" });
             }
           };
         }

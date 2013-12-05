@@ -19,7 +19,7 @@ module.exports = function(app, callback) {
   // TODO: app.settings.env automatically reads from process.env.NODE_ENV & defaults to 'development'.
   //       For some reason, process.env isn't reading my environment's NODE_ENV variable.
   //       Setting it manually for now, but figure out what's going on
-  app.settings.env = process.env.NODE_ENV = process.env.NODE_ENV || 'local';
+  app.settings.env = process.env.NODE_ENV || 'local';
   
   require('./winston-config')(app.settings.env);
 
@@ -75,6 +75,7 @@ module.exports = function(app, callback) {
   require('./auth-config')(app);
   require('./app-config')(app);
   require('./braintree-config').setEnvironment(app.settings.env);
+  require('../lib/mixpanel-wrapper').init(app);
 
 	// This has to occur after the connection has been set up
 	require('../models/user').setEmailVariables(app.config);	

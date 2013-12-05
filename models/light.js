@@ -133,6 +133,7 @@ LightSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 function(err, validatedFixture){
                   if (validatedFixture){ submittedLight.fixture = validatedFixture; }
                   if (silentValidationFail){
+                    if (err) { winston.error(JSON.stringify(err)); }
                     return innerInnerCallback();
                   } 
                   return innerInnerCallback(err);
@@ -152,6 +153,7 @@ LightSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 function(err, validatedBulb){
                   if (validatedBulb){ submittedLight.bulb = validatedBulb; }
                   if (silentValidationFail){
+                    if (err) { winston.error(JSON.stringify(err)); }
                     return innerInnerCallback();
                   } 
                   return innerInnerCallback(err);
@@ -167,6 +169,7 @@ LightSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
     ],
     function(err, validatedLight){
       if (silentValidationFail){
+        if (err) { winston.error(JSON.stringify(err)); }
         return callback(null, validatedLight);
       }
       return callback(err, validatedLight);

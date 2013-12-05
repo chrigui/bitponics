@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
   feBeUtils = requirejs('fe-be-utils'),
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  winston = require('winston');
 
 var GrowSystemSchema = new Schema({
 	
@@ -145,6 +146,7 @@ GrowSystemSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
       ],
       function(err, validatedGrowSystem){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedGrowSystem);
         }
         return callback(err, validatedGrowSystem);

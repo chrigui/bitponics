@@ -48,13 +48,13 @@ module.exports = function(app){
 			  var locals = {
 			  	title : 'Profile',
 				className : 'profile',
-				user: user,
 				className: "app-page single-page profile",
     			pageType: "app-page"
 			  }
 
-		    user.save(function (err) {
+		    user.save(function (err, updatedUser) {
 		      if (err) { return next(err); }
+          locals.user = updatedUser;
 	      	res.render('account/profile', locals);
 		    });
 		  });

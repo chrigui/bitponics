@@ -275,7 +275,8 @@ require([
         '$q',
         'sharedDataService',
         'NavService',
-        function ($scope, $http, $q, sharedDataService, NavService) {
+        'bpn.services.analytics',
+        function ($scope, $http, $q, sharedDataService, NavService, analytics) {
           $scope.sharedDataService = sharedDataService;
           $scope.controls = bpn.pageData.controls;
           $scope.sensors = bpn.pageData.sensors;
@@ -309,6 +310,8 @@ require([
             .error(function(data, status, headers, config) {
               currentControlAction.updateInProgress = false;
             });
+
+            analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "trigger immediate action" });
           }
 
           /*
@@ -459,7 +462,8 @@ require([
         '$scope',
         'sharedDataService',
         '$anchorScroll',
-        function($scope, sharedDataService, $anchorScroll){
+        'bpn.services.analytics',
+        function($scope, sharedDataService, $anchorScroll, analytics){
           $scope.sharedDataService = sharedDataService;
           $scope.modalOptions = {
             dialogClass : 'overlay photo'
@@ -488,6 +492,7 @@ require([
             console.log("data: " + JSON.stringify(data));
             writeFiles(files);
             $scope.uploadInProgress = false;
+            analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "upload photo" });
           };
      
           $scope.getData = function(files) { 
@@ -560,7 +565,8 @@ require([
         'sharedDataService',
         'NavService',
         '$rootScope',
-        function($scope, $timeout, sharedDataService, NavService, $rootScope){
+        'bpn.services.analytics',
+        function($scope, $timeout, sharedDataService, NavService, $rootScope, analytics){
           $scope.sharedDataService = sharedDataService;
 
           $scope.close = function(){
@@ -595,6 +601,8 @@ require([
             $timeout(function(){
               sharedDataService.activeOverlay = "AdvancePhaseOverlay";
             }, 200);
+
+            analytics.track("garden interaction", { "garden id" : sharedDataService.gardenModel._id, action : "try advance phase" });
           }
         }
       ]
@@ -606,10 +614,13 @@ require([
         '$scope',
         'sharedDataService',
         '$rootScope',
-        function($scope, sharedDataService, $rootScope){
+        'bpn.services.analytics',
+        function($scope, sharedDataService, $rootScope, analytics){
           $scope.sharedDataService = sharedDataService;
 
           $scope.advancePhase = function(e){
+            analytics.track("garden interaction", { "garden id" : sharedDataService.gardenModel._id, action : "confirm advance phase" });
+
             $scope.sharedDataService.gardenModel.$advancePhase({},
               function(){
                 console.log('success');
@@ -909,118 +920,129 @@ require([
           manualSensorEntry : "=?",
           manualTextEntry : "=?"
         },
-        controller : function ($scope, $element, $attrs, $transclude, $http, sharedDataService) {
-          $scope.sharedDataService = sharedDataService;
+        controller : [
+          '$scope', 
+          '$element',
+          '$attrs', 
+          '$transclude', 
+          '$http', 
+          'sharedDataService',
+          'bpn.services.analytics',
+          function ($scope, $element, $attrs, $transclude, $http, sharedDataService, analytics) {
+            $scope.sharedDataService = sharedDataService;
 
-          $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
-          $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
-          $scope.sensorUnits = sharedDataService.units;
+            $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
+            $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
+            $scope.sensorUnits = sharedDataService.units;
 
-          //if no device on garden, then just show the manual sensor entry forms
-          $scope.manualSensorEntryMode = !$scope.sharedDataService.gardenModel.device;
+            //if no device on garden, then just show the manual sensor entry forms
+            $scope.manualSensorEntryMode = !$scope.sharedDataService.gardenModel.device;
 
-          $scope.toggleManualEntry = function(){
-            $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
-            if ($scope.sharedDataService) {
-              $scope.sharedDataService.manualSensorEntryMode = $scope.manualSensorEntryMode;
-            }
-          };
-
-          $scope.changeUnit = function(sensorCode, value) {
-            var oldUnit = sharedDataService.gardenModel.settings.units[sensorCode],
-                oldValue = value,
-                newUnit,
-                newValue;
-
-            // Object.keys(sharedDataService.units[sensorCode]).forEach(function(unitName){
-            //   if (feBeUtils.units[sensorCode][unitName]) {}
-            // });
-            
-            console.log('toggleUnitType for ' + sensorCode);
-            console.log('has current unit of ' + oldUnit);
-            console.log('will change to ' + newUnit);
-
-          };
-
-          $scope.hasMultipleUnits = function (sensorCode) {
-            return $scope.sensorUnits[sensorCode.toUpperCase()].units.length > 1;
-          };
-
-          $scope.submit = function(){
-            var valid = true,
-                sensorDataObj = {},
-                textDataObj = {},
-                sensors = Object.keys($scope.manualSensorEntry),
-                text = $scope.manualTextEntry,
-                sensorlogsArray = [];
-
-            for (var i = 0; i < sensors.length; i++) {
-              if ($scope.manualSensorEntry[sensors[i]]) {
-                //construct sensor logs array for dataObj
-                sensorlogsArray.push({
-                  val: $scope.manualSensorEntry[sensors[i]],
-                  sCode: sensors[i]
-                });
-              }
-            }
-
-            //construct sensorDataObj for server
-            sensorDataObj = {
-              sensorLog: {
-                gpi: $scope.sharedDataService.gardenModel._id,
-                timestamp: new Date(),
-                logs: sensorlogsArray
+            $scope.toggleManualEntry = function(){
+              $scope.manualSensorEntryMode = $scope.manualSensorEntryMode ? false : true;
+              if ($scope.sharedDataService) {
+                $scope.sharedDataService.manualSensorEntryMode = $scope.manualSensorEntryMode;
               }
             };
 
-            //construct textDataObj for server
-            textDataObj = {
-              textLog: {
-                gpi: $scope.sharedDataService.gardenModel._id,
-                timestamp: new Date(),
-                logs: [{
-                  val: text,
-                  tags: []
-                }]
-              }
+            $scope.changeUnit = function(sensorCode, value) {
+              var oldUnit = sharedDataService.gardenModel.settings.units[sensorCode],
+                  oldValue = value,
+                  newUnit,
+                  newValue;
+
+              // Object.keys(sharedDataService.units[sensorCode]).forEach(function(unitName){
+              //   if (feBeUtils.units[sensorCode][unitName]) {}
+              // });
+              
+              console.log('toggleUnitType for ' + sensorCode);
+              console.log('has current unit of ' + oldUnit);
+              console.log('will change to ' + newUnit);
+
             };
-            
-            if (valid) {
-              //TODO: convert to $resource's
-              $http({
-                method: 'post',
-                headers: {
-                  'bpn-manual-log-entry': 'true'
-                },
-                url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/sensor-logs',
-                data: sensorDataObj
-              })
-              .success(function(data, status, headers, config) {
-                console.log('success');
-                if ($scope.close) $scope.close();
-              })
-              .error(function(data, status, headers, config) {
-                console.log('error');
 
-              });
+            $scope.hasMultipleUnits = function (sensorCode) {
+              return $scope.sensorUnits[sensorCode.toUpperCase()].units.length > 1;
+            };
 
-              if(text) {
+            $scope.submit = function(){
+              var valid = true,
+                  sensorDataObj = {},
+                  textDataObj = {},
+                  sensors = Object.keys($scope.manualSensorEntry),
+                  text = $scope.manualTextEntry,
+                  sensorlogsArray = [];
+
+              for (var i = 0; i < sensors.length; i++) {
+                if ($scope.manualSensorEntry[sensors[i]]) {
+                  //construct sensor logs array for dataObj
+                  sensorlogsArray.push({
+                    val: $scope.manualSensorEntry[sensors[i]],
+                    sCode: sensors[i]
+                  });
+                }
+              }
+
+              //construct sensorDataObj for server
+              sensorDataObj = {
+                sensorLog: {
+                  gpi: $scope.sharedDataService.gardenModel._id,
+                  timestamp: new Date(),
+                  logs: sensorlogsArray
+                }
+              };
+
+              //construct textDataObj for server
+              textDataObj = {
+                textLog: {
+                  gpi: $scope.sharedDataService.gardenModel._id,
+                  timestamp: new Date(),
+                  logs: [{
+                    val: text,
+                    tags: []
+                  }]
+                }
+              };
+              
+              if (valid) {
+                analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "post sensor log" });
+                //TODO: convert to $resource's
                 $http({
                   method: 'post',
-                  url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/text-logs',
-                  data: textDataObj
+                  headers: {
+                    'bpn-manual-log-entry': 'true'
+                  },
+                  url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/sensor-logs',
+                  data: sensorDataObj
                 })
                 .success(function(data, status, headers, config) {
                   console.log('success');
+                  if ($scope.close) $scope.close();
                 })
                 .error(function(data, status, headers, config) {
                   console.log('error');
-                });
-              }
-            }
-          };
 
-        },
+                });
+
+                if(text) {
+                  analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "post text log" });
+                  $http({
+                    method: 'post',
+                    url: '/api/gardens/' + $scope.sharedDataService.gardenModel._id + '/text-logs',
+                    data: textDataObj
+                  })
+                  .success(function(data, status, headers, config) {
+                    console.log('success');
+                  })
+                  .error(function(data, status, headers, config) {
+                    console.log('error');
+                  });
+                }
+              }
+            };
+
+          }
+        ],
         link: function (scope, element, attrs, controller) { 
           
         }

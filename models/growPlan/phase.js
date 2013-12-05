@@ -349,7 +349,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedActions.push(validatedAction._id);
               }
               if (silentValidationFail){
-                winston.error(err);
+                if (err) { winston.error(JSON.stringify(err)); }
                 return actionCallback();  
               }
               return actionCallback(err);
@@ -377,7 +377,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedActions.push(validatedAction._id);  
               }
               if (silentValidationFail){
-                winston.error(err);
+                if (err) { winston.error(JSON.stringify(err)); }
                 return actionCallback();  
               }
               return actionCallback(err);
@@ -404,7 +404,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
               submittedPhase.growSystem = validatedGrowSystem._id;  
             }
             if (silentValidationFail){
-              winston.error(err);
+              if (err) { winston.error(JSON.stringify(err)); }
               return innerCallback();   
             }
             return innerCallback(err);
@@ -429,7 +429,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                 validatedNutrients.push(validatedNutrient._id);
               }
               if (silentValidationFail){
-                winston.error(err);
+                if (err) { winston.error(JSON.stringify(err)); }
                 return nutrientCallback();  
               }
               return nutrientCallback(err);
@@ -456,7 +456,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
               submittedPhase.light = validatedLight._id;  
             }
             if (silentValidationFail){
-              winston.error(err);
+              if (err) { winston.error(JSON.stringify(err)); }
               return innerCallback();  
             }
             return innerCallback(err);
@@ -480,7 +480,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
                   validatedIdealRanges.push(validatedIdealRange);
                 }
                 if (silentValidationFail){
-                  winston.error(err);
+                  if (err) { winston.error(JSON.stringify(err)); }
                   return idealRangeCallback();
                 }
                 return idealRangeCallback(err);  
@@ -503,7 +503,7 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
       }
       
       if (silentValidationFail && err){
-        winston.error(err);
+        winston.error(JSON.stringify(err));
         return (null, null);
       } 
       return callback(err, submittedPhase);
