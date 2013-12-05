@@ -102,7 +102,8 @@ module.exports = function(app){
     	className: "landing-page single-page get-started",
     	pageType: "landing-page"
     };
-	  res.render('getstarted', locals);
+	  //res.render('getstarted', locals);
+    res.redirect('/signup');
 	});
 
 	app.get('/privacy', function (req, res){
