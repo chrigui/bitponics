@@ -315,4 +315,119 @@ define(['bpn.directives', 'jquery', 'd3'],
         }
       };
     });
+
+    bpnDirectives.directive('bpnDirectivesControlActionGraph', function() { 
+      return {
+        restrict : "EA",
+        replace : true,
+        scope : {
+          controlAction : "=",
+          eventHandler : '&customClick'
+        },
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
+        controller : function ($scope, $element, $attrs, $transclude){
+          $scope.getPathClassName = function (data, index) {
+            var num = parseInt(data.data.value, 10);
+
+            if (num == 0) {
+              return 'off';
+            } else {
+              return 'on';
+            }
+          };
+
+          $scope.iconMap = {
+            'seedlingheatmat' : 'icon-__96_heatmat_00e36c',
+            'humidifier' : 'icon-__98_humidifier_00e36c',
+            'airconditioner' : 'icon-__92_ac_00e36c',
+            'heater' : 'icon-__94_heater_00e36c',
+            'fan' : 'icon-__83_fan_00e36c',
+            'waterpump' : 'icon-__88_waterpump_00e36c',
+            'light' : 'icon-__100_light_accessory_00e36c'
+          }
+
+
+        },
+        link: function (scope, element, attrs, controller) { 
+          // link is where we have a created directive element as
+          // well as populated scope to work with
+          // element is a jQuery wrapper on the element
+
+          var outerMargin = 0,
+              width = element.width() - (outerMargin * 2),
+              height = width,
+              radius = width / 2,
+              innerWhitespaceRadius = radius / 2,
+              arcSpan = (radius - innerWhitespaceRadius),
+              arcMargin = 0,
+              colorScale = d3.scale.category20c(),
+              pie = d3.layout.pie(),
+              dayMilliseconds = 24 * 60 * 60 * 1000,
+              svg,
+              arc,
+              className,
+              svgGroup,
+              cycleStates,
+              cyclesInADay,
+              cycleGraphData = [],
+              i;
+
+          // disable data sorting & force all slices to be the same size
+          pie
+          .sort(null)
+          .value(function (d) {
+            return d.milliseconds || 1; // don't allow a 0 duration. d3 can't draw it
+          });
+
+          svg = d3.select(element[0])
+          .append('svg:svg')
+          .attr('width', width)
+          .attr('height', height);
+
+          arc = d3.svg.arc();
+          if (scope.controlAction.control) {
+            className = 'control-' + scope.controlAction.control.className;
+          } else {
+            className = 'action';
+          }
+
+          cycleStates = scope.controlAction.cycle.states.map(function(state){
+            return {
+              value : parseInt(state.controlValue, 10),
+              milliseconds : moment.duration(state.duration || 0, state.durationType || '').asMilliseconds()
+            }
+          });
+
+          if (scope.controlAction.overallDurationInMilliseconds === 0){
+            // then it's a single-state cycle with no duration (aka, just set to VALUE and leave forever)
+            cyclesInADay = 1;
+          } else {
+            cyclesInADay = dayMilliseconds / scope.controlAction.overallDurationInMilliseconds;
+          }
+          
+          for (i = 0; i < cyclesInADay; i++) {
+            cycleGraphData = cycleGraphData.concat(cycleStates);
+          }
+
+          arc
+          .outerRadius(radius - arcMargin)
+          .innerRadius(radius - arcSpan - arcMargin);
+
+          svgGroup = svg.append('svg:g')
+          .classed(className, true)
+          .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');          
+
+          svgGroup.selectAll('path')
+          .data(pie(cycleGraphData))
+          .enter()
+          .append('svg:path')
+          .attr('d', arc)
+          .attr('class', scope.getPathClassName)
+          //.attr('stroke', '#fff')
+          //.attr('stroke-width', 1)
+          //.attr('fill', scope.getControlFillColor)
+          
+        }
+      };
+    });
 });

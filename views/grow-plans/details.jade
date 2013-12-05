@@ -259,9 +259,9 @@ block head
                 class="btn-composite action", 
                 ng-click="triggerActionOverlay(action)") 
                 
-                h3 {{action.description}}
+                
                 div(data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
-
+                p {{action.description}}
               
                 div
                   div(modal="sharedDataService.activeOverlay=='ActionOverlay'+action._id", close="close()", options="sharedDataService.modalOptions")
