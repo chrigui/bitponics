@@ -538,6 +538,7 @@ ol.list-style {
 .btn.warning,
 .btn-composite.warning {
   color: #fac400;
+  font-weight: bold;
 }
 .btn-composite {
   background-color: #fff;
@@ -5243,8 +5244,13 @@ button.close {
   width: 2em;
   margin: 1em;
 }
-.growplans .phaseDescription {
+.growplans .phase-description {
   margin: 0 0 2em 0;
+}
+.growplans .phase-duration input {
+  display: inline;
+  width: 5em;
+  margin: 0 1em;
 }
 .growplans .phase-tabs {
   list-style: none;
