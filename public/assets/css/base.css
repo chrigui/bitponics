@@ -718,11 +718,7 @@ body {
 }
 div,
 p,
-span,
-a,
-a:visited,
-a:hover,
-a:active {
+span {
   color: #999;
 }
 section {
