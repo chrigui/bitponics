@@ -293,7 +293,7 @@ ol.list-style
 	@extends .display-ib
 	padding 1em
 	margin 1em
-	background color-logo-green
+	background-color color-logo-green
 	color white
 	cursor pointer
 	box-shadow 1px 1px 2px 0px rgba(0, 0, 0, 0.2)
@@ -336,6 +336,16 @@ ol.list-style
 
 	&.warning
 		color color-bg-orange
+
+.btn-composite
+	@extends .btn
+	background-color white
+	color color-logo-green
+	border 0 none
+	box-shadow none
+	p
+		color color-logo-green
+		padding-bottom: 0.15em;
 
 .link
 	@extends .display-i

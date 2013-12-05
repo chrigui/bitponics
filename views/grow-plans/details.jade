@@ -142,9 +142,10 @@ block head
             div(class="grid grid--wrapping", ng-controller="bpn.controllers.growPlan.Actions")
               //- ng-hide="!sharedDataService.selectedGrowPlan.device")
               
-              div(
+              button(
+                type="button",
                 ng-repeat="control in sharedDataService.controls", 
-                class="control icon-glyph icon-{{control.className}} grid-cell {{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] ? 'has-action' : ''}}",
+                class="btn-composite control icon-glyph icon-{{control.className}} grid-cell {{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] ? 'has-action' : ''}}",
                 ng-click="triggerActionOverlay(sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id], control)") 
                 
                 p {{control.name}}
@@ -252,9 +253,10 @@ block head
 
           div(class="reminders", accordion-group, heading="Reminders")
             div(ng-controller="bpn.controllers.growPlan.Actions")
-              div(
+              button(
+                type="button",
                 ng-repeat="action in sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl", 
-                class="action", 
+                class="btn-composite action", 
                 ng-click="triggerActionOverlay(action)") 
                 
                 h3 {{action.description}}

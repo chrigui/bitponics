@@ -47,6 +47,7 @@
 .display-ib,
 .btn,
 .btn *,
+.btn-composite,
 .control,
 .page-content.center-img img,
 .overlay .pagination li,
@@ -490,44 +491,63 @@ ol.list-style {
 /*
  * Generic Button Style
  */
-.btn {
+.btn,
+.btn-composite {
   padding: 1em;
   margin: 1em;
-  background: #00e36c;
+  background-color: #00e36c;
   color: #fff;
   cursor: pointer;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
   position: relative;
 }
-.btn:active {
+.btn:active,
+.btn-composite:active {
   box-shadow: none;
   top: 1px;
   right: -1px;
 }
-.btn * {
+.btn *,
+.btn-composite * {
   margin: 0;
 }
-.btn.sub {
+.btn.sub,
+.btn-composite.sub {
   background: #00e36c;
 }
-.btn.clear {
+.btn.clear,
+.btn-composite.clear {
   display: block;
   clear: both;
   margin: 0;
 }
-.btn.add {
+.btn.add,
+.btn-composite.add {
   border: 0 none;
 }
-.btn.on {
+.btn.on,
+.btn-composite.on {
   background: #00e36c;
   color: #fff;
 }
-.btn.off {
+.btn.off,
+.btn-composite.off {
   background: #fff;
   color: #00e36c;
 }
-.btn.warning {
+.btn.warning,
+.btn-composite.warning {
   color: #fac400;
+}
+.btn-composite {
+  background-color: #fff;
+  color: #00e36c;
+  border: 0 none;
+  box-shadow: none;
+}
+.btn-composite p {
+  color: #00e36c;
+  padding-bottom: 0.15em;
 }
 .link {
   color: #00e36c;
@@ -5374,7 +5394,7 @@ button.close {
   -ms-flex: 1 5em;
   flex: 1 5em;
   font-size: 0.85em;
-  padding: 4em 0 0;
+  padding: 5em 0 0;
   line-height: 1;
   font-weight: normal;
   margin: 0 0 1em;
