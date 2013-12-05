@@ -368,6 +368,7 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
                         validatedPlants.push(validatedPlant);    
                       }
                       if (silentValidationFail){
+                        if (err) { winston.error(JSON.stringify(err)); }
                         return plantCallback();  
                       }
                       return plantCallback(err);

@@ -145,6 +145,7 @@ GrowSystemSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
       ],
       function(err, validatedGrowSystem){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedGrowSystem);
         }
         return callback(err, validatedGrowSystem);

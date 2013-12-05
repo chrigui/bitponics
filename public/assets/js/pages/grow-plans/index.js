@@ -439,7 +439,7 @@ require([
           $scope.addAction = function (control) {
             var newAction = {
                 _id: "new_action" + '-' + (Date.now().toString()), // this is just to make it unique in the UI. The server will detect that this is not an ObjectId and create a new Action
-                cycle: { offset: { duration: 0, durationType: null }, states : [] }
+                cycle: { offset: { duration: 0, durationType: 'days' }, states : [] }
               };
             
             if (control){

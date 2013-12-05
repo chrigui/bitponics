@@ -86,6 +86,7 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
       ],
       function(err, validatedPlant){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedPlant);
         }
         return callback(err, validatedPlant);

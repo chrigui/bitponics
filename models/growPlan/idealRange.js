@@ -206,6 +206,7 @@ IdealRangeSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
             !submittedIdealRange.valueRange.min || 
             !submittedIdealRange.valueRange.max
           ){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback();
         }
         return callback(null, submittedIdealRange);

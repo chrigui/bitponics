@@ -90,6 +90,7 @@ NutrientSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       ],
       function(err, validatedNutrient){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedNutrient);
         }
         return callback(err, validatedNutrient);

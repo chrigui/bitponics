@@ -106,6 +106,7 @@ LightFixtureSchema.static('createNewIfUserDefinedPropertiesModified', function(o
       ],
       function(err, validatedLightFixture){
         if (silentValidationFail){
+          if (err) { winston.error(JSON.stringify(err)); }
           return callback(null, validatedLightFixture);
         }
         return callback(err, validatedLightFixture);
