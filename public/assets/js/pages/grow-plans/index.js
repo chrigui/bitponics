@@ -749,6 +749,8 @@ require([
               
               $scope.sharedDataService.submit.updateInProgress = true;
               
+              $scope.originalGrowPlan = angular.copy($scope.sharedDataService.selectedGrowPlan);
+
               $scope.sharedDataService.selectedGrowPlan.$save(
                 function(returnedGrowPlan){
                   console.log('success', arguments);

@@ -222,7 +222,7 @@ module.exports = function(app) {
   app.post('/api/grow-plans/:id', 
   	routeUtils.middleware.ensureLoggedIn,
   	function (req, res, next){
-	    console.log("got some grow plan PUT!", JSON.stringify(req.body));
+	    console.log("got some grow plan POST!", JSON.stringify(req.body));
       
       GrowPlanModel.createNewIfUserDefinedPropertiesModified(
         {
@@ -232,7 +232,7 @@ module.exports = function(app) {
           silentValidationFail : true
         },
         function(err, validatedGrowPlan){
-          winston.info("UPDATING GROW PLAN, err:" + JSON.stringify(err) + ", " + req.params.id + " " + validatedGrowPlan._id);
+          winston.info("UPDATED GROW PLAN, err:" + JSON.stringify(err) + ", originalId " + req.params.id + ", newId " + validatedGrowPlan._id);
 
           if (err) { 
             result.status = 'error';
