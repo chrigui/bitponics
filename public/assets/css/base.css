@@ -47,6 +47,7 @@
 .display-ib,
 .btn,
 .btn *,
+.btn-composite,
 .control,
 .page-content.center-img img,
 .overlay .pagination li,
@@ -490,44 +491,63 @@ ol.list-style {
 /*
  * Generic Button Style
  */
-.btn {
+.btn,
+.btn-composite {
   padding: 1em;
   margin: 1em;
-  background: #00e36c;
+  background-color: #00e36c;
   color: #fff;
   cursor: pointer;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
   position: relative;
 }
-.btn:active {
+.btn:active,
+.btn-composite:active {
   box-shadow: none;
   top: 1px;
   right: -1px;
 }
-.btn * {
+.btn *,
+.btn-composite * {
   margin: 0;
 }
-.btn.sub {
+.btn.sub,
+.btn-composite.sub {
   background: #00e36c;
 }
-.btn.clear {
+.btn.clear,
+.btn-composite.clear {
   display: block;
   clear: both;
   margin: 0;
 }
-.btn.add {
+.btn.add,
+.btn-composite.add {
   border: 0 none;
 }
-.btn.on {
+.btn.on,
+.btn-composite.on {
   background: #00e36c;
   color: #fff;
 }
-.btn.off {
+.btn.off,
+.btn-composite.off {
   background: #fff;
   color: #00e36c;
 }
-.btn.warning {
+.btn.warning,
+.btn-composite.warning {
   color: #fac400;
+}
+.btn-composite {
+  background-color: #fff;
+  color: #00e36c;
+  border: 0 none;
+  box-shadow: none;
+}
+.btn-composite p {
+  color: #00e36c;
+  padding-bottom: 0.15em;
 }
 .link {
   color: #00e36c;
@@ -2781,8 +2801,9 @@ input[type='checkbox']:checked + label.btn {
   width: 1em;
   height: 0.35em;
   background: transparent;
-  top: 0.6em;
+  top: 50%;
   right: 0.35em;
+  margin-top: -0.5em;
   border: 3px solid #fcfff4;
   border-top: none;
   border-right: none;
@@ -2803,6 +2824,11 @@ input[type='checkbox']:checked + label.btn {
   box-shadow: inset 1px 1px 1px #00e36c, 1px 1px 1px #00e36c;
   background: #fff;
 }
+.custom-checkbox-wrap input[type="checkbox"] + label:after,
+.custom-checkbox-wrap input[type="radio"] + label:after {
+  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #eee;
+  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #eee;
+}
 .custom-checkbox-wrap input[type="checkbox"]:checked + label:before,
 .custom-checkbox-wrap input[type="radio"]:checked + label:before {
   opacity: 1;
@@ -2811,8 +2837,6 @@ input[type='checkbox']:checked + label.btn {
 }
 .custom-checkbox-wrap input[type="checkbox"]:checked + label:after,
 .custom-checkbox-wrap input[type="radio"]:checked + label:after {
-  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
-  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
   background: #00e36c;
 }
 .custom-checkbox-wrap.left-orient label {
@@ -5145,7 +5169,6 @@ button.close {
   text-align: center;
 }
 .growplans .overlay .custom-checkbox-wrap .plant:before {
-  top: 1.1em;
   right: 0.85em;
 }
 .growplans .overlay .action-overlay .custom-checkbox-wrap {
@@ -5371,7 +5394,7 @@ button.close {
   -ms-flex: 1 5em;
   flex: 1 5em;
   font-size: 0.85em;
-  padding: 4em 0 0;
+  padding: 5em 0 0;
   line-height: 1;
   font-weight: normal;
   margin: 0 0 1em;

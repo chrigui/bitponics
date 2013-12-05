@@ -469,8 +469,9 @@ input[type='checkbox']:checked + label.btn {
   width: 1em;
   height: 0.35em;
   background: transparent;
-  top: 0.6em;
+  top: 50%;
   right: 0.35em;
+  margin-top: -0.5em;
   border: 3px solid #fcfff4;
   border-top: none;
   border-right: none;
@@ -491,6 +492,11 @@ input[type='checkbox']:checked + label.btn {
   box-shadow: inset 1px 1px 1px #00e36c, 1px 1px 1px #00e36c;
   background: #fff;
 }
+.custom-checkbox-wrap input[type="checkbox"] + label:after,
+.custom-checkbox-wrap input[type="radio"] + label:after {
+  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #eee;
+  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #eee;
+}
 .custom-checkbox-wrap input[type="checkbox"]:checked + label:before,
 .custom-checkbox-wrap input[type="radio"]:checked + label:before {
   opacity: 1;
@@ -499,8 +505,6 @@ input[type='checkbox']:checked + label.btn {
 }
 .custom-checkbox-wrap input[type="checkbox"]:checked + label:after,
 .custom-checkbox-wrap input[type="radio"]:checked + label:after {
-  -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
-  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #fff;
   background: #00e36c;
 }
 .custom-checkbox-wrap.left-orient label {

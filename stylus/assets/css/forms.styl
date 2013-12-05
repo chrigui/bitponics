@@ -274,10 +274,11 @@ input[type='checkbox']:checked + label.btn
 			width 1em
 			height 0.35em
 			background transparent
-			top 0.6em
+			top 50%
 			right .35em
 			//top 1.1em
-			//right .85em
+			// right .85em
+			margin-top: -.5em;
 			border 3px solid #fcfff4
 			border-top none
 			border-right none
@@ -299,6 +300,11 @@ input[type='checkbox']:checked + label.btn
 		}
 	}
 
+	input[type="checkbox"] + label:after,
+	input[type="radio"] + label:after {
+		box-shadow inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px #eee
+	}
+
 	input[type="checkbox"]:checked + label:before,
 	input[type="radio"]:checked + label:before {
 		// -ms-filter "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"
@@ -308,7 +314,7 @@ input[type='checkbox']:checked + label.btn
 
 	input[type="checkbox"]:checked + label:after,
 	input[type="radio"]:checked + label:after {
-		box-shadow inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px rgba(255,255,255,1)
+		// box-shadow inset 1px 1px 1px rgba(0,0,0,0.25), 1px 1px 1px rgba(255,255,255,1)
 		background color-logo-green
 	}
 }
