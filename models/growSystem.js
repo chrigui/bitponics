@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
   requirejs = require('../lib/requirejs-wrapper'),
   async = require('async'),
   feBeUtils = requirejs('fe-be-utils'),
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection;
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  winston = require('winston');
 
 var GrowSystemSchema = new Schema({
 	
