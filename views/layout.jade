@@ -20,3 +20,12 @@ html(class=className+" no-js")
             - if (user && user._id)
               script(type="text/javascript")
                 mixpanel.identify("#{user._id}");
+                mixpanel.people.set({
+                    "$email": "#{user.email}",    // only special properties need the $
+                    "$first_name": "#{user.name.first}",
+                    "$last_name": "#{user.name.last}",
+                    "$created": new Date("#{user.createdAt}")
+                 });
+
+            script(type="text/javascript")
+                mixpanel.track("page viewed", {'page name': document.title, 'url' : window.location.pathname });
