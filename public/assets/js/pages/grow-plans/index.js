@@ -49,9 +49,10 @@ require([
 
 		growPlanApp.factory('sharedDataService', 
       [
+        '$route',
         '$location',
         '$rootScope',
-        function($location, $rootScope){
+        function($route, $location, $rootScope){
     			var sharedData = {
     				selectedGrowPlan : {},
             selectedPhaseIndex : 0, //default to first
@@ -93,11 +94,11 @@ require([
             viewModels.initControlViewModel(control);
           });
 
+          
+
           sharedData.pageMode = ($location.search()['setup'] ? 'setup' : 'default');
 
           $rootScope.close = function(){
-            console.log('$rootScope.close');
-            console.trace();
             sharedData.activeOverlay = undefined;
           };
 
@@ -124,7 +125,6 @@ require([
               var delay = $q.defer();
 			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
 			    			function (growPlan) {
-			    				//viewModels.initGrowPlanViewModel(growPlan, sharedDataService.sensors);
 			    				sharedDataService.selectedGrowPlan = growPlan;
 			      			delay.resolve(sharedDataService.selectedGrowPlan);
 			    			}, 
@@ -257,10 +257,14 @@ require([
     growPlanApp.controller('bpn.controllers.growPlan.SaveOverlay',
       [
         '$scope',
+        '$window',
         'sharedDataService',
-        function($scope, sharedDataService){
+        function($scope, $window, sharedDataService){
           $scope.sharedDataService = sharedDataService;
     
+          $scope.loadGrowPlanPage = function(){
+            $window.location.href = '/grow-plans/' + $scope.sharedDataService.selectedGrowPlan._id;
+          }
         }
       ]
     );
@@ -467,10 +471,11 @@ require([
       [
         '$scope',
         '$location',
+        '$route',
         '$filter',
         'GrowPlanModel',
         'sharedDataService',
-        function ($scope, $location, $filter, GrowPlanModel, sharedDataService) {
+        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService) {
           $scope.sharedDataService = sharedDataService;
 
           //$scope.lights = bpn.lights;
@@ -732,6 +737,8 @@ require([
               $scope.sharedDataService.submit.updateInProgress = true;
               
               $scope.originalGrowPlan = angular.copy($scope.sharedDataService.selectedGrowPlan);
+
+              $scope.sharedDataService.originalGrowPlanId = $route.current.params.growPlanId;            
 
               $scope.sharedDataService.selectedGrowPlan.$save(
                 function(returnedGrowPlan){

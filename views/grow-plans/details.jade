@@ -1007,11 +1007,20 @@ block content
               div(class="close btn", ng-click="close()")
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               div(ng-show="!sharedDataService.submit.error")
-                h3(class="page-heading page-heading-small") Grow Plan Updated
-                p 
-                  | Your grow plan has been updated! Visit your 
-                  a(class="link", href="/gardens") gardens
-                  |  page to make sure your gardens are reflecting the updates.
+                
+                
+                div(ng-show="sharedDataService.originalGrowPlanId === sharedDataService.selectedGrowPlan._id")
+                  h3(class="page-heading page-heading-small") Grow Plan Updated
+                  p Your grow plan has been updated! Your 
+                    a(class="link", href="/gardens") gardens
+                    |  should now reflect the new updates. Happy growing!
+                div(ng-show="sharedDataService.originalGrowPlanId !== sharedDataService.selectedGrowPlan._id")
+                  h3(class="page-heading page-heading-small") You just contributed to the exploration of gardening knowledge!
+                  p We created you your very own branch of this grow plan. Now the community can learn how your changes help plant growth.
+                  p Any gardens that were using the original have been migrated to your new branch.
+                  p  
+                    a.btn(class="link", href="/grow-plans/{{sharedDataService.selectedGrowPlan._id}}", ng-click="loadGrowPlanPage()") Visit your new grow plan page
+                  
               div(ng-show="sharedDataService.submit.error")
                 h3(class="page-heading page-heading-small error") Error saving changes
                 p.error
