@@ -76,7 +76,7 @@ module.exports = function(app, callback) {
   require('./app-config')(app);
   require('./braintree-config').setEnvironment(app.settings.env);
   require('../lib/mixpanel-wrapper')(app);
-  
+   
 	// This has to occur after the connection has been set up
 	require('../models/user').setEmailVariables(app.config);	
 };

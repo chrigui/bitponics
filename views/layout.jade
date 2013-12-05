@@ -17,3 +17,6 @@ html(class=className+" no-js")
 
             block footer-scripts
         
+            - if (user && user._id)
+              script(type="text/javascript")
+                mixpanel.identify("#{user._id}");
