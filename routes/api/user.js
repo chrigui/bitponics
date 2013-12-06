@@ -67,11 +67,11 @@ module.exports = function(app) {
    */
   app.get('/api/users/:id', 
     routeUtils.middleware.ensureSecure, 
-    routeUtils.middleware.ensureUserIsAdmin, 
+    routeUtils.middleware.ensureLoggedIn, 
     function (req, res, next){
       return UserModel.findById(req.params.id, function (err, user) {
         if (err) { return next(err); }
-        return res.send(user);
+        return res.send(user.toPublicJSON());
       });
     }
   );

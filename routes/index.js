@@ -370,6 +370,7 @@ module.exports = function(app){
 	require('./grow-plans')(app);
 	require('./guides')(app);
 	require('./photos')(app);
+  require('./profiles')(app);
 	require('./reset')(app);
 	require('./setup')(app);
 	require('./sockets')(app);

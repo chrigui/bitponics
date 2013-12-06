@@ -40,7 +40,10 @@ function (angular, domReady, viewModels, moment, feBeUtils) {
         );
 
         $scope.userGardenResults = GardenModel.query(
-          { where : JSON.stringify({ 'users' : bpn.user._id })},
+          { 
+            where : JSON.stringify({ 'users' : bpn.user._id }),
+            select : 'name,startDate'
+          },
           function success(data){
             console.log(data);
           }
