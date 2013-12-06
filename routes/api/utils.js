@@ -135,7 +135,7 @@ module.exports = {
 					},
 					function getResults(innerCallback){
 						// Cast the query back to a find() operation so we can limit/skip/sort/select.
-						// TODO: Should keep the prior .where filters, but need to verify
+						// TODO: Expecting that this retains the prior .where clauses, but need to verify
         		query.find();
 
 						query.limit(limit);
@@ -147,9 +147,8 @@ module.exports = {
               query.sort(sort);
             } else if (options.defaultSort){
               query.sort(options.defaultSort);
-            } else {
-              query.sort('-date');
             }
+            
   
             if (select){
               select = select.split(',');
@@ -160,8 +159,6 @@ module.exports = {
                   fieldNested = fieldParts[1],
                   modelPath = Model.schema.path(fieldRoot);
                 
-                console.log('selecting', fieldRoot, fieldNested, modelPath);
-
                 // If fieldRoot is a ref'ed schema type
                 if (modelPath.options.ref){
                   // populate fieldRoot, select field[1]
