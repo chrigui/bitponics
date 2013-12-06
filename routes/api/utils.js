@@ -23,7 +23,8 @@ module.exports = {
    * @param {Number} [req.params.skip]
    * @param {Number} [req.params.limit=200]
    * @param {string=} [req.params.sort] - name of field to sort by. prefix with "-" for descending.
-   * @param {Object} [req.parans.where] - JSON-encoded query object. Follows mongodb query conventions. https://parse.com/docs/rest#queries
+   * @param {CSV} [req.params.select] - CSV list of field names to include in the response. Fields on nested objects can be requested with dot-notation: "nestedDocument.name"
+   * @param {Object} [req.params.where] - JSON-encoded query object. Follows mongodb query conventions. https://parse.com/docs/rest#queries
    * @param {string=} [req.params.search] String search term. Should usually be used to query fuzzy match on "name" field.
    *
    * Response:
@@ -42,16 +43,19 @@ module.exports = {
 	 	return [
 	 		routeUtils.middleware.ensureLoggedIn,
 	 		function(req, res, next){
+
 		 		var response = {
 		 			statusCode : 200,
 		 			body : {}
 		 		},
+
 		 		startDate = req.query['start-date'],
 		    endDate = req.query['end-date'],
 		    limit = req.query['limit'] || 200,
 		    skip = req.query['skip'],
         where = req.query['where'],
         sort = req.query['sort'],
+        select = req.query['select'],
 		    query;
 
         // cap the limit at 200
@@ -106,7 +110,7 @@ module.exports = {
               } catch(e){
                 winston.error(e);
               }
-console.log('the where!', where);
+
               if (where){
                 query.where(where);
               }
@@ -146,7 +150,31 @@ console.log('the where!', where);
             } else {
               query.sort('-date');
             }
-            
+  
+            if (select){
+              select = select.split(',');
+              select.forEach(function(field){
+                
+                var fieldParts = field.split('.'),
+                  fieldRoot = fieldParts[0],
+                  fieldNested = fieldParts[1],
+                  modelPath = Model.schema.path(fieldRoot);
+                
+                console.log('selecting', fieldRoot, fieldNested, modelPath);
+
+                // If fieldRoot is a ref'ed schema type
+                if (modelPath.options.ref){
+                  // populate fieldRoot, select field[1]
+                  console.log('populating');
+                  query.select(fieldRoot);
+                  query.populate(fieldRoot, fieldNested);
+                }
+                else{
+                  // select field as one thing (no parts). Standard mongo subdoc selection.
+                  query.select(field);
+                }
+              });
+            }            
 
 						query.exec(function(err, queryResults){
 							if (err){ return innerCallback(err); }
