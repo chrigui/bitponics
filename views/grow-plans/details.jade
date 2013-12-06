@@ -32,7 +32,7 @@ block head
         h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.focusedPhase.name}} 
           br
           | Sensor Ranges
-        div(ng-repeat="sensor in sharedDataService.sensors", class="sensor data-module {{sensor.code}} {{sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensor.code].valueRange ? '' : 'empty'}}", ng-click="triggerSensorOverlay(sensor)")
+        div(ng-repeat="sensor in sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors", class="sensor data-module {{sensor.code}} {{sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensor.code].valueRange ? '' : 'empty'}}", ng-click="triggerSensorOverlay(sensor)")
           h3.main-heading
             | {{sensor.abbrev}}
           div.sensor-data
@@ -125,7 +125,7 @@ block head
               input(type="number", size="4", placeholder="", ng-model="sharedDataService.selectedGrowPlan.focusedPhase.expectedNumberOfDays", min="0", max="365") 
               | days
 
-          a.btn.warning.no-margin(ng-click="removePhase(sharedDataService.selectedPhaseIndex)") Remove {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase
+          a.btn.remove.no-margin(ng-click="removePhase(sharedDataService.selectedPhaseIndex)") Remove {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase
 
 
       div(class="content-module side")

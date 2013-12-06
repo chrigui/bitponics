@@ -178,6 +178,8 @@ module.exports = function(app) {
   	function (req, res, next){
 	    console.log("got some grow plan POST!", JSON.stringify(req.body));
       
+      var result = {};
+      
       GrowPlanModel.createNewIfUserDefinedPropertiesModified(
         {
           growPlan : req.body,
@@ -186,7 +188,7 @@ module.exports = function(app) {
           silentValidationFail : true
         },
         function(err, validatedGrowPlan){
-          winston.info("UPDATED GROW PLAN, err:" + JSON.stringify(err) + ", originalId " + req.params.id + ", newId " + validatedGrowPlan._id);
+          winston.info("UPDATED GROW PLAN, err:" + JSON.stringify(err) + ", originalId " + req.params.id + ", newId " + (validatedGrowPlan ? validatedGrowPlan._id : ''));
 
           if (err) { 
             result.status = 'error';

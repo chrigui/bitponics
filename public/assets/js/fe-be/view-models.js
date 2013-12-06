@@ -272,12 +272,76 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   };
 
 
+
+
+
+
+  /**
+   *
+   */
+  viewModels.initGrowPlanPhaseViewModel = function (phase, sensors){
+    var initActionViewModel = viewModels.initActionViewModel;
+    
+    phase.idealRangesBySensor = {};
+    Object.keys(sensors).forEach(function(sensorKey){
+      phase.idealRangesBySensor[sensorKey] = {
+        sCode : sensorKey,
+        noApplicableTimeSpan : true
+      };
+    });
+
+    phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
+      if (!idealRange.applicableTimeSpan){
+        idealRange.noApplicableTimeSpan = true;
+      }
+
+      phase.idealRangesBySensor[idealRange.sCode] = idealRange;
+    });
+
+
+
+    phase.actionViewModels = [];
+    phase.actions.forEach(function(action){
+      phase.actionViewModels.push(initActionViewModel(action, 'phaseStart'));
+    });
+    phase.phaseEndActions.forEach(function(action){
+      phase.actionViewModels.push(initActionViewModel(action, 'phaseEnd'));
+    });
+
+    phase.actionViewModelsByControl = {};
+    var actionsWithControl = phase.actionViewModels.filter(function(actionViewModel){
+      return (!!(actionViewModel.control));
+    });
+    actionsWithControl.forEach(function(action){
+      phase.actionViewModelsByControl[action.control] = action;
+    });
+
+
+    phase.actionViewModelsNoControl = [];
+    var actionsWithNoControl = phase.actionViewModels.filter(function(actionViewModel){
+      return (!(actionViewModel.control));
+    });
+    actionsWithNoControl.forEach(function(action){
+      phase.actionViewModelsNoControl.push(action);
+    });
+
+    phase.nutrientsViewModel = {};
+    phase.nutrients.forEach(function(nutrient){
+      phase.nutrientsViewModel[nutrient._id] = nutrient;
+    });
+
+    return phase;
+  };
+
+
+
   /**
    * Adds/calculates properties necessary for UI presentation
    *
    * Sets the following properties:
    * - focusedPhase
-   * - focusedPhase.sortedControls - this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
+   * - focusedPhase.sortedControls - ordered by populated/unpopulated. this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
+   * - focusedPhase.sortedSensors - ordered by populated/unpopulated. this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
    * - plantsViewModel
    * - phases[].actionViewModels
    * - phases[].actionViewModelsByControl
@@ -292,62 +356,14 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * - phases[].actions (TODO once we remove the dependency in dashboard)
    */
   viewModels.initGrowPlanViewModel = function (growPlan, sensors){
-    var initActionViewModel = viewModels.initActionViewModel;
-
+    
 		growPlan.plantsViewModel = {};
 		growPlan.plants.forEach(function(plant){
 			growPlan.plantsViewModel[plant._id] = plant;
 		});
 
     growPlan.phases.forEach(function(phase, index){
-      phase.idealRangesBySensor = {};
-      Object.keys(sensors).forEach(function(sensorKey){
-        phase.idealRangesBySensor[sensorKey] = {
-          sCode : sensorKey,
-          noApplicableTimeSpan : true
-        };
-      });
-
-      phase.idealRanges.forEach(function(idealRange, idealRangeIndex){
-        if (!idealRange.applicableTimeSpan){
-          idealRange.noApplicableTimeSpan = true;
-        }
-
-        phase.idealRangesBySensor[idealRange.sCode] = idealRange;
-      });
-
-
-
-      phase.actionViewModels = [];
-      phase.actions.forEach(function(action){
-        phase.actionViewModels.push(initActionViewModel(action, 'phaseStart'));
-      });
-      phase.phaseEndActions.forEach(function(action){
-        phase.actionViewModels.push(initActionViewModel(action, 'phaseEnd'));
-      });
-
-      phase.actionViewModelsByControl = {};
-      var actionsWithControl = phase.actionViewModels.filter(function(actionViewModel){
-        return (!!(actionViewModel.control));
-      });
-      actionsWithControl.forEach(function(action){
-        phase.actionViewModelsByControl[action.control] = action;
-      });
-
-
-      phase.actionViewModelsNoControl = [];
-      var actionsWithNoControl = phase.actionViewModels.filter(function(actionViewModel){
-        return (!(actionViewModel.control));
-      });
-      actionsWithNoControl.forEach(function(action){
-        phase.actionViewModelsNoControl.push(action);
-      });
-
-      phase.nutrientsViewModel = {};
-      phase.nutrients.forEach(function(nutrient){
-      	phase.nutrientsViewModel[nutrient._id] = nutrient;
-      });
-
+      viewModels.initGrowPlanPhaseViewModel(phase, sensors);
     });
 
 
@@ -530,6 +546,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   };
 
 
+
+
   /**
    * Convert GrowPlan ViewModel back to server model
    * 
@@ -553,6 +571,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     growPlan.phases.forEach(function(phase, index){
 
       phase.sortedControls = undefined;
+      phase.sortedSensors = undefined;
 
       // Populate idealRanges from idealRangesBySensor
       phase.idealRanges = [];

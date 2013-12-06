@@ -9,7 +9,9 @@ var mongoose = require('mongoose'),
   GrowSystemModel = require('../growSystem').model,
   NutrientModel = require('../nutrient').model,
   LightModel = require('../light').model,
-  getObjectId = require('../utils').getObjectId;
+  getObjectId = require('../utils').getObjectId,
+  requirejs = require('../../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
 
 var PhaseSchema = new Schema({
 	
@@ -328,6 +330,10 @@ PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
       user = options.user,
       visibility = options.visibility,
       silentValidationFail = options.silentValidationFail;
+
+  if (!feBeUtils.canParseAsObjectId(submittedPhase._id)){
+    submittedPhase._id = new ObjectId();
+  }
 
   async.parallel(
     [

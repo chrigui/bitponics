@@ -580,7 +580,7 @@ require([
             if (sharedDataService.selectedGrowPlan.phases){
               sharedDataService.selectedGrowPlan.focusedPhase = sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex];
               
-              // Create the sortedControls array
+              // Create the sortedControls & sortedSensors arrays
               sharedDataService.selectedGrowPlan.focusedPhase.sortedControls = [];
               Object.keys(sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl).forEach(function(actionControlId){
                 sharedDataService.selectedGrowPlan.focusedPhase.sortedControls.push(sharedDataService.controlsById[actionControlId]);
@@ -590,6 +590,23 @@ require([
                   sharedDataService.selectedGrowPlan.focusedPhase.sortedControls.push(control);
                 }
               });
+
+              sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors = [];
+              Object.keys(sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor).forEach(function(sensorCode){
+                var idealRange = sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensorCode];
+
+                if (typeof idealRange.valueRange !== 'undefined' && (idealRange.valueRange.min !== 'undefined' || typeof idealRange.valueRange.max !== 'undefined')){
+                  sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.unshift(sharedDataService.sensors[sensorCode]);  
+                } else {
+                  sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.push(sharedDataService.sensors[sensorCode]); 
+                }
+                
+              });
+              // Object.keys(sharedDataService.sensors).forEach(function(sensorCode){
+              //   if (!sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensorCode]){
+              //     sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.push(sharedData.sensors[sensorCode]);
+              //   }
+              // });
             
               sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.sort(function(action1, action2){
                 var a = action1.scheduleType,
