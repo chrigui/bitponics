@@ -277,6 +277,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    *
    * Sets the following properties:
    * - focusedPhase
+   * - focusedPhase.sortedControls - this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
    * - plantsViewModel
    * - phases[].actionViewModels
    * - phases[].actionViewModelsByControl
@@ -284,6 +285,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * - phases[].nutrientsViewModel
    * - phases[].idealRangesBySensor
    * - phases[].idealRangesBySensor.noApplicableTimeSpan
+   * 
    * 
    * Unsets the following properties:
    * - phases[].idealRanges (TODO once we remove the dependency in dashboard)
@@ -530,6 +532,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
   /**
    * Convert GrowPlan ViewModel back to server model
+   * 
+   * Computes all viewModel properties back into server model props and then deletes all viewmodel props
    */
   viewModels.compileGrowPlanViewModelToServerModel = function(growPlan){
     var key;
@@ -547,6 +551,8 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     });
 
     growPlan.phases.forEach(function(phase, index){
+
+      phase.sortedControls = undefined;
 
       // Populate idealRanges from idealRangesBySensor
       phase.idealRanges = [];

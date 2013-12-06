@@ -107,7 +107,7 @@ block head
 
       div(id="phases", class="content-module middle")
         div(ng-controller="bpn.controllers.growPlan.PhasesGraph")
-          h2.page-heading-small.date Edit {{sharedDataService.selectedGrowPlan.focusedPhase.name + ' Phase' || 'Phases'}}
+          h2.page-heading-small.date Edit {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Phase
           div(data-bpn-directives-navigation-phases-graph)
           p.half-width.centered Use the rings to navigate between phases.
 
@@ -131,6 +131,8 @@ block head
       div(class="content-module side")
         h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.focusedPhase.name}} Schedules
         div(accordion)
+
+
           div(ng-show="sharedDataService.userOwnedDevices.length", class="device", id="device", accordion-group, heading="Device")
             ul(class="grid grid--wrapping devicelist")
               li(class="grid-cell") Here is where you can pair up your Bitponics device to your grow plan. Click a device name to select it. After you activate the grow plan, your device will start logging readings and automating any actions defined for your connected accessories.
@@ -148,7 +150,7 @@ block head
               
               button(
                 type="button",
-                ng-repeat="control in sharedDataService.controls", 
+                ng-repeat="control in sharedDataService.selectedGrowPlan.focusedPhase.sortedControls", 
                 class="btn-composite control icon-glyph icon-{{control.className}} grid-cell {{sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id] ? 'has-action' : ''}}",
                 ng-click="triggerActionOverlay(sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id], control)") 
                 
