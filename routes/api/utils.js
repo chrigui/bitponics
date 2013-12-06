@@ -13,15 +13,17 @@ module.exports = {
 	 * @param {string=} [options.parentModelFieldName = "ref.documentId"] - if parentModel is defined, used to query for parent id. 
 	 * @param {string=} [options.dateFieldName] - document field to use for start-date/end-date query filters
 	 * @param {string=} [options.defaultSort]  "fieldName" for ascending or "-fieldName" for descending
+   * @param {bool=} [options.restrictByVisibility = false] - optionally add a conditional clause to the query to limit to the documents the user has read-access to
 	 * 
 	 * @return {[function(req, res, next)]}
 	 * 
 	 * Request:
-	 * @param {Date} [req.params.start-date] (optional) Should be something parse-able by moment.js
-   * @param {Date} [req.params.end-date] (optional) Should be something parse-able by moment.js
+	 * @param {Date} [req.params.start-date] - Should be something parse-able by moment.js
+   * @param {Date} [req.params.end-date] - Should be something parse-able by moment.js
    * @param {Number} [req.params.skip]
    * @param {Number} [req.params.limit=200]
-   * @param {string=} [req.params.sort]
+   * @param {string=} [req.params.sort] - name of field to sort by. prefix with "-" for descending.
+   * @param {Object} [req.parans.where] - JSON-encoded query object. Follows mongodb query conventions. https://parse.com/docs/rest#queries
    * @param {string=} [req.params.search] String search term. Should usually be used to query fuzzy match on "name" field.
    *
    * Response:
@@ -48,7 +50,12 @@ module.exports = {
 		    endDate = req.query['end-date'],
 		    limit = req.query['limit'] || 200,
 		    skip = req.query['skip'],
+        where = req.query['where'],
+        sort = req.query['sort'],
 		    query;
+
+        // cap the limit at 200
+        if (limit > 200) { limit = 200; }
 
 		 		async.series([
 					function checkIfParentModel(innerCallback){
@@ -84,9 +91,26 @@ module.exports = {
 		        	query.where(parentQuery);
 		      	}
 
-			      // cap the limit at 200
-			      if (limit > 200) { limit = 200; }
+            
+            if (options.restrictByVisibility){
+              if (req.user.admin){
+                // no condition
+              } else {
+                query.or([{ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC }, { owner: req.user._id }]); 
+              }
+            }
 
+            if (where){
+              try {
+                where = JSON.parse(where);
+              } catch(e){
+                winston.error(e);
+              }
+console.log('the where!', where);
+              if (where){
+                query.where(where);
+              }
+            }
 			      
 			      // TODO : Localize start/end date based on owner's timezone if there's no tz embedded in the date?
 			      if (startDate){
@@ -115,7 +139,14 @@ module.exports = {
 							query.skip(skip);
 						}
 
-						query.sort('-date');
+						if (sort){
+              query.sort(sort);
+            } else if (options.defaultSort){
+              query.sort(options.defaultSort);
+            } else {
+              query.sort('-date');
+            }
+            
 
 						query.exec(function(err, queryResults){
 							if (err){ return innerCallback(err); }

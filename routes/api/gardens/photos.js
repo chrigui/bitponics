@@ -43,7 +43,8 @@ module.exports = function(app) {
   app.get('/api/gardens/:id/photos', apiUtils.query({
     model : PhotoModel,
     parentModel : GrowPlanInstanceModel,
-    dateFieldName : 'date'
+    dateFieldName : 'date',
+    defaultSort : '-date'
   }));
 
 
