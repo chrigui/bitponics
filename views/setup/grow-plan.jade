@@ -56,7 +56,8 @@ block head
             li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
               span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
         p Used by {{growPlan.activeGardenCount}} gardens
-        p(ng-show="growPlan.createdBy.name") Created by {{growPlan.createdBy.name.full}}
+        p(ng-show="growPlan.createdBy.name") Created by 
+          a(href="/profiles/{{growPlan.createdBy._id}}") {{growPlan.createdBy.name.full}}
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}

@@ -44,7 +44,8 @@ block content
 						div.first
 							div.value {{garden.name}}
 						p Started {{garden.startDate | friendlyDate:'lowercase'}}
-						p By {{garden.owner.name.full}}
+						p By 
+							a(href="/profiles/{{garden.owner._id}}") {{garden.owner.name.full}}
 						a.btn(href="/gardens/{{garden._id}}") Dashboard
 
 

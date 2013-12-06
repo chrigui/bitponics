@@ -15,22 +15,38 @@ block content
 			include ../includes/nav/main
 
 	section#main(role="main", class="main", ng-controller="bpn.controllers.profiles.Main", ng-cloak)
+
 		h2.page-heading {{user.name.first + ' ' + user.name.last}}'s Gardens
+
 		div.separator-top
 			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
-			div(ng-cloak)
-				ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
-					li(ng-repeat="garden in userGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
-						div.img-wrapper
-							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
-							div.icon-glyph.icon-__62_logo_00e36c
-						div.first
-							div.value {{garden.name}}
-						p Started {{garden.startDate | friendlyDate:'lowercase'}}
-						a.btn(href="/gardens/{{garden._id}}") Dashboard
+			ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+				li(ng-repeat="garden in userGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+					div.img-wrapper
+						//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
+						div.icon-glyph.icon-__62_logo_00e36c
+					div.first
+						div.value {{garden.name}}
+					p Started {{garden.startDate | friendlyDate:'lowercase'}}
+					a.btn(href="/gardens/{{garden._id}}") Dashboard
 
-				div(ng-hide="userGardenResults.data.length")
-					a.btn(href="/setup/grow-plan") Set up your first garden!
+			div(ng-hide="userGardenResults.data.length")
+				a.btn(href="/setup/grow-plan") Set up your first garden!
+
+		div.separator-top
+			h3 Grow Plans created by {{user.name.first}}
+			ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos")
+				li(ng-repeat="growPlan in userGrowPlanResults | orderBy:'-activeGardenCount'", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+					div.img-wrapper
+						div.icon-glyph.icon-__62_logo_00e36c
+					div.first
+						div.value {{growPlan.name}}
+					p.plants
+						ul(class="plantlist small-float")
+							li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
+								span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
+					p Used by {{growPlan.activeGardenCount}} gardens
+					a.btn(href="/grow-plans/{{growPlan._id}}") Details
 
 block footer-scripts
 	script
