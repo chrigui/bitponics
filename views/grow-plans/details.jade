@@ -259,7 +259,7 @@ block head
 
 
           div(class="reminders", accordion-group, heading="Reminders")
-            div(ng-controller="bpn.controllers.growPlan.Actions")
+            div(ng-controller="bpn.controllers.growPlan.Actions", class="content-centered")
               button(
                 type="button",
                 ng-repeat="action in sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl", 
