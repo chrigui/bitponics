@@ -11,7 +11,13 @@ define([
 					return $resource('/api/gardens/:id', 
 						{ id: '@_id'},
 						{
-							updateSettings: { 
+							
+              query : {
+                method:'GET',
+                isArray:false
+              },
+
+              updateSettings : { 
                 method:'POST', 
                 transformRequest: function (data, headersGetter) {
 	                var result = data.settings,
@@ -20,7 +26,7 @@ define([
         	     }
              },
 
-        	    complete: { 
+        	    complete : { 
                 method:'POST',
                 transformRequest: function(data, headersGetter){
                   return JSON.stringify({active : false });

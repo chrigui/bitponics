@@ -298,7 +298,7 @@ label {
 [x-ng-cloak],
 .ng-cloak,
 .x-ng-cloak {
-  display: none;
+  display: none !important;
 }
 .script {
   display: none;

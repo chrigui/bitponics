@@ -1,7 +1,7 @@
 extends ../layout
 
 block head
-	mixin requirejs("/assets/js/pages/dashboard")
+	mixin requirejs("/assets/js/pages/gardens/index")
 
 block css
 
@@ -10,42 +10,43 @@ block content
 		header
 			include ../includes/nav/main
 
-	section#main(role="main", class="main")
+	section#main(role="main", class="main", ng-controller="bpn.controllers.gardens.Main")
 		h2.page-heading My Gardens
 		div.separator-top
-		- if (typeof(userGrowPlanInstances) != 'undefined' && userGrowPlanInstances.length > 0)
-			ul(class="block-info-set grid photos content-module")
-				each gpi in userGrowPlanInstances
-					li
+			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+			div(ng-cloak)
+				ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+					li(ng-repeat="garden in userGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
 						div.img-wrapper
 							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
 							div.icon-glyph.icon-__62_logo_00e36c
 						div.first
-							h5.label Name
-							div.value #{gpi.name} 
-						div
-							h5.label ID
-							div.value.ww-break-word #{gpi._id} 
-						div
-							h5.label Active
-							div.value #{gpi.active}
-						div
-							h5.label Start Date
-							div.value #{gpi.friendlyStartDate}
-						div
-							h5.label Device
-							- if (gpi.device)
-								div.value #{gpi.device}
-							- else 
-								div.value None
-						
-						a.btn(href="/gardens/#{gpi._id}") Dashboard
-		- else
-			p Looks like you haven't set up a garden yet.
-			a.btn(href="/setup/grow-plan") Set up your first garden
+							div.value {{garden.name}}
+						p Started {{garden.startDate | friendlyDate:'lowercase'}}
+						//- div(ng-show="garden.device")
+						//- 	h5.label Device
+						//- 		div.value 
+						//- 			a(href="/account/devices/{{garden.device}}") {{garden.device}}
+						a.btn(href="/gardens/{{garden._id}}") Dashboard
+
+				div(ng-hide="userGardenResults.data.length")
+					a.btn(href="/setup/grow-plan") Set up your first garden!
+			
 		h2.page-heading.clear-b Community Member Gardens
 		div.separator-top
-			p Coming soon...
+			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+			div(ng-cloak)
+				ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+					li(ng-repeat="garden in communityGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+						div.img-wrapper
+							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
+							div.icon-glyph.icon-__62_logo_00e36c
+						div.first
+							div.value {{garden.name}}
+						p Started {{garden.startDate | friendlyDate:'lowercase'}}
+						p By {{garden.owner.name.full}}
+						a.btn(href="/gardens/{{garden._id}}") Dashboard
+
 
 block footer-scripts
 	script

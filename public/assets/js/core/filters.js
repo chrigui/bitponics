@@ -24,6 +24,8 @@ define(['angular', 'throttle-debounce'],
     
     bpnFilters.filter('friendlyDate', function() {
       return function(input, format) {
+        if (!input) { return ''; }
+        
         var val = moment(input).calendar();
 
         if (format === 'lowercase'){
