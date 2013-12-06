@@ -344,7 +344,8 @@ label {
 .data-module.empty {
   background-color: #cbffd1;
 }
-.data-module.warning {
+.data-module.warning,
+.data-module.remove {
   background-color: #fac400;
 }
 .data-module .main-heading,
@@ -536,7 +537,9 @@ ol.list-style {
   color: #00e36c;
 }
 .btn.warning,
-.btn-composite.warning {
+.btn-composite.warning,
+.btn.remove,
+.btn-composite.remove {
   color: #fac400;
   font-weight: bold;
 }
@@ -573,7 +576,9 @@ button.btn {
   border: 3px solid #00e36c;
 }
 a.btn.warning,
-button.btn.warning {
+button.btn.warning,
+a.btn.remove,
+button.btn.remove {
   border-color: #fac400;
 }
 a.btn i,
@@ -5187,6 +5192,9 @@ button.close {
 .growplans .overlay .action-overlay .action-duration input[type=number] {
   display: inline;
   margin: 0 1em;
+}
+.growplans .overlay .action-overlay .remove {
+  margin-top: 2em;
 }
 .growplans .edit-btn {
   height: 1em;

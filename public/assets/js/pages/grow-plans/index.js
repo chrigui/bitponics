@@ -171,8 +171,25 @@ require([
       [
         '$scope',
         'sharedDataService',
-        function($scope, sharedDataService){
+        '$rootScope',
+        '$timeout',
+        function($scope, sharedDataService, $rootScope, $timeout){
           $scope.sharedDataService = sharedDataService;
+
+          $scope.removeAction = function(action){
+            
+            $scope.close();
+
+            // Don't know why, but we have to defer the action deletion with a timeout, otherwise the overlay stays open
+            $timeout(function(){
+              if (action.control){
+                delete sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[action.control];
+              } else {
+                var index = sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.indexOf(action);
+                sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.splice(index, 1);
+              }  
+            }, 10);
+          };
         }
       ]
     );
@@ -573,10 +590,25 @@ require([
                   sharedDataService.selectedGrowPlan.focusedPhase.sortedControls.push(control);
                 }
               });
+            
+              sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.sort(function(action1, action2){
+                var a = action1.scheduleType,
+                  b = action2.scheduleType;
+
+                if (a == 'phaseStart') { return -1; }
+                else if (a == 'phaseEnd') { return 1; }
+                else {
+                  // else a is 'repeat'
+                  if (b === 'phaseStart') { return 1; }
+                  else if (b === 'phaseEnd') { return -1; }
+                  else return 0;
+                }
+              });
             }
           };
           $scope.$watch('sharedDataService.selectedPhaseIndex', $scope.refreshFocusedPhase);
           $scope.$watch('sharedDataService.selectedGrowPlan', $scope.refreshFocusedPhase);
+
 
 
           $scope.updateSelectedGrowSystem = function () {
