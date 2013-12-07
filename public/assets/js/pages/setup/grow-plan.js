@@ -684,7 +684,19 @@ define([
         }
       ]
     );
-  	
+  
+
+
+
+  growPlanApp.filter('keysToCSV', function(){
+    return function(input){
+      return Object.keys(input).join(',');
+    };
+  });
+      
+
+
+
   	domReady(function () {
       angular.bootstrap(document, ['bpn.apps.setup.growPlan']);
     });

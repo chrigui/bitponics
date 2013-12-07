@@ -78,7 +78,7 @@ block head
         //-label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         //- a.btn(href="customize/{{growPlan._id}}") Select
-        a.btn(href="/grow-plans/{{growPlan._id}}?setup=true") Select
+        a.btn(href="/grow-plans/{{growPlan._id}}?setup=true&plants={{sharedDataService.selected.plants | keysToCSV}}") Select
   
 
   script(type='text/ng-template', id='customize-overview.html')
