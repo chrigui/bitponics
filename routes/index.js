@@ -318,26 +318,27 @@ module.exports = function(app){
 		function (req, res, next) {
 		  var UserModel = require('../models/user').model,
 			  	locals = {
-			  		title: 'Welcome to Bitponics!',
-			      header: 'Thank you.',
-            message: 'Thanks for signing up. Check your email.',
-			      className: "landing-page single-page getstarted register",
-    				pageType: "landing-page"
+					title: 'Welcome to Bitponics!',
+					header: 'Thank you.',
+					message: 'Thanks for signing up. Check your email.',
+					className: "landing-page single-page getstarted register",
+					pageType: "landing-page"
 			    };
 
 		  if(req.query.verify){ //user coming back to verify account
-		    mixpanel.track(user, "activate registration");
-        return UserModel.findOne({ activationToken: req.query.verify }, 
+        	return UserModel.findOne({ activationToken: req.query.verify }, 
 		    	function (err, user) {
 			    	if (err) { return next(err); }
-			    	console.log(user)
+			    		if (user) {
+			    			mixpanel.track(user, "activate registration");
+			    		}
 						if (user && user.activationToken !== '') {
 							user.active = true;
 							user.sentEmail = true; //if we get here, this should be true
 							user.save( function(err, user){
 								if (err) { return next(err); }
 								locals.header =  "All set!";
-                locals.message = 'Your account is now verified.';
+                				locals.message = 'Your account is now verified.';
 								locals.link = '/setup/grow-plan';
 								// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
 								locals.user = user;
@@ -350,17 +351,17 @@ module.exports = function(app){
 		    	}
 	    	);
 	    } else if(req.query.status == 'success') { //user preordered successfully
-	      locals.message = 'You\'ve successfully preordered a Bitponics device';
-	      //TODO: here we could also collect additional info on user (amazon setting)
+			locals.message = 'You\'ve successfully preordered a Bitponics device';
+			//TODO: here we could also collect additional info on user (amazon setting)
 	    } else if(req.query.status == 'abandon') { //user cancelled preorder process mid-way
 		    locals.message = 'Issues preordering the device?';
-		  } else { //user just signed up, tell them to check email to verify
+		} else { //user just signed up, tell them to check email to verify
 		  	locals.header =  "Thanks for signing up!";
-        locals.message = "We've sent you a welcome email. When you get a chance, click the activation link in that email.<br/><br/>In the meanwhile, let's get you growing!";
-        locals.link = '/setup/grow-plan';
-		  }
+	        locals.message = "We've sent you a welcome email. When you get a chance, click the activation link in that email.<br/><br/>In the meanwhile, let's get you growing!";
+	        locals.link = '/setup/grow-plan';
+		}
 
-		  return res.render('register', locals);
+		  	return res.render('register', locals);
 		}
 	);
 
