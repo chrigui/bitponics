@@ -1,5 +1,5 @@
-define(['angular', 'throttle-debounce'], 
-	function(angular) { 
+define(['angular', 'fe-be-utils', 'throttle-debounce'], 
+	function(angular, feBeUtils) { 
 		'use strict';
 		
 		var bpnFilters = angular.module('bpn.filters', []); 
