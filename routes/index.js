@@ -338,7 +338,7 @@ module.exports = function(app){
 								if (err) { return next(err); }
 								locals.header =  "All set!";
                 locals.message = 'Your account is now verified.';
-								locals.link = '/login?redirect=/setup/grow-plan';
+								locals.link = '/setup/grow-plan';
 								// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
 								locals.user = user;
 								res.render('register', locals);
@@ -356,7 +356,8 @@ module.exports = function(app){
 		    locals.message = 'Issues preordering the device?';
 		  } else { //user just signed up, tell them to check email to verify
 		  	locals.header =  "Thanks for signing up!";
-        locals.message = "We've sent you an activation email. Click the activation link and then you'll be ready to get started.";
+        locals.message = "We've sent you a welcome email. When you get a chance, click the activation link in that email.<br/><br/>In the meanwhile, let's get you growing!";
+        locals.link = '/setup/grow-plan';
 		  }
 
 		  return res.render('register', locals);

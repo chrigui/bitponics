@@ -600,7 +600,7 @@ require([
           }
 
           $scope.updateName = function(){
-            GardenModel.updateName(sharedDataService.gardenModel);
+            sharedDataService.gardenModel.$updateName();
           };
 
           /*

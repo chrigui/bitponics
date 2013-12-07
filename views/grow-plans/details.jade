@@ -766,8 +766,8 @@ block content
         section.progress-bar(ng-show="sharedDataService.pageMode == 'setup'")
           ol
             li.complete 
-              span.number 1.
-              |  Select Grow Plan
+              a.number(href="/setup/grow-plan") 1.
+                |  Select Grow Plan
             li.active 
               span.number 2.
               |  Customize Grow Plan
