@@ -1,7 +1,12 @@
 block vars
   - pageClassName = 'app-page single-page profile'
-  
+
 extends ../layout
+
+block head
+  base(href="/account/profile/")
+  
+  mixin requirejs("/assets/js/pages/account/profile")
 
 block css
 
@@ -10,7 +15,7 @@ block content
     header
       include ../includes/nav/main
   
-  section#main(role="main", class="main")
+  section#main(role="main", class="main", ng-controller="bpn.controllers.account.profile.Main")
     div#profile.content-module.middle
       h1.page-heading Account Profile
       form(id="profile-form", method="POST", action="/account/profile")
@@ -42,13 +47,14 @@ block content
         //- input(id="addressline1", name="addressline1", type="number")
         //- input(id="addressline2", name="addressline2", type="number")
         
-        label Preferred Notification Methods 
-        input(class="display-i", id="notifications_email", name="notifications_email", 
-          type="checkbox", checked=user.notificationPreferences.email)
-        label(class="btn", for="notifications_email") Email
-        input(class="display-i", id="notifications_sms", name="notifications_sms", 
-          type="checkbox", checked=user.notificationPreferences.sms)
-        label(class="btn", for="notifications_sms") SMS
+        //- label Preferred Notification Methods 
+        //- input(class="display-i", id="notifications_email", name="notifications_email", 
+        //-   type="checkbox", checked=user.notificationPreferences.email)
+        //- label(class="btn", for="notifications_email") Email
+        
+        //- input(class="display-i", id="notifications_sms", name="notifications_sms", 
+        //-   type="checkbox", checked=user.notificationPreferences.sms)
+        //- label(class="btn", for="notifications_sms") SMS
 
         input(type="submit", value="Save Profile")
 

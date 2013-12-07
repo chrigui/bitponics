@@ -477,8 +477,8 @@ UserSchema.pre('save', true, function(next, done){
 		token = buf.toString('hex');
 		user.activationToken = user.activationToken || token;
 		
-	  //send activation email if not activated user
-		if(user.active && user.sentEmail){ return done(); }
+	  // The welcome email should be one-time only, even if the user hasn't activated yet
+		if(user.sentEmail){ return done(); }
 			
 		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
 

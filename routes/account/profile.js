@@ -23,10 +23,20 @@ module.exports = function(app){
 			UserModel.findById(req.user, function (err, user) {
 				if (err) { next(err); }
 
+        var firstName = req.body.firstname || '';
+        if (firstName === 'undefined'){ 
+          firstName = ''; 
+        }
+        var lastName = req.body.lastname || '';
+        if (lastName === 'undefined'){ 
+          lastName = ''; 
+        }
+
+
 		    user.email = req.body.email;
 		    user.name = { 
-		    	'first' : req.body.firstname,
-		    	'last' : req.body.lastname
+		    	'first' : firstName ,
+		    	'last' : lastName
 		    };
 		    user.locale.territory = req.body.locale_timezone;
 		    user.timezone = req.body.country_timezone;
