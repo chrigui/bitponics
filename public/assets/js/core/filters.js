@@ -1,5 +1,5 @@
-define(['angular', 'throttle-debounce'], 
-	function(angular) { 
+define(['angular', 'fe-be-utils', 'throttle-debounce'], 
+	function(angular, feBeUtils) { 
 		'use strict';
 		
 		var bpnFilters = angular.module('bpn.filters', []); 
@@ -24,6 +24,8 @@ define(['angular', 'throttle-debounce'],
     
     bpnFilters.filter('friendlyDate', function() {
       return function(input, format) {
+        if (!input) { return ''; }
+        
         var val = moment(input).calendar();
 
         if (format === 'lowercase'){

@@ -1,4 +1,5 @@
 var GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
+    GardenModel = GrowPlanInstanceModel,
     ActionModel = require('../../../models/action').model,
     DeviceModel = require('../../../models/device').model,
     SensorLogModel = require('../../../models/sensorLog').model,
@@ -14,7 +15,8 @@ var GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
     async = require('async'),
     routeUtils = require('../../route-utils'),
     requirejs = require('../../../lib/requirejs-wrapper'),
-    feBeUtils = requirejs('fe-be-utils');
+    feBeUtils = requirejs('fe-be-utils'),
+    apiUtils = require('../utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -28,22 +30,30 @@ module.exports = function(app) {
    * @param {ObjectId} req.query.owner
    */
   app.get('/api/gardens', 
-    routeUtils.middleware.ensureLoggedIn,
-    function (req, res, next){
-      var query = GrowPlanInstanceModel.find();
-
-      if (req.user.admin){
-
-      } else {
-        query.or([{ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC }, { owner: req.user._id }]); 
-      }
-      
-      query.exec(function (err, growPlanInstances) {
-        if (err) { return next(err); }
-        return res.send(growPlanInstances);
-      });
-    }
+    apiUtils.query({
+      model : GardenModel,
+      restrictByVisibility : true,
+      defaultSort : '-updatedAt',
+      dateFieldName : 'createdAt'
+    })
   );
+
+  //   routeUtils.middleware.ensureLoggedIn,
+  //   function (req, res, next){
+  //     var query = GrowPlanInstanceModel.find();
+
+  //     if (req.user.admin){
+
+  //     } else {
+  //       query.or([{ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC }, { owner: req.user._id }]); 
+  //     }
+      
+  //     query.exec(function (err, growPlanInstances) {
+  //       if (err) { return next(err); }
+  //       return res.send(growPlanInstances);
+  //     });
+  //   }
+  // );
 
 
   /**

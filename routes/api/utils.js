@@ -13,15 +13,18 @@ module.exports = {
 	 * @param {string=} [options.parentModelFieldName = "ref.documentId"] - if parentModel is defined, used to query for parent id. 
 	 * @param {string=} [options.dateFieldName] - document field to use for start-date/end-date query filters
 	 * @param {string=} [options.defaultSort]  "fieldName" for ascending or "-fieldName" for descending
+   * @param {bool=} [options.restrictByVisibility = false] - optionally add a conditional clause to the query to limit to the documents the user has read-access to
 	 * 
 	 * @return {[function(req, res, next)]}
 	 * 
 	 * Request:
-	 * @param {Date} [req.params.start-date] (optional) Should be something parse-able by moment.js
-   * @param {Date} [req.params.end-date] (optional) Should be something parse-able by moment.js
+	 * @param {Date} [req.params.start-date] - Should be something parse-able by moment.js
+   * @param {Date} [req.params.end-date] - Should be something parse-able by moment.js
    * @param {Number} [req.params.skip]
    * @param {Number} [req.params.limit=200]
-   * @param {string=} [req.params.sort]
+   * @param {string=} [req.params.sort] - name of field to sort by. prefix with "-" for descending.
+   * @param {CSV} [req.params.select] - CSV list of field names to include in the response. Fields on nested objects can be requested with dot-notation: "nestedDocument.name"
+   * @param {Object} [req.params.where] - JSON-encoded query object. Follows mongodb query conventions. https://parse.com/docs/rest#queries
    * @param {string=} [req.params.search] String search term. Should usually be used to query fuzzy match on "name" field.
    *
    * Response:
@@ -40,15 +43,23 @@ module.exports = {
 	 	return [
 	 		routeUtils.middleware.ensureLoggedIn,
 	 		function(req, res, next){
+
 		 		var response = {
 		 			statusCode : 200,
 		 			body : {}
 		 		},
+
 		 		startDate = req.query['start-date'],
 		    endDate = req.query['end-date'],
 		    limit = req.query['limit'] || 200,
 		    skip = req.query['skip'],
+        where = req.query['where'],
+        sort = req.query['sort'],
+        select = req.query['select'],
 		    query;
+
+        // cap the limit at 200
+        if (limit > 200) { limit = 200; }
 
 		 		async.series([
 					function checkIfParentModel(innerCallback){
@@ -84,9 +95,26 @@ module.exports = {
 		        	query.where(parentQuery);
 		      	}
 
-			      // cap the limit at 200
-			      if (limit > 200) { limit = 200; }
+            
+            if (options.restrictByVisibility){
+              if (req.user.admin){
+                // no condition
+              } else {
+                query.or([{ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC }, { owner: req.user._id }]); 
+              }
+            }
 
+            if (where){
+              try {
+                where = JSON.parse(where);
+              } catch(e){
+                winston.error(e);
+              }
+
+              if (where){
+                query.where(where);
+              }
+            }
 			      
 			      // TODO : Localize start/end date based on owner's timezone if there's no tz embedded in the date?
 			      if (startDate){
@@ -107,7 +135,7 @@ module.exports = {
 					},
 					function getResults(innerCallback){
 						// Cast the query back to a find() operation so we can limit/skip/sort/select.
-						// TODO: Should keep the prior .where filters, but need to verify
+						// TODO: Expecting that this retains the prior .where clauses, but need to verify
         		query.find();
 
 						query.limit(limit);
@@ -115,7 +143,35 @@ module.exports = {
 							query.skip(skip);
 						}
 
-						query.sort('-date');
+						if (sort){
+              query.sort(sort);
+            } else if (options.defaultSort){
+              query.sort(options.defaultSort);
+            }
+            
+  
+            if (select){
+              select = select.split(',');
+              select.forEach(function(field){
+                
+                var fieldParts = field.split('.'),
+                  fieldRoot = fieldParts[0],
+                  fieldNested = fieldParts[1],
+                  modelPath = Model.schema.path(fieldRoot);
+                
+                // If fieldRoot is a ref'ed schema type
+                if (modelPath.options.ref){
+                  // populate fieldRoot, select field[1]
+                  console.log('populating');
+                  query.select(fieldRoot);
+                  query.populate(fieldRoot, fieldNested);
+                }
+                else{
+                  // select field as one thing (no parts). Standard mongo subdoc selection.
+                  query.select(field);
+                }
+              });
+            }            
 
 						query.exec(function(err, queryResults){
 							if (err){ return innerCallback(err); }

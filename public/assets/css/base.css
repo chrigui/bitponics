@@ -129,6 +129,9 @@
 .no-margin-bottom {
   margin-bottom: 0;
 }
+.no-margin-left {
+  margin-left: 0;
+}
 .bottom-anchor {
   position: absolute;
 }
@@ -298,7 +301,7 @@ label {
 [x-ng-cloak],
 .ng-cloak,
 .x-ng-cloak {
-  display: none;
+  display: none !important;
 }
 .script {
   display: none;
@@ -344,7 +347,8 @@ label {
 .data-module.empty {
   background-color: #cbffd1;
 }
-.data-module.warning {
+.data-module.warning,
+.data-module.remove {
   background-color: #fac400;
 }
 .data-module .main-heading,
@@ -536,7 +540,9 @@ ol.list-style {
   color: #00e36c;
 }
 .btn.warning,
-.btn-composite.warning {
+.btn-composite.warning,
+.btn.remove,
+.btn-composite.remove {
   color: #fac400;
   font-weight: bold;
 }
@@ -573,7 +579,9 @@ button.btn {
   border: 3px solid #00e36c;
 }
 a.btn.warning,
-button.btn.warning {
+button.btn.warning,
+a.btn.remove,
+button.btn.remove {
   border-color: #fac400;
 }
 a.btn i,
@@ -1106,6 +1114,9 @@ img.page-spinner.spinner {
 }
 .no-margin-bottom {
   margin-bottom: 0;
+}
+.no-margin-left {
+  margin-left: 0;
 }
 .bottom-anchor {
   position: absolute;
@@ -2430,6 +2441,9 @@ img.page-spinner.spinner {
 .no-margin-bottom {
   margin-bottom: 0;
 }
+.no-margin-left {
+  margin-left: 0;
+}
 .bottom-anchor {
   position: absolute;
 }
@@ -3136,7 +3150,7 @@ label.newsletter.inline {
   width: 95%;
 }
 .single-page .main {
-  margin: 3em auto !important;
+  margin: 3em auto;
 }
 .single-page .content-module {
   padding-top: 1.5em;
@@ -3292,7 +3306,7 @@ li
 .app-page .header {
   position: static;
   padding: 0.45em 0;
-  margin: 0 0 1em;
+  margin: 0;
 }
 .undefined .header header,
 .app-page .header header {
@@ -3458,6 +3472,14 @@ li
   font-size: 0.75em;
   position: relative;
   top: -0.25em;
+}
+.undefined [contenteditable],
+.app-page [contenteditable],
+.undefined btn[contenteditable],
+.app-page btn[contenteditable] {
+  outline: none;
+  border-bottom: 1px dotted #00e36c;
+  white-space: nowrap;
 }
 @media screen and (min-width: 40em) {
   .undefined .main .page-heading,
@@ -4556,6 +4578,9 @@ button.close {
   padding: 9px 15px;
   border-top: 1px solid #e5e5e5;
 }
+.accordion-inner .content-centered {
+  text-align: center;
+}
 .invisible {
   visibility: hidden;
 }
@@ -5188,6 +5213,9 @@ button.close {
   display: inline;
   margin: 0 1em;
 }
+.growplans .overlay .action-overlay .remove {
+  margin-top: 2em;
+}
 .growplans .edit-btn {
   height: 1em;
   padding-left: 1em;
@@ -5468,12 +5496,6 @@ button.close {
   font-size: 1em;
   margin: 0;
 }
-.growplans .grow-plan-customize h2.page-heading [contenteditable],
-.growplans .grow-plan-customize btn[contenteditable] {
-  outline: none;
-  border-bottom: 1px dotted #00e36c;
-  white-space: nowrap;
-}
 .growplans .grow-plan-customize .seamless-input {
   background: #00e36c;
   color: #fff;
@@ -5548,6 +5570,9 @@ button.close {
 /*
  * Gardens List Page
  */
+.gardens .set-up-garden {
+  margin-left: 0;
+}
 /*
  * Error Pages
  */

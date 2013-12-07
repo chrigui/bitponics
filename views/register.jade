@@ -11,7 +11,7 @@ block content
     div(id="register", class="content-module middle")
         h3(class="page-heading nav-section") #{header}
 
-        h3.sub-heading #{message}
+        h3.sub-heading !{message}
         - if (typeof link != 'undefined')
             p
                   a(href="#{link}", class="btn") Set up your first garden

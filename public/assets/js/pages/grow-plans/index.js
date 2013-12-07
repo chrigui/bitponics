@@ -95,12 +95,14 @@ require([
             }
     			};
 
+          
           // Transform the data into viewModel-friendly formats
+          sharedData.controlsById = {};
           sharedData.controls.forEach(function (control) {
             viewModels.initControlViewModel(control);
+            sharedData.controlsById[control._id] = control;
           });
 
-          
 
           sharedData.pageMode = ($location.search()['setup'] ? 'setup' : 'default');
 
@@ -169,8 +171,25 @@ require([
       [
         '$scope',
         'sharedDataService',
-        function($scope, sharedDataService){
+        '$rootScope',
+        '$timeout',
+        function($scope, sharedDataService, $rootScope, $timeout){
           $scope.sharedDataService = sharedDataService;
+
+          $scope.removeAction = function(action){
+            
+            $scope.close();
+
+            // Don't know why, but we have to defer the action deletion with a timeout, otherwise the overlay stays open
+            $timeout(function(){
+              if (action.control){
+                delete sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[action.control];
+              } else {
+                var index = sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.indexOf(action);
+                sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.splice(index, 1);
+              }  
+            }, 10);
+          };
         }
       ]
     );
@@ -499,17 +518,17 @@ require([
           //$scope.lightFixtures = bpn.lightFixtures;
           //$scope.lightBulbs = bpn.lightBulbs;
           //$scope.nutrients = bpn.nutrients;
-          $scope.controls = bpn.controls;
-          $scope.sensors = bpn.sensors;
+          $scope.controls = sharedDataService.controls;
+          $scope.sensors = sharedDataService.sensors;
           $scope.userOwnedDevices = bpn.userOwnedDevices;
           $scope.plantSelections = {};
           $scope.plantQuery = '';
           //$scope.growSystems = bpn.growSystems;
           //$scope.selectedGrowPlan = {}; 
-          $scope.selectedGrowSystem = undefined;
+          //$scope.selectedGrowSystem = undefined;
           $scope.currentGrowPlanDay = 0;
-          $scope.growPlans = bpn.growPlans;
-          $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
+          //$scope.growPlans = bpn.growPlans;
+          //$scope.filteredGrowPlanList = angular.copy($scope.growPlans);
           $scope.timesOfDayList = feBeUtils.generateTimesOfDayArray();
           $scope.actionDurationTypeOptions = feBeUtils.DURATION_TYPES;
           $scope.actionWithNoAccessoryDurationTypeOptions = ['days', 'weeks', 'months'];
@@ -558,12 +577,55 @@ require([
 
 
           $scope.refreshFocusedPhase = function(){
-            if ($scope.sharedDataService.selectedGrowPlan.phases){
-              $scope.sharedDataService.selectedGrowPlan.focusedPhase = $scope.sharedDataService.selectedGrowPlan.phases[$scope.sharedDataService.selectedPhaseIndex];
+            if (sharedDataService.selectedGrowPlan.phases){
+              sharedDataService.selectedGrowPlan.focusedPhase = sharedDataService.selectedGrowPlan.phases[sharedDataService.selectedPhaseIndex];
+              
+              // Create the sortedControls & sortedSensors arrays
+              sharedDataService.selectedGrowPlan.focusedPhase.sortedControls = [];
+              Object.keys(sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl).forEach(function(actionControlId){
+                sharedDataService.selectedGrowPlan.focusedPhase.sortedControls.push(sharedDataService.controlsById[actionControlId]);
+              });
+              sharedDataService.controls.forEach(function(control){
+                if (!sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsByControl[control._id]){
+                  sharedDataService.selectedGrowPlan.focusedPhase.sortedControls.push(control);
+                }
+              });
+
+              sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors = [];
+              Object.keys(sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor).forEach(function(sensorCode){
+                var idealRange = sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensorCode];
+
+                if (typeof idealRange.valueRange !== 'undefined' && (idealRange.valueRange.min !== 'undefined' || typeof idealRange.valueRange.max !== 'undefined')){
+                  sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.unshift(sharedDataService.sensors[sensorCode]);  
+                } else {
+                  sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.push(sharedDataService.sensors[sensorCode]); 
+                }
+                
+              });
+              // Object.keys(sharedDataService.sensors).forEach(function(sensorCode){
+              //   if (!sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensorCode]){
+              //     sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors.push(sharedData.sensors[sensorCode]);
+              //   }
+              // });
+            
+              sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl.sort(function(action1, action2){
+                var a = action1.scheduleType,
+                  b = action2.scheduleType;
+
+                if (a == 'phaseStart') { return -1; }
+                else if (a == 'phaseEnd') { return 1; }
+                else {
+                  // else a is 'repeat'
+                  if (b === 'phaseStart') { return 1; }
+                  else if (b === 'phaseEnd') { return -1; }
+                  else return 0;
+                }
+              });
             }
           };
           $scope.$watch('sharedDataService.selectedPhaseIndex', $scope.refreshFocusedPhase);
           $scope.$watch('sharedDataService.selectedGrowPlan', $scope.refreshFocusedPhase);
+
 
 
           $scope.updateSelectedGrowSystem = function () {

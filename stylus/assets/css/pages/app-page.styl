@@ -4,7 +4,7 @@
 	.header
 		position static
 		padding .45em 0
-		margin: 0 0 1em;
+		margin 0
 		
 		header 
 			max-width 120em
@@ -140,6 +140,11 @@
 		font-size: 0.75em;
 		position: relative;
 		top: -0.25em;
+
+	[contenteditable], btn[contenteditable]
+		outline none
+		border-bottom 1px dotted color-logo-green
+		white-space nowrap
 
 @media screen and (min-width: 40em)
 	.undefined, .app-page

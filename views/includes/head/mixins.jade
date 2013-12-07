@@ -25,6 +25,7 @@ mixin requirejs(dataMain)
   - var bpnServicesGrowSystem = CDN('/assets/js/services/grow-system.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesNav = CDN('/assets/js/services/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesSocket = CDN('/assets/js/services/socket.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServicesUser = CDN('/assets/js/services/user.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var d3 = CDN('/assets/js/libs/d3.v2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var domReady = CDN('/assets/js/libs/requirejs/domReady.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var es5shim = CDN('/assets/js/libs/es5-shim.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -78,6 +79,7 @@ mixin requirejs(dataMain)
         'bpn.services.growSystem' : '#{bpnServicesGrowSystem}',
         'bpn.services.nav' : '#{bpnServicesNav}',
         'bpn.services.socket' : '#{bpnServicesSocket}',
+        'bpn.services.user' : '#{bpnServicesUser}',
         'd3' : '#{d3}',
         'domReady': '#{domReady}',
         'es5shim': '#{es5shim}',

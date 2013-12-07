@@ -160,8 +160,8 @@ module.exports = {
     if (!user._id){ return false; }
     var userId = user._id;
     return (  user.admin ||
-              resource.owner.equals(userId) || 
-              resource.createdBy.equals(userId) || 
+              (resource.owner ? resource.owner.equals(userId) : false) || 
+              (resource.createdBy ? resource.createdBy.equals(userId) : false) || 
               resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
         );
   },
@@ -183,9 +183,9 @@ module.exports = {
     if (!user._id){ return false; }
     var userId = user._id;
     return (  user.admin ||
-              resource.owner.equals(userId) || 
-              resource.createdBy.equals(userId) || 
-              resource.users.some(function(resourceUser){ return resourceUser.equals(userId);})
+              (resource.owner ? resource.owner.equals(userId) : false) ||
+              (resource.createdBy ? resource.createdBy.equals(userId) : false) ||
+              (resource.users ? resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) : false) 
         );
   },
 

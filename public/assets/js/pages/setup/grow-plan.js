@@ -152,14 +152,15 @@ define([
 		growPlanApp.controller('bpn.controllers.setup.growPlan.PlantOverlay',
     	[
     		'$scope',
+        '$rootScope',
     		'sharedDataService',
-    		function($scope, sharedDataService){
+    		function($scope, $rootScope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
     			$scope.overlayItems = $scope.sharedDataService.filteredPlantList;
 
     			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
             $scope.sharedDataService.updatefilteredGrowPlans();
+            $rootScope.close();
     			};
     		}
     	]
@@ -180,9 +181,6 @@ define([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
     		}
     	]
   	);
@@ -202,9 +200,6 @@ define([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
     		}
     	]
   	);
@@ -224,9 +219,6 @@ define([
     				}
   				);
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
     		}
     	]
   	);
@@ -256,9 +248,6 @@ define([
     				$scope.close();
     			};
 
-    			$scope.close = function(){
-						$scope.sharedDataService.activeOverlay.is = undefined;
-    			};
     		}
     	]
   	);
@@ -289,9 +278,6 @@ define([
           //   console.log('open it!');
           // };
 
-          $scope.close = function(){
-            $scope.sharedDataService.activeOverlay.is = undefined;
-          };
         }
       ]
     );
@@ -439,7 +425,8 @@ define([
         '$filter',
         'GrowPlanModel',
         'sharedDataService',
-        function ($scope, $filter, GrowPlanModel, sharedDataService) {
+        '$timeout',
+        function ($scope, $filter, GrowPlanModel, sharedDataService, $timeout) {
           $scope.sharedDataService = sharedDataService;
           
           //$scope.lights = bpn.lights;
@@ -519,6 +506,8 @@ define([
             $scope.$$childHead.query = "";
             $scope.$$childHead.search();
             obj.query = "";
+            $scope.close();
+            
           };
 
           // $scope.updateSelectedPlants = function(){
@@ -555,6 +544,8 @@ define([
             }
 
             $scope.updatefilteredGrowPlans();  
+
+            $scope.close();
           }, true);
 
           $scope.updateSelected = {
@@ -693,7 +684,19 @@ define([
         }
       ]
     );
-  	
+  
+
+
+
+  growPlanApp.filter('keysToCSV', function(){
+    return function(input){
+      return Object.keys(input).join(',');
+    };
+  });
+      
+
+
+
   	domReady(function () {
       angular.bootstrap(document, ['bpn.apps.setup.growPlan']);
     });

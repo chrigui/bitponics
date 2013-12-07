@@ -1,3 +1,15 @@
+/**
+ * Main file for garden dashboard
+ *
+ * Depends on following globals:
+ * - bpn.pageData.growPlanInstance
+ * - bpn.pageData.sensors
+ * - bpn.pageData.controls
+ * - bpn.pageData.notifications
+ * - bpn.pageData.photos
+ * - bpn.pageData.userCanModify
+ * - bpn.user
+ */
 require([
   'angular',
   'domReady',
@@ -58,7 +70,8 @@ require([
             controlHash : {},
             photos : bpn.pageData.photos,
             units : feBeUtils.UNITS,
-            gardenModel : new GardenModel(bpn.pageData.growPlanInstance)
+            gardenModel : new GardenModel(bpn.pageData.growPlanInstance),
+            userCanModify : bpn.pageData.userCanModify
           };
 
           sharedData.controls.forEach(function(control){
@@ -564,9 +577,10 @@ require([
         '$timeout',
         'sharedDataService',
         'NavService',
+        'GardenModel',
         '$rootScope',
         'bpn.services.analytics',
-        function($scope, $timeout, sharedDataService, NavService, $rootScope, analytics){
+        function($scope, $timeout, sharedDataService, NavService, GardenModel, $rootScope, analytics){
           $scope.sharedDataService = sharedDataService;
 
           $scope.close = function(){

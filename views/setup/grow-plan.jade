@@ -10,7 +10,7 @@ block head
     //filter
     section(class="filterable", ng-hide)
 
-      h4(class="page-heading float-l half-width") Select a Grow Plan
+      h4(class="page-heading float-l") Select a Grow Plan to manage your garden
       div(class="btn float-r", ng-click="showFilter = !showFilter") Filter
       
       div(id="filter_questions", class="accordion clear-b", ng-show="showFilter")
@@ -56,7 +56,8 @@ block head
             li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
               span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
         p Used by {{growPlan.activeGardenCount}} gardens
-        p(ng-show="growPlan.createdBy.name") Created by {{growPlan.createdBy.name.full}}
+        p(ng-show="growPlan.createdBy.name") Created by 
+          a(href="/profiles/{{growPlan.createdBy._id}}") {{growPlan.createdBy.name.full}}
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}
@@ -77,7 +78,7 @@ block head
         //-label(for="gplist_input_{{growPlan._id}}", class="btn next-step-btn") Select
         //-  | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
         //- a.btn(href="customize/{{growPlan._id}}") Select
-        a.btn(href="/grow-plans/{{growPlan._id}}?setup=true") Select
+        a.btn(href="/grow-plans/{{growPlan._id}}?setup=true&plants={{sharedDataService.selected.plants | keysToCSV}}") Select
   
 
   script(type='text/ng-template', id='customize-overview.html')

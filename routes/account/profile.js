@@ -11,8 +11,7 @@ module.exports = function(app){
 
 			res.render('account/profile', {
 				title : 'Profile',
-				className: "app-page single-page profile",
-    			pageType: "app-page"
+  			pageType: "app-page"
 			});
 		}
 	);
@@ -47,9 +46,7 @@ module.exports = function(app){
 
 			  var locals = {
 			  	title : 'Profile',
-				className : 'profile',
-				className: "app-page single-page profile",
-    			pageType: "app-page"
+				  pageType: "app-page"
 			  }
 
 		    user.save(function (err, updatedUser) {
