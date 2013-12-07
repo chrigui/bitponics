@@ -3141,7 +3141,7 @@ label.newsletter.inline {
   width: 95%;
 }
 .single-page .main {
-  margin: 3em auto !important;
+  margin: 3em auto;
 }
 .single-page .content-module {
   padding-top: 1.5em;
@@ -3297,7 +3297,7 @@ li
 .app-page .header {
   position: static;
   padding: 0.45em 0;
-  margin: 0 0 1em;
+  margin: 0;
 }
 .undefined .header header,
 .app-page .header header {
@@ -3463,6 +3463,14 @@ li
   font-size: 0.75em;
   position: relative;
   top: -0.25em;
+}
+.undefined [contenteditable],
+.app-page [contenteditable],
+.undefined btn[contenteditable],
+.app-page btn[contenteditable] {
+  outline: none;
+  border-bottom: 1px dotted #00e36c;
+  white-space: nowrap;
 }
 @media screen and (min-width: 40em) {
   .undefined .main .page-heading,
@@ -5479,12 +5487,6 @@ button.close {
   font-size: 1em;
   margin: 0;
 }
-.growplans .grow-plan-customize h2.page-heading [contenteditable],
-.growplans .grow-plan-customize btn[contenteditable] {
-  outline: none;
-  border-bottom: 1px dotted #00e36c;
-  white-space: nowrap;
-}
 .growplans .grow-plan-customize .seamless-input {
   background: #00e36c;
   color: #fff;
@@ -5559,6 +5561,9 @@ button.close {
 /*
  * Gardens List Page
  */
+.gardens .set-up-garden {
+  margin-left: 0;
+}
 /*
  * Error Pages
  */
