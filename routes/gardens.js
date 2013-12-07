@@ -132,7 +132,7 @@ module.exports = function(app){
 										
 										growPlanInstanceResult.growPlan = growPlanResult[0];
 										return innerInnerCallback();
-									});		
+									});
 								}
 							],
 							function gpiParallelFinal(err){
@@ -191,6 +191,11 @@ module.exports = function(app){
           locals.notifications = results[3] || [];
           locals.photos = results[4] || [];
 
+          var controlsById = {};
+          locals.controls.forEach(function(control){
+            controlsById[control._id] = control;
+          });
+          locals.controlsById = controlsById;
 
 					var sortedSensors = [];
 					results[0].forEach(function(sensor){

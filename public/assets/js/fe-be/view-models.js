@@ -150,7 +150,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     growPlanInstance.nextGrowPlanPhase = growPlanInstance.growPlan.phases[growPlanInstance.growPlan.phases.indexOf(growPlanInstance.activePhase.phase) + 1];
 
     
-    if (growPlanInstance.device){
+    if (typeof growPlanInstance.device === 'object'){
       viewModels.initDeviceViewModel(growPlanInstance.device, growPlanInstance.device.status, controlHash);
     }
 

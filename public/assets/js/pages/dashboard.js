@@ -577,9 +577,10 @@ require([
         '$timeout',
         'sharedDataService',
         'NavService',
+        'GardenModel',
         '$rootScope',
         'bpn.services.analytics',
-        function($scope, $timeout, sharedDataService, NavService, $rootScope, analytics){
+        function($scope, $timeout, sharedDataService, NavService, GardenModel, $rootScope, analytics){
           $scope.sharedDataService = sharedDataService;
 
           $scope.close = function(){
@@ -599,7 +600,7 @@ require([
           }
 
           $scope.updateName = function(){
-            sharedDataService.gardenModel.$updateName();
+            GardenModel.updateName(sharedDataService.gardenModel);
           };
 
           /*
