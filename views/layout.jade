@@ -1,5 +1,7 @@
 !!! 5
-html(class=className+" no-js")
+- var pageClassName = ''
+block vars
+html(class=className + " no-js " + pageClassName)
   head
     title= title
     meta(charset="UTF-8")

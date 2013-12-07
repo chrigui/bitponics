@@ -1,3 +1,6 @@
+block vars
+	- pageClassName = 'garden app-page single-page'
+
 extends ../layout
 
 block head
@@ -15,7 +18,10 @@ block content
 		div.separator-top
 			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
 			div(ng-cloak)
-				ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+				ul(
+					class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", 
+					ng-show="userGardenResults.data.length")
+
 					li(ng-repeat="garden in userGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
 						div.img-wrapper
 							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
@@ -30,7 +36,7 @@ block content
 						a.btn(href="/gardens/{{garden._id}}") Dashboard
 
 				div(ng-hide="userGardenResults.data.length")
-					a.btn(href="/setup/grow-plan") Set up your first garden!
+					a.btn.set-up-garden(href="/setup/grow-plan") Set up your first garden!
 			
 		h2.page-heading.clear-b Community Member Gardens
 		div.separator-top
