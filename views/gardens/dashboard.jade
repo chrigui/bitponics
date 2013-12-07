@@ -41,19 +41,24 @@ block content
               div(ng-hide="sharedDataService.gardenModel.endDate", class="content-module")
                 label
                   | Name
-                  input(type="text", ng-model="sharedDataService.gardenModel.name", ng-change="updateName()")
+                  input(
+                    type="text", 
+                    ng-show="sharedDataService.userCanModify",
+                    ng-model="sharedDataService.gardenModel.name", 
+                    ng-change="updateName()")
+                  div.readonly(ng-hide="sharedDataService.userCanModify") {{sharedDataService.gardenModel.name}}
 
                 div
                   span Currently in {{sharedDataService.gardenModel.activePhase.phase.name}} phase
 
                   button(
                     class="complete-garden btn",
-                    ng-show="sharedDataService.gardenModel.nextGrowPlanPhase",
+                    ng-show="sharedDataService.userCanModify && sharedDataService.gardenModel.nextGrowPlanPhase",
                     ng-click="advancePhase()") Advance garden to the {{sharedDataService.gardenModel.nextGrowPlanPhase.name}} phase
 
                 button(
                   class="complete-garden btn",
-                  ng-show="sharedDataService.gardenModel.active",
+                  ng-show="sharedDataService.userCanModify && sharedDataService.gardenModel.active",
                   ng-click="completeGarden()") Mark garden as complete
 
                 h4 Measurement Unit Preferences
@@ -66,14 +71,16 @@ block content
                     data-close="close",
                     class="manual-entry-form")
                     
-                    div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
-                    div(ng-show="hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
-                      select(class="custom-dropdown", 
+                    div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
+                    div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
+                      select(
+                        class="custom-dropdown", 
                         ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
                         ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units",
                         ng-change="updateSettings()")
                       .dblarrow
                         i
+                    div.readonly(ng-hide="sharedDataService.userCanModify") {{sensorName}} : {{ sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()] | lowercase }}
 
                 
 
@@ -129,16 +136,18 @@ block content
                       div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
 
                   div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
-                  - if (userCanModify === true)
-                    div(ng-show="sensor.code == 'ph' || sensor.code == 'ec'")
-                      a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.gardenModel.device._id}}/calibrate") Calibrate
                   
-                  div(data-bpn-directives-manual-entry-form, 
-                      data-sensor-unit="sensor.unit", 
-                      data-sensor-code="sensor.code", 
-                      data-sensor-logs="sharedDataService.activeDate.sensorLogs",
-                      data-close="close",
-                      class="manual-entry-form")
+                  div(ng-show="sharedDataService.userCanModify && (sensor.code == 'ph' || sensor.code == 'ec')")
+                    a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.gardenModel.device._id}}/calibrate") Calibrate
+                  
+                  div(
+                    ng-show="sharedDataService.userCanModify",
+                    data-bpn-directives-manual-entry-form,
+                    data-sensor-unit="sensor.unit", 
+                    data-sensor-code="sensor.code", 
+                    data-sensor-logs="sharedDataService.activeDate.sensorLogs",
+                    data-close="close",
+                    class="manual-entry-form")
                     
                     div(class="custom-checkbox-wrap")
                       input(id="{{sensorCode}}_manual_entry_toggle", 
@@ -170,7 +179,7 @@ block content
             li.photo(ng-repeat="photo in sharedDataService.photos | orderBy:predicate:date", ng-click="open(photo._id, $index)")
               img(ng-src="{{photo.thumbnailUrl}}", bpn-directives-if-thumbnail-404="{{photo.url}}")
           
-            li.photo
+            li.photo(ng-show="sharedDataService.userCanModify")
               img.spinner(src="/assets/img/spinner.svg", ng-show="uploadInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
               lvl-file-upload(
                 ng-hide="uploadInProgress",
@@ -208,10 +217,11 @@ block content
       div.content-module.side
           div.manual-entry-container(ng-controller="bpn.controllers.dashboard.ManualLog")
 
-            button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log
-              | <i class="icon-glyph-new icon-__64_plus_00e36c" aria-hidden="true"></i>
-            p(ng-hide="(sharedDataService.recentTextLogs.length) > 0")
-              | Journal your progress and enter any sensor data you want to record manually.
+            div(ng-show="sharedDataService.userCanModify")
+              button(class="btn centered full-width", ng-click="sharedDataService.activeOverlay='ManualLogOverlay'") Log
+                | <i class="icon-glyph-new icon-__64_plus_00e36c" aria-hidden="true"></i>
+              p(ng-hide="(sharedDataService.recentTextLogs.length) > 0")
+                | Journal your progress and enter any sensor data you want to record manually.
             
             h2(class="page-heading-small", ng-show="(sharedDataService.recentTextLogs.length) > 0") Recent Logs
             ul
@@ -283,12 +293,11 @@ block content
                       h4 This cycle has been overridden.
                     p.clear-b
                       {{controlAction.control.name}} is currently {{sharedDataService.gardenModel.device.outputMapByControlId[controlAction.control._id].currentState | controlValueToWord:true }}.
-                    - if (userCanModify === true)
-                      div.separator-top
-                        a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
-                        a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
-                        a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
-                        img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+                    div.separator-top(ng-show="sharedDataService.userCanModify")
+                      a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
+                      a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
+                      a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
+                      img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
 
           div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications", ng-hide="!sharedDataService.gardenModel.device")
             h2.page-heading-small Notifications
@@ -334,4 +343,5 @@ block footer-scripts
     bpn.pageData.controls = !{JSON.stringify(controls)};
     bpn.pageData.notifications = !{JSON.stringify(notifications)};
     bpn.pageData.photos = !{JSON.stringify(photos)};
+    bpn.pageData.userCanModify = !{JSON.stringify(userCanModify)};
     //bpn.pageData.photos = [{"createdAt":"2013-08-12T16:10:03.205Z","updatedAt":"2013-08-12T16:10:03.205Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0389.JPG","name":"IMG_0389.JPG","type":"image/jpg","size":177324,"gpi":"51b4e59dcda057020000000c","_id":"520908da78ec8704000000bd","__v":0,"visibility":"public","date":"2013-08-12T16:04:00.000Z","tags":[]},{"createdAt":"2013-08-12T15:50:03.295Z","updatedAt":"2013-08-12T15:50:03.295Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0388.JPG","name":"IMG_0388.JPG","type":"image/jpg","size":179780,"gpi":"51b4e59dcda057020000000c","_id":"5209042a78ec8704000000b8","__v":0,"visibility":"public","date":"2013-08-12T15:49:00.000Z","tags":[]},{"createdAt":"2013-08-12T15:40:02.609Z","updatedAt":"2013-08-12T15:40:02.609Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0386.JPG","name":"IMG_0386.JPG","type":"image/jpg","size":177881,"gpi":"51b4e59dcda057020000000c","_id":"520901d278ec8704000000b6","__v":0,"visibility":"public","date":"2013-08-12T15:34:00.000Z","tags":[]},{"createdAt":"2013-08-12T15:40:04.346Z","updatedAt":"2013-08-12T15:40:04.346Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0387.JPG","name":"IMG_0387.JPG","type":"image/jpg","size":179779,"gpi":"51b4e59dcda057020000000c","_id":"520901d478ec8704000000b7","__v":0,"visibility":"public","date":"2013-08-12T15:34:00.000Z","tags":[]},{"createdAt":"2013-08-12T15:10:04.826Z","updatedAt":"2013-08-12T15:10:04.826Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0383.JPG","name":"IMG_0383.JPG","type":"image/jpg","size":176677,"gpi":"51b4e59dcda057020000000c","_id":"5208facc78ec8704000000ab","__v":0,"visibility":"public","date":"2013-08-12T15:05:00.000Z","tags":[]},{"createdAt":"2013-08-12T15:10:06.408Z","updatedAt":"2013-08-12T15:10:06.408Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0385.JPG","name":"IMG_0385.JPG","type":"image/jpg","size":180308,"gpi":"51b4e59dcda057020000000c","_id":"5208face78ec8704000000ac","__v":0,"visibility":"public","date":"2013-08-12T15:05:00.000Z","tags":[]},{"createdAt":"2013-08-12T14:50:15.021Z","updatedAt":"2013-08-12T14:50:15.021Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0383.JPG","name":"IMG_0383.JPG","type":"image/jpg","size":176677,"gpi":"51b4e59dcda057020000000c","_id":"5208f62678ec8704000000a4","__v":0,"visibility":"public","date":"2013-08-12T14:49:00.000Z","tags":[]},{"createdAt":"2013-08-12T14:50:28.099Z","updatedAt":"2013-08-12T14:50:28.099Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0384.JPG","name":"IMG_0384.JPG","type":"image/jpg","size":178808,"gpi":"51b4e59dcda057020000000c","_id":"5208f63378ec8704000000a5","__v":0,"visibility":"public","date":"2013-08-12T14:49:00.000Z","tags":[]},{"createdAt":"2013-08-12T14:30:02.539Z","updatedAt":"2013-08-12T14:30:02.539Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0382.JPG","name":"IMG_0382.JPG","type":"image/jpg","size":173613,"gpi":"51b4e59dcda057020000000c","_id":"5208f16a78ec87040000009e","__v":0,"visibility":"public","date":"2013-08-12T14:25:00.000Z","tags":[]},{"createdAt":"2013-08-12T14:20:07.386Z","updatedAt":"2013-08-12T14:20:07.386Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0380.JPG","name":"IMG_0380.JPG","type":"image/jpg","size":175686,"gpi":"51b4e59dcda057020000000c","_id":"5208ef1778ec87040000009c","__v":0,"visibility":"public","date":"2013-08-12T14:10:00.000Z","tags":[]},{"createdAt":"2013-08-12T14:20:08.947Z","updatedAt":"2013-08-12T14:20:08.947Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0381.JPG","name":"IMG_0381.JPG","type":"image/jpg","size":173690,"gpi":"51b4e59dcda057020000000c","_id":"5208ef1878ec87040000009d","__v":0,"visibility":"public","date":"2013-08-12T14:10:00.000Z","tags":[]},{"createdAt":"2013-08-12T13:40:04.405Z","updatedAt":"2013-08-12T13:40:04.405Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0379.JPG","name":"IMG_0379.JPG","type":"image/jpg","size":179760,"gpi":"51b4e59dcda057020000000c","_id":"5208e5b478ec870400000091","__v":0,"visibility":"public","date":"2013-08-12T13:34:00.000Z","tags":[]},{"createdAt":"2013-08-12T13:20:02.441Z","updatedAt":"2013-08-12T13:20:02.441Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0378.JPG","name":"IMG_0378.JPG","type":"image/jpg","size":179018,"gpi":"51b4e59dcda057020000000c","_id":"5208e10278ec87040000008b","__v":0,"visibility":"public","date":"2013-08-12T13:19:00.000Z","tags":[]},{"createdAt":"2013-08-12T13:10:02.972Z","updatedAt":"2013-08-12T13:10:02.972Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0377.JPG","name":"IMG_0377.JPG","type":"image/jpg","size":178607,"gpi":"51b4e59dcda057020000000c","_id":"5208deaa78ec870400000085","__v":0,"visibility":"public","date":"2013-08-12T13:04:00.000Z","tags":[]},{"createdAt":"2013-08-12T12:50:03.911Z","updatedAt":"2013-08-12T12:50:03.911Z","owner":"506de30a8eebf7524342cb6c","originalFileName":"IMG_0376.JPG","name":"IMG_0376.JPG","type":"image/jpg","size":174517,"gpi":"51b4e59dcda057020000000c","_id":"5208d9fb78ec87040000007f","__v":0,"visibility":"public","date":"2013-08-12T12:49:00.000Z","tags":[]}];
