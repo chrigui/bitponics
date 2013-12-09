@@ -104,31 +104,47 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                     className = 'phase' + index,
                     phaseGroup;
                   
+                  scope.lastArc = d3.svg.arc();
                   scope.defaultArc = d3.svg.arc();
 
+                  scope.lastArc.outerRadius(radius - (arcSpan * arcNumber - 1) - arcMargin)
+                    .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+                  
                   scope.defaultArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
                     .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
 
-                  phaseGroup = svg.append('svg:g')
+                  phaseGroup = svg
+                    .append('svg:g')
                     .classed(className, true)
                     .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
                   
                   scope.allArcs = phaseGroup.selectAll('path')
                     .data(equalPie([{}])); //empty ring
 
-                  scope.allArcs
-                    .enter()
-                    .append('svg:g')
-                    .append('svg:path')
-                    .attr('d', scope.defaultArc)
-                    .attr('class', scope.getClasses(null, index));
+                  if (scope.userInteracted) {
+                    scope.allArcs
+                      .enter()
+                      .append('svg:g')
+                      .append('svg:path')
+                      .attr('d', null)
+                      .attr('d', scope.defaultArc)
+                      .attr('class', scope.getClasses(null, index));
+                  } else {
+                    scope.allArcs
+                      .enter()
+                      .append('svg:g')
+                      .append('svg:path')
+                      .attr('d', null)
+                      .attr('class', scope.getClasses(null, index))
+                      .transition()
+                      .delay(250 * index)
+                      .attr('d', scope.defaultArc);
+                  }
 
                   //labels
                   scope.allArcs
                     .append("svg:text")
                     .attr("fill", function(d, i) { return '#ffffff'; } )
-                    // .style({ 'fill': 'white', 'font-size': '20px'})
-                    // .attr("stroke", function(d, i) { return '#00F5A3'; } )
                     .attr("transform", function(d) {
                       //we have to make sure to set these before calling arc.centroid
                       d.innerRadius = 0;
@@ -143,7 +159,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
 
                       scope.$apply(function(){
                           //phase navigation
-
+                          scope.userInteracted = true;
                           scope.getClasses(null, index); //set active class
                           
                           scope.sharedDataService.selectedPhaseIndex = index;
