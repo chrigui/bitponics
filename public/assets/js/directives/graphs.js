@@ -295,6 +295,8 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 .enter()
                 .append('svg:g')
                 .append('svg:path')
+                .transition()
+                .delay(250 * index)
                 .attr('d', arc)
                 .attr('class', scope.getDaySummaryClass);
 
