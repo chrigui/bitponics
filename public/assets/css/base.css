@@ -3147,6 +3147,17 @@ label.newsletter.inline {
 /*
  * Profile Page
  */
+#profile input.unstyled {
+  margin-right: 0.5em;
+}
+#profile .locale_timezone_country {
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+}
+#profile .notification-email {
+  margin-top: 0;
+}
 /*
  * Single landing page overrides
  */

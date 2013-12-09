@@ -29,7 +29,7 @@ block content
         label(for="lastname") Last Name
         input(id="lastname", name="lastname", type="text", value="#{user.name.last}")
 
-        label(for="locale_timezone", class="display-ib") Locale
+        label(for="locale_timezone", class="display-ib") Timezone
         //not working
         //button(id="detect", class="display-i") Detect
         include ../misc/timezone_select_html
@@ -40,23 +40,29 @@ block content
           | <img class="timezone-pin" src="/assets/img/pin.png" /> 
           include ../misc/timezone_data_400x200
 
-        label(for="phone") Phone
-        input(id="phone", name="phone", type="text", value="#{user.phone}")
+        //- label(for="phone") Phone
+        //- input(id="phone", name="phone", type="text", value="#{user.phone}")
 
         //- label Address
         //- input(id="addressline1", name="addressline1", type="number")
         //- input(id="addressline2", name="addressline2", type="number")
         
-        //- label Preferred Notification Methods 
-        //- input(class="display-i", id="notifications_email", name="notifications_email", 
-        //-   type="checkbox", checked=user.notificationPreferences.email)
-        //- label(class="btn", for="notifications_email") Email
+        label Garden Notifications
+        
+        label.notification-email
+          input.unstyled(
+            id="notifications_email", 
+            name="notifications_email", 
+            type="checkbox", 
+            checked=user.notificationPreferences.email)
+          | Email
         
         //- input(class="display-i", id="notifications_sms", name="notifications_sms", 
         //-   type="checkbox", checked=user.notificationPreferences.sms)
         //- label(class="btn", for="notifications_sms") SMS
 
-        input(type="submit", value="Save Profile")
+        p
+          input(type="submit", value="Save Profile")
 
 
 block footer-scripts
