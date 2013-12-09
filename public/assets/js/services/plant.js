@@ -9,7 +9,13 @@ define([
 				'$resource', 
 				function ($resource) {
 					return $resource('/api/plants/:id', 
-						{ id: '@_id'}
+						{ id: '@_id'},
+            {
+              query : {
+                method:'GET',
+                isArray:false
+              }
+            }
 					);
 				}
 			]

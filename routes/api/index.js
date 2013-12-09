@@ -21,6 +21,7 @@ module.exports = function(app){
   require('./lightBulb')(app);
 	require('./lightFixture')(app);
 	require('./nutrient')(app);
+  require('./plants')(app);
 	require('./sensor')(app);
 	require('./sensorLog')(app);
 	require('./user')(app);
