@@ -165,6 +165,13 @@ UserSchema = new Schema({
   	sms: { type: Boolean, default: false }
   },
   
+
+  promotionalCodes : [{ type : String, enum : [ 
+    "KICKSTARTER_15", 
+    "KICKSTARTER_500" 
+  ]}],
+
+
   deviceKeys : [ DeviceKeySchema ],
   
   apiKey : {
