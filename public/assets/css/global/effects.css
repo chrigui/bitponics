@@ -55,6 +55,6 @@
   opacity: 1;
 }
 .grid-cell-animation.ng-leave {
-  top: 0;
+  bottom: -50px;
   opacity: 0;
 }

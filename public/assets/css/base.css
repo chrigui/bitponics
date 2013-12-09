@@ -600,7 +600,7 @@ button.btn:hover {
   stroke: #fff;
   stroke-width: 2;
   transition-property: fill;
-  transition-duration: 0.5s;
+  transition-duration: 0.75s;
 }
 .ring-graph svg .on,
 .ring-graph svg .good {
