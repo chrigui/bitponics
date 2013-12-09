@@ -506,6 +506,7 @@ ol.list-style {
   cursor: pointer;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
   position: relative;
+  transition: all 0.5s ease;
 }
 .btn:active,
 .btn-composite:active {
@@ -5282,6 +5283,10 @@ button.close {
 }
 .growplans .header-action {
   clear: both;
+}
+.growplans .header-action .spinner {
+  margin: 0 0 0 0.5em;
+  width: 1em;
 }
 .growplans .spinner {
   width: 2em;
