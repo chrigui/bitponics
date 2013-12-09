@@ -228,11 +228,11 @@
     padding: 0;
   }
   .header .icon-glyphlogo-new {
-    display: block;
+    display: none;
     font-size: 0.55em;
     position: relative;
-    top: 1.5em;
-    left: -1.75em;
+    top: 8em;
+    left: 10.25em;
     height: 7em;
     width: 7em;
   }
@@ -364,11 +364,7 @@
     min-height: 800px;
   }
   .landing-page .footer {
-    background-position: 45% 100%;
-    background-image: url("/assets/img/home/footer.jpg");
-    min-height: 1323px;
-    background-size: cover;
-    background-repeat: no-repeat;
+    min-height: 40px;
     position: relative;
     overflow: hidden;
   }
@@ -412,11 +408,22 @@
     color: #fff;
     width: 14em;
     font-size: 2em;
-    margin: 3em auto -6.5em auto;
+    margin: 0 0 -6.5em 7em;
     position: relative;
     height: 4em;
     line-height: 1.25;
     text-align: left;
+    position: absolute;
+    top: 4em;
+    left: 0.6em;
+  }
+  .landing-page .headline .icon-glyphlogo-new {
+    display: block;
+    font-size: 0.55em;
+    position: relative;
+    left: -1.8em;
+    height: 7em;
+    width: 7em;
   }
   .landing-page .last {
     margin: 0;
@@ -546,21 +553,15 @@
     min-height: 4em;
   }
   .list-grid-wrapper .grid-list.tier1 {
-    width: 30%;
+    width: 45%;
   }
   .list-grid-wrapper .grid-list.tier1 .first {
     min-height: 4em;
   }
   .list-grid-wrapper .grid-list.tier2 {
-    width: 30%;
+    width: 45%;
   }
   .list-grid-wrapper .grid-list.tier2 .first {
-    min-height: 4em;
-  }
-  .list-grid-wrapper .grid-list.tier3 {
-    width: 30%;
-  }
-  .list-grid-wrapper .grid-list.tier3 .first {
     min-height: 4em;
   }
   #pricing .center {
