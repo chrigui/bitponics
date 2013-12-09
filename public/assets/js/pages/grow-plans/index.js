@@ -857,6 +857,7 @@ require([
                     console.log(data);
                     $scope.sharedDataService.createdGrowPlanInstanceId = data.createdGrowPlanInstanceId
                     $scope.sharedDataService.submit.success = true;
+                    $scope.sharedDataService.submit.updateInProgress = false;
                   },
                   error: function(jqXHR, textStatus, error) {
                     console.log('error', jqXHR, textStatus, error);

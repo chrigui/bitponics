@@ -28,7 +28,9 @@ block head
               | Add
               | <i class="icon-glyph-new icon-__60_plus_white" aria-hidden="true"></i>
         
-        input.header-action(type="submit", ng-value="sharedDataService.pageMode == 'default' ? 'Save' : 'Activate garden'", ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success")
+        button.btn.header-action(type="submit", ng-disabled="sharedDataService.submit.updateInProgress || sharedDataService.submit.success")
+          | {{sharedDataService.pageMode == 'default' ? 'Save' : 'Activate garden'}}
+          img.spinner(src="/assets/img/spinner.svg", ng-show="sharedDataService.submit.updateInProgress")
 
       div(id="sensors", class="sensors content-module side")
         h2.page-heading-small.date {{sharedDataService.selectedGrowPlan.focusedPhase.name}} 
