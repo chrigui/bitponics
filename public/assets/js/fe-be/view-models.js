@@ -342,7 +342,6 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    * - focusedPhase
    * - focusedPhase.sortedControls - ordered by populated/unpopulated. this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
    * - focusedPhase.sortedSensors - ordered by populated/unpopulated. this is actually set by grow-plans/index.js. just documenting here to doc all view-model properties in one place
-   * - plantsViewModel
    * - phases[].actionViewModels
    * - phases[].actionViewModelsByControl
    * - phases[].actionViewModelsNoControl
@@ -357,12 +356,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.initGrowPlanViewModel = function (growPlan, sensors){
     
-		growPlan.plantsViewModel = {};
-		growPlan.plants.forEach(function(plant){
-			growPlan.plantsViewModel[plant._id] = plant;
-		});
-
-    growPlan.phases.forEach(function(phase, index){
+	 growPlan.phases.forEach(function(phase, index){
       viewModels.initGrowPlanPhaseViewModel(phase, sensors);
     });
 
@@ -555,14 +549,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    */
   viewModels.compileGrowPlanViewModelToServerModel = function(growPlan){
     var key;
-    growPlan.plants = [];
-    for (key in growPlan.plantsViewModel){
-    	if (growPlan.plantsViewModel.hasOwnProperty(key)){
-    		growPlan.plants.push(growPlan.plantsViewModel[key]);
-    	}
-    }
-    delete growPlan.plantsViewModel;
-
+    
     // Clean up unpopulated placeholder phases
     growPlan.phases = growPlan.phases.filter(function(phase){
       return (phase.name !== 'Add Phase' && phase.name !== 'Untitled');

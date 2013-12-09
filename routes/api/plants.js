@@ -2,7 +2,8 @@ var PlantModel = require('../../models/plant').model,
     winston = require('winston'),
     routeUtils = require('../route-utils'),
     requirejs = require('../../lib/requirejs-wrapper'),
-  	feBeUtils = requirejs('fe-be-utils');
+  	feBeUtils = requirejs('fe-be-utils'),
+    apiUtils = require('./utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -13,13 +14,9 @@ module.exports = function(app) {
 
    //List plants
   app.get('/api/plants',
-  	routeUtils.middleware.ensureLoggedIn,
-  	function (req, res, next){
-	    return plantModel.find(function (err, plants) {
-	      if (err) { return next(err); }
-	      return res.send(plants);
-	    });
-	  }
+  	apiUtils.query({
+      model : PlantModel
+    })
   );
 
   /*
@@ -87,6 +84,7 @@ module.exports = function(app) {
    */
   app.put('/api/plants/:id', 
   	routeUtils.middleware.ensureLoggedIn,
+    routeUtils.middleware.ensureUserIsAdmin,
   	function (req, res, next){
 	    return PlantModel.findById(req.params.id, function (err, plant) {
 	      if (err) { return next(err); }

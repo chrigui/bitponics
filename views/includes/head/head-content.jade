@@ -22,7 +22,7 @@ script
 		pages : {},
 		pageData : {}
 	};
-- if (user && user._id)
+- if (typeof user !== 'undefined' && user._id)
 	script
 		bpn.user = !{JSON.stringify(user.toPublicJSON())};
 

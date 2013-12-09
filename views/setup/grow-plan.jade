@@ -8,7 +8,7 @@ block head
   script(type='text/ng-template', id='browse.html')
 
     //filter
-    section(class="filterable", ng-hide)
+    section(class="filterable", ng-cloak, ng-hide)
 
       h4(class="page-heading float-l") Select a Grow Plan to manage your garden
       div(class="btn float-r", ng-click="showFilter = !showFilter") Filter
@@ -43,7 +43,7 @@ block head
 
 
 
-    ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
+    ul(ng-cloak, class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
       //- each growPlan, i in growPlans
       li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:'-activeGardenCount'", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
         div.img-wrapper
