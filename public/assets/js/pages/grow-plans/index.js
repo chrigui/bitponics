@@ -18,7 +18,8 @@ require([
   'selection-overlay',
   'overlay',
   'bpn.directives.graphs',
-  'bpn.services.growPlan'
+  'bpn.services.growPlan',
+  'bpn.services.plant'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
@@ -42,10 +43,6 @@ require([
 			          }]
 			        },
 			        templateUrl:'customize-overview.html'
-			      })
-			      .when('/:growPlanId/details', {
-			        controller: 'bpn.controllers.growPlan.CustomizeDetails',
-			        templateUrl:'customize-details.html'
 			      })
 			      .otherwise({redirectTo:'/'});
 				}
@@ -105,6 +102,9 @@ require([
 
 
           sharedData.pageMode = ($location.search()['setup'] ? 'setup' : 'default');
+          sharedData.additionalPlants = ($location.search()['plants'] ? $location.search()['plants'].split(',') : undefined);
+
+          console.log('sharedData.additionalPlants', sharedData.additionalPlants);
 
           $rootScope.close = function(){
             sharedData.activeOverlay = undefined;
@@ -146,6 +146,60 @@ require([
 				}
 			]
 		);
+
+
+    growPlanApp.factory('PlantLoader', 
+      [
+        'PlantModel', 
+        'sharedDataService',
+        '$route', 
+        '$q',
+        function(PlantModel, sharedDataService, $route, $q) {
+          return function() {
+            if (!(sharedDataService.additionalPlants && sharedDataService.additionalPlants.length)){
+              return sharedDataService.selectedGrowPlan.plants;
+            }
+
+            var filteredPlants = angular.copy(sharedDataService.additionalPlants);
+
+            console.log('sharedDataService.additionalPlants', sharedDataService.additionalPlants);
+            console.log('sharedDataService.selectedGrowPlan.plants before', sharedDataService.selectedGrowPlan.plants);
+            console.log('sharedDataService.selectedGrowPlan.plantsViewModel before', sharedDataService.selectedGrowPlan.plantsViewModel);
+
+            if (!sharedDataService.selectedGrowPlan || !sharedDataService.selectedGrowPlan.plants || !sharedDataService.selectedGrowPlan.plants.length){
+            } else {
+              filteredPlants = filteredPlants.filter(function(additionalPlantId){
+                if (sharedDataService.selectedGrowPlan.plants.some(function(plant){ return sharedplant._id === additionalPlantId; })){
+                  return true;
+                }
+                return false;
+              });  
+            }
+
+            console.log('filteredPlants', filteredPlants);
+            
+            var delay = $q.defer();
+              PlantModel.query( { where: JSON.stringify({ "_id" : { "$in" : filteredPlants } })}, 
+                function (additionalPlantsResult) {
+                  if (additionalPlantsResult.count){
+                    additionalPlantsResult.data.forEach(function(plant){
+                      sharedDataService.selected.plants[plant._id] = true;
+                    });
+                  }
+                  delay.resolve(additionalPlantsResult);
+                }, 
+                function() {
+                  delay.reject('Unable to fetch additional plants');
+                }
+              );
+
+            return delay.promise;
+          };
+        }
+      ]
+    );
+
+
     
     growPlanApp.controller('bpn.controllers.growPlan.PhasesGraph',
       [
@@ -511,7 +565,8 @@ require([
         'GrowPlanModel',
         'sharedDataService',
         'bpn.services.analytics',
-        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics) {
+        'PlantLoader',
+        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics, PlantLoader) {
           $scope.sharedDataService = sharedDataService;
 
           //$scope.lights = bpn.lights;
@@ -565,6 +620,9 @@ require([
             growMedium:undefined,
             nutrient:{}
           };
+
+
+          new PlantLoader();
 
 
           $scope.selectedSensors = function () {
