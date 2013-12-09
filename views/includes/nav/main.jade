@@ -5,7 +5,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
         a(href="/", data-page-include="false") 
           | bitponics
           span &trade;
-        | <i class="icon-glyph icon-glyphlogo-new icon-__63_logo_white" aria-hidden="true"></i>
+        //-| <i class="icon-glyph icon-glyphlogo-new icon-__63_logo_white" aria-hidden="true"></i>
       - var pageType = pageType || null;
       if !!pageType && pageType == 'landing-page'  
 
@@ -29,10 +29,10 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
               li(class="press", data-name="press")
                 a(href="/press") Press
           
-          li.nav-section(ng-click="toggleNavMenu()")
-            ul
-              li(class="installs", data-name="installs")
-                a(href="/installs") Installs
+          //- li.nav-section(ng-click="toggleNavMenu()")
+          //-   ul
+          //-     li(class="installs", data-name="installs")
+          //-       a(href="/installs") Installs
 
           li.nav-section(ng-click="toggleNavMenu()")
             ul
@@ -43,6 +43,11 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
             ul
               li(class="team", data-name="team") 
                 a(href="/team") Our Team
+          
+          //- li.nav-section.elevated-item
+          //-   ul
+          //-     li(class="login", data-name="login") 
+          //-       a.btn(href="/login", data-page-include="false") Log In
 
 
           //-li(class="nav-section elevated-item")
