@@ -688,7 +688,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
   .find()
   .where('tts')
   .lte(now)
-  .populate('u', 'email') // only need the email field for Users
+  .populate('u', 'email notificationPreferences')
   .populate('gpi')
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
@@ -698,7 +698,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
     //return callback(null, notificationResults.length);
 
     winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
-    winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS');
+    winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS ' + now);
 
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
@@ -720,7 +720,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
               function(err, notificationDisplay){
                 if (err) { return iteratorCallback(err); }
 
-                winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION DISPLAY");
+                winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION DISPLAY " + now);
 
                 var emailTemplateLocals = {
                   emailSubject : notificationDisplay.subject,
@@ -728,8 +728,11 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   emailBodyText : notificationDisplay.bodyText,
                   subscriptionPreferencesUrl : subscriptionPreferencesUrl,
                   appUrl : appUrl
-                },
-                users = notification.users;
+                },  
+                users = notification.users,
+                filteredUsers = users.filter(function(user) { 
+                  return user.notificationPreferences.email;
+                });
 
                 // TEMP HACK : special alert for hyatt device
                 try {
@@ -740,7 +743,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                       
                       winston.info('IN clearPendingNotifications, special case adding bitponics team');
                       // TEMP HACK : remove Hyatt from email notifications
-                      users = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
+                      filteredUsers = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
                       emailTemplateLocals.emailSubject = "HYATT DEVICE CONNECTION DROPPED";
                     }
                   }
@@ -749,16 +752,16 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
-                // users = [{email : 'jack@bitponics.com'}];
+                // filteredUsers = [{email : 'jack@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
-                  winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION EMAIL TEMPLATE POPULATED");
+                  winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION EMAIL TEMPLATE POPULATED " + now);
 
                   if (err) { return iteratorCallback(err); }
 
                   var mailOptions = {
                     from: "notifications@bitponics.com",
-                    to: users.map(function(user) { return user.email; }).join(', '),
+                    to: filteredUsers.map(function(user) { return user.email; }).join(', '),
                     subject: emailTemplateLocals.emailSubject,
                     text: finalEmailText,
                     html: finalEmailHtml
@@ -767,7 +770,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
                   
                   emailTransport.sendMail(mailOptions, function(err, response){
-                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT RESPONSE FROM EMAIL TRANSPORT");
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), " GOT RESPONSE FROM EMAIL TRANSPORT " + now);
                     if (err) { return iteratorCallback(err); }
                     
                     notification.sentLogs.push({ts: now});
@@ -788,7 +791,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     } else {
                       notification.timeToSend = null;
                     }
-                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "SAVING UPDATED NOTIFICATION DOCUMENT");
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " SAVING UPDATED NOTIFICATION DOCUMENT " + now);
                     notification.save(iteratorCallback);
                   });
                 });
@@ -807,7 +810,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           var notificationResultProcessingQueue = async.queue(notificationIterator, 5);
           notificationResultProcessingQueue.drain = notificationProcessingEnded;
           notificationResultProcessingQueue.push(notificationResults, function(err){
-            winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION");
+            winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION " + now);
             if (err) { winston.error(err); }
           });
         }

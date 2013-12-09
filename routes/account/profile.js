@@ -50,7 +50,7 @@ module.exports = function(app){
 		  		// country : req.body.country
 		    // };
 		    user.notificationPreferences = {
-			  	email: req.body.notifications_email,
+			  	email: !!req.body.notifications_email,
 			  	sms: req.body.notifications_sms
 			  };
 
