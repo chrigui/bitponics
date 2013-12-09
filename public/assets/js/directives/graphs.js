@@ -102,59 +102,61 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 phases.forEach(function(phase, index) {
                   var arcNumber = ((phaseCount + 1) - index - 1),
                     className = 'phase' + index,
-                    phaseGroup;
+                    phaseGroup,
+                    startArc = d3.svg.arc(),
+                    completeArc = d3.svg.arc(),
+                    allArcs;
                   
-                  scope.lastArc = d3.svg.arc();
-                  scope.defaultArc = d3.svg.arc();
+                  
+                  completeArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+                    .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
 
-                  scope.lastArc.outerRadius(radius - (arcSpan * arcNumber - 1) - arcMargin)
-                    .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
-                  
-                  scope.defaultArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
-                    .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+
+                  startArc.outerRadius(completeArc.innerRadius()).innerRadius(completeArc.innerRadius());
 
                   phaseGroup = svg
                     .append('svg:g')
                     .classed(className, true)
                     .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
                   
-                  scope.allArcs = phaseGroup.selectAll('path')
+                  allArcs = phaseGroup.selectAll('path')
                     .data(equalPie([{}])); //empty ring
 
                   if (scope.userInteracted) {
-                    scope.allArcs
+                    allArcs
                       .enter()
                       .append('svg:g')
                       .append('svg:path')
-                      .attr('d', null)
-                      .attr('d', scope.defaultArc)
+                      .attr('d', completeArc)
                       .attr('class', scope.getClasses(null, index));
                   } else {
-                    scope.allArcs
+                    allArcs
                       .enter()
                       .append('svg:g')
                       .append('svg:path')
-                      .attr('d', null)
+                      .attr('d', startArc)
                       .attr('class', scope.getClasses(null, index))
                       .transition()
-                      .delay(250 * index)
-                      .attr('d', scope.defaultArc);
+                      .duration(500)
+                      .ease('quad-in-out')
+                      .delay(500 * (index + 1))
+                      .attr('d', completeArc);
                   }
 
                   //labels
-                  scope.allArcs
+                  allArcs
                     .append("svg:text")
                     .attr("fill", function(d, i) { return '#ffffff'; } )
                     .attr("transform", function(d) {
                       //we have to make sure to set these before calling arc.centroid
                       d.innerRadius = 0;
                       d.outerRadius = radius;
-                      return "translate(" + scope.defaultArc.centroid(d) + ")";
+                      return "translate(" + completeArc.centroid(d) + ")";
                     })
                     .attr("text-anchor", "middle")
                     .text(function(d, i) { return phase.name; });     
 
-                  scope.allArcs
+                  allArcs
                     .on('click', function (d, i) {
 
                       scope.$apply(function(){
@@ -187,7 +189,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                       
                     });
 
-                  scope.allArcs.select('text').on('click', function(d, i) {
+                  allArcs.select('text').on('click', function(d, i) {
                     console.log('clicked text');
                   });
 
@@ -277,12 +279,15 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
 
             phases.forEach(function(phase, index) {
               var arcNumber = (phaseCount - index - 1),
-                arc = d3.svg.arc(),
+                startArc = d3.svg.arc(),
+                completeArc = d3.svg.arc(),
                 className = 'phase' + index,
                 phaseGroup;
 
-              arc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+              completeArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
                 .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+
+              startArc.outerRadius(completeArc.innerRadius()).innerRadius(completeArc.innerRadius());
 
               phaseGroup = svg.append('svg:g')
                 .classed(className, true)
@@ -295,10 +300,14 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 .enter()
                 .append('svg:g')
                 .append('svg:path')
+                .attr('d', startArc)
+                .attr('class', scope.getDaySummaryClass)
                 .transition()
-                .delay(250 * index)
-                .attr('d', arc)
-                .attr('class', scope.getDaySummaryClass);
+                .duration(500)
+                .ease('quad-in-out')
+                .delay(500 * (index + 1))
+                .attr('d', completeArc);
+                
 
               allArcs
                 .on('click', function (d, i) {
