@@ -19,3 +19,56 @@
 .fade-out-setup.fade-out-start{
     opacity:0;
 }
+
+/*
+ * Animations
+ */
+.accordion {
+  -webkit-transition:0.25s linear all;
+  transition:0.25s linear all;
+  opacity:1;
+}
+
+.accordion.ng-hide {
+  opacity:0;
+  height: 0;
+}
+
+.accordion.ng-hide-add, .accordion.ng-hide-remove {
+  /* this needs to be here to make it visible during the animation
+     since the .ng-hide class is already on the element rendering
+     it as hidden. */
+  display:block!important;
+}
+
+.grid-cell-animation.ng-enter, 
+.grid-cell-animation.ng-leave, 
+.grid-cell-animation.ng-move {
+  -webkit-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  position:relative;
+}
+
+.grid-cell-animation.ng-enter {
+  bottom:-50px;
+  opacity:0;
+}
+.grid-cell-animation.ng-enter.ng-enter-active {
+  bottom:0;
+  opacity:1;
+}
+
+.grid-cell-animation.ng-leave {
+  bottom:-50px;
+  opacity:0;
+}
+.grid-cell-animation.ng-leave.ng-leave-active {
+  // top:-10px;
+  // opacity:0;
+}
+.grid-cell-animation.ng-move {
+  // opacity:0.5;
+}
+.grid-cell-animation.ng-move.ng-move-active {
+  // opacity:1;
+}

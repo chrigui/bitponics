@@ -334,6 +334,8 @@ label {
   height: 6em;
   text-transform: uppercase;
   margin: 0.125em 0;
+  transition-property: background-color;
+  transition-duration: 0.5s;
 }
 .data-module div,
 .data-module p,
@@ -594,9 +596,14 @@ button.btn:hover {
 .step {
   padding: 3em 0 0;
 }
+svg path {
+  fill: #fff;
+}
 .ring-graph svg path {
   stroke: #fff;
   stroke-width: 2;
+  transition-property: fill;
+  transition-duration: 0.75s;
 }
 .ring-graph svg .on,
 .ring-graph svg .good {
@@ -5514,58 +5521,10 @@ button.close {
   font-size: 2em;
   top: 0.25em;
 }
-.accordion {
-  -webkit-transition: 0.25s linear all;
-  -webkit-transition: 0.25s linear all;
-  -moz-transition: 0.25s linear all;
-  -o-transition: 0.25s linear all;
-  -ms-transition: 0.25s linear all;
-  transition: 0.25s linear all;
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-}
-.accordion.ng-hide {
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-  height: 0;
-}
-.accordion.ng-hide-add,
-.accordion.ng-hide-remove {
-/* this needs to be here to make it visible during the animation
-     since the .ng-hide class is already on the element rendering
-     it as hidden. */
-  display: block !important;
-}
-.grid-cell-animation.ng-enter,
-.grid-cell-animation.ng-leave,
-.grid-cell-animation.ng-move {
-  -webkit-transition: 0.5s linear all;
-  -webkit-transition: 0.5s linear all;
-  -moz-transition: 0.5s linear all;
-  -o-transition: 0.5s linear all;
-  -ms-transition: 0.5s linear all;
-  transition: 0.5s linear all;
-  position: relative;
-}
-.grid-cell-animation.ng-enter {
-  top: -10px;
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-}
-.grid-cell-animation.ng-enter.ng-enter-active {
-  top: 0;
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-}
-.grid-cell-animation.ng-leave {
-  top: 0;
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
+@media  screen and (min-width: 65em) {
+  .growplans .page-heading {
+    width: 90%;
+  }
 }
 /*
  * Gardens List Page

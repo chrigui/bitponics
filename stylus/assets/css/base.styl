@@ -105,6 +105,8 @@ input, label
 	height 6em
 	text-transform uppercase
 	margin 0.125em 0
+	transition-property: background-color;
+	transition-duration: .5s;
 
 	div, p, span, a, a:visited, a:hover, a:active {
 		color white
@@ -410,11 +412,17 @@ button.btn
 .step
 	padding 3em 0 0
 
+svg
+	path
+		fill : white
+
 .ring-graph
 	svg
 		path 
 			stroke #fff
 			stroke-width 2
+			transition-property fill
+			transition-duration .75s
 			
 		.on, .good
 			fill : color-bg-green
