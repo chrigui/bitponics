@@ -865,8 +865,11 @@ require([
           sensorLogs : "="
         },
         template : '<div class="sparkline {{sensorCode}}"></div>',
-        controller : function ($scope, $element, $attrs, $transclude){
-        },
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude',
+          function ($scope, $element, $attrs, $transclude){
+          }
+        ],
         link: function (scope, element, attrs, controller) { 
           // link is where we have a created directive element as
           // well as populated scope to work with
