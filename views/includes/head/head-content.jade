@@ -1,4 +1,4 @@
-if (settings.env == 'local' || settings.env == 'development')
+if (settings.env == 'local')
 	link(rel='stylesheet', href='/assets/css/libs/resets.css')
 	link(rel='stylesheet', href='/assets/css/global/breakpoints.css')
 	link(rel='stylesheet', href='/assets/css/global/colors.css')
@@ -13,7 +13,7 @@ if (settings.env == 'local' || settings.env == 'development')
 	link(rel='stylesheet', href='/assets/css/layout-large.css')
 	link(rel='stylesheet', href='/assets/css/layout-medium.css')
 else
-	link(rel='stylesheet', href='/assets/css/all.css')
+	!= CDN('/assets/css/all.css')
 
 block css
 
@@ -26,19 +26,25 @@ script
 	script
 		bpn.user = !{JSON.stringify(user.toPublicJSON())};
 
-script(src='/assets/js/libs/modernizr.js')
+!= CDN('/assets/js/libs/modernizr.js')
 script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
 
 script window.jQuery || document.write('<script src="/assets/js/libs/jquery-1.8.2.min.js"><\/script>')
 
-
+- var iconSVGCSS = CDN('/assets/icons/icons.data.svg.css', { 'raw' : true }).trim();
+- var iconPNGCSS = CDN('/assets/icons/icons.data.png.css', { 'raw' : true }).trim();
+- var iconFALLBACKCSS = CDN('/assets/icons/icons.fallback.css', { 'raw' : true }).trim();
 script
 	/* grunticon Stylesheet Loader | https://github.com/filamentgroup/grunticon | (c) 2012 Scott Jehl, Filament Group, Inc. | MIT license. */
 	window.grunticon=function(e){if(e&&3===e.length){var t=window,n=!!t.document.createElementNS&&!!t.document.createElementNS("http://www.w3.org/2000/svg","svg").createSVGRect&&!!document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image","1.1"),A=function(A){var o=t.document.createElement("link"),r=t.document.getElementsByTagName("script")[0];o.rel="stylesheet",o.href=e[A&&n?0:A?1:2],r.parentNode.insertBefore(o,r)},o=new t.Image;o.onerror=function(){A(!1)},o.onload=function(){A(1===o.width&&1===o.height)},o.src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="}};
-	grunticon( [ "/assets/icons/icons.data.svg.css", "/assets/icons/icons.data.png.css", "/assets/icons/icons.fallback.css" ] );
+	grunticon([
+		'#{iconSVGCSS}',
+		'#{iconPNGCSS}',
+		'#{iconFALLBACKCSS}'
+	]);
 
 noscript
-	| <link href="/assets/icons/icons.fallback.css" rel="stylesheet">
+	| <link href="#{iconFALLBACKCSS}" rel="stylesheet">
 
 
 
