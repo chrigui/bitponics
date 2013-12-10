@@ -27,9 +27,6 @@ script
 		bpn.user = !{JSON.stringify(user.toPublicJSON())};
 
 != CDN('/assets/js/libs/modernizr.js')
-script(src='//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js')
-
-script window.jQuery || document.write('<script src="/assets/js/libs/jquery-1.8.2.min.js"><\/script>')
 
 - var iconSVGCSS = CDN('/assets/icons/icons.data.svg.css', { 'raw' : true }).trim();
 - var iconPNGCSS = CDN('/assets/icons/icons.data.png.css', { 'raw' : true }).trim();
