@@ -100,7 +100,7 @@ module.exports = function(app){
       , hostname   : 'localhost'
       , port       : 80
       , ssl        : true
-      , production : app.settings.env !== 'local' ? false : false //false means we use local assets
+      , production : app.settings.env !== 'local' ? false : true //false means we use local assets
       , logger     : winston.info
     };
 
