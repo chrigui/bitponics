@@ -913,9 +913,12 @@ require([
     growPlanApp.directive('bpnDirectivesShowcaseReveal', function() {
       return {
         restrict : "EA",
-        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
-          $scope.sharedDataService = sharedDataService;
-        },
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude', 'sharedDataService',
+          function ($scope, $element, $attrs, $transclude, sharedDataService){
+            $scope.sharedDataService = sharedDataService;
+          }
+        ],
         link: function (scope, element, attrs, controller) {
           scope.el = $(element[0]);
           scope.fadeSides = function (inout) {

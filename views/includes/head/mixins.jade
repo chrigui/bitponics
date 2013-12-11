@@ -2,6 +2,7 @@
 
 mixin requirejs(dataMain)
   - var dataMainVar = dataMain;
+  - var requirejs = CDN('/assets/js/libs/require.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angular = CDN('/assets/js/libs/angular/1.2.0/angular.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularFlexslider = CDN('/assets/js/libs/angular-flexslider.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularAnimate = CDN('/assets/js/libs/angular/1.2.0/angular-animate.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -53,11 +54,11 @@ mixin requirejs(dataMain)
 
   //- Dynamic data cannot be passed to CDN() as far as I can tell, so keep requirejs local for now
   // != CDN('/assets/js/libs/require.js', { 'data-main' : '#{dataMainVar}' })
-  script(src='/assets/js/libs/require.js', 'data-main'=dataMainVar)
+  script(src="#{requirejs}", data-main="#{dataMainVar}")
   script
     require.config({
       paths: {
-        'angular': '#{angular}',
+        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular',
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
         'angularAnimate' : '#{angularAnimate}',
