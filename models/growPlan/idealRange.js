@@ -3,7 +3,8 @@ var mongoose = require('mongoose'),
 	ObjectId = Schema.ObjectId,
 	ActionModel = require('../action').model,
 	getObjectId = require('../utils').getObjectId,
-  async = require('async');
+  async = require('async'),
+  winston = require('winston');
 
 var IdealRangeSchema = new Schema({
 
