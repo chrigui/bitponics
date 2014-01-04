@@ -6,14 +6,19 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   /**
    * Populate GrowPlanInstance viewModel properties
    * Assumes growPlanInstance.growPlan is a fully-populated GP
+   * If growPlanMigrations[].oldGrowPlan are populated, it will assign them to the appropriate growPlanInstance.phases[].growPlan
    * 
-   * phases[].daySummaries[].date
-   * phases[].phase
-   * phases[].calculatedStartDate : phase.startDate or the projected startDate the phase would have started in the past or future
-   * activePhase
-   * nextGrowPlanPhase
-   * device.status.activeActions[].control
-   * device.status.activeActions[].outputId
+   * Assigns the following properties:
+   * 
+   * - phases[].daySummaries[].date
+   * - phases[].phase
+   * - phases[].growPlan
+   * - phases[].calculatedStartDate : phase.startDate or the projected startDate the phase would have started in the past or future
+   * - activePhase
+   * - nextGrowPlanPhase
+   * - growPlansById {Object} : Grow Plans the garden has used (pulled from .growPlan and .growPlanMigrations). Keyed by grow plan _id
+   * - device.status.activeActions[].control
+   * - device.status.activeActions[].outputId
    * 
    * @param {Object} growPlanInstance,
    * @param {Object} controlHash : Keyed by control._id
@@ -37,14 +42,28 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     now = new Date(),
     nowMoment = moment(now);
 
+
+
+    // Create a hash of the grow plans the garden has used, keyed by id
+    growPlanInstance.growPlansById = {};
+    growPlanInstance.growPlansById[growPlanInstance.growPlan._id] = growPlanInstance.growPlan;
+    if (growPlanInstance.growPlanMigrations.length) {
+      growPlanInstance.growPlanMigrations.forEach(function(growPlanMigration){
+        growPlanInstance.growPlansById[growPlanMigration.oldGrowPlan._id] = growPlanMigration.oldGrowPlan;
+      });
+    }
+
+    
+
     // If we're looking at a GPI that's on its original GP, show all phases, even if they're past
-    // If we're looking at a GPI that's gone through a migration, don't show past phases (
-    // since the user has passed ove those phases in previous growPlans)
+    // If we're looking at a GPI that's gone through a migration, don't show past phases (since the user has passed over those phases in previous growPlans)
     var includePastPhases = (growPlanInstance.growPlanMigrations.length === 0);
 
 
+
+    // First, go through garden phases & set the calculatedStartDate
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
-      growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate).subtract("days", growPlanInstancePhase.startedOnDay);  
+      growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate);//.subtract("days", growPlanInstancePhase.startedOnDay);  // this offset start date calculation is probably not actually necessary
     });
 
     growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
@@ -100,9 +119,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
   		var i;
       
-      // TODO: If this is a migrated GPI, past GP Phases wouldn't be found here. 
-      // Should update the server response to send the old GP data also
-      growPlanInstancePhase.phase = growPlanInstance.growPlan.phases.filter(
+      growPlanInstancePhase.phase = growPlanInstance.growPlansById[growPlanInstancePhase.growPlan].phases.filter(
         function(growPlanPhase){
           return growPlanPhase._id === growPlanInstancePhase.phase;
         }
@@ -110,12 +127,31 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   		
   		
       
-      // ensure there's a daySummary for each day of each phase, past and future
-      for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
-        if (!growPlanInstancePhase.daySummaries[i]){
-          growPlanInstancePhase.daySummaries[i] = {};
-        }
+      // ensure there's a daySummary for each day of each phase
+      // All past days, future days only if it's the active phase (hasn't ended yet)
+      var phaseComplete = !!growPlanInstancePhase.endDate,
+          phaseDaysCompleted = 0;
+      // if endDate is defined
+      if (phaseComplete){
+        phaseDaysCompleted = moment(growPlanInstancePhase.endDate).diff(growPlanInstancePhase.startDate, 'days');
+      } else {
+        phaseDaysCompleted = moment(growPlanInstancePhase.endDate).diff(now, 'days');
       }
+
+      if (phaseComplete){
+        for (i = 0; i < phaseDaysCompleted; i++){
+          if (!growPlanInstancePhase.daySummaries[i]){
+            growPlanInstancePhase.daySummaries[i] = {};
+          }
+        }  
+      } else {
+        for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
+          if (!growPlanInstancePhase.daySummaries[i]){
+            growPlanInstancePhase.daySummaries[i] = {};
+          }
+        }  
+      }
+      
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
         if (!daySummary){

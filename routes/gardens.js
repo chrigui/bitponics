@@ -145,9 +145,18 @@ module.exports = function(app){
                     function(err, growPlanResults){
   										if (err) { return innerInnerCallback(err); }
   										
-  										growPlanInstanceResult.growPlan = growPlanResults.filter(function(growPlan){
-                        return growPlan._id.toString() === growPlanInstanceResult.growPlan.toString();
-                      })[0];
+  										var growPlansById = {};
+                      growPlanResults.forEach(function(growPlan){
+                        growPlansById[growPlan._id] = growPlan;
+                      });
+
+                      growPlanInstanceResult.growPlan = growPlansById[growPlanInstanceResult.growPlan.toString()];
+
+                      if (growPlanInstanceResult.growPlanMigrations){
+                        growPlanInstanceResult.growPlanMigrations.forEach(function(growPlanMigration){
+                          growPlanMigration.oldGrowPlan = growPlansById[growPlanMigration.oldGrowPlan.toString()];
+                        });
+                      }
                       
   										return innerInnerCallback();
   									}

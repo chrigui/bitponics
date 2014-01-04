@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
   feBeUtils = requirejs('fe-be-utils'),
   PlantModel = require('../plant').model,
   i18nKeys = require('../../i18n/keys'),
+  winston = require('winston'),
   mongooseConnection = require('../../config/mongoose-connection').defaultConnection;
   
 
@@ -300,7 +301,9 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       silentValidationFail = options.silentValidationFail,
       GrowPlanModel = this,
       GrowPlanInstanceModel = require('../growPlanInstance').model,
-      originalGrowPlan;
+      originalGrowPlan,
+      originalGrowPlanId,
+      originalGrowPlanCreatedById;
 
 
   ModelUtils.getFullyPopulatedGrowPlan( { _id: submittedGrowPlan._id }, function(err, growPlanResults){
@@ -312,6 +315,9 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       return callback(new Error(i18nKeys.get('Invalid Grow Plan id', submittedGrowPlan._id)));
     }
 
+    originalGrowPlanId = originalGrowPlan._id.toString();
+    originalGrowPlanCreatedById = getObjectId(originalGrowPlan.createdBy);
+
     GrowPlanModel.isEquivalentTo(submittedGrowPlan, originalGrowPlan, function(err, isEquivalent){
       if (err) { return callback(err); }
 
@@ -320,15 +326,15 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
         return GrowPlanModel.findById(originalGrowPlan._id, callback);
       }
       
+      winston.info("PROCESSING A GROW PLAN MODIFICATION " + submittedGrowPlan._id.toString());
       
       async.waterfall(
         [
           function decideOnBranching(innerCallback){
-            var originalGrowPlanCreatedById = getObjectId(originalGrowPlan.createdBy);
             
             // If different user and non-admin, branch it
             if (!user.admin && !(userId.equals(originalGrowPlanCreatedById))) {
-              //console.log("NOT BRANCHING FIRST TRUE", userId, originalGrowPlanCreatedById);
+              winston.info("PROCESSING A GROW PLAN MODIFICATION " + originalGrowPlanId + " BRANCH POINT 1");
               return innerCallback(null, true);
             }
 
@@ -338,13 +344,13 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
             .select('owner users active')
             .exec(function(err, growPlanInstanceResults){
               if (err) { return innerCallback(err); }
-              //console.log("HAS OTHER USERS growPlanInstanceResults", originalGrowPlan._id, growPlanInstanceResults);
+              winston.info("PROCESSING A GROW PLAN MODIFICATION " + originalGrowPlanId + " HAS OTHER USERS " + JSON.stringify(growPlanInstanceResults));
               var hasOtherUsers = growPlanInstanceResults.some(function(gpi){
                 return !(originalGrowPlanCreatedById.equals(gpi.owner));
               });
 
               // If there are other users using the original GP, branch the submitted GP
-              //console.log("HAS OTHER USERS", hasOtherUsers);
+              winston.info("PROCESSING A GROW PLAN MODIFICATION " + originalGrowPlanId + " HAS OTHER USERS " + hasOtherUsers);
               return innerCallback(null, hasOtherUsers);
             });
           },
@@ -463,9 +469,23 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
             if (err) { return innerCallback(err); }
 
             // Find all the GPI's using the old GP that are active and have "trackGrowPlanUpdates" set to true
-            GrowPlanInstanceModel.find({ growPlan : submittedGrowPlan._id, active : true, trackGrowPlanUpdates : true })
+            var gardenQuery = { growPlan : originalGrowPlanId, active : true, trackGrowPlanUpdates : true };
+
+            // If user is the creator or admin, update all gardens that are tracking updates
+            if (user.admin || userId.equals(originalGrowPlanCreatedById)) {
+              
+            } else {
+              // Else, just update this user's gardens
+              gardenQuery['owner'] = userId;
+            }
+
+            winston.info("PROCESSING A GROW PLAN MODIFICATION " + originalGrowPlanId + " SAVED GROW PLAN " + savedGrowPlan._id.toString() + " UPDATING GARDENS, QUERY " + JSON.stringify(gardenQuery));
+            
+            GrowPlanInstanceModel.find(gardenQuery)
             .exec(function(err, growPlanInstancesToUpdate){
               if (err) { return innerCallback(err); }
+
+              winston.info("PROCESSING A GROW PLAN MODIFICATION " + originalGrowPlanId + " SAVED GROW PLAN " + savedGrowPlan._id.toString() + " UPDATING GARDENS " + JSON.stringify(growPlanInstancesToUpdate.map(function(gpi) { return gpi._id.toString(); })) );
 
               async.eachLimit(
                 growPlanInstancesToUpdate,
