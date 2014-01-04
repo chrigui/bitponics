@@ -53,13 +53,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
       });
     }
 
+    
+
     // If we're looking at a GPI that's on its original GP, show all phases, even if they're past
     // If we're looking at a GPI that's gone through a migration, don't show past phases (since the user has passed over those phases in previous growPlans)
     var includePastPhases = (growPlanInstance.growPlanMigrations.length === 0);
 
 
+
+    // First, go through garden phases & set the calculatedStartDate
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
-      growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate).subtract("days", growPlanInstancePhase.startedOnDay);  
+      growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate);//.subtract("days", growPlanInstancePhase.startedOnDay);  // this offset start date calculation is probably not actually necessary
     });
 
     growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
@@ -123,12 +127,31 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
   		
   		
       
-      // ensure there's a daySummary for each day of each phase, past and future
-      for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
-        if (!growPlanInstancePhase.daySummaries[i]){
-          growPlanInstancePhase.daySummaries[i] = {};
-        }
+      // ensure there's a daySummary for each day of each phase
+      // All past days, future days only if it's the active phase (hasn't ended yet)
+      var phaseComplete = !!growPlanInstancePhase.endDate,
+          phaseDaysCompleted = 0;
+      // if endDate is defined
+      if (phaseComplete){
+        phaseDaysCompleted = moment(growPlanInstancePhase.endDate).diff(growPlanInstancePhase.startDate, 'days');
+      } else {
+        phaseDaysCompleted = moment(growPlanInstancePhase.endDate).diff(now, 'days');
       }
+
+      if (phaseComplete){
+        for (i = 0; i < phaseDaysCompleted; i++){
+          if (!growPlanInstancePhase.daySummaries[i]){
+            growPlanInstancePhase.daySummaries[i] = {};
+          }
+        }  
+      } else {
+        for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
+          if (!growPlanInstancePhase.daySummaries[i]){
+            growPlanInstancePhase.daySummaries[i] = {};
+          }
+        }  
+      }
+      
 
       growPlanInstancePhase.daySummaries.forEach(function(daySummary, daySummaryIndex){
         if (!daySummary){
