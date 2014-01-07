@@ -91,6 +91,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
           }
 
           growPlanInstance.phases.unshift({
+            growPlan : growPlanInstance.growPlan._id,
             phase : growPlanPhase._id,
             daySummaries : [],
             calculatedStartDate : calculatedStartDate
@@ -107,6 +108,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         }
 
         growPlanInstance.phases.push({
+          growPlan : growPlanInstance.growPlan._id,
           phase : growPlanPhase._id,
           daySummaries : [],
           calculatedStartDate : calculatedStartDate
