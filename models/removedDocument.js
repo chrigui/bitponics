@@ -1,5 +1,7 @@
 /**
  * All "Removed" docs get sent here, for later recovery if necessary.
+ * 
+ * @module models/RemovedDocument
  */
 
  var mongoose = require('mongoose'),
@@ -49,7 +51,15 @@ RemovedDocumentSchema.plugin(useTimestamps);
 RemovedDocumentSchema.index({ collectionName:1, documentId: 1  });
 
 RemovedDocumentModel = mongooseConnection.model('RemovedDocument', RemovedDocumentSchema);
+
+/**
+ * @type {Schema}
+ */
 exports.schema = RemovedDocumentSchema;
+
+/**
+ * @constructor
+ * @alias module:models/RemovedDocument.RemovedDocumentModel
+ * @type {Model}
+ */
 exports.model = RemovedDocumentModel;
-
-

@@ -1,3 +1,7 @@
+/**
+ * @module models/GrowSystem
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -157,5 +161,15 @@ GrowSystemSchema.static('createNewIfUserDefinedPropertiesModified', function(opt
 
 /*********************** END STATIC METHODS ******************************/
 
+
+/**
+ * @type {Schema}
+ */
 exports.schema = GrowSystemSchema;
+
+/**
+ * @constructor
+ * @alias module:models/GrowSystem.GrowSystemModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('GrowSystem', GrowSystemSchema);

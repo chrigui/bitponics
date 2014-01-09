@@ -1,3 +1,7 @@
+/**
+ * @module models/Sensor
+ */
+
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -30,5 +34,14 @@ var SensorSchema = new Schema({
 SensorSchema.plugin(useTimestamps);
 SensorSchema.plugin(mongoosePlugins.recoverableRemove);
 
+/**
+ * @type {Schema}
+ */
 exports.schema = SensorSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Sensor.SensorModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Sensor', SensorSchema);

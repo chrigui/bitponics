@@ -1,3 +1,7 @@
+/**
+ * @module models/Device
+ */
+
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -669,6 +673,23 @@ DeviceSchema.pre('save', function(next){
 /***************** END MIDDLEWARE **********************/
 
 
+
+/**
+ * @type {Schema}
+ */
 exports.schema = DeviceSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Device.DeviceModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Device', DeviceSchema);
+
+
+/**
+ * Utility methods for working with DeviceModels
+ * @alias module:models/Device/DeviceUtils
+ * @type {Object}
+ */
 exports.utils = DeviceUtils;

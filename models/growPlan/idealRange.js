@@ -1,3 +1,7 @@
+/**
+ * @module models/GrowPlan/IdealRange
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectId = Schema.ObjectId,

@@ -1,3 +1,7 @@
+/**
+ * @module models/ImmediateAction
+ */
+
 var mongoose = require('mongoose'),
   mongoosePlugins = require('../lib/mongoose-plugins'),
   Schema = mongoose.Schema,
@@ -184,5 +188,15 @@ ImmediateActionSchema.static('create', function(options, callback){
 
 ImmediateActionSchema.index({ 'gpi': 1,  'e' : -1, 'ts': -1 });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = ImmediateActionSchema;
+
+
+/**
+ * @constructor
+ * @alias module:models/ImmediateAction.ImmediateActionModel
+ * @type {Model}
+ */
 exports.model = ImmediateActionModel = mongooseConnection.model('ImmediateAction', ImmediateActionSchema);

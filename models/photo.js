@@ -1,3 +1,7 @@
+/**
+ * @module models/Photo
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
@@ -303,6 +307,14 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
 
 
-
+/**
+ * @type {Schema}
+ */
 exports.schema = PhotoSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Photo.PhotoModel
+ * @type {Model}
+ */
 exports.model = PhotoModel = mongooseConnection.model('Photo', PhotoSchema);

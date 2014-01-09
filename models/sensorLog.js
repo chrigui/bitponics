@@ -1,3 +1,7 @@
+/**
+ * @module models/SensorLog
+ */
+
 var mongoose = require('mongoose'),
     mongoosePlugins = require('../lib/mongoose-plugins'),
     Schema = mongoose.Schema,
@@ -133,5 +137,14 @@ SensorLogSchema.set('toJSON', {
 
 SensorLogSchema.index({ 'gpi' : 1,  'ts': -1 });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = SensorLogSchema;
+
+/**
+ * @constructor
+ * @alias module:models/SensorLog.SensorLogModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('SensorLog', SensorLogSchema);

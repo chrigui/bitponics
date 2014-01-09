@@ -1,5 +1,6 @@
 /**
  * Logs for completed calibrations.
+ * @module models/CalibrationLog
  */
 
  
@@ -79,5 +80,15 @@ CalibrationLogSchema.set('toJSON', {
 
 CalibrationLogSchema.index({ 'd': 1, 'ts': -1 });
 
+/**
+ * Schema for CalibrationLogModel
+ * @type {Schema}
+ */
 exports.schema = CalibrationLogSchema;
+
+/**
+ * @constructor
+ * @alias module:models/CalibrationLog.CalibrationLogModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('CalibrationLog', CalibrationLogSchema);

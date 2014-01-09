@@ -1,3 +1,7 @@
+/**
+ * @module models/User 
+ */
+
 var mongoose = require('mongoose'),
 	mongooseTypes = require('../lib/mongoose-types-wrapper'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -552,7 +556,17 @@ module.exports.setEmailVariables = function(appConfig){
   };
 };
 
+
+/**
+ * @type {Schema}
+ */
 module.exports.schema = UserSchema;
+
+/**
+ * @constructor
+ * @alias module:models/User.UserModel
+ * @type {Model}
+ */
 module.exports.model = User;
 
 

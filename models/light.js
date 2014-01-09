@@ -1,3 +1,7 @@
+/**
+ * @module models/Light
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -179,5 +183,14 @@ LightSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
 
 /*********************** END STATIC METHODS **************************/
 
+/**
+ * @type {Schema}
+ */
 exports.schema = LightSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Light.LightModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Light', LightSchema);

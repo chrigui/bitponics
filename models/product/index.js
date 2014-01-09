@@ -1,3 +1,7 @@
+/**
+ * @module models/Product
+ */
+ 
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../../lib/mongoose-plugins'),

@@ -1,3 +1,7 @@
+/**
+ * @module models/GrowPlan
+ */
+
 var mongoose = require('mongoose'),
 	mongoosePlugins = require('../../lib/mongoose-plugins'),
 	useTimestamps = mongoosePlugins.useTimestamps,
@@ -164,7 +168,7 @@ GrowPlanSchema.pre('save', function(next){
  * 
  * @param numberOfDays {Number}
  *
- * @return { phaseId : phaseId, day : numberOfDaysIntoPhase } 
+ * @return { { phaseId : phaseId, day : numberOfDaysIntoPhase } }
  *
  */
 GrowPlanSchema.method('getPhaseAndDayFromStartDay', function(numberOfDays){

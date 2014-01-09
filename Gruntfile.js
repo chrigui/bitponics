@@ -8,6 +8,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-shell-spawn');
+  grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.loadNpmTasks('grunt-ngdocs');
 
   grunt.initConfig({
     shell: {
@@ -147,6 +149,25 @@ module.exports = function(grunt) {
           dir : 'coverage/'
         }
       },
+    },
+
+    ngdocs: {
+      options: {
+        dest: 'docs'
+      },
+      models: {
+        src: ['models/**/*.js'],
+        title: 'Tutorial'
+      }
+    },
+
+    jsdoc: {
+      dist : {
+        src : ['models/**/*.js'],
+        options: {
+          destination: 'docs'
+        }
+      }
     }
   });
 
@@ -168,12 +189,14 @@ module.exports = function(grunt) {
   grunt.registerTask('install', ['update','shell:protractor_install']);
   grunt.registerTask('update', ['shell:npm_install','shell:bower_install']);
 
+  grunt.registerTask('doc', ['jsdoc']);
+
   //defaults
   grunt.registerTask('default', ['dev']);
 
   //development
   grunt.registerTask('dev', ['update', 'concat', 'connect:devserver', 'open:devserver', 'watch:assets']);
-
+  
   //server daemon
   grunt.registerTask('serve', ['connect:webserver']);
 };

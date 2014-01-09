@@ -1,3 +1,7 @@
+/**
+ * @module models/DeviceType
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -37,5 +41,15 @@ var DeviceTypeSchema = new Schema({
 DeviceTypeSchema.plugin(useTimestamps);
 DeviceTypeSchema.plugin(mongoosePlugins.recoverableRemove);
 
+/**
+ * @type {Schema}
+ */
 exports.schema = DeviceTypeSchema;
+
+
+/**
+ * @constructor
+ * @alias module:models/DeviceType.DeviceTypeModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('DeviceType', DeviceTypeSchema);

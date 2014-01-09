@@ -1,3 +1,7 @@
+/**
+ * @module models/Notification
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -423,7 +427,7 @@ NotificationSchema.method('ensureHash', function(){
  * 'summary' and 'detail' return strings.
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
  *
- * @param {'email'|'summary'|'detail'} options.displayType
+ * @param {string} options.displayType - must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
  * @param {function(err, display)} callback
  */
@@ -653,7 +657,7 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
  *
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  *
- * @param {'local'|'development'|'staging'|'production'} options.env
+ * @param {string} options.env - must be one of 'local'|'development'|'staging'|'production'
  * @param {function(err, numberResultsAffected)} callback
  */
 NotificationSchema.static('clearPendingNotifications', function (options, callback){
@@ -824,7 +828,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
 
 
 /**
- *
+ * TODO: doc
  */
 NotificationSchema.pre('save', function(next){
   // Since triggerDetails is a Mixed type, mongoose can't auto-detect whether it's modified.
@@ -843,5 +847,14 @@ NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
 NotificationSchema.index({ 'h' : 1, 'sl.ts' : -1 });
 
 
+/**
+ * @type {Schema}
+ */
 exports.schema = NotificationSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Notification.NotificationModel
+ * @type {Model}
+ */
 exports.model = NotificationModel = mongooseConnection.model('Notification', NotificationSchema);
