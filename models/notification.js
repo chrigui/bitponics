@@ -711,6 +711,20 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           
           var notificationIterator = function (notification, iteratorCallback){
             winston.info("PROCESSING NOTIFICATION " + notification._id.toString());
+            
+            var shouldNotSendEmailNotification = function (notification) {
+              return (notification.type === feBeUtils.NOTIFICATION_TYPES.INFO) ||
+                (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION && typeof notification.triggerDetails.cycleStateIndex !== 'undefined') ||
+                ((notification.repeat.durationType === 'seconds' && notification.repeat.duration < 86400) ||
+                (notification.repeat.durationType === 'minutes' && notification.repeat.duration < 1440) ||
+                (notification.repeat.durationType === 'days' && notification.repeat.duration < 1))
+            };
+
+            if (shouldNotSendEmailNotification(notification)) {
+              winston.info("DID NOT SEND EMAIL NOTIFICATION " + notification._id.toString());
+              return iteratorCallback();
+            }
+
             // Populate trigger details
             notification.getDisplay(
               {
@@ -752,7 +766,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
-                // filteredUsers = [{email : 'jack@bitponics.com'}];
+                filteredUsers = [{email : 'jack@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                   winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION EMAIL TEMPLATE POPULATED " + now);

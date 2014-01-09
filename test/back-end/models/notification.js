@@ -106,10 +106,102 @@ describe('Notification', function(){
     result.should.have.property('type');
   });
 
+  describe(".clearPendingNotifications", function(done){
+    
+    beforeEach(function(done){
+      var self = this;
+      
+      async.waterfall([
+        function saveAllNotifications(innerCallback) {
+          Notification.model.find({}).exec(function(err, notifications){
+            console.log('find err', err);
+            self.oldNotifications = notifications;
+            innerCallback();
+          });
+        },
+        function removeAllNotifications(innerCallback) {
+          Notification.model.remove({}, function(err){
+            console.log('remove err', err);
+            innerCallback();
+          });
+        },
+        function prepareNotification1(innerCallback){
+          var now = new Date();
+          //shouldnt send
+          Notification.model.create({
+            "_id" : ObjectID("521edeb06179930400000015"), 
+            "gpi" : ObjectID("51caf958f613580200000270"), 
+            "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+            "triggerDetails" : { 
+              "deviceId" : "000666809f76",
+              "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+            }, 
+            "tts" : now, 
+            "type" : feBeUtils.NOTIFICATION_TYPES.INFO, 
+            "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+          }, function(err, notification){
+            console.log('create err', err);
+            console.log('notification1', notification)
+            self.notification1 = notification;
+            return innerCallback();   
+          });
+        },
+        function prepareNotification2(innerCallback){
+          var now = new Date();
+          //should send
+          Notification.model.create({
+            "_id" : ObjectID("5203aba6cddbb70000000014"), 
+            "gpi" : ObjectID("51caf958f613580200000270"), 
+            "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+            "triggerDetails" : { 
+              "deviceId" : "000666809f76",
+              "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+            }, 
+            "tts" : now, 
+            "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+            "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+          }, function(err, notification){
+            console.log('create err', err);
+            console.log('notification2', notification)
+            self.notification2 = notification;
+            return innerCallback();   
+          });
 
+        }
+      ],
+      function(err){
+        return done();
+      });
+    });
+
+    afterEach(function(done){
+      var self = this;
+      Notification.model.remove({
+        '_id': { 
+          $in: [self.notification1._id, self.notification2._id]
+        }
+      }, done);
+      // Notification.model.create(self.oldNotifications);
+    });
+
+    it('Do not email INFO notifications', function(done){
+      var self = this;
+        should.exist(self.notification1);
+        should.exist(self.notification2);
+
+        Notification.model.clearPendingNotifications({ 
+          env: 'local'
+        }, function(err, count){
+          console.log('count', count);
+          should.not.exist(err);
+          count.should.equal(2);
+          return done();
+        });
+    });
+  });
 
   describe(".create", function(){
-
+    
     it('Creates new notification', function(done){
       var now = new Date();
       Notification.model.create({
@@ -523,48 +615,7 @@ describe('Notification', function(){
 
   });
 
-  // TODO: need to figure out error for below test:
-  // ReferenceError: c is not defined
-  //     at Context.<anonymous> (/Users/jack/Dropbox/dev/bitponics/test/models/notification.js:324:17)
-
-  // it('clearPendingNotifications test', function(done){
-  //   var now = Date.now(),
-  //     log = new c.create({
-  //       gpi : new ObjectID(),
-  //       trigger : "phase-action",
-  //       triggerDetails : {
-  //         gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
-  //         actionId : ObjectID("506de2f18eebf7524342cb27"),
-  //         phaseName : "Seedling"
-  //       },
-  //       _id : new ObjectID(),
-  //       type : "actionNeeded",
-  //       sl : [ ],
-  //       r : {
-  //         durationType : "days",
-  //         duration : 1,
-  //         timezone : "America/New_York"
-  //       },
-  //       tts : new Date(),
-  //       u : [
-  //         ObjectID("506de30a8eebf7524342cb6c")
-  //       ],
-  //       c : false
-  //     }, function (err, n) {
-  //       should.not.exist(err);
-
-  //       Notification.model.clearPendingNotifications({env: 'bitponics-test'}, function(err, count){
-  //         if (err) { console.log(err); }
-  //         should.not.exist(err);
-  //         should.exist(count);
-  //         count.should.equal(1);
-  //         // var finishedEnvironmentAt = moment();
-  //         // winston.info(environment + ' ModelUtils.clearPendingNotifications started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-  //         // winston.info((count || 0) + " records affected");
-  //         return done();
-  //       });
-  //     });
-  // });
+  
 
 
 });
