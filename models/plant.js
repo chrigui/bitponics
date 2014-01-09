@@ -1,3 +1,7 @@
+/**
+ * @module models/Photo
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -101,5 +105,14 @@ PlantSchema.static('createNewIfUserDefinedPropertiesModified', function(options,
 
 PlantSchema.path('name').index({ unique: true });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = PlantSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Plant.PlantModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Plant', PlantSchema);

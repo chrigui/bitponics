@@ -1,4 +1,6 @@
 var async = require('async'),
+  path    = require('path'),
+  express    = require('express'),
 	winston = require('winston'),
 	routeUtils = require('./route-utils'),
 	ModelUtils = require('../models/utils');
@@ -233,4 +235,13 @@ module.exports = function(app){
       res.render('admin/grow-systems', locals);
     });
   });
+
+
+
+  app.use('/admin/docs', express.static(path.join(__dirname, '/../docs')));
+  app.use('/admin/docs', express.directory(path.join(__dirname, '/../docs')));
+
+  // app.get('/admin/docs', function (req, res){
+  //   res.redirect('/admin/docs/');
+  // });
 };

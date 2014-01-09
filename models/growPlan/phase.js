@@ -1,3 +1,7 @@
+/**
+ * @module models/GrowPlan/Phase
+ */
+
 var mongoose = require('mongoose'),
 	mongoosePlugins = require('../../lib/mongoose-plugins'),
 	Schema = mongoose.Schema,

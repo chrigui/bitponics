@@ -1,6 +1,6 @@
 /**
  * Orders
- *
+ * @module models/Order
  */
 
 var mongoose = require('mongoose'),
@@ -229,6 +229,14 @@ OrderSchema.index({ 'sessionId' : 1, 'status' : 1 });
 
 
 
-
+/**
+ * @type {Schema}
+ */
 exports.schema = OrderSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Order.OrderModel
+ * @type {Model}
+ */
 exports.model = OrderModel = mongooseConnection.model('Order', OrderSchema);

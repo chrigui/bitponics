@@ -1,3 +1,8 @@
+/**
+ * @todo Refactor this to be Garden
+ * @module models/GrowPlanInstance
+ */
+
 var mongoose = require('mongoose'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
   useTimestamps = mongoosePlugins.useTimestamps,
@@ -1154,5 +1159,17 @@ GrowPlanInstanceSchema.pre('save', true, function(next, done){
 /***************** END MIDDLEWARE **********************/
 
 GrowPlanInstanceModel = mongooseConnection.model('GrowPlanInstance', GrowPlanInstanceSchema);
+
+
+/**
+ * @type {Schema}
+ */
 exports.schema = GrowPlanInstanceSchema;
+
+
+/**
+ * @constructor
+ * @alias module:models/GrowPlanInstance.GrowPlanInstanceModel
+ * @type {Model}
+ */
 exports.model = GrowPlanInstanceModel;

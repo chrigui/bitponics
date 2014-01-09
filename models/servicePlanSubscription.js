@@ -1,5 +1,7 @@
 /**
  * Subscriptions to service plans.
+ *
+ * @module models/ServicePlanSubscription
  */
 
 var mongoose = require('mongoose'),
@@ -55,5 +57,14 @@ ServicePlanSubscriptionSchema.plugin(mongoosePlugins.recoverableRemove);
 
 ServicePlanSubscriptionSchema.index({ 'owner' : 1 });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = ServicePlanSubscriptionSchema;
+
+/**
+ * @constructor
+ * @alias module:models/ServicePlanSubscription.ServicePlanSubscriptionModel
+ * @type {Model}
+ */
 exports.model = ServicePlanSubscriptionModel = mongooseConnection.model('ServicePlanSubscription', ServicePlanSubscriptionSchema);

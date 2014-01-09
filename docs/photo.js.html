@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: photo.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: photo.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
+ * @module models/Photo
+ */
+
+var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
+	ObjectIdSchema = Schema.ObjectId,
+  ObjectId = mongoose.Types.ObjectId,
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils'),
+  mongoosePlugins = require('../lib/mongoose-plugins'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  async = require('async'),
+  ModelUtils = require('./utils'),
+  getObjectId =  ModelUtils.getObjectId,
+  gm = require('gm').subClass({ imageMagick: true }),
+  tmpDirectory = require('path').join(__dirname, '/../tmp/'),
+  PhotoModel;
+
+
+/**
+ * Photo
+ */
+var PhotoSchema = new Schema({
+	
+  /**
+	 * The GrowPlanInstance. Optional. 
+   * 
+   */
+	//gpi : { type: ObjectIdSchema, ref: 'GrowPlanInstance', required: false},
+
+  
+  /**
+   * concept of ref'ed doc should be generalized rather than just having 'gpi'
+   */
+  ref : 
+  {
+    collectionName : { type : String },
+    documentId : { type : String }
+  },
+
+
+  tags : [ String ],
+
+  owner : { type: ObjectIdSchema, ref: 'User', required: true },
+
+  
+  originalFileName : { type : String },
+
+  
+  /**
+   * User-assignable date of creation, defaults to now
+   */
+  date : { type : Date, default : Date.now },
+
+
+  /** 
+   * The MIME-type of the file
+   */
+  type : { type : String },
+
+
+  /**
+   * User-definable name
+   */
+  name : { type : String },
+
+
+  /**
+   * Number of bytes of the original photo
+   */
+  size : { type : Number },
+
+  
+  /**
+   * Number of bytes of the thumbnail (200x200 max)
+
+   */
+  thumbnailSize : { type : Number }
+},
+{ id : false });
+
+PhotoSchema.plugin(mongoosePlugins.useTimestamps);
+PhotoSchema.plugin(mongoosePlugins.visibility);
+PhotoSchema.plugin(mongoosePlugins.recoverableRemove);
+
+
+PhotoSchema.index({ 'ref.documentId' : 1, 'date': -1 }, { sparse : true });
+
+
+PhotoSchema.virtual('gpi')
+  .get(function(){
+    if (this.ref && this.ref.collectionName === 'growplaninstances'){
+      return this.ref.documentId;
+    } else {
+      return undefined;
+    }
+  })
+  .set(function(gpi){
+    this.ref = {
+      'collectionName' : 'growplaninstances',
+      'documentId' : getObjectId(gpi)
+     }
+  });
+
+
+/*************** SERIALIZATION *************************/
+
+
+/**
+ * Remove the db-only-optimized property names and expose only the friendly names
+ *
+ * "Transforms are applied to the document and each of its sub-documents"
+ * http://mongoosejs.com/docs/api.html#document_Document-toObject
+ */
+PhotoSchema.set('toObject', {
+  getters : true,
+  transform : function(doc, ret, options){
+  }
+});
+PhotoSchema.set('toJSON', {
+  getters : true,
+  transform : PhotoSchema.options.toObject.transform
+});
+/*************** END SERIALIZATION *************************/
+
+
+
+
+
+
+/*************** STATIC METHODS *************************/
+
+/**
+ *
+ * @param options.owner
+ * @param options.originalFileName
+ * @param options.name
+ * @param options.contentType
+ * @param options.date
+ * @param options.size
+ * @param options.visibility
+ * @param {string[]} options.tags
+ * @param {ObjectId=} [options.gpi]
+ * @param {string=} [options.ref.collectionName]
+ * @param {string=} [options.ref.documentId]
+ * @param {Stream} options.stream : optional. If set, this is used to stream to S3
+ * @param {string} options.streamPath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
+ * @param {bool=} options.preserveStreamPath : optional. If true, file at options.streamPath is left alone after upload. If omitted or false, file is deleted after uplaod.
+ */
+PhotoSchema.static("createAndStorePhoto",  function(options, callback){
+  if (options.contentType.indexOf("image") !== 0){
+    return callback(new Error("Invalid photo content type " + options.contentType));
+  }
+
+  var s3Config = require('../config/s3-config'),
+      knox = require('knox'),
+      knoxClient = knox.createClient(s3Config),
+      fs = require('fs'),
+      requirejs = require('../lib/requirejs-wrapper'),
+      feBeUtils = requirejs('fe-be-utils');
+
+  var now = new Date(),
+    photo = new PhotoModel({
+      owner : options.owner,
+      originalFileName : options.originalFileName,
+      name : options.name,
+      type : options.contentType,
+      date : options.date || now,
+      size : options.size,
+      tags : options.tags || [],
+      visibility : (options.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC)
+    });
+    
+    if (options.ref){
+      photo.ref = {
+        collectionName : options.ref.collectionName,
+        documentId : options.ref.documentId
+      }  
+    }
+
+    if (options.gpi){
+      photo.gpi = options.gpi;
+    }
+
+    async.parallel(
+      [
+        function uploadOriginal(innerCallback){
+          var knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
+            knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath),
+            knoxHeaders = {
+              'Content-Type': photo.type, 
+              'x-amz-acl': 'private'
+            };
+
+          if (options.size){
+            knoxHeaders["Content-Length"] = options.size;
+          }
+
+          knoxClient[knoxMethod](
+            knoxMethodArgument,
+            s3Config.photoPathPrefix + photo._id.toString(), 
+            knoxHeaders, 
+            function(err, result) {
+              winston.info("RETURNED FROM S3, err:", err, ", statusCode: ", result.statusCode);
+
+              if (err) { return innerCallback(err);  }
+            
+              if (result.statusCode !== 200) {
+                return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+              }
+
+              return innerCallback();
+            }
+          );
+        },
+        function createAndUploadThumbnail(innerCallback){
+
+          var intermediateGM,
+              thumbnailGM;
+
+          var filesizeCallback = function(err, value){
+            if (err) { return innerCallback(err);  }
+
+            // value is returned in format "724B", need to parse int to get byte number
+            photo.thumbnailSize = parseInt(value, 10);
+            
+            knoxClient.putStream(
+              thumbnailGM.stream(),
+              s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+              {
+                'Content-Type': photo.type, 
+                'x-amz-acl': 'private',
+                'Content-Length' : photo.thumbnailSize
+              }, 
+              function(err, result) {
+                if (err) { return innerCallback(err);  }
+              
+                if (result.statusCode !== 200) {
+                  return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+                }
+
+                return innerCallback();
+              }
+            );
+          };
+
+          // Constructor is lenient in parsing stream vs path vs buffer. 2nd arg is optional and is only used for filetype inference, so it should handle undefined fine
+          // https://github.com/aheckmann/gm#constructor
+          if (typeof options.stream !== 'undefined'){
+            intermediateGM = gm(options.stream, options.originalFileName)
+          } else {
+            intermediateGM = gm(options.streamPath)
+          }
+          
+          // Resize to create thumbnail, but don't scale up smaller images
+          // http://stackoverflow.com/questions/14705152/thumbnails-from-graphics-magick-without-upscaling
+          intermediateGM
+          .resize(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT, ">")
+          .gravity('Center')
+          // use a white background rather than transparent. If we're dealing with a jpg, transparent gets rendered as black. No thanks mister.
+          .background('#fff')
+          .extent(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT);
+          
+          // Finalize the processing so that we can get the proper filesize
+          thumbnailGM = gm(intermediateGM.stream(), options.originalFileName);
+          
+          thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
+        }
+      ],
+      function(err){
+        if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
+          // Delete the file from disk
+          fs.unlink(options.streamPath);
+        }
+
+        if (err) { return callback(err);}
+
+        // If we're here, the photo's good to go
+        async.parallel([
+          function(innerCallback){
+            return photo.save(innerCallback);
+          },
+          function(innerCallback){
+            if (!photo.ref.collectionName){ return innerCallback(); }
+            
+            var refModel = ModelUtils.getModelFromCollectionName(photo.ref.collectionName);
+            if(!refModel.schema.path('photos')){
+              return innerCallback();
+            }
+
+            refModel.findById(photo.ref.documentId, function(err, refDocumentResult){
+              refDocumentResult.photos.push(photo._id);
+              return refDocumentResult.save(innerCallback);
+            });
+          }
+        ], function(err, results){
+          return callback(err, results[0]);
+        });
+      }
+    );
+  }
+);
+
+/*************** END STATIC METHODS *************************/
+
+
+
+
+/**
+ * @type {Schema}
+ */
+exports.schema = PhotoSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Photo.PhotoModel
+ * @type {Model}
+ */
+exports.model = PhotoModel = mongooseConnection.model('Photo', PhotoSchema);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowPlanInstance.html">models/GrowPlanInstance</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowPlanInstance.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 08 2014 22:42:48 GMT-0500 (EST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

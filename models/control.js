@@ -1,3 +1,7 @@
+/**
+ * @module models/Control
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -16,5 +20,16 @@ var ControlSchema = new Schema({
 ControlSchema.plugin(useTimestamps);
 ControlSchema.plugin(mongoosePlugins.recoverableRemove);
 
+
+/**
+ * @type {Schema}
+ */
 exports.schema = ControlSchema;
+
+
+/**
+ * @constructor
+ * @alias module:models/Control.ControlModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Control', ControlSchema);

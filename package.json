@@ -73,7 +73,9 @@
     "grunt-protractor-runner": "~0.1.2",
     "grunt-shell-spawn": "~0.3.0",
     "karma-htmlfile-reporter": "~0.1.0",
-    "karma-html-reporter": "~0.1.1"
+    "karma-html-reporter": "~0.1.1",
+    "grunt-ngdocs": "~0.1.8",
+    "grunt-jsdoc": "~0.5.1"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 ./test/back-end"

@@ -1,3 +1,7 @@
+/**
+ * @module models/Action
+ */
+
 var mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   ObjectIdSchema = Schema.ObjectId,
@@ -35,10 +39,20 @@ var ActionStateSchema = new Schema(
 );
 
 
-ActionSchema = new Schema({
+ActionSchema = new Schema(
+/**  
+ * @lends module:models/Action.ActionModel.prototype
+ */
+{
 
+  /** 
+   * @type {string}
+   */
   description: { type: String, required: true },
 
+  /** 
+   * @type {ObjectId}
+   */
   control: { type: ObjectIdSchema, ref: 'Control', required: false },
 
   /**
@@ -55,6 +69,11 @@ ActionSchema = new Schema({
    * Also, all fields are optional.
    *
    * The cycle itself is also optional. If undefined, the Action is considered a simple "reminder"
+   * 
+   * @type {object}
+   * @property {ActionStateSchema[]} states
+   * @property {object} offset (see source for docs)
+   * @property {bool} repeat
    */
   cycle: {
     
@@ -67,6 +86,8 @@ ActionSchema = new Schema({
      * Imagine cycle is a dial, with the beginning indicated by a line pointing straight up. 
      * The offset turns the dial so that states[0] starts [offset] later than it would. 
      * Which means that states[1] fills in the time from start until offset.
+     * @type {object}
+     * @memberof module:models/Action.ActionModel.prototype.cycle
      */
     offset : { 
       durationType: { type: String, enum: feBeUtils.DURATION_TYPES },
@@ -83,12 +104,15 @@ ActionSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
 /**
+ * Cycle timespan in milliseconds.
  * Used by the notification engine to set when actions should expire in
  * order to recalculate current actions.
  *
  * Single-state actions get a timespan of 1 year.
  *
- * @return Number. Cycle timespan in milliseconds.
+ * @name module:models/Action.ActionModel.prototype.overallCycleTimespan
+ * @instance
+ * @type {Number} 
  */
 ActionSchema.virtual('overallCycleTimespan')
   .get(function () {
@@ -127,6 +151,13 @@ ActionSchema.virtual('overallCycleTimespan')
 
 
 /************************** INSTANCE METHODS ***************************/
+
+/**
+ * @returns {Duration} moment.js duration object
+ * @name module:models/Action.ActionModel#getOverallCycleDurationObject
+ * @function
+ * @instance
+ */
 ActionSchema.method('getOverallCycleDurationObject', function(){
   return feBeUtils.getLargestWholeNumberDurationObject(this.overallCycleTimespan);
 });
@@ -144,9 +175,12 @@ ActionSchema.method('getOverallCycleDurationObject', function(){
  *
  * Synchronous.
  *
- * @param source {Action}. Action model object
- * @param other {Action}. Action model object
- * @return {boolean}. true if the objects are equivalent, false if not
+ * @param source {Action} Action model object
+ * @param other {Action} Action model object
+ * @returns {boolean}  true if the objects are equivalent, false if not
+ * @name module:models/Action.ActionModel.isEquivalentTo
+ * @function
+ * @static
  */
 ActionSchema.static('isEquivalentTo', function(source, other){
   if (source.description !== other.description){
@@ -202,6 +236,9 @@ ActionSchema.static('isEquivalentTo', function(source, other){
  * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
  * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
  * @param {function(err, Action)} callback
+ * @name module:models/Action.ActionModel.createNewIfUserDefinedPropertiesModified
+ * @function
+ * @static
  */
 ActionSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
   var submittedAction = options.action,
@@ -246,7 +283,12 @@ ActionSchema.static('createNewIfUserDefinedPropertiesModified', function(options
 
 
 /**
- *
+ * @param {Number} duration 
+ * @param {feBeUtils.DURATION_TYPES} durationType 
+ * 
+ * @name module:models/Action.ActionModel.convertDurationToMilliseconds
+ * @function
+ * @static
  */
 ActionSchema.static('convertDurationToMilliseconds', function(duration, durationType){
   switch(durationType){
@@ -268,12 +310,16 @@ ActionSchema.static('convertDurationToMilliseconds', function(duration, duration
  * Returns the time remaining in the current iteration of the action's cycle.
  * Calculated assuming the action started at 00:00:00 on the day the phase started.
  *
- * @param fromDate {Date} Date from which to calculate cycle remainder
- * @param growPlanInstancePhase {object}
- * @param action {Action}
- * @param userTimezone {String}
+ * @param {Date} fromDate - Date from which to calculate cycle remainder
+ * @param {object} growPlanInstancePhase 
+ * @param {Action} action 
+ * @param {String} userTimezone 
  *
- * @return {Number} Number of milliseconds remaining in the current action cycle iteration.
+ * @returns {Number} Number of milliseconds remaining in the current action cycle iteration.
+ *
+ * @name module:models/Action.ActionModel.getCycleRemainder
+ * @function
+ * @static
  */
 ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhase, action, userTimezone){
   // http://en.wikipedia.org/wiki/Date_%28Unix%29
@@ -296,12 +342,16 @@ ActionSchema.static('getCycleRemainder', function(fromDate, growPlanInstancePhas
 /**
  * Returns what the current controlValue should be, factoring in elapsed time in the phase and timezone
  *
- * @param fromDate {Date} Date from which to calculate cycle remainder
- * @param growPlanInstancePhase {object}
- * @param action {Action}
- * @param userTimezone {String}
+ * @param {Date} fromDate - Date from which to calculate cycle remainder
+ * @param {object} growPlanInstancePhase 
+ * @param {Action} action 
+ * @param {String} userTimezone 
  *
- * @return {0|1} 0 if control is OFF, 1 if control is ON.
+ * @returns {Number} 0 if control is OFF, 1 if control is ON.
+ * 
+ * @name module:models/Action.ActionModel.getCurrentControlValue
+ * @function
+ * @static
  */
 ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstancePhase, action, userTimezone){
   if (!growPlanInstancePhase){
@@ -380,11 +430,15 @@ ActionSchema.static('getCurrentControlValue', function(fromDate, growPlanInstanc
  *
  * ControlValues are parsed into integers since that's all the firmware can parse.
  *
- *
- * @param offset. Only a factor in a 2-state cycle. Otherwise it's just written straight to the template. 
+ * @param {Action.cycle} actionCycle
+ * @param {number} [offset] - Only a factor in a 2-state cycle. Otherwise it's just written straight to the template. 
  *                For single-state cycles, this is ignored and offset is set to 0.
  *
- * @return {Object}. { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
+ * @returns {Object} { offset: Number, value1: Number, duration1: Number, value2: Number, duration2: Number }
+ * 
+ * @name module:models/Action.ActionModel.getDeviceCycleFormat
+ * @function
+ * @static
  */
 ActionSchema.static('getDeviceCycleFormat', function(actionCycle, offset){
   var states = actionCycle.states,
@@ -437,16 +491,23 @@ ActionSchema.static('getDeviceCycleFormat', function(actionCycle, offset){
  *
  * Assumes it's passed an action with states with controlValues.
  *
- * @param offset. Only a factor in an offset cycle. Otherwise it's just written straight to the template.
+ * @param {string} cycleTemplateoffset
+ * @param {Action.cycle} actionCycle
+ * @param {number} [offset] - Only a factor in an offset cycle. Otherwise it's just written straight to the template.
  * 
- * @return Object. {
- *    cycleString : String,
- *    offset : Number,
- *    value1 : Number,
- *    duration1 : Number,
- *    value2 : Number,
- *    duration2 : Number
- *  }
+ * @returns {Object} 
+  {
+     cycleString : String,
+     offset : Number,
+     value1 : Number,
+     duration1 : Number,
+     value2 : Number,
+     duration2 : Number
+   }
+ * 
+ * @name module:models/Action.ActionModel.updateCycleTemplateWithStates
+ * @function
+ * @static
  */
 ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, actionCycle, offset){
   var result = ActionSchema.statics.getDeviceCycleFormat(actionCycle, offset),
@@ -468,6 +529,9 @@ ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, act
 /************************** MIDDLEWARE ***************************/
 
 
+
+/*************** Validate ******************************/
+
 /**
  *  Validate cycle states
  *
@@ -479,7 +543,6 @@ ActionSchema.static('updateCycleTemplateWithStates', function(cycleTemplate, act
  *
  *  An "offset" is represented by the offset property on a cycle.
  */
-/*************** Validate ******************************/
 ActionSchema.path('cycle.states').validate(function(states) {
   if(states.length) {
     return states.length > 0 && states.length < 3;
@@ -583,11 +646,15 @@ ActionSchema.pre('save', function(next){
     }
   );
 });
+*/
 
+
+ActionSchema.pre('save', 
 /**
- *  Validate description
+ * Validate description
+ * @alias module:models/Action.ActionModel#save
  */
-ActionSchema.pre('save', function(next){
+  function(next){
   var Control = require('./control'),
       ControlSchema = Control.schema,
       ControlModel = Control.model,
@@ -636,14 +703,25 @@ ActionSchema.pre('save', function(next){
 /************************** END MIDDLEWARE ***************************/
 
 
-/**
- * Now that schema is defined, add indices
- */
-  // Want a sparse index on control (since it's an optional field)
+// Now that schema is defined, add indices
+// Want a sparse index on control (since it's an optional field)
 ActionSchema.index({ control: 1, 'cycle.repeat': 1 }, { sparse: true});
+
+
 
 ActionModel = mongooseConnection.model('Action', ActionSchema);
 
 
+/**
+ * Schema for ActionModels
+ * @type {Schema}
+ */
 exports.schema = ActionSchema;
+
+
+/**
+ * @constructor
+ * @alias module:models/Action.ActionModel
+ * @type {Model}
+ */
 exports.model = ActionModel;
