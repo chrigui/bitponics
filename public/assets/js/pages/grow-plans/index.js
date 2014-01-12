@@ -413,15 +413,6 @@ require([
             $scope.expectedGrowPlanDuration = currentExpectedPlanDuration;
           };
 
-          // $scope.setfocusedPhase = function (phase, index) {
-          //   $scope.sharedDataService.selectedGrowPlan.focusedPhase = phase;
-          //   $scope.sharedDataService.selectedPhaseIndex = index;
-          // };
-
-          // $scope.setCurrentPhaseSectionTab = function (index) {
-          //   $scope.selected.selectedGrowPlanPhaseSection = index;
-          // };
-
           $scope.addPhase = function () {
             var existingPhaseLength = $scope.sharedDataService.selectedGrowPlan.phases.length,
               phase = {
@@ -430,13 +421,12 @@ require([
                 idealRanges:[]
               };
             $scope.sharedDataService.selectedGrowPlan.phases.push(phase);
-            $scope.setfocusedPhase(phase);
           };
 
           $scope.removePhase = function (index) {
             if($scope.sharedDataService.selectedGrowPlan.phases.length > 1) {
               $scope.sharedDataService.selectedGrowPlan.phases.splice(index, 1);
-              $scope.setfocusedPhase($scope.sharedDataService.selectedGrowPlan.phases[0]);
+              $scope.sharedDataService.selectedPhaseIndex = 0;
             }
           };
 
