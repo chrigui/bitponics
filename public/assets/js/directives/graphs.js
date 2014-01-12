@@ -299,11 +299,12 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 .classed(className, true)
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
               
-              arcData = phase.daySummaries.map(function(daySummary){
+              arcData = phase.daySummaries.map(function(daySummary, index){
                 return {
                   phase : phase,
                   dateKey : daySummary.dateKey,
-                  status : daySummary.status
+                  status : daySummary.status,
+                  dayIndex : index
                 }
               });
 
@@ -329,12 +330,12 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                   // Have to wrap this in a scope.$apply call because it occurs outside of the 
                   // Angular lifecycle, need to tell angular that it should refresh itself
                   scope.$apply(function(){
-                    console.log(d.data, phase);
+                    console.log(d.data);
                     // TODO : we actually want to switch to some sort of "day summary" overlay rather
-                    // then updating the dashboard in-place with a new active date
-                    if (d.data.dateKey){
-                      scope.sharedDataService.targetActiveDate = d.data.dateKey;  
-                    }
+                    // than updating the dashboard in-place with a new active date
+                    // d.data contains: { phase, dateKey, status, dayIndex }
+                    // So here we should launch the day summary overlay & pass it the phase, dayIndex & dateKey
+                    // Future phases don't have dateKeys, so we'll instead display just the dayIndex
                   });
                   
                   //var barberPoleCont = $('.barberPoleCont');
