@@ -61,9 +61,10 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
 
-    // First, go through garden phases & set the calculatedStartDate
+    // First, go through garden phases & set the calculatedStartDate & offset the daySummaries by startedOnDay
     growPlanInstance.phases.forEach(function(growPlanInstancePhase, phaseIndex){
       growPlanInstancePhase.calculatedStartDate = moment(growPlanInstancePhase.startDate);//.subtract("days", growPlanInstancePhase.startedOnDay);  // this offset start date calculation is probably not actually necessary
+      growPlanInstancePhase.daySummaries = growPlanInstancePhase.daySummaries.slice(growPlanInstancePhase.startedOnDay || 0);
     });
 
     growPlanInstance.growPlan.phases.forEach(function(growPlanPhase, index){
