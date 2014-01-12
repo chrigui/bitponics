@@ -4,8 +4,12 @@ section#main(role="main", class="main")
 			| Sign up for your bitponics account
 		div Enter an email and password, and you'll be on your way.
 		form.register-form(id="register-form", method="POST", action="/signup")
+			label(for="firstname") First Name
+			input(id="firstname", name="firstname", type="text", required) 
+			label(for="lastname") Last Name
+			input(id="lastname", name="lastname", type="text", required) 
 			label(for="email") Email
-			input(id="email", name="email", type="email", autofocus="autofocus", required) 
+			input(id="email", name="email", type="email", required) 
 			label(for="password") Password
 			input(id="password", name="password", type="password", required) 
 			
