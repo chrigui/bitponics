@@ -223,7 +223,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
             
             $scope.getDaySummaryClass = function(data){
               var className = data.data.status;
-              if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+              if (data.data.phase.active && data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
                 className += " active";
               }
               return className;
@@ -285,6 +285,8 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
               var arcNumber = (phaseCount - index - 1),
                 startArc = d3.svg.arc(),
                 completeArc = d3.svg.arc(),
+                allArcs,
+                arcData,
                 className = 'phase' + index,
                 phaseGroup;
 
@@ -297,8 +299,16 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 .classed(className, true)
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
               
-              var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phase.daySummaries));
+              arcData = phase.daySummaries.map(function(daySummary){
+                return {
+                  phase : phase,
+                  dateKey : daySummary.dateKey,
+                  status : daySummary.status
+                }
+              });
+
+              allArcs = phaseGroup.selectAll('path')
+                .data(equalPie(arcData));
 
               allArcs
                 .enter()
