@@ -101,17 +101,17 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
 
 
       if (index > currentGrowPlanPhaseIndex){
-        var calculatedStartDate = moment(activeGrowPlanInstancePhase.startDate);
+        //var calculatedStartDate = moment(activeGrowPlanInstancePhase.startDate);
 
         for (var i = currentGrowPlanPhaseIndex; i < index; i++){
-          calculatedStartDate.add("days", growPlanInstance.growPlan.phases[i].expectedNumberOfDays);
+          //calculatedStartDate.add("days", growPlanInstance.growPlan.phases[i].expectedNumberOfDays);
         }
 
         growPlanInstance.phases.push({
           growPlan : growPlanInstance.growPlan._id,
           phase : growPlanPhase._id,
           daySummaries : [],
-          calculatedStartDate : calculatedStartDate
+          //calculatedStartDate : calculatedStartDate
         });
       }
     });
@@ -160,14 +160,15 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
           daySummary = growPlanInstancePhase.daySummaries[daySummaryIndex] = {};
         }
 
-        //if (!daySummary.date) {
-        daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
-        //}
+        if (growPlanInstancePhase.calculatedStartDate) {
+          daySummary.date = moment(growPlanInstancePhase.calculatedStartDate).add("days", daySummaryIndex);
+          daySummary.dateKey = utils.getDateKey(daySummary.date);
+        }
         
-        daySummary.dateKey = utils.getDateKey(daySummary.date);
+        
 
         if (!daySummary.status){
-          if (daySummary.date.valueOf() < now.valueOf()){
+          if (daySummary.date && daySummary.date.valueOf() < now.valueOf()){
             daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.GOOD;
           } else {
             daySummary.status = utils.PHASE_DAY_SUMMARY_STATUSES.EMPTY;
