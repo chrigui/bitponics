@@ -492,7 +492,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
               });
             },
             function populateGrowPlan(innerCallback){
-              if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
+              if (!notification.gpi || !notification.triggerDetails.gpPhaseId){ return innerCallback(); }
 
               GrowPlanModel.findById(notification.gpi.growPlan)
               .exec(function(err, growPlanResult){
@@ -600,6 +600,12 @@ NotificationSchema.static('create', function(options, callback){
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
   
+  //do not create notifications with repeat of less than 1 day
+  if (options.repeat && feBeUtils.isLessThanOneDay(options.repeat.duration, options.repeat.durationType)) {
+    winston.info('not saving this notification due to repeat less than 1 day');
+    return callback();
+  }
+
   var newNotification = new NotificationModel(options),
       sentCutoff;
 
@@ -719,15 +725,17 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
             var shouldNotSendEmailNotification = function (notification) {
               return (notification.type === feBeUtils.NOTIFICATION_TYPES.INFO) ||
                 (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION && typeof notification.triggerDetails.cycleStateIndex !== 'undefined') ||
-                ((notification.repeat.durationType === 'seconds' && notification.repeat.duration < 86400) ||
-                (notification.repeat.durationType === 'minutes' && notification.repeat.duration < 1440) ||
-                (notification.repeat.durationType === 'days' && notification.repeat.duration < 1))
+                (feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType))
             };
-
+            winston.info("EMAIL NOTIFICATION?");
             if (shouldNotSendEmailNotification(notification)) {
               winston.info("DID NOT SEND EMAIL NOTIFICATION " + notification._id.toString());
+              winston.info("notification.repeat.duration: " + notification.repeat.duration);
+              winston.info("notification.repeat.durationType: " + notification.repeat.durationType);
+              console.log(feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType));
               return iteratorCallback();
             }
+            winston.info("YES");
 
             // Populate trigger details
             notification.getDisplay(
@@ -770,7 +778,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
-                filteredUsers = [{email : 'jack@bitponics.com'}];
+                // filteredUsers = [{email : 'jack@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
                   winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION EMAIL TEMPLATE POPULATED " + now);
