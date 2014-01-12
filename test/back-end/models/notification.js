@@ -114,14 +114,12 @@ describe('Notification', function(){
       async.waterfall([
         function saveAllNotifications(innerCallback) {
           Notification.model.find({}).exec(function(err, notifications){
-            console.log('find err', err);
             self.oldNotifications = notifications;
             innerCallback();
           });
         },
         function removeAllNotifications(innerCallback) {
           Notification.model.remove({}, function(err){
-            console.log('remove err', err);
             innerCallback();
           });
         },
@@ -140,8 +138,6 @@ describe('Notification', function(){
             "type" : feBeUtils.NOTIFICATION_TYPES.INFO, 
             "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
           }, function(err, notification){
-            console.log('create err', err);
-            console.log('notification1', notification)
             self.notification1 = notification;
             return innerCallback();   
           });
@@ -161,8 +157,6 @@ describe('Notification', function(){
             "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
             "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
           }, function(err, notification){
-            console.log('create err', err);
-            console.log('notification2', notification)
             self.notification2 = notification;
             return innerCallback();   
           });
