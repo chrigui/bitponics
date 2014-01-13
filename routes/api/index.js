@@ -24,5 +24,5 @@ module.exports = function(app){
   require('./plants')(app);
 	require('./sensor')(app);
 	require('./sensorLog')(app);
-	require('./user')(app);
+	require('./users')(app);
 };

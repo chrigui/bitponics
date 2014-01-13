@@ -866,6 +866,8 @@ NotificationSchema.pre('save', function(next){
 NotificationSchema.index({ 'tts': -1 }, { sparse : true });
 // Compound index on gpi+tts. Won't get expensive since all sent items will collapse into a single index entry of gpi+null
 NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
+NotificationSchema.index({ 'u' : 1, 'tts': -1}, { sparse : true } );
+NotificationSchema.index({ 'u' : 1, 'sl.ts': -1}, { sparse : true } );
 NotificationSchema.index({ 'h' : 1, 'sl.ts' : -1 });
 
 

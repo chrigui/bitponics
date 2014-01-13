@@ -1,6 +1,13 @@
-var UserModel = require('../../models/user').model,
+/**
+ * @module routes/api/users
+ */
+ 
+var UserModel = require('../../../models/user').model,
     winston = require('winston'),
-    routeUtils = require('../route-utils');
+    routeUtils = require('../../route-utils'),
+    requirejs = require('../../../lib/requirejs-wrapper'),
+    feBeUtils = requirejs('fe-be-utils'),
+    apiUtils = require('../utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 

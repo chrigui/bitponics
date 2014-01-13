@@ -12,7 +12,9 @@ module.exports = {
 	 * @param {Model=} [options.parentModel]
 	 * @param {string=} [options.parentModelFieldName = "ref.documentId"] - if parentModel is defined, used to query for parent id. 
 	 * @param {string=} [options.dateFieldName] - document field to use for start-date/end-date query filters
-	 * @param {string=} [options.defaultSort]  "fieldName" for ascending or "-fieldName" for descending
+	 * @param {string=} [options.defaultSort] - "fieldName" for ascending or "-fieldName" for descending
+   * @param {object|function} [options.defaultWhere] - default query for filtering results. Can be overridden by request "where" param. If a function, the function is invoked and should return an object
+   * @param {object} [options.defaultLimit=200] - default limit for number of results returned
    * @param {bool=} [options.restrictByVisibility = false] - optionally add a conditional clause to the query to limit to the documents the user has read-access to
 	 * 
 	 * @return {[function(req, res, next)]}
@@ -20,8 +22,8 @@ module.exports = {
 	 * Request:
 	 * @param {Date} [req.params.start-date] - Should be something parse-able by moment.js
    * @param {Date} [req.params.end-date] - Should be something parse-able by moment.js
-   * @param {Number} [req.params.skip]
-   * @param {Number} [req.params.limit=200]
+   * @param {Number} [req.params.skip=0] - Number of results to skip (used for pagination)
+   * @param {Number} [req.params.limit=200] - Number of results to return per page. Hard limit of 200.
    * @param {string=} [req.params.sort] - name of field to sort by. prefix with "-" for descending.
    * @param {CSV} [req.params.select] - CSV list of field names to include in the response. Fields on nested objects can be requested with dot-notation: "nestedDocument.name"
    * @param {Object} [req.params.where] - JSON-encoded query object. Follows mongodb query conventions. https://parse.com/docs/rest#queries
@@ -49,17 +51,20 @@ module.exports = {
 		 			body : {}
 		 		},
 
-		 		startDate = req.query['start-date'],
+        startDate = req.query['start-date'],
 		    endDate = req.query['end-date'],
 		    limit = req.query['limit'] || 200,
-		    skip = req.query['skip'],
-        where = req.query['where'],
+		    skip = req.query['skip'] || 0,
         sort = req.query['sort'],
         select = req.query['select'],
-		    query;
+		    where,
+        query;
 
         // cap the limit at 200
+        limit = parseInt(limit, 10);
         if (limit > 200) { limit = 200; }
+
+        skip = parseInt(skip, 10);
 
 		 		async.series([
 					function checkIfParentModel(innerCallback){
@@ -68,7 +73,7 @@ module.exports = {
 		 			ParentModel.findById(req.params.id)
 			 			.select('owner users createdBy visibility')
 			 			.exec(function(err, parentModelResult){
-			 				if (!routeUtils.checkResourceReadAccess(parentModelResult, req.user)){
+              if (!routeUtils.checkResourceReadAccess(parentModelResult, req.user)){
 				        response = {
 				        	statusCode : 401,
 				        	body : "The parent resource is private and only the owner may access its data."
@@ -104,16 +109,35 @@ module.exports = {
               }
             }
 
-            if (where){
+            // Now handle the "where". First read the options.defaultWhere
+            // into "where", then mix in the request's "where", then
+            // add the compiled clause to the query
+            if (options.defaultWhere){
+              if (typeof options.defaultWhere === 'function'){
+                where = options.defaultWhere();
+              } else {
+                where = options.defaultWhere;
+              }
+            }
+
+            if (req.query['where']){
+              var queryWhere;
               try {
-                where = JSON.parse(where);
+                queryWhere = JSON.parse(req.query['where']);
               } catch(e){
                 winston.error(e);
               }
 
-              if (where){
-                query.where(where);
+              if (queryWhere){
+                where = where || {};
+                Object.keys(queryWhere).forEach(function(key) {
+                  where[key] = queryWhere[key];
+                });
               }
+            }
+
+            if (where){
+              query.where(where);
             }
 			      
 			      // TODO : Localize start/end date based on owner's timezone if there's no tz embedded in the date?
@@ -133,13 +157,15 @@ module.exports = {
 			      	return innerCallback(err);
 			      });
 					},
+
 					function getResults(innerCallback){
 						// Cast the query back to a find() operation so we can limit/skip/sort/select.
 						// TODO: Expecting that this retains the prior .where clauses, but need to verify
         		query.find();
 
 						query.limit(limit);
-						if (skip){
+						
+            if (skip){
 							query.skip(skip);
 						}
 
@@ -150,6 +176,7 @@ module.exports = {
             }
             
   
+            // If selecting nested objects, need to tell mongo the correct fields to populate
             if (select){
               select = select.split(',');
               select.forEach(function(field){
