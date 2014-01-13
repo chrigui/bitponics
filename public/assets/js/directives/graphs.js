@@ -336,6 +336,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                     // d.data contains: { phase, dateKey, status, dayIndex }
                     // So here we should launch the day summary overlay & pass it the phase, dayIndex & dateKey
                     // Future phases don't have dateKeys, so we'll instead display just the dayIndex
+                    scope.sharedDataService.showDaySummaryOverlay(d.data);
                   });
                   
                   //var barberPoleCont = $('.barberPoleCont');

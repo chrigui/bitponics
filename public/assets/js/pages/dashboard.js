@@ -53,6 +53,7 @@ require([
           var sharedData = {
             targetActiveDate : new Date(),
             activeDate : {},
+            daySummaryData : {}, 
             notifications : bpn.pageData.notifications,
             dateDataCache : {},  // Keyed by Date, contains { sensorLogs, latestSensorLogs, growPlanInstancePhase, growPlanPhase }
             socket : socket,
@@ -220,7 +221,7 @@ require([
               
               return dateDataCache;
             }
-          };          
+          };
 
 
           /**
@@ -269,6 +270,22 @@ require([
           }
 
           initSocket();
+
+          /*
+           * Show the day summary overlay, triggered from the phase graph
+           *
+           * * @param {} data : { phase, dateKey, status, dayIndex }
+           */
+          sharedData.showDaySummaryOverlay = function (data) {
+            //open overlay
+            sharedData.activeOverlay = 'DaySummaryOverlay';
+
+            //set day summary data
+            sharedData.daySummaryData = angular.extend(sharedData.daySummaryData, data);
+
+            //cache date data
+            sharedData.getDateDataCache(data.dateKey, true);
+          };
 
           return sharedData;
         }
@@ -653,6 +670,7 @@ require([
         'sharedDataService',
         function($scope, sharedDataService){
           $scope.sharedDataService = sharedDataService;
+          $scope.manualSensorEntry = {};
           $scope.idealRanges = {}
           $scope.sharedDataService.gardenModel.activePhase.phase.idealRanges.forEach(function(idealRange) {
             $scope.idealRanges[idealRange.sCode] = idealRange;
@@ -777,6 +795,40 @@ require([
              .attr('stroke-width', '1')
              .attr("d", line);*/
           };
+        }
+      ]
+    );
+
+    dashboardApp.controller('bpn.controllers.dashboard.DaySummaryOverlay',
+      [
+        '$scope',
+        '$http',
+        'sharedDataService',
+        function($scope, $http, sharedDataService){
+          $scope.sharedDataService = sharedDataService;
+          $scope.phase = {};
+          $scope.dataCache = {};
+          $scope.dayIndex = 1;
+          $scope.activeSensor = {
+            obj: $scope.sharedDataService.sensors[0]
+          };
+
+          console.log('$scope.activeSensor.code', $scope.activeSensor.code);
+          console.log('sharedDataService.activeDate.sensorLogs',sharedDataService.activeDate.sensorLogs);
+
+          $scope.close = function(){
+            $scope.sharedDataService.activeOverlay = undefined;
+          };
+
+          $scope.$watch($scope.sharedDataService.daySummaryData, function(oldValue, newValue) {
+          // $scope.$watch(function(){ return $scope.sharedDataService.daySummaryData; }, function(oldValue, newValue) {
+            console.log('new day summary data');
+            $scope.dataCache = $scope.sharedDataService.getDateDataCache($scope.sharedDataService.daySummaryData.dateKey);
+            $scope.dayIndex = $scope.sharedDataService.daySummaryData.dayIndex + 1;
+            $scope.phase = $scope.sharedDataService.daySummaryData.phase;
+          // }, true);
+          });
+
         }
       ]
     );
@@ -929,14 +981,6 @@ require([
       return {
         restrict : "EA",
         replace : true,
-        scope : {
-          sensorUnit : "=?",
-          sensorCode : "=?",
-          sensorName : "=?",
-          close : "=?",
-          manualSensorEntry : "=?",
-          manualTextEntry : "=?"
-        },
         controller : [
           '$scope', 
           '$element',
@@ -947,10 +991,10 @@ require([
           'bpn.services.analytics',
           function ($scope, $element, $attrs, $transclude, $http, sharedDataService, analytics) {
             $scope.sharedDataService = sharedDataService;
-
             $scope.manualSensorEntry = $scope.manualSensorEntry ? $scope.manualSensorEntry : {};
             $scope.manualTextEntry = $scope.manualTextEntry ? $scope.manualTextEntry : '';
             $scope.sensorUnits = sharedDataService.units;
+            // $scope.form = {};
 
             //if no device on garden, then just show the manual sensor entry forms
             $scope.manualSensorEntryMode = !$scope.sharedDataService.gardenModel.device;
@@ -980,6 +1024,12 @@ require([
 
             $scope.hasMultipleUnits = function (sensorCode) {
               return $scope.sensorUnits[sensorCode.toUpperCase()].units.length > 1;
+            };
+
+            $scope.resetForm = function() {
+              $scope.manualSensorEntry = {};
+              $scope.manualTextEntry = '';
+              // $scope.form.$setPristine();
             };
 
             $scope.submit = function(){
@@ -1034,6 +1084,7 @@ require([
                 })
                 .success(function(data, status, headers, config) {
                   console.log('success');
+                  if ($scope.resetForm) $scope.resetForm();
                   if ($scope.close) $scope.close();
                 })
                 .error(function(data, status, headers, config) {
@@ -1061,7 +1112,10 @@ require([
           }
         ],
         link: function (scope, element, attrs, controller) { 
-          
+          scope.sensorUnit = attrs.sensorUnit;
+          scope.sensorCode = attrs.sensorCode;
+          scope.sensorLogs = attrs.sensorLogs;
+          // scope.form = element.find('form').eq(0);
         }
       }
     });
