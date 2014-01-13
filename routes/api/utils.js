@@ -130,6 +130,7 @@ module.exports = {
 
               if (queryWhere){
                 where = where || {};
+
                 Object.keys(queryWhere).forEach(function(key) {
                   where[key] = queryWhere[key];
                 });
