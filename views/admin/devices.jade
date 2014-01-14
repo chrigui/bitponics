@@ -32,6 +32,15 @@ block content
 						td {{device.owner.email}}
 						td {{device.lastConnectionAt}}
 
+					tr(ng-repeat="serial in availableSerials")
+						td {{serial}}
+						td 
+							form(ng-submit="submit()", ng-controller="bpn.controllers.admin.devices.AddDevice")
+								input(type="hidden", name="serial", ng-model="serial", value="{{serial}}")
+								input(name="macAddress", ng-model="macAddress", placeholder="lowercase mac address")
+								input(type="submit")
+
+
 block footer-scripts
 	script
 		bpn.pageData.devices = !{JSON.stringify(devices)};
