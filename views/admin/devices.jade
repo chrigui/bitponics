@@ -1,0 +1,37 @@
+extends ../layout
+
+block head
+	mixin requirejs("/assets/js/pages/admin/devices")
+
+	style
+		.device-table th {
+			text-align:left;
+		}
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main")
+		h2.page-heading Devices
+		div.separator-top(ng-cloak, ng-controller="bpn.controllers.admin.devices.Main")
+			table.device-table(border="1", cellpadding="10")
+				thead
+					tr
+						th Serial
+						th MAC Address
+						th Name
+						th Owner
+						th Last Connection At
+				tbody
+					tr(ng-repeat="device in devices")
+						td {{device.serial}}
+						td {{device._id}}
+						td {{device.name}}
+						td {{device.owner.email}}
+						td {{device.lastConnectionAt}}
+
+block footer-scripts
+	script
+		bpn.pageData.devices = !{JSON.stringify(devices)};

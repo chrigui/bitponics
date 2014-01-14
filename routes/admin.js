@@ -39,23 +39,28 @@ module.exports = function(app){
   /**
 	 * 
 	 */
-  app.get('/admin/add-device', function (req, res) {
-	  res.render('admin/add-device', {
-	    title: 'Bitponics Admin'
-	  })
+  app.get('/admin/devices', function (req, res) {
+	  var DeviceModel = require('../models/device').model,
+        locals = {
+          title: 'Bitponics Admin | Devices',
+          devices : []
+        };
+
+    DeviceModel.find()
+    .select('_id serial name owner lastConnectionAt')
+    .populate('owner', '_id email')
+    .sort('_id')
+    .lean()
+    .exec(function(err, deviceResults){
+      if (err) { return next(err);}
+
+      locals.devices = deviceResults;
+      res.render('admin/devices', locals);
+    });
+
 	});
 
 
-  /**
-	 * 
-	 */
-  app.post('/admin/add-device', function (req, res) {
-    res.render('admin/add-device', {
-      title: 'Bitponics Admin',
-      creationStatus : 'success'
-    })
-  });
-	
 
 	/**
 	 * 
