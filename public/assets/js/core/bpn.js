@@ -17,14 +17,15 @@ define([
 	'bpn.directives',
   'bpn.filters',
   'bpn.services',
-  'bpn.services.analytics'
+  'bpn.services.analytics',
+  'angularDialog' // had to include this so we could pass it to the angular module initializer. needed for nav controller
 	], 
 	function (angular) {
 		'use strict';
 
 		return angular.module(
 			'bpn', 
-			['bpn.controllers', 'bpn.directives', 'bpn.filters', 'bpn.services']).run(
+			['bpn.controllers', 'bpn.directives', 'bpn.filters', 'bpn.services', 'ngDialog']).run(
       [
         '$rootScope',
         'bpn.services.analytics',

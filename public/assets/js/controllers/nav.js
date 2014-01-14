@@ -7,21 +7,39 @@
  */
 define(
 	[
-  	'bpn.controllers',
+   'bpn.controllers',
     'bpn.services.nav',
-    'bpn.services.user'
+    'bpn.services.user',
+    'angularDialog'
 	],
-  function (bpnControllers, NavService) {
+  function (bpnControllers) {
     'use strict';
 
-    return bpnControllers.controller('bpn.controllers.Nav',
+    var notificationsController = bpnControllers.controller('bpn.controllers.nav.Notifications',
+      [
+        '$scope',
+        '$filter',
+        '$compile',
+        'UserModel',
+        function ($scope, $filter, $compile, UserModel) {
+          if (bpn.user){
+            $scope.user = new UserModel(bpn.user);
+            $scope.recentNotifications = $scope.user.$getRecentNotifications();  
+          }
+          console.log('gettin in here', $scope, $scope.recentNotifications)
+        }
+      ]
+    );
+
+    var mainController = bpnControllers.controller('bpn.controllers.nav.Main',
       [
         '$scope',
         '$filter',
         '$compile',
         'NavService',
         'UserModel',
-        function ($scope, $filter, $compile, NavService, UserModel) {
+        'ngDialog',
+        function ($scope, $filter, $compile, NavService, UserModel, ngDialog) {
           // init
           $scope.settingsDisplayVisible = false;
           $scope.navMenuDisplayVisible = false;
@@ -39,13 +57,21 @@ define(
             NavService.openGardenSettingsOverlay = true;
           }
 
+
           if (bpn.user){
             $scope.user = new UserModel(bpn.user);
-            $scope.recentNotifications = $scope.user.$getRecentNotifications();  
+            $scope.user.$getRecentNotifications({},
+              function success(data){
+                console.log('$getRecentNotifications', data);
+                $scope.recentNotifications = data;
+              }
+            );  
           }
           
         }
       ]
-    )
+    );
+
+    return mainController;
   }
 );

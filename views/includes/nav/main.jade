@@ -1,4 +1,7 @@
-nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDisplayVisible}")
+nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navMenuDisplayVisible}")
+  script(type="text/ng-template", id="nav-notifications.html")
+    div(class="notifications") notificationsjjj
+
   ul
     li(class="nav-section first")
       h1(class="logo icon", role="banner")
@@ -81,6 +84,14 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                | #{user.name.full}
               else
                | #{user.email}
+            
+            div(
+              class="notifications-icon",
+              ng-cloak,
+              ng-dialog="nav-notifications.html",
+              ng-dialog-controller="bpn.controllers.nav.Notifications",
+              ng-dialog-class="ngdialog-theme-menu") N {{recentNotifications.count}}
+            
             div(class="settings", ng-click="toggleSettings()")
               | <i class="icon-glyph icon-glyph-new icon-__71_settings_999999" aria-hidden="true"></i>
               div(class="settings-display", ng-class="{'visible':settingsDisplayVisible}")
