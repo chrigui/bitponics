@@ -1,6 +1,14 @@
 nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navMenuDisplayVisible}")
   script(type="text/ng-template", id="nav-notifications.html")
-    div(class="notifications") notificationsjjj
+    div(class="notifications") 
+      h2 Notifications
+      
+      ul.notifications-list
+        li(ng-repeat="notification in recentNotifications.data")
+          p.date {{notification | notificationDate}}
+          p.summary {{notification.displays.summary}} 
+
+
 
   ul
     li(class="nav-section first")
@@ -86,10 +94,11 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
                | #{user.email}
             
             div(
-              class="notifications-icon",
+              ng-class="getNotificationsIconClass()",
               ng-cloak,
               ng-dialog="nav-notifications.html",
               ng-dialog-controller="bpn.controllers.nav.Notifications",
+              ng-dialog-data="{{recentNotifications}}",
               ng-dialog-class="ngdialog-theme-menu") N {{recentNotifications.count}}
             
             div(class="settings", ng-click="toggleSettings()")
