@@ -186,7 +186,6 @@ module.exports = function(app){
 		}
 	);
 
-	//we're not currently using the GET view of this page
 	app.get('/signup', 
 		routeUtils.middleware.ensureSecure, 
 		function (req, res){
@@ -202,7 +201,11 @@ module.exports = function(app){
 		routeUtils.middleware.ensureSecure, 
 		function (req, res, next){
 			User.createUserWithPassword({
-				email: req.param('email')
+				email: req.param('email'),
+				name : {
+					first : req.param('firstname'),
+					last : req.param('lastname')
+				}
 			},
 			req.param('password'),
 			function(err, user){

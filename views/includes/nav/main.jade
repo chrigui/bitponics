@@ -74,7 +74,7 @@ nav(role="nav", ng-controller="bpn.controllers.Nav", ng-class="{'open':navMenuDi
                   | <i class="icon-glyph icon-__53_email_white" aria-hidden="true"></i>
 
       if !pageType || pageType == 'app-page'
-        if user && user.name
+        if typeof user !== 'undefined' && user.name
           li(class="nav-section app-user")
             a(href="/account/profile")
               if user.name.full != ''

@@ -9,7 +9,14 @@ define([
 				'$resource', 
 				function ($resource) {
 					return $resource('/api/users/:id', 
-						{ id: '@_id'}
+						{ id: '@_id'},
+            {
+              getRecentNotifications : {
+                method: 'GET',
+                isArray : false,
+                url : '/api/users/:id/recent-notifications'
+              },
+            }
 					);
 				}
 			]

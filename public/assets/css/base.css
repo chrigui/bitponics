@@ -577,7 +577,7 @@ ol.list-style {
 a.btn,
 button.btn {
   display: inline-block;
-  background: #fff !important;
+  background: #fff;
   color: #00e36c;
   border: 3px solid #00e36c;
 }
@@ -3094,14 +3094,14 @@ label.newsletter.inline {
 .dashboard .btn {
   padding: 0.5em;
 }
+.dashboard .sensor-reading-date.page-heading-small {
+  font-size: 0.85em;
+}
 .dashboard .manual-entry-container .btn i {
   font-size: 1.25em;
   position: relative;
   top: 0.12em;
   left: -0.5em;
-}
-.dashboard .manual-entry-form .sensor-reading-date.page-heading-small {
-  font-size: 0.85em;
 }
 .dashboard .manual-entry-form .btn {
   margin-bottom: 1em;
@@ -3127,6 +3127,9 @@ label.newsletter.inline {
 }
 .garden-settings {
   height: 2em;
+}
+.day-summary button.btn {
+  margin: 0.25em 0.25em 0.25em 0;
 }
 .circle {
   margin: 1.5em 0;
@@ -3226,9 +3229,6 @@ label.newsletter.inline {
 /*
  * Register page
  */
-.landing-page.getstarted .main {
-  margin: 1em 1em 0;
-}
 .landing-page.getstarted .main .page-heading {
   font-size: 2em;
   color: #00e36c;
