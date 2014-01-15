@@ -2,6 +2,13 @@
  * ngDialog - easy modals and popup windows
  * http://github.com/likeastore/ngDialog
  * (c) 2013 MIT License, https://likeastore.com
+ *
+ * 2014-01-15 - Modified by Amit Kumar with the following updates:
+ * - pass trigger element to open method
+ * - support positioning dialog relative to trigger element
+ * - attach close listener to body instead of dialog
+ * - option to append to element instead of body
+ * - jQuery dependency for .parents()
  */
 
 (function (window, angular, undefined) {
@@ -68,6 +75,8 @@
 					 * - showClose {Boolean} - show close button, default true
 					 * - closeByEscape {Boolean} - default true
 					 * - closeByDocument {Boolean} - default true
+           * - appendToElement {Boolean} - default false. If true, appends dialog to the trigger element rather than document body.
+           * - element {DOMElement} - element that triggered the dialog. Passed to the controller as ngDialogElement
 					 *
 					 * @return {Object} dialog
 					 */
@@ -108,6 +117,10 @@
 								scope.ngDialogData = options.data.replace(/^\s*/, '')[0] === '{' ? angular.fromJson(options.data) : options.data;
 							}
 
+              if (options.element) {
+                scope.ngDialogElement = options.element;
+              }
+
 							$timeout(function () {
 								$compile($dialog)(scope);
 							});
@@ -116,20 +129,30 @@
 								$dialog.remove();
 							});
 
-							$body.addClass('ngdialog-open').append($dialog);
+							
+              if (options.appendToElement){
+                options.element.addClass('ngdialog-open').append($dialog);
+              } else {
+                $body.addClass('ngdialog-open').append($dialog);  
+              }
+              
 
 							if (options.closeByEscape) {
 								$body.bind('keyup', privateMethods.onDocumentKeyup);
 							}
 
 							if (options.closeByDocument) {
-								$dialog.bind('click', function (event) {
+								$body.bind('click', function (event) {
 									var isOverlay = $el(event.target).hasClass('ngdialog-overlay');
 									var isCloseBtn = $el(event.target).hasClass('ngdialog-close');
+                  var isContent = !!$el(event.target).parents('.ngdialog-content').length;
 
-									if (isOverlay || isCloseBtn) {
+									if (isOverlay || isCloseBtn || !isContent) {
 										publicMethods.close($dialog.attr('id'));
 									}
+
+                  event.preventDefault();
+                  event.stopPropagation();
 								});
 							}
 
@@ -187,16 +210,25 @@
 				elem.on('click', function (e) {
 					e.preventDefault();
 
-					ngDialog.open({
-						template: attrs.ngDialog,
-						className: attrs.ngDialogClass,
-						controller: attrs.ngDialogController,
-						scope: attrs.ngDialogScope,
-						data: attrs.ngDialogData,
-						showClose: attrs.ngDialogShowClose === 'false' ? false : true,
-						closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : true,
-						closeByEscape: attrs.ngDialogCloseByKeyup === 'false' ? false : true
-					});
+          var isOverlay = $el(e.target).hasClass('ngdialog-overlay');
+          var isCloseBtn = $el(e.target).hasClass('ngdialog-close');
+          var isContent = !!$el(e.target).parents('.ngdialog-content').length;
+
+          if (!isOverlay && !isCloseBtn && !isContent) {
+            ngDialog.open({
+            template: attrs.ngDialog,
+            className: attrs.ngDialogClass,
+            controller: attrs.ngDialogController,
+            scope: attrs.ngDialogScope,
+            data: attrs.ngDialogData,
+            showClose: attrs.ngDialogShowClose === 'false' ? false : true,
+            closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : true,
+            closeByEscape: attrs.ngDialogCloseByKeyup === 'false' ? false : true,
+            appendToElement: attrs.ngDialogAppendToElement === 'true' ? true : false,
+            element : elem
+          });
+          }
+					
 				});
 			}
 		};

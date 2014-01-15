@@ -8,11 +8,12 @@
 define(
 	[
    'bpn.controllers',
+    'fe-be-utils',
     'bpn.services.nav',
     'bpn.services.user',
     'angularDialog'
 	],
-  function (bpnControllers) {
+  function (bpnControllers, feBeUtils) {
     'use strict';
 
     var notificationsController = bpnControllers.controller('bpn.controllers.nav.Notifications',
@@ -23,7 +24,22 @@ define(
         'UserModel',
         function ($scope, $filter, $compile, UserModel) {
           $scope.recentNotifications = $scope.$parent.ngDialogData;
-          console.log('gettin in here', $scope, $scope.recentNotifications)
+          $scope.element = $scope.$parent.ngDialogElement;
+          console.log('gettin in here', $scope, $scope.element, $scope.recentNotifications)
+
+          $scope.getNotificationClass = function(notification){
+            var classNames = ['notification'];
+            
+            if (notification.checked){
+              classNames.push('checked');
+            } else {
+              if (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED || notification.type === feBeUtils.NOTIFICATION_TYPES.ERROR){
+                classNames.push('warning');  
+              }
+            }
+            
+            return classNames;
+          };
         }
       ]
     );
@@ -70,7 +86,11 @@ define(
                 //console.log('$getRecentNotifications', data);
                 $scope.recentNotifications = data;
                 $scope.hasUncheckedActionNeededNotifications = $scope.recentNotifications.data.some(function(notification){
-
+                  if (!notification.checked &&
+                        (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED || notification.type === feBeUtils.NOTIFICATION_TYPES.ERROR)
+                      ){
+                    return true;
+                  }
                 });
               }
             );  

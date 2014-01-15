@@ -4,9 +4,10 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
       h2 Notifications
       
       ul.notifications-list
-        li(ng-repeat="notification in recentNotifications.data")
-          p.date {{notification | notificationDate}}
-          p.summary {{notification.displays.summary}} 
+        li(ng-repeat="notification in recentNotifications.data", ng-class="getNotificationClass(notification)")
+          button.notification-button
+            p.date {{notification | notificationDate}}
+            p.summary {{notification.displays.summary}} 
 
 
 
@@ -99,6 +100,7 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
               ng-dialog="nav-notifications.html",
               ng-dialog-controller="bpn.controllers.nav.Notifications",
               ng-dialog-data="{{recentNotifications}}",
+              ng-dialog-append-to-element="true",
               ng-dialog-class="ngdialog-theme-menu") N {{recentNotifications.count}}
             
             div(class="settings", ng-click="toggleSettings()")

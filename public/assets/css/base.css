@@ -1735,6 +1735,121 @@ body.ngdialog-open {
   }
 }
 /*
+ * Menu
+ */
+.ngdialog-theme-menu {
+  top: 1.2em;
+  right: 0;
+  left: auto;
+  bottom: auto;
+  position: absolute;
+}
+.ngdialog-theme-menu .ngdialog-overlay {
+  background: none;
+}
+.ngdialog-theme-menu .ngdialog-content {
+  width: 20em;
+  background: #fff;
+  color: #999;
+  padding: 0;
+  text-align: left;
+  z-index: 1;
+  border: 1px solid #d8d8d8;
+  box-shadow: 0px 2px 5px 0px #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-content h2,
+.ngdialog-theme-menu .ngdialog-content div,
+.ngdialog-theme-menu .ngdialog-content p,
+.ngdialog-theme-menu .ngdialog-content a {
+  color: #999;
+}
+.ngdialog-theme-menu .ngdialog-content h2 {
+  padding-top: 0.5em;
+  margin: 0 0 0.5em;
+  border-bottom: 1px solid #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-close {
+  display: none;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications h2 {
+  padding: 0.5em;
+  margin: 0;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border-left: 5px solid #00e36c;
+  margin-bottom: 5px;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification.warning {
+  border-left-color: #fac400;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification.checked {
+  border-left-color: #c1c2c4;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification .notification-button {
+  display: block;
+  background: none;
+  padding: 0 1em;
+  border: none;
+  outline: none;
+  text-align: left;
+  border-bottom: 1px solid #fff;
+  width: 100%;
+}
+/*
+ * Header
+ */
+.header .settings {
+  position: relative;
+  width: 1.2em;
+  display: inline-block;
+  cursor: pointer;
+}
+.header .settings .icon-__71_settings_999999 {
+  top: -0.75em;
+  position: absolute;
+  font-size: 1.5em;
+}
+.header .settings .settings-display {
+  display: none;
+  position: absolute;
+  background: #00e36c;
+  color: #fff;
+}
+.header .settings .settings-display.visible {
+  display: block;
+  top: 0.5em;
+  right: 0;
+  min-width: 12em;
+  padding: 0 1em 1em;
+  text-align: left;
+  z-index: 1;
+}
+.header .settings .settings-display.visible h2 {
+  margin: 0.5em 0;
+  border-bottom: 1px solid #fff;
+}
+.header .settings .settings-display.visible li {
+  display: block;
+  margin: 0;
+}
+.header .settings .settings-display.visible a {
+  text-align: left;
+  color: #fff;
+  margin: 0;
+  line-height: 2em;
+}
+.header .notifications-icon {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.header .notifications-icon.warning {
+  color: #fac400;
+}
+/*
  * Home Page
  */
 .headline {
@@ -3600,53 +3715,6 @@ li
 .undefined .app-user span,
 .app-page .app-user span {
   font-size: 0.85em;
-}
-.undefined .app-user .settings,
-.app-page .app-user .settings {
-  position: relative;
-  width: 1.2em;
-  display: inline-block;
-  cursor: pointer;
-}
-.undefined .app-user .settings .icon-__71_settings_999999,
-.app-page .app-user .settings .icon-__71_settings_999999 {
-  top: -0.75em;
-  position: absolute;
-  font-size: 1.5em;
-}
-.undefined .app-user .settings .settings-display,
-.app-page .app-user .settings .settings-display {
-  display: none;
-  position: absolute;
-  background: #00e36c;
-  color: #fff;
-}
-.undefined .app-user .settings .settings-display.visible,
-.app-page .app-user .settings .settings-display.visible {
-  display: block;
-  top: 0.5em;
-  right: 0;
-  min-width: 12em;
-  padding: 0 1em 1em;
-  text-align: left;
-  z-index: 1;
-}
-.undefined .app-user .settings .settings-display.visible h2,
-.app-page .app-user .settings .settings-display.visible h2 {
-  margin: 0.5em 0;
-  border-bottom: 1px solid #fff;
-}
-.undefined .app-user .settings .settings-display.visible li,
-.app-page .app-user .settings .settings-display.visible li {
-  display: block;
-  margin: 0;
-}
-.undefined .app-user .settings .settings-display.visible a,
-.app-page .app-user .settings .settings-display.visible a {
-  text-align: left;
-  color: #fff;
-  margin: 0;
-  line-height: 2em;
 }
 .undefined .flexslider,
 .app-page .flexslider {
