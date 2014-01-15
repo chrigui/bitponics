@@ -100,6 +100,7 @@ module.exports = function(app) {
               u : req.params.id,
               tts : { $lte : new Date() }
             })
+            .limit(20)
             .sort('-tts')
             .exec(innerCallback);
           },
@@ -117,11 +118,42 @@ module.exports = function(app) {
         ],
         function parallelEnd(err, results){
           if (err) { return next(err); }
-          response.body = {
-            data : [].concat(results[0], results[1])
-          };
-          response.body.count = response.body.data.length;
-          return routeUtils.sendJSONResponse(res, response.statusCode, response.body);
+          
+          var notifications = [].concat(results[0], results[1]),
+              notificationObjects = notifications.map(function(notification){ return notification.toObject() }),
+              notificationObjectsById = {};
+
+          notificationObjects.forEach(function(notification){
+            notificationObjectsById[notification._id] = notification;            
+          })
+
+          async.each(notifications, 
+            function notificationIterator(notification, iteratorCallback){
+              notification.getDisplays(
+                {
+                  secureAppUrl : app.config.secureAppUrl,
+                  displayTypes : ['summary','detail']
+                },
+                function(err, notificationDisplays){
+                  if (err) { return iteratorCallback(err); }
+
+                  notificationObjectsById[notification._id].displays = notificationDisplays;
+
+                  return iteratorCallback();
+                } 
+              );
+            },
+            function end(err){
+              if (err) { return next(err); }
+
+              response.body = {
+                data : notificationObjects
+              };
+              response.body.count = response.body.data.length;
+              return routeUtils.sendJSONResponse(res, response.statusCode, response.body);    
+            }
+          );
+
         });
       });
     }
