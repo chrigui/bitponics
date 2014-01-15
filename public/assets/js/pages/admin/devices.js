@@ -127,8 +127,24 @@ require([
         '$q',
         'DeviceModel',
         function ($scope, $http, $q, DeviceModel) {
+          $scope.$watch('macAddress', function(newVal, oldVal){
+            if ($scope.macAddress){
+              $scope.macAddress = $scope.macAddress.replace(/:/g,'').toLowerCase();  
+            }
+          });
+
           $scope.submit = function(){
             console.log($scope.macAddress, $scope.serial, this);
+            var deviceToAdd = new DeviceModel({
+              _id : $scope.macAddress,
+              deviceType: "506de2fe8eebf7524342cb37",
+              serial: $scope.serial,
+              name : "My Bitponics Device"
+            });
+            deviceToAdd.$save(function(data){
+              console.log('saved', data);
+              window.location.href = window.location.href;
+            });
           };
         }
       ]
