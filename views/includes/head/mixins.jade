@@ -6,6 +6,7 @@ mixin requirejs(dataMain)
   - var angular = CDN('/assets/js/libs/angular/1.2.0/angular.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularFlexslider = CDN('/assets/js/libs/angular-flexslider.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularAnimate = CDN('/assets/js/libs/angular/1.2.0/angular-animate.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularDialog = CDN('/assets/js/libs/angular/ngDialog.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularMask = CDN('/assets/js/libs/angular/mask.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularResource = CDN('/assets/js/libs/angular/1.2.0/angular-resource.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularRoute = CDN('/assets/js/libs/angular/1.2.0/angular-route.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -15,6 +16,7 @@ mixin requirejs(dataMain)
   - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnControllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnControllersNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnControllersNotifications = CDN('/assets/js/controllers/notifications.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectives = CDN('/assets/js/core/directives.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectivesGraphs = CDN('/assets/js/directives/graphs.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnFilters = CDN('/assets/js/core/filters.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -62,6 +64,7 @@ mixin requirejs(dataMain)
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
         'angularAnimate' : '#{angularAnimate}',
+        'angularDialog' : '#{angularDialog}',
         'angularResource' : '#{angularResource}',
         'angularRoute' : '#{angularRoute}',
         'angularUI' : '#{angularUI}',
@@ -70,6 +73,7 @@ mixin requirejs(dataMain)
         'bpn' : '#{bpnApp}',
         'bpn.controllers' : '#{bpnControllers}',
         'bpn.controllers.nav' : '#{bpnControllersNav}',
+        'bpn.controllers.notifications' : '#{bpnControllersNotifications}',
         'bpn.directives' : '#{bpnDirectives}',
         'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
         'bpn.filters' : '#{bpnFilters}',
@@ -114,6 +118,9 @@ mixin requirejs(dataMain)
           deps: [ 'angular' ] 
         }, 
         'angularAnimate': { 
+          deps: [ 'angular' ] 
+        },
+        'angularDialog': { 
           deps: [ 'angular' ] 
         },
         'angularRoute': { 
