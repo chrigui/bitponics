@@ -37,9 +37,9 @@ define(
                 classNames.push('warning');  
               }
             }
-            
             return classNames;
           };
+
         }
       ]
     );
@@ -72,10 +72,14 @@ define(
 
 
           $scope.getNotificationsIconClass = function(){
-            var classNames = ['notifications-icon'];
+            var classNames = ['icon-glyph notifications-icon'];
             if ($scope.hasUncheckedActionNeededNotifications){
-              classNames.push('warning');
-            };
+              classNames.push('icon_notification_warning');
+            } else if ($scope.hasUncheckedNotifications){
+              classNames.push('icon_notification_info_textGray');
+            } else {
+              classNames.push('icon_notification_info_textGray');
+            }
             return classNames;
           };
 
@@ -83,8 +87,15 @@ define(
             $scope.user = new UserModel(bpn.user);
             $scope.user.$getRecentNotifications({},
               function success(data){
-                //console.log('$getRecentNotifications', data);
+                
                 $scope.recentNotifications = data;
+                
+                $scope.hasUncheckedNotifications = $scope.recentNotifications.data.some(function(notification){
+                  if (!notification.checked){
+                    return true;
+                  }
+                });
+
                 $scope.hasUncheckedActionNeededNotifications = $scope.recentNotifications.data.some(function(notification){
                   if (!notification.checked &&
                         (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED || notification.type === feBeUtils.NOTIFICATION_TYPES.ERROR)

@@ -1738,7 +1738,7 @@ body.ngdialog-open {
  * Menu
  */
 .ngdialog-theme-menu {
-  top: 1.2em;
+  top: 0.5em;
   right: -3px;
   left: auto;
   bottom: auto;
@@ -1851,9 +1851,15 @@ body.ngdialog-open {
   position: relative;
   display: inline-block;
   cursor: pointer;
+  width: 1.8em;
 }
-.header .notifications-icon.warning {
-  color: #fac400;
+.header .notifications-icon .icon-glyph {
+  font-size: 1em;
+  top: -0.95em;
+  margin-left: 0.4em;
+  position: absolute;
+  width: 1.3em;
+  height: 1.3em;
 }
 /*
  * Home Page
