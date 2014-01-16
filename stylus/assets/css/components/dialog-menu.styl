@@ -13,10 +13,11 @@
 	// 	animation-duration 0
 
 	top 1.2em
-	right 0
+	right -3px
 	left auto
 	bottom auto
 	position absolute
+
 
 
 	.ngdialog-overlay
@@ -27,6 +28,7 @@
 		background white
 		color color-text-gray
 		padding 0
+		margin 0 3px 10px
 		text-align left
 		z-index 1
 		border 1px solid color-border-gray
@@ -52,8 +54,9 @@
 .ngdialog-theme-menu .ngdialog-content .notifications 
 	
 	h2
-		padding .5em
+		padding .5em .6em
 		margin 0
+		border-left 5px solid transparent
 
 	.notifications-list
 		.notification
@@ -61,7 +64,18 @@
 			margin 0
 			padding 0
 			border-left 5px solid color-logo-green
-			margin-bottom 5px
+			margin-top 5px
+			box-shadow 0px 2px 3px 0px color-border-gray
+
+			&:first-of-type
+				margin 0
+
+			// &:after
+			// 	content ''
+			// 	display block
+			// 	width 80%
+			// 	margin 0 auto
+			// 	border-bottom 1px solid color-border-gray
 
 			&.warning
 				border-left-color color-bg-orange

@@ -427,6 +427,7 @@ NotificationSchema.method('ensureHash', function(){
  * 'summary' returns a string
  * 'detail' returns string of html
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
+ * 'json' returns the data retrieved for template population (garden, actions, growPlans, etc). For now just returns garden...no use cases yet to return everything & the data gets massive
  *
  * @param {array[string]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
@@ -569,6 +570,13 @@ NotificationSchema.method('getDisplays', function(options, callback){
             case 'detail':
               notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
               break;
+            case 'json':
+              notificationDisplay = {
+                garden: {
+                  _id : notificationTemplateLocals.notification.growPlanInstance._id,
+                  name : notificationTemplateLocals.notification.growPlanInstance.name
+                }
+              };
           }
         } catch(e){
           winston.error(e);

@@ -132,7 +132,7 @@ module.exports = function(app) {
               notification.getDisplays(
                 {
                   secureAppUrl : app.config.secureAppUrl,
-                  displayTypes : ['summary','detail']
+                  displayTypes : ['summary','detail', 'json']
                 },
                 function(err, notificationDisplays){
                   if (err) { return iteratorCallback(err); }
