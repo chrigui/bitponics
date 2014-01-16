@@ -57,8 +57,11 @@ module.exports = function(app){
                 m : mode
               })
               .sort('-ts')
+              .limit(1)
               .exec(function (err, calibrationStatusLogResults){
-                if (err || (!(calibrationStatusLogResults && calibrationStatusLogResults.length))) { return; }
+                if (err) { return handleSocketError(err); }
+                if (!(calibrationStatusLogResults && calibrationStatusLogResults.length)) { return; }
+                
                 socket.emit(
                   'device_calibration_response', 
                   calibrationStatusLogResults[0]
@@ -87,8 +90,7 @@ module.exports = function(app){
                 type : type
               },
               function(err, newCalibrationLog){
-                // not going to do anything just yet. because I don't yet know what to do.
-                if (err) { winston.error(err);}
+                if (err) { return handleSocketError(err); }
               });  
             }
         }
@@ -122,7 +124,9 @@ module.exports = function(app){
           UserModel.findById(userId)
           .select('deviceKeys')
           .exec(function (err, user){
-            if (err || !user) { return; }
+            if (err){ return handleSocketError(err); }
+            if (!user) { return; }
+
             socket.emit(
               'keys',
               user.deviceKeys
@@ -295,7 +299,7 @@ module.exports = function(app){
                 }
               );
 
-            }, 10 * 1000);
+            }, 15 * 1000);
           }
         );
         
@@ -309,7 +313,7 @@ module.exports = function(app){
 
 
   function handleSocketError(err){
-    winston.info("SOCKET ERROR", err);
+    winston.error("SOCKET ERROR" + JSON.stringify(err));
     return;
   }
 };
