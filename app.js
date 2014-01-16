@@ -32,6 +32,7 @@ require('./config/error-config')(app);
 
 
 // Finally, start up the server
+winston.info('Finished app config, attempting server.listen');
 server.listen(process.env.PORT || 80, function(){
   //var address = server.address();
   //app.config.appUrl = 'http://' + address.address + (address.port == 80 ? '' : ':' + address.port);

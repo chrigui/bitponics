@@ -157,18 +157,18 @@ module.exports = function(app){
       // Heroku requires that we force socket.io to use long-polling
       // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
       io.configure(function () {
-        // io.set("transports", ["xhr-polling"]);
-        // io.set("polling duration", 10);
+        io.set("transports", ["xhr-polling"]);
+        io.set("polling duration", 10);
         io.set("log level", 2);
       });
 
       // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO#recommended-production-settings
-      io.configure('production', function () {
-        io.enable('browser client minification');  // send minified client
-        io.enable('browser client etag');          // apply etag caching logic based on version number
-        io.enable('browser client gzip');          // gzip the file
-        io.set('log level', 1);                    // reduce logging
-      });
+      // io.configure('production', function () {
+      //   io.enable('browser client minification');  // send minified client
+      //   io.enable('browser client etag');          // apply etag caching logic based on version number
+      //   io.enable('browser client gzip');          // gzip the file
+      //   io.set('log level', 1);                    // reduce logging
+      // });
 
 
       // Make socket.io handlers aware of user sessions
