@@ -16,7 +16,6 @@ mixin requirejs(dataMain)
   - var bpnApp = CDN('/assets/js/core/bpn.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnControllers = CDN('/assets/js/core/controllers.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnControllersNav = CDN('/assets/js/controllers/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var bpnControllersNotifications = CDN('/assets/js/controllers/notifications.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectives = CDN('/assets/js/core/directives.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnDirectivesGraphs = CDN('/assets/js/directives/graphs.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnFilters = CDN('/assets/js/core/filters.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -73,7 +72,6 @@ mixin requirejs(dataMain)
         'bpn' : '#{bpnApp}',
         'bpn.controllers' : '#{bpnControllers}',
         'bpn.controllers.nav' : '#{bpnControllersNav}',
-        'bpn.controllers.notifications' : '#{bpnControllersNotifications}',
         'bpn.directives' : '#{bpnDirectives}',
         'bpn.directives.graphs' : '#{bpnDirectivesGraphs}',
         'bpn.filters' : '#{bpnFilters}',
