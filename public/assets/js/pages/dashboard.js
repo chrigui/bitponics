@@ -233,6 +233,8 @@ require([
             socket.emit('ready', { growPlanInstanceId : sharedData.gardenModel._id });
 
             socket.on('update', function(data){
+              console.log('socket update received', data);
+              
               var sensorLog = data.sensorLog,
                   textLog = data.textLog,
                   deviceStatus = data.deviceStatus,

@@ -33,6 +33,7 @@
     "stylus": ">=0.37.0",
     "bootstrap-stylus": ">= 0.0.1",
     "passport": ">= 0.1.1",
+    "passport.socketio" : "2.2.1",
     "passport-local": ">= 0.1.6",
     "s3policy": "=0.0.1",
     "timezone": "=0.0.23",
