@@ -18,9 +18,11 @@ app.socketIOs = [io];
 
 // Configure the app instance
 require('./config')(app);
+winston.info('Finished main config');
 
 // Add Routes to the app
 require('./routes')(app);
+winston.info('Finished route config');
 
 /** 
  *  Error handling 
@@ -29,7 +31,7 @@ require('./routes')(app);
  *  http://expressjs.com/guide.html
  */
 require('./config/error-config')(app);
-
+winston.info('Finished error config');
 
 // Finally, start up the server
 winston.info('Finished app config, attempting server.listen');

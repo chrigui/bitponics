@@ -123,6 +123,8 @@ module.exports = function(app){
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }
 
+      winston.info('Finished mongoose config');
+
 	    app.config.mongooseConnection = mongooseConnection;
 
       app.config.session = {
@@ -141,6 +143,7 @@ module.exports = function(app){
 	    app.use(passport.initialize());
 	    app.use(passport.session());
       
+      winston.info('Finished session config');
     });
 
     
@@ -153,7 +156,6 @@ module.exports = function(app){
 
 
     app.socketIOs.forEach(function(io){
-      
       // Heroku requires that we force socket.io to use long-polling
       // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
       io.configure(function () {
@@ -161,15 +163,6 @@ module.exports = function(app){
         io.set("polling duration", 10);
         io.set("log level", 2);
       });
-
-      // https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO#recommended-production-settings
-      // io.configure('production', function () {
-      //   io.enable('browser client minification');  // send minified client
-      //   io.enable('browser client etag');          // apply etag caching logic based on version number
-      //   io.enable('browser client gzip');          // gzip the file
-      //   io.set('log level', 1);                    // reduce logging
-      // });
-
 
       // Make socket.io handlers aware of user sessions
       // http://stackoverflow.com/questions/13095418/how-to-use-passport-with-express-and-socket-io
