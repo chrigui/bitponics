@@ -1,10 +1,6 @@
-/**
- * Dependent on app.config.session
- */
-
-//var SocketMongoStore = require('../lib/mong.socket.io-wrapper');
 var passportSocketIo = require("passport.socketio"),
-    express = require('express');
+    express = require('express'),
+    SocketMongoStore = require('mong.socket.io');
 
 module.exports = function(app){
   
@@ -12,6 +8,11 @@ module.exports = function(app){
     
     io.configure(function () {
       io.set("log level", 3);
+      var store = new SocketMongoStore({
+        url: app.config.mongooseConnection.db
+      });
+      store.on('error', console.error);
+      io.set('store', store);
     });
 
 
