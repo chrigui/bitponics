@@ -182,15 +182,13 @@ module.exports = function(app){
 		        		//TODO: make this sync
 		        		function notificationIterator(notification, iteratorCallback){
 			        		var notificationObject = notification.toObject();
-			        		notification.getDisplay(
+			        		notification.getDisplays(
 			        			{ 
 			        				secureAppUrl : app.config.secureAppUrl,
-			        				displayType : 'summary'
+			        				displayTypes : ['summary']
 			        			},
-			        			function (err, notificationDisplay){
-			        				notificationObject.displays = {
-					        			summary : notificationDisplay
-					        		};
+			        			function (err, notificationDisplays){
+			        				notificationObject.displays = notificationDisplays;
 					        		notificationsWithSummaries.push(notificationObject);
 			        				return iteratorCallback();
 			        			}

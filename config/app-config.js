@@ -123,6 +123,8 @@ module.exports = function(app){
     require('./mongoose-connection').open(app.settings.env, function(err, mongooseConnection){
       if (err) { winston.error(err.toString()); }
 
+      winston.info('Finished mongoose config');
+
 	    app.config.mongooseConnection = mongooseConnection;
 
       app.config.session = {
@@ -141,6 +143,7 @@ module.exports = function(app){
 	    app.use(passport.initialize());
 	    app.use(passport.session());
       
+      winston.info('Finished session config');
     });
 
     
@@ -153,11 +156,7 @@ module.exports = function(app){
 
 
     app.socketIOs.forEach(function(io){
-      // Heroku requires that we force socket.io to use long-polling
-      // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
       io.configure(function () {
-        io.set("transports", ["xhr-polling"]);
-        io.set("polling duration", 10);
         io.set("log level", 2);
       });
 

@@ -1,1 +1,3 @@
-Action Triggered : <%= notificationDetails.action.description %>
+<% if (notification.type === NOTIFICATION_TYPES.ACTION_NEEDED){ %>
+<%= "Action needed :" %><% } else if (notification.type === NOTIFICATION_TYPES.INFO) { %><%= "Action triggered :" %>
+<% } %> <%= notificationDetails.action.description %>

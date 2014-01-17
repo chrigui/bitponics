@@ -424,14 +424,16 @@ NotificationSchema.method('ensureHash', function(){
 /**
  * Returns the Notification populated into the specified display template
  *
- * 'summary' and 'detail' return strings.
+ * 'summary' returns a string
+ * 'detail' returns string of html
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
+ * 'json' returns the data retrieved for template population (garden, actions, growPlans, etc). For now just returns garden...no use cases yet to return everything & the data gets massive
  *
- * @param {string} options.displayType - must be one of 'email'|'summary'|'detail'
+ * @param {array[string]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
- * @param {function(err, display)} callback
+ * @param {function(err, displays)} callback - Passed an object of displays keyed by displayType
  */
-NotificationSchema.method('getDisplay', function(options, callback){
+NotificationSchema.method('getDisplays', function(options, callback){
   var notification = this,
       ActionModel = require('./action').model,
       GrowPlanModel = require('./growPlan').growPlan.model,
@@ -447,7 +449,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
         ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
         secureAppUrl : options.secureAppUrl
       },
-      notificationDisplay;
+      notificationDisplays = {};
 
   
   async.waterfall(
@@ -548,33 +550,48 @@ NotificationSchema.method('getDisplay', function(options, callback){
           
       // At this point, notificationTemplateLocals is fully populated
       // 2013-08-22 AK: Getting occasional errors that I don't have time to fully debug, just wrapping things in a try/finally to ensure execution continues
-      try {
-        switch(options.displayType){
-          case 'email':
-            notificationDisplay = {
-              subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-              bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-              bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-            };
-            break;
-          case 'summary':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-            break;
-          case 'detail':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-            break;
+
+      options.displayTypes.forEach(function(displayType){
+        var notificationDisplay,
+            err;
+
+        try {
+          switch(displayType){
+            case 'email':
+              notificationDisplay = {
+                subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+              };
+              break;
+            case 'summary':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+              break;
+            case 'detail':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+              break;
+            case 'json':
+              notificationDisplay = {
+                garden: {
+                  _id : notificationTemplateLocals.notification.growPlanInstance._id,
+                  name : notificationTemplateLocals.notification.growPlanInstance.name
+                }
+              };
+          }
+        } catch(e){
+          winston.error(e);
         }
-      } catch(e){
-        winston.error(e);
-      } finally {
-        //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
+
         if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
           console.log("Error populating EJS notification template for " + notification._id.toString());
           console.log(JSON.stringify(notificationTemplateLocals));
           err = new Error("Error populating EJS notification template for " + notification._id.toString());
         }
-        return callback(err, notificationDisplay);  
-      }
+
+        notificationDisplays[displayType] = notificationDisplay; 
+      });
+
+      return callback(err, notificationDisplays);
     }
   );
 });
@@ -738,20 +755,20 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
             winston.info("YES");
 
             // Populate trigger details
-            notification.getDisplay(
+            notification.getDisplays(
               {
                 secureAppUrl : secureAppUrl,
-                displayType : 'email'
+                displayTypes : ['email']
               },
-              function(err, notificationDisplay){
+              function(err, notificationDisplays){
                 if (err) { return iteratorCallback(err); }
 
                 winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION DISPLAY " + now);
 
                 var emailTemplateLocals = {
-                  emailSubject : notificationDisplay.subject,
-                  emailBodyHtml : notificationDisplay.bodyHtml,
-                  emailBodyText : notificationDisplay.bodyText,
+                  emailSubject : notificationDisplays.email.subject,
+                  emailBodyHtml : notificationDisplays.email.bodyHtml,
+                  emailBodyText : notificationDisplays.email.bodyText,
                   subscriptionPreferencesUrl : subscriptionPreferencesUrl,
                   appUrl : appUrl
                 },  
