@@ -579,7 +579,7 @@ NotificationSchema.method('getDisplays', function(options, callback){
               };
           }
         } catch(e){
-          winston.error(e);
+          winston.error(JSON.stringify(e));
         }
 
         if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
@@ -791,7 +791,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     }
                   }
                 } catch(e){
-                  winston.error(e.toString());
+                  winston.error(JSON.stringify(e));
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
@@ -854,7 +854,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           notificationResultProcessingQueue.drain = notificationProcessingEnded;
           notificationResultProcessingQueue.push(notificationResults, function(err){
             winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION " + now);
-            if (err) { winston.error(err); }
+            if (err) { winston.error(JSON.stringify(err));}
           });
         }
       ],

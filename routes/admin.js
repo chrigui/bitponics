@@ -69,7 +69,7 @@ module.exports = function(app){
 	  var NotificationModel = require('../models/notification').model;
 	  NotificationModel.clearPendingNotifications({env : app.settings.env}, function(err, numberNotificationsAffected){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success, ' + numberNotificationsAffected + ' records affected');
@@ -83,7 +83,7 @@ module.exports = function(app){
 	app.post('/admin/trigger-scanForPhaseChanges', function (req, res) {
 	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success');
@@ -97,7 +97,7 @@ module.exports = function(app){
 	app.post('/admin/trigger-checkDeviceConnections', function (req, res) {
 	  ModelUtils.checkDeviceConnections(function(err){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success');

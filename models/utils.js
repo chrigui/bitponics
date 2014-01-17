@@ -515,7 +515,7 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
     .populate('growPlan')
     .select('_id users growPlan phases')
     .exec(function(err, growPlanInstanceResults){
-      if (err) { winston.error( err ); return callback(err); }
+      if (err) { winston.error(JSON.stringify(err)); return callback(err); }
       if (!growPlanInstanceResults.length) { return callback(); }
 
       async.each(growPlanInstanceResults, 
