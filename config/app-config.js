@@ -18,7 +18,8 @@ var connect    = require('connect'),
   cookie  = require('express/node_modules/cookie'),
   s3Config = require('../config/s3-config'),
   intercomConfig = require('../config/intercom-config'),
-  crypto = require('crypto');
+  crypto = require('crypto'),
+  SocketMongoStore = require('../lib/mong.socket.io-wrapper');
 
 module.exports = function(app){
 
@@ -158,6 +159,11 @@ module.exports = function(app){
     app.socketIOs.forEach(function(io){
       io.configure(function () {
         io.set("log level", 2);
+        var store = new SocketMongoStore({
+          url: require('./mongoose-connection').urls[app.settings.env]
+        });
+        store.on('error', console.error);
+        io.set('store', store);
       });
 
       // Make socket.io handlers aware of user sessions
