@@ -44,6 +44,19 @@
 						}
 					},
 
+          onBodyClick : function (event) {
+            var isOverlay = $el(event.target).hasClass('ngdialog-overlay');
+            var isCloseBtn = $el(event.target).hasClass('ngdialog-close');
+            var isContent = !!$el(event.target).parents('.ngdialog-content').length;
+
+            if (isOverlay || isCloseBtn || !isContent) {
+              publicMethods.closeAll();
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+          },
+
 					closeDialog: function ($dialog) {
 						$dialog.unbind('click');
 
@@ -60,6 +73,8 @@
 						} else {
 							$dialog.remove();
 						}
+
+            $body.unbind('click', privateMethods.onBodyClick);
 					}
 				};
 
@@ -142,18 +157,7 @@
 							}
 
 							if (options.closeByDocument) {
-								$body.bind('click', function (event) {
-									var isOverlay = $el(event.target).hasClass('ngdialog-overlay');
-									var isCloseBtn = $el(event.target).hasClass('ngdialog-close');
-                  var isContent = !!$el(event.target).parents('.ngdialog-content').length;
-
-									if (isOverlay || isCloseBtn || !isContent) {
-										publicMethods.close($dialog.attr('id'));
-									}
-
-                  event.preventDefault();
-                  event.stopPropagation();
-								});
+								$body.on('click', privateMethods.onBodyClick);
 							}
 
 							dialogsCount += 1;
