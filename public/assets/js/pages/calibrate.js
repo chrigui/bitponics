@@ -282,10 +282,6 @@ function (angular, domReady, moment, feBeUtils) {
           }
         });
 
-        $scope.socket.on('error', function(err){
-          console.log('socket error', err);
-        });
-
       }
     ]
   );

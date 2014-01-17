@@ -35,8 +35,8 @@ define([
            *
            * Allows you to execute debug functions from the view
            */
-          $rootScope.log = function(variable) {
-            console.log(variable);
+          $rootScope.log = function() {
+            console.log.apply(console, [].slice.call(arguments, 0));
           };
           $rootScope.alert = function(text) {
             alert(text);
