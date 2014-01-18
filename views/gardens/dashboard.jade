@@ -174,15 +174,17 @@ block content
               h3(class="page-heading") Day {{dayIndex}} of {{phase.phase.name}} Phase
               h4(class="sensor-reading-date page-heading-small") {{dataCache.date | date:'longDate'}}
               
-              ul(class="btn-list menu")
-                li(ng-repeat="sensor in sharedDataService.sensors", class="float-l")
-                  button(type="button", class="btn", ng-class="{on: sensor.code==activeSensor.obj.code}", ng-click="activeSensor.obj=sensor") {{sensor.name}}
+              div(ng-show="dataCache.sensorLogs")
+                ul(class="btn-list menu")
+                  li(ng-repeat="sensor in sharedDataService.sensors", class="float-l")
+                    button(type="button", class="btn", ng-class="{on: sensor.code==activeSensor.obj.code}", ng-click="activeSensor.obj=sensor") {{sensor.name}}
 
-              div(class="graph clear-b")
-                div(ng-show="activeSensor.obj.code==sensor.code", ng-repeat="sensor in sharedDataService.sensors")
-                  div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="dataCache.sensorLogs")
+                div(class="graph clear-b")
+                  div(ng-show="activeSensor.obj.code==sensor.code", ng-repeat="sensor in sharedDataService.sensors")
+                    div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="dataCache.sensorLogs")
 
-              //- h3(class="page-heading page-heading-small") {{activeSensor.obj.name}}
+              div(ng-hide="dataCache.sensorLogs")
+                p It seems there is no data for this date.
 
       div.content-module.middle
         div(ng-controller="bpn.controllers.dashboard.PhasesGraph")
