@@ -59,7 +59,7 @@ define(['angular', 'fe-be-utils', 'throttle-debounce'],
 
     bpnFilters.filter('notificationDate', function() {
       return function(notification) {
-        var date = notification.timeToSend || notification.sentLogs[0].timestamp,
+        var date = notification.timeToSend || notification.sentLogs[0].timeToSend,
           val = moment(date).calendar();
         return val.charAt(0).toUpperCase() + val.slice(1);
       }

@@ -55,32 +55,60 @@ var dateValidationFns = [
 var NotificationSentLogSchema = new Schema({ 
   /**
    * timestamp
+   * The time this log was specified to be sent (timeToSend from parent Notification). 
+   * TODO : migrate all db entries from ts to tts
    */
   ts : { type : Date },
 
+  
   /**
-   * checked
+   * emailedAt
+   * If this tts was emailed, this is the time the email was sent
+   */
+  eA : { type : Date, required : false },
+
+
+  /**
+   * checkedAt
    * User can "check" a notification log to hide it/mark completed
    */
-  c : { type : Boolean }
+  cA : { type : Date, required : false }
 },
 { _id : false, id : false });
 
-NotificationSentLogSchema.virtual('timestamp')
+NotificationSentLogSchema.virtual('timeToSend')
 .get(function(){
   return this.ts;
 })
-.set(function(timestamp){
-  this.ts = timestamp;
+.set(function(timeToSend){
+  this.ts = timeToSend;
+});
+
+NotificationSentLogSchema.virtual('emailedAt')
+.get(function(){
+  return this.eA;
+})
+.set(function(value){
+  this.eA = value;
+});
+
+NotificationSentLogSchema.virtual('checkedAt')
+.get(function(){
+  return this.cA;
+})
+.set(function(checkedAt){
+  this.cA = checkedAt;
 });
 
 NotificationSentLogSchema.virtual('checked')
 .get(function(){
-  return this.c;
+  return !!this.cA;
 })
 .set(function(checked){
-  this.c = checked;
+  if (this.cA) { return; }
+  this.cA = new Date();
 });
+
 
 /**
  * Notification
@@ -142,6 +170,8 @@ var NotificationSchema = new Schema({
 		timezone : String
 	},
 	
+
+
 
   /**
    * sentLogs
@@ -243,13 +273,17 @@ var NotificationSchema = new Schema({
    */
   h : { type : String },
 
+  
   /**
    * checked
    * User can "check" a notification log to hide it/mark completed
    *
-   * TODO : decide what the behavior is if a repeating notification is marked checked
+   * "Checking" a notification should create a sentLog entry with "checkedAt" set
+   * 
+   * This is a dynamic property. It's false by default, set to true if 
+   * a notification has been checked
    */
-  c : { type : Boolean }
+  //c : { type : Boolean }
 
 },
 { id : false });
@@ -291,12 +325,12 @@ NotificationSchema.virtual('repeat')
   });
 
 /*
-NotificationSchema.virtual('r.repeatType')
+NotificationSchema.virtual('r.durationType')
   .get(function(){
-    return this.r.rt;
+    return this.r.dT;
   })
-  .set(function(repeatType){
-    this.r.rt = repeatType;
+  .set(function(durationType){
+    this.r.dT = durationType;
   });
 
 NotificationSchema.virtual('r.duration')
@@ -324,13 +358,13 @@ NotificationSchema.virtual('sentLogs')
     this.sl = sentLogs;
   });
 
-NotificationSchema.virtual('checked')
-  .get(function(){
-    return this.c;
-  })
-  .set(function(checked){
-    this.c = checked;
-  })
+// NotificationSchema.virtual('checked')
+//   .get(function(){
+//     return this.c;
+//   })
+//   .set(function(checked){
+//     this.c = checked;
+//   })
 
 NotificationSchema.virtual('hash')
   .get(function(){
@@ -363,6 +397,7 @@ NotificationSchema.set('toObject', {
       delete ret.r;
       delete ret.sl;
       delete ret.h;
+
     }
   }
 });
@@ -377,6 +412,83 @@ NotificationSchema.set('toJSON', {
 
 
 /*************** INSTANCE METHODS *************************/
+
+/**
+ * Marks the provided "timeToSend" sentLog as checked
+ * 
+ * If the current notification.timeToSend was provided, creates a sentLog entry and resets timeToSend
+ * 
+ * @param {Date} [timeToSendToCheck] - Mark a specific tts as checked. If omitted, uses the most recent notification.timeToSend/notification.sentLog
+ */
+NotificationSchema.method('markAsChecked', function(timeToSendToCheck){
+  var notification = this,
+      timeToSendToCheckAsMilliseconds,
+      sentLogFound,
+      now = new Date(),
+      nowAsMilliseconds = now.valueOf();
+
+  if (!timeToSendToCheck){
+    
+    if (notification.timeToSend.valueOf() < nowAsMilliseconds){
+      timeToSendToCheck = notification.timeToSend;
+    } else if (notification.sentLogs.length > 0){
+      // notification.sentLogs are ordered by ascending timeToSend
+      timeToSendToCheck = notification.sentLogs[notification.sentLogs.length-1].timeToSend;
+    } else {
+      // else, no valid date to use
+      return;
+    }
+  }
+
+  timeToSendToCheckAsMilliseconds = timeToSendToCheck.valueOf();
+
+  sentLogFound = notification.sentLogs.some(function(sentLog){
+    if (sentLog.timeToSend.valueOf() === timeToSendToCheckAsMilliseconds){
+      sentLog.checked = true;
+    }
+  });
+  
+  if (!sentLogFound){
+    notification.sentLogs.push({
+      timeToSend : timeToSendToCheck,
+      checked : true
+    });
+  }
+
+  if(notification.timeToSend && notification.timeToSend.valueOf() === timeToSendToCheckAsMilliseconds){
+    notification.resetTimeToSend();
+  }
+
+});
+
+
+/**
+ * Resets notification's timeToSend to the next timeToSend, or null notification doesn't repeat
+ * 
+ * 
+ */
+NotificationSchema.method('resetTimeToSend', function(){
+  var notification = this,
+      now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
+      //tz = require('../lib/timezone-wrapper');
+      moment = require('moment');
+
+  if (notification.timeToSend && notification.repeat && notification.repeat.timezone && notification.repeat.duration && notification.repeat.durationType){
+    winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
+    // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
+    // if we've got notifications regularly being processed
+    //console.log('nowAsMilliseconds', nowAsMilliseconds);
+    //console.log('timeToSend start', notification.timeToSend.valueOf());
+    //console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+
+    while (notification.timeToSend.valueOf() < nowAsMilliseconds){
+      notification.timeToSend = moment(notification.timeToSend).add(notification.repeat.durationType, notification.repeat.duration).toDate();
+    } 
+  } else {
+    notification.timeToSend = null;
+  }
+});
 
 /**
  * Creates a hash of the pertinent Notification details:
@@ -607,6 +719,8 @@ NotificationSchema.method('getDisplays', function(options, callback){
  * notification that's active (tts is not null) or has recently been sent. 
  * If so, it returns that existing Notification.
  *
+ * If options.repeat is defined, must be greater than 1 day.
+ *
  * "Recently been sent" cutoff varies per trigger type.
  *
  * @param {Object} options : Properties of the NotificationModel object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
@@ -816,24 +930,13 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), " GOT RESPONSE FROM EMAIL TRANSPORT " + now);
                     if (err) { return iteratorCallback(err); }
                     
-                    notification.sentLogs.push({ts: now});
+                    notification.sentLogs.push({
+                      timeToSend: notification.timeToSend,
+                      emailedAt: now
+                    });
                     
-                    if (notification.repeat && notification.repeat.timezone && notification.repeat.duration && notification.repeat.durationType){
-                      winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
-                      // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-                      // if we've got notifications regularly being processed
-                      //console.log('nowAsMilliseconds', nowAsMilliseconds);
-                      //console.log('timeToSend start', notification.timeToSend.valueOf());
-                      //console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+                    notification.resetTimeToSend();
 
-                      while (notification.timeToSend.valueOf() < nowAsMilliseconds){
-                        //console.log(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
-                        notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
-                        //winston.info(notification.timeToSend.valueOf());
-                      } 
-                    } else {
-                      notification.timeToSend = null;
-                    }
                     winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " SAVING UPDATED NOTIFICATION DOCUMENT " + now);
                     notification.save(iteratorCallback);
                   });
