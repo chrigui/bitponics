@@ -386,7 +386,11 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()">' + 
+                      '<img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" />' +
+                      '<i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i>' + 
+                      '<div class="duration-abbrev" ng-hide="controlAction.overallDuration === 0">{{controlAction.overallDuration}}{{controlAction.overallDurationType.charAt(0)}}</div>' + 
+                    '</div>',
         controller : [
           '$scope', '$element', '$attrs', '$transclude',
           function ($scope, $element, $attrs, $transclude){
