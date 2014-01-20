@@ -541,6 +541,17 @@ require([
             }
             $scope.sharedDataService.activeOverlay = 'ActionOverlay' + action._id;
           }
+
+          $scope.close = function() {
+            console.log('should re-render graph?');
+            $scope.sharedDataService.activeOverlay = undefined; 
+          }
+
+          // $scope.$watch('sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl', function(){
+
+          //   console.log('should re-render graph');
+
+          // }, true);
         }
       ]
     );

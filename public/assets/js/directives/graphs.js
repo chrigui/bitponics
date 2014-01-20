@@ -438,7 +438,6 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
               i;
 
 
-          debugger;
           // disable data sorting & force all slices to be the same size
           pie
           .sort(null)
