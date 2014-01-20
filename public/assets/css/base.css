@@ -3444,6 +3444,7 @@ label.newsletter.inline {
   height: 4.25em;
   display: block !important;
   white-space: nowrap;
+  text-align: left;
 }
 .day-summary .photos li {
   float: none;
