@@ -5,7 +5,7 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
       
       ul.notifications-list
         li(ng-repeat="notification in recentNotifications.data", ng-class="getNotificationClass(notification)")
-          button.notification-button
+          button.notification-button(ng-click="markAsChecked(notification)")
             p.date {{notification | notificationDate}}
             p.garden(ng-show="notification.displays.json.garden.name") {{notification.displays.json.garden.name}} 
             p.summary {{notification.displays.summary}} 

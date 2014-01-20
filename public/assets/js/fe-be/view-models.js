@@ -773,5 +773,105 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     return action;
   };
 
+
+  
+  /**
+   * Initializes each notification as NotificationViewModel
+   * Sorts the array according to descending sort date
+   *
+   * @returns {Array.NotificationViewModel}
+   */
+  viewModels.initNotificationsViewModel = function(notifications){
+    var result = [];
+
+    result = notifications.map(function(notification){
+      return viewModels.initNotificationViewModel(notification);
+    });    
+
+    result = result.sort(function(notification1, notification2){
+      if (notification1.sortDateValue > notification2.sortDateValue){
+        return -1;
+      } else if (notification1.sortDateValue < notification2.sortDateValue){
+        return 1;
+      }
+      return 0;
+    });
+
+    return result;
+  };
+
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   * Makes changes in-place on provided object
+   *
+   * Converts the following properties to Date objects:
+   * - timeToSend
+   * - createdAt
+   * - updatedAt
+   * - sentLogs.timeToSend
+   * - sentLogs.emailedAt
+   * - sentLogs.checkedAt
+   * 
+   * Adds the following properties:
+   * - notification.sortDateValue {Number} - Date as milliseconds, computed from timeToSend & sentLogs, used when displaying lists of notifications
+   * - notification.checked {boolean} - true if the most recent timeToSend has a sentLogs entry and is marked as checked
+   *
+   * @param {NotificationServerModel} notification
+   *
+   * @returns {NotificationViewModel} - The modified Notification object.
+   */
+  viewModels.initNotificationViewModel = function(notification){
+    var checked = false,
+        now = new Date(),
+        nowAsMilliseconds = now.valueOf(),
+        notificationTimeToSendAsMilliseconds,
+        sortDate;
+
+    notification.timeToSend = notification.timeToSend ? new Date(notification.timeToSend) : undefined;
+    notification.createdAt = notification.createdAt ? new Date(notification.createdAt) : undefined;
+    notification.updatedAt = notification.updatedAt ? new Date(notification.updatedAt) : undefined;
+
+    if (notification.sentLogs && notification.sentLogs.length){
+      notification.sentLogs.forEach(function(sentLog){
+        sentLog.timeToSend = sentLog.timeToSend ? new Date(sentLog.timeToSend) : undefined;
+        sentLog.emailedAt = sentLog.emailedAt ? new Date(sentLog.emailedAt) : undefined;
+        sentLog.checkedAt = sentLog.checkedAt ? new Date(sentLog.checkedAt) : undefined;
+      });
+    }
+
+    notificationTimeToSendAsMilliseconds = (notification.timeToSend ? notification.timeToSend.valueOf() : undefined);
+
+    if (!notification.timeToSend){
+      if (notification.sentLogs.length){
+        checked = notification.sentLogs[notification.sentLogs.length-1].checked;
+        sortDate = notification.sentLogs[notification.sentLogs.length-1].timeToSend;
+      } else {
+        checked = true;
+      }
+    } else {
+      // Past timeToSend
+      if (notificationTimeToSendAsMilliseconds < nowAsMilliseconds){
+        checked = notification.sentLogs.some(function(sentLog){
+          return ( (sentLog.timeToSend.valueOf() === notificationTimeToSendAsMilliseconds) && sentLog.checked);
+        });
+
+        sortDate = notification.timeToSend;
+      } else {
+        // Future timeToSend
+        checked = (!!notification.sentLogs.length && notification.sentLogs[notification.sentLogs.length-1].checked);
+
+        sortDate = notification.sentLogs.length ? notification.sentLogs[notification.sentLogs.length-1].timeToSend : undefined;
+      }
+    }
+
+    notification.checked = checked;
+
+    notification.sortDateValue = sortDate ? sortDate.valueOf() : 0;
+
+    return notification;
+  };
+
+
   return viewModels;
 });

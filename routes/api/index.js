@@ -20,6 +20,7 @@ module.exports = function(app){
 	require('./light')(app);
   require('./lightBulb')(app);
 	require('./lightFixture')(app);
+  require('./notifications')(app);
 	require('./nutrient')(app);
   require('./plants')(app);
 	require('./sensor')(app);

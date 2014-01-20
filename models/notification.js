@@ -144,7 +144,7 @@ var NotificationSchema = new Schema({
 	 * Once a notification is sent and has no further repeats, this is set to null. 
 	 * To clear pending notifications, this field is queried for values <= now
 	 */ 
-	tts : { type: Date, default: Date.now, validate: dateValidationFns },
+	tts : { type: Date, validate: dateValidationFns },
 
 
 	/**
@@ -389,6 +389,7 @@ NotificationSchema.set('toObject', {
     if (doc.schema === NotificationSentLogSchema){
       delete ret.ts;
       delete ret.c;
+      delete ret.cA;
     } else {
       // else we're operating on the parent doc (the NotificationSchema doc)
       delete ret.u;
@@ -429,7 +430,7 @@ NotificationSchema.method('markAsChecked', function(timeToSendToCheck){
 
   if (!timeToSendToCheck){
     
-    if (notification.timeToSend.valueOf() < nowAsMilliseconds){
+    if (notification.timeToSend && (notification.timeToSend.valueOf() < nowAsMilliseconds)){
       timeToSendToCheck = notification.timeToSend;
     } else if (notification.sentLogs.length > 0){
       // notification.sentLogs are ordered by ascending timeToSend
@@ -445,6 +446,7 @@ NotificationSchema.method('markAsChecked', function(timeToSendToCheck){
   sentLogFound = notification.sentLogs.some(function(sentLog){
     if (sentLog.timeToSend.valueOf() === timeToSendToCheckAsMilliseconds){
       sentLog.checked = true;
+      return true;
     }
   });
   

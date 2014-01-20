@@ -11,6 +11,8 @@ define(
     'fe-be-utils',
     'bpn.services.nav',
     'bpn.services.user',
+    'bpn.services.notification',
+    'bpn.services.socket',
     'angularDialog'
 	],
   function (bpnControllers, feBeUtils) {
@@ -22,7 +24,9 @@ define(
         '$filter',
         '$compile',
         'UserModel',
-        function ($scope, $filter, $compile, UserModel) {
+        'NotificationModel',
+        function ($scope, $filter, $compile, UserModel, NotificationModel) {
+
           $scope.recentNotifications = $scope.$parent.ngDialogData;
           $scope.element = $scope.$parent.ngDialogElement;
           console.log('gettin in here', $scope, $scope.element, $scope.recentNotifications)
@@ -40,6 +44,11 @@ define(
             return classNames;
           };
 
+          $scope.markAsChecked = function(notification){
+            console.log('$scope.markAsChecked', notification);
+            NotificationModel.markAsChecked(notification);
+          };
+
         }
       ]
     );
@@ -52,10 +61,13 @@ define(
         'NavService',
         'UserModel',
         'ngDialog',
-        function ($scope, $filter, $compile, NavService, UserModel, ngDialog) {
+        'bpn.services.socket',
+        function ($scope, $filter, $compile, NavService, UserModel, ngDialog, socket) {
           // init
           $scope.settingsDisplayVisible = false;
           $scope.navMenuDisplayVisible = false;
+
+          $scope.socket = socket;
 
           $scope.toggleSettings = function(){
             $scope.settingsDisplayVisible = !$scope.settingsDisplayVisible;
@@ -104,7 +116,15 @@ define(
                   }
                 });
               }
-            );  
+            );
+
+            socket.connect('/new-notifications');
+            socket.emit('ready');
+            socket.on('new-notifications', function(data){
+              console.log('new-notifications socket update received', data);
+
+              
+            });
           }
           
         }
