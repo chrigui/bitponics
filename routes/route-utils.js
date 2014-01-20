@@ -1,3 +1,8 @@
+/**
+ * @module routes/route-utils
+ */
+
+
 module.exports = {
 	middleware : {
 		ensureLoggedIn : function(req, res, next){
@@ -144,7 +149,8 @@ module.exports = {
   /**
    * Check whether a user is allowed to read a certain piece of data
    * 
-   * Assumes resource has "owner" and "users" properties
+   * If resource is a UserModel object, returns true if user is object. 
+   * If resource is any other type of object, assumes resource has "owner", "users", or "createdBy" properties
    * Assumes resource.owner and resource.users[] contain ObjectIds, not populated User documents
    *
    * @param {Object} resource
@@ -157,8 +163,9 @@ module.exports = {
     if (resource.visibility === feBeUtils.VISIBILITY_OPTIONS.PUBLIC){
       return true;
     }
-    if (!user._id){ return false; }
     var userId = user._id;
+    if (!userId){ return false; }
+    if (resource._id && resource._id.toString() === userId.toString()) { return true; }
     return (  user.admin ||
               (resource.owner ? resource.owner.equals(userId) : false) || 
               (resource.createdBy ? resource.createdBy.equals(userId) : false) || 

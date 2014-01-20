@@ -58,7 +58,7 @@ module.exports = function(app) {
    *    console.log("Post response:"); console.dir(data); console.log(textStatus); console.dir(jqXHR);
    *  });
    */
-  app.post('/api/devices/', 
+  app.post('/api/devices', 
     routeUtils.middleware.ensureSecure, 
     routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
@@ -276,7 +276,7 @@ module.exports = function(app) {
                   try{
                     pendingDeviceLogs[key] = parseFloat(tempDeviceLogs[key]);
                   } catch(e){
-                    winston.error(e);
+                    winston.error(JSON.stringify(e));
                     delete pendingDeviceLogs[key];
                   }
                 }

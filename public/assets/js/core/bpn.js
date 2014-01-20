@@ -17,14 +17,15 @@ define([
 	'bpn.directives',
   'bpn.filters',
   'bpn.services',
-  'bpn.services.analytics'
+  'bpn.services.analytics',
+  'angularDialog' // had to include this so we could pass it to the angular module initializer. needed for nav controller
 	], 
 	function (angular) {
 		'use strict';
 
 		return angular.module(
 			'bpn', 
-			['bpn.controllers', 'bpn.directives', 'bpn.filters', 'bpn.services']).run(
+			['bpn.controllers', 'bpn.directives', 'bpn.filters', 'bpn.services', 'ngDialog']).run(
       [
         '$rootScope',
         'bpn.services.analytics',
@@ -34,8 +35,8 @@ define([
            *
            * Allows you to execute debug functions from the view
            */
-          $rootScope.log = function(variable) {
-            console.log(variable);
+          $rootScope.log = function() {
+            console.log.apply(console, [].slice.call(arguments, 0));
           };
           $rootScope.alert = function(text) {
             alert(text);

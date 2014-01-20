@@ -96,7 +96,7 @@ module.exports = {
 							  //.write(localFilePath, function (err) {
 							  	winston.info("CALLBACK FROM WRITING FILE TO TMP", localFilePath, fileMetaData);
 							    if (err) { 
-							    	winston.error("ERROR IN CALLBACK FROM WRITING FILE TO TMP ", err); 
+							    	winston.error("ERROR IN CALLBACK FROM WRITING FILE TO TMP " + JSON.stringify(err)); 
 							    	return iteratorCallback(err); 
 							    }
 
@@ -144,7 +144,7 @@ module.exports = {
 						};
 						fileQueue.push(fileList, function(err){
 							winston.info("FTP PHOTO FETCHER FINISHED PROCESSING A FILE");
-							if (err) { winston.error(err); }
+							if (err) { winston.error(JSON.stringify(err)); }
 						});
 					} else {
 						return innerCallback(err, []);
@@ -152,7 +152,7 @@ module.exports = {
 				}
 			],
 			function(err, result){
-				if (err){ winston.error(err); }
+				if (err){ winston.error(JSON.stringify(err)); }
 
 				return callback(err, result);
 			}

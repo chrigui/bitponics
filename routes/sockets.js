@@ -20,12 +20,11 @@ module.exports = function(app){
     io
     .of('/calibrate')
     .on('connection', function(socket){
-      var session = socket.handshake.session,
-          userId,
+      var user = socket.handshake.user,
           checkIntervalId;
 
-      if (!session){ return; }
-      userId = session.passport.user,
+      if (!user.logged_in){ return; }
+      //userId = session.passport.user,
 
       socket.on('disconnect', function () {
         clearInterval(checkIntervalId);
@@ -57,8 +56,11 @@ module.exports = function(app){
                 m : mode
               })
               .sort('-ts')
+              .limit(1)
               .exec(function (err, calibrationStatusLogResults){
-                if (err || (!(calibrationStatusLogResults && calibrationStatusLogResults.length))) { return; }
+                if (err) { return handleSocketError(err); }
+                if (!(calibrationStatusLogResults && calibrationStatusLogResults.length)) { return; }
+                
                 socket.emit(
                   'device_calibration_response', 
                   calibrationStatusLogResults[0]
@@ -87,8 +89,7 @@ module.exports = function(app){
                 type : type
               },
               function(err, newCalibrationLog){
-                // not going to do anything just yet. because I don't yet know what to do.
-                if (err) { winston.error(err);}
+                if (err) { return handleSocketError(err); }
               });  
             }
         }
@@ -101,8 +102,8 @@ module.exports = function(app){
     io
     .of('/setup')
     .on('connection', function(socket){
-      var session = socket.handshake.session,
-          userId = session.passport.user,
+      var //session = socket.handshake.session,
+          //userId = session.passport.user,
           checkIntervalId;
 
       socket.on('disconnect', function () {
@@ -119,10 +120,12 @@ module.exports = function(app){
         
         checkIntervalId = setInterval(function(){
           
-          UserModel.findById(userId)
+          UserModel.findById(socket.handshake.user._id)
           .select('deviceKeys')
           .exec(function (err, user){
-            if (err || !user) { return; }
+            if (err){ return handleSocketError(err); }
+            if (!user) { return; }
+
             socket.emit(
               'keys',
               user.deviceKeys
@@ -145,8 +148,8 @@ module.exports = function(app){
     io
     .of('/latest-grow-plan-instance-data')
     .on('connection', function(socket){
-      var session = socket.handshake.session,
-          userId = session.passport.user,
+      var //session = socket.handshake.session,
+          //userId = session.passport.user,
           checkIntervalId;
 
       socket.on('disconnect', function () {
@@ -171,7 +174,7 @@ module.exports = function(app){
               .exec(innerCallback);
             },
             function getUser(innerCallback){
-              UserModel.findById(userId)
+              UserModel.findById(socket.handshake.user._id)
               .select('admin')
               .exec(innerCallback);
             }
@@ -196,6 +199,7 @@ module.exports = function(app){
             clearInterval(checkIntervalId);
         
             checkIntervalId = setInterval(function(){
+              winston.info("SOCKET /latest-grow-plan-instance-data interval, " + user._id.toString() + ", gpi " + growPlanInstanceId);
               async.parallel(
                 [
                   function getSensorLogs(innerCallback){
@@ -295,7 +299,7 @@ module.exports = function(app){
                 }
               );
 
-            }, 10 * 1000);
+            }, 15 * 1000);
           }
         );
         
@@ -309,7 +313,7 @@ module.exports = function(app){
 
 
   function handleSocketError(err){
-    winston.info("SOCKET ERROR", err);
+    winston.error("SOCKET ERROR" + JSON.stringify(err));
     return;
   }
 };

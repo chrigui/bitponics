@@ -3,8 +3,8 @@
  * 
  * Include common shared directives
  */
-define(['angular'], 
-	function(angular) { 
+define(['angular', 'jquery', 'throttle-debounce'], 
+	function(angular, $) { 
 		'use strict'; 
 		var bpnDirectives = angular.module('bpn.directives', []);
 
@@ -60,7 +60,9 @@ define(['angular'],
             function ($scope, $element, $attrs, $transclude, $http, sharedDataService){
               $scope.$watch('sharedDataService.activeOverlay', function (newVal, oldVal) {
                 $scope.sharedDataService.activeOverlayPositionTop = angular.element($window)[0].scrollY;
-                $scope.setOverlayPosition();
+                if ($scope.sharedDataService.activeOverlay){
+                  $scope.setOverlayPosition();
+                }
               });
 
               $scope.setOverlayPosition = function() {
@@ -83,8 +85,10 @@ define(['angular'],
           ],
           link: function(scope, element, attrs, controller) {
             angular.element($window).bind("scroll", function() {
-              scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
-              scope.setOverlayPosition();
+              if (scope.sharedDataService.activeOverlay){
+                scope.sharedDataService.activeOverlayPositionTop = this.scrollY;
+                scope.setOverlayPosition();
+              }
             });
           }
         };

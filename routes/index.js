@@ -280,7 +280,7 @@ module.exports = function(app){
             });
 
             post_req.on('error', function(e) {
-              winston.error(e);
+              winston.error(JSON.stringify(e));
             });
 
             // post the data

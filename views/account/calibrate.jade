@@ -86,7 +86,7 @@ block footer-scripts
     
     h1 Calibrating your EC probe
     p 
-      | Calibrating EC is a 3-step process. You'll calibrate your probe to "dry", then to 3000&#956;S, and finally to 200&#956;S. And then you'll be all set!
+      | Calibrating EC is a 3-step process. You'll calibrate your probe to "dry", then to 3000&#956;S, and finally to 220&#956;S. And then you'll be all set!
 
     h2 Step 1
     p We'll start with EC-Dry. 
@@ -111,11 +111,11 @@ block footer-scripts
   script(type="text/ng-template", id="ec-lo.html")
     
     h2 Last Step
-    p Great! EC-Dry and EC-3000µS are done, onto EC-200&#956;S.
+    p Great! EC-Dry and EC-3000µS are done, onto EC-220&#956;S.
     ul
-      li You should have a bottle labeled "EC 200&#956;S". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
+      li You should have a bottle labeled "EC 220&#956;S". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes.
-    button(ng-click="showOverlay()") Calibrate EC-200&#956;S
+    button(ng-click="showOverlay()") Calibrate EC-220&#956;S
 
 
   script(type="text/ng-template", id="ec-done.html")

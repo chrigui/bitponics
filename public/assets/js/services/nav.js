@@ -6,8 +6,7 @@ define([
 
 		return bpnServices.factory('NavService', 
 			[
-				'$resource', 
-				function ($resource) {
+				function () {
 					return {
 						openGardenSettingsOverlay: false //closed by default
 					}
