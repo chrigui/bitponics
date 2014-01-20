@@ -97,6 +97,9 @@
 .no-margin-bottom {
   margin-bottom: 0;
 }
+.no-margin-left {
+  margin-left: 0;
+}
 .bottom-anchor {
   position: absolute;
 }

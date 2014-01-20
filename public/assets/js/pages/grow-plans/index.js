@@ -482,7 +482,7 @@ require([
         'bpn.services.analytics',
         function ($scope, $filter, sharedDataService, analytics) {
           $scope.sharedDataService = sharedDataService;
-
+          $scope.currentAction = false;
           
           /**
            * @param {Control=} [control] (optional)
@@ -539,7 +539,14 @@ require([
             if (!action){
               action = $scope.addAction(control);
             }
+            $scope.currentAction = action;
             $scope.sharedDataService.activeOverlay = 'ActionOverlay' + action._id;
+          }
+
+          $scope.close = function() {
+            console.log('should re-render graph?');
+            $scope.sharedDataService.activeOverlay = undefined;
+            $scope.currentAction = false;
           }
         }
       ]

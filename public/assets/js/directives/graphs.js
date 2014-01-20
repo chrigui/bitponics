@@ -386,7 +386,11 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
           controlAction : "=",
           eventHandler : '&customClick'
         },
-        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
+        template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()">' + 
+                      '<img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" />' +
+                      '<i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i>' + 
+                      '<div class="duration-abbrev" ng-hide="controlAction.overallDuration === 0">{{controlAction.overallDuration}}{{controlAction.overallDurationType.charAt(0)}}</div>' + 
+                    '</div>',
         controller : [
           '$scope', '$element', '$attrs', '$transclude',
           function ($scope, $element, $attrs, $transclude){
@@ -437,6 +441,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
               cycleGraphData = [],
               i;
 
+
           // disable data sorting & force all slices to be the same size
           pie
           .sort(null)
@@ -456,22 +461,21 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
             className = 'action';
           }
 
-          cycleStates = scope.controlAction.cycle.states.map(function(state){
-            return {
-              value : parseInt(state.controlValue, 10),
-              milliseconds : moment.duration(state.duration || 0, state.durationType || '').asMilliseconds()
-            }
-          });
-
           if (scope.controlAction.overallDurationInMilliseconds === 0){
             // then it's a single-state cycle with no duration (aka, just set to VALUE and leave forever)
             cyclesInADay = 1;
+            cycleGraphData = [{ value: 0, milliseconds: 0 }];
           } else {
+            cycleStates = scope.controlAction.cycle.states.map(function(state){
+              return {
+                value : parseInt(state.controlValue, 10),
+                milliseconds : moment.duration(state.duration || 0, state.durationType || '').asMilliseconds()
+              }
+            });
             cyclesInADay = dayMilliseconds / scope.controlAction.overallDurationInMilliseconds;
-          }
-          
-          for (i = 0; i < cyclesInADay; i++) {
-            cycleGraphData = cycleGraphData.concat(cycleStates);
+            for (i = 0; i < cyclesInADay; i++) {
+              cycleGraphData = cycleGraphData.concat(cycleStates);
+            }
           }
 
           arc

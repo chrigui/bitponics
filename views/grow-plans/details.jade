@@ -273,7 +273,7 @@ block head
                 ng-click="triggerActionOverlay(action)") 
                 
                 
-                //- div(data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
+                div(ng-if="!currentAction", data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
                 p {{action.description}}
               
                 div
