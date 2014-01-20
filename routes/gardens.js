@@ -52,9 +52,7 @@ module.exports = function(app){
 	
 	
 	/**
-	 * Show a "dashboard" view of a growPlanInstance
-	 * TODO : Hide/show elements in the dashboard.jade depending on
-	 * whether the req.user is the owner/permissioned member or not
+	 * Show a "dashboard" view of a garden
 	 */
 	app.get('/gardens/:growPlanInstanceId',
 		routeUtils.middleware.ensureSecure,
@@ -126,13 +124,43 @@ module.exports = function(app){
                     });
 									});
 								},
-								function getGrowPlan(innerInnerCallback){
-									ModelUtils.getFullyPopulatedGrowPlan({ _id: growPlanInstanceResult.growPlan }, function(err, growPlanResult){
-										if (err) { return innerInnerCallback(err); }
-										
-										growPlanInstanceResult.growPlan = growPlanResult[0];
-										return innerInnerCallback();
-									});
+								function getGrowPlans(innerInnerCallback){
+									// Need to use string representation of ObjectId so array.indexOf comparison will work
+                  var growPlansToGet = [growPlanInstanceResult.growPlan.toString()];
+
+                  if (growPlanInstanceResult.growPlanMigrations){
+                    growPlanInstanceResult.growPlanMigrations.forEach(function(growPlanMigration){
+                      if (growPlansToGet.indexOf(growPlanMigration.oldGrowPlan.toString()) === -1){
+                        growPlansToGet.push(growPlanMigration.oldGrowPlan.toString())
+                      }
+                    });
+                  }
+                  
+                  ModelUtils.getFullyPopulatedGrowPlan(
+                    { 
+                      _id: { 
+                        "$in" : growPlansToGet 
+                      }
+                    }, 
+                    function(err, growPlanResults){
+  										if (err) { return innerInnerCallback(err); }
+  										
+  										var growPlansById = {};
+                      growPlanResults.forEach(function(growPlan){
+                        growPlansById[growPlan._id] = growPlan;
+                      });
+
+                      growPlanInstanceResult.growPlan = growPlansById[growPlanInstanceResult.growPlan.toString()];
+
+                      if (growPlanInstanceResult.growPlanMigrations){
+                        growPlanInstanceResult.growPlanMigrations.forEach(function(growPlanMigration){
+                          growPlanMigration.oldGrowPlan = growPlansById[growPlanMigration.oldGrowPlan.toString()];
+                        });
+                      }
+                      
+  										return innerInnerCallback();
+  									}
+                  );
 								}
 							],
 							function gpiParallelFinal(err){
@@ -154,15 +182,13 @@ module.exports = function(app){
 		        		//TODO: make this sync
 		        		function notificationIterator(notification, iteratorCallback){
 			        		var notificationObject = notification.toObject();
-			        		notification.getDisplay(
+			        		notification.getDisplays(
 			        			{ 
 			        				secureAppUrl : app.config.secureAppUrl,
-			        				displayType : 'summary'
+			        				displayTypes : ['summary']
 			        			},
-			        			function (err, notificationDisplay){
-			        				notificationObject.displays = {
-					        			summary : notificationDisplay
-					        		};
+			        			function (err, notificationDisplays){
+			        				notificationObject.displays = notificationDisplays;
 					        		notificationsWithSummaries.push(notificationObject);
 			        				return iteratorCallback();
 			        			}

@@ -15,6 +15,10 @@ define([
     		  return {
     		  	connect : function(path){
     		  		socket = io.connect(path);
+
+              socket.on('error', function(err){
+                $rootScope.log('socket error', err);
+              });
     		  	},
     		  	disconnect : function(){
     		  		if (socket){

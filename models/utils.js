@@ -1,16 +1,23 @@
+/**
+ * @module models/Utils
+ */
+
 module.exports = {};
 
 /**
- * logSensorLog : Log a sensorLog to the sensorLog collection as well as the
+ * Log a sensorLog to the sensorLog collection as well as the
  * device.recentSensorLogs & growPlanInstance.recentSensorLogs. 
  * Verify against IdealRanges and trigger Actions if necessary.
  *
- * @param options.pendingSensorLog {Object} : object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to 
- *      the device's recentSensorLogs
- * @param options.growPlanInstance {GrowPlanInstance}: optional. GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
- * @param options.device {Device} : optional. Device Model instance on which to log this to recentSensorLogs
- * @param options.user {User} Only needs the timezone property populated.
- * @param callback {function(err)}
+ * @alias module:models/Utils.logSensorLog
+ * @function
+ * @static
+ * 
+ * @param {Object} options.pendingSensorLog - object in a format matching SensorLogSchema. gpid is optional, and if omitted, the log will only be logged to the device's recentSensorLogs
+ * @param {GrowPlanInstance} [options.growPlanInstance] - GrowPlanInstance model instance on which to log this to recentSensorLogs. Optional since we may want to log logs for a device during device setup, before there's been a GPI pairing.
+ * @param {Device} [options.device] - Device Model instance on which to log this to recentSensorLogs
+ * @param {User} options.user - Only needs the timezone property populated.
+ * @param {function(err)} callback 
  */
 module.exports.logSensorLog = function (options, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
@@ -166,6 +173,10 @@ module.exports.logSensorLog = function (options, callback){
 /**
  * Create a Notification and triggers an ImmediateAction if defined
  * Should only be called after verifying an IdealRange was violated.
+ *
+ * @alias module:models/Utils.processIdealRangeViolation
+ * @function
+ * @static
  * 
  * @param {IdealRange} options.idealRange : required
  * @param {Number} options.sensorValue : required
@@ -275,6 +286,10 @@ module.exports.processIdealRangeViolation = function (options, callback){
  * Trigger an immediate action. Can be called manually or because of an IdealRange violation.
  *
  * If there's an assumedociated control for the action, expires the override with the next iteration of an action cycle on the given control.
+ *
+ * @alias module:models/Utils.triggerImmediateAction
+ * @function
+ * @static
  *
  * @param {object} options  
  * @param {GrowPlanInstance} options.growPlanInstance : GrowPlanInstanceModel. Should have populated "owner" (just need timezone) 
@@ -473,6 +488,9 @@ module.exports.triggerImmediateAction = function (options, callback){
 
 /**
  *
+ * @alias module:models/Utils.scanForPhaseChanges
+ * @function
+ * @static
  */
 module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
   var GrowPlanInstanceModel = require('./growPlanInstance').model,
@@ -497,7 +515,7 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
     .populate('growPlan')
     .select('_id users growPlan phases')
     .exec(function(err, growPlanInstanceResults){
-      if (err) { winston.error( err ); return callback(err); }
+      if (err) { winston.error(JSON.stringify(err)); return callback(err); }
       if (!growPlanInstanceResults.length) { return callback(); }
 
       async.each(growPlanInstanceResults, 
@@ -555,6 +573,9 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
 
 /**
  *
+ * @alias module:models/Utils.checkDeviceConnections
+ * @function
+ * @static
  * @param {function(err, devicesAffected)} callback
  */
 module.exports.checkDeviceConnections = function(callback){
@@ -616,6 +637,11 @@ module.exports.checkDeviceConnections = function(callback){
  * Returns the ObjectId of the object, taking into account
  * whether the object is a populated Model or an ObjectId
  *
+ *
+ * @alias module:models/Utils.getObjectId
+ * @function
+ * @static
+ * 
  * @param object
  * @return ObjectId
  */
@@ -665,6 +691,10 @@ module.exports.getDocumentIdString = function(object){
  * 
  * @param query {Object} Mongoose query parameters.
  * @param callback {function} Function with the signature function(err, [GrowPlan]){}. "GrowPlan" param is an array of POJO GrowPlans.
+ *
+ * @alias module:models/Utils.getFullyPopulatedGrowPlan
+ * @function
+ * @static
  */
 module.exports.getFullyPopulatedGrowPlan = function(query, callback){
   var GrowPlanModel = require('./growPlan').growPlan.model,
@@ -828,6 +858,11 @@ module.exports.getFullyPopulatedGrowPlan = function(query, callback){
  * @param {DeviceKeySchema} settings.deviceKey : Instance from User.deviceKeys
  * @param {User} settings.device
  * @param {function(err, {device: Device, user: User})} callback 
+ *
+ *
+ * @alias module:models/Utils.assignDeviceToUser
+ * @function
+ * @static
  */
 module.exports.assignDeviceToUser = function(settings, callback){
   var Device = require('./device'),
@@ -888,13 +923,14 @@ module.exports.assignDeviceToUser = function(settings, callback){
  * TODO: IMPLEMENT THIS...
  * Pass in a doc and what fields you want populated with their data model
  * 
- * @param arrayOfObjects [Array] array of mongoose objects
- * @param fields [Array] array of object of form: 
- *        
- *      { 'key': key, 'dataModel': require('./someModel')}
+ * @param {Array} arrayOfObjects - array of mongoose objects
+ * @param {Array} fields - array of object of form: { 'key': key, 'dataModel': require('./someModel')}
+ * @param {function} callback - Function with the signature function(err, [Obj]){}. "Obj" param is a POJO.
  *
- * @param callback {function} Function with the signature function(err, [Obj]){}. "Obj" param is a POJO.
  *
+ * @alias module:models/Utils.populateObjArray
+ * @function
+ * @static
  */
 module.exports.populateObjArray = function(arrayOfDocs, fields, callback) {
   var 
@@ -966,6 +1002,9 @@ module.exports.populateObjArray = function(arrayOfDocs, fields, callback) {
 
 /**
  *
+ * @alias module:models/Utils.getModelFromCollectionName
+ * @function
+ * @static
  */
 module.exports.getModelFromCollectionName = function(collectionName) {
   var mongoose = require('mongoose'),

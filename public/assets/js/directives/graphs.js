@@ -20,48 +20,49 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
             restrict : "EA",
             template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
             replace : true,
-            controller : function ($scope, $element, $attrs, $transclude){
-              $scope.sharedDataService = sharedDataService;
-              $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
-              $scope.phaseAddString = "Add Phase";
-              $scope.getClasses = function(data, index){
-                var className = 'good';
-                // if (index == 0){ //first ring
-                //   className += " good";
-                // }
-                // if (index != 0){ //all other rings
-                //   className += " good";
-                // }
-                if (index == $scope.phases.length - 1) { //"add phase" ring (last)
-                  className += " add-phase"; 
-                }
-                if (index == $scope.sharedDataService.selectedPhaseIndex) {
-                  className += " active"; 
-                }
-                // console.log('index', index);
-                // console.log('$scope.sharedDataService.selectedPhaseIndex in getCLasses',$scope.sharedDataService.selectedPhaseIndex);
-                return className; 
-              };
-
-              $scope.$watch("sharedDataService.selectedPhaseIndex", function(newVal){
-                d3.select($element[0]).selectAll('path')
-                .attr('class', $scope.getClasses)
-                .each(function(d, i){
-                  /*
-                  if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
-                    var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
-                    d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
-                    
-                  } else {
-                    d3.select(this).attr('transform', '');
+            controller : [
+              '$scope', '$element', '$attrs', '$transclude',
+              function ($scope, $element, $attrs, $transclude){
+                $scope.sharedDataService = sharedDataService;
+                $scope.phases = $scope.sharedDataService.selectedGrowPlan.phases;
+                $scope.phaseAddString = "Add Phase";
+                $scope.getClasses = function(data, index){
+                  var className = 'good';
+                  // if (index == 0){ //first ring
+                  //   className += " good";
+                  // }
+                  // if (index != 0){ //all other rings
+                  //   className += " good";
+                  // }
+                  if (index == $scope.phases.length - 1) { //"add phase" ring (last)
+                    className += " add-phase"; 
                   }
-                  */
+                  if (index == $scope.sharedDataService.selectedPhaseIndex) {
+                    className += " active"; 
+                  }
+                  // console.log('index', index);
+                  // console.log('$scope.sharedDataService.selectedPhaseIndex in getCLasses',$scope.sharedDataService.selectedPhaseIndex);
+                  return className; 
+                };
+
+                $scope.$watch("sharedDataService.selectedPhaseIndex", function(newVal){
+                  d3.select($element[0]).selectAll('path')
+                  .attr('class', $scope.getClasses)
+                  .each(function(d, i){
+                    /*
+                    if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                      var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                      d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
+                      
+                    } else {
+                      d3.select(this).attr('transform', '');
+                    }
+                    */
+                  });
                 });
-              });
+              }
+            ],
 
-
-
-            },
             link: function (scope, element, attrs, controller) {
 
               $(element[0]).find('.icon-glyphlogo-new').css('font-size', $(element[0]).width()/15);
@@ -102,48 +103,66 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                 phases.forEach(function(phase, index) {
                   var arcNumber = ((phaseCount + 1) - index - 1),
                     className = 'phase' + index,
-                    phaseGroup;
+                    phaseGroup,
+                    startArc = d3.svg.arc(),
+                    completeArc = d3.svg.arc(),
+                    allArcs;
                   
-                  scope.defaultArc = d3.svg.arc();
-
-                  scope.defaultArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+                  
+                  completeArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
                     .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
 
-                  phaseGroup = svg.append('svg:g')
+
+                  startArc.outerRadius(completeArc.innerRadius()).innerRadius(completeArc.innerRadius());
+
+                  phaseGroup = svg
+                    .append('svg:g')
                     .classed(className, true)
                     .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
                   
-                  scope.allArcs = phaseGroup.selectAll('path')
+                  allArcs = phaseGroup.selectAll('path')
                     .data(equalPie([{}])); //empty ring
 
-                  scope.allArcs
-                    .enter()
-                    .append('svg:g')
-                    .append('svg:path')
-                    .attr('d', scope.defaultArc)
-                    .attr('class', scope.getClasses(null, index));
+                  if (scope.userInteracted) {
+                    allArcs
+                      .enter()
+                      .append('svg:g')
+                      .append('svg:path')
+                      .attr('d', completeArc)
+                      .attr('class', scope.getClasses(null, index));
+                  } else {
+                    allArcs
+                      .enter()
+                      .append('svg:g')
+                      .append('svg:path')
+                      .attr('d', startArc)
+                      .attr('class', scope.getClasses(null, index))
+                      .transition()
+                      .duration(500)
+                      .ease('quad-in-out')
+                      .delay(500 * (index + 1))
+                      .attr('d', completeArc);
+                  }
 
                   //labels
-                  scope.allArcs
+                  allArcs
                     .append("svg:text")
                     .attr("fill", function(d, i) { return '#ffffff'; } )
-                    // .style({ 'fill': 'white', 'font-size': '20px'})
-                    // .attr("stroke", function(d, i) { return '#00F5A3'; } )
                     .attr("transform", function(d) {
                       //we have to make sure to set these before calling arc.centroid
                       d.innerRadius = 0;
                       d.outerRadius = radius;
-                      return "translate(" + scope.defaultArc.centroid(d) + ")";
+                      return "translate(" + completeArc.centroid(d) + ")";
                     })
                     .attr("text-anchor", "middle")
                     .text(function(d, i) { return phase.name; });     
 
-                  scope.allArcs
+                  allArcs
                     .on('click', function (d, i) {
 
                       scope.$apply(function(){
                           //phase navigation
-
+                          scope.userInteracted = true;
                           scope.getClasses(null, index); //set active class
                           
                           scope.sharedDataService.selectedPhaseIndex = index;
@@ -171,7 +190,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                       
                     });
 
-                  scope.allArcs.select('text').on('click', function(d, i) {
+                  allArcs.select('text').on('click', function(d, i) {
                     console.log('clicked text');
                   });
 
@@ -196,34 +215,37 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
         restrict : "EA",
         template : '<div class="phases-graph ring-graph circle centered"><div class="icon-glyph icon-glyphlogo-new icon-__62_logo_00e36c"></div></div>',
         replace : true,
-        controller : function ($scope, $element, $attrs, $transclude, sharedDataService){
-          $scope.sharedDataService = sharedDataService;
-          $scope.phases = $scope.sharedDataService.gardenModel.phases;
-          
-          $scope.getDaySummaryClass = function(data){
-            var className = data.data.status;
-            if (data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
-              className += " active";
-            }
-            return className;
-          }
-
-          $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
-            d3.select($element[0]).selectAll('path')
-            .attr('class', $scope.getDaySummaryClass)
-            .each(function(d, i){
-              /*
-              if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
-                var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
-                d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
-                
-              } else {
-                d3.select(this).attr('transform', '');
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude', 'sharedDataService',
+          function ($scope, $element, $attrs, $transclude, sharedDataService){
+            $scope.sharedDataService = sharedDataService;
+            $scope.phases = $scope.sharedDataService.gardenModel.phases;
+            
+            $scope.getDaySummaryClass = function(data){
+              var className = data.data.status;
+              if (data.data.phase.active && data.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                className += " active";
               }
-              */
+              return className;
+            }
+
+            $scope.$watch("sharedDataService.activeDate.dateKey", function(newVal){
+              d3.select($element[0]).selectAll('path')
+              .attr('class', $scope.getDaySummaryClass)
+              .each(function(d, i){
+                /*
+                if (d.data.dateKey === $scope.sharedDataService.activeDate.dateKey){
+                  var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                  d3.select(this).attr('transform', 'translate(' + arc.centroid(d) + ') rotate(' + ( (angle * (180/Math.PI)) + 45) + ')');
+                  
+                } else {
+                  d3.select(this).attr('transform', '');
+                }
+                */
+              });
             });
-          });
-        },
+          }
+        ],
         link: function (scope, element, attrs, controller) {
           $(element[0]).find('.icon-glyphlogo-new').css('font-size',$(element[0]).width()/15).click(function(e){
             e.preventDefault();
@@ -261,26 +283,46 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
 
             phases.forEach(function(phase, index) {
               var arcNumber = (phaseCount - index - 1),
-                arc = d3.svg.arc(),
+                startArc = d3.svg.arc(),
+                completeArc = d3.svg.arc(),
+                allArcs,
+                arcData,
                 className = 'phase' + index,
                 phaseGroup;
 
-              arc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
+              completeArc.outerRadius(radius - (arcSpan * arcNumber) - arcMargin)
                 .innerRadius(radius - (arcSpan * (arcNumber + 1)) - arcMargin);
+
+              startArc.outerRadius(completeArc.innerRadius()).innerRadius(completeArc.innerRadius());
 
               phaseGroup = svg.append('svg:g')
                 .classed(className, true)
                 .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');
               
-              var allArcs = phaseGroup.selectAll('path')
-                .data(equalPie(phase.daySummaries));
+              arcData = phase.daySummaries.map(function(daySummary, index){
+                return {
+                  phase : phase,
+                  dateKey : daySummary.dateKey,
+                  status : daySummary.status,
+                  dayIndex : index
+                }
+              });
+
+              allArcs = phaseGroup.selectAll('path')
+                .data(equalPie(arcData));
 
               allArcs
                 .enter()
                 .append('svg:g')
                 .append('svg:path')
-                .attr('d', arc)
-                .attr('class', scope.getDaySummaryClass);
+                .attr('d', startArc)
+                .attr('class', scope.getDaySummaryClass)
+                .transition()
+                .duration(500)
+                .ease('quad-in-out')
+                .delay(500 * (index + 1))
+                .attr('d', completeArc);
+                
 
               allArcs
                 .on('click', function (d, i) {
@@ -288,7 +330,13 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
                   // Have to wrap this in a scope.$apply call because it occurs outside of the 
                   // Angular lifecycle, need to tell angular that it should refresh itself
                   scope.$apply(function(){
-                    scope.sharedDataService.targetActiveDate = d.data.dateKey;
+                    console.log(d.data);
+                    // TODO : we actually want to switch to some sort of "day summary" overlay rather
+                    // than updating the dashboard in-place with a new active date
+                    // d.data contains: { phase, dateKey, status, dayIndex }
+                    // So here we should launch the day summary overlay & pass it the phase, dayIndex & dateKey
+                    // Future phases don't have dateKeys, so we'll instead display just the dayIndex
+                    scope.sharedDataService.showDaySummaryOverlay(d.data);
                   });
                   
                   //var barberPoleCont = $('.barberPoleCont');
@@ -339,29 +387,32 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
           eventHandler : '&customClick'
         },
         template : '<div class="control ring-graph {{controlAction.control.className}}" ng-click="eventHandler()"><img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" /><i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i></div>',
-        controller : function ($scope, $element, $attrs, $transclude){
-          $scope.getPathClassName = function (data, index) {
-            var num = parseInt(data.data.value, 10);
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude',
+          function ($scope, $element, $attrs, $transclude){
+            $scope.getPathClassName = function (data, index) {
+              var num = parseInt(data.data.value, 10);
 
-            if (num == 0) {
-              return 'off';
-            } else {
-              return 'on';
+              if (num == 0) {
+                return 'off';
+              } else {
+                return 'on';
+              }
+            };
+
+            $scope.iconMap = {
+              'seedlingheatmat' : 'icon-__96_heatmat_00e36c',
+              'humidifier' : 'icon-__98_humidifier_00e36c',
+              'airconditioner' : 'icon-__92_ac_00e36c',
+              'heater' : 'icon-__94_heater_00e36c',
+              'fan' : 'icon-__83_fan_00e36c',
+              'waterpump' : 'icon-__88_waterpump_00e36c',
+              'light' : 'icon-__100_light_accessory_00e36c'
             }
-          };
 
-          $scope.iconMap = {
-            'seedlingheatmat' : 'icon-__96_heatmat_00e36c',
-            'humidifier' : 'icon-__98_humidifier_00e36c',
-            'airconditioner' : 'icon-__92_ac_00e36c',
-            'heater' : 'icon-__94_heater_00e36c',
-            'fan' : 'icon-__83_fan_00e36c',
-            'waterpump' : 'icon-__88_waterpump_00e36c',
-            'light' : 'icon-__100_light_accessory_00e36c'
+
           }
-
-
-        },
+        ],
         link: function (scope, element, attrs, controller) { 
           // link is where we have a created directive element as
           // well as populated scope to work with

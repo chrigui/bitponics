@@ -19,6 +19,7 @@ requirejs.config({
         'angular': './assets/js/libs/angular/1.2.0/angular.min.js?v=1383102804480',
         'angular-flexslider' : './assets/js/libs/angular-flexslider.js?v=1383102804480',
         'angular-mask' : './assets/js/libs/angular/mask.js?v=1383102804480',
+        'angularDialog' : './assets/js/libs/angular/ngDialog.js?v=1383102804480',
         'angularResource' : './assets/js/libs/angular/1.2.0/angular-resource.min.js?v=1383102804480',
         'angularRoute' : './assets/js/libs/angular/1.2.0/angular-route.min.js?v=1383102804480',
         'angularUI' : './assets/js/libs/angular/angular-ui.min.js?v=1383102804480',
@@ -76,6 +77,9 @@ requirejs.config({
             deps: [ ], 
             exports: 'angular' 
         }, 
+        'angularDialog': { 
+            deps: [ 'angular' ] 
+        },
         'angularRoute': { 
             deps: [ 'angular' ] 
         },

@@ -1,16 +1,12 @@
 README
 ======
 
+Environment Setup & Workflow:
+https://docs.google.com/a/bitponics.com/document/d/145qi_CohjhT_qwwhXuA3bZy65cpnOlgrVQ4cQ506baE/edit
 
-  - The Procfile is used when deployed to Heroku.
-  
-To push to heroku from dev to master:
->git push heroku dev:master
 
-To run:
-  - Update host file to have "127.0.0.1 bitponics.com"
-  - > mongod
-  - > sudo node-dev app.js
+To run tests, use the same command that's in package.json scripts.test:
+> ./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 ./test/back-end
 
-To run tests:
-> ./node_modules/.bin/mocha --reporter dot --recursive
+To run a specific test, use the grep flag:
+> ./node_modules/.bin/mocha --reporter spec --recursive --timeout 15000 --slow 50 ./test/back-end --grep "name of my test"

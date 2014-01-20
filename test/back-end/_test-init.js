@@ -8,7 +8,8 @@
  */
 var mongooseConnection = require('../../config/mongoose-connection').open('test'),
 	  exec = require('child_process').exec,
- 	  winston = require('winston');
+ 	  winston = require('winston'),
+    sinon = require('sinon');
 
 /*
  * before Method
@@ -17,7 +18,18 @@ var mongooseConnection = require('../../config/mongoose-connection').open('test'
  * code will not run every time an individual test is run.
  */
  before(function(done){
-  	// Connecting to a local test database or creating it on the fly
+  	// Stub email sender
+    var stub = sinon.stub(require("nodemailer"), "createTransport", function(){
+      console.log('returning mock nodemailer.createTransport')
+      return {
+        sendMail : function(options, callback){
+          console.log('calling mock sendMail')
+          return callback();
+        }
+      }
+    });
+
+    // Connecting to a local test database or creating it on the fly
   	exec('db_init test clear', 
   		function (error, stdout, stderr){
   			if (error) { console.log(error); return done(new Error(error));}

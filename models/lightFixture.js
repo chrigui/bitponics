@@ -1,3 +1,7 @@
+/**
+ * @module models/LightFixture
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -118,5 +122,14 @@ LightFixtureSchema.static('createNewIfUserDefinedPropertiesModified', function(o
 /*********************** END STATIC METHODS **************************/
 
 
+/**
+ * @type {Schema}
+ */
 exports.schema = LightFixtureSchema;
+
+/**
+ * @constructor
+ * @alias module:models/LightFixture.LightFixtureModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('LightFixture', LightFixtureSchema);

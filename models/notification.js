@@ -1,3 +1,7 @@
+/**
+ * @module models/Notification
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -420,14 +424,16 @@ NotificationSchema.method('ensureHash', function(){
 /**
  * Returns the Notification populated into the specified display template
  *
- * 'summary' and 'detail' return strings.
+ * 'summary' returns a string
+ * 'detail' returns string of html
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
+ * 'json' returns the data retrieved for template population (garden, actions, growPlans, etc). For now just returns garden...no use cases yet to return everything & the data gets massive
  *
- * @param {'email'|'summary'|'detail'} options.displayType
+ * @param {array[string]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
- * @param {function(err, display)} callback
+ * @param {function(err, displays)} callback - Passed an object of displays keyed by displayType
  */
-NotificationSchema.method('getDisplay', function(options, callback){
+NotificationSchema.method('getDisplays', function(options, callback){
   var notification = this,
       ActionModel = require('./action').model,
       GrowPlanModel = require('./growPlan').growPlan.model,
@@ -443,7 +449,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
         ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
         secureAppUrl : options.secureAppUrl
       },
-      notificationDisplay;
+      notificationDisplays = {};
 
   
   async.waterfall(
@@ -488,7 +494,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
               });
             },
             function populateGrowPlan(innerCallback){
-              if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
+              if (!notification.gpi || !notification.triggerDetails.gpPhaseId){ return innerCallback(); }
 
               GrowPlanModel.findById(notification.gpi.growPlan)
               .exec(function(err, growPlanResult){
@@ -544,33 +550,48 @@ NotificationSchema.method('getDisplay', function(options, callback){
           
       // At this point, notificationTemplateLocals is fully populated
       // 2013-08-22 AK: Getting occasional errors that I don't have time to fully debug, just wrapping things in a try/finally to ensure execution continues
-      try {
-        switch(options.displayType){
-          case 'email':
-            notificationDisplay = {
-              subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-              bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-              bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-            };
-            break;
-          case 'summary':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-            break;
-          case 'detail':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-            break;
+
+      options.displayTypes.forEach(function(displayType){
+        var notificationDisplay,
+            err;
+
+        try {
+          switch(displayType){
+            case 'email':
+              notificationDisplay = {
+                subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+              };
+              break;
+            case 'summary':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+              break;
+            case 'detail':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+              break;
+            case 'json':
+              notificationDisplay = {
+                garden: {
+                  _id : notificationTemplateLocals.notification.growPlanInstance._id,
+                  name : notificationTemplateLocals.notification.growPlanInstance.name
+                }
+              };
+          }
+        } catch(e){
+          winston.error(JSON.stringify(e));
         }
-      } catch(e){
-        winston.error(e);
-      } finally {
-        //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
+
         if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
           console.log("Error populating EJS notification template for " + notification._id.toString());
           console.log(JSON.stringify(notificationTemplateLocals));
           err = new Error("Error populating EJS notification template for " + notification._id.toString());
         }
-        return callback(err, notificationDisplay);  
-      }
+
+        notificationDisplays[displayType] = notificationDisplay; 
+      });
+
+      return callback(err, notificationDisplays);
     }
   );
 });
@@ -596,6 +617,12 @@ NotificationSchema.static('create', function(options, callback){
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
   
+  //do not create notifications with repeat of less than 1 day
+  if (options.repeat && feBeUtils.isLessThanOneDay(options.repeat.duration, options.repeat.durationType)) {
+    winston.info('not saving this notification due to repeat less than 1 day');
+    return callback();
+  }
+
   var newNotification = new NotificationModel(options),
       sentCutoff;
 
@@ -653,7 +680,7 @@ NotificationSchema.static('expireAllGrowPlanInstanceNotifications', function(gro
  *
  * Gets Notifications with "timeToSend" in the past, sends them, then resets "timeToSend"
  *
- * @param {'local'|'development'|'staging'|'production'} options.env
+ * @param {string} options.env - must be one of 'local'|'development'|'staging'|'production'
  * @param {function(err, numberResultsAffected)} callback
  */
 NotificationSchema.static('clearPendingNotifications', function (options, callback){
@@ -688,7 +715,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
   .find()
   .where('tts')
   .lte(now)
-  .populate('u', 'email') // only need the email field for Users
+  .populate('u', 'email notificationPreferences')
   .populate('gpi')
   .exec(function(err, notificationResults){
     if (err) { return callback(err); }
@@ -698,7 +725,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
     //return callback(null, notificationResults.length);
 
     winston.info("IN clearPendingNotifications, db " + NotificationModel.db.name);
-    winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS');
+    winston.info('IN clearPendingNotifications, PROCESSING ' + notificationResults.length + ' RESULTS ' + now);
 
     var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
     
@@ -711,25 +738,44 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           
           var notificationIterator = function (notification, iteratorCallback){
             winston.info("PROCESSING NOTIFICATION " + notification._id.toString());
+            
+            var shouldNotSendEmailNotification = function (notification) {
+              return (notification.type === feBeUtils.NOTIFICATION_TYPES.INFO) ||
+                (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION && typeof notification.triggerDetails.cycleStateIndex !== 'undefined') ||
+                (feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType))
+            };
+            winston.info("EMAIL NOTIFICATION?");
+            if (shouldNotSendEmailNotification(notification)) {
+              winston.info("DID NOT SEND EMAIL NOTIFICATION " + notification._id.toString());
+              winston.info("notification.repeat.duration: " + notification.repeat.duration);
+              winston.info("notification.repeat.durationType: " + notification.repeat.durationType);
+              console.log(feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType));
+              return iteratorCallback();
+            }
+            winston.info("YES");
+
             // Populate trigger details
-            notification.getDisplay(
+            notification.getDisplays(
               {
                 secureAppUrl : secureAppUrl,
-                displayType : 'email'
+                displayTypes : ['email']
               },
-              function(err, notificationDisplay){
+              function(err, notificationDisplays){
                 if (err) { return iteratorCallback(err); }
 
-                winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION DISPLAY");
+                winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION DISPLAY " + now);
 
                 var emailTemplateLocals = {
-                  emailSubject : notificationDisplay.subject,
-                  emailBodyHtml : notificationDisplay.bodyHtml,
-                  emailBodyText : notificationDisplay.bodyText,
+                  emailSubject : notificationDisplays.email.subject,
+                  emailBodyHtml : notificationDisplays.email.bodyHtml,
+                  emailBodyText : notificationDisplays.email.bodyText,
                   subscriptionPreferencesUrl : subscriptionPreferencesUrl,
                   appUrl : appUrl
-                },
-                users = notification.users;
+                },  
+                users = notification.users,
+                filteredUsers = users.filter(function(user) { 
+                  return user.notificationPreferences.email;
+                });
 
                 // TEMP HACK : special alert for hyatt device
                 try {
@@ -740,25 +786,25 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                       
                       winston.info('IN clearPendingNotifications, special case adding bitponics team');
                       // TEMP HACK : remove Hyatt from email notifications
-                      users = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
+                      filteredUsers = [{email : 'amit@bitponics.com'}, { email : 'michael@bitponics.com'}, {email : 'jack@bitponics.com'}];
                       emailTemplateLocals.emailSubject = "HYATT DEVICE CONNECTION DROPPED";
                     }
                   }
                 } catch(e){
-                  winston.error(e.toString());
+                  winston.error(JSON.stringify(e));
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
-                // users = [{email : 'jack@bitponics.com'}];
+                // filteredUsers = [{email : 'jack@bitponics.com'}];
 
                 runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
-                  winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT NOTIFICATION EMAIL TEMPLATE POPULATED");
+                  winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION EMAIL TEMPLATE POPULATED " + now);
 
                   if (err) { return iteratorCallback(err); }
 
                   var mailOptions = {
                     from: "notifications@bitponics.com",
-                    to: users.map(function(user) { return user.email; }).join(', '),
+                    to: filteredUsers.map(function(user) { return user.email; }).join(', '),
                     subject: emailTemplateLocals.emailSubject,
                     text: finalEmailText,
                     html: finalEmailHtml
@@ -767,7 +813,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                   winston.info("IN clearPendingNotifications, ATTEMPTING TO SEND EMAIL NOTIFICATION TO " + mailOptions.to);
                   
                   emailTransport.sendMail(mailOptions, function(err, response){
-                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "GOT RESPONSE FROM EMAIL TRANSPORT");
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), " GOT RESPONSE FROM EMAIL TRANSPORT " + now);
                     if (err) { return iteratorCallback(err); }
                     
                     notification.sentLogs.push({ts: now});
@@ -788,7 +834,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     } else {
                       notification.timeToSend = null;
                     }
-                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), "SAVING UPDATED NOTIFICATION DOCUMENT");
+                    winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " SAVING UPDATED NOTIFICATION DOCUMENT " + now);
                     notification.save(iteratorCallback);
                   });
                 });
@@ -807,8 +853,8 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           var notificationResultProcessingQueue = async.queue(notificationIterator, 5);
           notificationResultProcessingQueue.drain = notificationProcessingEnded;
           notificationResultProcessingQueue.push(notificationResults, function(err){
-            winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION");
-            if (err) { winston.error(err); }
+            winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION " + now);
+            if (err) { winston.error(JSON.stringify(err));}
           });
         }
       ],
@@ -821,7 +867,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
 
 
 /**
- *
+ * TODO: doc
  */
 NotificationSchema.pre('save', function(next){
   // Since triggerDetails is a Mixed type, mongoose can't auto-detect whether it's modified.
@@ -837,8 +883,18 @@ NotificationSchema.pre('save', function(next){
 NotificationSchema.index({ 'tts': -1 }, { sparse : true });
 // Compound index on gpi+tts. Won't get expensive since all sent items will collapse into a single index entry of gpi+null
 NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
+NotificationSchema.index({ 'u' : 1, 'tts': -1}, { sparse : true } );
 NotificationSchema.index({ 'h' : 1, 'sl.ts' : -1 });
 
 
+/**
+ * @type {Schema}
+ */
 exports.schema = NotificationSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Notification.NotificationModel
+ * @type {Model}
+ */
 exports.model = NotificationModel = mongooseConnection.model('Notification', NotificationSchema);

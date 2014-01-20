@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: growPlan/phase.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: growPlan/phase.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
+ * @module models/GrowPlan/Phase
+ */
+
+var mongoose = require('mongoose'),
+	mongoosePlugins = require('../../lib/mongoose-plugins'),
+	Schema = mongoose.Schema,
+	ObjectIdSchema = Schema.ObjectId,
+  ObjectId = mongoose.Types.ObjectId,
+	IdealRangeSchema = require('./idealRange').schema,
+	async = require('async'),
+	ActionModel = require('../action').model,
+  GrowSystemModel = require('../growSystem').model,
+  NutrientModel = require('../nutrient').model,
+  LightModel = require('../light').model,
+  getObjectId = require('../utils').getObjectId,
+  requirejs = require('../../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils');
+
+var PhaseSchema = new Schema({
+	
+	name: { type: String, required: false },
+	
+	description: { type: String },
+
+	/**
+	 * expectedNumberOfDays. undefined means infinite.
+	 */
+	expectedNumberOfDays: { type: Number },
+	
+	/**
+	 * Light definition. Optional. Defines fixtures, bulbs, and quantities.
+	 */
+	light: { type : ObjectIdSchema, ref: 'Light'	},
+
+	growSystem: { type: ObjectIdSchema, ref: 'GrowSystem' },
+	
+	growMedium: { type: String },
+
+	actions: [{ type: ObjectIdSchema, ref: 'Action' }],
+	
+	phaseEndActions : [{ type: ObjectIdSchema, ref: 'Action'}],
+
+	phaseEndDescription : { type : String },
+
+	idealRanges: [IdealRangeSchema],
+
+	nutrients : [{ type: ObjectIdSchema, ref: 'Nutrient' }],
+},
+{ id : false });
+
+/************************** INSTANCE METHODS  ***************************/
+
+
+// TODO : Add validation on save. 
+// Validation rules:
+// Max 1 idealRange per sensor. 
+
+/*********************** END INSTANCE METHODS *************************/
+
+
+
+/*********************** STATIC METHODS ******************************/
+
+/**
+ * Given 2 Phase objects, determine whether they're equivalent.
+ * Assumes fully-populated Phase objects.
+ * Comparing only user-defined properties.
+ * 
+ * @param {Phase} source : Fully-populated Phase object
+ * @param {Phase} other : Fully-populated Phase object
+ * @param {function(err, bool)} callback : Function to be called with result. Passed a boolean argument,
+ * 					true if the objects are equivalent, false if not
+ *
+ */
+PhaseSchema.static('isEquivalentTo', function(source, other, callback){
+	// compare name
+	if (source.name !== other.name) { return callback(null, false); }
+
+	// compare description
+	if (source.description !== other.description) { return callback(null, false); }
+
+	// compare expectedNumberOfDays
+	if (source.expectedNumberOfDays !== other.expectedNumberOfDays) { return callback(null, false); }
+
+	// compare growMedium
+	if (source.growMedium !== other.growMedium) { return callback(null, false); }	
+
+
+	// compare phaseEndDescription
+	if (source.phaseEndDescription !== other.phaseEndDescription) { return callback(null, false); }		
+
+  // compare growSystem, shallow
+  if ( !(
+      (source.growSystem && other.growSystem)
+      ||
+      (!source.growSystem && !other.growSystem)
+      )
+    )
+  { 
+    return callback(null, false); 
+  }
+  if (source.growSystem){
+    var thisGrowSystemId = getObjectId(source.growSystem),
+      otherGrowSystemId = getObjectId(other.growSystem);
+    if (!thisGrowSystemId.equals(otherGrowSystemId)){
+      return callback(null, false);
+    }
+  }
+	// compare light, shallow
+	if (!(
+		(source.light && other.light)
+		||
+		(!source.light && !other.light)
+		)){ 
+		return callback(null, false); 
+	}
+	if (source.light){
+		if ( !(
+			(source.light.fixture && other.light.fixture) ||
+			(!source.light.fixture && !other.light.fixture)
+		 )
+		){ 
+			return callback(null, false); 
+		}
+		if ( !(
+			(source.light.bulb && other.light.bulb) ||
+			(!source.light.bulb && !other.light.bulb)
+		 )
+		){ 
+			return callback(null, false); 
+		}
+		if ( source.light.fixtureQuantity !== other.light.fixtureQuantity)
+		{ 
+			return callback(null, false); 
+		}
+	}
+
+	// compare actions, shallow
+	if ( !(
+			(source.actions && other.actions) ||
+			(!source.actions && !other.actions)
+		 )
+		){ 
+		return callback(null, false); 
+	}
+	if (source.actions && other.actions && (source.actions.length !== other.actions.length)){
+		return callback(null, false);
+	}
+
+	// compare phaseEndActions, shallow
+	if ( !(
+			(source.phaseEndActions && other.phaseEndActions) ||
+			(!source.phaseEndActions && !other.phaseEndActions)
+		 )
+		){ 
+		return callback(null, false); 
+	}
+	if (source.phaseEndActions && other.phaseEndActions && (source.phaseEndActions.length !== other.phaseEndActions.length)){
+		return callback(null, false);
+	}
+
+
+	// compare idealRanges, shallow
+	if ( !(
+			(source.idealRanges && other.idealRanges) ||
+			(!source.idealRanges && !other.idealRanges)
+		 )
+		){ 
+		return callback(null, false); 
+	}
+	if (source.idealRanges && other.idealRanges && (source.idealRanges.length !== other.idealRanges.length)){
+		return callback(null, false);
+	}
+	
+
+	// compare nutrients, shallow
+	if ( !(
+			(source.nutrients && other.nutrients) ||
+			(!source.nutrients && !other.nutrients)
+		 )
+		){ 
+		return callback(null, false); 
+	}
+	if (source.nutrients && other.nutrients && (source.nutrients.length !== other.nutrients.length)){
+		return callback(null, false);
+	}
+	
+	async.parallel(
+		[
+      function growSystemComparison(innerCallback){
+        if (!source.growSystem){ return innerCallback(null, true); }
+        return innerCallback(null, GrowSystemModel.isEquivalentTo(source.growSystem, other.growSystem));
+      },
+      function lightComparison(innerCallback){
+				if (!source.light){ return innerCallback(null, true); }
+
+				if (source.light.fixture){
+					var sourceLightFixtureId = getObjectId(source.light.fixture),
+						otherLightFixtureId = getObjectId(other.light.fixture);
+					if (!sourceLightFixtureId.equals(otherLightFixtureId)){
+						return innerCallback(null, false);
+					}
+				}
+				if (source.light.fixtureQuantity !== other.light.fixtureQuantity){
+					return innerCallback(null, false);
+				}
+				if (source.light.bulb){
+					var sourceLightBulbId = getObjectId(source.light.bulb),
+						otherLightBulbId = getObjectId(other.light.bulb);
+					if (!sourceLightBulbId.equals(otherLightBulbId)){
+						return innerCallback(null, false);
+					}
+				}
+				return innerCallback(null, true);
+			},
+			function actionsComparison(innerCallback){
+				if (!source.actions || !source.actions.length) { return innerCallback(null, true); }
+
+				var allActionsFound = true;
+				for (var i = 0, length = source.actions.length; i &lt; length; i++){
+					var action = source.actions[i],
+						actionFound = false;
+					for (var j = 0; j &lt; length; j++){
+						var otherAction = other.actions[j];
+						if (ActionModel.isEquivalentTo(action, otherAction)) {
+							actionFound = true;
+							break;
+						}
+					}
+					if (!actionFound) { 
+						allActionsFound = false;
+						break;
+					}
+				}
+				if (!allActionsFound){
+					return innerCallback(null, false);
+				}
+				return innerCallback(null, true);
+			},
+			function phaseEndActionsComparison(innerCallback){
+				if (!source.phaseEndActions || !source.phaseEndActions.length) { return innerCallback(null, true); }
+
+				var allActionsFound = true;
+				for (var i = 0, length = source.phaseEndActions.length; i &lt; length; i++){
+					var action = source.phaseEndActions[i],
+						actionFound = false;
+					for (var j = 0; j &lt; length; j++){
+						var otherAction = other.phaseEndActions[j];
+						if (ActionModel.isEquivalentTo(action, otherAction)){
+							actionFound = true;
+							break;
+						}
+					}
+					if (!actionFound) { 
+						allActionsFound = false;
+						break;
+					}
+				}
+				if (!allActionsFound){
+					return innerCallback(null, false);
+				}
+				return innerCallback(null, true);	
+			},
+			function idealRangesComparison(innerCallback){
+				if (!source.idealRanges || !source.idealRanges.length) { return innerCallback(null, true); }
+
+				var allIdealRangesFound = true;
+				for (var i = 0, length = source.idealRanges.length; i &lt; length; i++){
+					var idealRangeFound = false;
+					for (var j = 0; j &lt; length; j++){
+						if (IdealRangeSchema.statics.isEquivalentTo(source.idealRanges[i], other.idealRanges[j])){
+							idealRangeFound = true;
+							break;
+						}
+					}
+					if (!idealRangeFound) { 
+						allIdealRangesFound = false;
+						break;
+					}
+				}
+				if (!allIdealRangesFound){
+					return innerCallback(null, false);
+				}
+				return innerCallback(null, true);
+			},
+			function nutrientsComparison(innerCallback){
+				if (!source.nutrients || !source.nutrients.length) { return innerCallback(null, true); }
+
+				var allNutrientsFound = true;
+				for (var i = 0, length = source.nutrients.length; i &lt; length; i++){
+					var nutrientId = getObjectId(source.nutrients[i]),
+						nutrientFound = false;
+					for (var j = 0; j &lt; length; j++){
+						var otherNutrientId = getObjectId(other.nutrients[j]);
+						if (nutrientId.equals(otherNutrientId)){
+							nutrientFound = true;
+							break;
+						}
+					}
+					if (!nutrientFound) { 
+						allNutrientsFound = false;
+						break;
+					}
+				}
+				if (!allNutrientsFound){
+					return innerCallback(null, false);
+				}
+				return innerCallback(null, true);	
+			}
+		],
+		function parallelComparisonEnd(err, results){
+      var allAsyncEquivalenceChecksPassed = results.every(function(result){ return result; });
+			return callback(err, allAsyncEquivalenceChecksPassed);
+		}
+	);
+});
+
+
+/**
+ * Takes a fully-populated Phase object (such as is submitted from grow-plans creation page)
+ * and, for all nested documents (actions, nutrients, growSystem, light, idealRanges), creates them if they don't match existing DB entries
+ * Then returns Phase object
+ * 
+ * @param {object} options.phase
+ * @param {User} options.user : used to set "createdBy" field for new objects
+ * @param {VISIBILITY_OPTION} options.visibility : used to set "visibility" field for new objects. value from fe-be-utils.VISIBILITY_OPTIONS
+ * @param {bool} options.silentValidationFail : if true: if components fail validation, simply omit them from the created object instead of returning errors up the chain.
+ * @param {bool} options.attemptInPlaceEdit : passed in from GrowPlan.createNewIfUserDefinedPropertiesModified. if true: make all changes in-place (don't create a new _id). else, normal behavior.
+ * @param {function(err, Phase)} callback
+ */
+PhaseSchema.static('createNewIfUserDefinedPropertiesModified', function(options, callback){
+  var submittedPhase = options.phase,
+      user = options.user,
+      visibility = options.visibility,
+      silentValidationFail = options.silentValidationFail;
+
+  if (!feBeUtils.canParseAsObjectId(submittedPhase._id)){
+    submittedPhase._id = new ObjectId();
+  }
+
+  async.parallel(
+    [
+      function validateActions(innerCallback){
+        var validatedActions = [];
+
+        if (!submittedPhase.actions && submittedPhase.actions.length){ return innerCallback(); }
+        
+        async.forEach(submittedPhase.actions, 
+          function validateAction(action, actionCallback){
+            ActionModel.createNewIfUserDefinedPropertiesModified({
+              action : action,
+              user : user,
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
+            },
+            function(err, validatedAction){
+              if (validatedAction){
+                validatedActions.push(validatedAction._id);
+              }
+              if (silentValidationFail){
+                if (err) { winston.error(JSON.stringify(err)); }
+                return actionCallback();  
+              }
+              return actionCallback(err);
+            });
+          },
+          function actionLoopEnd(err){
+            submittedPhase.actions = validatedActions;
+            return innerCallback(err);
+          }
+        );
+      },
+      function validatePhaseEndActions(innerCallback){
+        var validatedActions = [];
+
+        async.forEach(submittedPhase.phaseEndActions, 
+          function validateAction(action, actionCallback){
+            ActionModel.createNewIfUserDefinedPropertiesModified({
+              action : action,
+              user : user,
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
+            },
+            function(err, validatedAction){
+              if (validatedAction){
+                validatedActions.push(validatedAction._id);  
+              }
+              if (silentValidationFail){
+                if (err) { winston.error(JSON.stringify(err)); }
+                return actionCallback();  
+              }
+              return actionCallback(err);
+            });
+          },
+          function actionLoopEnd(err){
+            submittedPhase.phaseEndActions = validatedActions;
+            return innerCallback(err);
+          }
+        );
+      },
+      function validateGrowSystem(innerCallback){
+        if (!submittedPhase.growSystem){ return innerCallback(); }
+        
+        GrowSystemModel.createNewIfUserDefinedPropertiesModified(
+          {
+            growSystem : submittedPhase.growSystem,
+            user : user,
+            visibility : visibility,
+            silentValidationFail : silentValidationFail
+          },
+          function(err, validatedGrowSystem){
+            if (validatedGrowSystem){
+              submittedPhase.growSystem = validatedGrowSystem._id;  
+            }
+            if (silentValidationFail){
+              if (err) { winston.error(JSON.stringify(err)); }
+              return innerCallback();   
+            }
+            return innerCallback(err);
+          }
+        );
+      },
+      function validateNutrients(innerCallback){
+        if (!(submittedPhase.nutrients && submittedPhase.nutrients.length)) { return innerCallback(); }
+
+        var validatedNutrients = [];
+
+        async.forEach(submittedPhase.nutrients, 
+          function validateNutrient(nutrient, nutrientCallback){
+            NutrientModel.createNewIfUserDefinedPropertiesModified({
+              nutrient : nutrient,
+              user : user,
+              visibility : visibility,
+              silentValidationFail : silentValidationFail
+            },
+            function(err, validatedNutrient){
+              if (validatedNutrient){
+                validatedNutrients.push(validatedNutrient._id);
+              }
+              if (silentValidationFail){
+                if (err) { winston.error(JSON.stringify(err)); }
+                return nutrientCallback();  
+              }
+              return nutrientCallback(err);
+            });
+          },
+          function nutrientLoopEnd(err){
+            submittedPhase.nutrients = validatedNutrients;
+            return innerCallback(err);
+          }
+        );
+      },
+      function validateLight(innerCallback){
+        if (!submittedPhase.light){ return innerCallback(); }
+
+        LightModel.createNewIfUserDefinedPropertiesModified(
+          {
+            light : submittedPhase.light,
+            user : user,
+            visibility : visibility,
+            silentValidationFail : silentValidationFail
+          },
+          function(err, validatedLight){
+            if (validatedLight){
+              submittedPhase.light = validatedLight._id;  
+            }
+            if (silentValidationFail){
+              if (err) { winston.error(JSON.stringify(err)); }
+              return innerCallback();  
+            }
+            return innerCallback(err);
+          }
+        );
+      },
+      function validateIdealRanges(innerCallback){
+        var validatedIdealRanges = [];
+
+        async.forEach(submittedPhase.idealRanges, 
+          function (idealRange, idealRangeCallback){
+            IdealRangeSchema.statics.createNewIfUserDefinedPropertiesModified(
+              {
+                idealRange : idealRange,
+                user : user,
+                visibility : visibility,
+                silentValidationFail : silentValidationFail
+              }, 
+              function(err, validatedIdealRange){
+                if (validatedIdealRange){
+                  validatedIdealRanges.push(validatedIdealRange);
+                }
+                if (silentValidationFail){
+                  if (err) { winston.error(JSON.stringify(err)); }
+                  return idealRangeCallback();
+                }
+                return idealRangeCallback(err);  
+              }
+            );            
+          },
+          function idealRangeLoopEnd(err){
+            submittedPhase.idealRanges = validatedIdealRanges;
+            return innerCallback(err);
+          }
+        );  
+      },
+    ],
+    function parallelEnd(err, results){
+      if (options.attemptInPlaceEdit){
+
+      } else {
+        // force mongoose to create a new _id
+        delete submittedPhase._id;
+      }
+      
+      if (silentValidationFail && err){
+        winston.error(JSON.stringify(err));
+        return (null, null);
+      } 
+      return callback(err, submittedPhase);
+    }
+  );
+});
+/*********************** END STATIC METHODS **************************/
+
+exports.schema = PhaseSchema;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowPlanInstance.html">models/GrowPlanInstance</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowPlanInstance.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 08 2014 22:42:48 GMT-0500 (EST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

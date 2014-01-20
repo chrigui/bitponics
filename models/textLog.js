@@ -1,3 +1,7 @@
+/**
+ * @module models/TextLog
+ */
+
 var mongoose = require('mongoose'),
   mongoosePlugins = require('../lib/mongoose-plugins'),
 	Schema = mongoose.Schema,
@@ -105,5 +109,14 @@ TextLogSchema.set('toJSON', {
 
 TextLogSchema.index({ 'gpi ts l.t': -1 });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = TextLogSchema;
+
+/**
+ * @constructor
+ * @alias module:models/TextLog.TextLogModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('TextLog', TextLogSchema);

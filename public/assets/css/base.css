@@ -334,6 +334,8 @@ label {
   height: 6em;
   text-transform: uppercase;
   margin: 0.125em 0;
+  transition-property: background-color;
+  transition-duration: 0.5s;
 }
 .data-module div,
 .data-module p,
@@ -504,6 +506,7 @@ ol.list-style {
   cursor: pointer;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
   position: relative;
+  transition: all 0.5s ease;
 }
 .btn:active,
 .btn-composite:active {
@@ -574,7 +577,7 @@ ol.list-style {
 a.btn,
 button.btn {
   display: inline-block;
-  background: #fff !important;
+  background: #fff;
   color: #00e36c;
   border: 3px solid #00e36c;
 }
@@ -594,9 +597,14 @@ button.btn:hover {
 .step {
   padding: 3em 0 0;
 }
+svg path {
+  fill: #fff;
+}
 .ring-graph svg path {
   stroke: #fff;
   stroke-width: 2;
+  transition-property: all;
+  transition-duration: 0.75s;
 }
 .ring-graph svg .on,
 .ring-graph svg .good {
@@ -741,6 +749,9 @@ input[type=submit] {
   color: #fff;
   padding: 0 2.5%;
   font-size: 0.85em;
+}
+.footer a {
+  color: #fff;
 }
 ul {
   list-style: none;
@@ -1559,6 +1570,298 @@ img.page-spinner.spinner {
   }
 }
 /*
+ * Dialog
+ */
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0,0,0,0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 20000px;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+.ngdialog-content {
+  background: #fff;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+.ngdialog-close:before {
+  font-family: 'Helvetica', Arial, sans-serif;
+  content: '\00D7';
+  cursor: pointer;
+}
+body.ngdialog-open {
+  overflow: hidden;
+}
+@-moz-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@-o-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@-ms-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+@-moz-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@-o-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@-ms-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+/*
+ * Menu
+ */
+.ngdialog-theme-menu {
+  top: 0.5em;
+  right: -3px;
+  left: auto;
+  bottom: auto;
+  position: absolute;
+}
+.ngdialog-theme-menu .ngdialog-overlay {
+  background: none;
+}
+.ngdialog-theme-menu .ngdialog-content {
+  width: 20em;
+  background: #fff;
+  color: #999;
+  padding: 0;
+  margin: 0 3px 10px;
+  text-align: left;
+  z-index: 1;
+  border: 1px solid #d8d8d8;
+  box-shadow: 0px 2px 5px 0px #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-content h2,
+.ngdialog-theme-menu .ngdialog-content div,
+.ngdialog-theme-menu .ngdialog-content p,
+.ngdialog-theme-menu .ngdialog-content a {
+  color: #999;
+}
+.ngdialog-theme-menu .ngdialog-content h2 {
+  padding-top: 0.5em;
+  margin: 0 0 0.5em;
+  border-bottom: 1px solid #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-close {
+  display: none;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications h2 {
+  padding: 0.5em 0.6em;
+  margin: 0;
+  border-left: 5px solid transparent;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border-left: 5px solid #00e36c;
+  margin-top: 5px;
+  box-shadow: 0px 2px 3px 0px #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification:first-of-type {
+  margin: 0;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification.warning {
+  border-left-color: #fac400;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification.checked {
+  border-left-color: #c1c2c4;
+}
+.ngdialog-theme-menu .ngdialog-content .notifications .notifications-list .notification .notification-button {
+  display: block;
+  background: none;
+  padding: 0 1em;
+  border: none;
+  outline: none;
+  text-align: left;
+  border-bottom: 1px solid #fff;
+  width: 100%;
+}
+/*
+ * Header
+ */
+.header .settings {
+  position: relative;
+  width: 1.2em;
+  display: inline-block;
+  cursor: pointer;
+}
+.header .settings .icon-__71_settings_999999 {
+  top: -0.75em;
+  position: absolute;
+  font-size: 1.5em;
+}
+.header .settings .settings-display {
+  display: none;
+  position: absolute;
+  background: #00e36c;
+  color: #fff;
+}
+.header .settings .settings-display.visible {
+  display: block;
+  top: 0.5em;
+  right: 0;
+  min-width: 12em;
+  padding: 0 1em 1em;
+  text-align: left;
+  z-index: 1;
+}
+.header .settings .settings-display.visible h2 {
+  margin: 0.5em 0;
+  border-bottom: 1px solid #fff;
+}
+.header .settings .settings-display.visible li {
+  display: block;
+  margin: 0;
+}
+.header .settings .settings-display.visible a {
+  text-align: left;
+  color: #fff;
+  margin: 0;
+  line-height: 2em;
+}
+.header .notifications-icon {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  width: 1.8em;
+}
+.header .notifications-icon .icon-glyph {
+  font-size: 1em;
+  top: -0.95em;
+  margin-left: 0.4em;
+  position: absolute;
+  width: 1.3em;
+  height: 1.3em;
+}
+/*
  * Home Page
  */
 .headline {
@@ -1675,6 +1978,9 @@ img.page-spinner.spinner {
   min-height: auto;
   height: auto;
 }
+#pricing .page-heading {
+  margin-bottom: 0;
+}
 #pricing .development-status {
   color: #00e36c;
   font-size: 1.5em;
@@ -1689,9 +1995,8 @@ img.page-spinner.spinner {
 }
 #pricing h2.price-category {
   color: #00e36c;
-  border-top: 1px solid #00e36c;
   line-height: 2em;
-  margin-top: 3em;
+  margin-top: 0;
   margin-bottom: 1em;
 }
 #pricing h2.price-category.first {
@@ -3081,14 +3386,14 @@ label.newsletter.inline {
 .dashboard .btn {
   padding: 0.5em;
 }
+.dashboard .sensor-reading-date.page-heading-small {
+  font-size: 0.85em;
+}
 .dashboard .manual-entry-container .btn i {
   font-size: 1.25em;
   position: relative;
   top: 0.12em;
   left: -0.5em;
-}
-.dashboard .manual-entry-form .sensor-reading-date.page-heading-small {
-  font-size: 0.85em;
 }
 .dashboard .manual-entry-form .btn {
   margin-bottom: 1em;
@@ -3115,6 +3420,9 @@ label.newsletter.inline {
 .garden-settings {
   height: 2em;
 }
+.day-summary button.btn {
+  margin: 0.25em 0.25em 0.25em 0;
+}
 .circle {
   margin: 1.5em 0;
 }
@@ -3134,6 +3442,17 @@ label.newsletter.inline {
 /*
  * Profile Page
  */
+#profile input.unstyled {
+  margin-right: 0.5em;
+}
+#profile .locale_timezone_country {
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+}
+#profile .notification-email {
+  margin-top: 0;
+}
 /*
  * Single landing page overrides
  */
@@ -3202,9 +3521,6 @@ label.newsletter.inline {
 /*
  * Register page
  */
-.landing-page.getstarted .main {
-  margin: 1em 1em 0;
-}
 .landing-page.getstarted .main .page-heading {
   font-size: 2em;
   color: #00e36c;
@@ -3411,53 +3727,6 @@ li
 .undefined .app-user span,
 .app-page .app-user span {
   font-size: 0.85em;
-}
-.undefined .app-user .settings,
-.app-page .app-user .settings {
-  position: relative;
-  width: 1.2em;
-  display: inline-block;
-  cursor: pointer;
-}
-.undefined .app-user .settings .icon-__71_settings_999999,
-.app-page .app-user .settings .icon-__71_settings_999999 {
-  top: -0.75em;
-  position: absolute;
-  font-size: 1.5em;
-}
-.undefined .app-user .settings .settings-display,
-.app-page .app-user .settings .settings-display {
-  display: none;
-  position: absolute;
-  background: #00e36c;
-  color: #fff;
-}
-.undefined .app-user .settings .settings-display.visible,
-.app-page .app-user .settings .settings-display.visible {
-  display: block;
-  top: 0.5em;
-  right: 0;
-  min-width: 12em;
-  padding: 0 1em 1em;
-  text-align: left;
-  z-index: 1;
-}
-.undefined .app-user .settings .settings-display.visible h2,
-.app-page .app-user .settings .settings-display.visible h2 {
-  margin: 0.5em 0;
-  border-bottom: 1px solid #fff;
-}
-.undefined .app-user .settings .settings-display.visible li,
-.app-page .app-user .settings .settings-display.visible li {
-  display: block;
-  margin: 0;
-}
-.undefined .app-user .settings .settings-display.visible a,
-.app-page .app-user .settings .settings-display.visible a {
-  text-align: left;
-  color: #fff;
-  margin: 0;
-  line-height: 2em;
 }
 .undefined .flexslider,
 .app-page .flexslider {
@@ -5271,6 +5540,10 @@ button.close {
 .growplans .header-action {
   clear: both;
 }
+.growplans .header-action .spinner {
+  margin: 0 0 0 0.5em;
+  width: 1em;
+}
 .growplans .spinner {
   width: 2em;
   margin: 1em;
@@ -5404,10 +5677,16 @@ button.close {
   width: 60%;
 }
 .growplans .ring-graph .good {
-  fill: #92ed00;
+  fill: #00e36c;
+  opacity: 0.7;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+  filter: alpha(opacity=70);
 }
 .growplans .ring-graph .active {
   fill: #00e36c;
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
 }
 .growplans .ring-graph .add-phase {
   fill: #92ed00;
@@ -5514,58 +5793,10 @@ button.close {
   font-size: 2em;
   top: 0.25em;
 }
-.accordion {
-  -webkit-transition: 0.25s linear all;
-  -webkit-transition: 0.25s linear all;
-  -moz-transition: 0.25s linear all;
-  -o-transition: 0.25s linear all;
-  -ms-transition: 0.25s linear all;
-  transition: 0.25s linear all;
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-}
-.accordion.ng-hide {
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-  height: 0;
-}
-.accordion.ng-hide-add,
-.accordion.ng-hide-remove {
-/* this needs to be here to make it visible during the animation
-     since the .ng-hide class is already on the element rendering
-     it as hidden. */
-  display: block !important;
-}
-.grid-cell-animation.ng-enter,
-.grid-cell-animation.ng-leave,
-.grid-cell-animation.ng-move {
-  -webkit-transition: 0.5s linear all;
-  -webkit-transition: 0.5s linear all;
-  -moz-transition: 0.5s linear all;
-  -o-transition: 0.5s linear all;
-  -ms-transition: 0.5s linear all;
-  transition: 0.5s linear all;
-  position: relative;
-}
-.grid-cell-animation.ng-enter {
-  top: -10px;
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-}
-.grid-cell-animation.ng-enter.ng-enter-active {
-  top: 0;
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
-}
-.grid-cell-animation.ng-leave {
-  top: 0;
-  opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
+@media  screen and (min-width: 65em) {
+  .growplans .page-heading {
+    width: 90%;
+  }
 }
 /*
  * Gardens List Page

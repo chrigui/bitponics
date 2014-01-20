@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: user.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: user.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
+ * @module models/User 
+ */
+
+var mongoose = require('mongoose'),
+	mongooseTypes = require('../lib/mongoose-types-wrapper'),
+	mongoosePlugins = require('../lib/mongoose-plugins'),
+	useTimestamps = mongoosePlugins.useTimestamps,
+	Schema = mongoose.Schema,
+	ObjectIdSchema = Schema.ObjectId,
+	UserSchema = undefined,
+	User = undefined,
+	nodemailer = require('nodemailer'),
+	crypto = require('crypto'),
+	bcrypt = require('bcrypt'),
+	winston = require('winston'),
+	timezone = require('../lib/timezone-wrapper'),	
+	EmailConfig = require('../config/email-config'),
+  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+  async = require('async'),
+  requirejs = require('../lib/requirejs-wrapper'),
+  feBeUtils = requirejs('fe-be-utils'),
+  ejs = require('../config/ejs-config'),
+  fs = require('fs'),
+  path = require('path'),
+  
+  // emailVariables is passed in by a function call later in the startup process
+  emailVariables = {
+    appDomain : undefined,
+    appUrl : undefined,
+    secureAppUrl : undefined
+  },
+  emailTemplates = require('email-templates'),
+  emailTemplatesDir = path.join(__dirname, '/../views/emails'),
+  welcomeEmailTemplateDirectory = path.join(__dirname, '/../views/emails/welcome'),
+  compiledWelcomeEmailBody = {
+    html :  ejs.compile(fs.readFileSync(path.join(welcomeEmailTemplateDirectory, "email-body-html.ejs"), 'utf8')),
+    text : ejs.compile(fs.readFileSync(path.join(welcomeEmailTemplateDirectory, "email-body-text.ejs"), 'utf8'))
+  };
+
+
+
+/**
+ * Internal schema used only for User. Created separately just to exclude
+ * unnecessary _id prop
+ */
+var DeviceKeySchema = new Schema({
+  /**
+   * deviceId not required. We temporarily create & save unassociated deviceKeys
+   * for use during the setup process
+   */
+  deviceId : { type: String, ref : 'Device', match: /^([a-z0-9_-]){12}$/, required : false },
+
+  serial : { type : String },
+
+  verified : { type : Boolean, default : false },
+
+  verifiedDate : { type : Date },
+
+  createdAt : { type : Date, default: Date.now },
+
+  /**
+   * Public device key is a 16-char random hex string
+   */
+  public : String,
+  /**
+   * Private device key is a 16-char random hex string
+   */
+  private : String
+
+}, 
+{ _id : false, id : false, toObject : { virtuals: true }, toJSON : { virtuals : true } });
+
+DeviceKeySchema.virtual('combinedKey')
+.get(function(){
+	return this.public + feBeUtils.COMBINED_DEVICE_KEY_SPLITTER + this.private;
+});
+
+
+UserSchema = new Schema({
+  
+  /**
+   * Organizations will be treated as "standard users plus some features".
+   */
+  isOrganization : { type : Boolean },
+
+  /**
+   * Organization-only property
+   */
+  orgUsers : [
+		{
+			user : { type : ObjectIdSchema, ref: "User"},
+			roles : [{ type : String, enum : [ "admin", "member" ]}]
+		}  	
+  ],
+
+
+  name : {
+    first: String,
+	  last: String
+	},
+  
+  email : { 
+  	type : mongoose.SchemaTypes.Email, 
+  	required : true, 
+  	unique: true 
+  },
+  
+  phone : { type : String },
+  
+  address : {
+  	
+    /**
+     * Line 1
+     */
+    streetAddress : String,
+  	
+    /**
+     * Line 2
+     */
+    extendedAddress : String,
+  	
+    /**
+     * City
+     */
+    locality : String,
+
+    /** 
+     * State
+     */
+  	region : String,
+  	
+    /**
+     * Zip
+     */
+    postalCode : String,
+
+
+  	/**
+     * 2-letter country code
+     * http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+     */
+    countryCode : { type: String, default: 'US' }
+  },
+  
+  salt: { type: String, required: true },
+  
+  hash: { type: String, required: true },
+  
+  locale: { 
+  	lang: { type: String, default : 'en' },
+  	territory : { type : String, default: 'US'}
+  },
+  
+  timezone: { type : String, default : 'America/New_York' }, 
+  
+  active : { type : Boolean, default : false },
+  
+  admin :  { type : Boolean, default : false },
+  
+  activationToken : { type : String, default : '' },
+  
+  resetToken : { type : String, default : '' },
+  
+  sentEmail : { type: Boolean, default: false },
+  
+  notificationPreferences: {
+  	email: { type: Boolean, default: true },
+  	sms: { type: Boolean, default: false }
+  },
+  
+
+  promotionalCodes : [{ type : String, enum : [ 
+    "KICKSTARTER_15", 
+    "KICKSTARTER_500" 
+  ]}],
+
+
+  deviceKeys : [ DeviceKeySchema ],
+  
+  apiKey : {
+  	/**
+  	 * Public API key is a 16-char random hex string
+  	 */
+  	public: String,
+  	/**
+  	 * Private API key is a 32-char random hex string
+  	 */
+  	private: String
+  }
+},
+{ id : false, toObject : { virtuals: true }, toJSON : { virtuals : true } });
+
+UserSchema.plugin(useTimestamps); // adds createdAt/updatedAt fields to the schema, and adds the necessary middleware to populate those fields 
+UserSchema.plugin(mongoosePlugins.recoverableRemove);
+
+UserSchema.virtual('name.full')
+	.get(function () {
+		var fullName = '';
+		if (this.name.first) { fullName += this.name.first; }
+		if (this.name.last) { fullName += ' ' + this.name.last; }
+		return fullName;
+	})
+	.set(function (setFullNameTo) {
+	  	var split = setFullNameTo.split(' ')
+	  		, firstName = split[0]
+	    	, lastName = split[1];
+
+		this.set('name.first', firstName);
+		this.set('name.last', lastName);
+	});
+
+UserSchema.virtual('locale.full')
+	.get(function () {
+		return this.locale.language + this.locale.territory ? '_' + this.locale.territory : '';
+	})
+	.set(function (fullLocale) {
+	  	var split = fullLocale.split('_')
+	  		, language = split[0]
+	    	, territory = split[1];
+
+		this.set('locale.language', language);
+		this.set('locale.territory', territory || '');
+	});
+
+/**
+ *  Get the current timezone offset from UTC time. This can't be a static
+ *  value since offsets change with daylight savings and stuff. 
+ *
+UserSchema.virtual('timezoneOffset')
+	.get(function(){
+		var now = new Date(),
+			timezoneOffsetString = timezone(now, this.timezone, '%z'),
+			timezoneOffsetDirection = timezoneOffsetString[0],
+			timezoneOffsetHours = parseInt(timezoneOffsetString.substr(1,2), 10),
+			timezoneOffsetMinutes = parseInt(timezoneOffsetString.substr(3,2), 10),
+			timezoneOffset = (timezoneOffsetDirection == '-' ? -1 : 1) * (timezoneOffsetHours * 60 * 60 * 1000) + (timezoneOffsetMinutes * 60 * 1000);
+		return timezoneoffset;
+	});
+*/
+/************************** STATIC METHODS  ***************************/
+
+
+/**
+ *
+ * @param {object} userProperties : any User model properties
+ * @param {string} password
+ * @param {function(err, user)} done
+ */
+UserSchema.static('createUserWithPassword', function(userProperties, password, done){
+	var newUser = new User(userProperties);
+
+	bcrypt.genSalt(10, function(err, salt) {
+  	if (err) { return done(err); }
+  	newUser.salt = salt;
+  	
+  	bcrypt.hash(password, salt, function(err, hash) {
+  		if (err) { return done(err); }
+
+    		newUser.hash = hash;
+
+    		newUser.save(function(err) {
+    		return done(err, newUser);
+		    });
+		});
+	});
+});
+
+
+UserSchema.static('authenticate', function(email, password, done) {
+  this.findOne({ email: email.toLowerCase() }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(new Error('No user found with that email'), false); }
+      user.verifyPassword(password, function(err, passwordCorrect) {
+        if (err) { return done(err); }
+        if (!passwordCorrect) { return done(new Error('Incorrect password'), false); }
+        return done(null, user);
+      });
+    });
+});
+
+
+/**
+ * Used by Passport BPN_DEVICE strategy
+ */
+UserSchema.static('getByPublicDeviceKey', function(key, done) {
+  User.findOne({ 'deviceKeys.public': key })
+  .exec(function(err, user) {
+	  if (err) { return done(err); }
+      if (!user) { return done(new Error('No such device key'), false); }
+      var matchingKey = user.deviceKeys.filter(function(deviceKey){
+      	return deviceKey.public === key;
+      })[0];
+      return done(null, user, matchingKey);
+  });
+});
+
+UserSchema.static('getByPublicApiKey', function(key, done) {
+  User.findOne({ 'apiKey.public': key }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(new Error('No such API key'), false); }
+
+      return done(null, user, user.apiKey);
+  });
+});
+/************************** END STATIC METHODS  ***************************/
+
+
+
+/************** INSTANCE METHODS ********************/
+
+UserSchema.method('verifyPassword', function(password, next) {
+  bcrypt.compare(password, this.hash, next);
+});
+
+UserSchema.method('toPublicJSON', function() {
+  return {
+  	_id : this._id,
+  	name : this.name,
+  	email : this.email,
+  	phone : this.phone,
+  	address : this.country,
+  	locale: this.locale,
+  	timezone: this.timezone,
+  	active : this.active,
+  	notificationPreferences: this.notificationPreferences,
+  	deviceKeys : this.deviceKeys.map(
+  		function(el){ 
+  			return { device : el.device, 'public' : el.public};
+  		}
+	),
+  	apiKey : {
+  		public: this.apiKey.public
+  	}
+  };
+});
+
+
+/**
+ * Get the first key matching provided options, 
+ * or if options are empty, first available device key
+ *
+ * @param {string=} options.serial. optional.
+ */
+UserSchema.method('getDeviceKey', function(options) {
+  var user = this,
+  		serial,
+			i,
+			currentDeviceKey,
+			deviceKeys = user.deviceKeys || [],
+			length = deviceKeys.length;;
+
+		if (options){
+			serial = options.serial;			
+		}
+
+		for (i = 0; i &lt; length; i++) {
+			currentDeviceKey = deviceKeys[i];
+			if (serial && (currentDeviceKey.serial === serial)) {
+					return currentDeviceKey;
+			} else if (!currentDeviceKey.deviceId){
+				return currentDeviceKey;		
+			}
+		};
+});
+
+
+
+
+/**
+ * Make sure User has an unassigned deviceKey
+ *
+ * @param {string} serial. THe serial number that the user entered that will be assigned to this device key
+ * @param {function(err, object )} done : Passed the available deviceKey object (DeviceKeySchema)
+ */
+UserSchema.method('ensureDeviceKey', function(serial, done){
+	var user = this,
+		availableDeviceKey,
+		i,
+		currentDeviceKey,
+		matchingDeviceKey;
+
+	user.deviceKeys = user.deviceKeys || [];
+
+	for (i = user.deviceKeys.length; i--;) {
+		currentDeviceKey = user.deviceKeys[i];
+		if (!currentDeviceKey.deviceId){
+			availableDeviceKey = currentDeviceKey;
+		}
+		if(currentDeviceKey.serial === serial){
+			matchingDeviceKey = currentDeviceKey;
+		}
+	};
+	
+	async.waterfall(
+		[
+			function updateAvailableDeviceKey(innerCallback){
+				if (matchingDeviceKey){
+					return innerCallback();
+				}
+				if (availableDeviceKey){
+					availableDeviceKey.serial = serial;	
+					return innerCallback();
+				} else {
+					crypto.randomBytes(32, function(err, buf) {
+						if (err) { return innerCallback(err); }
+				  	var keysSource = buf.toString('hex'),
+				  		publicKey = keysSource.substr(0, 16),
+				  		privateKey = keysSource.substr(16, 16);
+				  	
+				  	availableDeviceKey = {
+				  		'public' : publicKey,
+				  		'private' : privateKey,
+				  		'serial' : serial
+				  	};
+				  	user.deviceKeys.push(availableDeviceKey);
+				  	return innerCallback();
+					});	
+				}
+			},
+			function saveUser(innerCallback){
+				user.save(innerCallback);
+			}
+		],
+		function (err, updatedUser){
+			if (err) { return done(err); }
+			return done(null, updatedUser.getDeviceKey({serial : serial}), updatedUser);
+		}
+	);
+});
+
+/************** END INSTANCE METHODS ********************/
+
+
+
+
+/***************** MIDDLEWARE **********************/
+
+
+UserSchema.pre('save', function(next){
+	this.email = this.email.toLowerCase();
+	next();
+});
+
+/**
+ *  Give user API keys if needed. Can be done in parallel with other pre save hooks. 
+ *  http://mongoosejs.com/docs/middleware.html
+ */
+UserSchema.pre('save', true, function(next, done){
+	var user = this;
+	
+	next();
+	
+	if (user.apiKey && user.apiKey.public && user.apiKey.private){ return done(); }
+
+	crypto.randomBytes(48, function(ex, buf) {
+		if (ex) { return done(ex); }
+	  	var keysSource = buf.toString('hex'),
+	  		publicKey = keysSource.substr(0, 16),
+	  		privateKey = keysSource.substr(16, 32);
+	  	
+	  	user.apiKey = {
+	  		public : publicKey,
+	  		private : privateKey
+	  	};
+	  	done();
+  	});
+});
+
+/**
+ *  Give user activation token if needed. This also can be done in parallel.
+ */
+UserSchema.pre('save', true, function(next, done){
+	var user = this,
+		token = "";
+
+	next();
+
+	//winston.info('user.active:'+user.active)
+	//winston.info('user.sentEmail:'+user.sentEmail)
+
+	if(user.activationToken && user.active) { return done(); }
+	
+	//create random string to verify against
+	crypto.randomBytes(48, function(ex, buf) {
+		if (ex) { return done(ex); }
+		
+		token = buf.toString('hex');
+		user.activationToken = user.activationToken || token;
+		
+	  // The welcome email should be one-time only, even if the user hasn't activated yet
+		if(user.sentEmail){ return done(); }
+			
+		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
+
+		var welcomeEmailTemplateLocals = {
+      verifyUrl : (emailVariables.secureAppUrl + '/register?verify=' + user.activationToken)
+    };
+
+    var emailTemplateLocals = {
+      emailSubject : "Get started with Bitponics",
+      emailBodyHtml : compiledWelcomeEmailBody.html(welcomeEmailTemplateLocals),
+      emailBodyText : compiledWelcomeEmailBody.text(welcomeEmailTemplateLocals),
+      subscriptionPreferencesUrl : emailVariables.secureAppUrl + "/account/profile",
+      appUrl : emailVariables.appUrl,
+      secureAppUrl : emailVariables.secureAppUrl
+    };
+
+    emailTemplates(emailTemplatesDir, function(err, runEmailTemplate){
+      if (err) { return done(err); }
+      
+      runEmailTemplate('default', emailTemplateLocals, function(err, finalEmailHtml, finalEmailText) {
+      
+        if (err) { return done(err); }
+
+        var mailOptions = {
+          from: "accounts@bitponics.com",
+          to: user.email,
+          subject: emailTemplateLocals.emailSubject,
+          text: finalEmailText,
+          html: finalEmailHtml
+        };
+
+        emailTransport.sendMail(mailOptions, function(err, response){
+          if(err){ return done(err); }
+          winston.info("Email sent: " + response.message);
+          user.sentEmail = true;
+          done();
+        });
+      });
+    });
+
+    
+
+
+	});
+});
+/***************** END MIDDLEWARE **********************/
+
+
+
+/***************** INDEXES ************************************/
+UserSchema.index({ 'email': 1 });
+UserSchema.index({ 'deviceKeys.public': 1 });
+UserSchema.index({ 'apiKey.public': 1 });
+/***************** END INDEXES ********************************/
+
+
+User = mongooseConnection.model('User', UserSchema);
+
+module.exports.setEmailVariables = function(appConfig){
+	emailVariables = {
+    appUrl : appConfig.appUrl,
+    secureAppUrl : appConfig.secureAppUrl,
+    appDomain : appConfig.appDomain
+  };
+};
+
+
+/**
+ * @type {Schema}
+ */
+module.exports.schema = UserSchema;
+
+/**
+ * @constructor
+ * @alias module:models/User.UserModel
+ * @type {Model}
+ */
+module.exports.model = User;
+
+
+/*
+	// Auth
+	UserSchema.plugin(mongooseAuth, {
+		everymodule: {
+	          everyauth: {
+	              User: function () {
+	                return User;
+	            }
+	        }
+	    },
+	    facebook: {
+	      	everyauth: {
+	      		myHostname: app.config.appUrl,
+	          	appId: app.config.auth.fb.appId,
+	        	appSecret: app.config.auth.fb.appSecret,
+	        	redirectPath: '/',
+	        	scope: 'email'
+	      	}
+	    },
+	    google: {
+			everyauth: {
+				myHostname: app.config.appUrl,
+				appId: app.config.auth.google.clientId,
+				appSecret: app.config.auth.google.clientSecret,
+				redirectPath: '/',
+				scope: 'https://www.googleapis.com/auth/userinfo.email',
+
+			}
+		},
+		password: {
+	        loginWith: 'email', 
+
+			everyauth: {
+	            getLoginPath: '/login',
+	          	postLoginPath: '/login',
+	          	loginView: 'login.jade',
+	          	loginLocals : {
+	          		title : 'Login - Bitponics'
+	          	},
+	          	getRegisterPath: '/signup',
+	          	postRegisterPath: '/signup',
+	          	registerView: 'signup.jade',
+	          	registerLocals: {
+			      title: 'Sign Up - Bitponics'
+				},
+	          	loginSuccessRedirect: '/',
+	         	registerSuccessRedirect: '/register'
+	        }
+	    }
+	});
+
+
+	// now that we've initialized the mongoose-auth plugin, override any functions
+
+	// override createWithFB
+	UserSchema.static('createWithFB', function (fbUserMeta, accessToken, expires, callback) {
+	    console.log('in da fb override wuttup');
+	    //console.log(fbUserMeta, accessToken, expires, callback);
+	    var expiresDate = new Date;
+	    expiresDate.setSeconds(expiresDate.getSeconds() + expires);
+
+	    var params =  {
+	      fb: {
+	          id: fbUserMeta.id
+	        , accessToken: accessToken
+	        , expires: expiresDate
+	        , name: {
+	              full: fbUserMeta.name
+	            , first: fbUserMeta.first_name
+	            , last: fbUserMeta.last_name
+	          }
+	        , alias: fbUserMeta.link.match(/^http:\/\/www.facebook\.com\/(.+)/)[1]
+	        , gender: fbUserMeta.gender
+	        , email: fbUserMeta.email
+	        , timezone: fbUserMeta.timezone
+	        , locale: fbUserMeta.locale
+	        , verified: fbUserMeta.verified
+	        , updatedTime: fbUserMeta.updated_time
+	      }
+	    };
+
+	    // password.loginKey() is email
+	    params[everyauth.password.loginKey()] = fbUserMeta.email; 
+	    params.email = fbUserMeta.email;
+	    this.create(params, callback);
+	  });
+
+	// override createWithGoogleOAuth
+	UserSchema.static('createWithGoogleOAuth', function (googleUser, accessToken, accessTokenExtra, callback) {
+	    console.log('in da google override wuttup');
+	    var expiresDate = new Date;
+	    expiresDate.setSeconds(expiresDate.getSeconds() +  accessTokenExtra.expires_in);
+
+	    var params = {
+	      google: {
+	          email: googleUser.id
+	        , expires: expiresDate
+	        , accessToken: accessToken
+	        , refreshToken: accessTokenExtra.refresh_token
+	      }
+	    };
+
+	    // TODO Only do this if password module is enabled
+	    //      Currently, this is not a valid way to check for enabled
+	    if (everyauth.password)
+	      params[everyauth.password.loginKey()] = "google:" + googleUser.id; // Hack because of way mongodb treate unique indexes
+	  	params.email = googleUser.email;
+	    this.create(params, callback);
+	  });
+*/
+
+	
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowPlanInstance.html">models/GrowPlanInstance</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowPlanInstance.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 08 2014 22:42:48 GMT-0500 (EST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

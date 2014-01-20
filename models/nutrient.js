@@ -1,3 +1,7 @@
+/**
+ * @module models/Nutrient
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -101,5 +105,15 @@ NutrientSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
 
 /*********************** END STATIC METHODS **************************/
 
+
+/**
+ * @type {Schema}
+ */
 exports.schema = NutrientSchema;
+
+/**
+ * @constructor
+ * @alias module:models/Nutrient.NutrientModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('Nutrient', NutrientSchema);

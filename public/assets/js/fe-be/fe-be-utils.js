@@ -556,5 +556,21 @@ define(['moment'], function(moment){
 
   utils.noop = function() {};
 
+  /**
+   *
+   * Used to ensure we don't create notifications with repeat of less than 1 day
+   *
+   * @param num {Number} Required.
+   */
+  utils.isLessThanOneDay = function(duration, durationType) {
+    var map = {
+      'seconds': 86400,
+      'minutes': 1440,
+      'hours': 24,
+      'days': 1
+    };
+    return duration && map[durationType] && (duration < map[durationType]);
+  };
+
   return utils;
 });

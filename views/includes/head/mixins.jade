@@ -2,9 +2,11 @@
 
 mixin requirejs(dataMain)
   - var dataMainVar = dataMain;
+  - var requirejs = CDN('/assets/js/libs/require.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angular = CDN('/assets/js/libs/angular/1.2.0/angular.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularFlexslider = CDN('/assets/js/libs/angular-flexslider.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularAnimate = CDN('/assets/js/libs/angular/1.2.0/angular-animate.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var angularDialog = CDN('/assets/js/libs/angular/ngDialog.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularMask = CDN('/assets/js/libs/angular/mask.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularResource = CDN('/assets/js/libs/angular/1.2.0/angular-resource.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var angularRoute = CDN('/assets/js/libs/angular/1.2.0/angular-route.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -24,6 +26,7 @@ mixin requirejs(dataMain)
   - var bpnServicesGrowPlanService = CDN('/assets/js/services/grow-plan.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesGrowSystem = CDN('/assets/js/services/grow-system.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesNav = CDN('/assets/js/services/nav.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var bpnServicesPlant = CDN('/assets/js/services/plant.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesSocket = CDN('/assets/js/services/socket.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var bpnServicesUser = CDN('/assets/js/services/user.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var d3 = CDN('/assets/js/libs/d3.v2.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -52,14 +55,15 @@ mixin requirejs(dataMain)
 
   //- Dynamic data cannot be passed to CDN() as far as I can tell, so keep requirejs local for now
   // != CDN('/assets/js/libs/require.js', { 'data-main' : '#{dataMainVar}' })
-  script(src='/assets/js/libs/require.js', 'data-main'=dataMainVar)
+  script(src="#{requirejs}", data-main="#{dataMainVar}")
   script
     require.config({
       paths: {
-        'angular': '#{angular}',
+        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular',
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
         'angularAnimate' : '#{angularAnimate}',
+        'angularDialog' : '#{angularDialog}',
         'angularResource' : '#{angularResource}',
         'angularRoute' : '#{angularRoute}',
         'angularUI' : '#{angularUI}',
@@ -78,6 +82,7 @@ mixin requirejs(dataMain)
         'bpn.services.growPlan' : '#{bpnServicesGrowPlanService}',
         'bpn.services.growSystem' : '#{bpnServicesGrowSystem}',
         'bpn.services.nav' : '#{bpnServicesNav}',
+        'bpn.services.plant' : '#{bpnServicesPlant}',
         'bpn.services.socket' : '#{bpnServicesSocket}',
         'bpn.services.user' : '#{bpnServicesUser}',
         'd3' : '#{d3}',
@@ -111,6 +116,9 @@ mixin requirejs(dataMain)
           deps: [ 'angular' ] 
         }, 
         'angularAnimate': { 
+          deps: [ 'angular' ] 
+        },
+        'angularDialog': { 
           deps: [ 'angular' ] 
         },
         'angularRoute': { 

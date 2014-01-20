@@ -1,4 +1,6 @@
 var async = require('async'),
+  path    = require('path'),
+  express    = require('express'),
 	winston = require('winston'),
 	routeUtils = require('./route-utils'),
 	ModelUtils = require('../models/utils');
@@ -37,23 +39,28 @@ module.exports = function(app){
   /**
 	 * 
 	 */
-  app.get('/admin/add-device', function (req, res) {
-	  res.render('admin/add-device', {
-	    title: 'Bitponics Admin'
-	  })
+  app.get('/admin/devices', function (req, res) {
+	  var DeviceModel = require('../models/device').model,
+        locals = {
+          title: 'Bitponics Admin | Devices',
+          devices : []
+        };
+
+    DeviceModel.find()
+    .select('_id serial name owner lastConnectionAt')
+    .populate('owner', '_id email')
+    .sort('_id')
+    .lean()
+    .exec(function(err, deviceResults){
+      if (err) { return next(err);}
+
+      locals.devices = deviceResults;
+      res.render('admin/devices', locals);
+    });
+
 	});
 
 
-  /**
-	 * 
-	 */
-  app.post('/admin/add-device', function (req, res) {
-    res.render('admin/add-device', {
-      title: 'Bitponics Admin',
-      creationStatus : 'success'
-    })
-  });
-	
 
 	/**
 	 * 
@@ -62,7 +69,7 @@ module.exports = function(app){
 	  var NotificationModel = require('../models/notification').model;
 	  NotificationModel.clearPendingNotifications({env : app.settings.env}, function(err, numberNotificationsAffected){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success, ' + numberNotificationsAffected + ' records affected');
@@ -76,7 +83,7 @@ module.exports = function(app){
 	app.post('/admin/trigger-scanForPhaseChanges', function (req, res) {
 	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success');
@@ -90,7 +97,7 @@ module.exports = function(app){
 	app.post('/admin/trigger-checkDeviceConnections', function (req, res) {
 	  ModelUtils.checkDeviceConnections(function(err){
 	  	if (err) { 
-	  		winston.error(err); 
+	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
 	  	}
 	  	return res.send(200, 'success');
@@ -233,4 +240,13 @@ module.exports = function(app){
       res.render('admin/grow-systems', locals);
     });
   });
+
+
+
+  app.use('/admin/docs', express.static(path.join(__dirname, '/../docs')));
+  app.use('/admin/docs', express.directory(path.join(__dirname, '/../docs')));
+
+  // app.get('/admin/docs', function (req, res){
+  //   res.redirect('/admin/docs/');
+  // });
 };

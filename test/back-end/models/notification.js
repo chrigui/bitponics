@@ -106,10 +106,96 @@ describe('Notification', function(){
     result.should.have.property('type');
   });
 
+  describe(".clearPendingNotifications", function(done){
+    
+    beforeEach(function(done){
+      var self = this;
+      
+      async.waterfall([
+        function saveAllNotifications(innerCallback) {
+          Notification.model.find({}).exec(function(err, notifications){
+            self.oldNotifications = notifications;
+            innerCallback();
+          });
+        },
+        function removeAllNotifications(innerCallback) {
+          Notification.model.remove({}, function(err){
+            innerCallback();
+          });
+        },
+        function prepareNotification1(innerCallback){
+          var now = new Date();
+          //shouldnt send
+          Notification.model.create({
+            "_id" : ObjectID("521edeb06179930400000015"), 
+            "gpi" : ObjectID("51caf958f613580200000270"), 
+            "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+            "triggerDetails" : { 
+              "deviceId" : "000666809f76",
+              "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+            }, 
+            "tts" : now, 
+            "type" : feBeUtils.NOTIFICATION_TYPES.INFO, 
+            "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+          }, function(err, notification){
+            self.notification1 = notification;
+            return innerCallback();   
+          });
+        },
+        function prepareNotification2(innerCallback){
+          var now = new Date();
+          //should send
+          Notification.model.create({
+            "_id" : ObjectID("5203aba6cddbb70000000014"), 
+            "gpi" : ObjectID("51caf958f613580200000270"), 
+            "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+            "triggerDetails" : { 
+              "deviceId" : "000666809f76",
+              "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+            }, 
+            "tts" : now, 
+            "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+            "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+          }, function(err, notification){
+            self.notification2 = notification;
+            return innerCallback();   
+          });
 
+        }
+      ],
+      function(err){
+        return done();
+      });
+    });
+
+    afterEach(function(done){
+      var self = this;
+      Notification.model.remove({
+        '_id': { 
+          $in: [self.notification1._id, self.notification2._id]
+        }
+      }, done);
+      // Notification.model.create(self.oldNotifications);
+    });
+
+    it('Do not email INFO notifications', function(done){
+      var self = this;
+        should.exist(self.notification1);
+        should.exist(self.notification2);
+
+        Notification.model.clearPendingNotifications({ 
+          env: 'local'
+        }, function(err, count){
+          console.log('count', count);
+          should.not.exist(err);
+          count.should.equal(2);
+          return done();
+        });
+    });
+  });
 
   describe(".create", function(){
-
+    
     it('Creates new notification', function(done){
       var now = new Date();
       Notification.model.create({
@@ -461,18 +547,19 @@ describe('Notification', function(){
 
 
     describe("NOTIFICATION_TRIGGERS.DEVICE_MISSING", function(){
+      
       it("handles email display", function(done){
         var self = this;
         should.exist(self.notification);
         should.exist(self.device);
 
-        self.notification.getDisplay({
+        self.notification.getDisplays({
           secureAppUrl : "http://test.com",
-          displayType : 'email'
-        }, function(err, display){
+          displayTypes : ['email']
+        }, function(err, displays){
           should.not.exist(err);
           
-          display.should.include({ 
+          displays.email.should.include({ 
             subject: 'Bitponics Alert | Development Device 2013-06-13 Connection Dropped',
             bodyHtml: '<h1>Development Device 2013-06-13 seems to have dropped its connection.</h1>\n\n<p>We haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.</p>\n\n\n<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>\n\n\n<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know through our <a href="http://test.com/help">help page</a>. We\'ll help you resolve any issues ASAP.</p>\n\n<a class="btn" href="http://test.com/account/devices/000666809f76">Manage your devices</a>',
             bodyText: 'Development Device 2013-06-13 seems to have dropped its connection.\n\nWe haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.\n\nIt probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.\n\nTo see device details, click the link below:\nhttp://test.com/account/devices/000666809f76\n\nIf you continue to have device connectivity issues, please let us know through our help page: http://test.com/help">. We\'ll help you resolve any issues ASAP.\n\n' 
@@ -488,13 +575,13 @@ describe('Notification', function(){
         should.exist(self.notification);
         should.exist(self.device);
 
-        self.notification.getDisplay({
+        self.notification.getDisplays({
           secureAppUrl : "http://test.com",
-          displayType : 'summary'
-        }, function(err, display){
+          displayTypes : ['summary']
+        }, function(err, displays){
           should.not.exist(err);
           
-          display.should.equal("Development Device 2013-06-13 seems to have dropped its connection.");
+          displays.summary.should.equal("Development Device 2013-06-13 seems to have dropped its connection.");
 
           return done();
         });
@@ -506,13 +593,13 @@ describe('Notification', function(){
         should.exist(self.notification);
         should.exist(self.device);
 
-        self.notification.getDisplay({
+        self.notification.getDisplays({
           secureAppUrl : "http://test.com",
-          displayType : 'detail'
-        }, function(err, display){
+          displayTypes : ['detail']
+        }, function(err, displays){
           should.not.exist(err);
           
-          display.should.equal('<h1>Development Device 2013-06-13 seems to have dropped its connection.</h1>\n\n<p>We haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.</p>\n\n\n<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>\n\n\n<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know our <a href="http://test.com/help">help page</a>. We\'ll help you resolve any issues ASAP.</p>\n\n<a class="btn" href="http://test.com/account/devices/000666809f76">Manage your devices</a>');
+          displays.detail.should.equal('<h1>Development Device 2013-06-13 seems to have dropped its connection.</h1>\n\n<p>We haven\'t heard from your device with the id 000666809f76 since Thursday, August 29th 2013, 8:00 am.</p>\n\n\n<p>It probably just needs a reset to get back on your wifi network. Unplug the device power and plug it back in.</p>\n\n\n<p>To see device details, click the link below. If you continue to have device connectivity issues, please let us know our <a href="http://test.com/help">help page</a>. We\'ll help you resolve any issues ASAP.</p>\n\n<a class="btn" href="http://test.com/account/devices/000666809f76">Manage your devices</a>');
 
           return done();
         });
@@ -523,48 +610,7 @@ describe('Notification', function(){
 
   });
 
-  // TODO: need to figure out error for below test:
-  // ReferenceError: c is not defined
-  //     at Context.<anonymous> (/Users/jack/Dropbox/dev/bitponics/test/models/notification.js:324:17)
-
-  // it('clearPendingNotifications test', function(done){
-  //   var now = Date.now(),
-  //     log = new c.create({
-  //       gpi : new ObjectID(),
-  //       trigger : "phase-action",
-  //       triggerDetails : {
-  //         gpPhaseId : ObjectID("506de30c8eebf7524342cb72"),
-  //         actionId : ObjectID("506de2f18eebf7524342cb27"),
-  //         phaseName : "Seedling"
-  //       },
-  //       _id : new ObjectID(),
-  //       type : "actionNeeded",
-  //       sl : [ ],
-  //       r : {
-  //         durationType : "days",
-  //         duration : 1,
-  //         timezone : "America/New_York"
-  //       },
-  //       tts : new Date(),
-  //       u : [
-  //         ObjectID("506de30a8eebf7524342cb6c")
-  //       ],
-  //       c : false
-  //     }, function (err, n) {
-  //       should.not.exist(err);
-
-  //       Notification.model.clearPendingNotifications({env: 'bitponics-test'}, function(err, count){
-  //         if (err) { console.log(err); }
-  //         should.not.exist(err);
-  //         should.exist(count);
-  //         count.should.equal(1);
-  //         // var finishedEnvironmentAt = moment();
-  //         // winston.info(environment + ' ModelUtils.clearPendingNotifications started at ' + now.format() + ', ended at ' + finishedEnvironmentAt.format() + ', duration ' + now.diff(finishedEnvironmentAt) + 'ms');
-  //         // winston.info((count || 0) + " records affected");
-  //         return done();
-  //       });
-  //     });
-  // });
+  
 
 
 });

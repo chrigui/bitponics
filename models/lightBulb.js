@@ -1,3 +1,7 @@
+/**
+ * @module models/LightBulb
+ */
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -109,5 +113,15 @@ LightBulbSchema.static('createNewIfUserDefinedPropertiesModified', function(opti
 
 /*********************** END STATIC METHODS **************************/
 
+
+/**
+ * @type {Schema}
+ */
 exports.schema = LightBulbSchema;
+
+/**
+ * @constructor
+ * @alias module:models/LightBulb.LightBulbModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('LightBulb', LightBulbSchema);

@@ -65,10 +65,9 @@ block content
 
                 div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                   div(data-bpn-directives-manual-entry-form, 
-                    data-sensor-unit="sensor.unit", 
-                    data-sensor-code="sensor.code",
-                    data-sensor-name="sensor.name",
-                    data-close="close",
+                    data-sensor-unit="{{sensor.unit}}", 
+                    data-sensor-code="{{sensor.code}}",
+                    data-sensor-name="{{sensor.name}}",
                     class="manual-entry-form")
                     
                     div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
@@ -143,10 +142,9 @@ block content
                   div(
                     ng-show="sharedDataService.userCanModify",
                     data-bpn-directives-manual-entry-form,
-                    data-sensor-unit="sensor.unit", 
-                    data-sensor-code="sensor.code", 
-                    data-sensor-logs="sharedDataService.activeDate.sensorLogs",
-                    data-close="close",
+                    data-sensor-unit="{{sensor.unit}}", 
+                    data-sensor-code="{{sensor.code}}", 
+                    data-sensor-logs="{{sharedDataService.activeDate.sensorLogs}}",
                     class="manual-entry-form")
                     
                     div(class="custom-checkbox-wrap")
@@ -156,7 +154,7 @@ block content
                       label(ng-show="sharedDataService.gardenModel.device", ng-click="toggleManualEntry()", for="{{sensorCode}}_manual_entry_toggle", class="btn no-margin") Manual Log
                     
                     div(ng-show="!sharedDataService.gardenModel.device || manualSensorEntryMode && sharedDataService.gardenModel.device")
-                      form(action="", ng-submit="submit()")
+                      form(name="form", action="", ng-submit="submit()")
                         input(ng-model="manualSensorEntry[sensorCode]", id="manual_input_sensor_overlay_{{sensorCode}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any",required)
                         div(ng-hide="hasMultipleUnits(sensorCode)", class="sensor-reading-unit")
                           span.sensor-unit {{sensorUnit}}
@@ -166,7 +164,25 @@ block content
                             ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units")
                           .dblarrow
                             i
-                        input(type="submit", value="Record")
+                        input(type="submit", value="Record", ng-click="log(this)")
+
+        div
+          div(modal="sharedDataService.activeOverlay=='DaySummaryOverlay'", close="close()", options="sharedDataService.modalOptions")
+            div(ng-controller="bpn.controllers.dashboard.DaySummaryOverlay", class="overlay-contain day-summary")
+              div(class="close btn", ng-click="close()")
+                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
+              h3(class="page-heading") Day {{dayIndex}} of {{phase.phase.name}} Phase
+              h4(class="sensor-reading-date page-heading-small") {{dataCache.date | date:'longDate'}}
+              
+              ul(class="btn-list menu")
+                li(ng-repeat="sensor in sharedDataService.sensors", class="float-l")
+                  button(type="button", class="btn", ng-class="{on: sensor.code==activeSensor.obj.code}", ng-click="activeSensor.obj=sensor") {{sensor.name}}
+
+              div(class="graph clear-b")
+                div(ng-show="activeSensor.obj.code==sensor.code", ng-repeat="sensor in sharedDataService.sensors")
+                  div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="dataCache.sensorLogs")
+
+              //- h3(class="page-heading page-heading-small") {{activeSensor.obj.name}}
 
       div.content-module.middle
         div(ng-controller="bpn.controllers.dashboard.PhasesGraph")
@@ -235,14 +251,13 @@ block content
                 | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
               
               div(data-bpn-directives-manual-entry-form, 
-                  data-close="close",
                   class="manual-entry-form")
 
                 h3(class="page-heading page-heading-small") Log Entry
                 h4(class="sensor-reading-date page-heading-small") {{sharedDataService.activeDate.date | date:'shortDate'}}
 
                 div
-                  form(action="", ng-submit="submit()")
+                  form(name="form", action="", ng-submit="submit()")
                     textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width", placeholder="How are your plants doing today?")
                     div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                       input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any", placeholder="{{sensor.name}}")
@@ -297,7 +312,7 @@ block content
                       a.btn.turn-on.flush-left(ng-show="controlAction.control.onAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.onAction._id)") Turn on
                       a.btn.turn-off.flush-left(ng-show="controlAction.control.offAction", ng-click="triggerImmediateAction(controlAction, controlAction.control.offAction._id)") Turn off
                       a.btn.resume-cycle.flush-left(ng-show="controlAction.cycle.states.length <= 1 && controlAction.baseCycle.states.length > 1", ng-click="clearImmediateAction(controlAction, controlAction.control)") Resume cycle
-                      img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress", ng-animate="{show: 'fade-in', hide:'fade-out'}")
+                      img.spinner(src="/assets/img/spinner.svg", ng-show="controlAction.updateInProgress")
 
           div#notifications.notifications.separator-top(ng-controller="bpn.controllers.dashboard.Notifications", ng-hide="!sharedDataService.gardenModel.device")
             h2.page-heading-small Notifications

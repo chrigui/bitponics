@@ -10,7 +10,7 @@ block head
     div(class="separator-top")
       p 
         | Now, we need to send your device key to your Base Station and tell it how to connect to your Wifi network. 
-        | When in setup mode, the Base Station broadcasts a Wifi network named "BITPONICS". 
+        | When in setup mode, the Base Station broadcasts a Wifi network named "BitponicsSetup". 
         | By connecting your computer to that network, you're able to send setup information to the device. 
       p We'll walk you through the process below. If at any time you need assistance, please contact us at our 
         a(href="/help") help page
@@ -27,11 +27,11 @@ block head
           p
             | When you first plug in your Base Station, this light will be red, indicating that it's starting up. 
             span.led-indicator.scan
-            | Once the light switches to blue, your device has started broadcasting the "BITPONICS" network, and you're ready for the next step. 
+            | Once the light switches to blue, your device has started broadcasting the "BitponicsSetup" network, and you're ready for the next step. 
             span.led-indicator.adhoc
         li
-          h4.page-heading-small Connect to "BITPONICS"
-          p Open your computer's WiFi settings. You should see a new network listed called "BITPONICS". Connect to it. This may take up to 1 minute. 
+          h4.page-heading-small Connect to "BitponicsSetup"
+          p Open your computer's WiFi settings. You should see a new network listed called "BitponicsSetup". Connect to it. This may take up to 1 minute. 
         li
           h4.page-heading-small Link Base Station
           p Once you're connected, click the button below to link your Base Station.
@@ -92,8 +92,7 @@ block head
           h4.page-heading-small Disconnect and Reconnect
           p Great! The Bitponics device is now connecting to the 
             span.selectedNetworkSsid {{sharedDataService.selectedWifiNetwork.ssid}} network.
-          p Now, disconnect your computer from the BITPONICS Wifi network and reconnect it to 
-            span.selectedNetworkSsid {{sharedDataService.selectedWifiNetwork.ssid}}.
+          p Now, disconnect your computer from the BitponicsSetup Wifi network and reconnect it to your home network.
           
           p After you're back on your old wifi network, close this page and check back on the previous tab.
             | That page will notify you once your device is paired with your account. You can also check the status of all 

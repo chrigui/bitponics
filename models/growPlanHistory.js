@@ -1,6 +1,7 @@
 /**
  * A means of storing past revisions of individial Grow Plans. 
  * Not in active use anywhere in the UI.
+ * @module models/GrowPlanHistory
  */
 
  var mongoose = require('mongoose'),
@@ -38,5 +39,15 @@ GrowPlanHistorySchema.plugin(useTimestamps);
 GrowPlanHistorySchema.plugin(mongoosePlugins.recoverableRemove);
 
 GrowPlanHistoryModel = mongooseConnection.model('GrowPlanHistory', GrowPlanHistorySchema);
+
+/**
+ * @type {Schema}
+ */
 exports.schema = GrowPlanHistorySchema;
+
+/**
+ * @constructor
+ * @alias module:models/GrowPlanHistory.GrowPlanHistoryModel
+ * @type {Model}
+ */
 exports.model = GrowPlanHistoryModel;

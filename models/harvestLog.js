@@ -1,3 +1,7 @@
+/**
+ * @module models/HarvestLog
+ */
+
 var mongoose = require('mongoose'),
     mongoosePlugins = require('../lib/mongoose-plugins'),
     Schema = mongoose.Schema,
@@ -109,5 +113,14 @@ HarvestLogSchema.set('toJSON', {
 
 HarvestLogSchema.index({ 'gpi': 1, 'ts': -1 });
 
+/**
+ * @type {Schema}
+ */
 exports.schema = HarvestLogSchema;
+
+/**
+ * @constructor
+ * @alias module:models/HarvestLog.HarvestLogModel
+ * @type {Model}
+ */
 exports.model = mongooseConnection.model('HarvestLog', HarvestLogSchema);

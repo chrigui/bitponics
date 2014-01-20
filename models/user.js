@@ -1,3 +1,7 @@
+/**
+ * @module models/User 
+ */
+
 var mongoose = require('mongoose'),
 	mongooseTypes = require('../lib/mongoose-types-wrapper'),
 	mongoosePlugins = require('../lib/mongoose-plugins'),
@@ -165,6 +169,13 @@ UserSchema = new Schema({
   	sms: { type: Boolean, default: false }
   },
   
+
+  promotionalCodes : [{ type : String, enum : [ 
+    "KICKSTARTER_15", 
+    "KICKSTARTER_500" 
+  ]}],
+
+
   deviceKeys : [ DeviceKeySchema ],
   
   apiKey : {
@@ -477,8 +488,8 @@ UserSchema.pre('save', true, function(next, done){
 		token = buf.toString('hex');
 		user.activationToken = user.activationToken || token;
 		
-	  //send activation email if not activated user
-		if(user.active && user.sentEmail){ return done(); }
+	  // The welcome email should be one-time only, even if the user hasn't activated yet
+		if(user.sentEmail){ return done(); }
 			
 		var emailTransport = nodemailer.createTransport("SES", EmailConfig.amazonSES.api);
 
@@ -545,7 +556,17 @@ module.exports.setEmailVariables = function(appConfig){
   };
 };
 
+
+/**
+ * @type {Schema}
+ */
 module.exports.schema = UserSchema;
+
+/**
+ * @constructor
+ * @alias module:models/User.UserModel
+ * @type {Model}
+ */
 module.exports.model = User;
 
 
