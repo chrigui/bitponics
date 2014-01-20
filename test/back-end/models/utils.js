@@ -144,14 +144,10 @@ describe('Model Utils', function(){
           // users should include settings.user
           notification.users.should.include(immediateActionSettings.user._id.toString());
           // repeat shouldn't exist
-          notification.repeat.should.not.have.property('repeatType');
+          notification.repeat.should.not.have.property('durationType');
           notification.repeat.should.not.have.property('duration');
           notification.repeat.should.not.have.property('timezone');
-          notification.repeat.should.not.have.property('rt');
-          notification.repeat.should.not.have.property('d');
-          notification.repeat.should.not.have.property('tz');
           
-
           done();
         }
       );
@@ -219,12 +215,9 @@ describe('Model Utils', function(){
           // users should include settings.user
           notification.users.should.include(immediateActionSettings.user._id.toString());
           // repeat shouldn't exist
-          notification.repeat.should.not.have.property('repeatType');
+          notification.repeat.should.not.have.property('durationType');
           notification.repeat.should.not.have.property('duration');
           notification.repeat.should.not.have.property('timezone');
-          notification.repeat.should.not.have.property('rt');
-          notification.repeat.should.not.have.property('d');
-          notification.repeat.should.not.have.property('tz');
           
 
           done();
@@ -331,14 +324,10 @@ describe('Model Utils', function(){
               // users should include settings.user
               notification.users.should.include(immediateActionSettings.user._id.toString());
               // repeat shouldn't exist
-              notification.repeat.should.not.have.property('repeatType');
+              notification.repeat.should.not.have.property('durationType');
               notification.repeat.should.not.have.property('duration');
               notification.repeat.should.not.have.property('timezone');
-              notification.repeat.should.not.have.property('rt');
-              notification.repeat.should.not.have.property('d');
-              notification.repeat.should.not.have.property('tz');
               
-
               done();
             }
           );

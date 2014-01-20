@@ -21,6 +21,7 @@ module.exports = function(app) {
   
   /**
    * Get user's notifications
+   * By default, returns pending notifications (timeToSend is defined and is less than now)
    * 
    * Request:
    * @param {Date} [req.params.start-date] (optional) Should be something parse-able by moment.js
@@ -37,7 +38,7 @@ module.exports = function(app) {
    * @param {Number} skip
    * @param {Number} limit
    */
-  app.get('/api/users/:id/pending-notifications', apiUtils.query({
+  app.get('/api/users/:id/notifications', apiUtils.query({
     parentModel : UserModel,
     parentModelFieldName : 'u',
     model : NotificationModel,
@@ -49,19 +50,57 @@ module.exports = function(app) {
   }));
 
 
+
+  /**
+   * Mark a notification as checked.
+   * 
+   * No params.
+   *
+   */
+  // app.post('/api/users/:id/notifications/:notificationId/mark-as-checked',
+  //   routeUtils.middleware.ensureLoggedIn,
+  //   function(req, res, next){
+      
+  //     var response = {
+  //       statusCode : 200,
+  //       body : {}
+  //     };
+
+  //     NotificationModel.findById(req.params.notificationId)
+  //     .exec(function(err, notificationResult){
+  //       if (err) { return next(err); }
+  //       if (!notificationResult){ return routeUtils.sendJSONResponse(res, 400);  }
+        
+  //       if (!routeUtils.checkResourceModifyAccess(user, req.user)){
+  //         response = {
+  //           statusCode : 401,
+  //           body : "Only the user may modify user notifications."
+  //         };
+  //         return routeUtils.sendJSONResponse(res, response.statusCode, response.body);
+  //       }
+
+  //       notificationResult.markAsChecked();
+
+  //       notificationResult.save(function(err, updatedNotification){
+  //         if (err) { return next(err); }
+          
+  //         response.body = updatedNotification;
+
+  //         winston.info("MARKING NOTIFICATION CHECKED, id " + updatedNotification._id.toString() + ", user " + req.params.id);
+
+  //         return routeUtils.sendJSONResponse(res, response.statusCode, response.body);    
+  //       });
+
+  //     });      
+  //   }
+  // );
+
+
   
   /**
    * Get user's recent notifications
    * Returns a concat'ed list of user's pending and recently-sent notifications
    * 
-   * Request:
-   * @param {Date} [req.params.start-date] (optional) Should be something parse-able by moment.js
-   * @param {Date} [req.params.end-date] (optional) Should be something parse-able by moment.js
-   * @param {Number} [req.params.skip=0] - Number of results to skip (used for pagination)
-   * @param {Number} [req.params.limit=200] - Number of results to return per page. Hard limit of 200.
-   * @param {string=} [req.params.sort] - name of field to sort by. prefix with "-" for descending.
-   * @param {CSV} [req.params.select] - CSV list of field names to include in the response. Fields on nested objects can be requested with dot-notation: "nestedDocument.name"
-   * @param {Object} [req.params.where] - JSON-encoded query object. Defaults to filtering on notifications with a timeToSend in the past
    *
    * Response:
    * @param {Array[model]} data
@@ -105,11 +144,15 @@ module.exports = function(app) {
             .exec(innerCallback);
           },
           function getSentNotifications(innerCallback){
+            // TODO : examine the execution plan of this query...hopefully it uses the u+tts index, but might be a whole table scan
             NotificationModel
             .find({
               u : req.params.id,
-              tts : null,
-              'sl.ts' : { $ne : null }
+              'sl.ts' : { $ne : null },
+              $or : [
+                { tts : null },
+                { tts : {$gte : new Date() }}
+              ]
             })
             .sort('-sl.ts')
             .limit(10)
@@ -125,7 +168,7 @@ module.exports = function(app) {
 
           notificationObjects.forEach(function(notification){
             notificationObjectsById[notification._id] = notification;            
-          })
+          });
 
           async.each(notifications, 
             function notificationIterator(notification, iteratorCallback){

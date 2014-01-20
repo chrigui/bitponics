@@ -5,6 +5,7 @@ var mongooseConnection = require('../../../config/mongoose-connection').open('te
   Device = require('../../../models/device'),
   should = require('should'),
   async = require('async'),
+  moment = require('moment'),
   requirejs = require('../../../lib/requirejs-wrapper'),
   feBeUtils = requirejs('fe-be-utils');
 
@@ -29,7 +30,7 @@ describe('Notification', function(){
         growPlanInstance : new ObjectID(),
         timeToSend : now,
         repeat : {
-          repeatType : 'weeks',
+          durationType : 'weeks',
           duration : 4,
           timezone : 'America/New_York'
         },
@@ -71,7 +72,7 @@ describe('Notification', function(){
         growPlanInstance : new ObjectID(),
         timeToSend : now,
         repeat : {
-          repeatType : 'weeks',
+          durationType : 'weeks',
           duration : 4,
           timezone : 'America/New_York'
         },
@@ -192,7 +193,9 @@ describe('Notification', function(){
           return done();
         });
     });
-  });
+  }); // /.clearPendingNotifications
+
+  
 
   describe(".create", function(){
     
@@ -415,9 +418,10 @@ describe('Notification', function(){
       });
     });
 
-  });
+  }); // /.create
   
 
+  
   describe("#ensureHash", function(){
     
     it('returns an identical hash for Notifications with identical details that were created at different times', function(done){
@@ -498,10 +502,11 @@ describe('Notification', function(){
     });    
 
 
-  });
+  }); // /#ensureHash
 
   
-  describe("#getDisplay", function(){
+  
+  describe("#getDisplays", function(){
     beforeEach(function(done){
       var self = this;
       
@@ -607,10 +612,244 @@ describe('Notification', function(){
 
     });
     
-
-  });
+  }); // /#getDisplays
 
   
+  
+  describe('#resetTimeToSend', function(){
+    beforeEach(function(done){
+      return done();
+      // var self = this;
 
+      // var now = Date.now();
+
+      // Notification.model.create({
+      //   users : [ new ObjectID() ],
+      //   growPlanInstance : new ObjectID(),
+      //   timeToSend : now,
+      //   repeat : {
+      //     durationType : 'weeks',
+      //     duration : 4,
+      //     timezone : 'America/New_York'
+      //   },
+      //   sentLogs : [],
+      //   type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED
+      // }, function(err, notification){
+      //   self.repeatingNotification = notification;
+      //   done();
+      // });
+    });
+
+    afterEach(function(done){
+      return done();
+
+      //var self = this;
+      //Notification.model.remove({_id : self.repeatingNotification._id}, done);
+
+    });
+
+    it('sets timeToSend to null if notification doesn\'t repeat', function(done){
+      var self = this,
+        now = new Date();
+
+      Notification.model.create({
+        "_id" : ObjectID("5203aba6cddbb70000000016"), 
+        "gpi" : ObjectID("51caf958f613580200000270"), 
+        "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+        "triggerDetails" : { 
+          "deviceId" : "000666809f76",
+          "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+        }, 
+        "tts" : now, 
+        "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+        "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+      }, function(err, notification){
+        should.not.exist(err);
+        should.exist(notification);
+        notification.resetTimeToSend();
+        (!!notification.timeToSend).should.equal(false, 'timeToSend should be falsy');
+
+        notification.remove(done);
+      });
+    });
+
+
+    it('sets timeToSend to next tts if notification repeats', function(done){
+      var self = this,
+        now = new Date();
+
+      Notification.model.create({
+        "_id" : ObjectID("5203aba6cddbb70000000016"), 
+        "gpi" : ObjectID("51caf958f613580200000270"), 
+        "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+        "triggerDetails" : { 
+          "deviceId" : "000666809f76",
+          "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+        },
+        repeat : {
+          durationType : 'weeks',
+          duration : 4,
+          timezone : 'America/New_York'
+        },
+        timeToSend : now, 
+        "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+        "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+      }, function(err, notification){
+        should.not.exist(err);
+        should.exist(notification);
+
+        var originalTimeToSend = notification.timeToSend.valueOf();
+
+        notification.resetTimeToSend();
+        (!!notification.timeToSend).should.equal(true, 'timeToSend should exist');
+
+        moment(notification.timeToSend).diff(now, notification.repeat.durationType).should.equal(notification.repeat.duration);
+        
+        notification.remove(done);
+      });
+    });
+    
+  }); // /#resetTimeToSend
+
+
+  describe('#markAsChecked', function(){
+
+    it('if called with no arguments & notification.timeToSend is in the past, marks it as sent & checked, and resets timeToSend', function(done){
+      var self = this,
+        now = new Date();
+
+      Notification.model.create({
+        "_id" : ObjectID("5203aba6cddbb70000000017"), 
+        "gpi" : ObjectID("51caf958f613580200000270"), 
+        "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+        "triggerDetails" : { 
+          "deviceId" : "000666809f76",
+          "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+        },
+        repeat : {
+          durationType : 'weeks',
+          duration : 4,
+          timezone : 'America/New_York'
+        },
+        timeToSend : now, 
+        "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+        "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+      }, function(err, notification){
+        should.not.exist(err);
+        should.exist(notification);
+
+        var originalTimeToSend = notification.timeToSend.valueOf();
+
+        notification.markAsChecked();
+        (!!notification.timeToSend).should.equal(true, 'timeToSend should exist');
+
+        moment(notification.timeToSend).diff(now, notification.repeat.durationType).should.equal(notification.repeat.duration);
+        
+
+        // latest sentLogs entry should be the tts, and should be marked as checked
+        notification.sentLogs.length.should.be.greaterThan(0);
+        notification.sentLogs[notification.sentLogs.length-1].timeToSend.valueOf().should.equal(now.valueOf(), 'latest sentLogs entry should be the tts, and should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checked.should.equal(true, 'latest sentLogs entry should be the tts, and should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checkedAt.valueOf().should.be.greaterThan(now.valueOf());
+
+        notification.remove(done);
+      });
+    });
+
+
+    it('if called with no arguments & notification.timeToSend is in the future, marks most recent sentLog as checked', function(done){
+      var self = this,
+        now = new Date(),
+        timeToSend =  (new Date(now.valueOf() + 10000000));
+
+      Notification.model.create({
+        "_id" : ObjectID("5203aba6cddbb70000000018"), 
+        "gpi" : ObjectID("51caf958f613580200000270"), 
+        "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+        "triggerDetails" : { 
+          "deviceId" : "000666809f76",
+          "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+        },
+        repeat : {
+          durationType : 'weeks',
+          duration : 4,
+          timezone : 'America/New_York'
+        },
+        timeToSend : timeToSend, 
+        sentLogs : [
+          {
+            timeToSend : now
+          }      
+        ],
+        "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+        "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+      }, function(err, notification){
+        should.not.exist(err);
+        should.exist(notification);
+
+        var originalTimeToSend = notification.timeToSend.valueOf();
+
+        notification.markAsChecked();
+        notification.timeToSend.valueOf().should.equal(timeToSend.valueOf(), 'timeToSend should be unchanged');
+
+        notification.sentLogs.length.should.be.greaterThan(0);
+        notification.sentLogs[notification.sentLogs.length-1].timeToSend.valueOf().should.equal(now.valueOf(), 'matching sentLog entry should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checked.should.equal(true, 'matching sentLog entry should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checkedAt.valueOf().should.be.greaterThan(now.valueOf());
+
+        notification.remove(done);
+      });
+    });
+
+
+    it('if called with a timeToSend param & matching sentLog exists, marks that sentLog as checked', function(done){
+      var self = this,
+        now = new Date(),
+        timeToSend =  (new Date(now.valueOf() + 10000000));
+
+      Notification.model.create({
+        "_id" : ObjectID("5203aba6cddbb70000000018"), 
+        "gpi" : ObjectID("51caf958f613580200000270"), 
+        "trigger" : feBeUtils.NOTIFICATION_TRIGGERS.DEVICE_MISSING, 
+        "triggerDetails" : { 
+          "deviceId" : "000666809f76",
+          "lastConnectionAt" : new Date("2013-08-29T12:00:00.000Z")
+        },
+        repeat : {
+          durationType : 'weeks',
+          duration : 4,
+          timezone : 'America/New_York'
+        },
+        timeToSend : timeToSend, 
+        sentLogs : [
+          {
+            timeToSend : (new Date(now.valueOf() - 10000000))
+          },
+          {
+            timeToSend : now
+          }
+        ],
+        "type" : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED, 
+        "u" : [  ObjectID("506de30a8eebf7524342cb6c") ]
+      }, function(err, notification){
+        should.not.exist(err);
+        should.exist(notification);
+
+        var originalTimeToSend = notification.timeToSend.valueOf();
+
+        notification.markAsChecked(now);
+        notification.timeToSend.valueOf().should.equal(timeToSend.valueOf(), 'timeToSend should be unchanged');
+
+        notification.sentLogs.length.should.be.greaterThan(0);
+        notification.sentLogs[notification.sentLogs.length-1].timeToSend.valueOf().should.equal(now.valueOf(), 'matching sentLog entry should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checked.should.equal(true, 'matching sentLog entry should be marked as checked');
+        notification.sentLogs[notification.sentLogs.length-1].checkedAt.valueOf().should.be.greaterThan(now.valueOf());
+
+        notification.remove(done);
+      });
+    });
+
+
+  }); // /#markAsChecked
 
 });

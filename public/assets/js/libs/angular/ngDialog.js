@@ -9,6 +9,7 @@
  * - attach close listener to body instead of dialog
  * - option to append to element instead of body
  * - jQuery dependency for .parents()
+ * - add hook for dialog close event
  */
 
 (function (window, angular, undefined) {
@@ -59,6 +60,7 @@
 
 					closeDialog: function ($dialog) {
 						$dialog.unbind('click');
+            $body.unbind('click', privateMethods.onBodyClick);
 
 						if (dialogsCount === 1) {
 							$body.unbind('keyup').removeClass('ngdialog-open');
@@ -68,13 +70,14 @@
 
 						if (animationEndSupport) {
 							$dialog.unbind(animationEndEvent).bind(animationEndEvent, function () {
-								$dialog.remove();
+								// 2014-01-20 AK : for some reason dialog controller isn't getting destroyed on .remove(). 
+                // Calling destroy explicity
+                $dialog.scope().$destroy();
+                $dialog.remove();
 							}).addClass('ngdialog-closing');
 						} else {
 							$dialog.remove();
 						}
-
-            $body.unbind('click', privateMethods.onBodyClick);
 					}
 				};
 
@@ -220,17 +223,17 @@
 
           if (!isOverlay && !isCloseBtn && !isContent) {
             ngDialog.open({
-            template: attrs.ngDialog,
-            className: attrs.ngDialogClass,
-            controller: attrs.ngDialogController,
-            scope: attrs.ngDialogScope,
-            data: attrs.ngDialogData,
-            showClose: attrs.ngDialogShowClose === 'false' ? false : true,
-            closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : true,
-            closeByEscape: attrs.ngDialogCloseByKeyup === 'false' ? false : true,
-            appendToElement: attrs.ngDialogAppendToElement === 'true' ? true : false,
-            element : elem
-          });
+              template: attrs.ngDialog,
+              className: attrs.ngDialogClass,
+              controller: attrs.ngDialogController,
+              scope: attrs.ngDialogScope,
+              data: attrs.ngDialogData,
+              showClose: attrs.ngDialogShowClose === 'false' ? false : true,
+              closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : true,
+              closeByEscape: attrs.ngDialogCloseByKeyup === 'false' ? false : true,
+              appendToElement: attrs.ngDialogAppendToElement === 'true' ? true : false,
+              element : elem
+            });
           }
 					
 				});

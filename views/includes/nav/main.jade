@@ -5,7 +5,7 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
       
       ul.notifications-list
         li(ng-repeat="notification in recentNotifications.data", ng-class="getNotificationClass(notification)")
-          button.notification-button
+          button.notification-button(ng-click="markAsChecked(notification)")
             p.date {{notification | notificationDate}}
             p.garden(ng-show="notification.displays.json.garden.name") {{notification.displays.json.garden.name}} 
             p.summary {{notification.displays.summary}} 
@@ -99,7 +99,6 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
               class="notifications-icon",
               ng-dialog="nav-notifications.html",
               ng-dialog-controller="bpn.controllers.nav.Notifications",
-              ng-dialog-data="{{recentNotifications}}",
               ng-dialog-append-to-element="true",
               ng-dialog-class="ngdialog-theme-menu")
               | <i class="icon-glyph icon-glyph-new icon_notification_info_textGray" aria-hidden="true" ng-class="getNotificationsIconClass()"></i>
