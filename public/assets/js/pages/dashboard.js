@@ -25,6 +25,7 @@ require([
   'bpn',
   'bpn.directives.graphs',
   'bpn.services.garden',
+  'bpn.services.photo',
   'bpn.services.socket',
   'selection-overlay',
   'overlay',
@@ -42,10 +43,11 @@ require([
     dashboardApp.factory('sharedDataService', 
       [
         'GardenModel',
+        'PhotosModel',
         'bpn.services.socket',
         '$http',
         '$q',
-        function(GardenModel, socket, $http, $q){
+        function(GardenModel, PhotosModel, socket, $http, $q){
           
           /**
            * All the properties this service will expose
@@ -72,6 +74,7 @@ require([
             photos : bpn.pageData.photos,
             units : feBeUtils.UNITS,
             gardenModel : new GardenModel(bpn.pageData.growPlanInstance),
+            photosModel : PhotosModel,
             userCanModify : bpn.pageData.userCanModify
           };
 
@@ -120,6 +123,26 @@ require([
             }
             return growPlanInstancePhases[0];
           };
+
+          // sharedData.getGrowPlanInstancePhotosFromDate = function (date) {
+          //   var dateMoment = moment(date),
+          //     growPlanInstancePhotos = sharedData.gardenModel.photos,
+          //     i,
+          //     photoDay;
+
+          //   console.log(growPlanInstancePhotos.length);
+          //   //find photos from this date
+          //   if (growPlanInstancePhotos.length) {
+          //     for (i = growPlanInstancePhotos.length; i--;) {
+          //       photoDay = growPlanInstancePhotos[i].date;
+          //       if (dateMoment.isSame(photoDay, 'day')) {
+          //         return growPlanInstancePhotos[i];
+          //       }
+          //     }
+          //   }
+
+          //   return growPlanInstancePhotos;
+          // };
 
 
 
@@ -183,6 +206,27 @@ require([
             return deferred.promise;
           };
 
+          /**
+           * Returns a an angular promise
+           *
+           * @return {Promise}
+           */
+          sharedData.getPhotosByDate = function (dateKey) {
+            var deferred = $q.defer(),
+                dateMoment = moment(dateKey);
+
+            sharedData.photosModel.query({
+                'id': sharedData.gardenModel._id,
+                'start-date' : dateMoment.startOf("day").format(),
+                'end-date' : dateMoment.endOf("day").format()
+              }, function(data){
+                sharedData.dateDataCache[dateKey].photos = data.data.map(viewModels.initPhotoViewModel);
+                deferred.resolve(data);
+              });
+
+            return deferred.promise;
+          };
+
 
     
           /**
@@ -192,7 +236,7 @@ require([
            *
            * @param {Date|String} date : a date processable by momentjs
            */
-          sharedData.getDateDataCache = function(date, loadSensorData){
+          sharedData.getDateDataCache = function(date, loadSensorData, loadPhotoData){
             var dateMoment = moment(date),
                 dateKey = feBeUtils.getDateKey(dateMoment),
                 dateDataCache = sharedData.dateDataCache[dateKey];
@@ -201,7 +245,6 @@ require([
               return dateDataCache;
             } else {
               dateDataCache = {};
-              
               dateDataCache.growPlanInstancePhase = sharedData.getGrowPlanInstancePhaseFromDate(date);
               dateDataCache.growPlanPhase = dateDataCache.growPlanInstancePhase.phase;
               dateDataCache.date = dateMoment.toDate();
@@ -216,6 +259,10 @@ require([
 
               if (loadSensorData){
                 sharedData.getSensorLogsByDate(dateKey);  
+              }
+
+              if (loadPhotoData) {
+                sharedData.getPhotosByDate(dateKey);
               }
               
               
@@ -284,7 +331,7 @@ require([
             sharedData.daySummaryData = angular.extend(sharedData.daySummaryData, data);
 
             //cache date data
-            sharedData.getDateDataCache(data.dateKey, true);
+            sharedData.getDateDataCache(data.dateKey, true, true);
           };
 
           return sharedData;
@@ -813,20 +860,14 @@ require([
             obj: $scope.sharedDataService.sensors[0]
           };
 
-          console.log('$scope.activeSensor.code', $scope.activeSensor.code);
-          console.log('sharedDataService.activeDate.sensorLogs',sharedDataService.activeDate.sensorLogs);
-
           $scope.close = function(){
             $scope.sharedDataService.activeOverlay = undefined;
           };
 
           $scope.$watch($scope.sharedDataService.daySummaryData, function(oldValue, newValue) {
-          // $scope.$watch(function(){ return $scope.sharedDataService.daySummaryData; }, function(oldValue, newValue) {
-            console.log('new day summary data');
             $scope.dataCache = $scope.sharedDataService.getDateDataCache($scope.sharedDataService.daySummaryData.dateKey);
             $scope.dayIndex = $scope.sharedDataService.daySummaryData.dayIndex + 1;
             $scope.phase = $scope.sharedDataService.daySummaryData.phase;
-          // }, true);
           });
 
         }
