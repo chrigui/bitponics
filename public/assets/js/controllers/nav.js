@@ -25,11 +25,14 @@ define(
         '$compile',
         'UserModel',
         'NotificationModel',
-        function ($scope, $filter, $compile, UserModel, NotificationModel) {
+        'NavService',
+        function ($scope, $filter, $compile, UserModel, NotificationModel, NavService) {
+          
+          $scope.NavService = NavService;
 
-          $scope.recentNotifications = $scope.$parent.ngDialogData;
+          $scope.recentNotifications = $scope.NavService.recentNotifications;// $scope.$parent.ngDialogData;
           $scope.element = $scope.$parent.ngDialogElement;
-          console.log('gettin in here', $scope, $scope.element, $scope.recentNotifications)
+          //console.log('gettin in here', $scope, $scope.element, $scope.recentNotifications)
 
           $scope.getNotificationClass = function(notification){
             var classNames = ['notification'];
@@ -49,6 +52,15 @@ define(
             NotificationModel.markAsChecked(notification);
           };
 
+          $scope.$on("$destroy", function(e){
+            console.log('destroying notifications controller');
+            
+            // TODO : as an automatic action, we actually only want to clear the info notifications
+            // Clearing all for now as temp hack
+            NavService.clearAllNotifications();
+            //NavService.clearInfoNotifications();
+
+          });
         }
       ]
     );
@@ -68,6 +80,7 @@ define(
           $scope.navMenuDisplayVisible = false;
 
           $scope.socket = socket;
+          $scope.NavService = NavService;
 
           $scope.toggleSettings = function(){
             $scope.settingsDisplayVisible = !$scope.settingsDisplayVisible;
@@ -95,38 +108,11 @@ define(
             return classNames;
           };
 
-          if (bpn.user){
-            $scope.user = new UserModel(bpn.user);
-            $scope.user.$getRecentNotifications({},
-              function success(data){
-                
-                $scope.recentNotifications = data;
-                
-                $scope.hasUncheckedNotifications = $scope.recentNotifications.data.some(function(notification){
-                  if (!notification.checked){
-                    return true;
-                  }
-                });
-
-                $scope.hasUncheckedActionNeededNotifications = $scope.recentNotifications.data.some(function(notification){
-                  if (!notification.checked &&
-                        (notification.type === feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED || notification.type === feBeUtils.NOTIFICATION_TYPES.ERROR)
-                      ){
-                    return true;
-                  }
-                });
-              }
-            );
-
-            socket.connect('/new-notifications');
-            socket.emit('ready');
-            socket.on('new-notifications', function(data){
-              console.log('new-notifications socket update received', data);
-
-              
-            });
-          }
-          
+          $scope.$watch('NavService.recentNotifications', function(){
+            $scope.recentNotifications = NavService.recentNotifications;
+            $scope.hasUncheckedNotifications = NavService.hasUncheckedNotifications;
+            $scope.hasUncheckedActionNeededNotifications = NavService.hasUncheckedActionNeededNotifications;
+          });
         }
       ]
     );
