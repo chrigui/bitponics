@@ -241,6 +241,15 @@ require([
                 dateKey = feBeUtils.getDateKey(dateMoment),
                 dateDataCache = sharedData.dateDataCache[dateKey];
 
+
+            if (loadSensorData){
+              sharedData.getSensorLogsByDate(dateKey);  
+            }
+
+            if (loadPhotoData) {
+              sharedData.getPhotosByDate(dateKey);
+            }
+
             if (dateDataCache){
               return dateDataCache;
             } else {
@@ -256,15 +265,6 @@ require([
               );
               dateDataCache.loaded = false;
               sharedData.dateDataCache[dateKey] = dateDataCache;
-
-              if (loadSensorData){
-                sharedData.getSensorLogsByDate(dateKey);  
-              }
-
-              if (loadPhotoData) {
-                sharedData.getPhotosByDate(dateKey);
-              }
-              
               
               return dateDataCache;
             }

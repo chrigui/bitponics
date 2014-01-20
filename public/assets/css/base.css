@@ -3348,7 +3348,7 @@ label.newsletter.inline {
 .dashboard .overlay .sparkline {
   margin: 1em 0;
   width: 100%;
-  overflow: scroll;
+  overflow-x: scroll;
 }
 .dashboard .overlay .page-heading {
   font-size: 2em;
@@ -3428,6 +3428,15 @@ label.newsletter.inline {
 }
 .day-summary .graph {
   text-align: center;
+}
+.day-summary .photos {
+  overflow-x: scroll;
+  height: 4.25em;
+  display: block !important;
+  white-space: nowrap;
+}
+.day-summary .photos li {
+  float: none;
 }
 .circle {
   margin: 1.5em 0;

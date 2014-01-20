@@ -186,9 +186,9 @@ block content
               div(ng-hide="dataCache.sensorLogs")
                 p It seems there is no data for this date.
 
-              div(ng-show="dataCache.photos", ng-controller="bpn.controllers.dashboard.Photos")
-                ul
-                  li.photo(ng-repeat="photo in dataCache.photos | orderBy:predicate:date")
+              div(class="full-width", ng-show="dataCache.photos", ng-controller="bpn.controllers.dashboard.Photos")
+                ul(class="grid photos") 
+                  li(class="photo display-ib", ng-repeat="photo in dataCache.photos | orderBy:predicate:date")
                     img(ng-src="{{photo.thumbnailUrl}}", bpn-directives-if-thumbnail-404="{{photo.url}}")
           
 
