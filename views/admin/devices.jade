@@ -21,6 +21,7 @@ block content
 					tr
 						th Serial
 						th MAC Address
+						th EC?
 						th Name
 						th Owner
 						th Last Connection At
@@ -28,6 +29,8 @@ block content
 					tr(ng-repeat="device in devices")
 						td {{device.serial}}
 						td {{device._id}}
+						td(ng-controller="bpn.controllers.admin.devices.EditDevice")
+							input.unstyled(type="checkbox", ng-model="device.sensorsById.ec", ng-change="saveSensors()")
 						td {{device.name}}
 						td {{device.owner.email}}
 						td {{device.lastConnectionAt}}

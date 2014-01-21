@@ -16,6 +16,13 @@ define([
                 method:'POST', 
                 isArray: false,
                 url: '/api/devices/'
+              },
+              saveSensors : {
+                method:'PUT', 
+                transformRequest: function (data, headersGetter) {
+                  var json = JSON.stringify({ sensors: data.sensors });
+                  return json;
+                }
               }
 						}
 					);

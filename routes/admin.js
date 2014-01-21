@@ -47,7 +47,7 @@ module.exports = function(app){
         };
 
     DeviceModel.find()
-    .select('_id serial name owner lastConnectionAt')
+    .select('_id serial name owner lastConnectionAt sensors')
     .populate('owner', '_id email')
     .sort('_id')
     .lean()

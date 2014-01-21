@@ -120,6 +120,38 @@ require([
       'WD-301-T8YD',
     ];
 
+    
+    app.controller('bpn.controllers.admin.devices.EditDevice', 
+      [
+        '$scope',
+        '$http',
+        '$q',
+        'DeviceModel',
+        function ($scope, $http, $q, DeviceModel) {
+
+          $scope.device = $scope.$parent.device;
+
+          $scope.saveSensors = function(device){
+            
+            console.log('saveSensors', $scope.device);
+            var device = $scope.device;
+            
+            // TODO : this sensorsById -> sensors logic is duplicating what should only be in the viewModel
+            //device.sensorsById.ec = !$scope.$parent.device.sensorsById.ec;
+            device.sensors = [];
+            Object.keys(device.sensorsById).forEach(function(sensorKey){
+              if (device.sensorsById[sensorKey]){
+                device.sensors.push(sensorKey);
+              }
+            });
+
+            device.$saveSensors();
+          };          
+        }
+      ]
+    );
+
+
     app.controller('bpn.controllers.admin.devices.AddDevice', 
       [
         '$scope',
@@ -159,13 +191,18 @@ require([
         function ($scope, $http, $q, DeviceModel) {
           
           $scope.devices = bpn.pageData.devices.map(function(device){
+            // TODO : this sensors -> sensorsById logic is duplicating what should only be in the viewModel
+            device.sensorsById = {};
+            device.sensors.forEach(function(sensorCode){
+              device.sensorsById[sensorCode] = true;
+            });
             return new DeviceModel(device); 
           });
           
           $scope.devicesBySerial = {};
           $scope.devices.forEach(function(device){
             $scope.devicesBySerial[device.serial] = device;
-          })
+          });
 
           $scope.availableSerials = [];
           productionSerials.forEach(function(serial){
@@ -174,8 +211,9 @@ require([
             }
           });
 
-          console.log($scope.availableSerials)
+          console.log('availableSerials', $scope.availableSerials)
 
+          
         }
       ]
     );

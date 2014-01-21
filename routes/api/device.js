@@ -99,7 +99,10 @@ module.exports = function(app) {
 
   /*
    * Update a device
-   *
+   * All properties are optional
+   * Undefined properties are left unchanged.
+   * To delete a property, it should be assigned null.
+   * 
    * To test:
    * jQuery.ajax({
    *     url: "/api/devices/${id}",
@@ -117,48 +120,106 @@ module.exports = function(app) {
    */
   app.put('/api/devices/:id', 
     routeUtils.middleware.ensureSecure,
-    routeUtils.middleware.ensureUserIsAdmin, 
     function (req, res, next){
-      winston.info('in PUT')
-      var data = {
-        deviceType: req.body.deviceType,
-        name: req.body.name,
-        serial: req.body.serial,
-        owner: req.body.owner,
-        activeGrowPlanInstance: req.body.activeGrowPlanInstance._id,
-        // status: {
-        //   actions: req.body.status.actions,
-        //   activeActions: req.body.status.activeAction,
-        //   immediateActions: req.body.status.immediateActions
-        // },
-        outputMap: req.body.outputMap.map(function(output){ return { control: output.control._id, outputId: output.outputId } }),
-        // sensorMap: req.body.sensorMap,
-        // userAssignmentLogs: req.body.userAssignmentLogs,
-        // users: req.body.users
-      }
       
-      return DeviceModel.findByIdAndUpdate(req.params.id, data, function (err, device) {
+      winston.info('in PUT /api/devices/' + req.params.id);
+      
+      DeviceModel.findById(req.params.id, function(err, device){
         if (err) { return next(err); }
-        return device.save(function (err, device) {
-          if (err) { return next(err); }
-          
-          winston.info("updated device");
 
-          //TODO: use a more generic pop helper for any obj/prop that we want to return from server to UI
-          // ModelUtils.populateObjArray(
-          //   device.outputMap, 
-          //   [{'key': 'control', 'dataModel': require('./control')}], 
-          //   function(err, obj){
-          //     if (err) { return next(err); }
-          //     return res.send(obj);
-          //   }
-          // );
+        if (!routeUtils.checkResourceModifyAccess(device, req.user)){
+          return res.send(401, "Only resource owner may modify a resource.");
+        }
+
+        // Update the shallow props the user can modify
+        if (typeof req.body.deviceType !== 'undefined'){
+          device.deviceType = req.body.deviceType;
+        }
+
+        if (typeof req.body.name !== 'undefined'){
+          device.name = req.body.name;
+        }
+
+        if (typeof req.body.activeGrowPlanInstance !== 'undefined'){
+          device.activeGrowPlanInstance = req.body.activeGrowPlanInstance;
+        }
+
+        if (typeof req.body.outputMap !== 'undefined'){
+          device.outputMap = req.body.outputMap.map(function(output){ return { control: output.control._id, outputId: output.outputId } });
+        }
+
+        if (typeof req.body.sensors !== 'undefined'){
+          device.sensors = req.body.sensors;
+        }
+
+
+        // Update the shallow props only an admin can modify
+        if (req.user.admin){
+          
+          if (typeof req.body.serial !== 'undefined'){
+            device.serial = req.body.serial;
+          }
+
+          if (typeof req.body.owner !== 'undefined'){
+            device.owner = req.body.owner;
+          }
+
+        } // /.req.user.admin
+
+        device.save(function(err){
+          if (err) { return next(err); }
+
+          winston.info("updated device " + req.params.id + JSON.stringify(req.body));
 
           //For now, can just return nothing and Angular will ignore
-          return res.send();
-          
+          return res.send();          
         });
+
       });
+
+      // var data = {
+      //   deviceType: req.body.deviceType,
+      //   name: req.body.name,
+      //   serial: req.body.serial,
+      //   owner: req.body.owner,
+      //   activeGrowPlanInstance: req.body.activeGrowPlanInstance._id,
+      //   // status: {
+      //   //   actions: req.body.status.actions,
+      //   //   activeActions: req.body.status.activeAction,
+      //   //   immediateActions: req.body.status.immediateActions
+      //   // },
+      //   outputMap: req.body.outputMap.map(function(output){ return { control: output.control._id, outputId: output.outputId } }),
+      //   sensors : req.body.sensors
+      //   // sensorMap: req.body.sensorMap,
+      //   // userAssignmentLogs: req.body.userAssignmentLogs,
+      //   // users: req.body.users
+      // }
+      
+
+
+      // DeviceModel.findByIdAndUpdate(req.params.id, data, function (err, device) {
+      //   if (err) { return next(err); }
+      //   return device.save(function (err, device) {
+      //     if (err) { return next(err); }
+          
+      //     winston.info("updated device");
+
+      //     //TODO: use a more generic pop helper for any obj/prop that we want to return from server to UI
+      //     // ModelUtils.populateObjArray(
+      //     //   device.outputMap, 
+      //     //   [{'key': 'control', 'dataModel': require('./control')}], 
+      //     //   function(err, obj){
+      //     //     if (err) { return next(err); }
+      //     //     return res.send(obj);
+      //     //   }
+      //     // );
+
+      //     //For now, can just return nothing and Angular will ignore
+      //     return res.send();
+          
+      //   });
+      // });
+
     }
   );
 

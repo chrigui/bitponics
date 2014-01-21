@@ -418,6 +418,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
    *   of action.cycle. If an ImmediateAction, this will be the cycle of the action it overrides.
    *   Used to bind the overlay details.
    * - Sets a "currentValue" property.
+   * - Adds a "sensorsById" hash. Keys are sensor id's, values are boolean of whether the sensor exists in the device.sensors array
    *
    * @param {Object} deviceStatus : the device.status property
    * @param {Array(Control)} controls : array of Control objects. Should contain all that may be referenced in the device status
@@ -475,6 +476,11 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
         outputId : outputMapping.outputId,
         currentState : activeActionsByControlId[outputMapping.control] ? deviceStatus.outputValues[outputMapping.outputId] : 0
       };
+    });
+
+    device.sensorsById = {};
+    device.sensors.forEach(function(sensorCode){
+      device.sensorsById[sensorCode] = true;
     });
 
     return deviceStatus;

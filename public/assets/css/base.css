@@ -3452,9 +3452,6 @@ label.newsletter.inline {
 .circle {
   margin: 1.5em 0;
 }
-.circle svg {
-  max-width: 100%;
-}
 @media  screen and (min-width: 65em) {
   .dashboard .garden-settings {
     float: right;
