@@ -47,6 +47,7 @@
     "requirejs": ">=2.1.2",
     "moment": "2.5.0",
     "moment-timezone": "0.0.3",
+    "time" : "0.10.0",
     "braintree": "*"
   },
   "devDependencies": {
