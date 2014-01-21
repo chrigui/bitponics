@@ -586,7 +586,8 @@ module.exports.checkDeviceConnections = function(callback){
       requirejs = require('../lib/requirejs-wrapper'),
       feBeUtils = requirejs('fe-be-utils'),
       i18nKeys = require('../i18n/keys'),
-      moment = require('moment');
+      moment = require('moment'),
+      getObjectId = module.exports.getObjectId;
 
   var now = new Date(),
       nowAsMilliseconds = now.valueOf(),
@@ -611,9 +612,22 @@ module.exports.checkDeviceConnections = function(callback){
     async.each(deviceResults,
       function iterator(device, iteratorCallback){
         if (!device.activeGrowPlanInstance.active) { return iteratorCallback(); }
+        
+        var usersToNotify = [];
+        if (device.users && device.users.length){
+          usersToNotify = usersToNotify.concat(device.users);
+        }
+        device.activeGrowPlanInstance.users.forEach(function(gardenUser){
+          var userAlreadyExists = usersToNotify.some(function(notificationUser){
+            return getObjectId(notificationUser).equals(getObjectId(gardenUser));
+          });
+          if (!userAlreadyExists){
+            usersToNotify.push(gardenUser);
+          }
+        });
 
         NotificationModel.create({
-          users : device.activeGrowPlanInstance.users,
+          users : usersToNotify,
           gpi : device.activeGrowPlanInstance._id,
           timeToSend : now,
           type : feBeUtils.NOTIFICATION_TYPES.ACTION_NEEDED,
