@@ -59,8 +59,15 @@ define(['angular', 'fe-be-utils', 'throttle-debounce'],
 
     bpnFilters.filter('notificationDate', function() {
       return function(notification) {
-        var date = notification.timeToSend || notification.sentLogs[notification.sentLogs.length-1].timeToSend,
-          val = moment(date).calendar();
+        var date, val, nowAsMilliseconds = (new Date()).valueOf();
+
+        if (notification.timeToSend && notification.timeToSend.valueOf() < nowAsMilliseconds){
+          date = notification.timeToSend;
+        } else {
+          date = notification.sentLogs[notification.sentLogs.length-1].timeToSend;
+        }
+
+        val = moment(date).calendar();
         
         return val.charAt(0).toUpperCase() + val.slice(1);
       }
