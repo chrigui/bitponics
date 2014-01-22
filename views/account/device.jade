@@ -1,8 +1,6 @@
 extends ../layout
 
 block head
-  base(href="/setup/device/")
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js')
   mixin requirejs("/assets/js/pages/account/devices")
 
 block css 
@@ -11,10 +9,10 @@ block css
 
 block content
   section.header
-    header
-      include /includes/nav/main
-  
-  section(ng-cloak="")#main(role="main", class="main")
+      header
+        include ../includes/nav/main
+        
+  section#main(role="main", class="main")
     div.content-module.middle(ng-controller="bpn.controllers.account.devices.Main")
       h1.page-heading Manage Devices
       //- section(ng-view)
