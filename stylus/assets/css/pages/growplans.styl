@@ -304,6 +304,15 @@
 		text
 			font-size 1em
 
+		&.reminder
+			// tried inverting the colors, but looks pretty bad
+			// 	svg
+			// 		background white
+			// 		.on
+			// 			fill white
+			// 		path
+			// 			stroke color-bg-green
+
 	.controls
 		.grid--wrapping > .grid-cell
 			flex 1 5em
@@ -320,6 +329,10 @@
 
 			&.has-action
 				opacity 1
+
+	.reminders
+		.btn-compact
+			width 13em
 
 	.grow-systems, .lights, .nutrients, .ideal-ranges
 		.grid--wrapping > .grid-cell

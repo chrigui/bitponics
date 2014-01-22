@@ -444,15 +444,15 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
 
           // disable data sorting & force all slices to be the same size
           pie
-          .sort(null)
-          .value(function (d) {
-            return d.milliseconds || 1; // don't allow a 0 duration. d3 can't draw it
-          });
+            .sort(null)
+            .value(function (d) {
+              return d.milliseconds || 1; // don't allow a 0 duration. d3 can't draw it
+            });
 
           svg = d3.select(element[0])
-          .append('svg:svg')
-          .attr('width', width)
-          .attr('height', height);
+            .append('svg:svg')
+            .attr('width', width)
+            .attr('height', height);
 
           arc = d3.svg.arc();
           if (scope.controlAction.control) {
@@ -479,24 +479,137 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
           }
 
           arc
-          .outerRadius(radius - arcMargin)
-          .innerRadius(radius - arcSpan - arcMargin);
+            .outerRadius(radius - arcMargin)
+            .innerRadius(radius - arcSpan - arcMargin);
 
           svgGroup = svg.append('svg:g')
-          .classed(className, true)
-          .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');          
+            .classed(className, true)
+            .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');          
 
           svgGroup.selectAll('path')
-          .data(pie(cycleGraphData))
-          .enter()
-          .append('svg:path')
-          .attr('d', arc)
-          .attr('class', scope.getPathClassName)
-          //.attr('stroke', '#fff')
-          //.attr('stroke-width', 1)
-          //.attr('fill', scope.getControlFillColor)
+            .data(pie(cycleGraphData))
+            .enter()
+            .append('svg:path')
+            .attr('d', arc)
+            .attr('class', scope.getPathClassName)
+            //.attr('stroke', '#fff')
+            //.attr('stroke-width', 1)
+            //.attr('fill', scope.getControlFillColor)
           
         }
       };
     });
+
+    bpnDirectives.directive('bpnDirectivesReminderGraph', 
+      [
+        function() {
+          return {
+            restrict : "EA",
+            replace : true,
+            scope : {
+              controlAction : "=",
+              phase : "=",
+              eventHandler : '&customClick'
+            },
+            template : '<div class="control reminder ring-graph {{controlAction.control.className}}" ng-click="eventHandler()">' + 
+                          '<img src="/assets/img/spinner.svg" class="spinner" ng-show="controlAction.updateInProgress" />' +
+                          '<i class="icon-glyph-new {{controlAction.control.className}} {{iconMap[controlAction.control.className]}}" aria-hidden="true"></i>' + 
+                          '<div class="duration-abbrev" ng-hide="controlAction.overallDuration === 0">{{controlAction.overallDuration}}{{controlAction.overallDurationType.charAt(0)}}</div>' + 
+                        '</div>',
+            controller : [
+              '$scope', '$element', '$attrs', '$transclude',
+              function ($scope, $element, $attrs, $transclude){
+                $scope.getPathClassName = function (data, index) {
+                  var num = parseInt(data.data.value, 10);
+
+                  if (num == 0) {
+                    return 'off';
+                  } else {
+                    return 'on';
+                  }
+                };
+
+                $scope.iconMap = {
+                  'seedlingheatmat' : 'icon-__96_heatmat_00e36c',
+                  'humidifier' : 'icon-__98_humidifier_00e36c',
+                  'airconditioner' : 'icon-__92_ac_00e36c',
+                  'heater' : 'icon-__94_heater_00e36c',
+                  'fan' : 'icon-__83_fan_00e36c',
+                  'waterpump' : 'icon-__88_waterpump_00e36c',
+                  'light' : 'icon-__100_light_accessory_00e36c'
+                }
+
+
+              }
+            ],
+            link: function (scope, element, attrs, controller) { 
+              var outerMargin = 0,
+                  width = element.width() - (outerMargin * 2),
+                  height = width,
+                  radius = width / 2,
+                  innerWhitespaceRadius = radius / 2,
+                  arcSpan = (radius - innerWhitespaceRadius),
+                  arcMargin = 0,
+                  pie = d3.layout.pie(),
+                  svg,
+                  arc,
+                  svgGroup,
+                  cycleStates,
+                  cyclesInADay,
+                  cycleGraphData = [{ value: 1 }], //default to solid ring
+                  dayMilliseconds = 24 * 60 * 60 * 1000,
+                  weekMilliseconds = 7 * 24 * 60 * 60 * 1000,
+                  monthMilliseconds = 30 * 24 * 60 * 60 * 1000,
+                  totalPhaseMilliseconds,
+                  actionDurationInMilliseconds,
+                  numActionInstancePerPhase,
+                  className = 'action';
+
+              pie
+                .sort(null)
+                .value(function (d) {
+                  return d.value || 1; // don't allow a 0 duration. d3 can't draw it
+                });
+
+              svg = d3.select(element[0])
+                .append('svg:svg')
+                .attr('width', width)
+                .attr('height', height);
+
+              arc = d3.svg.arc();
+
+              if (scope.controlAction.overallDuration !== 0){
+                totalPhaseMilliseconds = moment.duration(scope.phase.expectedNumberOfDays || 0, 'days').asMilliseconds();
+                actionDurationInMilliseconds = moment.duration(scope.controlAction.overallDuration || 0, scope.controlAction.overallDurationType || '').asMilliseconds()
+                numActionInstancePerPhase = totalPhaseMilliseconds/actionDurationInMilliseconds;
+                // console.log('totalPhaseMilliseconds', totalPhaseMilliseconds)
+                // console.log('actionDurationInMilliseconds', actionDurationInMilliseconds)
+                // console.log('numActionInstancePerPhase', numActionInstancePerPhase)
+                // totalPhaseMilliseconds - (actionDurationInMilliseconds * i),
+                cycleGraphData = [];
+                for (var i = 0; i < numActionInstancePerPhase; i++) {
+                  cycleGraphData.push({ value: 1 });
+                }
+              }
+
+              arc
+                .outerRadius(radius - arcMargin)
+                .innerRadius(radius - arcSpan - arcMargin);
+
+              svgGroup = svg.append('svg:g')
+                .classed(className, true)
+                .attr('transform', 'translate(' + (width / 2) + ',' + (width / 2) + ')');          
+
+              svgGroup.selectAll('path')
+                .data(pie(cycleGraphData))
+                .enter()
+                .append('svg:path')
+                .attr('d', arc)
+                .attr('class', scope.getPathClassName)
+              
+            }
+          }
+        }
+      ]
+    );
 });
