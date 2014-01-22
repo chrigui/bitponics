@@ -1,6 +1,34 @@
-var passportSocketIo = require("passport.socketio"),
-    express = require('express'),
-    SocketMongoStore = require('mong.socket.io');
+var passportSocketIo = require("passport.socketio")
+    , winston = require('winston')
+    , express = require('express')
+    , SocketMongoStore = require('mong.socket.io')
+    // https://devcenter.heroku.com/articles/rediscloud#using-redis-from-node-js
+    , redis = require("redis")
+    , url = require('url')
+    , redisURL = url.parse(process.env.REDISCLOUD_URL || 'http://@localhost') // need empty auth on local
+    //, client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+    , password = redisURL.auth.split(":")[1];
+
+
+var RedisStore = require('socket.io/lib/stores/redis')
+  , pub    = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true})
+  , sub    = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true})
+  , client = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+
+var redisAuthCallback = function(err){
+  if (err){
+    winston.err(JSON.stringify(err));
+  }
+};
+
+pub.auth(password, redisAuthCallback);
+sub.auth(password, redisAuthCallback);
+client.auth(password, redisAuthCallback);
+
+client.set('test-connection', 'connected');
+client.get('test-connection', function (err, reply) {
+  winston.info('redis connection is: ' + reply.toString()); // Will print `connected`
+});
 
 module.exports = function(app){
   
@@ -8,11 +36,17 @@ module.exports = function(app){
     
     io.configure(function () {
       io.set("log level", 3);
-      var store = new SocketMongoStore({
-        url: app.config.mongooseConnection.db
-      });
-      store.on('error', console.error);
-      io.set('store', store);
+      // var store = new SocketMongoStore({
+      //   url: app.config.mongooseConnection.db
+      // });
+      // store.on('error', console.error);
+      // io.set('store', store);
+      io.set('store', new RedisStore({
+        redis    : redis
+      , redisPub : pub
+      , redisSub : sub
+      , redisClient : client
+      }));
     });
 
 
