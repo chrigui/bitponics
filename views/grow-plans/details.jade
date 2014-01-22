@@ -269,11 +269,16 @@ block head
               button(
                 type="button",
                 ng-repeat="action in sharedDataService.selectedGrowPlan.focusedPhase.actionViewModelsNoControl", 
-                class="btn-composite action", 
+                class="btn-compact action", 
                 ng-click="triggerActionOverlay(action)") 
                 
                 
-                div(ng-if="!currentAction", data-bpn-directives-control-action-graph, data-control-action="action", custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
+                div(ng-if="!currentAction", 
+                    data-bpn-directives-reminder-graph, 
+                    data-control-action="action", 
+                    data-phase="sharedDataService.selectedGrowPlan.focusedPhase", 
+                    custom-click="sharedDataService.activeOverlay = 'ActionOverlay' + action._id")
+
                 p {{action.description}}
               
                 div
@@ -324,7 +329,7 @@ block head
                           div.separator-top
                             a.btn.remove(ng-click="removeAction(action)") Remove this reminder
 
-              div.btn(ng-click="triggerActionOverlay()") Add Reminder
+              div.btn.display-b(ng-click="triggerActionOverlay()") Add Reminder
 
 
 

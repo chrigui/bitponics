@@ -48,6 +48,7 @@
 .btn,
 .btn *,
 .btn-composite,
+.btn-compact,
 .control,
 .page-content.center-img img,
 .overlay .pagination li,
@@ -498,7 +499,8 @@ ol.list-style {
  * Generic Button Style
  */
 .btn,
-.btn-composite {
+.btn-composite,
+.btn-compact {
   padding: 1em;
   margin: 1em;
   background-color: #00e36c;
@@ -509,55 +511,70 @@ ol.list-style {
   transition: all 0.5s ease;
 }
 .btn:active,
-.btn-composite:active {
+.btn-composite:active,
+.btn-compact:active {
   box-shadow: none;
   top: 1px;
   right: -1px;
 }
 .btn *,
-.btn-composite * {
+.btn-composite *,
+.btn-compact * {
   margin: 0;
 }
 .btn.sub,
-.btn-composite.sub {
+.btn-composite.sub,
+.btn-compact.sub {
   background: #00e36c;
 }
 .btn.clear,
-.btn-composite.clear {
+.btn-composite.clear,
+.btn-compact.clear {
   display: block;
   clear: both;
   margin: 0;
 }
 .btn.add,
-.btn-composite.add {
+.btn-composite.add,
+.btn-compact.add {
   border: 0 none;
 }
 .btn.on,
-.btn-composite.on {
+.btn-composite.on,
+.btn-compact.on {
   background: #00e36c;
   color: #fff;
 }
 .btn.off,
-.btn-composite.off {
+.btn-composite.off,
+.btn-compact.off {
   background: #fff;
   color: #00e36c;
 }
 .btn.warning,
 .btn-composite.warning,
+.btn-compact.warning,
 .btn.remove,
-.btn-composite.remove {
+.btn-composite.remove,
+.btn-compact.remove {
   color: #fac400;
   font-weight: bold;
 }
-.btn-composite {
+.btn-composite,
+.btn-compact {
   background-color: #fff;
   color: #00e36c;
   border: 0 none;
   box-shadow: none;
 }
-.btn-composite p {
+.btn-composite p,
+.btn-compact p {
   color: #00e36c;
   padding-bottom: 0.15em;
+}
+.btn-compact {
+  margin: 0;
+  padding: 0;
 }
 .link {
   color: #00e36c;
@@ -5749,6 +5766,9 @@ button.close {
   opacity: 1;
   -ms-filter: none;
   filter: none;
+}
+.growplans .reminders .btn-compact {
+  width: 13em;
 }
 .growplans .grow-systems .grid--wrapping > .grid-cell,
 .growplans .lights .grid--wrapping > .grid-cell,
