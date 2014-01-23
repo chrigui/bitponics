@@ -75,6 +75,13 @@ module.exports = function(app, callback) {
   require('./auth-config')(app);
   require('./app-config')(app);
   require('./braintree-config').setEnvironment(app.settings.env);
+  // warm up the redis cache
+  var cache = require('../lib/redis-cache');
+  cache.set('application started', new Date(), 1);
+  cache.get('application started', function(err, value){
+    winston.info('cache response: application started ' + value);
+  });
+
   require('../lib/mixpanel-wrapper').init(app);
 
 	// This has to occur after the connection has been set up
