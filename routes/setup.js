@@ -135,48 +135,11 @@ module.exports = function(app){
 						ControlModel.find({}, callback);
 					},
 					function parallel4(callback){
-						//get all grow plans and populate
-						async.series(
-							[
-								function (innerCallback) {
-									GrowPlanModel.find({ visibility: 'public' })
-									.populate('plants')
-									.populate('phases.nutrients')
-									.populate('phases.actions')
-									.populate('phases.growSystem')
-									.populate('phases.phaseEndActions')
-                  .populate('createdBy', 'name')
-									.exec(function(err, gps){
-										if (err) { return innerCallback(err); }
-										locals.growPlans = gps;
-										innerCallback();
-									});
-								},
-								function (innerCallback) {
-									var actionIds = [];
-									locals.growPlans.forEach(function(growPlan) {
-										growPlan.phases.forEach(function(phase) {
-											phase.idealRanges.forEach(function(idealRange, i) {
-												actionIds.push(idealRange.actionAboveMax);
-												actionIds.push(idealRange.actionBelowMin);
-											});
-										});
-									});
-									ActionModel.find({})
-										.where('_id').in(actionIds)
-										.exec(function (err, actions) {
-											if (err) { return innerCallback(err); }
-											actions.forEach(function(item, index) {
-												locals.actions[item._id] = item;
-											});
-											innerCallback();
-										});
-								}
-							],
-							function (err, result) {
-								callback();
-							}
-						);
+						// Grow Plans are now being retrieved by an API call during page init, only need to provide the All-Purpose default here
+            GrowPlanModel.findById(allPurposeGrowPlanId)
+            .select('name description phases.expectedNumberOfDays createdBy activeGardenCount plants')
+            .populate('createdBy', 'name')
+            .exec(callback);
 					},
 					function parallel5(callback){
 						// Get the devices that the user owns
@@ -208,6 +171,7 @@ module.exports = function(app){
 					var growSystems = result[0],
 							plants = result[1],
 							controls = result[2],
+              growPlanDefault = result[3],
 							userOwnedDevices = result[4],
               sensors = result[5],
               lights = result[6],
@@ -222,6 +186,7 @@ module.exports = function(app){
           locals.lightFixtures = lightFixtures;
 					locals.lightBulbs = lightBulbs;
           locals.nutrients = nutrients;
+          locals.growPlanDefault = growPlanDefault;
           
 					//convert controls into obj with id as keys
 					controls.forEach(function (item, index) {
@@ -234,12 +199,12 @@ module.exports = function(app){
 					});
           
 					//single out the default grow plan
-					locals.growPlans.forEach(function (item, index) {
-						if(item._id == allPurposeGrowPlanId){
-							locals.growPlanDefault = item;
-							locals.growPlans.splice(index, 1); //remove default from general list of grow plans
-						}
-					});
+					// locals.growPlans.forEach(function (item, index) {
+					// 	if(item._id == allPurposeGrowPlanId){
+					// 		locals.growPlanDefault = item;
+					// 		locals.growPlans.splice(index, 1); //remove default from general list of grow plans
+					// 	}
+					// });
 
 					res.render('setup/grow-plan', locals);
 				}

@@ -143,6 +143,9 @@ mixin requirejs(dataMain)
         'jquery': { 
           exports : '$'
         },
+        'select2': {
+          deps : ['jquery']
+        },
         'socket.io': {
           exports: 'io'
         },

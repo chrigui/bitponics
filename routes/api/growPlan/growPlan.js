@@ -48,7 +48,7 @@ module.exports = function(app) {
     }
 
     query.where('_id').ne(allPurposeGrowPlanId)
-    query.select('name description phases.expectedNumberOfDays createdBy activeGardenCount')
+    query.select('name description phases.expectedNumberOfDays createdBy activeGardenCount plants')
     .populate('createdBy', 'name')
     .lean()
     .exec(function (err, growPlans) {
@@ -142,6 +142,26 @@ module.exports = function(app) {
       });
 	  }
   );
+
+
+
+  app.get('/api/grow-plans/:id/default-photo', 
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      GrowPlanModel.findById(req.params.id)
+      .select('plants owner users visibility')
+      .exec(function(err, growPlanResult){
+        if (err) { return next(err); }
+
+        if (!growPlanResult){ 
+          return next(new Error(i18nKeys.get('Invalid Grow Plan id', req.params.id)));
+        }
+
+        return res.send(302, '//s3.amazonaws.com/bitponics-cdn/assets/img/plants/' + growPlanResult.plants[0].toString() + '.jpg');
+      });
+    }
+  );
+  
 
 
   /*

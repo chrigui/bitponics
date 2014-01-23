@@ -17,7 +17,7 @@ define([
         'UserModel',
         'NotificationModel',
 				function (UserModel, NotificationModel) {
-          console.log('called"')
+          console.log("NavService initializing")
           var navService = {
             openGardenSettingsOverlay : false, //closed by default
             recentNotifications : []

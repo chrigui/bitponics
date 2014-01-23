@@ -442,8 +442,8 @@ define([
           //$scope.selectedGrowPlan = {}; 
           // $scope.selectedGrowSystem = undefined;
           $scope.currentGrowPlanDay = 0;
-          $scope.growPlans = bpn.growPlans;
-          $scope.filteredGrowPlanList = angular.copy($scope.growPlans);
+          //$scope.growPlans = bpn.growPlans;
+          $scope.filteredGrowPlanList = [];//angular.copy($scope.growPlans);
           $scope.timesOfDayList = feBeUtils.generateTimesOfDayArray();
           $scope.actionDurationTypeOptions = feBeUtils.DURATION_TYPES;
           $scope.actionWithNoAccessoryDurationTypeOptions = ['days', 'weeks', 'months'];
@@ -528,7 +528,9 @@ define([
           // };
 
           $scope.$watch('sharedDataService.selectedGrowSystem', function () {
-            $scope.updatefilteredGrowPlans();
+            // Re-enable this once we implement grow system filtering
+            // For some reason though, it's firing on page initialization. Haven't traced down what's setting selectedGrowSystem on init
+            //$scope.updatefilteredGrowPlans();
           });
 
           $scope.$watch('sharedDataService.selected.plants', function(){
@@ -629,6 +631,8 @@ define([
           };        
 
           $scope.updatefilteredGrowPlans = function () {
+            console.log('$scope.updatefilteredGrowPlans');
+            console.trace();
             var selectedPlantIds = $scope.sharedDataService.selectedPlants.map(function (plant) { return plant._id }),
               growPlanDefault = new GrowPlanModel(bpn.growPlanDefault);
 
@@ -681,6 +685,13 @@ define([
               });
             }
           };
+
+          $scope.init = function(){
+            // updatefilteredGrowPlans is already being called by the selectedPlants watcher during init
+            //$scope.updatefilteredGrowPlans();
+          };
+
+          $scope.init();
         }
       ]
     );

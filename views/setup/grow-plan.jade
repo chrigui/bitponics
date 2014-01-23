@@ -13,7 +13,7 @@ block head
       h4(class="page-heading float-l") Select a Grow Plan to manage your garden
       div(class="btn float-r", ng-click="showFilter = !showFilter") Filter
       
-      div(id="filter_questions", class="accordion clear-b", ng-show="showFilter")
+      div(id="filter_questions", class="accordion clear-b ng-hide", ng-show="showFilter")
         div.separator-top
         //- .question
         //-   h5.question-title Filter by grow system
