@@ -70,6 +70,12 @@ GrowPlanSchema.plugin(useTimestamps);
 GrowPlanSchema.plugin(mongoosePlugins.recoverableRemove);
 
 
+/************************** INDICES ***************************/
+GrowPlanSchema.index({ plants: 1 });
+GrowPlanSchema.index({ createdBy: 1 });
+/************************** END INDICES ***************************/
+
+
 /************************** VIRTUALS ***************************/
 
 GrowPlanSchema.virtual('owner')
