@@ -47,8 +47,6 @@ block head
       //- each growPlan, i in growPlans
       li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:'-activeGardenCount'", class="grow-plan-list-item grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
         div.img-wrapper(bpn-directives-grow-plan-photo-grid)
-          //div.icon-glyph.icon-__62_logo_00e36c
-          //img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{growPlan.plants[0]}}.jpg", alt="{{plant.name}}")
         div.first
           //- h5.label Name
           h3.label {{growPlan.name}}

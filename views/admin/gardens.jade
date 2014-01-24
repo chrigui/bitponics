@@ -13,8 +13,8 @@ block content
 	section#main(role="main", class="main")
 		h2.page-heading All Gardens
 		div.separator-top(ng-cloak, ng-controller="bpn.controllers.admin.gardens.Main")
-			ul(class="block-info-set content-module") 
-				li(ng-repeat="garden in gardens", ng-click="")
+			ul(class="block-info-set content-module garden-list") 
+				li(class="garden-list-item", ng-repeat="garden in gardens", ng-click="")
 					div.first
 						h5.label Name
 						div.value {{garden.name}}

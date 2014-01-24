@@ -4,6 +4,7 @@
  * Depends on following globals:
  * - bpn
  * - bpn.user
+ * - bpn.plants
  */
 require([
   'angular',
@@ -28,11 +29,17 @@ function (angular, domReady, viewModels, moment, feBeUtils) {
     '$scope',
     'GardenModel',
     function($scope, GardenModel){
+      $scope.plants = bpn.plants;
+      $scope.plantsById = {};
+      $scope.plants.forEach(function(plant){
+        $scope.plantsById[plant._id] = plant;
+      });
+
       $scope.init = function(){
         $scope.communityGardenResults = GardenModel.query(
           { 
             where : JSON.stringify({ 'users' : { '$ne' : bpn.user._id }}),
-            select : 'name,startDate,owner.name'
+            select : 'name,startDate,owner.name,growPlan.name,growPlan.plants'
           },
           function success(data){
             console.log(data);
@@ -42,7 +49,7 @@ function (angular, domReady, viewModels, moment, feBeUtils) {
         $scope.userGardenResults = GardenModel.query(
           { 
             where : JSON.stringify({ 'users' : bpn.user._id }),
-            select : 'name,startDate'
+            select : 'name,startDate,growPlan.name,growPlan.plants'
           },
           function success(data){
             console.log(data);

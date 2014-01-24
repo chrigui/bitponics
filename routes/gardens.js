@@ -1,6 +1,7 @@
 var ControlModel = require('../models/control').model,
 GrowPlanModel = require('../models/growPlan').growPlan.model,
 GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+PlantModel = require('../models/plant').model,
 SensorModel = require('../models/sensor').model,
 SensorLogModel = require('../models/sensorLog').model,
 ControlModel = require('../models/control').model,
@@ -25,27 +26,18 @@ module.exports = function(app){
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
-				userGrowPlanInstances : [],
-				communityGrowPlanInstances : [],
 				className: "gardens app-page single-page",
-    			pageType: "app-page"
+  			pageType: "app-page",
+        plants : []
 			};
 
-			GrowPlanInstanceModel
-			.find({ 'users': req.user })
-			.sort('-startDate')
-			.exec(function(err, growPlanInstanceResults){
-				if (err) { return next(err); }
-				locals.userGrowPlanInstances = growPlanInstanceResults.map(function(gpi) { return gpi.toObject(); })
-				locals.userGrowPlanInstances.forEach(function(gpi){
-					gpi.friendlyStartDate = '';
-					if (gpi.startDate){
-						gpi.friendlyStartDate = moment(gpi.startDate).calendar();
-					}
-					
-				})
-				res.render('gardens', locals);
-			});
+			PlantModel.find().exec(function(err, plants){
+        if (err) { return next(err); }
+        locals.plants = plants;
+        res.render('gardens', locals);  
+      });
+			
+			
 		}
 	);
 

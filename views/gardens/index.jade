@@ -19,20 +19,20 @@ block content
 			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
 			div(ng-cloak)
 				ul(
-					class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", 
+					class="garden-list grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", 
 					ng-show="userGardenResults.data.length")
-
-					li(ng-repeat="garden in userGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
-						div.img-wrapper
-							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
-							div.icon-glyph.icon-__62_logo_00e36c
+					li(ng-repeat="garden in userGardenResults.data", class="garden-list-item grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+						div.img-wrapper(bpn-directives-garden-photo-grid)
 						div.first
-							div.value {{garden.name}}
+							h3.label {{garden.name}}
+						ul(class="plantlist")
+							li(ng-show="!garden.growPlan.plants.length")
+								span.value.plant All Plants
+							li(ng-repeat="plant in garden.growPlan.plants track by $index | orderBy:name", class="grid-cell")
+								span.value(class="plant") {{plantsById[plant].name}}&nbsp;
+						p 
+							a(href="/grow-plans/{{garden.growPlan._id}}") {{garden.growPlan.name}} Grow Plan
 						p Started {{garden.startDate | friendlyDate:'lowercase'}}
-						//- div(ng-show="garden.device")
-						//- 	h5.label Device
-						//- 		div.value 
-						//- 			a(href="/account/devices/{{garden.device}}") {{garden.device}}
 						a.btn(href="/gardens/{{garden._id}}") Dashboard
 
 				div(ng-hide="userGardenResults.data.length")
@@ -42,19 +42,25 @@ block content
 		div.separator-top
 			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
 			div(ng-cloak)
-				ul(class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
-					li(ng-repeat="garden in communityGardenResults.data", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
-						div.img-wrapper
-							//- img(src="/assets/img/placeholders/hydro6.jpg", alt="Latest #{gpi.name} photo")
-							div.icon-glyph.icon-__62_logo_00e36c
+				ul(class="garden-list grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+					li(ng-repeat="garden in communityGardenResults.data", class="garden-list-item grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+						div.img-wrapper(bpn-directives-garden-photo-grid)
 						div.first
-							div.value {{garden.name}}
+							h3.label {{garden.name}}
+						ul(class="plantlist")
+							li(ng-show="!garden.growPlan.plants.length")
+								span.value.plant All Plants
+							li(ng-repeat="plant in garden.growPlan.plants track by $index | orderBy:name", class="grid-cell")
+								span.value(class="plant") {{plantsById[plant].name}}&nbsp;
+						p 
+							a(href="/grow-plans/{{garden.growPlan._id}}") {{garden.growPlan.name}} Grow Plan
 						p Started {{garden.startDate | friendlyDate:'lowercase'}}
 						p By 
 							a(href="/profiles/{{garden.owner._id}}") {{garden.owner.name.full}}
 						a.btn(href="/gardens/{{garden._id}}") Dashboard
 
+					
 
 block footer-scripts
 	script
-		bpn.pageData.userGrowPlanInstances = !{JSON.stringify(userGrowPlanInstances)};
+		bpn.plants = !{JSON.stringify(plants)};

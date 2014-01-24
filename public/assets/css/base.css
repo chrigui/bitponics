@@ -1856,42 +1856,42 @@ body.ngdialog-open {
  * Grow Plan List
  */
 .grow-plan-list .grow-plan-list-item,
-.garden-list.garden-list-item {
+.garden-list .garden-list-item {
   text-align: center;
 }
 .grow-plan-list .grow-plan-list-item h3,
-.garden-list.garden-list-item h3 {
+.garden-list .garden-list-item h3 {
   font-size: 2em;
   margin-top: 0.2em;
 }
 .grow-plan-list .grow-plan-list-item .value,
-.garden-list.garden-list-item .value {
+.garden-list .garden-list-item .value {
   font-size: 1em;
   margin: 0.5em 0;
 }
 .grow-plan-list .grow-plan-list-item p,
-.garden-list.garden-list-item p {
+.garden-list .garden-list-item p {
   font-size: 1em;
   margin: 0.5em 0;
 }
 .grow-plan-list .grow-plan-list-item .plantlist li,
-.garden-list.garden-list-item .plantlist li {
+.garden-list .garden-list-item .plantlist li {
   display: inline;
 }
 .grow-plan-list .grow-plan-list-item .btn,
-.garden-list.garden-list-item .btn {
+.garden-list .garden-list-item .btn {
   display: block;
   margin: 0 auto;
   width: 50%;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper,
-.garden-list.garden-list-item .img-wrapper {
+.garden-list .garden-list-item .img-wrapper {
   position: relative;
   height: 0;
   padding-bottom: 100%;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper .plant-grid-image {
   float: left;
   width: 100%;
   height: 0;
@@ -1904,19 +1904,19 @@ body.ngdialog-open {
   padding-top: 12px;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper .icon-glyph,
-.garden-list.garden-list-item .img-wrapper .icon-glyph {
+.garden-list .garden-list-item .img-wrapper .icon-glyph {
   height: 5em;
   width: 5em;
   background-position: -1em 0;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper.grid-4 .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper.grid-4 .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper.grid-4 .plant-grid-image {
   width: 50%;
   padding-bottom: 50%;
   padding-top: 4px;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper.grid-16 .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper.grid-16 .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper.grid-16 .plant-grid-image {
   width: 25%;
   padding-bottom: 25%;
   padding-top: 0;
@@ -1925,42 +1925,42 @@ body.ngdialog-open {
  * Garden List
  */
 .grow-plan-list .grow-plan-list-item,
-.garden-list.garden-list-item {
+.garden-list .garden-list-item {
   text-align: center;
 }
 .grow-plan-list .grow-plan-list-item h3,
-.garden-list.garden-list-item h3 {
+.garden-list .garden-list-item h3 {
   font-size: 2em;
   margin-top: 0.2em;
 }
 .grow-plan-list .grow-plan-list-item .value,
-.garden-list.garden-list-item .value {
+.garden-list .garden-list-item .value {
   font-size: 1em;
   margin: 0.5em 0;
 }
 .grow-plan-list .grow-plan-list-item p,
-.garden-list.garden-list-item p {
+.garden-list .garden-list-item p {
   font-size: 1em;
   margin: 0.5em 0;
 }
 .grow-plan-list .grow-plan-list-item .plantlist li,
-.garden-list.garden-list-item .plantlist li {
+.garden-list .garden-list-item .plantlist li {
   display: inline;
 }
 .grow-plan-list .grow-plan-list-item .btn,
-.garden-list.garden-list-item .btn {
+.garden-list .garden-list-item .btn {
   display: block;
   margin: 0 auto;
   width: 50%;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper,
-.garden-list.garden-list-item .img-wrapper {
+.garden-list .garden-list-item .img-wrapper {
   position: relative;
   height: 0;
   padding-bottom: 100%;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper .plant-grid-image {
   float: left;
   width: 100%;
   height: 0;
@@ -1973,19 +1973,19 @@ body.ngdialog-open {
   padding-top: 12px;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper .icon-glyph,
-.garden-list.garden-list-item .img-wrapper .icon-glyph {
+.garden-list .garden-list-item .img-wrapper .icon-glyph {
   height: 5em;
   width: 5em;
   background-position: -1em 0;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper.grid-4 .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper.grid-4 .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper.grid-4 .plant-grid-image {
   width: 50%;
   padding-bottom: 50%;
   padding-top: 4px;
 }
 .grow-plan-list .grow-plan-list-item .img-wrapper.grid-16 .plant-grid-image,
-.garden-list.garden-list-item .img-wrapper.grid-16 .plant-grid-image {
+.garden-list .garden-list-item .img-wrapper.grid-16 .plant-grid-image {
   width: 25%;
   padding-bottom: 25%;
   padding-top: 0;
@@ -6122,7 +6122,12 @@ button.close {
 /*
  * Gardens List Page
  */
-.gardens .set-up-garden {
+.gardens .page-heading,
+.app-page.gardens .page-heading {
+  font-size: 2.5em;
+}
+.gardens .set-up-garden,
+.app-page.gardens .set-up-garden {
   margin-left: 0;
 }
 /*

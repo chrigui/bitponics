@@ -188,7 +188,7 @@ define(['angular', 'jquery', 'throttle-debounce'],
             //element.append('<div class="icon-glyph icon-__62_logo_00e36c"></div>');
             element.addClass('grid-16');
             for (i = 1; i <= 16; i++){
-              element.append(scope.generatePhoto(bpn.plants[i]._id));  
+              element.append(scope.generatePhoto(bpn.plants[i%bpn.plants.length]._id));  
             }
             
           } else if (length === 1){ 
@@ -205,6 +205,31 @@ define(['angular', 'jquery', 'throttle-debounce'],
             }
           }
         }
+      }
+    });
+
+    /**
+     * Assumes growPlan.plants is an array of plant id's (not populated plant objects)
+     * 
+     * Dependent on following globals:
+     * - bpn.plants
+     */
+    bpnDirectives.directive('bpnDirectivesGardenPhotoGrid', function() {
+      return {
+        template : '<div bpn-directives-grow-plan-photo-grid></div>',
+        // replace : true,
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude',
+          function ($scope, $element, $attrs, $transclude){
+            $scope.growPlan = $scope.garden.growPlan;
+          }
+        ],
+        // link: function(scope, element, attrs) {
+        //   console.log('scope');
+        //   element.append("<div bpn-directives-grow-plan-photo-grid></div>");
+          
+        // }
+        
       }
     });
 

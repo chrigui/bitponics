@@ -180,23 +180,35 @@ module.exports = {
             // If selecting nested objects, need to tell mongo the correct fields to populate
             if (select){
               select = select.split(',');
+
+              var fieldRoots = {};
               select.forEach(function(field){
-                
                 var fieldParts = field.split('.'),
                   fieldRoot = fieldParts[0],
-                  fieldNested = fieldParts[1],
+                  fieldNested = fieldParts[1];
+
+                if (!fieldRoots[fieldRoot]){
+                  fieldRoots[fieldRoot] = [];
+                }
+                fieldRoots[fieldRoot].push(fieldNested || '');
+              });
+              Object.keys(fieldRoots).forEach(function(fieldRoot){
+                
+                var //fieldParts = field.split('.'),
+                  //fieldRoot = selectRoot,
+                  fieldNested = fieldRoots[fieldRoot].join(' '),
                   modelPath = Model.schema.path(fieldRoot);
                 
                 // If fieldRoot is a ref'ed schema type
                 if (modelPath.options.ref){
                   // populate fieldRoot, select field[1]
-                  console.log('populating');
+                  console.log('populating', fieldRoot, fieldNested);
                   query.select(fieldRoot);
                   query.populate(fieldRoot, fieldNested);
                 }
                 else{
                   // select field as one thing (no parts). Standard mongo subdoc selection.
-                  query.select(field);
+                  query.select(fieldRoot + '.' + fieldNested);
                 }
               });
             }            
