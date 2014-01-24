@@ -632,9 +632,10 @@ define([
 
           $scope.updatefilteredGrowPlans = function () {
             console.log('$scope.updatefilteredGrowPlans');
-            console.trace();
             var selectedPlantIds = $scope.sharedDataService.selectedPlants.map(function (plant) { return plant._id }),
               growPlanDefault = new GrowPlanModel(bpn.growPlanDefault);
+
+            // TODO : show/hide a loading indicator here
 
             //hit API with params to filter grow plans
             $scope.filteredGrowPlanList = GrowPlanModel.query({

@@ -151,6 +151,54 @@ define(['angular', 'jquery', 'throttle-debounce'],
       };
     });
 
+
+    /**
+     * Assumes growPlan.plants is an array of plant id's (not populated plant objects)
+     */
+    bpnDirectives.directive('bpnDirectivesGrowPlanPhotoGrid', function() {
+      return {
+        template : '<div class="img-wrapper"></div>',
+        replace : true,
+        controller : [
+          '$scope', '$element', '$attrs', '$transclude',
+          function ($scope, $element, $attrs, $transclude){
+            $scope.photoTemplate = '<div class="plant-grid-image {{className}}" style="background-image:url(//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{plantId}}.jpg);"></div>';
+            $scope.generatePhoto = function(plant, className){
+              return $scope.photoTemplate.replace('{{className}}', className).replace('{{plantId}}', plant);
+            }
+          }
+        ],
+        link: function(scope, element, attrs) {
+          var growPlan = scope.growPlan,
+              plants = growPlan.plants,
+              length = plants.length,
+              i;
+          
+          // breakpoints
+          // 0 (All-Purpose Grow Plan)
+          // 1 (show single image)
+          // >1, <=4 (show grid of 4, repeating to fill if <4)
+          // >4 (show grid of 8 max, repeat to fill)
+          if (!plants || (length === 0) ){
+            // use the b
+            element.append('<div class="icon-glyph icon-__62_logo_00e36c"></div>');
+          } else if (length === 1){ 
+            element.append(scope.generatePhoto(plants[0]));
+          } else if (length <= 4) {
+            element.addClass('grid-4');
+            for (i = 1; i <= 4; i++){
+              element.append(scope.generatePhoto(plants[i%length]));  
+            }
+          } else {
+            element.addClass('grid-16');
+            for (i = 1; i <= 16; i++){
+              element.append(scope.generatePhoto(plants[i%length]));  
+            }
+          }
+        }
+      }
+    });
+
     return bpnDirectives;
 	}
 );

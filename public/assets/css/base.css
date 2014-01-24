@@ -5563,13 +5563,39 @@ button.close {
   clear: left;
   margin: 0.7em 1em 1em 0;
 }
-.growplans .img-wrapper {
+.growplans .photos .img-wrapper {
   position: relative;
+  height: 0;
+  padding-bottom: 100%;
 }
-.growplans .img-wrapper .icon-glyph {
+.growplans .photos .img-wrapper .plant-grid-image {
+  float: left;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  background-position: center;
+/* Make the background image cover the area of the <div>, and clip the excess */
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.growplans .photos .img-wrapper .icon-glyph {
   height: 5em;
   width: 5em;
   background-position: -1em 0;
+}
+.growplans .photos .img-wrapper.grid-4 .plant-grid-image {
+  width: 50%;
+  padding-bottom: 50%;
+  border: 2px solid #fff;
+}
+.growplans .photos .img-wrapper.grid-16 .plant-grid-image {
+  width: 25%;
+  padding-bottom: 25%;
+  border: 2px solid #fff;
 }
 .growplans .icon-glyph-new {
   height: 1em;
