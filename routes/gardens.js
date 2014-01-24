@@ -39,8 +39,6 @@ module.exports = function(app){
         locals.plants = plants;
         res.render('gardens', locals);  
       });
-			
-			
 		}
 	);
 
@@ -277,13 +275,12 @@ module.exports = function(app){
 	/**
 	 * 
 	 */
-	app.get('/gardens/:growPlanInstanceId/sensor-logs', 
+	app.get('/gardens/:growPlanInstanceId/history', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
-	    	title: "Bitponics | ",
-	    	className: "garden-sensor-logs"
+	    	title: "Bitponics | Garden History"
 	    };
 		  
 		  GrowPlanInstanceModel
@@ -296,29 +293,22 @@ module.exports = function(app){
 
       	locals.growPlanInstance = growPlanInstanceResult;
 
-
       	async.parallel(
 					[
 						function parallel1(innerCallback){
 							SensorModel.find({visible : true}).exec(innerCallback);
 						},
-						function parallel2(innerCallback){
+            function parallel2(innerCallback){
 							ControlModel.find().exec(innerCallback);
-						},
-						function parallel3(innerCallback){
-							SensorLogModel
-							.find({ gpi : req.params.growPlanInstanceId})
-							.select('ts l')
-							.exec(innerCallback);
 						}
 					],
 					function(err, results){
 						if (err) { return next(err); }
-						locals.sensors = results[0];
+						
+            locals.sensors = results[0];
 						locals.controls = results[1];
-						locals.sensorLogs = results[2];
 
-						res.render('gardens/sensor-logs', locals);
+						res.render('gardens/history', locals);
 					}
 		    );
 			});
