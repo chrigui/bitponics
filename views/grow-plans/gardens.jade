@@ -1,0 +1,43 @@
+block vars
+	- pageClassName = 'growplans gardens app-page single-page'
+
+extends ../layout
+
+block head
+	mixin requirejs("/assets/js/pages/grow-plans/gardens")
+
+block css
+
+block content
+	section.header
+		header
+			include ../includes/nav/main
+
+	section#main(role="main", class="main", ng-controller="bpn.controllers.growPlan.gardens.Main")
+		h2.page-heading.clear-b Gardens using the {{growPlan.name}} Grow Plan
+		div.separator-top
+			img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+			div()
+				ul(class="garden-list grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos", ng-show="userGardenResults")
+					li(ng-repeat="garden in gardenResults.data", class="garden-list-item grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+						div.img-wrapper(bpn-directives-garden-photo-grid)
+						div.first
+							h3.label {{garden.name}}
+						ul(class="plantlist")
+							li(ng-show="!garden.growPlan.plants.length")
+								span.value.plant All Plants
+							li(ng-repeat="plant in garden.growPlan.plants track by $index | orderBy:name", class="grid-cell")
+								span.value(class="plant") {{plantsById[plant].name}}&nbsp;
+						p 
+							a(href="/grow-plans/{{garden.growPlan._id}}") {{garden.growPlan.name}} Grow Plan
+						p Started {{garden.startDate | friendlyDate:'lowercase'}}
+						p By 
+							a(href="/profiles/{{garden.owner._id}}") {{garden.owner | communityMemberName}}
+						a.btn(href="/gardens/{{garden._id}}") Dashboard
+
+					
+
+block footer-scripts
+	script
+		bpn.plants = !{JSON.stringify(plants)};
+		bpn.pageData.growPlan = !{JSON.stringify(growPlan)};

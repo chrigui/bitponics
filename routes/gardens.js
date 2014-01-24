@@ -31,7 +31,10 @@ module.exports = function(app){
         plants : []
 			};
 
-			PlantModel.find().exec(function(err, plants){
+			PlantModel.find()
+      .select('_id name')
+      .lean()
+      .exec(function(err, plants){
         if (err) { return next(err); }
         locals.plants = plants;
         res.render('gardens', locals);  

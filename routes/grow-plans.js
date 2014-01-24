@@ -76,7 +76,8 @@ module.exports = function(app){
 		}
 	);
 
-	app.get('/grow-plans/:id',
+	
+  app.get('/grow-plans/:id',
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
@@ -202,6 +203,58 @@ module.exports = function(app){
 
             return res.render('grow-plans/details', locals);
           });        
+        });
+      });
+    }
+  );
+
+
+
+
+
+
+
+  app.get('/grow-plans/:id/gardens',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next) {
+      var locals = {
+        title : 'Bitponics - Grow Plans',
+        user : req.user,
+        growPlan : undefined,
+        className: "grow-plans growplans garden app-page",
+        pageType: 'app-page',
+        //message : req.flash('info') //TODO: this isn't coming thru
+        growSystems: {},
+        plants: {},
+        controls: {},
+        idealRanges: [],
+        actions: {},
+        sensors: {}
+      };
+
+      // First, verify that the user can see this
+      GrowPlanModel.findById(req.params.id)
+      .select('owner visibility users createdBy name plants')
+      .lean()
+      .exec(function(err, leanGrowPlanResult){
+        if (err) { return next(err); }
+        if (!leanGrowPlanResult){ return next(new Error('Invalid grow plan id'));}
+        if (!routeUtils.checkResourceReadAccess(leanGrowPlanResult, req.user)){
+          return res.send(401, "This grow plan is private. You must be the owner to view it.");
+        }
+        
+        locals.growPlan = leanGrowPlanResult;
+
+        PlantModel.find()
+        .select('_id name')
+        .lean()
+        .exec(function(err, plantResults){
+          if (err) { return next(err); }
+        
+          locals.plants = plantResults;
+
+          return res.render('grow-plans/gardens', locals);
         });
       });
     }
