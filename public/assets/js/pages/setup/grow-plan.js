@@ -705,7 +705,17 @@ define([
       return Object.keys(input).join(',');
     };
   });
-      
+     
+
+  growPlanApp.filter('createdBy', function(){
+    return function(input){
+      console.log('input', input);
+      if (input.name && input.name.first){
+        return input.name.first + ' ' + input.name.last;
+      }
+      return 'Community Member'; //input._id;
+    };
+  }); 
 
 
 
