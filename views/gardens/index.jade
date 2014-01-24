@@ -56,7 +56,7 @@ block content
 							a(href="/grow-plans/{{garden.growPlan._id}}") {{garden.growPlan.name}} Grow Plan
 						p Started {{garden.startDate | friendlyDate:'lowercase'}}
 						p By 
-							a(href="/profiles/{{garden.owner._id}}") {{garden.owner.name.full}}
+							a(href="/profiles/{{garden.owner._id}}") {{garden.owner | communityMemberName}}
 						a.btn(href="/gardens/{{garden._id}}") Dashboard
 
 					

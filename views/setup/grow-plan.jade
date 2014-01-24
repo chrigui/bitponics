@@ -59,7 +59,7 @@ block head
         p Used by 
           a(href="/grow-plans/{{growPlan._id}}/gardens") {{growPlan.activeGardenCount || 0}} gardens
         p Created by 
-          a(href="/profiles/{{growPlan.createdBy._id}}") {{growPlan.createdBy | createdBy}}
+          a(href="/profiles/{{growPlan.createdBy._id}}") {{growPlan.createdBy | communityMemberName}}
         //- div
         //-   h5.label Number of Phases
         //-   div.value {{growPlan.phases.length}}

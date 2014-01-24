@@ -102,6 +102,16 @@ define(['angular', 'fe-be-utils', 'throttle-debounce'],
     
 
 
+    bpnFilters.filter('communityMemberName', function(){
+      return function(input){
+        if (input.name && input.name.first){
+          return input.name.first + ' ' + input.name.last;
+        }
+        return 'Community Member'; //input._id;
+      };
+    }); 
+
+    
 		return bpnFilters;
 	}
 );

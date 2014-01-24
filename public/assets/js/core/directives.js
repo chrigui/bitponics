@@ -233,6 +233,7 @@ define(['angular', 'jquery', 'throttle-debounce'],
       }
     });
 
+
     return bpnDirectives;
 	}
 );
