@@ -43,21 +43,24 @@ block head
 
 
 
-    ul(ng-cloak, class="grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
+    ul(ng-cloak, class="grow-plan-list grid grid--top grid--wrapping grid--gutters grid--full medium-grid--1of3 small-no-flexbox-grid--1of2 medium-no-flexbox-grid--1of3 block-info-set sortlist photos separator-top")
       //- each growPlan, i in growPlans
-      li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:'-activeGardenCount'", class="grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
+      li(ng-repeat="growPlan in filteredGrowPlanList | orderBy:'-activeGardenCount'", class="grow-plan-list-item grid-cell grid-cell-animation", style="-webkit-transition-delay:{{$index * 100}}ms")
         div.img-wrapper(bpn-directives-grow-plan-photo-grid)
           //div.icon-glyph.icon-__62_logo_00e36c
-          img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{growPlan.plants[0]}}.jpg", alt="{{plant.name}}")
+          //img(ng-src="//s3.amazonaws.com/bitponics-cdn/assets/img/plants/{{growPlan.plants[0]}}.jpg", alt="{{plant.name}}")
         div.first
           //- h5.label Name
-          div.value {{growPlan.name}}
-        p.plants
-          ul(class="plantlist small-float")
-            li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
-              span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
-        p Used by {{growPlan.activeGardenCount}} gardens
-        p() Created by 
+          h3.label {{growPlan.name}}
+        
+        ul(class="plantlist small-float")
+          li(ng-show="!growPlan.plants.length")
+            span.value.plant All Plants
+          li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")
+            span.value(class="plant", ng-repeat="plant2 in sharedDataService.plants | filter:{ _id: plant }") {{plant2.name}}&nbsp;
+        p Used by 
+          a(href="/grow-plans/{{growPlan._id}}/gardens") {{growPlan.activeGardenCount}} gardens
+        p Created by 
           a(href="/profiles/{{growPlan.createdBy._id}}") {{growPlan.createdBy | createdBy}}
         //- div
         //-   h5.label Number of Phases

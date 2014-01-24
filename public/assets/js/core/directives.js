@@ -154,6 +154,9 @@ define(['angular', 'jquery', 'throttle-debounce'],
 
     /**
      * Assumes growPlan.plants is an array of plant id's (not populated plant objects)
+     * 
+     * Dependent on following globals:
+     * - bpn.plants
      */
     bpnDirectives.directive('bpnDirectivesGrowPlanPhotoGrid', function() {
       return {
@@ -180,8 +183,14 @@ define(['angular', 'jquery', 'throttle-debounce'],
           // >1, <=4 (show grid of 4, repeating to fill if <4)
           // >4 (show grid of 8 max, repeat to fill)
           if (!plants || (length === 0) ){
-            // use the b
-            element.append('<div class="icon-glyph icon-__62_logo_00e36c"></div>');
+            // means it's the All-Purpose
+            // to append the "b":
+            //element.append('<div class="icon-glyph icon-__62_logo_00e36c"></div>');
+            element.addClass('grid-16');
+            for (i = 1; i <= 16; i++){
+              element.append(scope.generatePhoto(bpn.plants[i]._id));  
+            }
+            
           } else if (length === 1){ 
             element.append(scope.generatePhoto(plants[0]));
           } else if (length <= 4) {
