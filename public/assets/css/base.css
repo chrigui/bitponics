@@ -3874,6 +3874,11 @@ li
 .app-page .footer {
   min-height: 0;
   background: #fff;
+  color: #999;
+}
+.undefined .footer a,
+.app-page .footer a {
+  color: #999;
 }
 .undefined .label,
 .app-page .label {
