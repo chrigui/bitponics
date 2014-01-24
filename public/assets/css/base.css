@@ -27,11 +27,13 @@
   position: fixed;
 }
 .position-r,
-.growplans .grow-plan-customize header {
+.growplans .grow-plan-customize header,
+.growplans.app-page .grow-plan-customize header {
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header .header-action {
+.growplans .grow-plan-customize header .header-action,
+.growplans.app-page .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -63,12 +65,19 @@
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
+.growplans.app-page .edit-btn,
 .growplans .header-action,
+.growplans.app-page .header-action,
 .growplans .spinner,
+.growplans.app-page .spinner,
 .growplans .idealRanges .hi input[type=number],
+.growplans.app-page .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
+.growplans.app-page .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number] {
+.growplans.app-page .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number],
+.growplans.app-page .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -102,7 +111,9 @@
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
 .growplans .grow-plan-customize h2.page-heading,
-.growplans .grow-plan-customize ul.plantlist {
+.growplans.app-page .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist,
+.growplans.app-page .grow-plan-customize ul.plantlist {
   float: left;
 }
 .float-r {
@@ -143,7 +154,8 @@
   text-transform: lowercase;
 }
 .text-align-c,
-.growplans .grow-plan-customize #phases .page-heading-small {
+.growplans .grow-plan-customize #phases .page-heading-small,
+.growplans.app-page .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -506,7 +518,7 @@ ol.list-style {
   background-color: #00e36c;
   color: #fff;
   cursor: pointer;
-  box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
   position: relative;
   transition: all 0.5s ease;
 }
@@ -1054,11 +1066,13 @@ img.page-spinner.spinner {
   position: fixed;
 }
 .position-r,
-.growplans .grow-plan-customize header {
+.growplans .grow-plan-customize header,
+.growplans.app-page .grow-plan-customize header {
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header .header-action {
+.growplans .grow-plan-customize header .header-action,
+.growplans.app-page .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -1083,12 +1097,19 @@ img.page-spinner.spinner {
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
+.growplans.app-page .edit-btn,
 .growplans .header-action,
+.growplans.app-page .header-action,
 .growplans .spinner,
+.growplans.app-page .spinner,
 .growplans .idealRanges .hi input[type=number],
+.growplans.app-page .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
+.growplans.app-page .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number] {
+.growplans.app-page .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number],
+.growplans.app-page .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -1122,7 +1143,9 @@ img.page-spinner.spinner {
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
 .growplans .grow-plan-customize h2.page-heading,
-.growplans .grow-plan-customize ul.plantlist {
+.growplans.app-page .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist,
+.growplans.app-page .grow-plan-customize ul.plantlist {
   float: left;
 }
 .float-r {
@@ -1163,7 +1186,8 @@ img.page-spinner.spinner {
   text-transform: lowercase;
 }
 .text-align-c,
-.growplans .grow-plan-customize #phases .page-heading-small {
+.growplans .grow-plan-customize #phases .page-heading-small,
+.growplans.app-page .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -2681,11 +2705,13 @@ body.ngdialog-open {
   position: fixed;
 }
 .position-r,
-.growplans .grow-plan-customize header {
+.growplans .grow-plan-customize header,
+.growplans.app-page .grow-plan-customize header {
   position: relative;
 }
 .position-a,
-.growplans .grow-plan-customize header .header-action {
+.growplans .grow-plan-customize header .header-action,
+.growplans.app-page .grow-plan-customize header .header-action {
   position: absolute;
 }
 .display-b {
@@ -2703,12 +2729,19 @@ body.ngdialog-open {
 .dashboard .overlay.photo img,
 .dashboard .grid.photos,
 .growplans .edit-btn,
+.growplans.app-page .edit-btn,
 .growplans .header-action,
+.growplans.app-page .header-action,
 .growplans .spinner,
+.growplans.app-page .spinner,
 .growplans .idealRanges .hi input[type=number],
+.growplans.app-page .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
+.growplans.app-page .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number] {
+.growplans.app-page .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number],
+.growplans.app-page .actions .lo input[type=number] {
   display: -moz-inline-stack;
   zoom: 1;
   *display: inline;
@@ -2742,7 +2775,9 @@ body.ngdialog-open {
 .dashboard .manual-entry-form .sensor-reading-unit,
 .dashboard .manual-entry-form .sensor-reading-value,
 .growplans .grow-plan-customize h2.page-heading,
-.growplans .grow-plan-customize ul.plantlist {
+.growplans.app-page .grow-plan-customize h2.page-heading,
+.growplans .grow-plan-customize ul.plantlist,
+.growplans.app-page .grow-plan-customize ul.plantlist {
   float: left;
 }
 .float-r {
@@ -2783,7 +2818,8 @@ body.ngdialog-open {
   text-transform: lowercase;
 }
 .text-align-c,
-.growplans .grow-plan-customize #phases .page-heading-small {
+.growplans .grow-plan-customize #phases .page-heading-small,
+.growplans.app-page .grow-plan-customize #phases .page-heading-small {
   text-align: center;
 }
 .text-align-r {
@@ -5447,44 +5483,54 @@ button.close {
 .progress-bar ol li .number {
   color: inherit;
 }
-.growplans .plantlist {
+.growplans .plantlist,
+.growplans.app-page .plantlist {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   padding: 0;
 }
-.growplans .plantlist.float {
+.growplans .plantlist.float,
+.growplans.app-page .plantlist.float {
   overflow: hidden;
   border: 1px dashed #d8d8d8;
 }
-.growplans .plantlist.float li {
+.growplans .plantlist.float li,
+.growplans.app-page .plantlist.float li {
   margin: 0 auto auto;
   float: left;
 }
-.growplans .plantlist.small-float {
+.growplans .plantlist.small-float,
+.growplans.app-page .plantlist.small-float {
   overflow: hidden;
   margin: 0;
 }
-.growplans .plantlist.small-float li {
+.growplans .plantlist.small-float li,
+.growplans.app-page .plantlist.small-float li {
   font-size: 0.75em;
   float: left;
 }
-.growplans .plantlist.small-float li .btn {
+.growplans .plantlist.small-float li .btn,
+.growplans.app-page .plantlist.small-float li .btn {
   margin: 0 0.5em 1em;
 }
-.growplans .plantlist.small-float li .btn.add {
+.growplans .plantlist.small-float li .btn.add,
+.growplans.app-page .plantlist.small-float li .btn.add {
   border: 1px solid #00e36c;
 }
-.growplans .plantlist .grid-cell {
+.growplans .plantlist .grid-cell,
+.growplans.app-page .plantlist .grid-cell {
   margin: 0 auto;
 }
-.growplans .plantlist .img-wrapper {
+.growplans .plantlist .img-wrapper,
+.growplans.app-page .plantlist .img-wrapper {
   position: relative;
   height: 15em;
   overflow: hidden;
   max-width: 40em;
   margin: 0 auto;
 }
-.growplans .plantlist .img-wrapper img {
+.growplans .plantlist .img-wrapper img,
+.growplans.app-page .plantlist .img-wrapper img {
   position: absolute;
   top: 0;
   min-width: 100%;
@@ -5492,52 +5538,66 @@ button.close {
   width: auto;
   max-width: 135%;
 }
-.growplans .btn {
+.growplans .btn,
+.growplans.app-page .btn {
   padding: 0.5em;
 }
-.growplans .overlay .btn {
+.growplans .overlay .btn,
+.growplans.app-page .overlay .btn {
   margin: 0;
 }
-.growplans .overlay .custom-checkbox-wrap {
+.growplans .overlay .custom-checkbox-wrap,
+.growplans.app-page .overlay .custom-checkbox-wrap {
   bottom: 4em;
   text-align: center;
 }
-.growplans .overlay .custom-checkbox-wrap .plant:before {
+.growplans .overlay .custom-checkbox-wrap .plant:before,
+.growplans.app-page .overlay .custom-checkbox-wrap .plant:before {
   right: 0.85em;
 }
-.growplans .overlay .action-overlay .custom-checkbox-wrap {
+.growplans .overlay .action-overlay .custom-checkbox-wrap,
+.growplans.app-page .overlay .action-overlay .custom-checkbox-wrap {
   bottom: auto;
   text-align: left;
 }
-.growplans .overlay .action-overlay .action-duration {
+.growplans .overlay .action-overlay .action-duration,
+.growplans.app-page .overlay .action-overlay .action-duration {
   display: table;
   margin-top: 1em;
 }
 .growplans .overlay .action-overlay .action-duration >label,
-.growplans .overlay .action-overlay .action-duration >div {
+.growplans.app-page .overlay .action-overlay .action-duration >label,
+.growplans .overlay .action-overlay .action-duration >div,
+.growplans.app-page .overlay .action-overlay .action-duration >div {
   display: table-cell;
   vertical-align: middle;
 }
-.growplans .overlay .action-overlay .action-duration input[type=number] {
+.growplans .overlay .action-overlay .action-duration input[type=number],
+.growplans.app-page .overlay .action-overlay .action-duration input[type=number] {
   display: inline;
   margin: 0 1em;
 }
-.growplans .overlay .action-overlay .remove {
+.growplans .overlay .action-overlay .remove,
+.growplans.app-page .overlay .action-overlay .remove {
   margin-top: 2em;
 }
-.growplans .edit-btn {
+.growplans .edit-btn,
+.growplans.app-page .edit-btn {
   height: 1em;
   padding-left: 1em;
   position: relative;
   margin: 0 0 1em;
 }
-.growplans .edit-btn i {
+.growplans .edit-btn i,
+.growplans.app-page .edit-btn i {
   position: absolute;
   top: 0;
   left: 0;
 }
 .growplans .next-step-btn,
-.growplans .phase-tabs .btn {
+.growplans.app-page .next-step-btn,
+.growplans .phase-tabs .btn,
+.growplans.app-page .phase-tabs .btn {
   background: #fff !important;
   color: #00e36c !important;
   border: 3px solid #00e36c;
@@ -5547,40 +5607,64 @@ button.close {
   width: 15em;
 }
 .growplans .next-step-btn .icon-glyph-new,
-.growplans .phase-tabs .btn .icon-glyph-new {
+.growplans.app-page .next-step-btn .icon-glyph-new,
+.growplans .phase-tabs .btn .icon-glyph-new,
+.growplans.app-page .phase-tabs .btn .icon-glyph-new {
   color: #00e36c;
 }
-.growplans .question .grid li {
+.growplans .question .grid li,
+.growplans.app-page .question .grid li {
   margin: 0;
   width: auto;
 }
-.growplans .question .grid li .btn {
+.growplans .question .grid li .btn,
+.growplans.app-page .question .grid li .btn {
   margin: 0.7em 1em 1em 0;
   width: auto;
 }
-.growplans .question .add {
+.growplans .question .add,
+.growplans.app-page .question .add {
   float: left;
   clear: left;
   margin: 0.7em 1em 1em 0;
 }
-.growplans .grow-plan-list-item h3 {
+.growplans .grow-plan-list-item,
+.growplans.app-page .grow-plan-list-item {
+  text-align: center;
+}
+.growplans .grow-plan-list-item h3,
+.growplans.app-page .grow-plan-list-item h3 {
   font-size: 2em;
   margin-top: 0.2em;
 }
-.growplans .grow-plan-list-item .value {
+.growplans .grow-plan-list-item .value,
+.growplans.app-page .grow-plan-list-item .value {
   font-size: 1em;
   margin: 0.5em 0;
 }
-.growplans .grow-plan-list-item p {
-  font-size: 0.8em;
+.growplans .grow-plan-list-item p,
+.growplans.app-page .grow-plan-list-item p {
+  font-size: 1em;
   margin: 0.5em 0;
 }
-.growplans .photos .img-wrapper {
+.growplans .grow-plan-list-item .plantlist li,
+.growplans.app-page .grow-plan-list-item .plantlist li {
+  display: inline;
+}
+.growplans .grow-plan-list-item .btn,
+.growplans.app-page .grow-plan-list-item .btn {
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+}
+.growplans .photos .img-wrapper,
+.growplans.app-page .photos .img-wrapper {
   position: relative;
   height: 0;
   padding-bottom: 100%;
 }
-.growplans .photos .img-wrapper .plant-grid-image {
+.growplans .photos .img-wrapper .plant-grid-image,
+.growplans.app-page .photos .img-wrapper .plant-grid-image {
   float: left;
   width: 100%;
   height: 0;
@@ -5596,120 +5680,154 @@ button.close {
   border: 2px solid #fff;
   padding-top: 12px;
 }
-.growplans .photos .img-wrapper .icon-glyph {
+.growplans .photos .img-wrapper .icon-glyph,
+.growplans.app-page .photos .img-wrapper .icon-glyph {
   height: 5em;
   width: 5em;
   background-position: -1em 0;
 }
-.growplans .photos .img-wrapper.grid-4 .plant-grid-image {
+.growplans .photos .img-wrapper.grid-4 .plant-grid-image,
+.growplans.app-page .photos .img-wrapper.grid-4 .plant-grid-image {
   width: 50%;
   padding-bottom: 50%;
   padding-top: 4px;
 }
-.growplans .photos .img-wrapper.grid-16 .plant-grid-image {
+.growplans .photos .img-wrapper.grid-16 .plant-grid-image,
+.growplans.app-page .photos .img-wrapper.grid-16 .plant-grid-image {
   width: 25%;
   padding-bottom: 25%;
   padding-top: 0;
 }
-.growplans .icon-glyph-new {
+.growplans .icon-glyph-new,
+.growplans.app-page .icon-glyph-new {
   height: 1em;
   font-size: 1.25em;
   position: relative;
   top: 0.15em;
 }
-.growplans .header-action {
+.growplans .header-action,
+.growplans.app-page .header-action {
   clear: both;
 }
-.growplans .header-action .spinner {
+.growplans .header-action .spinner,
+.growplans.app-page .header-action .spinner {
   margin: 0 0 0 0.5em;
   width: 1em;
 }
-.growplans .spinner {
+.growplans .spinner,
+.growplans.app-page .spinner {
   width: 2em;
   margin: 1em;
 }
-.growplans .phase-description {
+.growplans .phase-description,
+.growplans.app-page .phase-description {
   margin: 0 0 2em 0;
 }
-.growplans .phase-duration input {
+.growplans .phase-duration input,
+.growplans.app-page .phase-duration input {
   display: inline;
   width: 5em;
   margin: 0 1em;
 }
-.growplans .phase-tabs {
+.growplans .phase-tabs,
+.growplans.app-page .phase-tabs {
   list-style: none;
   clear: both;
   overflow: hidden;
 }
-.growplans .phase-tabs .btn {
+.growplans .phase-tabs .btn,
+.growplans.app-page .phase-tabs .btn {
   width: auto;
 }
-.growplans .phase-tabs div {
+.growplans .phase-tabs div,
+.growplans.app-page .phase-tabs div {
   padding-left: 1em;
 }
-.growplans .phase-tabs .selected {
+.growplans .phase-tabs .selected,
+.growplans.app-page .phase-tabs .selected {
   background: #00e36c !important;
   color: #fff !important;
 }
-.growplans .phase-tabs .selected .icon-glyph-new {
+.growplans .phase-tabs .selected .icon-glyph-new,
+.growplans.app-page .phase-tabs .selected .icon-glyph-new {
   color: #fff !important;
 }
-.growplans .phase-tabs li {
+.growplans .phase-tabs li,
+.growplans.app-page .phase-tabs li {
   position: relative;
   width: auto;
   float: left;
   padding: 0.25em 0.5em;
   margin: 1em 0.25em 1em 0;
 }
-.growplans .phase-tabs li.focused {
+.growplans .phase-tabs li.focused,
+.growplans.app-page .phase-tabs li.focused {
   text-decoration: underline;
 }
-.growplans .phase-tabs li.inactive {
+.growplans .phase-tabs li.inactive,
+.growplans.app-page .phase-tabs li.inactive {
   display: block;
   opacity: 1;
   -ms-filter: none;
   filter: none;
   background-color: rgba(36,211,33,0.6);
 }
-.growplans .phase-tabs li .toggle {
+.growplans .phase-tabs li .toggle,
+.growplans.app-page .phase-tabs li .toggle {
   text-decoration: none;
 }
 .growplans .idealRanges,
-.growplans .actions {
+.growplans.app-page .idealRanges,
+.growplans .actions,
+.growplans.app-page .actions {
   position: relative;
   zoom: 1;
 }
 .growplans .idealRanges:before,
+.growplans.app-page .idealRanges:before,
 .growplans .actions:before,
+.growplans.app-page .actions:before,
 .growplans .idealRanges:after,
-.growplans .actions:after {
+.growplans.app-page .idealRanges:after,
+.growplans .actions:after,
+.growplans.app-page .actions:after {
   content: "";
   display: table;
 }
 .growplans .idealRanges:after,
-.growplans .actions:after {
+.growplans.app-page .idealRanges:after,
+.growplans .actions:after,
+.growplans.app-page .actions:after {
   clear: both;
 }
 .growplans .idealRanges ul,
-.growplans .actions ul {
+.growplans.app-page .idealRanges ul,
+.growplans .actions ul,
+.growplans.app-page .actions ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 .growplans .idealRanges .question,
-.growplans .actions .question {
+.growplans.app-page .idealRanges .question,
+.growplans .actions .question,
+.growplans.app-page .actions .question {
   margin: 0 1em 1em 0;
   border: 1px solid #d8d8d8;
   padding: 2em 1em 1em;
   position: relative;
 }
 .growplans .idealRanges .btn,
-.growplans .actions .btn {
+.growplans.app-page .idealRanges .btn,
+.growplans .actions .btn,
+.growplans.app-page .actions .btn {
   margin-left: 0;
   margin-top: 0;
 }
 .growplans .idealRanges .btn.close,
-.growplans .actions .btn.close {
+.growplans.app-page .idealRanges .btn.close,
+.growplans .actions .btn.close,
+.growplans.app-page .actions .btn.close {
   position: absolute;
   top: 0;
   right: -0.25em;
@@ -5718,7 +5836,9 @@ button.close {
   color: #999;
 }
 .growplans .idealRanges input[type=checkbox],
-.growplans .actions input[type=checkbox] {
+.growplans.app-page .idealRanges input[type=checkbox],
+.growplans .actions input[type=checkbox],
+.growplans.app-page .actions input[type=checkbox] {
   opacity: 1;
   -ms-filter: none;
   filter: none;
@@ -5728,56 +5848,77 @@ button.close {
   display: inline;
 }
 .growplans .idealRanges .separator-top,
-.growplans .actions .separator-top {
+.growplans.app-page .idealRanges .separator-top,
+.growplans .actions .separator-top,
+.growplans.app-page .actions .separator-top {
   margin-top: 1em;
 }
 .growplans .idealRanges .hi label,
+.growplans.app-page .idealRanges .hi label,
 .growplans .actions .hi label,
+.growplans.app-page .actions .hi label,
 .growplans .idealRanges .lo label,
+.growplans.app-page .idealRanges .lo label,
 .growplans .actions .lo label,
+.growplans.app-page .actions .lo label,
 .growplans .idealRanges .hi textarea,
+.growplans.app-page .idealRanges .hi textarea,
 .growplans .actions .hi textarea,
+.growplans.app-page .actions .hi textarea,
 .growplans .idealRanges .lo textarea,
-.growplans .actions .lo textarea {
+.growplans.app-page .idealRanges .lo textarea,
+.growplans .actions .lo textarea,
+.growplans.app-page .actions .lo textarea {
   display: block;
   width: 100%;
 }
 .growplans .idealRanges .hi input[type=number],
+.growplans.app-page .idealRanges .hi input[type=number],
 .growplans .actions .hi input[type=number],
+.growplans.app-page .actions .hi input[type=number],
 .growplans .idealRanges .lo input[type=number],
-.growplans .actions .lo input[type=number] {
+.growplans.app-page .idealRanges .lo input[type=number],
+.growplans .actions .lo input[type=number],
+.growplans.app-page .actions .lo input[type=number] {
   width: 6em;
   margin-right: 1em;
 }
-.growplans .phaseEndDescription {
+.growplans .phaseEndDescription,
+.growplans.app-page .phaseEndDescription {
   margin: 2em 0 2em;
   clear: both;
 }
-.growplans div[data-bpn-directives-navigation-phases-graph] {
+.growplans div[data-bpn-directives-navigation-phases-graph],
+.growplans.app-page div[data-bpn-directives-navigation-phases-graph] {
   width: 60%;
 }
-.growplans .ring-graph .good {
+.growplans .ring-graph .good,
+.growplans.app-page .ring-graph .good {
   fill: #00e36c;
   opacity: 0.7;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
   filter: alpha(opacity=70);
 }
-.growplans .ring-graph .active {
+.growplans .ring-graph .active,
+.growplans.app-page .ring-graph .active {
   fill: #00e36c;
   opacity: 1;
   -ms-filter: none;
   filter: none;
 }
-.growplans .ring-graph .add-phase {
+.growplans .ring-graph .add-phase,
+.growplans.app-page .ring-graph .add-phase {
   fill: #92ed00;
   opacity: 0.45;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=45)";
   filter: alpha(opacity=45);
 }
-.growplans .ring-graph text {
+.growplans .ring-graph text,
+.growplans.app-page .ring-graph text {
   font-size: 1em;
 }
-.growplans .controls .grid--wrapping > .grid-cell {
+.growplans .controls .grid--wrapping > .grid-cell,
+.growplans.app-page .controls .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -o-box-flex: 1;
@@ -5792,7 +5933,8 @@ button.close {
   margin: 0 0 1em;
   max-width: 5em;
 }
-.growplans .controls .icon-glyph {
+.growplans .controls .icon-glyph,
+.growplans.app-page .controls .icon-glyph {
   opacity: 0.5;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
   filter: alpha(opacity=50);
@@ -5802,18 +5944,24 @@ button.close {
   -ms-transition: 0.5s all ease;
   transition: 0.5s all ease;
 }
-.growplans .controls .icon-glyph.has-action {
+.growplans .controls .icon-glyph.has-action,
+.growplans.app-page .controls .icon-glyph.has-action {
   opacity: 1;
   -ms-filter: none;
   filter: none;
 }
-.growplans .reminders .btn-compact {
+.growplans .reminders .btn-compact,
+.growplans.app-page .reminders .btn-compact {
   width: 13em;
 }
 .growplans .grow-systems .grid--wrapping > .grid-cell,
+.growplans.app-page .grow-systems .grid--wrapping > .grid-cell,
 .growplans .lights .grid--wrapping > .grid-cell,
+.growplans.app-page .lights .grid--wrapping > .grid-cell,
 .growplans .nutrients .grid--wrapping > .grid-cell,
-.growplans .ideal-ranges .grid--wrapping > .grid-cell {
+.growplans.app-page .nutrients .grid--wrapping > .grid-cell,
+.growplans .ideal-ranges .grid--wrapping > .grid-cell,
+.growplans.app-page .ideal-ranges .grid--wrapping > .grid-cell {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -o-box-flex: 1;
@@ -5829,56 +5977,78 @@ button.close {
   max-width: 50%;
 }
 .growplans .grow-systems .grid--wrapping > .grid-cell .btn,
+.growplans.app-page .grow-systems .grid--wrapping > .grid-cell .btn,
 .growplans .lights .grid--wrapping > .grid-cell .btn,
+.growplans.app-page .lights .grid--wrapping > .grid-cell .btn,
 .growplans .nutrients .grid--wrapping > .grid-cell .btn,
-.growplans .ideal-ranges .grid--wrapping > .grid-cell .btn {
+.growplans.app-page .nutrients .grid--wrapping > .grid-cell .btn,
+.growplans .ideal-ranges .grid--wrapping > .grid-cell .btn,
+.growplans.app-page .ideal-ranges .grid--wrapping > .grid-cell .btn {
   margin: 0 1em 1em 0;
 }
-.growplans .side {
+.growplans .side,
+.growplans.app-page .side {
   -webkit-transition: opacity 0.5s linear;
   -moz-transition: opacity 0.5s linear;
   -o-transition: opacity 0.5s linear;
   -ms-transition: opacity 0.5s linear;
   transition: opacity 0.5s linear;
 }
-.growplans .grow-plan-customize h2.page-heading {
+.growplans .grow-plan-customize h2.page-heading,
+.growplans.app-page .grow-plan-customize h2.page-heading {
   max-width: 49%;
   clear: left;
 }
-.growplans .grow-plan-customize h2.page-heading .garden-name {
+.growplans .grow-plan-customize h2.page-heading .garden-name,
+.growplans.app-page .grow-plan-customize h2.page-heading .garden-name {
   position: relative;
 }
-.growplans .grow-plan-customize ul.plantlist {
+.growplans .grow-plan-customize ul.plantlist,
+.growplans.app-page .grow-plan-customize ul.plantlist {
   max-width: 80%;
   clear: left;
 }
-.growplans .grow-plan-customize header .header-action {
+.growplans .grow-plan-customize header .header-action,
+.growplans.app-page .grow-plan-customize header .header-action {
   top: 0;
   right: 0;
   font-size: 1em;
   margin: 0;
 }
-.growplans .grow-plan-customize .seamless-input {
+.growplans .grow-plan-customize .seamless-input,
+.growplans.app-page .grow-plan-customize .seamless-input {
   background: #00e36c;
   color: #fff;
   border: none;
 }
-.growplans .grow-plan-customize #phases .page-heading-small {
+.growplans .grow-plan-customize #phases .page-heading-small,
+.growplans.app-page .grow-plan-customize #phases .page-heading-small {
   float: none;
 }
-.growplans .grow-plan-customize #phases .circle {
+.growplans .grow-plan-customize #phases .circle,
+.growplans.app-page .grow-plan-customize #phases .circle {
   margin-top: 0;
 }
-.growplans .grow-plan-customize #phases .circle svg {
+.growplans .grow-plan-customize #phases .circle svg,
+.growplans.app-page .grow-plan-customize #phases .circle svg {
   max-width: 100%;
 }
-.growplans .grow-plan-customize .sensors .sensor-value {
+.growplans .grow-plan-customize .sensors .sensor-value,
+.growplans.app-page .grow-plan-customize .sensors .sensor-value {
   font-size: 2em;
   top: 0.25em;
 }
 @media  screen and (min-width: 65em) {
-  .growplans .page-heading {
+  .growplans .page-heading,
+  .growplans.app-page .page-heading {
     width: 90%;
+  }
+}
+@media  screen and (min-width: 40em) {
+  .growplans .page-heading,
+  .growplans.app-page .page-heading {
+    font-size: 2.5em;
+    padding-top: 0.2em;
   }
 }
 /*

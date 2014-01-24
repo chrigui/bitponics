@@ -53,7 +53,7 @@ block head
           //- h5.label Name
           h3.label {{growPlan.name}}
         
-        ul(class="plantlist small-float")
+        ul(class="plantlist")
           li(ng-show="!growPlan.plants.length")
             span.value.plant All Plants
           li(ng-repeat="plant in growPlan.plants track by $index | orderBy:name", class="grid-cell")

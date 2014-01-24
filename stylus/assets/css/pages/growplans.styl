@@ -4,7 +4,8 @@
 @import "../global/breakpoints"
 
 // .landing-page.growplans
-.growplans
+.growplans,
+.growplans.app-page
 
 	.plantlist
 		margin-top .5em
@@ -135,6 +136,8 @@
 			// margin-top 0	
 
 	.grow-plan-list-item
+		text-align center
+
 		h3
 			font-size 2em
 			margin-top .2em
@@ -142,8 +145,16 @@
 			font-size 1em
 			margin .5em 0
 		p
-			font-size .8em
+			font-size 1em
 			margin .5em 0
+
+		.plantlist li 
+			display inline
+
+		.btn
+			display block
+			margin 0 auto
+			width 50%
 
 	.photos
 		.img-wrapper
@@ -440,3 +451,8 @@
 	@media $mq_larger
 		.page-heading
 			width 90%
+
+	@media $mq_medium
+		.page-heading
+			font-size 2.5em
+			padding-top .2em
