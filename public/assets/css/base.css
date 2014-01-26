@@ -786,9 +786,6 @@ input[type=submit] {
   padding: 0 2.5%;
   font-size: 0.85em;
 }
-.footer a {
-  color: #fff;
-}
 ul {
   list-style: none;
   margin: 0;
@@ -2291,6 +2288,9 @@ body.ngdialog-open {
 .landing-page .flex-direction-nav i {
   color: #fff;
   font-size: 3em;
+}
+.landing-page .footer a {
+  color: #fff;
 }
 /*
  * Dashboard Page

@@ -1,11 +1,10 @@
 extends ../layout
 
 block head
-  mixin requirejs("/assets/js/pages/account/devices")
+  mixin requirejs("/assets/js/pages/account/device")
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/account-devices.css')
-  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
 
 block content
   section.header
@@ -14,7 +13,7 @@ block content
         
   section#main(role="main", class="main")
     div.content-module.middle(ng-controller="bpn.controllers.account.devices.Main")
-      h1.page-heading Manage Devices
+      h1.page-heading Manage Device
       //- section(ng-view)
       section.separator-top
 
@@ -41,9 +40,14 @@ block content
                     span.label Garden:
                     span.value 
                       a(href="/gardens/#{device.activeGrowPlanInstance._id}") #{device.activeGrowPlanInstance.name}
-                //-div
-                  span.label Last log: 
-                  span.value #{device.recentSensorLogs[0]}
+                - if (device.recentSensorLogs)
+                  div
+                    span.label Last log: 
+                    span.value #{device.recentSensorLogs[0]}
+                - if (device.lastConnectionAt)
+                  div
+                    span.label Last Connection: 
+                    span.value #{device.lastConnectionAt}
 
                 div
                   span.label Power Outlet Mapping: 

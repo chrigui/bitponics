@@ -43,9 +43,14 @@ block content
                     span.label Garden:
                     span.value 
                       a(href="/gardens/#{device.activeGrowPlanInstance._id}") #{device.activeGrowPlanInstance.name}
-                //-div
-                  span.label Last log: 
-                  span.value #{device.recentSensorLogs[0]}
+                - if (device.recentSensorLogs)
+                  div
+                    span.label Last log: 
+                    span.value #{device.recentSensorLogs[0]}
+                - if (device.lastConnectionAt)
+                  div
+                    span.label Last Connection: 
+                    span.value #{device.lastConnectionAt}
 
                 div
                   span.label Power Outlet Mapping: 
