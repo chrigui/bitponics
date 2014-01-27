@@ -14,16 +14,23 @@ block content
       include ../includes/nav/main
 
   section#main(role="main", class="main", ng-controller="bpn.controllers.gardens.history.Main")
-    h2.page-heading Garden
+    h2.page-heading.ng-cloak {{garden.name}} Graphs
     div.separator-top
       img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
       div(ng-cloak)
+        h3 {{viewOptions.timespan}}
+
+        
+        div(ng-repeat="sensor in sharedDataService.visibleSensors")
+          div(data-bpn-directives-sensor-graph, data-sensor="sensor", data-sensor-logs="sharedDataService.sensorLogs", data-shared-data-service="sharedDataService")
+
+
 
 block footer-scripts
 
   script
     bpn.pageData = {
-      garden : !{JSON.stringify(growPlanInstance)},
+      garden : !{JSON.stringify(garden)},
       sensors : !{JSON.stringify(sensors)},
       controls : !{JSON.stringify(controls)}
     };
