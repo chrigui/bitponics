@@ -518,7 +518,7 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
       if (err) { winston.error(JSON.stringify(err)); return callback(err); }
       if (!growPlanInstanceResults.length) { return callback(); }
 
-      async.each(growPlanInstanceResults, 
+      async.eachLimit(growPlanInstanceResults, 10,
         function growPlanInstanceIterator(growPlanInstance, iteratorCallback){
           var currentGrowPlanInstancePhase,
             currentGrowPlanInstancePhaseIndex, 
@@ -533,40 +533,41 @@ module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
                 return true;
               }
             }
-        );
+          );
         
-        nextGrowPlanInstancePhase = growPlanInstance.phases[currentGrowPlanInstancePhaseIndex + 1];
+          nextGrowPlanInstancePhase = growPlanInstance.phases[currentGrowPlanInstancePhaseIndex + 1];
 
-        if (!nextGrowPlanInstancePhase) { return iteratorCallback(); }
-        
-        growPlanInstance.growPlan.phases.some(function(item){
-          if (item._id.equals(nextGrowPlanInstancePhase.phase)){
-            nextPhase = item;
-            return true;
-          }
-        });
-
-        NotificationModel.create(
-          {
-            gpi : growPlanInstance._id,
-            users : growPlanInstance.users,
-            type : feBeUtils.NOTIFICATION_TYPES.INFO,
-            timeToSend : now,
-            trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
-            triggerDetails : {
-              gpPhaseId : currentGrowPlanInstancePhase.phase,
-              nextGpPhaseId : nextGrowPlanInstancePhase.phase,
-              gpiPhaseId : nextGrowPlanInstancePhase._id
+          if (!nextGrowPlanInstancePhase) { return iteratorCallback(); }
+          
+          growPlanInstance.growPlan.phases.some(function(item){
+            if (item._id.equals(nextGrowPlanInstancePhase.phase)){
+              nextPhase = item;
+              return true;
             }
-          },
-          iteratorCallback
-        );
-      },
-      function growPlanInstancesAllDone(err){
-        return callback(err, growPlanInstanceResults.length);
-      }
-    );
-  });
+          });
+
+          NotificationModel.create(
+            {
+              gpi : growPlanInstance._id,
+              users : growPlanInstance.users,
+              type : feBeUtils.NOTIFICATION_TYPES.INFO,
+              timeToSend : now,
+              trigger : feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ENDING_SOON,
+              triggerDetails : {
+                gpPhaseId : currentGrowPlanInstancePhase.phase,
+                nextGpPhaseId : nextGrowPlanInstancePhase.phase,
+                gpiPhaseId : nextGrowPlanInstancePhase._id
+              }
+            },
+            iteratorCallback
+          );
+        },
+        function growPlanInstancesAllDone(err){
+          return callback(err, growPlanInstanceResults.length);
+        }
+      );
+    }
+  );
 };
 
 
@@ -609,7 +610,7 @@ module.exports.checkDeviceConnections = function(callback){
   .exec(function(err, deviceResults){
     if (err) { return callback(err); }
     
-    async.each(deviceResults,
+    async.eachLimit(deviceResults, 10,
       function iterator(device, iteratorCallback){
         if (!device.activeGrowPlanInstance.active) { return iteratorCallback(); }
         
