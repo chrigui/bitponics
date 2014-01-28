@@ -6664,33 +6664,30 @@ button.close {
 .garden-history svg text,
 .app-page.garden-history svg text {
   fill: #999;
+  font-size: 0.8em;
 }
-.garden-history path.line,
-.app-page.garden-history path.line {
+.garden-history svg path.line,
+.app-page.garden-history svg path.line {
   fill: none;
   stroke: #999;
   stroke-width: 1.5px;
 }
-.garden-history path.area,
-.app-page.garden-history path.area {
+.garden-history svg path.area,
+.app-page.garden-history svg path.area {
   fill: #e7e7e7;
 }
-.garden-history .axis,
-.app-page.garden-history .axis {
+.garden-history svg .axis,
+.app-page.garden-history svg .axis {
   shape-rendering: crispEdges;
 }
-.garden-history .x.axis .minor,
-.app-page.garden-history .x.axis .minor {
+.garden-history svg .axis.x .minor,
+.app-page.garden-history svg .axis.x .minor {
   stroke-opacity: 0.5;
 }
-.garden-history .x.axis line,
-.app-page.garden-history .x.axis line,
-.garden-history .x.axis path,
-.app-page.garden-history .x.axis path,
-.garden-history .y.axis line,
-.app-page.garden-history .y.axis line,
-.garden-history .y.axis path,
-.app-page.garden-history .y.axis path {
+.garden-history svg .axis line,
+.app-page.garden-history svg .axis line,
+.garden-history svg .axis path,
+.app-page.garden-history svg .axis path {
   fill: none;
   stroke: #999;
 }

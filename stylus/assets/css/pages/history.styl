@@ -6,26 +6,34 @@
 	.page-heading
 		font-size 2.5em
 
-	svg text
-		fill color-text-gray
+	svg 
+		text
+			fill color-text-gray
+			font-size .8em
 
-	path.line
-		fill: none;
-		stroke: color-text-gray;
-		stroke-width: 1.5px;
+		path
+			
+			&.line
+				fill: none;
+				stroke: color-text-gray;
+				stroke-width: 1.5px;
+			
+			&.area
+				fill: #e7e7e7;
 
-	path.area
-		fill: #e7e7e7;
+		.axis
+			shape-rendering: crispEdges;
 
-	.axis
-		shape-rendering: crispEdges;
+			&.x
+				.minor
+					stroke-opacity: .5;
+		
+			line, path
+				fill: none;
+				stroke: color-text-gray;
+		
+		// .x.axis line, .x.axis path,
+		// .y.axis line, .y.axis path
+			
 
-	.x.axis .minor
-		stroke-opacity: .5;
-
-	.x.axis line, .x.axis path,
-	.y.axis line, .y.axis path
-		fill: none;
-		stroke: color-text-gray;
-
-	
+		

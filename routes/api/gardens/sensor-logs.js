@@ -22,6 +22,7 @@ var GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
  * @param app : app instance. Will have the configs appended to a .config property. 
  */
 module.exports = function(app) {
+  
   /**
    * Sensor Logs nested resource
    * 
@@ -48,16 +49,14 @@ module.exports = function(app) {
 
       var startDate = req.query['start-date'],
           endDate = req.query['end-date'],
-          limit = req.query['limit'] || 200,
+          limit = req.query['limit'] || 1000,
           skip = req.query['skip'],
           sCode = req.query['sCode'],
           query = SensorLogModel.find({ gpi : growPlanInstance._id });
 
-      // cap the limit at 200
-      if (limit > 200) { limit = 200; }
+      // cap the limit at 1000
+      if (limit > 1000) { limit = 1000; }
 
-      
-      // TODO : Localize start/end date based on owner's timezone?
       if (startDate){
         startDate = moment(startDate).toDate();
         query.where('ts').gte(startDate);

@@ -44,6 +44,14 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
       sharedData.endDate = undefined;
       sharedData.sensorLogs = [];
       sharedData.textLogs = [];
+      sharedData.viewOptions = {
+        timespans : [
+          '24 hours',
+          '1 week',
+          'All'
+        ],
+        selectedTimespan : '24 hours'
+      };
 
       sharedData.sensors = bpn.pageData.sensors;
       sharedData.sensorsByCode = {};
@@ -131,16 +139,22 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
       
       $scope.sharedDataService = sharedDataService;
 
-      $scope.viewOptions = {
-        timespan : 'All'
-      };
+      $scope.viewOptions = sharedDataService.viewOptions;
 
-      $scope.$watch('viewOptions.timespan', function(){
-        switch($scope.viewOptions.timespan){
+      $scope.$watch('viewOptions.selectedTimespan', function(){
+        switch($scope.viewOptions.selectedTimespan){
           case '24 hours':
+            sharedDataService.startDate = moment().add('hours','-24');
+            sharedDataService.endDate = moment();
+            break;
           case '1 week':
+            sharedDataService.startDate = moment().add('days','-7');
+            sharedDataService.endDate = moment();
+            break;
           case 'All':
           default:
+            sharedDataService.startDate = moment(sharedDataService.gardenModel.startDate);
+            sharedDataService.endDate = undefined;
             //sharedDataService.startDate = moment().startOf('day');
             //sharedDataService.endDate = moment().endOf('day');
         }
@@ -186,6 +200,8 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
         // well as populated scope to work with
         // element is a jQuery wrapper on the element
 
+        
+
         function render () {
           element.empty();
 
@@ -204,6 +220,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           // });
           // sensorReadings = sensorReadings.reverse();
 
+          
           // Testing with random data
           var sensorReadings = [];
           var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
@@ -213,7 +230,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
             //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
             sensorReadings.push({
-              val : Math.floor(Math.random() * 100),
+              val : Math.floor(Math.random() * 2000),
               ts : randomTS
             });
           }
@@ -223,12 +240,12 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
             return sensorReading.val;
           });
 
-          console.log(scope.sensor.code, 'sensorReadings', sensorReadings);
+          // console.log(scope.sensor.code, 'sensorReadings', sensorReadings);
 
           // Using "conventional margins" http://bl.ocks.org/mbostock/3019563
           // D3 Axis example: http://bl.ocks.org/mbostock/1166403
 
-          var margin = {top: 10, right: 70, bottom: 30, left: 70},
+          var margin = {top: 10, right: 70, bottom: 30, left: 30},
               outerWidth = element.width(),
               width = outerWidth - margin.left - margin.right,
               outerHeight = 200,
@@ -249,7 +266,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           var yAxis = d3.svg.axis()
               .scale(yAxisScale)
-              .ticks(4)
+              .ticks(5)
               .orient("right");
 
           var line = d3.svg.line()
@@ -333,6 +350,10 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
         scope.$watch("sensorLogs", function(val) {
           render();
+        });
+
+        scope.$watch("sharedDataService.viewOptions.selectedTimespan", function(val) {
+          console.log('selectedTimespan', val);
         });
       }
     };

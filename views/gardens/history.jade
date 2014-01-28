@@ -18,7 +18,16 @@ block content
     div.separator-top
       img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
       div(ng-cloak)
-        h3 {{viewOptions.timespan}}
+        //-h2 Timespan:
+        div(class="custom-dropdown-wrap")
+          select(
+            class="custom-dropdown", 
+            ng-model="sharedDataService.viewOptions.selectedTimespan",
+            ng-change="")
+            option(ng-repeat="option in sharedDataService.viewOptions.timespans", ng-value="option") {{option}}
+          .dblarrow
+            i
+        //-h3 {{viewOptions.selectedTimespan}}
 
         
         div(ng-repeat="sensor in sharedDataService.visibleSensors")
