@@ -193,16 +193,31 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           scope.sensorLogs = scope.sensorLogs || [];
 
-          var sensorReadings = scope.sensorLogs.map(function(sensorLog){
-            return {
-              val : sensorLog[sensorCode],
-              ts : new Date(sensorLog.timestamp)
-            }
-          });
-          sensorReadings = sensorReadings.filter(function(sensorReading){
-            return (typeof sensorReading.val === 'number');
-          });
-          sensorReadings = sensorReadings.reverse();
+          // var sensorReadings = scope.sensorLogs.map(function(sensorLog){
+          //   return {
+          //     val : sensorLog[sensorCode],
+          //     ts : new Date(sensorLog.timestamp)
+          //   }
+          // });
+          // sensorReadings = sensorReadings.filter(function(sensorReading){
+          //   return (typeof sensorReading.val === 'number');
+          // });
+          // sensorReadings = sensorReadings.reverse();
+
+          // Testing with random data
+          var sensorReadings = [];
+          var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
+          for (var i = 0; i < 1000; i++){
+            // should start at starDate, each step should be 1/1000 of the way to endDate
+            var randomTS = scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 1000));
+
+            //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
+            sensorReadings.push({
+              val : Math.floor(Math.random() * 100),
+              ts : randomTS
+            });
+          }
+
 
           var sensorReadingValues = sensorReadings.map(function(sensorReading){
             return sensorReading.val;
@@ -210,8 +225,14 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           console.log(scope.sensor.code, 'sensorReadings', sensorReadings);
 
-          var width = element.width(),
-              height = 200,
+          // Using "conventional margins" http://bl.ocks.org/mbostock/3019563
+          // D3 Axis example: http://bl.ocks.org/mbostock/1166403
+
+          var margin = {top: 10, right: 70, bottom: 30, left: 70},
+              outerWidth = element.width(),
+              width = outerWidth - margin.left - margin.right,
+              outerHeight = 200,
+              height = outerHeight - margin.top - margin.bottom,
               minY = d3.min(sensorReadingValues),
               maxY = d3.max(sensorReadingValues);
           
@@ -223,11 +244,13 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           var xAxis = d3.svg.axis()
               .scale(xAxisScale)
+              .tickSize(-height).tickSubdivide(true)
               .orient("bottom");
 
           var yAxis = d3.svg.axis()
               .scale(yAxisScale)
-              .orient("left");
+              .ticks(4)
+              .orient("right");
 
           var line = d3.svg.line()
               .x(function(d) { return xAxisScale(d.ts); })
@@ -236,8 +259,10 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           var svg = d3.select(element[0])
             .append("svg")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", outerWidth)
+            .attr("height", outerHeight)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
           //console.log('extent', d3.extent(sensorReadings, function(d) { return d.val; }))
@@ -255,9 +280,13 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           svg.append("g")
             .attr("class", "y axis")
+            // Make the y-axis attached to the right
+            .attr("transform", "translate(" + width + ",0)")
             .call(yAxis)
+          
+          svg.append("g")
           .append("text")
-            .attr("transform", "rotate(-90)")
+            .attr("transform", "rotate(-90),translate(0,-30)")
             .attr("y", 6)
             .attr("dy", ".8em")
             .style("text-anchor", "end")

@@ -36,6 +36,7 @@ module.exports = function(){
    */
   app.use(function(err, req, res, next){
     winston.info('In the error middleware');
+    console.log(err);
     winston.error(JSON.stringify(err));   
     res.status(err.status || 500);
     
