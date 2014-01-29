@@ -131,6 +131,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
     }
   ]);
 
+
   app.controller('bpn.controllers.gardens.history.Main', [
     '$scope',
     'sharedDataService',
@@ -138,6 +139,8 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
     function($scope, sharedDataService, GardenModel){
       
       $scope.sharedDataService = sharedDataService;
+
+      $scope.garden = sharedDataService.gardenModel;
 
       $scope.viewOptions = sharedDataService.viewOptions;
 
@@ -162,13 +165,8 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
         sharedDataService.getTextLogs();
       });
 
-      $scope.garden = sharedDataService.gardenModel;
-   
-
-
 
       $scope.init = function(){
-        
         //sharedDataService.getSensorLogs(new Date());
       };
 
@@ -256,13 +254,21 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           var xAxisScale = d3.time.scale()
               .range([0, width]);
 
+          // TODO : yAxis should maybe use a threshold scale (http://bl.ocks.org/mbostock/4573883)
+          // Thresholds would be the ideal range bounds
+
           var yAxisScale = d3.scale.linear()
               .range([height, 0]);
 
           var xAxis = d3.svg.axis()
               .scale(xAxisScale)
               .tickSize(-height).tickSubdivide(true)
+              .tickFormat(function(d){
+                // the line below is equivalent to not specifying any tickFormat on xAxis
+                return xAxisScale.tickFormat()(d);
+              })
               .orient("bottom");
+              console.log('xAxis.timeformat', xAxisScale.tickFormat());
 
           var yAxis = d3.svg.axis()
               .scale(yAxisScale)
@@ -311,7 +317,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           svg.append("path")
             .datum(sensorReadings)
-            .attr("class", "line")
+            .attr("class", "line data-path")
             .attr("d", line);
 
           // var max=0, min=0, len=0;
@@ -346,7 +352,18 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           // g.append("svg:path")
           //  .attr("d", line(sensorReadings));
            //.attr("stroke", function(d) { return fill("hello"); });
+
+          element.find('svg').mouseleave(function(event) {
+            //handleMouseOutGraph(event);
+            console.log("mouse leave");
+          })
+          element.find('svg').mousemove(function(event) {
+            //handleMouseOverGraph(event);
+            console.log("mouse move on graph");
+          })  
         }
+
+
 
         scope.$watch("sensorLogs", function(val) {
           render();
