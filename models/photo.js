@@ -221,6 +221,8 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
               thumbnailGM;
 
           var filesizeCallback = function(err, value){
+            console.log("PHOTO PROCESSING ", photo._id, " INSIDE filesizeCallback");
+
             if (err) { 
               winston.error("ERROR in filesizeCallback " + JSON.stringify(err));
               return innerCallback(err);  
@@ -238,6 +240,8 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
                 'Content-Length' : photo.thumbnailSize
               }, 
               function(err, result) {
+                winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", statusCode: " + result.statusCode);
+
                 if (err) { 
                   winston.error(JSON.stringify(err));
                   return innerCallback(err);  
@@ -264,6 +268,8 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
             var readStream = fs.createReadStream(options.filePath);
             intermediateGM = gm(readStream, options.originalFileName);
           }
+
+          console.log("PHOTO PROCESSING ", photo._id, "CREATED intermediateGM");
           
           intermediateGM
           .noProfile()
@@ -273,8 +279,12 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
               winston.error("ERROR in thumbnail stream " + JSON.stringify(err));
               return innerCallback(err);  
             }
+
+            console.log("PHOTO PROCESSING ", photo._id, " CREATED THUMBNAIL STREAM");
+
             thumbnailGM = gm(stdout);
             thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
+            console.log("PHOTO PROCESSING ", photo._id, " SENT THUMBNAIL TO filesize stream");
           });
           // .thumb(
           //   feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
