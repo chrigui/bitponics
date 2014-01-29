@@ -222,7 +222,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
           var filesizeCallback = function(err, value){
             if (err) { 
-              winston.error(JSON.stringify(err));
+              winston.error("ERROR in filesizeCallback " + JSON.stringify(err));
               return innerCallback(err);  
             }
 
@@ -270,7 +270,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
           .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
           .stream(function (err, stdout, stderr) {
             if (err) { 
-              winston.error(JSON.stringify(err));
+              winston.error("ERROR in thumbnail stream " + JSON.stringify(err));
               return innerCallback(err);  
             }
             thumbnailGM = gm(stdout);
@@ -314,7 +314,10 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
           fs.unlink(options.filePath);
         }
 
-        if (err) { return callback(err);}
+        if (err) { 
+          winston.error("ERROR PROCESSING PHOTO " + photo._id.toString() + " " + JSON.stringify(err));
+          return callback(err);
+        }
 
         // If we're here, the photo's good to go
         async.parallel([
@@ -325,13 +328,25 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
             if (!photo.ref.collectionName){ return innerCallback(); }
             
             var refModel = ModelUtils.getModelFromCollectionName(photo.ref.collectionName);
+            console.log("refModel.schema.path('photos')", !!refModel.schema.path('photos'));
             if(!refModel.schema.path('photos')){
               return innerCallback();
             }
 
             refModel.findById(photo.ref.documentId, function(err, refDocumentResult){
+
+              if (err) {
+                winston.error("ERROR RETRIEVING PHOTO REFERENCE DOC " + JSON.stringify(err));
+                return innerCallback();
+              }
+              
+              if (!refDocumentResult){
+                winston.error("ERROR: DID NOT RETRIEVE PHOTO REFERENCE DOC " + photo._id.toString + ", ref " ref.documentId);
+                return innerCallback();
+              }
+              
               refDocumentResult.photos.push(photo._id);
-              return refDocumentResult.save(innerCallback);
+              return refDocumentResult.save(innerCallback);  
             });
           }
         ], function(err, results){

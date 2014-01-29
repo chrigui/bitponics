@@ -330,7 +330,10 @@ module.exports = {
           filePath : photo.path
         },
         function(err, photo){
-          if (err) { return iteratorCallback(err); }
+          if (err) { 
+            winston.error("ERROR IN processPhotoUpload PhotoModel.createAndStorePhoto " + JSON.stringify(err));
+            return iteratorCallback(err); 
+          }
           responseData.push(photo);
           return iteratorCallback();
         });
