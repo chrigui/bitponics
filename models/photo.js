@@ -341,7 +341,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
               }
               
               if (!refDocumentResult){
-                winston.error("ERROR: DID NOT RETRIEVE PHOTO REFERENCE DOC " + photo._id.toString + ", ref " ref.documentId);
+                winston.error("ERROR: DID NOT RETRIEVE PHOTO REFERENCE DOC " + photo._id.toString + ", ref " + ref.documentId);
                 return innerCallback();
               }
               
