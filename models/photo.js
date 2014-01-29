@@ -238,13 +238,16 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
           console.log("PHOTO PROCESSING ", photo._id, "CREATED intermediateGM");
           
-          var thumbnailFilePath = tmpDirectory + 'thumb-' + (Math.floor(Math.random(10000))) + '-' + options.originalFileName;
+          var thumbnailFilePath = tmpDirectory + 'thumb-' + (Math.floor(Math.random() * 10000)) + '-' + (new Date()).valueOf() + '.jpg';
 
           intermediateGM
           .noProfile()
           .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
           .write(thumbnailFilePath, function (err) {
-            if (err) { return innerCallback(err);  }
+            if (err) { 
+              winston.error("PHOTO PROCESSING " + photo._id + " ERROR WRITING THUMBNAIL " + thumbnailFilePath);
+              return innerCallback(err);  
+            }
 
             knoxClient.putFile(
               thumbnailFilePath,
