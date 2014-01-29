@@ -228,7 +228,7 @@ DeviceSchema.set('toJSON', {
  */
 DeviceSchema.method('refreshStatus', function(callback) {
   var device = this,
-      GrowPlanInstance = require('./growPlanInstance'),
+      GrowPlanInstance = require('./garden'),
       GrowPlanInstanceSchema = GrowPlanInstance.schema,
       GrowPlanInstanceModel = GrowPlanInstance.model,
       GrowPlan = require('./growPlan').growPlan,

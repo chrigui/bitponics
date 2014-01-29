@@ -82,32 +82,60 @@ var dateValidationFns = [
 var NotificationSentLogSchema = new Schema({ 
   /**
    * timestamp
+   * The time this log was specified to be sent (timeToSend from parent Notification). 
+   * TODO : migrate all db entries from ts to tts
    */
   ts : { type : Date },
 
+  
   /**
-   * checked
+   * emailedAt
+   * If this tts was emailed, this is the time the email was sent
+   */
+  eA : { type : Date, required : false },
+
+
+  /**
+   * checkedAt
    * User can "check" a notification log to hide it/mark completed
    */
-  c : { type : Boolean }
+  cA : { type : Date, required : false }
 },
 { _id : false, id : false });
 
-NotificationSentLogSchema.virtual('timestamp')
+NotificationSentLogSchema.virtual('timeToSend')
 .get(function(){
   return this.ts;
 })
-.set(function(timestamp){
-  this.ts = timestamp;
+.set(function(timeToSend){
+  this.ts = timeToSend;
+});
+
+NotificationSentLogSchema.virtual('emailedAt')
+.get(function(){
+  return this.eA;
+})
+.set(function(value){
+  this.eA = value;
+});
+
+NotificationSentLogSchema.virtual('checkedAt')
+.get(function(){
+  return this.cA;
+})
+.set(function(checkedAt){
+  this.cA = checkedAt;
 });
 
 NotificationSentLogSchema.virtual('checked')
 .get(function(){
-  return this.c;
+  return !!this.cA;
 })
 .set(function(checked){
-  this.c = checked;
+  if (this.cA) { return; }
+  this.cA = new Date();
 });
+
 
 /**
  * Notification
@@ -143,7 +171,7 @@ var NotificationSchema = new Schema({
 	 * Once a notification is sent and has no further repeats, this is set to null. 
 	 * To clear pending notifications, this field is queried for values &lt;= now
 	 */ 
-	tts : { type: Date, default: Date.now, validate: dateValidationFns },
+	tts : { type: Date, validate: dateValidationFns },
 
 
 	/**
@@ -169,6 +197,8 @@ var NotificationSchema = new Schema({
 		timezone : String
 	},
 	
+
+
 
   /**
    * sentLogs
@@ -270,13 +300,17 @@ var NotificationSchema = new Schema({
    */
   h : { type : String },
 
+  
   /**
    * checked
    * User can "check" a notification log to hide it/mark completed
    *
-   * TODO : decide what the behavior is if a repeating notification is marked checked
+   * "Checking" a notification should create a sentLog entry with "checkedAt" set
+   * 
+   * This is a dynamic property. It's false by default, set to true if 
+   * a notification has been checked
    */
-  c : { type : Boolean }
+  //c : { type : Boolean }
 
 },
 { id : false });
@@ -318,12 +352,12 @@ NotificationSchema.virtual('repeat')
   });
 
 /*
-NotificationSchema.virtual('r.repeatType')
+NotificationSchema.virtual('r.durationType')
   .get(function(){
-    return this.r.rt;
+    return this.r.dT;
   })
-  .set(function(repeatType){
-    this.r.rt = repeatType;
+  .set(function(durationType){
+    this.r.dT = durationType;
   });
 
 NotificationSchema.virtual('r.duration')
@@ -351,13 +385,13 @@ NotificationSchema.virtual('sentLogs')
     this.sl = sentLogs;
   });
 
-NotificationSchema.virtual('checked')
-  .get(function(){
-    return this.c;
-  })
-  .set(function(checked){
-    this.c = checked;
-  })
+// NotificationSchema.virtual('checked')
+//   .get(function(){
+//     return this.c;
+//   })
+//   .set(function(checked){
+//     this.c = checked;
+//   })
 
 NotificationSchema.virtual('hash')
   .get(function(){
@@ -382,6 +416,7 @@ NotificationSchema.set('toObject', {
     if (doc.schema === NotificationSentLogSchema){
       delete ret.ts;
       delete ret.c;
+      delete ret.cA;
     } else {
       // else we're operating on the parent doc (the NotificationSchema doc)
       delete ret.u;
@@ -390,6 +425,7 @@ NotificationSchema.set('toObject', {
       delete ret.r;
       delete ret.sl;
       delete ret.h;
+
     }
   }
 });
@@ -404,6 +440,84 @@ NotificationSchema.set('toJSON', {
 
 
 /*************** INSTANCE METHODS *************************/
+
+/**
+ * Marks the provided "timeToSend" sentLog as checked
+ * 
+ * If the current notification.timeToSend was provided, creates a sentLog entry and resets timeToSend
+ * 
+ * @param {Date} [timeToSendToCheck] - Mark a specific tts as checked. If omitted, uses the most recent notification.timeToSend/notification.sentLog
+ */
+NotificationSchema.method('markAsChecked', function(timeToSendToCheck){
+  var notification = this,
+      timeToSendToCheckAsMilliseconds,
+      sentLogFound,
+      now = new Date(),
+      nowAsMilliseconds = now.valueOf();
+
+  if (!timeToSendToCheck){
+    
+    if (notification.timeToSend && (notification.timeToSend.valueOf() &lt; nowAsMilliseconds)){
+      timeToSendToCheck = notification.timeToSend;
+    } else if (notification.sentLogs.length > 0){
+      // notification.sentLogs are ordered by ascending timeToSend
+      timeToSendToCheck = notification.sentLogs[notification.sentLogs.length-1].timeToSend;
+    } else {
+      // else, no valid date to use
+      return;
+    }
+  }
+
+  timeToSendToCheckAsMilliseconds = timeToSendToCheck.valueOf();
+
+  sentLogFound = notification.sentLogs.some(function(sentLog){
+    if (sentLog.timeToSend.valueOf() === timeToSendToCheckAsMilliseconds){
+      sentLog.checked = true;
+      return true;
+    }
+  });
+  
+  if (!sentLogFound){
+    notification.sentLogs.push({
+      timeToSend : timeToSendToCheck,
+      checked : true
+    });
+  }
+
+  if(notification.timeToSend && notification.timeToSend.valueOf() === timeToSendToCheckAsMilliseconds){
+    notification.resetTimeToSend();
+  }
+
+});
+
+
+/**
+ * Resets notification's timeToSend to the next timeToSend, or null notification doesn't repeat
+ * 
+ * 
+ */
+NotificationSchema.method('resetTimeToSend', function(){
+  var notification = this,
+      now = new Date(),
+      nowAsMilliseconds = now.valueOf(),
+      //tz = require('../lib/timezone-wrapper');
+      moment = require('moment');
+
+  if (notification.timeToSend && notification.repeat && notification.repeat.timezone && notification.repeat.duration && notification.repeat.durationType){
+    winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
+    // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
+    // if we've got notifications regularly being processed
+    //console.log('nowAsMilliseconds', nowAsMilliseconds);
+    //console.log('timeToSend start', notification.timeToSend.valueOf());
+    //console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+
+    while (notification.timeToSend.valueOf() &lt; nowAsMilliseconds){
+      notification.timeToSend = moment(notification.timeToSend).add(notification.repeat.durationType, notification.repeat.duration).toDate();
+    } 
+  } else {
+    notification.timeToSend = null;
+  }
+});
 
 /**
  * Creates a hash of the pertinent Notification details:
@@ -451,14 +565,16 @@ NotificationSchema.method('ensureHash', function(){
 /**
  * Returns the Notification populated into the specified display template
  *
- * 'summary' and 'detail' return strings.
+ * 'summary' returns a string
+ * 'detail' returns string of html
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
+ * 'json' returns the data retrieved for template population (garden, actions, growPlans, etc). For now just returns garden...no use cases yet to return everything & the data gets massive
  *
- * @param {string} options.displayType - must be one of 'email'|'summary'|'detail'
+ * @param {string[]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
- * @param {function(err, display)} callback
+ * @param {function} callback - Passed an object of displays keyed by displayType
  */
-NotificationSchema.method('getDisplay', function(options, callback){
+NotificationSchema.method('getDisplays', function(options, callback){
   var notification = this,
       ActionModel = require('./action').model,
       GrowPlanModel = require('./growPlan').growPlan.model,
@@ -474,7 +590,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
         ACCESSORY_VALUES : feBeUtils.ACCESSORY_VALUES,
         secureAppUrl : options.secureAppUrl
       },
-      notificationDisplay;
+      notificationDisplays = {};
 
   
   async.waterfall(
@@ -519,7 +635,7 @@ NotificationSchema.method('getDisplay', function(options, callback){
               });
             },
             function populateGrowPlan(innerCallback){
-              if (!notification.triggerDetails.gpPhaseId){ return innerCallback(); }
+              if (!notification.gpi || !notification.triggerDetails.gpPhaseId){ return innerCallback(); }
 
               GrowPlanModel.findById(notification.gpi.growPlan)
               .exec(function(err, growPlanResult){
@@ -575,33 +691,48 @@ NotificationSchema.method('getDisplay', function(options, callback){
           
       // At this point, notificationTemplateLocals is fully populated
       // 2013-08-22 AK: Getting occasional errors that I don't have time to fully debug, just wrapping things in a try/finally to ensure execution continues
-      try {
-        switch(options.displayType){
-          case 'email':
-            notificationDisplay = {
-              subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
-              bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
-              bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
-            };
-            break;
-          case 'summary':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
-            break;
-          case 'detail':
-            notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
-            break;
+
+      options.displayTypes.forEach(function(displayType){
+        var notificationDisplay,
+            err;
+
+        try {
+          switch(displayType){
+            case 'email':
+              notificationDisplay = {
+                subject : compiledNotificationTemplates[notification.trigger]['email-subject'](notificationTemplateLocals),
+                bodyHtml : compiledNotificationTemplates[notification.trigger]['email-body-html'](notificationTemplateLocals),
+                bodyText : compiledNotificationTemplates[notification.trigger]['email-body-text'](notificationTemplateLocals)
+              };
+              break;
+            case 'summary':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['summary-text'](notificationTemplateLocals);
+              break;
+            case 'detail':
+              notificationDisplay = compiledNotificationTemplates[notification.trigger]['detail-html'](notificationTemplateLocals);
+              break;
+            case 'json':
+              notificationDisplay = {
+                garden: {
+                  _id : notificationTemplateLocals.notification.growPlanInstance._id,
+                  name : notificationTemplateLocals.notification.growPlanInstance.name
+                }
+              };
+          }
+        } catch(e){
+          winston.error(JSON.stringify(e));
         }
-      } catch(e){
-        winston.error(e);
-      } finally {
-        //console.log("PARALLEL FINAL RETURNING RESULT", notificationDisplay);
+
         if ((typeof notificationDisplay === 'undefined') || (options.displayType === 'email' && !(notificationDisplay.bodyHtml))){
           console.log("Error populating EJS notification template for " + notification._id.toString());
           console.log(JSON.stringify(notificationTemplateLocals));
           err = new Error("Error populating EJS notification template for " + notification._id.toString());
         }
-        return callback(err, notificationDisplay);  
-      }
+
+        notificationDisplays[displayType] = notificationDisplay; 
+      });
+
+      return callback(err, notificationDisplays);
     }
   );
 });
@@ -617,6 +748,8 @@ NotificationSchema.method('getDisplay', function(options, callback){
  * notification that's active (tts is not null) or has recently been sent. 
  * If so, it returns that existing Notification.
  *
+ * If options.repeat is defined, must be greater than 1 day.
+ *
  * "Recently been sent" cutoff varies per trigger type.
  *
  * @param {Object} options : Properties of the NotificationModel object. All properties are expected to be in friendly form, if a friendly form exists (virtual prop name)
@@ -627,6 +760,12 @@ NotificationSchema.static('create', function(options, callback){
   // mongo can filter with the index we have on tts+gpi first, which
   // should greatly lessen the load
   
+  //do not create notifications with repeat of less than 1 day
+  if (options.repeat && feBeUtils.isLessThanOneDay(options.repeat.duration, options.repeat.durationType)) {
+    winston.info('not saving this notification due to repeat less than 1 day');
+    return callback();
+  }
+
   var newNotification = new NotificationModel(options),
       sentCutoff;
 
@@ -742,21 +881,37 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           
           var notificationIterator = function (notification, iteratorCallback){
             winston.info("PROCESSING NOTIFICATION " + notification._id.toString());
+            
+            var shouldNotSendEmailNotification = function (notification) {
+              return (notification.type === feBeUtils.NOTIFICATION_TYPES.INFO) ||
+                (notification.trigger === feBeUtils.NOTIFICATION_TRIGGERS.PHASE_ACTION && typeof notification.triggerDetails.cycleStateIndex !== 'undefined') ||
+                (feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType))
+            };
+            winston.info("EMAIL NOTIFICATION?");
+            if (shouldNotSendEmailNotification(notification)) {
+              winston.info("DID NOT SEND EMAIL NOTIFICATION " + notification._id.toString());
+              winston.info("notification.repeat.duration: " + notification.repeat.duration);
+              winston.info("notification.repeat.durationType: " + notification.repeat.durationType);
+              console.log(feBeUtils.isLessThanOneDay(notification.repeat.duration, notification.repeat.durationType));
+              return iteratorCallback();
+            }
+            winston.info("YES");
+
             // Populate trigger details
-            notification.getDisplay(
+            notification.getDisplays(
               {
                 secureAppUrl : secureAppUrl,
-                displayType : 'email'
+                displayTypes : ['email']
               },
-              function(err, notificationDisplay){
+              function(err, notificationDisplays){
                 if (err) { return iteratorCallback(err); }
 
                 winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " GOT NOTIFICATION DISPLAY " + now);
 
                 var emailTemplateLocals = {
-                  emailSubject : notificationDisplay.subject,
-                  emailBodyHtml : notificationDisplay.bodyHtml,
-                  emailBodyText : notificationDisplay.bodyText,
+                  emailSubject : notificationDisplays.email.subject,
+                  emailBodyHtml : notificationDisplays.email.bodyHtml,
+                  emailBodyText : notificationDisplays.email.bodyText,
                   subscriptionPreferencesUrl : subscriptionPreferencesUrl,
                   appUrl : appUrl
                 },  
@@ -779,7 +934,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     }
                   }
                 } catch(e){
-                  winston.error(e.toString());
+                  winston.error(JSON.stringify(e));
                 }
 
                 // TEMP HACK WHILE DEBUGGING : send all emails to self
@@ -804,24 +959,13 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
                     winston.info("PROCESSING NOTIFICATION " + notification._id.toString(), " GOT RESPONSE FROM EMAIL TRANSPORT " + now);
                     if (err) { return iteratorCallback(err); }
                     
-                    notification.sentLogs.push({ts: now});
+                    notification.sentLogs.push({
+                      timeToSend: notification.timeToSend,
+                      emailedAt: now
+                    });
                     
-                    if (notification.repeat && notification.repeat.timezone && notification.repeat.duration && notification.repeat.durationType){
-                      winston.info("IN clearPendingNotifications, resetting notification.repeat", notification._id.toString(), notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType)
-                      // Prevent notifications from getting stuck on repeat in the past...shouldn't actually ever happen
-                      // if we've got notifications regularly being processed
-                      //console.log('nowAsMilliseconds', nowAsMilliseconds);
-                      //console.log('timeToSend start', notification.timeToSend.valueOf());
-                      //console.log(tz(notification.timeToSend, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
+                    notification.resetTimeToSend();
 
-                      while (notification.timeToSend.valueOf() &lt; nowAsMilliseconds){
-                        //console.log(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));  
-                        notification.timeToSend = new Date(tz(notification.timeToSend, notification.repeat.timezone, '+' + notification.repeat.duration + ' ' + notification.repeat.durationType));
-                        //winston.info(notification.timeToSend.valueOf());
-                      } 
-                    } else {
-                      notification.timeToSend = null;
-                    }
                     winston.info("PROCESSING NOTIFICATION " + notification._id.toString() + " SAVING UPDATED NOTIFICATION DOCUMENT " + now);
                     notification.save(iteratorCallback);
                   });
@@ -842,7 +986,7 @@ NotificationSchema.static('clearPendingNotifications', function (options, callba
           notificationResultProcessingQueue.drain = notificationProcessingEnded;
           notificationResultProcessingQueue.push(notificationResults, function(err){
             winston.info("NotificationModel.clearPendingNotifications FINISHED PROCESSING A NOTIFICATION " + now);
-            if (err) { winston.error(err); }
+            if (err) { winston.error(JSON.stringify(err));}
           });
         }
       ],
@@ -871,6 +1015,7 @@ NotificationSchema.pre('save', function(next){
 NotificationSchema.index({ 'tts': -1 }, { sparse : true });
 // Compound index on gpi+tts. Won't get expensive since all sent items will collapse into a single index entry of gpi+null
 NotificationSchema.index({ 'gpi' : 1, 'tts': -1}, { sparse : true } );
+NotificationSchema.index({ 'u' : 1, 'tts': -1}, { sparse : true } );
 NotificationSchema.index({ 'h' : 1, 'sl.ts' : -1 });
 
 
@@ -894,13 +1039,13 @@ exports.model = NotificationModel = mongooseConnection.model('Notification', Not
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowPlanInstance.html">models/GrowPlanInstance</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowPlanInstance.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="Garden.html">models/Garden</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="Garden.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 08 2014 22:42:48 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 29 2014 13:26:32 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

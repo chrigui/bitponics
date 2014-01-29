@@ -186,6 +186,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
     async.parallel(
       [
+        
         function uploadOriginal(innerCallback){
           var knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
             knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.filePath),
@@ -215,32 +216,45 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
             }
           );
         },
+
         function createAndUploadThumbnail(innerCallback){
 
           var intermediateGM,
               thumbnailGM;
 
-          var filesizeCallback = function(err, value){
-            console.log("PHOTO PROCESSING ", photo._id, " INSIDE filesizeCallback");
 
-            if (err) { 
-              winston.error("ERROR in filesizeCallback " + JSON.stringify(err));
-              return innerCallback(err);  
-            }
+          winston.info("CREATING PHOTO THUMB, id: " + photo._id.toString());
 
-            // value is returned in format "724B", need to parse int to get byte number
-            photo.thumbnailSize = parseInt(value, 10);
-            
-            knoxClient.putStream(
-              thumbnailGM.stream(),
+          // Constructor is lenient in parsing stream vs path vs buffer. 2nd arg is optional and is only used for filetype inference, so it should handle undefined fine
+          // https://github.com/aheckmann/gm#constructor
+          if (typeof options.stream !== 'undefined'){
+            intermediateGM = gm(options.stream, options.originalFileName)
+          } else {
+            console.log('options.filePath', options.filePath);
+            // use the (stream, filename) call to make sure gm knows the filetype (from originalFileName)
+            var readStream = fs.createReadStream(options.filePath);
+            intermediateGM = gm(readStream, options.originalFileName);
+          }
+
+          console.log("PHOTO PROCESSING ", photo._id, "CREATED intermediateGM");
+          
+          var thumbnailFilePath = tmpDirectory + 'thumb-' + (Math.floor(Math.random(10000))) + '-' + options.originalFileName;
+
+          intermediateGM
+          .noProfile()
+          .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
+          .write(thumbnailFilePath, function (err) {
+            if (err) { return innerCallback(err);  }
+
+            knoxClient.putFile(
+              thumbnailFilePath,
               s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
               {
                 'Content-Type': photo.type, 
-                'x-amz-acl': 'private',
-                'Content-Length' : photo.thumbnailSize
-              }, 
+                'x-amz-acl': 'private'
+              },
               function(err, result) {
-                winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", statusCode: " + result.statusCode);
+                winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", result: " + JSON.stringify(Object.keys(result)) + ', statusCode:' + JSON.stringify(result.statusCode));
 
                 if (err) { 
                   winston.error(JSON.stringify(err));
@@ -254,38 +268,56 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
                 return innerCallback();
               }
             );
-          };
-
-          winston.info("CREATING PHOTO THUMB, id: " + photo._id.toString());
-
-          // Constructor is lenient in parsing stream vs path vs buffer. 2nd arg is optional and is only used for filetype inference, so it should handle undefined fine
-          // https://github.com/aheckmann/gm#constructor
-          if (typeof options.stream !== 'undefined'){
-            intermediateGM = gm(options.stream, options.originalFileName)
-          } else {
-            console.log('options.filePath', options.filePath);
-            // use the (stream, filename) call to make sure gm knows the filetype (from originalFilename)
-            var readStream = fs.createReadStream(options.filePath);
-            intermediateGM = gm(readStream, options.originalFileName);
-          }
-
-          console.log("PHOTO PROCESSING ", photo._id, "CREATED intermediateGM");
-          
-          intermediateGM
-          .noProfile()
-          .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
-          .stream(function (err, stdout, stderr) {
-            if (err) { 
-              winston.error("ERROR in thumbnail stream " + JSON.stringify(err));
-              return innerCallback(err);  
-            }
-
-            console.log("PHOTO PROCESSING ", photo._id, " CREATED THUMBNAIL STREAM");
-
-            thumbnailGM = gm(stdout);
-            thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
-            console.log("PHOTO PROCESSING ", photo._id, " SENT THUMBNAIL TO filesize stream");
           });
+
+
+          // .stream(function (err, stdout, stderr) {
+          //   if (err) { 
+          //     winston.error("ERROR in thumbnail stream " + JSON.stringify(err));
+          //     return innerCallback(err);  
+          //   }
+
+          //   console.log("PHOTO PROCESSING ", photo._id, " CREATED THUMBNAIL STREAM");
+
+          //   thumbnailGM = gm(stdout);
+            
+          //   thumbnailGM.filesize({bufferStream : true}, function(err, value){
+          //     console.log("PHOTO PROCESSING ", photo._id, " INSIDE filesizeCallback, value ", value);
+
+          //     if (err) { 
+          //       winston.error("ERROR in filesizeCallback " + JSON.stringify(err));
+          //       return innerCallback(err);  
+          //     }
+
+          //     // value is returned in format "724B", need to parse int to get byte number
+          //     photo.thumbnailSize = parseInt(value.replace(/\D/g,''), 10);
+              
+          //     knoxClient.putStream(
+          //       thumbnailGM.stream(),
+          //       s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+          //       {
+          //         'Content-Type': photo.type, 
+          //         'x-amz-acl': 'private',
+          //         'Content-Length' : photo.thumbnailSize
+          //       },
+          //       function(err, result) {
+          //         winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", result: " + JSON.stringify(Object.keys(result)) + ', statusCode:' + JSON.stringify(result.statusCode));
+
+          //         if (err) { 
+          //           winston.error(JSON.stringify(err));
+          //           return innerCallback(err);  
+          //         }
+                
+          //         if (result.statusCode !== 200) {
+          //           return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+          //         }
+
+          //         return innerCallback();
+          //       }
+          //     );
+          //   });
+          //   console.log("PHOTO PROCESSING ", photo._id, " SENT THUMBNAIL TO filesize stream");
+          // });
           // .thumb(
           //   feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
           //   feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT,

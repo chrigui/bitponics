@@ -1,6 +1,6 @@
 /**
  * @todo Refactor this to be Garden
- * @module models/GrowPlanInstance
+ * @module models/Garden
  */
 
 var mongoose = require('mongoose'),
@@ -1169,7 +1169,7 @@ exports.schema = GrowPlanInstanceSchema;
 
 /**
  * @constructor
- * @alias module:models/GrowPlanInstance.GrowPlanInstanceModel
+ * @alias module:models/Garden.GrowPlanInstanceModel
  * @type {Model}
  */
 exports.model = GrowPlanInstanceModel;

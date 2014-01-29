@@ -543,9 +543,9 @@ NotificationSchema.method('ensureHash', function(){
  * 'email' returns { subject: string, bodyHtml : string, bodyText: string }
  * 'json' returns the data retrieved for template population (garden, actions, growPlans, etc). For now just returns garden...no use cases yet to return everything & the data gets massive
  *
- * @param {array[string]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
+ * @param {string[]} options.displayTypes - List of display types. Must be one of 'email'|'summary'|'detail'
  * @param {string} options.secureAppUrl
- * @param {function(err, displays)} callback - Passed an object of displays keyed by displayType
+ * @param {function} callback - Passed an object of displays keyed by displayType
  */
 NotificationSchema.method('getDisplays', function(options, callback){
   var notification = this,

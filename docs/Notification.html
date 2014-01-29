@@ -143,7 +143,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line853">line 853</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line998">line 998</a>
     </li></ul></dd>
     
     
@@ -161,14 +161,14 @@
         
             
 <dt>
-    <h4 class="name" id="c"><span class="type-signature">&lt;inner> </span>c<span class="type-signature"></span></h4>
+    <h4 class="name" id="cA"><span class="type-signature">&lt;inner> </span>cA<span class="type-signature"></span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        checked
+        checkedAt
 User can "check" a notification log to hide it/mark completed
     </div>
     
@@ -198,7 +198,7 @@ User can "check" a notification log to hide it/mark completed
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line65">line 65</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line75">line 75</a>
     </li></ul></dd>
     
     
@@ -216,17 +216,15 @@ User can "check" a notification log to hide it/mark completed
         
             
 <dt>
-    <h4 class="name" id="c"><span class="type-signature">&lt;inner> </span>c<span class="type-signature"></span></h4>
+    <h4 class="name" id="eA"><span class="type-signature">&lt;inner> </span>eA<span class="type-signature"></span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        checked
-User can "check" a notification log to hide it/mark completed
-
-TODO : decide what the behavior is if a repeating notification is marked checked
+        emailedAt
+If this tts was emailed, this is the time the email was sent
     </div>
     
     
@@ -255,7 +253,7 @@ TODO : decide what the behavior is if a repeating notification is marked checked
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line252">line 252</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line68">line 68</a>
     </li></ul></dd>
     
     
@@ -309,7 +307,7 @@ TODO : decide what the behavior is if a repeating notification is marked checked
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line110">line 110</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line138">line 138</a>
     </li></ul></dd>
     
     
@@ -365,7 +363,7 @@ Used to prevent creation of contemporaneous duplicates
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line244">line 244</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line274">line 274</a>
     </li></ul></dd>
     
     
@@ -427,7 +425,7 @@ Used to prevent creation of contemporaneous duplicates
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line96">line 96</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line124">line 124</a>
     </li></ul></dd>
     
     
@@ -484,7 +482,7 @@ Once the notification is sent, it's used to update the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line128">line 128</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line156">line 156</a>
     </li></ul></dd>
     
     
@@ -538,7 +536,7 @@ Once the notification is sent, it's used to update the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line149">line 149</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line179">line 179</a>
     </li></ul></dd>
     
     
@@ -593,7 +591,7 @@ Going to use this to group notifications together
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line156">line 156</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line186">line 186</a>
     </li></ul></dd>
     
     
@@ -692,7 +690,7 @@ DEVICE_MISSING
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line221">line 221</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line251">line 251</a>
     </li></ul></dd>
     
     
@@ -718,6 +716,8 @@ DEVICE_MISSING
     
     <div class="description">
         timestamp
+The time this log was specified to be sent (timeToSend from parent Notification). 
+TODO : migrate all db entries from ts to tts
     </div>
     
     
@@ -746,7 +746,7 @@ DEVICE_MISSING
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line59">line 59</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line61">line 61</a>
     </li></ul></dd>
     
     
@@ -803,7 +803,7 @@ To clear pending notifications, this field is queried for values <= now
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line119">line 119</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line147">line 147</a>
     </li></ul></dd>
     
     
@@ -857,7 +857,7 @@ To clear pending notifications, this field is queried for values <= now
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line227">line 227</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line257">line 257</a>
     </li></ul></dd>
     
     
@@ -913,7 +913,7 @@ Will usually be a copy of a GPI's or Device's users
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line104">line 104</a>
+        <a href="notification.js.html">notification.js</a>, <a href="notification.js.html#line132">line 132</a>
     </li></ul></dd>
     
     
@@ -946,13 +946,13 @@ Will usually be a copy of a GPI's or Device's users
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowPlanInstance.html">models/GrowPlanInstance</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowPlanInstance.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="Action.html">models/Action</a></li><li><a href="CalibrationLog.html">models/CalibrationLog</a></li><li><a href="CalibrationStatusLog.html">models/CalibrationStatusLog</a></li><li><a href="Control.html">models/Control</a></li><li><a href="Device.html">models/Device</a></li><li><a href="DeviceType.html">models/DeviceType</a></li><li><a href="Garden.html">models/Garden</a></li><li><a href="GrowPlan.html">models/GrowPlan</a></li><li><a href="IdealRange.html">models/GrowPlan/IdealRange</a></li><li><a href="Phase.html">models/GrowPlan/Phase</a></li><li><a href="GrowPlanHistory.html">models/GrowPlanHistory</a></li><li><a href="GrowSystem.html">models/GrowSystem</a></li><li><a href="HarvestLog.html">models/HarvestLog</a></li><li><a href="ImmediateAction.html">models/ImmediateAction</a></li><li><a href="Light.html">models/Light</a></li><li><a href="LightBulb.html">models/LightBulb</a></li><li><a href="LightFixture.html">models/LightFixture</a></li><li><a href="Notification.html">models/Notification</a></li><li><a href="Nutrient.html">models/Nutrient</a></li><li><a href="Order.html">models/Order</a></li><li><a href="Photo.html">models/Photo</a></li><li><a href="Product.html">models/Product</a></li><li><a href="RemovedDocument.html">models/RemovedDocument</a></li><li><a href="Sensor.html">models/Sensor</a></li><li><a href="SensorLog.html">models/SensorLog</a></li><li><a href="ServicePlanSubscription.html">models/ServicePlanSubscription</a></li><li><a href="TextLog.html">models/TextLog</a></li><li><a href="User.html">models/User</a></li><li><a href="Utils.html">models/Utils</a></li></ul><h3>Classes</h3><ul><li><a href="Action.ActionModel.html">ActionModel</a></li><li><a href="CalibrationLog.CalibrationLogModel.html">CalibrationLogModel</a></li><li><a href="CalibrationStatusLog.CalibrationStatusLogModel.html">CalibrationStatusLogModel</a></li><li><a href="Control.ControlModel.html">ControlModel</a></li><li><a href="Device.DeviceModel.html">DeviceModel</a></li><li><a href="DeviceType.DeviceTypeModel.html">DeviceTypeModel</a></li><li><a href="Garden.GrowPlanInstanceModel.html">GrowPlanInstanceModel</a></li><li><a href="GrowPlanHistory.GrowPlanHistoryModel.html">GrowPlanHistoryModel</a></li><li><a href="GrowSystem.GrowSystemModel.html">GrowSystemModel</a></li><li><a href="HarvestLog.HarvestLogModel.html">HarvestLogModel</a></li><li><a href="ImmediateAction.ImmediateActionModel.html">ImmediateActionModel</a></li><li><a href="Light.LightModel.html">LightModel</a></li><li><a href="LightBulb.LightBulbModel.html">LightBulbModel</a></li><li><a href="LightFixture.LightFixtureModel.html">LightFixtureModel</a></li><li><a href="Notification.NotificationModel.html">NotificationModel</a></li><li><a href="Nutrient.NutrientModel.html">NutrientModel</a></li><li><a href="Order.OrderModel.html">OrderModel</a></li><li><a href="Photo.PhotoModel.html">PhotoModel</a></li><li><a href="Plant.PlantModel.html">PlantModel</a></li><li><a href="RemovedDocument.RemovedDocumentModel.html">RemovedDocumentModel</a></li><li><a href="Sensor.SensorModel.html">SensorModel</a></li><li><a href="SensorLog.SensorLogModel.html">SensorLogModel</a></li><li><a href="ServicePlanSubscription.ServicePlanSubscriptionModel.html">ServicePlanSubscriptionModel</a></li><li><a href="TextLog.TextLogModel.html">TextLogModel</a></li><li><a href="User.UserModel.html">UserModel</a></li></ul><h3>Global</h3><ul><li><a href="DeviceUtils.html">module:models/Device/DeviceUtils</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 08 2014 22:42:50 GMT-0500 (EST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Wed Jan 29 2014 13:26:33 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

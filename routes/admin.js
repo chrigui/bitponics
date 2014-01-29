@@ -81,7 +81,7 @@ module.exports = function(app){
 	 * 
 	 */
 	app.post('/admin/trigger-scanForPhaseChanges', function (req, res) {
-	  ModelUtils.scanForPhaseChanges(require('../models/growPlanInstance').model, function(err){
+	  ModelUtils.scanForPhaseChanges(require('../models/garden').model, function(err){
 	  	if (err) { 
 	  		winston.error(JSON.stringify(err));
 	  		return res.send(500, err);
@@ -186,7 +186,7 @@ module.exports = function(app){
   
 
 	app.get('/admin/gardens', function(req, res, next){
-		var GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+		var GrowPlanInstanceModel = require('../models/garden').model,
 				locals = {
 					title: 'Bitponics Admin | Gardens',
 					growPlanInstances : []

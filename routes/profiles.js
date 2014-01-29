@@ -1,6 +1,6 @@
 var ControlModel = require('../models/control').model,
 GrowPlanModel = require('../models/growPlan').growPlan.model,
-GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+GrowPlanInstanceModel = require('../models/garden').model,
 SensorModel = require('../models/sensor').model,
 SensorLogModel = require('../models/sensorLog').model,
 ControlModel = require('../models/control').model,

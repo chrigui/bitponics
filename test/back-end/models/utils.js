@@ -15,7 +15,7 @@ describe('Model Utils', function(){
 	var mongooseConnection = require('../../../config/mongoose-connection').open('test'),
   ObjectID = require('mongodb').ObjectID,
   ImmediateAction = require('../../../models/immediateAction').model,
-  GrowPlanInstance = require('../../../models/growPlanInstance').model,
+  GrowPlanInstance = require('../../../models/garden').model,
   Device = require('../../../models/device'),
   SensorLogModel = require('../../../models/sensorLog').model,
   DeviceModel = Device.model,

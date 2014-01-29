@@ -1,7 +1,7 @@
 var DeviceModel = require('../models/device').model,
     CalibrationStatusLogModel = require('../models/calibrationStatusLog').model,
     CalibrationLogModel = require('../models/calibrationLog').model,
-    GrowPlanInstanceModel = require('../models/growPlanInstance').model,
+    GrowPlanInstanceModel = require('../models/garden').model,
     SensorLogModel = require('../models/sensorLog').model,
     TextLogModel = require('../models/textLog').model,
     NotificationModel = require('../models/notification').model,

@@ -61,8 +61,8 @@ module.exports.logSensorLog = function (options, callback){
     },
     function saveToGPI(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
-      //growPlanInstance.recentSensorLogs.push(pendingSensorLog);          
-      //growPlanInstance.save(innerCallback);
+      //garden.recentSensorLogs.push(pendingSensorLog);          
+      //garden.save(innerCallback);
       innerCallback();
     },
     function saveSensorLog(innerCallback){
@@ -304,7 +304,7 @@ module.exports.triggerImmediateAction = function (options, callback){
   var Device = require('./device'),
     DeviceModel = Device.model,
     DeviceUtils = Device.utils,
-    GrowPlanInstanceModel = require('./growPlanInstance').model,
+    GrowPlanInstanceModel = require('./garden').model,
     GrowPlanModel = require('./growPlan').growPlan.model,
     Action = require('./action'),
     ActionModel = Action.model,
@@ -493,7 +493,7 @@ module.exports.triggerImmediateAction = function (options, callback){
  * @static
  */
 module.exports.scanForPhaseChanges = function (GrowPlanInstanceModel, callback){
-  var GrowPlanInstanceModel = require('./growPlanInstance').model,
+  var GrowPlanInstanceModel = require('./garden').model,
       NotificationModel = require('./notification').model,
       winston = require('winston'),
       async = require('async'),

@@ -10,7 +10,7 @@ var environment = process.argv.slice(2)[0], //gets first cmd line arg
 	mongooseConnection = require('./config/mongoose-connection').open(environment),
 	ModelUtils = require('./models/utils'),
 	NotificationModel = require('./models/notification').model,
-	GrowPlanInstanceModel = require('./models/growPlanInstance').model,
+	GrowPlanInstanceModel = require('./models/garden').model,
 	PhotoModel = require('./models/photo').model,
     winston = require('./config/winston-config')('worker');
 

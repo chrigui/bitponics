@@ -1,4 +1,4 @@
-var GrowPlanInstanceModel = require('../../../models/growPlanInstance').model,
+var GrowPlanInstanceModel = require('../../../models/garden').model,
     ActionModel = require('../../../models/action').model,
     DeviceModel = require('../../../models/device').model,
     SensorLogModel = require('../../../models/sensorLog').model,

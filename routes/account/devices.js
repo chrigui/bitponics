@@ -1,6 +1,6 @@
 var DeviceModel = require('../../models/device').model,
   ControlModel = require('../../models/control').model,
-  GrowPlanInstanceModel = require('../../models/growPlanInstance').model,
+  GrowPlanInstanceModel = require('../../models/garden').model,
   routeUtils = require('../route-utils'),
   async = require('async'),
   winston = require('winston');

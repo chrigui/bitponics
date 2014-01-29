@@ -69,7 +69,7 @@ require([
             },
             controls : bpn.pageData.controls,
             sensors : bpn.pageData.sensors,
-            //growPlanInstance : bpn.pageData.growPlanInstance,
+            //garden : bpn.pageData.growPlanInstance,
             controlHash : {},
             photos : bpn.pageData.photos,
             units : feBeUtils.UNITS,

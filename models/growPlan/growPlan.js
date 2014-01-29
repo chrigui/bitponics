@@ -310,7 +310,7 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
       visibility = options.visibility,
       silentValidationFail = options.silentValidationFail,
       GrowPlanModel = this,
-      GrowPlanInstanceModel = require('../growPlanInstance').model,
+      GrowPlanInstanceModel = require('../garden').model,
       originalGrowPlan,
       originalGrowPlanId,
       originalGrowPlanCreatedById;
