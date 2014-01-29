@@ -139,7 +139,7 @@ module.exports = {
 																		date : parsedEmail.headers.date,
 																		size : attachment.length,
 																		visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
-																		streamPath : filePath,
+																		filePath : filePath,
 																		gpi : gpiId
 																	},
 																	function(err, photo){

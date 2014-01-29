@@ -144,10 +144,6 @@ module.exports = function(app){
 	    app.use(passport.initialize());
 	    app.use(passport.session());
 
-      // Socket.io needs the database connection
-      require('../config/socket-config')(app);
-      winston.info('Finished socket config');
-      
       winston.info('Finished session config');
     });
 

@@ -14,7 +14,8 @@ var mongoose = require('mongoose'),
   ModelUtils = require('./utils'),
   getObjectId =  ModelUtils.getObjectId,
   gm = require('gm').subClass({ imageMagick: true }),
-  tmpDirectory = require('path').join(__dirname, '/../tmp/'),
+  path = require('path'),
+  tmpDirectory = path.join(__dirname, '/../tmp/'),
   PhotoModel;
 
 
@@ -145,8 +146,8 @@ PhotoSchema.set('toJSON', {
  * @param {string=} [options.ref.collectionName]
  * @param {string=} [options.ref.documentId]
  * @param {Stream} options.stream : optional. If set, this is used to stream to S3
- * @param {string} options.streamPath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
- * @param {bool=} options.preserveStreamPath : optional. If true, file at options.streamPath is left alone after upload. If omitted or false, file is deleted after uplaod.
+ * @param {string} options.filePath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
+ * @param {bool=} options.preserveFilePath : optional. If true, file at options.filePath is left alone after upload. If omitted or false, file is deleted after uplaod.
  */
 PhotoSchema.static("createAndStorePhoto",  function(options, callback){
   if (options.contentType.indexOf("image") !== 0){
@@ -187,7 +188,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
       [
         function uploadOriginal(innerCallback){
           var knoxMethod = ( (typeof options.stream !== 'undefined') ? 'putStream' : 'putFile'),
-            knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.streamPath),
+            knoxMethodArgument = (knoxMethod === 'putStream' ? options.stream : options.filePath),
             knoxHeaders = {
               'Content-Type': photo.type, 
               'x-amz-acl': 'private'
@@ -202,7 +203,7 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
             s3Config.photoPathPrefix + photo._id.toString(), 
             knoxHeaders, 
             function(err, result) {
-              winston.info("RETURNED FROM S3, err:", err, ", statusCode: ", result.statusCode);
+              winston.info("RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", statusCode: " + result.statusCode);
 
               if (err) { return innerCallback(err);  }
             
@@ -220,7 +221,10 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
               thumbnailGM;
 
           var filesizeCallback = function(err, value){
-            if (err) { return innerCallback(err);  }
+            if (err) { 
+              winston.error(JSON.stringify(err));
+              return innerCallback(err);  
+            }
 
             // value is returned in format "724B", need to parse int to get byte number
             photo.thumbnailSize = parseInt(value, 10);
@@ -234,7 +238,10 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
                 'Content-Length' : photo.thumbnailSize
               }, 
               function(err, result) {
-                if (err) { return innerCallback(err);  }
+                if (err) { 
+                  winston.error(JSON.stringify(err));
+                  return innerCallback(err);  
+                }
               
                 if (result.statusCode !== 200) {
                   return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
@@ -245,33 +252,66 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
             );
           };
 
+          winston.info("CREATING PHOTO THUMB, id: " + photo._id.toString());
+
           // Constructor is lenient in parsing stream vs path vs buffer. 2nd arg is optional and is only used for filetype inference, so it should handle undefined fine
           // https://github.com/aheckmann/gm#constructor
           if (typeof options.stream !== 'undefined'){
             intermediateGM = gm(options.stream, options.originalFileName)
           } else {
-            intermediateGM = gm(options.streamPath)
+            console.log('options.filePath', options.filePath);
+            // use the (stream, filename) call to make sure gm knows the filetype (from originalFilename)
+            var readStream = fs.createReadStream(options.filePath);
+            intermediateGM = gm(readStream, options.originalFileName);
           }
+          
+          intermediateGM
+          .noProfile()
+          .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
+          .stream(function (err, stdout, stderr) {
+            if (err) { 
+              winston.error(JSON.stringify(err));
+              return innerCallback(err);  
+            }
+            thumbnailGM = gm(stdout);
+            thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
+          });
+          // .thumb(
+          //   feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+          //   feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT,
+          //   tmpDirectory + 'thumb-' + options.originalFileName,
+          //   80,
+          //   function (err, stdout, stderr, command){
+          //     if (err) { 
+          //       winston.error(JSON.stringify(err));
+          //       return innerCallback(err);  
+          //     }
+          //     //innerCallback();
+          //     thumbnailGM = gm(tmpDirectory + 'thumb-' + options.originalFileName);
+          //     thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
+          //     //thumbnailGM = gm.filesize({bufferStream : true}, filesizeCallback);
+          //   }
+          // );
           
           // Resize to create thumbnail, but don't scale up smaller images
           // http://stackoverflow.com/questions/14705152/thumbnails-from-graphics-magick-without-upscaling
-          intermediateGM
-          .resize(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT, ">")
-          .gravity('Center')
-          // use a white background rather than transparent. If we're dealing with a jpg, transparent gets rendered as black. No thanks mister.
-          .background('#fff')
-          .extent(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT);
+          // intermediateGM
+          // .resize(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT, ">")
+          // .gravity('Center')
+          // // use a white background rather than transparent. If we're dealing with a jpg, transparent gets rendered as black. No thanks mister.
+          // .background('#fff')
+          // .extent(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT);
           
-          // Finalize the processing so that we can get the proper filesize
-          thumbnailGM = gm(intermediateGM.stream(), options.originalFileName);
+          // // Finalize the processing so that we can get the proper filesize
+          // thumbnailGM = gm(intermediateGM.stream(), options.originalFileName);
           
-          thumbnailGM.filesize({bufferStream : true}, filesizeCallback);
+          
         }
       ],
       function(err){
-        if (typeof options.streamPath !== 'undefined' && !options.preserveStreamPath){
+        if (typeof options.filePath !== 'undefined' && !options.preserveFilePath){
           // Delete the file from disk
-          fs.unlink(options.streamPath);
+          fs.unlink(options.filePath);
         }
 
         if (err) { return callback(err);}

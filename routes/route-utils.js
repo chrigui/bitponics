@@ -327,7 +327,7 @@ module.exports = {
           gpi : req.body.gpi,
           ref : req.body.ref,
           visibility : req.body.visibility || feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
-          streamPath : photo.path
+          filePath : photo.path
         },
         function(err, photo){
           if (err) { return iteratorCallback(err); }

@@ -111,7 +111,7 @@ module.exports = {
 											date : new Date(fileMetaData.time),
 											size : fileMetaData.size,
 											visibility : feBeUtils.VISIBILITY_OPTIONS.PUBLIC,
-											streamPath : localFilePath
+											filePath : localFilePath
 										},
 										function(err, photo){
 											winston.info("IN Photo creation callback");
