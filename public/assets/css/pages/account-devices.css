@@ -1,3 +1,63 @@
-.device-list .value {
+.device-list {
+  width: 100%;
+}
+.device-list > li {
+  margin: 3em 0 3em;
+}
+.device-list .display-t {
+  width: 100%;
+}
+.device-list .display-t .label,
+.device-list .display-t .value {
+  display: block;
+}
+.device-list .display-t .value {
   font-style: italic;
+  color: #6b6b6b;
+  padding: 0 0.35em;
+}
+.device-list .display-t .label {
+  color: #999;
+}
+.device-list .display-tr {
+  width: 100%;
+}
+.device-list .device-outlet-mapping .value {
+  text-align: left;
+}
+.device-list .device-outlet-mapping .display-tr,
+.device-list .device-outlet-mapping .display-tc {
+  width: 100%;
+}
+.device-list .actions .btn {
+  margin: 1em 1em 1em 0;
+}
+.device-list .outlet-mapping {
+  margin: 1em 0;
+}
+@media  screen and (min-width: 65em) {
+  .device-list {
+    max-width: 30em;
+  }
+  .device-list .display-t .label,
+  .device-list .display-t .value {
+    display: table-cell;
+    width: 25%;
+  }
+  .device-list .display-t .value {
+    text-align: right;
+    width: 75%;
+  }
+  .outlet-mapping {
+    position: absolute;
+    top: 11em;
+    left: 5.75em;
+  }
+  .outlet-mapping .label {
+    display: none;
+  }
+  .outlet-mapping .btn {
+    margin: 0.25em 0;
+    padding: 0.75em;
+  }
 }

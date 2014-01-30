@@ -16,74 +16,67 @@ block content
       h1.page-heading Manage Device
       //- section(ng-view)
       section.separator-top
+        
+        img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
 
         if (userOwnedDevices.length > 0)
-          ul.device-list
+          ul.device-list(ng-cloak)
             each device in userOwnedDevices
               li
-                
-                div
-                  span.label Name: 
-                  span.value.device-name #{device.name}
 
-                div
-                  span.label MAC Address: 
-                  span.value.device-mac-address #{device._id}
+                div.display-t
+                  
+                  div.display-tr
+                    span(class="label display-tc") Name: 
+                    span(class="value device-name display-tc") #{device.name}
 
+                  div.display-tr
+                    span.label.display-tc MAC Address: 
+                    span(class="value device-mac-address display-tc") #{device._id}
 
-                div
-                  span.label Device Key: 
-                  span.value.device-mac-address #{device.combinedKey}
+                  div.display-tr
+                    span.label Device Key: 
+                    span(class="value device-mac-address display-tc") #{device.combinedKey}
 
-                - if (device.activeGrowPlanInstance)
-                  div 
-                    span.label Garden:
-                    span.value 
-                      a(href="/gardens/#{device.activeGrowPlanInstance._id}") #{device.activeGrowPlanInstance.name}
-                - if (device.recentSensorLogs)
-                  div
-                    span.label Last log: 
-                    span.value #{device.recentSensorLogs[0]}
-                - if (device.lastConnectionAt)
-                  div
-                    span.label Last Connection: 
-                    span.value #{device.lastConnectionAt}
+                  - if (device.activeGrowPlanInstance)
+                    div.display-tr
+                      span(class="label") Garden:
+                      span(class="value display-tc")
+                        a(href="/gardens/#{device.activeGrowPlanInstance._id}") #{device.activeGrowPlanInstance.name}
+                  - if (device.recentSensorLogs)
+                    div.display-tr
+                      span(class="label") Last log: 
+                      span(class="value display-tc") #{device.recentSensorLogs[0]}
+                  - if (device.lastConnectionAt)
+                    div.display-tr
+                      span(class="label") Last Connection: 
+                      span(class="value display-tc") #{device.lastConnectionAt}
 
-                div
-                  span.label Power Outlet Mapping: 
-                  ul 
-                    each outputMapping in device.outputMap
-                      li
-                        div 
-                          span.label Outlet: 
-                          span.value #{outputMapping.outputId}
-                        div
-                          span.label Accessory: 
-                          - if (outputMapping.control)
-                            span.value #{outputMapping.control.name}
-                          - else
-                            span.value Nothing mapped
+                  each outputMapping, i in device.outputMap
+                    div.device-outlet-mapping.display-tr
+                            span(class="label", data-id="#{outputMapping.outputId}") Outlet ##{i+1}: 
+                            //- span(class="value display-tc") #{outputMapping.outputId}
+                            - if (outputMapping.control)
+                              span(class="value") #{outputMapping.control.name}
+                            - else
+                              div(class="value") 
+                                a(href="/account/devices/#{device._id}/outlet-map", target="_blank") 
+                                  | Set
 
-
-                - if (typeof device.status.calibrationMode !== 'undefined')
-                  div
-                    span.label Calibration Mode: 
-                    span.value Device is currently attempting to calibrate #{device.status.calibrationMode}
-                    form(action="/account/devices/#{device._id}", method="POST")
-                      input(type="hidden", name="clearCalibrationMode", value="true")
-                      button(type="submit") Exit Calibrate Mode
-                - else 
-                  div
-                    a(class="btn next-step-btn calibrate-device-item", href="/account/devices/#{device._id}/calibrate")
-                      | Calibrate 
-                
-                div
+                div.actions
+                  - if (typeof device.status.calibrationMode !== 'undefined')
+                    div
+                      span(class="label") Calibration Mode: 
+                      span(class="value") Device is currently attempting to calibrate #{device.status.calibrationMode}
+                      form(action="/account/devices/#{device._id}", method="POST")
+                        input(type="hidden", name="clearCalibrationMode", value="true")
+                        button(type="submit") Exit Calibrate Mode
+                  - else 
+                      a(class="btn next-step-btn calibrate-device-item", href="/account/devices/#{device._id}/calibrate")
+                        | Calibrate 
+                  
                   a(class="btn next-step-btn", href="/account/devices/#{device._id}/outlet-map", target="_blank") 
-                    | Map accessories to power outlets
+                      | Map power outlets
 
-                div
                   a(class="btn next-step-btn", href="#{appUrl}/setup", target="_blank") 
-                    | Pair to a Wifi network
-
-
-  a(href="/setup") Set up a new Bitponics Device
+                      | Pair to Wifi

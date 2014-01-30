@@ -1,29 +1,24 @@
 extends ../layout
 
-
 block head
   base(href="/account/devices/#{device._id}/calibrate/")
   script 
     bpn.pageData["deviceId"] = !{JSON.stringify(device._id)};
-
   mixin requirejs("/assets/js/pages/calibrate")
 
-
 block css 
-  style
-    button {
-      display: block;
-    }
-    .overlay {
-      display:none;
-    }
+  link(rel='stylesheet', href='/assets/css/pages/account-devices.css')
 
 block content
-  img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
-  div(ng-cloak, ng-controller="bpn.controllers.calibrate.Main")
-    div(ng-view)
+  section.header
+      header
+        include ../includes/nav/main
+        
+  section#main(role="main", class="main")
+    div(ng-cloak, ng-controller="bpn.controllers.calibrate.Main")
+      div(ng-view)
 
-  div#overlay.overlay
+    div#overlay.overlay
 
 block footer-scripts
   
