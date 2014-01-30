@@ -14,24 +14,33 @@
 		path
 			
 			&.line
-				fill: none;
-				stroke: color-text-gray;
-				stroke-width: 1.5px;
+				fill none
+				stroke color-text-gray
+				stroke-width 1.5px
+
+				&.data-path
+					stroke color-logo-green
 			
 			&.area
-				fill: #e7e7e7;
+				fill #e7e7e7
 
 		.axis
 			shape-rendering: crispEdges;
 
 			&.x
 				.minor
-					stroke-opacity: .5;
+					stroke-opacity .5
 		
 			line, path
-				fill: none;
-				stroke: color-text-gray;
-		
+				fill none
+				stroke color-text-gray
+	
+
+		.focus-line
+			stroke-width 1px
+			fill none
+			stroke color-logo-green
+
 		// .x.axis line, .x.axis path,
 		// .y.axis line, .y.axis path
 			

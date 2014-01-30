@@ -572,5 +572,42 @@ define(['moment'], function(moment){
     return duration && map[durationType] && (duration < map[durationType]);
   };
 
+
+
+  /**
+   * http://oli.me.uk/2013/06/08/searching-javascript-arrays-with-a-binary-search/
+   * 
+   * Performs a binary search on the host array. This method can either be
+   * injected into Array.prototype or called with a specified scope like this:
+   * binaryIndexOf.call(someArray, searchElement);
+   *
+   * @param {*} searchElement The item to search for within the array.
+   * @return {Number} The index of the element, or the negated target index if not found (ie, if target element has a value that fits between elements 3&4, returns -4)
+   */
+  utils.binaryIndexOf = function(array, searchElement) {
+    var minIndex = 0;
+    var maxIndex = array.length - 1;
+    var currentIndex;
+    var currentElement;
+    var resultIndex;
+
+    while (minIndex <= maxIndex) {
+      resultIndex = currentIndex = (minIndex + maxIndex) / 2 | 0;
+      currentElement = array[currentIndex];
+
+      if (currentElement < searchElement) {
+        minIndex = currentIndex + 1;
+      }
+      else if (currentElement > searchElement) {
+        maxIndex = currentIndex - 1;
+      }
+      else {
+        return currentIndex;
+      }
+    }
+
+    return ~maxIndex;
+  };
+
   return utils;
 });

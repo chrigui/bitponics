@@ -222,9 +222,9 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           // Testing with random data
           var sensorReadings = [];
           var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
-          for (var i = 0; i < 1000; i++){
+          for (var i = 0; i < 10; i++){
             // should start at starDate, each step should be 1/1000 of the way to endDate
-            var randomTS = scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 1000));
+            var randomTS = Math.round(scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 10)));
 
             //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
             sensorReadings.push({
@@ -268,7 +268,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
                 return xAxisScale.tickFormat()(d);
               })
               .orient("bottom");
-              console.log('xAxis.timeformat', xAxisScale.tickFormat());
+          //console.log('xAxis.timeformat', xAxisScale.tickFormat());
 
           var yAxis = d3.svg.axis()
               .scale(yAxisScale)
@@ -289,7 +289,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
 
           //console.log('extent', d3.extent(sensorReadings, function(d) { return d.val; }))
-          console.log('graphing', scope.sensor.code, [scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
+          //console.log('graphing', scope.sensor.code, [scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
           
           xAxisScale.domain([scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
           yAxisScale.domain(d3.extent(sensorReadings, function(d) { return d.val; }));
@@ -320,47 +320,71 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
             .attr("class", "line data-path")
             .attr("d", line);
 
-          // var max=0, min=0, len=0;
-          // min = d3.min(sensorReadings);
-          // max = d3.max(sensorReadings);
-          // len = sensorReadings.length;
           
-          // // TODO : figure out how to make the size dynamic based on container
-          // var h = 100,
-          //     w = 750,
-          //     p = 2,
-          //     x = d3.scale.linear().domain([0, len]).range([p, w - p]),
-          //     y = d3.scale.linear().domain([min, max]).range([h - p, p]),
-          //     line = d3.svg.line()
-          //            .x(function(d, i) { 
-          //             console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
-          //             // return the X coordinate where we want to plot this datapoint
-          //             return x(i); 
-          //            })
-          //            .y(function(d) { 
-          //               console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
-          //               // return the Y coordinate where we want to plot this datapoint
-          //               return y(d); 
-          //            });
+          var focusLineGroup = svg.append("g") //the vertical line across the plots
+          .attr("class", "focus-line");
 
-          // var svg = d3.select(element[0])
-          //             .append("svg:svg")
-          //             .attr("height", h)
-          //             .attr("width", w);
+          var focusLine = focusLineGroup
+            .append("line")
+            .attr("x1", 0).attr("x2", 1) 
+            .attr("y1", 0).attr("y2", height) 
 
-          // var g = svg.append("svg:g");
-          // g.append("svg:path")
-          //  .attr("d", line(sensorReadings));
-           //.attr("stroke", function(d) { return fill("hello"); });
+          
+          var offset = element.offset();
+          offset.top = Math.round(offset.top);
+          offset.left = Math.round(offset.left);
 
-          element.find('svg').mouseleave(function(event) {
-            //handleMouseOutGraph(event);
-            console.log("mouse leave");
-          })
-          element.find('svg').mousemove(function(event) {
-            //handleMouseOverGraph(event);
-            console.log("mouse move on graph");
-          })  
+          element.find('svg')
+            .mouseleave(function(e) {
+              console.log("mouse leave");
+            })
+            .mousemove(function(e) {
+              //console.log("mouse move on graph", e.pageX, e.pageY);
+              var linePositionX = e.pageX - margin.left - offset.left;
+              focusLine.attr("x1", linePositionX).attr("x2", linePositionX + 1);
+
+              //console.log(linePositionX/width);
+
+              var xAxisDate = xAxisScale.invert(linePositionX);
+              console.log('xAxisDate', xAxisDate);
+              var xAxisDateValue = xAxisDate.valueOf();
+
+              // Find neighboring data points, then ge the closest
+              var priorDataPoint, nextDataPoint;
+              // for(var i = 0, length = sensorReadings.length; i < length; i++){
+              //   console.log('iterating', i);
+              //   nextDataPoint = sensorReadings[i];
+              //   console.log(nextDataPoint.ts,xAxisDateValue);
+              //   if (nextDataPoint.ts > xAxisDateValue){
+              //     priorDataPoint = sensorReadings[i-1];
+              //     console.log('found', i, nextDataPoint, priorDataPoint);
+              //     break;
+              //   }
+              // }
+
+              //console.log(sensorReadings.map(function(s){ return s.ts}), xAxisDateValue, feBeUtils.binaryIndexOf(sensorReadings.map(function(s){ return s.ts}), xAxisDateValue));
+
+              var nextDataPointIndex = Math.abs(feBeUtils.binaryIndexOf(sensorReadings.map(function(s){ return s.ts}), xAxisDateValue));
+              nextDataPoint = sensorReadings[nextDataPointIndex];
+              priorDataPoint = sensorReadings[nextDataPointIndex - 1];
+              
+              var closestDataPoint;
+
+              if (!priorDataPoint && !nextDataPoint){ 
+                
+              } else if (!priorDataPoint){
+                closestDataPoint = nextDataPoint;
+              } else if (!nextDataPoint){
+                closestDataPoint = priorDataPoint;
+              } else {
+                var priorDiff = xAxisDateValue - priorDataPoint.ts,
+                    nextDiff = nextDataPoint.ts - xAxisDateValue;
+                closestDataPoint = priorDiff < nextDiff ? priorDataPoint : nextDataPoint;                
+              }
+
+              //console.log(closestDataPoint);
+
+            });
         }
 
 
