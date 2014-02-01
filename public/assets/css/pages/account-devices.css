@@ -35,6 +35,9 @@
 .device-list .outlet-mapping {
   margin: 1em 0;
 }
+.calibrate .btn {
+  margin: 1em 1em 1em 0 !important;
+}
 @media  screen and (min-width: 65em) {
   .device-list {
     max-width: 30em;

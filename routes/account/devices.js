@@ -138,7 +138,7 @@ module.exports = function(app){
    */
   app.get('/account/devices/:id/calibrate/*',
     function (req, res, next){
-      return res.redirect('/account/devices/calibrate/' + req.param('id'));
+      return res.redirect('/account/devices/' + req.param('id') + '/calibrate/');
     }
   );
 

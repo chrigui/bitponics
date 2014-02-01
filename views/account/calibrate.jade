@@ -15,25 +15,31 @@ block content
         include ../includes/nav/main
         
   section#main(role="main", class="main")
-    div(ng-cloak, ng-controller="bpn.controllers.calibrate.Main")
-      div(ng-view)
+    div.content-module.middle(ng-controller="bpn.controllers.calibrate.Main")
+      h1.page-heading Manage Device
+      section.separator-top
+        div(ng-view)
+          img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
 
-    div#overlay.overlay
+        //- div#overlay.overlay
 
 block footer-scripts
   
   script(type="text/ng-template", id="select.html")
+    
+
     h1 Which probe would you like to calibrate?
-    p
-      a(class="btn", href="ph") pH
-        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
-      a(class="btn", href="ec") EC/TDS
-        | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+      p
+        a(class="btn", href="ph") pH
+          | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+        a(class="btn", href="ec") EC/TDS
+          | <i class="icon-glyph icon-glypharrow" aria-hidden="true"></i>
+
 
   script(type="text/ng-template", id="ph-7.html")
+
     h1 Calibrating your pH probe
-    p 
-      | Calibrating pH is a 3-step process. You'll calibrate your probe to pH 7, then pH 4, and finally pH 10. And then you'll be all set!
+    p Calibrating pH is a 3-step process. You'll calibrate your probe to pH 7, then pH 4, and finally pH 10. And then you'll be all set!
 
     h2 Step 1
     p We'll start with pH 7. 
@@ -41,10 +47,19 @@ block footer-scripts
       li Rinse the tip of the probe under tap water. 
       li You should have a bottle labeled "pH 7 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, the calibrating process will begin, and we'll notifiy you when the step is complete. Calibrating may take several minutes. 
-    button(ng-click="showOverlay()") Calibrate ph 7
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ph-7-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.PH_7",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate ph 7
+
+  script(type="text/ng-template", id="ph-7-dialog.html")
+
+    h1 Calibrating pH 7...
 
   script(type="text/ng-template", id="ph-4.html")
-    
+
     h2 Step 2
     p 
       | Great! ph 7 is done, onto pH 4.
@@ -53,32 +68,53 @@ block footer-scripts
       li Rinse the tip of the probe under tap water. 
       li You should have a bottle labeled "pH 4 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
-    button(ng-click="showOverlay()") Calibrate ph 4
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ph-4-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.PH_4",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate ph 4
+
+  script(type="text/ng-template", id="ph-4-dialog.html")
+
+    h1 Calibrating pH 4...
+
 
   script(type="text/ng-template", id="ph-10.html")
+
     h2 Last Step
     p Great! ph 7 and ph 4 are done, onto pH 10.
     ul
       li Rinse the tip of the probe under tap water. 
       li You should have a bottle labeled "pH 10 Calibration Solution". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes. 
-    button(ng-click="showOverlay()") Calibrate ph 10
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ph-10-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.PH_10",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate ph 10
+
+  script(type="text/ng-template", id="ph-10-dialog.html")
+
+    h1 Calibrating pH 10...
+
 
   
   script(type="text/ng-template", id="ph-done.html")
-    
-      h2 Cool beans! Your pH probe is now calibrated. 
-      p If you also have an EC/TDS probe, 
-        a(href="ec") click here to start EC calibration. 
-        | If not, you can just continue on and check out your latest probe readings on your 
-        a(href="/account/devices") devices page 
-        | or head over to your 
-        a(href="/dashboard") Dashboard
-        | .
+
+    h2 Cool beans! Your pH probe is now calibrated. 
+    p If you also have an EC/TDS probe, 
+      a(href="ec") click here to start EC calibration. 
+      | If not, you can just continue on and check out your latest probe readings on your 
+      a(href="/account/devices") devices page 
+      | or head over to your 
+      a(href="/dashboard") Dashboard
+      | .
 
 
   script(type="text/ng-template", id="ec-dry.html")
-    
+
     h1 Calibrating your EC probe
     p 
       | Calibrating EC is a 3-step process. You'll calibrate your probe to "dry", then to 3000&#956;S, and finally to 220&#956;S. And then you'll be all set!
@@ -89,35 +125,68 @@ block footer-scripts
       li Rinse the tip of the probe under tap water. 
       li Dry off the tip of the probe with a paper towel, then click the "Calibrate EC-Dry" button below.
         | Once you click, the calibrating process will begin, and we'll notifiy you when the step is complete. Calibrating may take several minutes. 
-    button(ng-click="showOverlay()") Calibrate EC-Dry
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ec-dry-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.EC_DRY",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate EC-Dry
+
+  script(type="text/ng-template", id="ec-dry-dialog.html")
+
+    h1 Calibrating EC-Dry...
 
 
+  
   script(type="text/ng-template", id="ec-hi.html")
-    
+  
     h2 Step 2
     p Great! EC-Dry is done, onto EC 3000&#956;S.
     
     ul
       li You should have a bottle labeled "EC 3000&#956;S". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes.
-    button(ng-click="showOverlay()") Calibrate EC-3000&#956;S
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ec-hi-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.EC_HI",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate EC-3000&#956;S
 
+  script(type="text/ng-template", id="ec-hi-dialog.html")
   
+    h1 Calibrating EC-3000&#956;S...
+
+
+
   script(type="text/ng-template", id="ec-lo.html")
-    
+  
     h2 Last Step
     p Great! EC-Dry and EC-3000µS are done, onto EC-220&#956;S.
     ul
       li You should have a bottle labeled "EC 220&#956;S". Pour a small amount of the solution into another small container, just enough to submerse the tip of the probe.
       li Place the probe into the solution, then click the button below. Once you click, calibrating may take several minutes.
-    button(ng-click="showOverlay()") Calibrate EC-220&#956;S
+    button(
+      class="btn",
+      ng-click="showOverlay()"
+      ng-dialog="ec-lo-dialog.html",
+      ng-dialog-controller="bpn.controllers.calibrate.EC_LO",
+      ng-dialog-class="ngdialog-theme-overlay") Calibrate EC-220&#956;S
+
+  script(type="text/ng-template", id="ec-lo-dialog.html")
+  
+    h1 Calibrating EC-220&#956;S...
+
 
 
   script(type="text/ng-template", id="ec-done.html")
-    
-      h2 Nice, your EC probe is now calibrated. 
-      p Now you can check out your latest probe readings on your 
-        a(href="/account/devices") devices page 
-        | or head over to your 
-        a(href="/dashboard") Dashboard
-        | .
+  
+    h2 Nice, your EC probe is now calibrated. 
+    p Now you can check out your latest probe readings on your 
+      a(href="/account/devices") devices page 
+      | or head over to your 
+      a(href="/dashboard") Dashboard
+      | .
+
+
+

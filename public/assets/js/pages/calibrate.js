@@ -9,7 +9,8 @@ require([
   'es5shim',
   'bpn',
   'bpn.services.socket',
-  'overlay'
+  // 'overlay'
+  'angularDialog'
   ],
 function (angular, domReady, moment, feBeUtils) {
   'use strict';
@@ -84,13 +85,17 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
+        $scope.element = $scope.$parent.ngDialogElement;
+
+        console.log($scope.element);
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_7;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating pH 7...</h1>").show();
+          ngDialog.open({ template: 'ph-7-dialog.html' });
         };
       }
     ]
@@ -102,13 +107,14 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_4;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating pH 4...</h1>").show();
+          ngDialog.open({ template: 'ph-4-dialog.html' });
         };
       }
     ]
@@ -120,13 +126,14 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.PH_10;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating pH 10...</h1>").show();
+          ngDialog.open({ template: 'ph-10-dialog.html' });
         }; 
       }
     ]
@@ -154,13 +161,14 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_DRY;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating EC-Dry...</h1>").show();
+          ngDialog.open({ template: 'ec-dry-dialog.html' });
         };
       }
     ]
@@ -172,13 +180,14 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_HI;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating EC-3000&#956;s...</h1>").show();
+          ngDialog.open({ template: 'ec-hi-dialog.html' });
         };
       }
     ]
@@ -190,13 +199,14 @@ function (angular, domReady, moment, feBeUtils) {
       '$scope',
       'sharedDataService',
       'bpn.services.socket',
-      function($scope, sharedDataService, socket){
+      'ngDialog',
+      function($scope, sharedDataService, socket, ngDialog){
         $scope.sharedDataService = sharedDataService;
         
         $scope.showOverlay = function(){
           $scope.sharedDataService.waitingOn = bpn.utils.CALIB_MODES.EC_LO;
           socket.emit('ready', { deviceId: $scope.sharedDataService.deviceId, mode: $scope.sharedDataService.waitingOn });
-          $scope.$overlay.html("<h1>Calibrating EC-200&#956;s...</h1>").show();
+          ngDialog.open({ template: 'ec-lo-dialog.html' });
         };
       }
     ]
@@ -237,14 +247,15 @@ function (angular, domReady, moment, feBeUtils) {
       '$location',
       'bpn.services.socket',
       'sharedDataService',
-      function ($scope, $filter, $location, socket, sharedDataService) {
+      'ngDialog',
+      function ($scope, $filter, $location, socket, sharedDataService, ngDialog) {
         
         $scope.socket = socket;
         $scope.socket.connect('/calibrate');
 
         $scope.sharedDataService = sharedDataService;
         $scope.sharedDataService.waitingOn = '';
-        $scope.$overlay = $('#overlay');
+        // $scope.$overlay = $('#overlay');
         
         $scope.socket.on('connect', function () {
           //console.log('connected');
@@ -255,28 +266,28 @@ function (angular, domReady, moment, feBeUtils) {
           switch(data.mode){
             // ph: 7, then 4, then 10
             case bpn.utils.CALIB_MODES.PH_7:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ph-4');
               break;
             case bpn.utils.CALIB_MODES.PH_4:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ph-10');
               break;
             case bpn.utils.CALIB_MODES.PH_10:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ph-done');
               break;
             // ec: dry, then hi, then lo
             case bpn.utils.CALIB_MODES.EC_DRY:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ec-hi');
               break;
             case bpn.utils.CALIB_MODES.EC_HI:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ec-lo');
               break;
             case bpn.utils.CALIB_MODES.EC_LO:
-              $scope.$overlay.hide();
+              // $scope.$overlay.hide();
               $location.path('/ec-done');
               break;
           }
