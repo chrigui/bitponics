@@ -6701,6 +6701,12 @@ button.close {
   fill: none;
   stroke: #00e36c;
 }
+.garden-history svg .focus-point,
+.app-page.garden-history svg .focus-point {
+  stroke-width: 2px;
+  fill: #fff;
+  stroke: #00e36c;
+}
 /*
  * Error Pages
  */

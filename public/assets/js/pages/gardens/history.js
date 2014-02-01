@@ -191,6 +191,9 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
       controller : [
         '$scope', '$element', '$attrs', '$transclude',
         function ($scope, $element, $attrs, $transclude){
+          $scope.getLogDisplay = function(log){
+            return log.val + ' ' + $scope.sensor.unit + ' @ ' + moment(log.ts).format('MMMM Do YYYY, h:mm a');
+          };
         }
       ],
       link: function (scope, element, attrs, controller) { 
@@ -222,9 +225,9 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           // Testing with random data
           var sensorReadings = [];
           var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
-          for (var i = 0; i < 10; i++){
+          for (var i = 0; i < 1000; i++){
             // should start at starDate, each step should be 1/1000 of the way to endDate
-            var randomTS = Math.round(scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 10)));
+            var randomTS = Math.round(scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 1000)));
 
             //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
             sensorReadings.push({
@@ -243,7 +246,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           // Using "conventional margins" http://bl.ocks.org/mbostock/3019563
           // D3 Axis example: http://bl.ocks.org/mbostock/1166403
 
-          var margin = {top: 10, right: 70, bottom: 30, left: 30},
+          var margin = {top: 30, right: 70, bottom: 30, left: 0},
               outerWidth = element.width(),
               width = outerWidth - margin.left - margin.right,
               outerHeight = 200,
@@ -256,7 +259,6 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           // TODO : yAxis should maybe use a threshold scale (http://bl.ocks.org/mbostock/4573883)
           // Thresholds would be the ideal range bounds
-
           var yAxisScale = d3.scale.linear()
               .range([height, 0]);
 
@@ -268,7 +270,6 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
                 return xAxisScale.tickFormat()(d);
               })
               .orient("bottom");
-          //console.log('xAxis.timeformat', xAxisScale.tickFormat());
 
           var yAxis = d3.svg.axis()
               .scale(yAxisScale)
@@ -276,6 +277,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
               .orient("right");
 
           var line = d3.svg.line()
+              .interpolate("cardinal")
               .x(function(d) { return xAxisScale(d.ts); })
               .y(function(d) { return yAxisScale(d.val); });
 
@@ -287,13 +289,8 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-          //console.log('extent', d3.extent(sensorReadings, function(d) { return d.val; }))
-          //console.log('graphing', scope.sensor.code, [scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
-          
           xAxisScale.domain([scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
           yAxisScale.domain(d3.extent(sensorReadings, function(d) { return d.val; }));
-
 
           svg.append("g")
             .attr("class", "x axis")
@@ -307,27 +304,42 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
             .attr("transform", "translate(" + width + ",0)")
             .call(yAxis)
           
-          svg.append("g")
-          .append("text")
-            .attr("transform", "rotate(-90),translate(0,-30)")
-            .attr("y", 6)
-            .attr("dy", ".8em")
-            .style("text-anchor", "end")
-            .text(scope.sensor.name); // axis label
+          var sensorLabel = svg.append("g")
+            .append("text")
+              //.attr("transform", "rotate(-90),translate(0,-30)")
+              //.attr("y", 6)
+              //.attr("dy", ".8em")
+              //.style("text-anchor", "end")
+              .attr("transform", "translate(0,-10)")
+              .text(scope.sensor.name); // axis label
 
-          svg.append("path")
+          var path = svg.append("path")
             .datum(sensorReadings)
             .attr("class", "line data-path")
             .attr("d", line);
 
           
-          var focusLineGroup = svg.append("g") //the vertical line across the plots
-          .attr("class", "focus-line");
+          var focusGroup = svg.append("g"); //the vertical line across the plots
 
-          var focusLine = focusLineGroup
+
+          var focusLine = focusGroup
             .append("line")
+            .attr("class", "focus-line")
             .attr("x1", 0).attr("x2", 1) 
             .attr("y1", 0).attr("y2", height) 
+
+
+          var focusPoint = focusGroup.append("circle")
+              .attr("class", "focus-point")
+              .attr("r", "5")
+              .attr("transform", "translate(" + line([sensorReadings[sensorReadings.length-1]]).replace('M','') + ")");
+
+          var focusText = focusGroup
+            .append("text")
+              .attr("class", "focus-text")
+              .attr("text-anchor", "end")
+              .attr("transform", "translate(" + width + ",-10)")
+              .text(scope.getLogDisplay(sensorReadings[sensorReadings.length-1]));
 
           
           var offset = element.offset();
@@ -335,10 +347,10 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
           offset.left = Math.round(offset.left);
 
           element.find('svg')
-            .mouseleave(function(e) {
+            .on('mouseleave', function(e) {
               console.log("mouse leave");
             })
-            .mousemove(function(e) {
+            .on('mousemove touchmove', function(e) {
               //console.log("mouse move on graph", e.pageX, e.pageY);
               var linePositionX = e.pageX - margin.left - offset.left;
               focusLine.attr("x1", linePositionX).attr("x2", linePositionX + 1);
@@ -382,11 +394,14 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
                 closestDataPoint = priorDiff < nextDiff ? priorDataPoint : nextDataPoint;                
               }
 
-              //console.log(closestDataPoint);
-
-            });
+              //console.log(closestDataPoint, closestDataPoint);  
+              if (closestDataPoint){
+                focusPoint.attr("transform", "translate(" + line([closestDataPoint]).replace('M','') + ")");
+                focusText.text(scope.getLogDisplay(closestDataPoint));
+              }
+            }
+          );
         }
-
 
 
         scope.$watch("sensorLogs", function(val) {
