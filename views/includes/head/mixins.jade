@@ -39,7 +39,6 @@ mixin requirejs(dataMain)
   - var fileSaver = CDN('/assets/js/libs/FileSaver.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var flexslider = CDN('/assets/js/libs/flexslider/jquery.flexslider-min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var jquery = CDN('/assets/js/libs/jquery-1.8.2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
-  - var jqueryUI = CDN('/assets/js/libs/jquery-ui-1.8.15.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var localscroll = CDN('/assets/js/libs/jquery/jquery.localScroll.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var lvlServicesFileUploader = CDN('/assets/js/libs/angular/lvl-xhr-post.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var lvlServicesUUID = CDN('/assets/js/libs/angular/lvl-uuid.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -100,7 +99,6 @@ mixin requirejs(dataMain)
         'fe-be-utils': '#{feBeUtils}',
         'flexslider': '#{flexslider}',
         'jquery' : '#{jquery}',
-        'jqueryUI' : '#{jqueryUI}',
         'localscroll': '#{localscroll}',
         'lvl.services.fileUploader': '#{lvlServicesFileUploader}',
         'lvl.services.uuid': '#{lvlServicesUUID}',
@@ -149,13 +147,6 @@ mixin requirejs(dataMain)
         },
         'jquery': { 
           exports : '$'
-        },
-        'jqueryUI': { 
-          deps : ['jquery']
-        },
-        'rickshaw' : {
-          deps : ['d3', 'jqueryUI'],
-          exports : 'Rickshaw'
         },
         'select2': {
           deps : ['jquery']
