@@ -16,10 +16,9 @@ require([
   'moment',
   'fe-be-utils',
   'view-models',
+  'd3',
   'angularResource',
   'angularRoute',
-  'd3',
-  'es5shim',
   'angularUI',
   'angularUIBootstrap',
   'bpn',
@@ -34,7 +33,7 @@ require([
   'throttle-debounce',
   'lvl.directives.fileUpload'
 ],
-  function (angular, domReady, moment, feBeUtils, viewModels) {
+  function (angular, domReady, moment, feBeUtils, viewModels, d3) {
     'use strict';
 
 

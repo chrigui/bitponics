@@ -1,0 +1,46 @@
+block vars
+  - pageClassName = 'garden-graphs app-page single-page'
+
+extends ../layout
+
+block head
+  mixin requirejs("/assets/js/pages/gardens/graphs")
+
+block css
+
+block content
+  section.header
+    header
+      include ../includes/nav/main
+
+  section#main(role="main", class="main", ng-controller="bpn.controllers.gardens.graphs.Main")
+    h2.page-heading.ng-cloak {{garden.name}} Graphs
+    div.separator-top
+      img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+      div(ng-cloak)
+        //-h2 Timespan:
+        div(class="custom-dropdown-wrap")
+          select(
+            class="custom-dropdown", 
+            ng-model="sharedDataService.viewOptions.selectedTimespan",
+            ng-change="")
+            option(ng-repeat="option in sharedDataService.viewOptions.timespans", ng-value="option") {{option}}
+          .dblarrow
+            i
+        
+        //-button.btn Export
+        
+        div(ng-repeat="sensor in sharedDataService.visibleSensors")
+          //-h3 {{sensor.name}}
+          div(data-bpn-directives-sensor-graph, data-sensor="sensor", data-sensor-logs="sharedDataService.sensorLogs", data-shared-data-service="sharedDataService")
+
+
+
+block footer-scripts
+
+  script
+    bpn.pageData = {
+      garden : !{JSON.stringify(garden)},
+      sensors : !{JSON.stringify(sensors)},
+      controls : !{JSON.stringify(controls)}
+    };

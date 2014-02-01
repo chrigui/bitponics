@@ -7,7 +7,7 @@
  * bpn.sensors
  */
 define(['bpn.directives', 'jquery', 'view-models', 'd3'],
-  function (bpnDirectives, $, viewModels) {
+  function (bpnDirectives, $, viewModels, d3) {
     
     /*
      * Grow Plan navigation phase graph

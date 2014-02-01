@@ -18,7 +18,8 @@ define([
   'bpn.filters',
   'bpn.services',
   'bpn.services.analytics',
-  'angularDialog' // had to include this so we could pass it to the angular module initializer. needed for nav controller
+  'angularDialog', // had to include this so we could pass it to the angular module initializer. needed for nav controller
+  'es5shim'
 	], 
 	function (angular) {
 		'use strict';
