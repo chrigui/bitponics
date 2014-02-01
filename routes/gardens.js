@@ -275,12 +275,12 @@ module.exports = function(app){
 	/**
 	 * 
 	 */
-	app.get('/gardens/:growPlanInstanceId/history', 
+	app.get('/gardens/:growPlanInstanceId/graphs', 
 		routeUtils.middleware.ensureSecure,
 		routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
-	    	title: "Bitponics | Garden History"
+	    	title: "Bitponics | Garden Graphs"
 	    };
 		  
 		  GrowPlanInstanceModel
@@ -308,7 +308,7 @@ module.exports = function(app){
             locals.sensors = results[0];
 						locals.controls = results[1];
 
-						res.render('gardens/history', locals);
+						res.render('gardens/graphs', locals);
 					}
 		    );
 			});

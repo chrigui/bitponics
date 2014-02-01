@@ -1,5 +1,5 @@
 /**
- * Main file for /gardens/:id/history
+ * Main file for /gardens/:id/graphs
  *
  * Depends on following globals:
  * - bpn
@@ -26,7 +26,7 @@ require([
 function (angular, domReady, viewModels, moment, feBeUtils, d3) {
   'use strict';
 
-  var app = angular.module('bpn.apps.gardens.history', ['bpn', 'ui', 'ui.bootstrap']);
+  var app = angular.module('bpn.apps.gardens.graphs', ['bpn', 'ui', 'ui.bootstrap']);
 
   app.factory('sharedDataService', 
   [
@@ -132,7 +132,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
   ]);
 
 
-  app.controller('bpn.controllers.gardens.history.Main', [
+  app.controller('bpn.controllers.gardens.graphs.Main', [
     '$scope',
     'sharedDataService',
     'GardenModel',
@@ -192,6 +192,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
         '$scope', '$element', '$attrs', '$transclude',
         function ($scope, $element, $attrs, $transclude){
           $scope.getLogDisplay = function(log){
+            if (!log) { return ''; }
             return log.val + ' ' + $scope.sensor.unit + ' @ ' + moment(log.ts).format('MMMM Do YYYY, h:mm a');
           };
         }
@@ -201,104 +202,73 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
         // well as populated scope to work with
         // element is a jQuery wrapper on the element
 
-        
+        // Using "conventional margins" http://bl.ocks.org/mbostock/3019563
+        // D3 Axis example: http://bl.ocks.org/mbostock/1166403
 
-        function render () {
-          element.empty();
+        var sensorCode = scope.sensor.code,
+            sensorLogs,
+            sensorReadings,
+            sensorReadingValues;
 
-          var sensorCode = scope.sensor.code;
+        var margin = {top: 30, right: 70, bottom: 30, left: 0},
+            outerWidth = element.width(),
+            width = outerWidth - margin.left - margin.right,
+            outerHeight = 200,
+            height = outerHeight - margin.top - margin.bottom;
 
-          scope.sensorLogs = scope.sensorLogs || [];
-
-          // var sensorReadings = scope.sensorLogs.map(function(sensorLog){
-          //   return {
-          //     val : sensorLog[sensorCode],
-          //     ts : new Date(sensorLog.timestamp)
-          //   }
-          // });
-          // sensorReadings = sensorReadings.filter(function(sensorReading){
-          //   return (typeof sensorReading.val === 'number');
-          // });
-          // sensorReadings = sensorReadings.reverse();
-
-          
-          // Testing with random data
-          var sensorReadings = [];
-          var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
-          for (var i = 0; i < 1000; i++){
-            // should start at starDate, each step should be 1/1000 of the way to endDate
-            var randomTS = Math.round(scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 1000)));
-
-            //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
-            sensorReadings.push({
-              val : Math.floor(Math.random() * 2000),
-              ts : randomTS
-            });
-          }
-
-
-          var sensorReadingValues = sensorReadings.map(function(sensorReading){
-            return sensorReading.val;
-          });
-
-          // console.log(scope.sensor.code, 'sensorReadings', sensorReadings);
-
-          // Using "conventional margins" http://bl.ocks.org/mbostock/3019563
-          // D3 Axis example: http://bl.ocks.org/mbostock/1166403
-
-          var margin = {top: 30, right: 70, bottom: 30, left: 0},
-              outerWidth = element.width(),
-              width = outerWidth - margin.left - margin.right,
-              outerHeight = 200,
-              height = outerHeight - margin.top - margin.bottom,
-              minY = d3.min(sensorReadingValues),
-              maxY = d3.max(sensorReadingValues);
-          
-          var xAxisScale = d3.time.scale()
+        var xAxisScale = d3.time.scale()
               .range([0, width]);
 
-          // TODO : yAxis should maybe use a threshold scale (http://bl.ocks.org/mbostock/4573883)
-          // Thresholds would be the ideal range bounds
-          var yAxisScale = d3.scale.linear()
-              .range([height, 0]);
+        // TODO : yAxis should maybe use a threshold scale (http://bl.ocks.org/mbostock/4573883)
+        // Thresholds would be the ideal range bounds
+        var yAxisScale = d3.scale.linear()
+            .range([height, 0]);
 
-          var xAxis = d3.svg.axis()
-              .scale(xAxisScale)
-              .tickSize(-height).tickSubdivide(true)
-              .tickFormat(function(d){
-                // the line below is equivalent to not specifying any tickFormat on xAxis
-                return xAxisScale.tickFormat()(d);
-              })
-              .orient("bottom");
+        var xAxis = d3.svg.axis()
+            .scale(xAxisScale)
+            .tickSize(-height).tickSubdivide(true)
+            .tickFormat(function(d){
+              // the line below is equivalent to not specifying any tickFormat on xAxis
+              return xAxisScale.tickFormat()(d);
+            })
+            .orient("bottom");
 
-          var yAxis = d3.svg.axis()
-              .scale(yAxisScale)
-              .ticks(5)
-              .orient("right");
+        var yAxis = d3.svg.axis()
+            .scale(yAxisScale)
+            .ticks(5)
+            .orient("right");
 
-          var line = d3.svg.line()
-              .interpolate("cardinal")
-              .x(function(d) { return xAxisScale(d.ts); })
-              .y(function(d) { return yAxisScale(d.val); });
+        var line = d3.svg.line()
+            //.interpolate("cardinal")
+            .x(function(d) { 
+              return !!d ? xAxisScale(d.ts) : undefined; 
+            })
+            .y(function(d) { 
+              return !!d ? yAxisScale(d.val) : undefined; 
+            });
 
 
-          var svg = d3.select(element[0])
+
+
+
+        var svg = d3.select(element[0])
             .append("svg")
             .attr("width", outerWidth)
             .attr("height", outerHeight)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-          xAxisScale.domain([scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
-          yAxisScale.domain(d3.extent(sensorReadings, function(d) { return d.val; }));
 
-          svg.append("g")
+          xAxisScale.domain([scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
+          //yAxisScale.domain(d3.extent(sensorReadings, function(d) { return d.val; }));
+
+          var xAxisElement = svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
 
 
-          svg.append("g")
+          var yAxisElement = svg.append("g")
             .attr("class", "y axis")
             // Make the y-axis attached to the right
             .attr("transform", "translate(" + width + ",0)")
@@ -314,9 +284,9 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
               .text(scope.sensor.name); // axis label
 
           var path = svg.append("path")
-            .datum(sensorReadings)
+            //.datum(sensorReadings)
             .attr("class", "line data-path")
-            .attr("d", line);
+            //.attr("d", line);
 
           
           var focusGroup = svg.append("g"); //the vertical line across the plots
@@ -331,15 +301,16 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
           var focusPoint = focusGroup.append("circle")
               .attr("class", "focus-point")
-              .attr("r", "5")
-              .attr("transform", "translate(" + line([sensorReadings[sensorReadings.length-1]]).replace('M','') + ")");
+              .attr("r", "5");
+              //.attr("transform", "translate(" + line([sensorReadings[sensorReadings.length-1]]).replace('M','') + ")");
+
 
           var focusText = focusGroup
             .append("text")
               .attr("class", "focus-text")
               .attr("text-anchor", "end")
               .attr("transform", "translate(" + width + ",-10)")
-              .text(scope.getLogDisplay(sensorReadings[sensorReadings.length-1]));
+              .text('');
 
           
           var offset = element.offset();
@@ -396,11 +367,77 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
               //console.log(closestDataPoint, closestDataPoint);  
               if (closestDataPoint){
-                focusPoint.attr("transform", "translate(" + line([closestDataPoint]).replace('M','') + ")");
+                focusPoint.classed('active', true).attr("transform", "translate(" + line([closestDataPoint]).replace('M','') + ")");
                 focusText.text(scope.getLogDisplay(closestDataPoint));
               }
             }
           );
+        
+
+
+
+        function render () {
+          
+          sensorLogs = scope.sensorLogs || [];
+
+          sensorReadings = sensorLogs.filter(function(sensorLog){
+            return (typeof sensorLog[sensorCode] === 'number');
+          });
+
+          sensorReadings = sensorReadings.map(function(sensorReading){
+            return {
+              val : sensorReading[sensorCode],
+              ts : +(new Date(sensorReading.timestamp))
+            }
+          }).reverse();
+
+          //console.log('sensorReadings', sensorReadings)
+          
+          // Testing with random data
+          // sensorReadings = [];
+          // var dateDiff = moment(scope.sharedDataService.endDate).toDate().valueOf() - scope.sharedDataService.startDate.toDate().valueOf();
+          // for (var i = 0; i < 1000; i++){
+          //   // should start at starDate, each step should be 1/1000 of the way to endDate
+          //   var randomTS = Math.round(scope.sharedDataService.startDate.toDate().valueOf() + (i * (dateDiff / 1000)));
+
+          //   //scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()
+          //   sensorReadings.push({
+          //     val : Math.floor(Math.random() * 2000),
+          //     ts : randomTS
+          //   });
+          // }
+
+
+          sensorReadingValues = sensorReadings.map(function(sensorReading){
+            return sensorReading.val;
+          });
+
+            
+          xAxisScale.domain([scope.sharedDataService.startDate.toDate(), moment(scope.sharedDataService.endDate).toDate()]);
+          yAxisScale.domain(d3.extent(sensorReadings, function(d) { return d.val; }));
+
+
+          path.datum(sensorReadings).transition().duration(750).attr("d", line);
+
+          var t = d3.transition()
+            .duration(750)
+            .ease('quad-in-out');
+
+          t.each(function(){
+            //path.attr("d", line);
+            xAxisElement.call(xAxis);
+            yAxisElement.call(yAxis);
+          });
+          
+
+          focusPoint
+            .attr("transform", "translate(" + line([sensorReadings[sensorReadings.length-1]]).replace('M','') + ")")
+            .classed('active', !!sensorReadings.length);
+
+          if (sensorReadings.length){
+            focusText.text(scope.getLogDisplay(sensorReadings[sensorReadings.length-1]));
+          }
+
         }
 
 
@@ -418,7 +455,7 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
 
   domReady(function () {
-    angular.bootstrap(document, ['bpn.apps.gardens.history']);
+    angular.bootstrap(document, ['bpn.apps.gardens.graphs']);
   });
 
   return app;
