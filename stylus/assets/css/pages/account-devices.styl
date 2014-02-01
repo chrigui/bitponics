@@ -1,4 +1,70 @@
-.device-list .value {
-  font-style: italic;
-}
+@import "../global/breakpoints"
+@import "../global/colors"
 
+.device-list
+	width 100%
+
+.device-list
+	& > li 
+		margin 3em 0 3em
+
+	.display-t
+		width 100%	
+		.label, .value
+			display block
+		.value
+			font-style italic
+			color darken(color-text-gray, 30%)
+			padding 0 .35em
+		.label
+			color color-text-gray
+			
+	.display-tr
+		width 100%
+
+	.device-outlet-mapping
+		.value
+			text-align left
+		.display-tr, .display-tc
+			width 100%
+
+	ul, li
+		// width 100%
+
+	.actions
+		.btn
+			margin 1em 1em 1em 0
+
+	.outlet-mapping
+		margin 1em 0
+
+.calibrate
+	.btn
+		margin 1em 1em 1em 0!important
+
+@media $mq_larger
+	.device-list
+		max-width 30em
+
+		.display-t
+			.label, .value
+				display table-cell
+				width 25%
+			.value
+				text-align right
+				width 75%
+
+	.device-image, .outlet-mapping
+		// float left
+
+	.outlet-mapping
+		position absolute
+		top 11em
+		left 5.75em
+
+		.label
+			display none
+
+		.btn
+			margin .25em 0
+			padding .75em

@@ -71,7 +71,7 @@ define(['angular', 'jquery', 'throttle-debounce'],
                       overlayHeight = overlay.height(),
                       topValue = $scope.sharedDataService.activeOverlayPositionTop,
                       windowHeight = angular.element($window).height(),
-                      padding = 144;
+                      padding = 16;
                   if (overlay.length > 0) {
                     if ((windowHeight > overlayHeight + padding)) {
                       overlay.css({ top: topValue + padding });
