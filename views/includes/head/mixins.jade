@@ -63,7 +63,8 @@ mixin requirejs(dataMain)
   script
     require.config({
       paths: {
-        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular',
+        'angular': '#{angular}',
+        // 'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular',
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
         'angularAnimate' : '#{angularAnimate}',

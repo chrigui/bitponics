@@ -145,7 +145,13 @@ module.exports = function(app) {
         }
 
         if (typeof req.body.outputMap !== 'undefined'){
-          device.outputMap = req.body.outputMap.map(function(output){ return { control: output.control._id, outputId: output.outputId } });
+          device.outputMap = req.body.outputMap.map(function(output){ 
+            console.log(output);
+            return { 
+              control: output.control ? output.control._id : null, 
+              outputId: output.outputId
+            }
+          });
         }
 
         if (typeof req.body.sensors !== 'undefined'){
@@ -171,8 +177,7 @@ module.exports = function(app) {
 
           winston.info("updated device " + req.params.id + JSON.stringify(req.body));
 
-          //For now, can just return nothing and Angular will ignore
-          return res.send();          
+          return res.send(device);
         });
 
       });

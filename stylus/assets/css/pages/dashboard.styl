@@ -5,10 +5,10 @@
 .dashboard	
 
 	.overlay
-		top 8em
+		// top 1em
 		// top 10%
-		left 25%
-		width 40%
+		left 0
+		width 100%
 		overflow hidden
 
 		&.photo
@@ -173,8 +173,17 @@
 		// max-width 100%
 
 /* Large screens */
+@media $mq_medium
+	.dashboard
+		.overlay
+			left 5%
+			width 90%
+
 @media $mq_larger
 	.dashboard
+		.overlay
+			left 25%
+			width 50%
 		
 		.garden-settings
 			float right

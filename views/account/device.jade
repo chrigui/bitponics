@@ -1,27 +1,23 @@
 extends ../layout
 
 block head
-  base(href="/setup/device/")
-  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js')
-  mixin requirejs("/assets/js/pages/account/devices")
+  mixin requirejs("/assets/js/pages/account/device")
 
 block css 
   link(rel='stylesheet', href='/assets/css/pages/account-devices.css')
-  //- link(rel='stylesheet', href='/assets/css/libs/steps.css')
 
 block content
   section.header
-    header
-      include /includes/nav/main
-  
+      header
+        include ../includes/nav/main
+        
   section#main(role="main", class="main")
     div.content-module.middle(ng-controller="bpn.controllers.account.devices.Main")
-      h1.page-heading Manage Devices
+      h1.page-heading Manage Device
+      //- section(ng-view)
       section.separator-top
-
+        
         img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
-
-        a(href="/setup", ng-cloak) Set up a new Bitponics Device
 
         if (userOwnedDevices.length > 0)
           ul.device-list(ng-cloak)
@@ -38,10 +34,9 @@ block content
                     span.label.display-tc MAC Address: 
                     span(class="value device-mac-address display-tc") #{device._id}
 
-                  - if (device.combinedKey)
-                    div.display-tr
-                      span.label Device Key: 
-                      span(class="value device-mac-address display-tc") #{device.combinedKey}
+                  div.display-tr
+                    span.label Device Key: 
+                    span(class="value device-mac-address display-tc") #{device.combinedKey}
 
                   - if (device.activeGrowPlanInstance)
                     div.display-tr

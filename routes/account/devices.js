@@ -56,7 +56,54 @@ module.exports = function(app){
     }
   );
 
-  
+    /**
+   *
+   */
+  app.get('/account/devices/:id',
+    routeUtils.middleware.ensureSecure,
+    routeUtils.middleware.ensureLoggedIn,
+    function (req, res, next){
+      var locals = {
+        title : 'Device',
+        className : 'app-page account-devices',
+        pageType : 'app-page',
+        appUrl: app.config.appUrl
+      };
+
+      async.parallel(
+        [
+          function(innerCallback){
+            DeviceModel
+            .find({ '_id' : req.params.id })
+            .populate('activeGrowPlanInstance')
+            .populate('outputMap.control')
+            .exec(function(err, deviceResults){
+              if (err) { return innerCallback(err); }
+              
+              // TODO : send the user's device keys to the page too, so that the user can see them.
+              
+              locals.userOwnedDevices = deviceResults.map(function(device) { return device.toObject(); });
+
+              req.user.deviceKeys.forEach(function(deviceKey){
+                locals.userOwnedDevices.forEach(function(device){
+                  if (device._id.toString() === deviceKey.deviceId){
+                    device.combinedKey = deviceKey.combinedKey;
+                    return false;
+                  }
+                })                  
+              });
+              return innerCallback();
+            });
+          }
+        ],
+        function(err, results){
+          if (err) { return next(err); }
+          res.render('account/device', locals);
+        }
+      );
+    }
+  );
+
   /**
    *
    */
@@ -91,7 +138,7 @@ module.exports = function(app){
    */
   app.get('/account/devices/:id/calibrate/*',
     function (req, res, next){
-      return res.redirect('/account/devices/calibrate/' + req.param('id'));
+      return res.redirect('/account/devices/' + req.param('id') + '/calibrate/');
     }
   );
 

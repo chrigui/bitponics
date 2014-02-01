@@ -85,6 +85,13 @@
 }
 .display-t {
   display: table;
+  table-layout: fixed;
+}
+.display-tr {
+  display: table-row;
+}
+.display-tc {
+  display: table-cell;
 }
 .clear-b,
 .dashboard .sensor-reading-group {
@@ -786,9 +793,6 @@ input[type=submit] {
   padding: 0 2.5%;
   font-size: 0.85em;
 }
-.footer a {
-  color: #fff;
-}
 ul {
   list-style: none;
   margin: 0;
@@ -919,7 +923,7 @@ nav .toggle-menu i {
   white-space: nowrap;
 }
 .logo span {
-  font-size: 0.65em;
+  font-size: 0.4em;
   vertical-align: top;
 }
 .icon-glyphlogo-new {
@@ -1117,6 +1121,13 @@ img.page-spinner.spinner {
 }
 .display-t {
   display: table;
+  table-layout: fixed;
+}
+.display-tr {
+  display: table-row;
+}
+.display-tc {
+  display: table-cell;
 }
 .clear-b,
 .dashboard .sensor-reading-group {
@@ -1285,7 +1296,7 @@ img.page-spinner.spinner {
 .overlay {
   position: absolute;
   height: auto;
-  top: 8em;
+  top: 1em;
   left: 5%;
   right: 5%;
   background: #fff;
@@ -1853,6 +1864,38 @@ body.ngdialog-open {
   width: 100%;
 }
 /*
+ * Dialog Overlay
+ */
+.ngdialog-theme-overlay .ngdialog-content {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  width: 90%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  background: #fff;
+  color: #999;
+  padding: 1em;
+  text-align: center;
+  z-index: 1;
+  border: 1px solid #d8d8d8;
+  box-shadow: 0px 2px 5px 0px #d8d8d8;
+}
+.ngdialog-theme-overlay .ngdialog-content h2,
+.ngdialog-theme-overlay .ngdialog-content div,
+.ngdialog-theme-overlay .ngdialog-content p,
+.ngdialog-theme-overlay .ngdialog-content a {
+  color: #999;
+}
+.ngdialog-theme-overlay .ngdialog-content h2 {
+  padding-top: 0.5em;
+  margin: 0 0 0.5em;
+  border-bottom: 1px solid #d8d8d8;
+}
+.ngdialog-theme-overlay .ngdialog-close {
+  display: none;
+}
+/*
  * Grow Plan List
  */
 .grow-plan-list .grow-plan-list-item,
@@ -2291,6 +2334,9 @@ body.ngdialog-open {
 .landing-page .flex-direction-nav i {
   color: #fff;
   font-size: 3em;
+}
+.landing-page .footer a {
+  color: #fff;
 }
 /*
  * Dashboard Page
@@ -2887,6 +2933,13 @@ body.ngdialog-open {
 }
 .display-t {
   display: table;
+  table-layout: fixed;
+}
+.display-tr {
+  display: table-row;
+}
+.display-tc {
+  display: table-cell;
 }
 .clear-b,
 .dashboard .sensor-reading-group {
@@ -3500,9 +3553,8 @@ label.newsletter.inline {
   margin-left: 0.5em;
 }
 .dashboard .overlay {
-  top: 8em;
-  left: 25%;
-  width: 40%;
+  left: 0;
+  width: 100%;
   overflow: hidden;
 }
 .dashboard .overlay.photo {
@@ -3643,7 +3695,17 @@ label.newsletter.inline {
 .circle {
   margin: 1.5em 0;
 }
+@media  screen and (min-width: 40em) {
+  .dashboard .overlay {
+    left: 5%;
+    width: 90%;
+  }
+}
 @media  screen and (min-width: 65em) {
+  .dashboard .overlay {
+    left: 25%;
+    width: 50%;
+  }
   .dashboard .garden-settings {
     float: right;
     height: 1em;
@@ -3836,7 +3898,8 @@ li
 .app-page .header {
   position: static;
   padding: 0.45em 0;
-  margin: 0;
+  margin: 0 auto;
+  width: 95%;
 }
 .undefined .header header,
 .app-page .header header {
@@ -3878,15 +3941,6 @@ li
 }
 .undefined .footer a,
 .app-page .footer a {
-  color: #999;
-}
-.undefined .label,
-.app-page .label {
-  font-size: 0.75em;
-}
-.undefined .value,
-.app-page .value {
-  font-size: 1.5em;
   color: #999;
 }
 .undefined .page-heading,
@@ -3957,7 +4011,7 @@ li
 .undefined .icon-glyph-new,
 .app-page .icon-glyph-new {
   height: 1em;
-  font-size: 0.75em;
+  font-size: 1.25em;
   position: relative;
   top: -0.25em;
 }
@@ -3976,6 +4030,11 @@ li
   }
 }
 @media screen and (min-width: 60em) {
+  .undefined .header,
+  .app-page .header {
+    margin: 0;
+    width: auto;
+  }
   .undefined .overlay.auto-size,
   .app-page .overlay.auto-size {
     left: 25%;

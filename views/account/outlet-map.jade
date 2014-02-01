@@ -14,23 +14,30 @@ block content
     header
       include /includes/nav/main
   
-  section(ng-cloak="")#main(role="main", class="main")
+  section#main(role="main", class="main")
     div.content-module.middle(ng-controller="bpn.controllers.account.outletMap.Main")
       h1.page-heading Manage Devices
       //- section(ng-view)
       section.separator-top
-        if (userOwnedDevice)        
-          h4.page-heading-small Power Outlet Mapping for #{userOwnedDevice.name}:
-          
-          ul 
-            li(ng-repeat="outputMapping in sharedDataService.userOwnedDevice.outputMap")
-                div(ng-click="setCurrentVisibleOutput($index, 'ControlOverlay');")
-                  span.label Outlet {{outputMapping.outputId}}: 
-                  span.value {{outputMapping.control.name}}
 
-      div
+        img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
+
+        if (userOwnedDevice)
+          div(class="position-r", ng-cloak="")
+            h4 Power Outlet Mapping for
+              | <b>#{userOwnedDevice.name}</b>
+            
+            ul.outlet-mapping
+              li(ng-repeat="outputMapping in outputMap")
+                  div(ng-click="setCurrentVisibleOutput($index, 'ControlOverlay');")
+                    span.label Outlet {{outputMapping.outputId}}: 
+                    span.btn.value {{outputMapping.control.name || 'None'}}
+
+            img(class="device-image", src="/assets/img/home/device-outlet-numbers.png")
+
+      div(ng-cloak="")
         div(ng-controller="bpn.controllers.account.outputMapping.ControlOverlay", modal="sharedDataService.activeOverlay.is=='ControlOverlay'", close="close()", options="sharedDataService.modalOptions")
-          div(ng-controller="bpn.controllers.SelectionOverlay")
+          div(ng-controller="bpn.controllers.SelectionOverlay", class="overlay-contain")
             div(class="close btn", ng-click="close()")
               | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
             h3(class="page-heading page-heading-small") Choose a Control
@@ -50,13 +57,12 @@ block content
                   //- h4(style="background: red;border: 1px solid blue;") {{item._id}} = {{sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control._id}}
 
                   input(id="control_{{item._id}}", 
-                    type='radio',
+                    type='checkbox',
                     name="controlOverlaySelection", 
-                    value="{{item._id}}", 
-                    ng-model="sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control",
-                    ng-change="log(sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control)"
-                    ng-checked="item._id == sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control._id",
+                    ng-model="outputMap[sharedDataService.currentVisibleOutput].control._id",
+                    ng-checked="item._id == outputMap[sharedDataService.currentVisibleOutput].control._id",
                     ng-click="toggleItemSelection(item, this)")
+                  //- ng-checked="outputMap[sharedDataService.currentVisibleOutput].control._id",
                   label(for="control_{{item._id}}", class="item btn next-step-btn") {{item.name}}
 
               ul.pagination

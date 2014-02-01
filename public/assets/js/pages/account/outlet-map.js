@@ -46,10 +46,9 @@ function (angular, domReady, feBeUtils) {
       // 'DeviceLoader',
 	  	function(DeviceModel){
 	      return {
-          // userOwnedDevice : DeviceLoader(),
 	      	userOwnedDevice : new DeviceModel(bpn.userOwnedDevice),
 	        controls : bpn.controls,
-	        currentVisibleOutput : undefined,
+	        currentVisibleOutput : 0,
 	        activeOverlay : { is: undefined },
 	        modalOptions : {
 	          backdropFade : true,
@@ -68,23 +67,15 @@ function (angular, domReady, feBeUtils) {
 		'sharedDataService',
 		function($scope, sharedDataService){
 			$scope.sharedDataService = sharedDataService;
+      $scope.outputMap = sharedDataService.userOwnedDevice.outputMap;
 			$scope.overlayItems = $scope.sharedDataService.controls;
 			$scope.itemsPerPage = 10;
 
 			$scope.toggleItemSelection = function(control, input){
-				sharedDataService.userOwnedDevice.outputMap[sharedDataService.currentVisibleOutput].control = control;
+				$scope.outputMap[sharedDataService.currentVisibleOutput].control = control;
 				sharedDataService.userOwnedDevice.$update();
 				$scope.close();
 			};
-
-  			// $scope.device = new DeviceModel($scope.sharedDataService.userOwnedDevice);
-
-			//   	$scope.setControlMap = function(outputId, controlId){
-			//   		$scope.device.outputMap.filter(function(output){
-			//   			return output.outputId === outputId;
-			//   		})[0].control = controlId;
-			//   		$scope.device.$save;
-			//   	};
 
 			$scope.close = function(){
 				$scope.sharedDataService.activeOverlay.is = undefined;
@@ -102,6 +93,7 @@ function (angular, domReady, feBeUtils) {
       'DeviceModel',
       function ($scope, $filter, sharedDataService, DeviceModel) {
       	$scope.sharedDataService = sharedDataService;
+        $scope.outputMap = sharedDataService.userOwnedDevice.outputMap;
 
     		$scope.setCurrentVisibleOutput = function (index) {
     			$scope.sharedDataService.currentVisibleOutput = index;
