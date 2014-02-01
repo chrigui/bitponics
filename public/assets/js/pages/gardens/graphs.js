@@ -15,6 +15,7 @@ require([
   'moment',
   'fe-be-utils',
   'd3',
+  'fileSaver',
   'angularUI',
   'angularUIBootstrap',
   'bpn',
@@ -23,7 +24,7 @@ require([
   'bpn.services.photo',
   'bpn.services.socket',
 ],
-function (angular, domReady, viewModels, moment, feBeUtils, d3) {
+function (angular, domReady, viewModels, moment, feBeUtils, d3, fileSaver) {
   'use strict';
 
   var app = angular.module('bpn.apps.gardens.graphs', ['bpn', 'ui', 'ui.bootstrap']);
@@ -144,6 +145,17 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
 
       $scope.viewOptions = sharedDataService.viewOptions;
 
+      try { 
+        $scope.isFileSaverSupported = !!new Blob(); 
+      } catch(e){}
+
+
+      $scope.init = function(){
+        //sharedDataService.getSensorLogs(new Date());
+      };
+
+
+
       $scope.$watch('viewOptions.selectedTimespan', function(){
         switch($scope.viewOptions.selectedTimespan){
           case '24 hours':
@@ -165,11 +177,10 @@ function (angular, domReady, viewModels, moment, feBeUtils, d3) {
         sharedDataService.getTextLogs();
       });
 
-
-      $scope.init = function(){
-        //sharedDataService.getSensorLogs(new Date());
+      $scope.export = function(){
+        var blob = new Blob([JSON.stringify(sharedDataService.sensorLogs)], {type: "text/json;charset=utf-8"});
+        fileSaver(blob, "bitponics-data-export.json");
       };
-
 
       $scope.init();
     }

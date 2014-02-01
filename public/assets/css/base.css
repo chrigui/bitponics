@@ -6142,6 +6142,14 @@ button.close {
 .app-page.garden-graphs .page-heading {
   font-size: 2.5em;
 }
+.garden-graphs .timespan-selector,
+.app-page.garden-graphs .timespan-selector {
+  display: inline-block;
+}
+.garden-graphs .export,
+.app-page.garden-graphs .export {
+  float: right;
+}
 .garden-graphs svg text,
 .app-page.garden-graphs svg text {
   fill: #999;

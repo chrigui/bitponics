@@ -19,7 +19,7 @@ block content
       img.page-spinner.spinner(src="/assets/img/spinner.svg", ng-hide="true")
       div(ng-cloak)
         //-h2 Timespan:
-        div(class="custom-dropdown-wrap")
+        div(class="custom-dropdown-wrap timespan-selector")
           select(
             class="custom-dropdown", 
             ng-model="sharedDataService.viewOptions.selectedTimespan",
@@ -28,7 +28,7 @@ block content
           .dblarrow
             i
         
-        //-button.btn Export
+        button.btn.export(ng-show="isFileSaverSupported", ng-click="export()") Export
         
         div(ng-repeat="sensor in sharedDataService.visibleSensors")
           //-h3 {{sensor.name}}
