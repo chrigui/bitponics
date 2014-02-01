@@ -5624,6 +5624,11 @@ li
 .app-page .footer {
   min-height: 0;
   background: #fff;
+  color: #999;
+}
+.undefined .footer a,
+.app-page .footer a {
+  color: #999;
 }
 .undefined .label,
 .app-page .label {
@@ -7873,6 +7878,69 @@ button.close {
 .gardens .set-up-garden,
 .app-page.gardens .set-up-garden {
   margin-left: 0;
+}
+.garden-graphs .page-heading,
+.app-page.garden-graphs .page-heading {
+  font-size: 2.5em;
+}
+.garden-graphs .timespan-selector,
+.app-page.garden-graphs .timespan-selector {
+  display: inline-block;
+}
+.garden-graphs .export,
+.app-page.garden-graphs .export {
+  float: right;
+}
+.garden-graphs svg text,
+.app-page.garden-graphs svg text {
+  fill: #999;
+  font-size: 0.8em;
+}
+.garden-graphs svg path.line,
+.app-page.garden-graphs svg path.line {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1.5px;
+}
+.garden-graphs svg path.line.data-path,
+.app-page.garden-graphs svg path.line.data-path {
+  stroke: #00e36c;
+}
+.garden-graphs svg path.area,
+.app-page.garden-graphs svg path.area {
+  fill: #e7e7e7;
+}
+.garden-graphs svg .axis,
+.app-page.garden-graphs svg .axis {
+  shape-rendering: crispEdges;
+}
+.garden-graphs svg .axis.x .minor,
+.app-page.garden-graphs svg .axis.x .minor {
+  stroke-opacity: 0.5;
+}
+.garden-graphs svg .axis line,
+.app-page.garden-graphs svg .axis line,
+.garden-graphs svg .axis path,
+.app-page.garden-graphs svg .axis path {
+  fill: none;
+  stroke: #999;
+}
+.garden-graphs svg .focus-line,
+.app-page.garden-graphs svg .focus-line {
+  stroke-width: 1px;
+  fill: none;
+  stroke: #00e36c;
+}
+.garden-graphs svg .focus-point,
+.app-page.garden-graphs svg .focus-point {
+  stroke-width: 2px;
+  fill: #fff;
+  stroke: #00e36c;
+  display: none;
+}
+.garden-graphs svg .focus-point.active,
+.app-page.garden-graphs svg .focus-point.active {
+  display: block;
 }
 .main.error {
   min-height: 35em;
