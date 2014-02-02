@@ -2,7 +2,7 @@
  * @module models/Photo
  */
 
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	ObjectIdSchema = Schema.ObjectId,
   ObjectId = mongoose.Types.ObjectId,
@@ -16,8 +16,11 @@ var mongoose = require('mongoose'),
   gm = require('gm').subClass({ imageMagick: true }),
   path = require('path'),
   tmpDirectory = path.join(__dirname, '/../tmp/'),
-  PhotoModel;
+  fs = require('fs');
 
+var PhotoModel;
+
+//fs.mkdir(tmpDirectory);
 
 /**
  * Photo
@@ -232,8 +235,9 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
           } else {
             console.log('options.filePath', options.filePath);
             // use the (stream, filename) call to make sure gm knows the filetype (from originalFileName)
-            var readStream = fs.createReadStream(options.filePath);
-            intermediateGM = gm(readStream, options.originalFileName);
+            //var readStream = fs.createReadStream(options.filePath);
+            //intermediateGM = gm(readStream, options.originalFileName);
+            intermediateGM = gm(options.filePath);
           }
 
           console.log("PHOTO PROCESSING ", photo._id, "CREATED intermediateGM");
@@ -242,36 +246,46 @@ PhotoSchema.static("createAndStorePhoto",  function(options, callback){
 
           intermediateGM
           .noProfile()
-          .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
-          .write(thumbnailFilePath, function (err) {
-            if (err) { 
-              winston.error("PHOTO PROCESSING " + photo._id + " ERROR WRITING THUMBNAIL " + thumbnailFilePath);
-              return innerCallback(err);  
-            }
-
-            knoxClient.putFile(
-              thumbnailFilePath,
-              s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
-              {
-                'Content-Type': photo.type, 
-                'x-amz-acl': 'private'
-              },
-              function(err, result) {
-                winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", result: " + JSON.stringify(Object.keys(result)) + ', statusCode:' + JSON.stringify(result.statusCode));
-
-                if (err) { 
-                  winston.error(JSON.stringify(err));
-                  return innerCallback(err);  
-                }
-              
-                if (result.statusCode !== 200) {
-                  return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
-                }
-
-                return innerCallback();
+          // .thumbnail(feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT)
+          // .write(thumbnailFilePath, function (err) {
+          .thumb(
+            feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+            feBeUtils.PHOTO_THUMBNAIL_SIZE.HEIGHT, 
+            thumbnailFilePath, 
+            80, 
+            function (err) {
+            
+              if (err) { 
+                winston.error("PHOTO PROCESSING " + photo._id + " ERROR WRITING THUMBNAIL " + thumbnailFilePath);
+                return innerCallback(err);  
               }
-            );
-          });
+
+              knoxClient.putFile(
+                thumbnailFilePath,
+                s3Config.photoPathPrefix + photo._id.toString() + '/' + feBeUtils.PHOTO_THUMBNAIL_SIZE.WIDTH, 
+                {
+                  'Content-Type': photo.type, 
+                  'x-amz-acl': 'private'
+                },
+                function(err, result) {
+                  winston.info("PHOTO PROCESSING THUMBNAIL RETURNED FROM S3, id: " + photo._id.toString() + ", err:" +  JSON.stringify(err) + ", result: " + JSON.stringify(Object.keys(result)) + ', statusCode:' + JSON.stringify(result.statusCode));
+
+                  fs.unlink(thumbnailFilePath);
+
+                  if (err) { 
+                    winston.error(JSON.stringify(err));
+                    return innerCallback(err);  
+                  }
+                
+                  if (result.statusCode !== 200) {
+                    return innerCallback(new Error("Status " + (result.statusCode || 'undefined') + " from S3"));
+                  }
+
+                  return innerCallback();
+                }
+              );
+            }
+          );
 
 
           // .stream(function (err, stdout, stderr) {
