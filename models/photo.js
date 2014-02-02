@@ -151,6 +151,7 @@ PhotoSchema.set('toJSON', {
  * @param {Stream} options.stream : optional. If set, this is used to stream to S3
  * @param {string} options.filePath: optional. Must be set if options.stream is not set. Path on the file system to stream to S3.
  * @param {bool=} options.preserveFilePath : optional. If true, file at options.filePath is left alone after upload. If omitted or false, file is deleted after uplaod.
+ * @param {function} callback - passed (err, photoModels)
  */
 PhotoSchema.static("createAndStorePhoto",  function(options, callback){
   if (options.contentType.indexOf("image") !== 0){

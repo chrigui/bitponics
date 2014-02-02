@@ -311,7 +311,13 @@ require([
                 photos.forEach(viewModels.initPhotoViewModel);
 
                 photos.forEach(function(photo){
-                  sharedData.photos.push(photo);
+                  var photoAlreadyExists = sharedData.photos.some(function(existingPhoto){
+                    return (existingPhoto._id === photo._id);
+                  });
+
+                  if (!photoAlreadyExists){
+                    sharedData.photos.push(photo);  
+                  }
                 });
               }
             });
@@ -565,11 +571,18 @@ require([
             $scope.uploadInProgress = true;
           };
      
-          $scope.done = function(files, data) {
-            console.log("upload complete");
-            console.log("data: " + JSON.stringify(data));
-            writeFiles(files);
+          $scope.done = function(files, responseData) {
             $scope.uploadInProgress = false;
+            console.log("upload complete");
+            console.log("responseData: " + JSON.stringify(responseData));
+            if (responseData.data.length)
+            var completedPhotos = responseData.data[0].filter(function(item){ return typeof item === 'object'; });
+            //writeFiles(files);
+            //completedPhotos.forEach();
+            completedPhotos.forEach(function(photo){
+              viewModels.initPhotoViewModel(photo);
+              sharedDataService.photos.push(photo);
+            });
             analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "upload photo" });
           };
      
@@ -581,6 +594,19 @@ require([
           $scope.error = function(files, type, msg) {
             console.log("Upload error: " + msg);
             console.log("Error type:" + type);
+            
+            var errorMessage = '';
+
+            switch(type) {
+              case "TOO_MANY_FILES":
+                errorMessage = "Sorry, we can't process that many files at a time. 5 files max please!";
+                break;
+              case "MAX_SIZE_EXCEEDED":
+                errorMessage = "Sorry, we can't process a file that large. Max file size is 5mb.";
+                break;
+              default:
+              errorMessage = "Sorry, there was an error uploading your photo' + we can't process that many files at a time. 5 files max please!";
+            }
             writeFiles(files);
           }
      
@@ -588,7 +614,7 @@ require([
           {
             console.log('Files')
             for (var i = 0; i < files.length; i++) {
-                  console.log('\t' + files[i].name);
+              console.log('\t' + files[i].name);
             }
           }
         }
