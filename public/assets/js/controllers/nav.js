@@ -7,15 +7,18 @@
  */
 define(
 	[
-   'bpn.controllers',
+    'angular',
+    'bpn.controllers',
     'fe-be-utils',
+    'bpn',
+    'angularResource',
     'bpn.services.nav',
     'bpn.services.user',
     'bpn.services.notification',
     'bpn.services.socket',
     'angularDialog'
 	],
-  function (bpnControllers, feBeUtils) {
+  function (angular, bpnControllers, feBeUtils) {
     'use strict';
 
     var notificationsController = bpnControllers.controller('bpn.controllers.nav.Notifications',
@@ -74,6 +77,7 @@ define(
         'NavService',
         function ($scope, $filter, $compile, NavService) {
           $scope.NavService = NavService;
+          $scope.log('bpn.controllers.nav.Menu initialized')
         }
       ]
     );
@@ -126,6 +130,8 @@ define(
             $scope.hasUncheckedNotifications = NavService.hasUncheckedNotifications;
             $scope.hasUncheckedActionNeededNotifications = NavService.hasUncheckedActionNeededNotifications;
           });
+
+          $scope.log('bpn.controllers.nav.Main initialized')
         }
       ]
     );

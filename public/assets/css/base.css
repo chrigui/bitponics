@@ -1038,6 +1038,10 @@ img.page-spinner.spinner {
   box-shadow: none;
   background: transparent;
 }
+#IModalOverlay {
+  background-color: #fff !important;
+  opacity: 0.75 !important;
+}
 /*
  * Overlay
  */
@@ -1803,8 +1807,18 @@ body.ngdialog-open {
   bottom: auto;
   position: absolute;
 }
+.ngdialog-theme-menu.ngdialog-closing .ngdialog-overlay {
+  animation-duration: 0;
+}
+.ngdialog-theme-menu .ngdialog-content {
+  animation-duration: 0.2s;
+}
+.ngdialog-theme-menu.ngdialog-closing .ngdialog-content {
+  animation-duration: 0.2s;
+}
 .ngdialog-theme-menu .ngdialog-overlay {
   background: none;
+  animation-duration: 0.2s;
 }
 .ngdialog-theme-menu .ngdialog-content {
   width: 20em;
@@ -1827,6 +1841,29 @@ body.ngdialog-open {
   padding-top: 0.5em;
   margin: 0 0 0.5em;
   border-bottom: 1px solid #d8d8d8;
+}
+.ngdialog-theme-menu .ngdialog-content h2 {
+  padding: 0.5em 0.6em;
+  margin: 0;
+}
+.ngdialog-theme-menu .ngdialog-content ul {
+  font-size: 1em;
+}
+.ngdialog-theme-menu .ngdialog-content .link-list {
+  margin: 0.2em 0;
+}
+.ngdialog-theme-menu .ngdialog-content .link-list li {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+.ngdialog-theme-menu .ngdialog-content .link-list li a {
+  text-align: left;
+  padding: 1em;
+  display: block;
+  color: #00e36c;
+  font-size: 1em;
+  line-height: 1em;
 }
 .ngdialog-theme-menu .ngdialog-close {
   display: none;
@@ -2036,55 +2073,22 @@ body.ngdialog-open {
 /*
  * Header
  */
-.header .settings {
-  position: relative;
-  width: 1.2em;
-  display: inline-block;
-  cursor: pointer;
-}
-.header .settings .icon-__71_settings_999999 {
-  top: -0.75em;
-  position: absolute;
-  font-size: 1.5em;
-}
-.header .settings .settings-display {
-  display: none;
-  position: absolute;
-  background: #00e36c;
-  color: #fff;
-}
-.header .settings .settings-display.visible {
-  display: block;
-  top: 0.5em;
-  right: 0;
-  min-width: 12em;
-  padding: 0 1em 1em;
-  text-align: left;
-  z-index: 1;
-}
-.header .settings .settings-display.visible h2 {
-  margin: 0.5em 0;
-  border-bottom: 1px solid #fff;
-}
-.header .settings .settings-display.visible li {
-  display: block;
-  margin: 0;
-}
-.header .settings .settings-display.visible a {
-  text-align: left;
-  color: #fff;
-  margin: 0;
-  line-height: 2em;
-}
-.header .notifications-icon {
+.header .notifications-icon,
+.header .help-icon,
+.header .menu-icon {
   position: relative;
   display: inline-block;
   cursor: pointer;
-  width: 1.2em;
+  width: 1.4em;
   vertical-align: middle;
-  height: 1.2em;
+  height: 1.4em;
 }
-.header .notifications-icon .icon-glyph {
+.header .notifications-icon .icon-glyph,
+.header .help-icon .icon-glyph,
+.header .menu-icon .icon-glyph,
+.header .notifications-icon .icon-glyph-new,
+.header .help-icon .icon-glyph-new,
+.header .menu-icon .icon-glyph-new {
   top: 50%;
   margin: 0;
   position: absolute;
@@ -5833,13 +5837,6 @@ button.close {
   float: left;
   clear: left;
   margin: 0.7em 1em 1em 0;
-}
-.growplans .icon-glyph-new,
-.growplans.app-page .icon-glyph-new {
-  height: 1em;
-  font-size: 1.25em;
-  position: relative;
-  top: 0.15em;
 }
 .growplans .header-action,
 .growplans.app-page .header-action {

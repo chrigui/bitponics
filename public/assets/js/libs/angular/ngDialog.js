@@ -10,6 +10,7 @@
  * - option to append to element instead of body
  * - jQuery dependency for .parents()
  * - add hook for dialog close event
+ * - forced use of in-page templates (removed async template retrieval); was having weird issues
  */
 
 (function (window, angular, undefined) {
@@ -45,17 +46,21 @@
 						}
 					},
 
-          onBodyClick : function (event) {
-            var isOverlay = $el(event.target).hasClass('ngdialog-overlay');
-            var isCloseBtn = $el(event.target).hasClass('ngdialog-close');
-            var isContent = !!$el(event.target).parents('.ngdialog-content').length;
+          onBodyClick : function (e) {
+            var $target = $el(event.target);
+            var isOverlay = $target.hasClass('ngdialog-overlay');
+            var isCloseBtn = $target.hasClass('ngdialog-close');
+            var isContent = !!$target.parents('.ngdialog-content').length;
 
             if (isOverlay || isCloseBtn || !isContent) {
               publicMethods.closeAll();
             }
 
-            event.preventDefault();
-            event.stopPropagation();
+            if (!isContent){
+              e.preventDefault();
+              e.stopPropagation();  
+            }
+            
           },
 
 					closeDialog: function ($dialog) {
@@ -104,17 +109,23 @@
 						opts = opts || {};
 						angular.extend(options, opts);
 
-						globalID += 1;
+						
+            globalID += 1;
+            console.log('open call for globalID', globalID);
 
 						var scope = angular.isObject(options.scope) ? options.scope : $rootScope.$new();
 						var $dialog;
 
-						$q.when(loadTemplate(options.template)).then(function (template) {
-							template = angular.isString(template) ?
-								template :
-								template.data && angular.isString( template.data ) ?
-									template.data :
-									'';
+						//$q.when(loadTemplate(options.template)).then(function (template) {
+            $timeout(function(){
+
+              console.log('executing internal dialog func, globalID', globalID)
+							// template = angular.isString(template) ?
+							// 	template :
+							// 	template.data && angular.isString( template.data ) ?
+							// 		template.data :
+							// 		'';
+              var template = $templateCache.get(options.template);
 
 							if (options.showClose) {
 								template += '<div class="ngdialog-close"></div>';
@@ -148,6 +159,9 @@
 							});
 
 							
+              $el('.ngdialog').remove();
+              
+              console.log('appending', $dialog);
               if (options.appendToElement){
                 options.element.addClass('ngdialog-open').append($dialog);
               } else {
@@ -165,8 +179,8 @@
 
 							dialogsCount += 1;
 
-							return publicMethods;
-						});
+							//return publicMethods;
+						}, 10);
 
 						function loadTemplate (tmpl) {
 							if (!tmpl) {
@@ -176,7 +190,7 @@
 							if (angular.isString(tmpl) && options.plain) {
 								return tmpl;
 							}
-
+              console.log('$templateCache.get(tmpl)', tmpl, typeof $templateCache.get(tmpl), JSON.stringify($templateCache.get(tmpl)));
 							return $templateCache.get(tmpl) || $http.get(tmpl, { cache: true });
 						}
 					},
@@ -214,15 +228,32 @@
 		return {
 			restrict: 'A',
 			link: function (scope, elem, attrs) {
-				elem.on('click', function (e) {
-					e.preventDefault();
-
+				console.log('ngDialog linked');
+        elem.on('click', function (e) {
+					
           var isOverlay = $el(e.target).hasClass('ngdialog-overlay');
           var isCloseBtn = $el(e.target).hasClass('ngdialog-close');
           var isContent = !!$el(e.target).parents('.ngdialog-content').length;
 
+          console.log('element clicked', isOverlay, isCloseBtn, isContent);
+
           if (!isOverlay && !isCloseBtn && !isContent) {
-            ngDialog.open({
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log('element clicked', 'opening', { 
+              template: attrs.ngDialog,
+              className: attrs.ngDialogClass,
+              controller: attrs.ngDialogController,
+              scope: attrs.ngDialogScope,
+              data: attrs.ngDialogData,
+              showClose: attrs.ngDialogShowClose === 'false' ? false : true,
+              closeByDocument: attrs.ngDialogCloseByDocument === 'false' ? false : true,
+              closeByEscape: attrs.ngDialogCloseByKeyup === 'false' ? false : true,
+              appendToElement: attrs.ngDialogAppendToElement === 'true' ? true : false,
+              element : elem
+            });
+            ngDialog.open({ 
               template: attrs.ngDialog,
               className: attrs.ngDialogClass,
               controller: attrs.ngDialogController,

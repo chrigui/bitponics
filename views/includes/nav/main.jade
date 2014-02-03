@@ -1,4 +1,4 @@
-nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navMenuDisplayVisible}")
+nav(role="nav", ng-controller="bpn.controllers.nav.Main", class="main-nav")
   script(type="text/ng-template", id="nav-notifications.html")
     div(class="notifications") 
       h2 Notifications
@@ -11,7 +11,7 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
             p.summary {{notification.displays.summary}} 
 
 
-  script(type="text/ng-template", id="nav-menu.html")
+  script(type="text/ng-template", id="nav-menu-template")
     div(class="menu") 
       h2 Menu
       ul.link-list
@@ -130,7 +130,7 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
             
             div(
               class="menu-icon",
-              ng-dialog="nav-menu.html",
+              ng-dialog="nav-menu-template",
               ng-dialog-controller="bpn.controllers.nav.Menu",
               ng-dialog-append-to-element="true",
               ng-dialog-class="ngdialog-theme-menu")
@@ -165,3 +165,5 @@ nav(role="nav", ng-controller="bpn.controllers.nav.Main", ng-class="{'open':navM
       i(class="font-style-normal", aria-hidden="true", ng-hide="navMenuDisplayVisible") &#9776;
       i(class="icon-glyph-new icon-__72_x_999999", aria-hidden="true", ng-show="navMenuDisplayVisible")
   
+block footer-scripts
+  mixin requirejs("/assets/js/controllers/nav")
