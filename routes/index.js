@@ -30,7 +30,13 @@ module.exports = function(app){
   
   app.get('/help', function (req, res){  
     mixpanel.track(req.user, "help");  
-    res.redirect('http://help.bitponics.com');
+    //res.redirect('http://help.bitponics.com');
+    var locals = {
+      title: "Help",
+      className: "app-page",
+      pageType: "app-page"
+    };
+    res.render('help', locals);
   });
 
 	app.get('/about', function (req, res){

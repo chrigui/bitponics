@@ -3561,27 +3561,8 @@ body.ngdialog-open {
   bottom: auto;
   position: absolute;
 }
-.ngdialog-theme-menu .ngdialog-content {
-  -webkit-animation-duration: 0;
-  -moz-animation-duration: 0;
-  -o-animation-duration: 0;
-  -ms-animation-duration: 0;
-  animation-duration: 0;
-}
-.ngdialog-theme-menu.ngdialog-closing .ngdialog-content {
-  -webkit-animation-duration: 0;
-  -moz-animation-duration: 0;
-  -o-animation-duration: 0;
-  -ms-animation-duration: 0;
-  animation-duration: 0;
-}
 .ngdialog-theme-menu .ngdialog-overlay {
   background: none;
-  -webkit-animation-duration: 0;
-  -moz-animation-duration: 0;
-  -o-animation-duration: 0;
-  -ms-animation-duration: 0;
-  animation-duration: 0;
 }
 .ngdialog-theme-menu .ngdialog-content {
   width: 20em;
@@ -7612,13 +7593,6 @@ button.close {
   float: left;
   clear: left;
   margin: 0.7em 1em 1em 0;
-}
-.growplans .icon-glyph-new,
-.growplans.app-page .icon-glyph-new {
-  height: 1em;
-  font-size: 1.25em;
-  position: relative;
-  top: 0.15em;
 }
 .growplans .header-action,
 .growplans.app-page .header-action {

@@ -1,0 +1,28 @@
+extends layout
+
+block head
+
+block content
+
+	section.header
+		header
+			include includes/nav/main
+	
+	section#main(role="main", class="main split-layout")
+		p If a message overlay does not appear in 5 seconds, please click the "?" icon in the upper right of the page to manually launch our help tool.
+block footer-scripts
+	script
+		var launchIntercomInterval = setInterval(function(){
+			if (typeof Intercom === 'function' && typeof $ === 'function'){
+				clearInterval(launchIntercomInterval);
+
+				console.log('showing Intercom');
+				//$('.intercom-trigger').click();
+				Intercom('show');
+				//- setTimeout(function(){
+				//- 	$('.page-spinner.spinner').fadeOut();	
+				//- }, 5000);
+				
+				
+			}
+		}, 100);
