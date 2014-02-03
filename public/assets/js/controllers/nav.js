@@ -65,6 +65,19 @@ define(
       ]
     );
 
+
+    var menuController = bpnControllers.controller('bpn.controllers.nav.Menu',
+      [
+        '$scope',
+        '$filter',
+        '$compile',
+        'NavService',
+        function ($scope, $filter, $compile, NavService) {
+          $scope.NavService = NavService;
+        }
+      ]
+    );
+
     var mainController = bpnControllers.controller('bpn.controllers.nav.Main',
       [
         '$scope',

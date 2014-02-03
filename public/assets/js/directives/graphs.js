@@ -423,7 +423,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
           // element is a jQuery wrapper on the element
 
           var outerMargin = 0,
-              width = element.width() - (outerMargin * 2),
+              width = $(element[0]).width() - (outerMargin * 2),
               height = width,
               radius = width / 2,
               innerWhitespaceRadius = radius / 2,
@@ -544,7 +544,7 @@ define(['bpn.directives', 'jquery', 'view-models', 'd3'],
             ],
             link: function (scope, element, attrs, controller) { 
               var outerMargin = 0,
-                  width = element.width() - (outerMargin * 2),
+                  width = $(element[0]).width() - (outerMargin * 2),
                   height = width,
                   radius = width / 2,
                   innerWhitespaceRadius = radius / 2,

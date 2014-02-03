@@ -47,6 +47,7 @@ mixin requirejs(dataMain)
   - var overlay = CDN('/assets/js/shared/overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var scrollto = CDN('/assets/js/libs/jquery/jquery.scrollTo.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var select2 = CDN('/assets/js/libs/jquery/select2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var shepherd = CDN('/assets/js/libs/shepherd.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var selectionOverlay = CDN('/assets/js/controllers/selection-overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var steps = CDN('/assets/js/libs/Steps.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var throttleDebounce = CDN('/assets/js/libs/jquery/jquery.ba-throttle-debounce.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -108,18 +109,23 @@ mixin requirejs(dataMain)
         'scrollto': '#{scrollto}',
         'select2' : '#{select2}',
         'selection-overlay' : '#{selectionOverlay}',
+        'shepherd' : '#{shepherd}',
         'socket.io' : '/socket.io/socket.io',
         'spin' : '/assets/js/libs/spin.min',
         'steps': '#{steps}',
+        'tether' : '#{shepherd}',
         'throttle-debounce': '#{throttleDebounce}',
         'utils': '#{utils}',
         'view-models': '#{viewModels}'
       },
       shim: { 
         'angular': { 
-          deps: [ ], 
+          deps: [ 'jquery' ], 
           exports: 'angular' 
         }, 
+        'angular-mask' : {
+          deps: ['angular']
+        },
         'angularResource': { 
           deps: [ 'angular' ] 
         }, 
@@ -174,8 +180,11 @@ mixin requirejs(dataMain)
         'selection-overlay' : {
           deps: ['angular']
         },
-        'angular-mask' : {
-          deps: ['angular']
+        'shepherd' : {
+          exports: 'Shepherd'
+        },
+        'tether' : {
+          exports: 'Tether'
         }
       }
     });
