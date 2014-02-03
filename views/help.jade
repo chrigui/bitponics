@@ -9,7 +9,9 @@ block content
 			include includes/nav/main
 	
 	section#main(role="main", class="main split-layout")
-		p If a message overlay does not appear in 5 seconds, please click the "?" icon in the upper right of the page to manually launch our help tool.
+		p.waiting Our help page is a work in progress...you should see a message overlay pop up within 5 seconds. If it doesn't, you can try the "?" icon in the upper right of the page or email us at 
+			a(href="mailto:help@bitponics.com") help@bitponics.com
+			| .
 block footer-scripts
 	script
 		var launchIntercomInterval = setInterval(function(){
@@ -19,6 +21,7 @@ block footer-scripts
 				console.log('showing Intercom');
 				//$('.intercom-trigger').click();
 				Intercom('show');
+				//$('.waiting').fadeOut();
 				//- setTimeout(function(){
 				//- 	$('.page-spinner.spinner').fadeOut();	
 				//- }, 5000);
