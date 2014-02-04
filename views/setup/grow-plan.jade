@@ -11,9 +11,11 @@ block head
     section(class="filterable", ng-cloak, ng-hide)
 
       h4(class="page-heading float-l") Select a Grow Plan to manage your garden
-      div(class="btn float-r", ng-click="showFilter = !showFilter") Filter
+      div(class="btn float-l toggle filter", ng-click="toggleOption('filter')") Filter
+      div(class="btn float-l toggle advanced", ng-click="toggleOption('advanced')") Advanced
       
-      div(id="filter_questions", class="accordion clear-b ng-hide", ng-show="showFilter")
+      
+      div(id="filter_questions", class="accordion clear-b ng-hide", ng-show="expandedOption == 'filter'")
         div.separator-top
         //- .question
         //-   h5.question-title Filter by grow system
@@ -23,7 +25,7 @@ block head
         //-     option(ng-repeat="growSystem in sharedDataService.growSystems", value="{{growSystem._id}}") {{growSystem.name}}
 
         
-        .question
+        .question.plants
           h5.question-title Filter by plants
           
           ul(class="plantlist float")
@@ -39,7 +41,19 @@ block head
     
         .clear-b
 
-    //end filter
+      div(class="accordion clear-b ng-hide", ng-show="expandedOption == 'advanced'")
+        div.separator-top
+        //- .question
+        //-   h5.question-title Filter by grow system
+          
+        //-   select(ui-select2="sharedDataService.growSystemSelectOptions", ng-model="sharedDataService.selectedGrowSystem")
+        //-     option(value="")
+        //-     option(ng-repeat="growSystem in sharedDataService.growSystems", value="{{growSystem._id}}") {{growSystem.name}}
+
+        
+        a.btn.no-margin-left(href="/grow-plans/new?setup=true&plants={{sharedDataService.selected.plants | keysToCSV}}") Create Grow Plan From Scratch
+    
+        .clear-b
 
 
 

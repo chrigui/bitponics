@@ -14,7 +14,8 @@ block head
             class="garden-name", 
             ng-model="sharedDataService.selectedGrowPlan.name", 
             contenteditable,
-            spellcheck="false")
+            spellcheck="false",
+            data-placeholder="Name your Grow Plan")
           //- | <i class="icon-glyph-new icon-__90_pencil_00e36c" aria-hidden="true" ng-click="sharedDataService.updatefilteredGrowPlans()"></i>
 
         ul(class="plantlist small-float")
@@ -38,7 +39,7 @@ block head
           | Sensor Ranges
         div(ng-repeat="sensor in sharedDataService.selectedGrowPlan.focusedPhase.sortedSensors", class="sensor data-module {{sensor.code}} {{sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensor.code].valueRange ? '' : 'empty'}}", ng-click="triggerSensorOverlay(sensor)")
           h3.main-heading
-            | {{sensor.abbrev}}
+            | {{sensor.name}}
           div.sensor-data
             
             div.sensor-value {{sharedDataService.selectedGrowPlan.focusedPhase.idealRangesBySensor[sensor.code].valueRange | valueRangeDisplay }}

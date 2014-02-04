@@ -534,6 +534,38 @@ var createInstance = function(callback){
       }); // /returns the original GrowPlan if there haven\'t been any modifications
   
 
+
+      it('returns a new GrowPlan if _id is not found', function(done){
+        var self = this;
+        should.exist(self.sourceGrowPlan, 'self.sourceGrowPlan should exist')
+
+        var newGrowPlan = {
+          _id : "new",
+          name : "test fresh grow plan",
+          plants : [],
+          phases : []
+        };
+
+        GrowPlan.createNewIfUserDefinedPropertiesModified(
+          {
+            growPlan : newGrowPlan,
+            user : self.userId,
+            visibility : 'public'
+          },
+          function(err, validatedGrowPlan){
+            should.not.exist(err);
+            should.exist(validatedGrowPlan);
+            
+            validatedGrowPlan._id.equals(self.originalGrowPlan._id).should.equal(false, "_id should be new");
+
+            
+            validatedGrowPlan.name.should.equal(newGrowPlan.name);
+
+            done();
+          }
+        );
+      }); // /returns the original GrowPlan if there haven\'t been any modifications
+
       
       it('leaves associated GrowPlanInstances associated to the parent GrowPlan if the growPlan has been branched but GPI.trackGrowPlanUpdates == false', function(done){
         // TODO

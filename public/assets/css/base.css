@@ -367,7 +367,7 @@ label {
   color: #fff;
 }
 .data-module.empty {
-  background-color: #cbffd1;
+  background-color: #86ff94;
 }
 .data-module.warning,
 .data-module.remove {
@@ -3200,6 +3200,21 @@ input[type='checkbox']:checked + label.btn {
   background: #00e36c;
   color: #fff;
 }
+[placeholder]:focus:-webkit-input-placeholder,
+[placeholder]:focus:-moz-placeholder,
+[placeholder]:focus:-ms-input-placeholder {
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+[contentEditable=true]:empty:not(:focus):before {
+  content: attr(data-placeholder);
+}
 .hide-unchecked-items input[type='radio'] + label.btn,
 .hide-unchecked-items input[type='checkbox'] + label.btn {
   display: none;
@@ -5752,6 +5767,24 @@ button.close {
 .growplans.app-page .btn {
   padding: 0.5em;
 }
+.growplans .btn.add .icon-glyph-new,
+.growplans.app-page .btn.add .icon-glyph-new {
+  top: 0;
+  font-size: 1em;
+}
+.growplans .toggle,
+.growplans.app-page .toggle {
+  padding: 0.2em 0.5em;
+  margin: 0 0 1em;
+}
+.growplans .toggle.filter,
+.growplans.app-page .toggle.filter {
+  clear: both;
+}
+.growplans .toggle.advanced,
+.growplans.app-page .toggle.advanced {
+  margin-left: 1em;
+}
 .growplans .overlay .btn,
 .growplans.app-page .overlay .btn {
   margin: 0;
@@ -5821,6 +5854,14 @@ button.close {
 .growplans .phase-tabs .btn .icon-glyph-new,
 .growplans.app-page .phase-tabs .btn .icon-glyph-new {
   color: #00e36c;
+}
+.growplans .question.plants,
+.growplans.app-page .question.plants {
+  margin: 0;
+}
+.growplans .question .question-title,
+.growplans.app-page .question .question-title {
+  margin-top: 0.75em;
 }
 .growplans .question .grid li,
 .growplans.app-page .question .grid li {
@@ -6131,6 +6172,7 @@ button.close {
 .growplans.app-page .grow-plan-customize h2.page-heading {
   max-width: 49%;
   clear: left;
+  min-height: 1.2em;
 }
 .growplans .grow-plan-customize h2.page-heading .garden-name,
 .growplans.app-page .grow-plan-customize h2.page-heading .garden-name {

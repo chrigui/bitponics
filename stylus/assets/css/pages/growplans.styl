@@ -33,6 +33,8 @@
 						border 1px solid color-logo-green
 
 
+
+
 		.grid-cell
 			// max-width 40em
 			margin 0 auto
@@ -54,6 +56,21 @@
 
 	.btn
 		padding .5em
+
+		&.add
+			.icon-glyph-new
+				top 0
+				font-size 1em
+
+	.toggle 
+		padding .2em .5em
+		margin 0 0 1em
+
+		&.filter
+			clear both
+
+		&.advanced
+			margin-left 1em
 
 	.overlay 
 		.btn
@@ -118,6 +135,13 @@
 			color color-logo-green
 
 	.question
+
+		&.plants
+			margin 0
+
+		.question-title
+			margin-top .75em
+			
 		.grid 
 			ul 
 				// clear both
@@ -353,9 +377,11 @@
 			@extends .float-l
 			max-width 49%
 			clear left
+			min-height 1.2em
 
 			.garden-name
 				position relative
+
 				
 
 

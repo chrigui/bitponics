@@ -303,6 +303,22 @@ input[type='checkbox']:checked + label.btn {
   background: #00e36c;
   color: #fff;
 }
+/* http://css-tricks.com/hang-on-placeholders/ */
+[placeholder]:focus:-webkit-input-placeholder,
+[placeholder]:focus:-moz-placeholder,
+[placeholder]:focus:-ms-input-placeholder {
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+[contentEditable=true]:empty:not(:focus):before {
+  content: attr(data-placeholder);
+}
 .hide-unchecked-items input[type='radio'] + label.btn,
 .hide-unchecked-items input[type='checkbox'] + label.btn {
   display: none;

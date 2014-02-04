@@ -734,6 +734,8 @@ module.exports.getFullyPopulatedGrowPlan = function(query, callback){
         .populate('phases.phaseEndActions')
         .populate('phases.light')
         .exec(function(err, growPlanResults){
+          if (err) { return innerCallback(err); }
+          
           growPlans = growPlanResults.map(function(growPlanResult){ return growPlanResult.toObject(); });
           innerCallback();
         });

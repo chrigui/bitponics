@@ -122,7 +122,8 @@ require([
 				'sharedDataService',
 				'$route', 
 				'$q',
-		    function(GrowPlanModel, sharedDataService, $route, $q) {
+        '$timeout',
+		    function(GrowPlanModel, sharedDataService, $route, $q, $timeout) {
 		  		return function() {
             var selectedGrowPlanId = $route.current.params.growPlanId;
             if ((sharedDataService.selectedGrowPlan instanceof GrowPlanModel)
@@ -131,15 +132,41 @@ require([
 		  				return sharedDataService.selectedGrowPlan;
 		  			} else {
               var delay = $q.defer();
-			    		GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
-			    			function (growPlan) {
-			    				sharedDataService.selectedGrowPlan = growPlan;
-			      			delay.resolve(sharedDataService.selectedGrowPlan);
-			    			}, 
-			    			function() {
-			      			delay.reject('Unable to fetch grow plan '  + $route.current.params.growPlanId );
-			    			}
-		    			);
+              console.log('$route.current.params.growPlanId', $route.current.params.growPlanId );
+			    		if ($route.current.params.growPlanId === 'new'){
+                
+                $timeout(function(){
+                  //debugger;
+                  sharedDataService.selectedGrowPlan = viewModels.initGrowPlanViewModel({
+                    _id : "new",
+                    name : "Name Your Grow Plan",
+                    plants : [],
+                    phases : [
+                      {
+                        _id : "",
+                        name : "First",
+                        idealRanges : [],
+                        actions : [],
+                        phaseEndActions : [],
+                        nutrients : []
+                      }
+                    ]
+                  }, bpn.sensors);
+                  delay.resolve(sharedDataService.selectedGrowPlan);
+                });
+              } else {
+                GrowPlanModel.get( { id : $route.current.params.growPlanId }, 
+                  function (growPlan) {
+                    sharedDataService.selectedGrowPlan = growPlan;
+                    delay.resolve(sharedDataService.selectedGrowPlan);
+                  }, 
+                  function() {
+                    delay.reject('Unable to fetch grow plan '  + $route.current.params.growPlanId );
+                  }
+                );  
+              }
+
+              
 			    		return delay.promise;	
 		  			}
 		  		};

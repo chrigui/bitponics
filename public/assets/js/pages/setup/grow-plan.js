@@ -299,7 +299,16 @@ define([
     		'sharedDataService',
     		function($scope, sharedDataService){
     			$scope.sharedDataService = sharedDataService;
-          $scope.showFilter = false;
+          $scope.expandedOption = '';
+
+          $scope.toggleOption = function(optionName){
+            if ($scope.expandedOption === optionName){
+              $scope.expandedOption = '';
+            } else {
+              $scope.expandedOption = optionName;
+            }
+
+          }
     		}
     	]
   	);

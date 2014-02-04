@@ -542,7 +542,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
       if (err) { return callback(err);}
 
       async.waterfall([
-        function (innerCallback){
+        function activatePhase(innerCallback){
           gpi.activatePhase({
             phaseId : activePhaseId,
             phaseDay : options.activePhaseDay,
@@ -550,7 +550,7 @@ GrowPlanInstanceSchema.method('activate', function(options, callback) {
           },
           innerCallback);
         },
-        function (gpiWithActivePhase, innerCallback){
+        function pairWithDevice(gpiWithActivePhase, innerCallback){
           if (!gpiWithActivePhase.device){ return innerCallback(null, gpiWithActivePhase); }
 
           gpiWithActivePhase.pairWithDevice({
@@ -617,7 +617,8 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   // Make sure the gpi is active
   growPlanInstance.active = true;
 
-
+console.trace();
+console.log('activatePhase', options)
   async.series(
     [
       function getPopulatedOwner(innerCallback){
@@ -635,6 +636,7 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
         UserModel.findById(growPlanInstance.owner)
         .select('timezone') // only property we actually need here is timezone
+        .lean()
         .exec(function (err, user){
           if (err) { return innerCallback(err);}
           if (!user) { return innerCallback(new Error("GrowPlanInstance owner could not be found")); }
@@ -709,15 +711,17 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
 
       function saveGPI(innerCallback){
         // At this point, the growPlanInstance is done being edited.
-        if (options.save) {
-          return growPlanInstance.save(function(err, updatedGrowPlanInstance){
-            // update the outer scope's growPlanInstance
-            growPlanInstance = updatedGrowPlanInstance;
-            return innerCallback();
-          });
-        } else {
+        if (!options.save) {
           return innerCallback();
         }
+        
+        growPlanInstance.save(function(err, updatedGrowPlanInstance){
+          if (err) { return innerCallback(err); }
+          // update the outer scope's growPlanInstance
+          growPlanInstance = updatedGrowPlanInstance;
+          return innerCallback();
+        });
+        
       },
 
       function expireExistingNotificationsAndImmediateActions(innerCallback){

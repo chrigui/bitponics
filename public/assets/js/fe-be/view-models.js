@@ -148,7 +148,7 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
           }
         }  
       } else {
-        for (i = 0; i < growPlanInstancePhase.phase.expectedNumberOfDays; i++){
+        for (i = 0; i < (growPlanInstancePhase.phase.expectedNumberOfDays || 30); i++){
           if (!growPlanInstancePhase.daySummaries[i]){
             growPlanInstancePhase.daySummaries[i] = {};
           }

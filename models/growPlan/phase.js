@@ -26,7 +26,7 @@ var PhaseSchema = new Schema({
 	/**
 	 * expectedNumberOfDays. undefined means infinite.
 	 */
-	expectedNumberOfDays: { type: Number },
+	expectedNumberOfDays: { type: Number, default : 0 },
 	
 	/**
 	 * Light definition. Optional. Defines fixtures, bulbs, and quantities.

@@ -265,6 +265,8 @@ module.exports = function(app){
 
         var startingPhaseData = validatedGrowPlan.getPhaseAndDayFromStartDay(parseInt(req.body.growPlanInstance.currentGrowPlanDay, 10));
         
+        console.log('startingPhaseData', startingPhaseData);
+
         GrowPlanInstanceModel.create(
           {
             growPlan : validatedGrowPlan._id,
@@ -302,6 +304,12 @@ module.exports = function(app){
 		}
 	); // /app.post('/grow-plans'
 
+
+  app.get('/setup/grow-plans',
+    function (req, res, next){
+      return res.redirect('/setup/grow-plan');
+    }
+  );
 
 	app.get('/setup/grow-plan/filter', 
 		function (req, res, next){
