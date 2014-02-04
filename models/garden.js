@@ -617,8 +617,9 @@ GrowPlanInstanceSchema.method('activatePhase', function(options, callback) {
   // Make sure the gpi is active
   growPlanInstance.active = true;
 
-console.trace();
+//console.trace();
 console.log('activatePhase', options)
+
   async.series(
     [
       function getPopulatedOwner(innerCallback){
@@ -721,7 +722,7 @@ console.log('activatePhase', options)
           growPlanInstance = updatedGrowPlanInstance;
           return innerCallback();
         });
-        
+
       },
 
       function expireExistingNotificationsAndImmediateActions(innerCallback){
