@@ -2,192 +2,195 @@
 @import "../forms"
 @import "../global/breakpoints"
 
-.dashboard	
+.dashboard  
 
-	.overlay
-		// top 1em
-		// top 10%
-		left 0
-		width 100%
-		overflow hidden
+  .overlay
+    // top 1em
+    // top 10%
+    left 0
+    width 100%
+    overflow hidden
 
-		&.photo
-			// top 5%
-			// left 10%
-			// right 10%
-			// width auto
-			// height auto
-			// position absolute
+    &.photo
+      // top 5%
+      // left 10%
+      // right 10%
+      // width auto
+      // height auto
+      // position absolute
 
-			width: 100%;
-			height: 100%;
-			top: 0;
-			right: 0;
-			left: 0;
-			text-align center
+      width: 100%;
+      height: 100%;
+      top: 0;
+      right: 0;
+      left: 0;
+      text-align center
 
-			img
-				@extend .display-ib;
-				max-height 100%
-				width auto
-				padding 0 0 4em 0
+      img
+        @extend .display-ib;
+        max-height 100%
+        width auto
+        padding 0 0 4em 0
 
 
-			.content-module
-				width 100%
-				text-align center
+      .content-module
+        width 100%
+        text-align center
 
-		.overlay-data
-			.left, .right
-				float left
-				width 45%
-				margin 0 5% 0 0
+    .overlay-data
+      .left, .right
+        float left
+        width 45%
+        margin 0 5% 0 0
 
-				div
-					font-size 2em
-					color color-logo-green
-				p
-					margin-top 1.25em
+        div
+          font-size 2em
+          color color-logo-green
+        p
+          margin-top 1.25em
 
-			h4
-				margin 1em 0 0
+      h4
+        margin 1em 0 0
 
-			h5.reading-time
-				margin 0
+      h5.reading-time
+        margin 0
 
-		.sparkline
-			margin 1em 0
-			width 100%
-			overflow-x scroll
+    .sparkline
+      margin 1em 0
+      width 100%
+      overflow-x scroll
 
-		.page-heading
-			font-size: 2em;
-			text-align: left;
-			// margin: 0 .5em 0;
-		
-		.flush-left
-			margin-left 0
+    .page-heading
+      font-size: 2em;
+      text-align: left;
+      // margin: 0 .5em 0;
+    
+    .flush-left
+      margin-left 0
 
-		.close
-			margin 0
+    .close
+      margin 0
 
-	.grid
-		width 80%
-		text-align right
-		height 4em
-		overflow hidden
-		//margin 1em auto 0
-		li
-			// @extends .display-ib
-			cursor pointer
-			float left
-			width 4em
-			height 4em
-			overflow hidden
-			vertical-align top
-			margin 0 0 .25em
-			border 1px solid #fff
+  .grid
+    width 80%
+    text-align right
+    height 4em
+    overflow hidden
+    //margin 1em auto 0
+    li
+      // @extends .display-ib
+      cursor pointer
+      float left
+      width 4em
+      height 4em
+      overflow hidden
+      vertical-align top
+      margin 0 0 .25em
+      border 1px solid #fff
 
-			img 
-				height 100%
-				width auto
-		&.photos
-			@extends .display-ib
-			width auto
-	.btn
-		padding: 0.5em;
+      img 
+        height 100%
+        width auto
+    &.photos
+      @extends .display-ib
+      width auto
+  .btn
+    padding: 0.5em;
 
-	.sensor-reading-group
-		@extends .clear-b
-		@extends .full-width
+  .sensor-reading-group
+    @extends .clear-b
+    @extends .full-width
 
-	.sensor-reading-date.page-heading-small
-		// @extends .no-margin
-		// @extends .position-a
-		// top 2em
-		// right 2em
-		font-size .85em
+  .sensor-reading-date.page-heading-small
+    // @extends .no-margin
+    // @extends .position-a
+    // top 2em
+    // right 2em
+    font-size .85em
 
-	.manual-entry-container
-		.btn
-			i
-				font-size: 1.25em;
-				position: relative;
-				top: .12em;
-				left: -.5em;
+  .manual-entry-container
+    .btn
+      i
+        font-size: 1.25em;
+        position: relative;
+        top: .12em;
+        left: -.5em;
 
-	.manual-entry-form
+  .manual-entry-form
 
-		.btn
-			margin-bottom 1em
+    .btn
+      margin-bottom 1em
 
-		textarea
-			margin 1em 0
+    textarea
+      margin 1em 0
 
-		.sensor-reading-unit, .sensor-reading-value
-			@extends .float-l
+    .sensor-reading-unit, .sensor-reading-value
+      @extends .float-l
 
-		.sensor-reading-unit
-			margin .5em
+    .sensor-reading-unit, .sensor-unit
+      margin .5em
+      
+    .sensor-unit
+      display inline-block
 
-		.custom-dropdown-wrap
-			margin 0
+    .custom-dropdown-wrap
+      margin 0
 
-		select.custom-dropdown
-			font-size .85em
-			height 2.425em
-			width 3.5em
+    select.custom-dropdown
+      font-size .85em
+      height 2.425em
+      width 3.5em
 
-		input[type="submit"]
-			clear: both;
-			width: 50%;
-			margin-left: 0;
+    input[type="submit"]
+      clear: both;
+      width: 50%;
+      margin-left: 0;
 
-	.control
-		.duration-abbrev
-			display none
+  .control
+    .duration-abbrev
+      display none
 
 .garden-settings
-	height 2em
+  height 2em
 
 .day-summary
-	.btn-list
-		overflow hidden
-	button.btn
-		margin .25em .25em .25em 0
-	.graph
-		text-align center
-	.photos
-		overflow-x scroll
-		height 4.25em
-		display block!important
-		white-space nowrap
-		text-align left
+  .btn-list
+    overflow hidden
+  button.btn
+    margin .25em .25em .25em 0
+  .graph
+    text-align center
+  .photos
+    overflow-x scroll
+    height 4.25em
+    display block!important
+    white-space nowrap
+    text-align left
 
-		li
-			float none
+    li
+      float none
 .circle
-	margin 1.5em 0
-	svg
-		// causes centering issues in Mac OSX Mavericks
-		// max-width 100%
+  margin 1.5em 0
+  svg
+    // causes centering issues in Mac OSX Mavericks
+    // max-width 100%
 
 /* Large screens */
 @media $mq_medium
-	.dashboard
-		.overlay
-			left 5%
-			width 90%
+  .dashboard
+    .overlay
+      left 5%
+      width 90%
 
 @media $mq_larger
-	.dashboard
-		.overlay
-			left 25%
-			width 50%
-		
-		.garden-settings
-			float right
-			height 1em
-			i
-				cursor pointer
-				font-size 2.75em
+  .dashboard
+    .overlay
+      left 25%
+      width 50%
+    
+    .garden-settings
+      float right
+      height 1em
+      i
+        cursor pointer
+        font-size 2.75em

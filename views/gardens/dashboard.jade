@@ -62,24 +62,25 @@ block content
                   ng-click="completeGarden()") Mark garden as complete
 
                 h4 Measurement Unit Preferences
+                p Coming soon
 
-                div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
-                  div(data-bpn-directives-manual-entry-form, 
-                    data-sensor-unit="{{sensor.unit}}", 
-                    data-sensor-code="{{sensor.code}}",
-                    data-sensor-name="{{sensor.name}}",
-                    class="manual-entry-form")
+                //- div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
+                //-   div(data-bpn-directives-manual-entry-form, 
+                //-     data-sensor-unit="{{sensor.unit}}", 
+                //-     data-sensor-code="{{sensor.code}}",
+                //-     data-sensor-name="{{sensor.name}}",
+                //-     class="manual-entry-form")
                     
-                    div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
-                    div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
-                      select(
-                        class="custom-dropdown", 
-                        ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
-                        ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units",
-                        ng-change="updateSettings()")
-                      .dblarrow
-                        i
-                    div.readonly(ng-hide="sharedDataService.userCanModify") {{sensorName}} : {{ sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()] | lowercase }}
+                //-     div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-value") {{sensorName}}
+                //-     div(ng-show="sharedDataService.userCanModify && hasMultipleUnits(sensorCode)", class="sensor-reading-unit custom-dropdown-wrap")
+                //-       select(
+                //-         class="custom-dropdown", 
+                //-         ng-model="sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()]", 
+                //-         ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensorCode.toUpperCase()].units",
+                //-         ng-change="updateSettings()")
+                //-       .dblarrow
+                //-         i
+                //-     div.readonly(ng-hide="sharedDataService.userCanModify") {{sensorName}} : {{ sharedDataService.gardenModel.settings.units[sensorCode.toUpperCase()] | lowercase }}
 
                 
 
@@ -134,7 +135,8 @@ block content
                       h4 Ideal Range ({{sensor.unit}})
                       div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
 
-                  div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
+                  a(ng-href="/gardens/{{sharedDataService.gardenModel._id}}/graphs")
+                    div(data-bpn-directives-sensor-sparkline-graph, data-sensor-code="sensor.code", data-sensor-logs="sharedDataService.activeDate.sensorLogs")
                   
                   div(ng-show="sharedDataService.userCanModify && (sensor.code == 'ph' || sensor.code == 'ec')")
                     a(class="btn flush-left", ng-href="/account/devices/{{sharedDataService.gardenModel.device._id}}/calibrate") Calibrate
@@ -269,9 +271,9 @@ block content
                     textarea(ng-model="manualTextEntry", id="manual_input_text", cols="5", rows="5", class="full-width", placeholder="How are your plants doing today?")
                     div(ng-repeat="sensor in sharedDataService.sensors", class="sensor-reading-group")
                       input(ng-model="manualSensorEntry[sensor.code]", id="manual_input_{{sensor.code}}", size="5", class="sensor-reading-value display-ib half-width", type="number", step="any", placeholder="{{sensor.name}}")
-                      div(ng-hide="hasMultipleUnits(sensor.code)", class="sensor-reading-unit")
-                        span.sensor-unit {{sensor.unit}}
-                      div(ng-show="hasMultipleUnits(sensor.code)", class="sensor-reading-unit custom-dropdown-wrap")
+                      //- div(ng-hide="hasMultipleUnits(sensor.code)", class="sensor-reading-unit")
+                      span.sensor-unit {{sensor.unit}}
+                      //- div(ng-show="hasMultipleUnits(sensor.code)", class="sensor-reading-unit custom-dropdown-wrap")
                         select(class="custom-dropdown no-margin", 
                           ng-model="sharedDataService.gardenModel.settings.units[sensor.code.toUpperCase()]", 
                           ng-options="obj.id as obj.abbrev for obj in sensorUnits[sensor.code.toUpperCase()].units")

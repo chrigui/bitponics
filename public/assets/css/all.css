@@ -5509,8 +5509,12 @@ label.newsletter.inline {
 .dashboard .manual-entry-form textarea {
   margin: 1em 0;
 }
-.dashboard .manual-entry-form .sensor-reading-unit {
+.dashboard .manual-entry-form .sensor-reading-unit,
+.dashboard .manual-entry-form .sensor-unit {
   margin: 0.5em;
+}
+.dashboard .manual-entry-form .sensor-unit {
+  display: inline-block;
 }
 .dashboard .manual-entry-form .custom-dropdown-wrap {
   margin: 0;

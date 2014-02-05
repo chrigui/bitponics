@@ -999,7 +999,7 @@ require([
             element.empty();
 
             if (!scope.sensorLogs || !scope.sensorLogs.length) {
-              element.append('<div>DATA NOT AVAILABLE FOR THIS DATE</div>');
+              element.append('<div>No logs for this date.</div>');
               return;
             }
 
