@@ -560,6 +560,8 @@ var createInstance = function(callback){
 
             
             validatedGrowPlan.name.should.equal(newGrowPlan.name);
+            validatedGrowPlan.createdBy.equals(self.userId).should.equal(true, "user should be assigned to createdBy");
+            validatedGrowPlan.users[0].equals(self.userId).should.equal(true, "user should be assigned to users");
 
             done();
           }

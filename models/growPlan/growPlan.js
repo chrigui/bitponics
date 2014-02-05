@@ -35,7 +35,12 @@ GrowPlanSchema = new Schema({
    * User that created this GP
    */
   createdBy: { type: ObjectIdSchema, ref: 'User' },
-	
+
+
+  /**
+   * List of users who can admin this GP
+   */
+  users : [{ type: ObjectIdSchema, ref: 'User' }],
   
   /**
    * Name
@@ -459,6 +464,7 @@ GrowPlanSchema.static('createNewIfUserDefinedPropertiesModified', function(optio
           }
           
           submittedGrowPlan.createdBy = user;
+          submittedGrowPlan.users = [user];
           submittedGrowPlan.visibility = visibility;
 
           GrowPlanModel.create(submittedGrowPlan, innerCallback);
