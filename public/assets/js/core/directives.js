@@ -115,10 +115,11 @@ define(['angular', 'jquery', 'throttle-debounce'],
     /** 
      * This overrides the default contenteditable to be one that can be bound to ng-model
      * 
-     * taken from http://docs.angularjs.org/api/ng.directive:ngModel.NgModelController
+     * Taken from http://docs.angularjs.org/api/ng.directive:ngModel.NgModelController
      * with the following changes:
      * - prevent assigning of <br> by default
      * - prevent automatic read() on creation
+     * - on focus, select all text
      */
     bpnDirectives.directive('contenteditable', function() {
       return {
@@ -133,6 +134,13 @@ define(['angular', 'jquery', 'throttle-debounce'],
             element.html(ngModel.$viewValue || '');
           };
    
+          element.on('focus', function() {
+            //scope.$apply(read);
+            setTimeout(function(){
+              document.execCommand('selectAll', false, null);
+            }, 10);
+          });
+
           // Listen for change events to enable binding
           element.on('blur keyup', function() {
             scope.$apply(read);
