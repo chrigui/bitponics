@@ -118,7 +118,7 @@ module.exports = function(app){
 				actions: {},
 				sensors: {},
 				growPlanDefault: {}
-			}
+			};
 			
 			async.parallel(
 				[

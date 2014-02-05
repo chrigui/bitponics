@@ -48,7 +48,7 @@ module.exports = function(app) {
     }
 
     query.where('_id').ne(allPurposeGrowPlanId)
-    query.select('name description phases.expectedNumberOfDays createdBy activeGardenCount plants')
+    query.select('name description phases.expectedNumberOfDays createdBy activeGardenCount plants createdAt')
     .populate('createdBy', 'name')
     .lean()
     .exec(function (err, growPlans) {

@@ -1,5 +1,5 @@
 /**
- * Main file for /grow-plans/:id
+ * Main file for /gardens
  *
  * Depends on following globals:
  * - bpn
