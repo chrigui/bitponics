@@ -129,7 +129,7 @@ block content
                       h4 Last Reading ({{sensor.unit}})
                       div.separator-top(ng-show="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") {{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}
                       div.separator-top(ng-hide="{{sharedDataService.activeDate.latestSensorLogs[sensor.code].val}}") ----
-                      h5.reading-time {{sharedDataService.activeDate.latestSensorLogs.timestamp | date:'short' }}
+                      h5.reading-time {{sharedDataService.activeDate.latestSensorLogs[sensor.code].timestamp | date:'short' }}
                     div.right(ng-show="idealRanges[sensor.code]")
                       h4 Ideal Range ({{sensor.unit}})
                       div.separator-top() {{idealRanges[sensor.code].valueRange.min}} - {{idealRanges[sensor.code].valueRange.max}}
