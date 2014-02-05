@@ -19,7 +19,8 @@ require([
   'overlay',
   'bpn.directives.graphs',
   'bpn.services.growPlan',
-  'bpn.services.plant'
+  'bpn.services.plant',
+  'angularDialog'
 ],
   function (angular, domReady, viewModels, moment, feBeUtils) {
     'use strict';
@@ -137,7 +138,7 @@ require([
                 
                 $timeout(function(){
                   //debugger;
-                  sharedDataService.selectedGrowPlan = viewModels.initGrowPlanViewModel({
+                  sharedDataService.selectedGrowPlan = new GrowPlanModel(viewModels.initGrowPlanViewModel({
                     _id : "new",
                     name : "Name Your Grow Plan",
                     plants : [],
@@ -151,7 +152,7 @@ require([
                         nutrients : []
                       }
                     ]
-                  }, bpn.sensors);
+                  }, bpn.sensors));
                   delay.resolve(sharedDataService.selectedGrowPlan);
                 });
               } else {
@@ -590,7 +591,8 @@ require([
         'sharedDataService',
         'bpn.services.analytics',
         'PlantLoader',
-        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics, PlantLoader) {
+        'ngDialog',
+        function ($scope, $location, $route, $filter, GrowPlanModel, sharedDataService, analytics, PlantLoader, ngDialog) {
           $scope.sharedDataService = sharedDataService;
 
           //$scope.lights = bpn.lights;
@@ -911,14 +913,25 @@ require([
                   console.log('successfully saved grow plan', returnedGrowPlan);
                   $scope.sharedDataService.submit.success = true;
                   $scope.sharedDataService.submit.updateInProgress = false;
-                  $scope.sharedDataService.activeOverlay = 'SaveOverlay';
+                  //$scope.sharedDataService.activeOverlay = 'SaveOverlay';
+                  ngDialog.open({ 
+                    template: 'save-overlay-template',
+                    scope: $scope,
+                    controller : "bpn.controllers.growPlan.SaveOverlay",
+                    className : "ngdialog-theme-overlay-message"
+                  });
 
                 }, function(){
                   console.log('error saving grow plan', arguments);
                   $scope.sharedDataService.submit.error = true;
                   $scope.sharedDataService.submit.success = false;
                   $scope.sharedDataService.submit.updateInProgress = false;
-                  $scope.sharedDataService.activeOverlay = 'SaveOverlay';
+                  ngDialog.open({ 
+                    template: 'save-overlay-template',
+                    scope: $scope,
+                    controller : "bpn.controllers.growPlan.SaveOverlay",
+                    className : "ngdialog-theme-overlay-message"
+                  });
                 }
               );
 

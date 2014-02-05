@@ -1018,37 +1018,34 @@ block content
                 p.error
                   | There was a technical problem and your garden was not set up.
         
-        div
-          div(
-            ng-controller="bpn.controllers.growPlan.SaveOverlay", 
-            modal="sharedDataService.activeOverlay=='SaveOverlay'", 
-            close="close()", 
-            options="{ dialogClass: 'overlay dead-end auto-size', backdropFade: true, dialogFade: true }")
-            
-            div(class="overlay-contain")
-              div(class="close btn", ng-click="close()")
-                | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
-              div(ng-show="!sharedDataService.submit.error")
+        script(type="text/ng-template", id="save-overlay-template")
+          div()
+            //- div(class="close btn", ng-click="close()")
+            //-   | <i class="icon-glyph-new icon-__72_x_999999" aria-hidden="true"></i>
+            div(ng-show="!sharedDataService.submit.error")
+              div(ng-show="sharedDataService.originalGrowPlanId === sharedDataService.selectedGrowPlan._id")
+                h3(class="page-heading page-heading-small") Grow Plan Updated
+                p Your grow plan has been updated! Your 
+                  a(class="link", href="/gardens") gardens
+                  |  should now reflect the new updates. Happy growing!
+              div(ng-show="sharedDataService.originalGrowPlanId !== sharedDataService.selectedGrowPlan._id && sharedDataService.originalGrowPlanId !== 'new'")
+                h3(class="page-heading page-heading-small") Boom! More knowledge.
+                p We created you your very own branch of this grow plan. Now the community can learn how your changes help plant growth.
+                p Any gardens that were using the original have been migrated to your new branch.
+                p  
+                  a.btn(class="link", href="/grow-plans/{{sharedDataService.selectedGrowPlan._id}}", ng-click="loadGrowPlanPage()") Visit your new grow plan page
+              div(ng-show="sharedDataService.originalGrowPlanId == 'new'")
+                h3(class="page-heading page-heading-small") Boom! More knowledge.
+                p You created your very own grow plan. Now the community can learn how your methods help plant growth.
+                p  
+                  a.btn(class="link", href="/grow-plans/{{sharedDataService.selectedGrowPlan._id}}", ng-click="loadGrowPlanPage()") Visit your new grow plan page
                 
-                
-                div(ng-show="sharedDataService.originalGrowPlanId === sharedDataService.selectedGrowPlan._id")
-                  h3(class="page-heading page-heading-small") Grow Plan Updated
-                  p Your grow plan has been updated! Your 
-                    a(class="link", href="/gardens") gardens
-                    |  should now reflect the new updates. Happy growing!
-                div(ng-show="sharedDataService.originalGrowPlanId !== sharedDataService.selectedGrowPlan._id")
-                  h3(class="page-heading page-heading-small") You just contributed to the exploration of gardening knowledge!
-                  p We created you your very own branch of this grow plan. Now the community can learn how your changes help plant growth.
-                  p Any gardens that were using the original have been migrated to your new branch.
-                  p  
-                    a.btn(class="link", href="/grow-plans/{{sharedDataService.selectedGrowPlan._id}}", ng-click="loadGrowPlanPage()") Visit your new grow plan page
-                  
-              div(ng-show="sharedDataService.submit.error")
-                h3(class="page-heading page-heading-small error") Error saving changes
-                p.error
-                  | There was a technical problem while attempting to save your changes. We're sorry for disrupting your flow. Feel free to 
-                  span(data-bpn-directives-intercom-trigger) contact us
-                  |  and let's see if we can help.
+            div(ng-show="sharedDataService.submit.error")
+              h3(class="page-heading page-heading-small error") Error saving changes
+              p.error
+                | There was a technical problem while attempting to save your changes. We're sorry for disrupting your flow. Feel free to 
+                span(data-bpn-directives-intercom-trigger) contact us
+                |  and let's see if we can help.
 
         //- End Overlay Templates
         

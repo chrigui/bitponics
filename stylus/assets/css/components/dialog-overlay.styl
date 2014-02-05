@@ -3,7 +3,8 @@
  * Designed only to be used with ngdialog option of "appendToElement" set to true
  */
 
-.ngdialog-theme-overlay
+.ngdialog.ngdialog-theme-overlay,
+.ngdialog.ngdialog-theme-overlay-message
 	// position absolute
 	// top 2em
 	// left 5%
@@ -28,7 +29,7 @@
 		box-shadow 0px 2px 5px 0px color-border-gray
 
 
-		h2, div, p, a 
+		h2, div, p
 			color color-text-gray
 
 		h2
@@ -37,5 +38,17 @@
 			border-bottom 1px solid color-border-gray
 
 
+
 	.ngdialog-close
 		display none
+
+
+.ngdialog.ngdialog-theme-overlay-message
+	
+	.ngdialog-content
+		h2, h3, p
+			text-align center
+			width 100%
+
+		.btn
+			margin 0

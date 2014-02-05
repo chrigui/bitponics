@@ -135,7 +135,8 @@ define(['angular', 'jquery', 'throttle-debounce'],
           };
    
           element.on('focus', function() {
-            //scope.$apply(read);
+            // selection needs to be done after a timeout so document 
+            // has a chance to register this element as focused
             setTimeout(function(){
               document.execCommand('selectAll', false, null);
             }, 10);

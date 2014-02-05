@@ -1903,7 +1903,8 @@ body.ngdialog-open {
 /*
  * Dialog Overlay
  */
-.ngdialog-theme-overlay .ngdialog-content {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
   position: absolute;
   top: 50%;
   left: 5%;
@@ -1918,19 +1919,32 @@ body.ngdialog-open {
   border: 1px solid #d8d8d8;
   box-shadow: 0px 2px 5px 0px #d8d8d8;
 }
-.ngdialog-theme-overlay .ngdialog-content h2,
-.ngdialog-theme-overlay .ngdialog-content div,
-.ngdialog-theme-overlay .ngdialog-content p,
-.ngdialog-theme-overlay .ngdialog-content a {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay .ngdialog-content div,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content div,
+.ngdialog.ngdialog-theme-overlay .ngdialog-content p,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content p {
   color: #999;
 }
-.ngdialog-theme-overlay .ngdialog-content h2 {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2 {
   padding-top: 0.5em;
   margin: 0 0 0.5em;
   border-bottom: 1px solid #d8d8d8;
 }
-.ngdialog-theme-overlay .ngdialog-close {
+.ngdialog.ngdialog-theme-overlay .ngdialog-close,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-close {
   display: none;
+}
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h3,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content p {
+  text-align: center;
+  width: 100%;
+}
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content .btn {
+  margin: 0;
 }
 /*
  * Grow Plan List
