@@ -3741,6 +3741,15 @@ body.ngdialog-open {
 .ngdialog.ngdialog-theme-overlay-message .ngdialog-close {
   display: none;
 }
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
+  padding: 2em;
+}
+@media  screen and (min-width: 50em) {
+  .ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
+    left: 20%;
+    width: 60%;
+  }
+}
 .ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2,
 .ngdialog.ngdialog-theme-overlay-message .ngdialog-content h3,
 .ngdialog.ngdialog-theme-overlay-message .ngdialog-content p {
@@ -3749,6 +3758,14 @@ body.ngdialog-open {
 }
 .ngdialog.ngdialog-theme-overlay-message .ngdialog-content .btn {
   margin: 0;
+}
+.ngdialog.ngdialog-theme-overlay-message.error .ngdialog-content {
+  border-color: #fac400;
+  -webkit-box-shadow: 0px 2px 5px 0px #fac400;
+  box-shadow: 0px 2px 5px 0px #fac400;
+}
+.ngdialog.ngdialog-theme-overlay-message.error h3 {
+  color: #fac400;
 }
 .grow-plan-list .grow-plan-list-item,
 .garden-list .garden-list-item {

@@ -215,7 +215,10 @@ a {
 a:hover {
   text-decoration: underline;
 }
-.app-page.setup * {
+.app-page.setup h2,
+.app-page.setup h3,
+.app-page.setup p,
+.app-page.setup div {
   color: #999;
 }
 .app-page.setup .page-heading-small {
@@ -242,7 +245,7 @@ a:hover {
   margin-left: 0;
 }
 .app-page.setup .btn.loading {
-  padding-bottom: 1.8em;
+  padding-bottom: 1.5em;
   text-align: center;
 }
 .app-page.setup .btn.loading .loading-meter {

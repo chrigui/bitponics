@@ -79,23 +79,24 @@ function (angular, domReady, feBeUtils) {
           if ($scope.connecting){ return; }
 
           var connectStartedAt = (new Date()).valueOf(),
-              waitMilliseconds = 60000,
-              interval = waitMilliseconds / 60,
+              waitMilliseconds = 50000,
+              interval = 100,
               completeAt = connectStartedAt + waitMilliseconds,
               connectTimeout,
-              progressInterval;
+              progressInterval,
+              ajaxTimeout = 5000;
           
           $scope.connecting = true;
           $scope.progressPercent = 0;
           $scope.connectText = "Connecting...         ";
 
           connectTimeout = $timeout(function(){
-            $interval.cancel(progressInterval);
-
+            
             $.ajax({
               url : $scope.deviceUrl,
-              timeout : 5000,
+              timeout : ajaxTimeout,
               success : function (data) {
+                $interval.cancel(progressInterval);
                 console.log(data);
                 if (typeof data === 'string'){
                   data = JSON.parse(data);
@@ -135,17 +136,25 @@ function (angular, domReady, feBeUtils) {
                 $scope.$apply();
               },
               error : function (data, textStatus) {
+                $interval.cancel(progressInterval);
                 $scope.$apply(function() {
-                  $scope.sharedDataService.activeOverlay = { is: 'ErrorOverlay' };
+                  ngDialog.open({
+                    template: "error-dialog-template",
+                    controller: "bpn.controllers.setup.device.ErrorOverlay",
+                    className : "ngdialog-theme-overlay-message error"
+                  });
+
+                  $scope.progressPercent = 0;
+                  $scope.connecting = false;
+                  $scope.connectText = "Connect to Base Station";
                 });
               }
             });
-          }, waitMilliseconds)
+          }, waitMilliseconds - ajaxTimeout);
 
           var advanceProgress = function(){
-            
             var nowAsMilliseconds = (new Date()).valueOf();
-            $scope.progressPercent = 20 + (1 - (completeAt - nowAsMilliseconds)/waitMilliseconds) * 85;
+            $scope.progressPercent = 20 + (1 - (completeAt - nowAsMilliseconds)/waitMilliseconds) * 81;
             console.log('advanceProgress', $scope.progressPercent);
           };
 
