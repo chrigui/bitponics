@@ -155,7 +155,6 @@ function (angular, domReady, feBeUtils) {
           var advanceProgress = function(){
             var nowAsMilliseconds = (new Date()).valueOf();
             $scope.progressPercent = 20 + (1 - (completeAt - nowAsMilliseconds)/waitMilliseconds) * 81;
-            console.log('advanceProgress', $scope.progressPercent);
           };
 
           $scope.progressPercent = 20;

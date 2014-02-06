@@ -2078,6 +2078,31 @@ ol.list-style {
   color: #fac400;
   font-weight: bold;
 }
+.btn.loading,
+.btn-composite.loading,
+.btn-compact.loading {
+  text-align: center;
+}
+.btn.loading .loading-meter,
+.btn-composite.loading .loading-meter,
+.btn-compact.loading .loading-meter {
+  height: 0.5em;
+}
+.btn .loading-meter,
+.btn-composite .loading-meter,
+.btn-compact .loading-meter {
+  height: 0;
+  position: absolute;
+  width: 0;
+  background: #00e36c;
+  bottom: 0;
+  left: 0;
+  -webkit-transition: all 0.5s ease-out;
+  -moz-transition: all 0.5s ease-out;
+  -o-transition: all 0.5s ease-out;
+  -ms-transition: all 0.5s ease-out;
+  transition: all 0.5s ease-out;
+}
 .btn-composite,
 .btn-compact {
   background-color: #fff;

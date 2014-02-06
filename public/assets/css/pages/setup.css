@@ -244,22 +244,6 @@ a:hover {
 .app-page.setup .btn {
   margin-left: 0;
 }
-.app-page.setup .btn.loading {
-  padding-bottom: 1.5em;
-  text-align: center;
-}
-.app-page.setup .btn.loading .loading-meter {
-  height: 1em;
-}
-.app-page.setup .btn .loading-meter {
-  height: 0;
-  position: absolute;
-  width: 0;
-  background: #00e36c;
-  bottom: 0;
-  left: 0;
-  transition: all 0.5s ease-out;
-}
 .app-page.setup .btn.connect {
   min-width: 13em;
 }

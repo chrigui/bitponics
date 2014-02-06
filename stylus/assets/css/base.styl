@@ -1,787 +1,802 @@
 @import "helpers"
 
 html
-	min-height 100%
+  min-height 100%
 
 body
-	margin: .5em;
-	color: #333
-	//font 112.5%/1.5 Helvetica, Arial, sans-serif
-	font-family Reader, Helvetica, Arial, sans-serif
-	font-size 112.5%
-	line-height 1.5
-	background color-global-background
+  margin: .5em;
+  color: #333
+  //font 112.5%/1.5 Helvetica, Arial, sans-serif
+  font-family Reader, Helvetica, Arial, sans-serif
+  font-size 112.5%
+  line-height 1.5
+  background color-global-background
 
 
 * 
-	-webkit-box-sizing border-box
-	-moz-box-sizing border-box
-	box-sizing border-box
+  -webkit-box-sizing border-box
+  -moz-box-sizing border-box
+  box-sizing border-box
 
 h1,h2,h3,h4,h5,h6
-	font-weight normal
-	-webkit-font-smoothing antialiased
+  font-weight normal
+  -webkit-font-smoothing antialiased
 
 h1
-	// font-weight bold
+  // font-weight bold
 
 abbr[title]
-	border none
+  border none
 
 div, p, span, a, a:visited, a:hover, a:active
-	color color-logo-green
+  color color-logo-green
 a
-	-ms-word-break: break-all;
-	word-break: break-all;
-	// Non standard for webkit
-	word-break: break-word;
-	-webkit-hyphens: auto;
-	-moz-hyphens: auto;
-	hyphens: auto;
+  -ms-word-break: break-all;
+  word-break: break-all;
+  // Non standard for webkit
+  word-break: break-word;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 
 img
-	max-width 100%
-	height auto
+  max-width 100%
+  height auto
 
 dd, dt
-	margin 0
-	padding 0
+  margin 0
+  padding 0
 
 input, label
-	max-width 100%
-	// width 100%
+  max-width 100%
+  // width 100%
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak 
-	display none !important
-	
-	// visibility hidden !important
-	// display block !important
-	// position relative
-	// min-height 7em
-	// transition all .5s ease
+  display none !important
+  
+  // visibility hidden !important
+  // display block !important
+  // position relative
+  // min-height 7em
+  // transition all .5s ease
 
-	// &:after
-	// 	content: '';
-	// 	background-image: url('/assets/img/spinner.svg');
-	// 	background-repeat: no-repeat;
-	// 	background-size: contain;
-	// 	min-width: 7em;
-	// 	min-height: 7em;
-	// 	display:block
-	// 	position absolute
-	// 	top 0
+  // &:after
+  //  content: '';
+  //  background-image: url('/assets/img/spinner.svg');
+  //  background-repeat: no-repeat;
+  //  background-size: contain;
+  //  min-width: 7em;
+  //  min-height: 7em;
+  //  display:block
+  //  position absolute
+  //  top 0
 
-	// 	-webkit-animation: spin 0.5s infinite linear;
-	// 	-moz-animation: spin 0.5s infinite linear;
-	// 	-o-animation: spin 0.5s infinite linear;
-	// 	-ms-animation: spin 0.5s infinite linear;
-	// 	animation: spin 0.5s infinite linear;
+  //  -webkit-animation: spin 0.5s infinite linear;
+  //  -moz-animation: spin 0.5s infinite linear;
+  //  -o-animation: spin 0.5s infinite linear;
+  //  -ms-animation: spin 0.5s infinite linear;
+  //  animation: spin 0.5s infinite linear;
 
 .script
-	display none
+  display none
 
 /*
  * Modules
  */
 .content-module
-	min-width 9em
-	margin 0 0 2.25em
-	border-top 3px solid color-logo-green
-	&.small
-		width 25%
-	&.medium
-		width 50%
-	&.large
-		width 100%
-	&.middle
-		width 100%
+  min-width 9em
+  margin 0 0 2.25em
+  border-top 3px solid color-logo-green
+  &.small
+    width 25%
+  &.medium
+    width 50%
+  &.large
+    width 100%
+  &.middle
+    width 100%
 
 .data-module {
-	color white
-	text-align center
-	position relative
-	background-color color-logo-green
-	//width 100%
-	height 6em
-	text-transform uppercase
-	margin 0.125em 0
-	transition-property: background-color;
-	transition-duration: .5s;
+  color white
+  text-align center
+  position relative
+  background-color color-logo-green
+  //width 100%
+  height 6em
+  text-transform uppercase
+  margin 0.125em 0
+  transition-property: background-color;
+  transition-duration: .5s;
 
-	div, p, span, a, a:visited, a:hover, a:active {
-		color white
-	}
+  div, p, span, a, a:visited, a:hover, a:active {
+    color white
+  }
 
-	&.empty {
-		background-color darken(color-bg-light-green, 15%)
-	}
-	
-	&.warning, 
-	&.remove {
-		background-color color-bg-orange
-	}
-
-
-	.main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
-		position absolute
-	}
-
-	.main-heading {
-		color white
-		font-size .75em
-		margin 0
-		top .5em
-		left .75em
-		font-weight bold
-	}
-	.message {
-		bottom .5em
-		right .75em
-	}
-	.settings {
-		top .15em
-		right .5em
-	}
-	.message, .sensor-value-unit {
-		font-size .55em //~10px
-		font-weight bold
-	}
-	.sensor-value-unit {
-		top 1em
-		right 1.85em
-		line-height 1em
-		text-align left
-
-		span {
-			display block
-		}
-	}
-	.sensor-data {
-		display inline-block
-		vertical-align middle
-		position: absolute;
-		top 1.85em
-		left 0
-		width 100%
-		// border-top 1px solid white
-	}
-	.sensor-value {
-		font-size 10em
-		// letter-spacing -.1em
-		line-height 1.25em
-		margin -.15em 0 0 -.15em
-		text-align center
-		
-	}
-	.sensor-type {
-		// bottom: .25em;
-		// left: .5em;
-		top .25em
-		right .5em
-	}
-
-	&.closed { //TODO: work on closed state
-		min-height 2em
-		height auto
-
-		.main-heading {
-			position static
-			display inline-block
-			vertical-align middle
-			width 63%
-			text-align left
-			text-indent .45em
-		}
-		.sensor-value-unit, .message, .settings, .sensor-type {
-			display none
-		}
-		.sensor-data {
-			width 30%
-			text-align right
-			position relative
-			right .25em
-			top 0
-			border none 0
-			
-		}
-		.sensor-value {
-			font-size .75em
-			position static
-			letter-spacing normal
-			margin 0
-			position relative
-			right 0.15em
-			text-align right
-			font-weight bold	
-		}
+  &.empty {
+    background-color darken(color-bg-light-green, 15%)
+  }
+  
+  &.warning, 
+  &.remove {
+    background-color color-bg-orange
+  }
 
 
-	}
+  .main-heading, .message, .settings, .sensor-value-unit, .sensor-type {
+    position absolute
+  }
 
-	&:before {
-	    content ''
-	    display inline-block
-	    height 100%
-	    vertical-align middle
-	    margin-right -0.25em
-	}
+  .main-heading {
+    color white
+    font-size .75em
+    margin 0
+    top .5em
+    left .75em
+    font-weight bold
+  }
+  .message {
+    bottom .5em
+    right .75em
+  }
+  .settings {
+    top .15em
+    right .5em
+  }
+  .message, .sensor-value-unit {
+    font-size .55em //~10px
+    font-weight bold
+  }
+  .sensor-value-unit {
+    top 1em
+    right 1.85em
+    line-height 1em
+    text-align left
+
+    span {
+      display block
+    }
+  }
+  .sensor-data {
+    display inline-block
+    vertical-align middle
+    position: absolute;
+    top 1.85em
+    left 0
+    width 100%
+    // border-top 1px solid white
+  }
+  .sensor-value {
+    font-size 10em
+    // letter-spacing -.1em
+    line-height 1.25em
+    margin -.15em 0 0 -.15em
+    text-align center
+    
+  }
+  .sensor-type {
+    // bottom: .25em;
+    // left: .5em;
+    top .25em
+    right .5em
+  }
+
+  &.closed { //TODO: work on closed state
+    min-height 2em
+    height auto
+
+    .main-heading {
+      position static
+      display inline-block
+      vertical-align middle
+      width 63%
+      text-align left
+      text-indent .45em
+    }
+    .sensor-value-unit, .message, .settings, .sensor-type {
+      display none
+    }
+    .sensor-data {
+      width 30%
+      text-align right
+      position relative
+      right .25em
+      top 0
+      border none 0
+      
+    }
+    .sensor-value {
+      font-size .75em
+      position static
+      letter-spacing normal
+      margin 0
+      position relative
+      right 0.15em
+      text-align right
+      font-weight bold  
+    }
+
+
+  }
+
+  &:before {
+      content ''
+      display inline-block
+      height 100%
+      vertical-align middle
+      margin-right -0.25em
+  }
 }
 
 /*
  * headings
  */
 // #logo
-// 	position absolute
-// 	top 0
-// 	left 0
-// 	img
-// 		width 5em
-// 		padding .5em
-// 		z-index: 1;
-// 		position: relative;
+//  position absolute
+//  top 0
+//  left 0
+//  img
+//    width 5em
+//    padding .5em
+//    z-index: 1;
+//    position: relative;
 
 // .main-heading
-// 	color color-logo-green
-// 	margin .5em 0
-// 	font-weight bold
+//  color color-logo-green
+//  margin .5em 0
+//  font-weight bold
 // .sub-heading
-// 	color color-logo-green
-// 	margin .65em 0
-// 	font-weight bold
+//  color color-logo-green
+//  margin .65em 0
+//  font-weight bold
 // .select-block
-// 	line-height 1.66em
-// 	padding 0
-// 	margin 1em 0
-// 	text-align right
+//  line-height 1.66em
+//  padding 0
+//  margin 1em 0
+//  text-align right
 
-	
-// 	.main-heading, .sub-heading
-// 		@extends .ellipsis
-// 		margin 0
-// 		font-size  1.5em
-// 		width 100%
-		
-// 	.sub-heading
-// 		//cursor pointer
-// 		position relative
-// 		/*
-// 		&:after
-// 			position absolute
-// 			content ''
-// 			right 0
-// 			top .35em
-// 			width 1px
-// 			height 1px
-// 			create-triangle('down', 10px, color-carrot-green)
-// 		*/
+  
+//  .main-heading, .sub-heading
+//    @extends .ellipsis
+//    margin 0
+//    font-size  1.5em
+//    width 100%
+    
+//  .sub-heading
+//    //cursor pointer
+//    position relative
+//    /*
+//    &:after
+//      position absolute
+//      content ''
+//      right 0
+//      top .35em
+//      width 1px
+//      height 1px
+//      create-triangle('down', 10px, color-carrot-green)
+//    */
 
 /*
  * Icons
  */
 .icon
-	display inline-block
-	div,a
-		text-transform lowercase
+  display inline-block
+  div,a
+    text-transform lowercase
 
 /*
  * Default list style
  */
 .list-style {
- 	list-style-position inside
- 	margin 0
- 	padding 0
- 	ul {
-		list-style-type circle
-		list-style-position inside
-		padding-left 1em
-	}
-	ol {
-		list-style-type lower-latin
-		list-style-position inside
-		padding-left 1em
-	}
+  list-style-position inside
+  margin 0
+  padding 0
+  ul {
+    list-style-type circle
+    list-style-position inside
+    padding-left 1em
+  }
+  ol {
+    list-style-type lower-latin
+    list-style-position inside
+    padding-left 1em
+  }
 }
 ul.list-style
-	list-style-type disc
+  list-style-type disc
 ol.list-style
-	list-style-type decimal
+  list-style-type decimal
 .list-continue-3 {
-	counter-reset: 3;
+  counter-reset: 3;
 }
 .list-continue-4 {
-	counter-reset: 4;
+  counter-reset: 4;
 }
 
 /*
  * Generic Button Style
  */
 .btn
-	@extends .display-ib
-	padding 1em
-	margin 1em
-	background-color color-logo-green
-	color white
-	cursor pointer
-	box-shadow 0 1px 2px 0 rgba(0, 0, 0, 0.2)
-	position relative
-	transition all .5s ease
+  @extends .display-ib
+  padding 1em
+  margin 1em
+  background-color color-logo-green
+  color white
+  cursor pointer
+  box-shadow 0 1px 2px 0 rgba(0, 0, 0, 0.2)
+  position relative
+  transition all .5s ease
 
-	// &:hover
-	// 	background color-logo-green
-	// 	color white
-	&:active
-		// box-shadow 1px 1px 1px 0px rgba(0, 0, 0, 0.25)
-		box-shadow none
-		top 1px
-		right -1px
-		// background lighten(color-logo-green, 10%)
-		// color white
+  // &:hover
+  //  background color-logo-green
+  //  color white
+  &:active
+    // box-shadow 1px 1px 1px 0px rgba(0, 0, 0, 0.25)
+    box-shadow none
+    top 1px
+    right -1px
+    // background lighten(color-logo-green, 10%)
+    // color white
 
-	& *
-		@extends .display-ib
-		margin 0
+  & *
+    @extends .display-ib
+    margin 0
 
-	&.sub
-		background color-logo-green
+  &.sub
+    background color-logo-green
 
-	&.clear
-		display block
-		clear both
-		margin 0
+  &.clear
+    display block
+    clear both
+    margin 0
 
-	&.add
-		border 0 none
+  &.add
+    border 0 none
 
 
-	&.on
-		background color-logo-green
-		color white
+  &.on
+    background color-logo-green
+    color white
 
-	&.off 
-		background white
-		color color-logo-green
+  &.off 
+    background white
+    color color-logo-green
 
-	&.warning,
-	&.remove
-		color color-bg-orange
-		font-weight bold // orange needs some visibility help
+  &.warning,
+  &.remove
+    color color-bg-orange
+    font-weight bold // orange needs some visibility help
+    
+  &.loading
+    text-align center
+  
+    .loading-meter
+      height .5em
+      
+  .loading-meter
+    height 0
+    position absolute
+    width 0
+    background color-logo-green
+    bottom 0
+    left 0
+    transition all .5s ease-out
 
 .btn-composite
-	@extends .btn
-	background-color white
-	color color-logo-green
-	border 0 none
-	box-shadow none
-	p
-		color color-logo-green
-		padding-bottom: 0.15em;
+  @extends .btn
+  background-color white
+  color color-logo-green
+  border 0 none
+  box-shadow none
+  p
+    color color-logo-green
+    padding-bottom: 0.15em;
 
 .btn-compact
-	@extends .btn-composite
-	margin 0
-	padding 0
+  @extends .btn-composite
+  margin 0
+  padding 0
 
 .link
-	@extends .display-i
-	color color-logo-green
-	background white
-	border none
+  @extends .display-i
+  color color-logo-green
+  background white
+  border none
 
-	&:hover
-		color color-logo-green
+  &:hover
+    color color-logo-green
 
 .page-content
-	.center
-		width: 100%;
-		clear: both;
-		text-align: center;
-		float: right;
-		margin 0
+  .center
+    width: 100%;
+    clear: both;
+    text-align: center;
+    float: right;
+    margin 0
 
 a.btn, button.btn
-	display inline-block
-	background white
-	color color-logo-green
-	border 3px solid color-logo-green
+  display inline-block
+  background white
+  color color-logo-green
+  border 3px solid color-logo-green
 
-	&.warning,
-	&.remove
-		border-color color-bg-orange
+  &.warning,
+  &.remove
+    border-color color-bg-orange
 
-	i
-		margin: 0 0 0 .5em;
+  i
+    margin: 0 0 0 .5em;
 
 button.btn
-	&:hover
-		text-decoration underline
+  &:hover
+    text-decoration underline
 
 .step
-	padding 3em 0 0
+  padding 3em 0 0
 
 svg
-	path
-		fill : white
+  path
+    fill : white
 
 .ring-graph
-	svg
-		path 
-			stroke #fff
-			stroke-width 2
-			transition-property all
-			transition-duration .75s
-			
-		.on, .good
-			fill : color-bg-green
-		
-		.off, .empty
-			fill : color-bg-light-green
+  svg
+    path 
+      stroke #fff
+      stroke-width 2
+      transition-property all
+      transition-duration .75s
+      
+    .on, .good
+      fill : color-bg-green
+    
+    .off, .empty
+      fill : color-bg-light-green
 
-		.bad 
-			fill : color-bg-orange
+    .bad 
+      fill : color-bg-orange
 
-		.active
-			mask url(#svg-active-mask);
-			//background-image: linear-gradient( 45deg, rgba(black, 0.1)  25%, transparent       25%, transparent       50%, rgba(black, 0.1)  50%, rgba(black, 0.1)  75%, transparent       75%, transparent)
+    .active
+      mask url(#svg-active-mask);
+      //background-image: linear-gradient( 45deg, rgba(black, 0.1)  25%, transparent       25%, transparent       50%, rgba(black, 0.1)  50%, rgba(black, 0.1)  75%, transparent       75%, transparent)
 
-	.spinner
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin-top: -28.5%;
-		margin-left: -26%;
-		width: 51%;
-		// to make it occupy the outer-inner ring diameter:
-		// margin-top: -39%;
-		// margin-left: -36%;
-		// width: 71%;
+  .spinner
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -28.5%;
+    margin-left: -26%;
+    width: 51%;
+    // to make it occupy the outer-inner ring diameter:
+    // margin-top: -39%;
+    // margin-left: -36%;
+    // width: 71%;
 
 
 .sparkline
-	path
-		stroke color-bg-green
-		stroke-width 1;
-		fill none
-		
+  path
+    stroke color-bg-green
+    stroke-width 1;
+    fill none
+    
 
 /*
  * controls
  */
 .control
-	@extends .display-ib
-	width 8em
-	position relative
-	text-align center
-	color color-logo-green
-	font-weight bold
-	margin 0
+  @extends .display-ib
+  width 8em
+  position relative
+  text-align center
+  color color-logo-green
+  font-weight bold
+  margin 0
 
-	&:before
-		position: absolute;
-		padding-top: 3.35em;
-		width: 100%;
-		top: 0;
-		left: 0;
-		font-size: 1.5em;
+  &:before
+    position: absolute;
+    padding-top: 3.35em;
+    width: 100%;
+    top: 0;
+    left: 0;
+    font-size: 1.5em;
 
-	svg
-		top 2em
-		left 0
+  svg
+    top 2em
+    left 0
 
-	.duration-abbrev
-		position absolute
-		top 50%
-		text-align center
-		width 100%
-		color color-logo-green
+  .duration-abbrev
+    position absolute
+    top 50%
+    text-align center
+    width 100%
+    color color-logo-green
 
 
 /*
  * sensors
  */
 #ph,#ec,#tds,#sal,#water
-	background-color color-sensor-water
+  background-color color-sensor-water
 
 #air,#hum,#co2
-	background-color color-sensor-air
+  background-color color-sensor-air
 
 #lux,#ir,#full,#vis
-	background-color color-sensor-light
+  background-color color-sensor-light
 
 .empty
-	background-color color-sensor-empty
+  background-color color-sensor-empty
 
 /*
  * Phase Visualizer
  */
 .phases-graph
-	position relative
-	
-	svg
-		display: inline-block;
-		vertical-align: top;
-		cursor pointer
-	
-	.icon-glyphlogo-new
-		display block
-		position absolute
-		font-size 2em
-		width 1em
-		height 1em
-		top 50%
-		left 50%
-		margin-left -.5em
-		margin-top -.7em
-		color color-logo-green
-		cursor pointer
+  position relative
+  
+  svg
+    display: inline-block;
+    vertical-align: top;
+    cursor pointer
+  
+  .icon-glyphlogo-new
+    display block
+    position absolute
+    font-size 2em
+    width 1em
+    height 1em
+    top 50%
+    left 50%
+    margin-left -.5em
+    margin-top -.7em
+    color color-logo-green
+    cursor pointer
 
 section.footer
-	clear both
-	
-	div
-		width 100%
-		text-align center
-		
-	a 
-		margin 0 1em
-		display inline-block
+  clear both
+  
+  div
+    width 100%
+    text-align center
+    
+  a 
+    margin 0 1em
+    display inline-block
 
-	.content-module
-		background-color color-global-background
+  .content-module
+    background-color color-global-background
 
 
 /*
  * Notifications
  */
 #notifications
-	//
+  //
 .notification.sub-heading
-	//background-color color-sensor-light
+  //background-color color-sensor-light
 
 
 .loader 
-	height 24px
-	width 24px
-	background url(/assets/img/loader.gif) no-repeat 0 0
+  height 24px
+  width 24px
+  background url(/assets/img/loader.gif) no-repeat 0 0
 
 .page-content
-	em
-		display block
+  em
+    display block
 
 
 body
-	// background linear-gradient(top, #9e9e9e, #cdd1d2);
-	//background-color #cfd5d5
-	color white
-	margin 0
+  // background linear-gradient(top, #9e9e9e, #cdd1d2);
+  //background-color #cfd5d5
+  color white
+  margin 0
 
 div, p, span//, a, a:visited, a:hover, a:active
-	color color-text-gray
+  color color-text-gray
 
-section	
-	clear both
+section 
+  clear both
 
 input[type=submit]
-	font-size 1.1em
+  font-size 1.1em
 
 .footer
-	background-color color-bg-gray
-	color white
-	padding 0 2.5%
-	font-size .85em
+  background-color color-bg-gray
+  color white
+  padding 0 2.5%
+  font-size .85em
 
-	a
-		// color white
+  a
+    // color white
 
 ul
-	list-style none
-	margin 0
-	padding 0
+  list-style none
+  margin 0
+  padding 0
 
 .main-heading
-	color white
+  color white
 
 .content-module
-	border none
-	//min-height 300px
-	//height 800px
-	background-color white
-	color color-logo-green
-	
-	h3 div, a, a:visited, a:hover, a:active
-		color color-logo-green
-	
-	.nav-section
-		border-top 1px solid color-logo-green
+  border none
+  //min-height 300px
+  //height 800px
+  background-color white
+  color color-logo-green
+  
+  h3 div, a, a:visited, a:hover, a:active
+    color color-logo-green
+  
+  .nav-section
+    border-top 1px solid color-logo-green
 
 
-	&.inverted-color
-		background-color color-logo-green 
-		
-		div, p, span, a, a:visited, a:hover, a:active
-			color white
+  &.inverted-color
+    background-color color-logo-green 
+    
+    div, p, span, a, a:visited, a:hover, a:active
+      color white
 
-		.nav-section
-			border-top 1px solid white
+    .nav-section
+      border-top 1px solid white
 
-	&#home
-		// background-color: transparent;
-		background-color color-bg-gray2
+  &#home
+    // background-color: transparent;
+    background-color color-bg-gray2
 
 
 .page
-	background-position 35% -13em
-	background-repeat no-repeat
+  background-position 35% -13em
+  background-repeat no-repeat
 
 
 /* Sticky Footer */
 .page-wrapper
-	display -webkit-box
-	-webkit-box-orient vertical
-	display box
-	box-orient vertical
-	display flex
-	min-height 100vh
-	flex-direction column
+  display -webkit-box
+  -webkit-box-orient vertical
+  display box
+  box-orient vertical
+  display flex
+  min-height 100vh
+  flex-direction column
 .main
-	-webkit-box-flex 1
-	box-flex 1
-	flex 1
-	width 100%
+  -webkit-box-flex 1
+  box-flex 1
+  flex 1
+  width 100%
 
 
 
 
 .main > div, header
-	//padding 2em 2.6%
-	margin 0
-	z-index 2
+  //padding 2em 2.6%
+  margin 0
+  z-index 2
 
 .header-fixed
-	display none
+  display none
 
 nav
-	li
-		display block
-		margin 0
-		padding .25em .5em
-		background none
-		// color color-text-gray
-		display none
-		&.first
-			display block
+  li
+    display block
+    margin 0
+    padding .25em .5em
+    background none
+    // color color-text-gray
+    display none
+    &.first
+      display block
 
-		li
-			a, a:visited
-				color color-logo-green
-	&.open
-		height 2.5em
-		z-index 5
-		position relative
+    li
+      a, a:visited
+        color color-logo-green
+  &.open
+    height 2.5em
+    z-index 5
+    position relative
 
-		& > ul
-			position fixed
-			// width 95%
-			// margin 0 2.5%
-			width 100%
-			background white
-			box-shadow 0 0 .5em .25em color-bg-gray
+    & > ul
+      position fixed
+      // width 95%
+      // margin 0 2.5%
+      width 100%
+      background white
+      box-shadow 0 0 .5em .25em color-bg-gray
 
-		li
-			display block
-			background white
+    li
+      display block
+      background white
 
-		.toggle-menu
-			position fixed
+    .toggle-menu
+      position fixed
 
-	.toggle-menu
-		position: absolute;
-		top: 0em;
-		right: 0;
-		height: 2.5em;
-		width: 3em;
-		border: none;
-		outline: none;
-		// background: green;
-		padding: 0;
+  .toggle-menu
+    position: absolute;
+    top: 0em;
+    right: 0;
+    height: 2.5em;
+    width: 3em;
+    border: none;
+    outline: none;
+    // background: green;
+    padding: 0;
 
-		span
-			display none
+    span
+      display none
 
-		i
-			position: absolute;
-			bottom: 0;
-			left: 0;
-			width: 100%;
-			height: 75%;
-			outline: none;
-	// &.open
-	// 	li
-	// 		display block
+    i
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 75%;
+      outline: none;
+  // &.open
+  //  li
+  //    display block
 
 .logo
-	font-size 1.45em
-	margin 0
-	width auto
-	height 1em
-	white-space nowrap
+  font-size 1.45em
+  margin 0
+  width auto
+  height 1em
+  white-space nowrap
 
-	span
-		font-size: .4em;
-		vertical-align: top;
+  span
+    font-size: .4em;
+    vertical-align: top;
 
 .icon-glyphlogo-new
-	display none
+  display none
 
 .page-heading, .page-content
-	width 95%
-	margin 0 auto
+  width 95%
+  margin 0 auto
 .page-heading
-	.icon-glyphlogo-new
-		display none
+  .icon-glyphlogo-new
+    display none
 
 .page-content
-	clear: both;
-	overflow: hidden; 
-	
-	&.center-img
-		text-align center
+  clear: both;
+  overflow: hidden; 
+  
+  &.center-img
+    text-align center
 
-		img
-			@extends .display-ib
+    img
+      @extends .display-ib
 
-	p
-		font-size .85em
-		text-align: left;
-		max-width: 35em;
+  p
+    font-size .85em
+    text-align: left;
+    max-width: 35em;
 
-	p.blurb 
-		position relative
-		border-top 1px solid white
-		padding 2em 0 0 12em
-		line-height 1.5em
-	// .icon-logo
-	// 	display none
-	// 	position absolute
-	// 	top .35em
-	// 	left .5em
-	// 	font-size 6.5em
-	// 	line-height 1em
+  p.blurb 
+    position relative
+    border-top 1px solid white
+    padding 2em 0 0 12em
+    line-height 1.5em
+  // .icon-logo
+  //  display none
+  //  position absolute
+  //  top .35em
+  //  left .5em
+  //  font-size 6.5em
+  //  line-height 1em
 
 // .spinner 
-// 	position absolute !important
-// 	right 0 !important
-// 	top 14px
-// 	margin-right 17px
+//  position absolute !important
+//  right 0 !important
+//  top 14px
+//  margin-right 17px
 
 
 
 .spinner {
-	width 1em
-	-webkit-animation: spin 0.5s infinite linear;
-	-moz-animation: spin 0.5s infinite linear;
-	-o-animation: spin 0.5s infinite linear;
-	-ms-animation: spin 0.5s infinite linear;
-	animation: spin 0.5s infinite linear;
+  width 1em
+  -webkit-animation: spin 0.5s infinite linear;
+  -moz-animation: spin 0.5s infinite linear;
+  -o-animation: spin 0.5s infinite linear;
+  -ms-animation: spin 0.5s infinite linear;
+  animation: spin 0.5s infinite linear;
 }
 @-webkit-keyframes spin {
 0% { -webkit-transform: rotate(0deg);}
@@ -802,51 +817,51 @@ nav
 
 
 img.page-spinner.spinner
-	display block
-	margin 0 auto
-	width 30%
-		
+  display block
+  margin 0 auto
+  width 30%
+    
 
 /*
  * Block style select (gp selection and gardens selection)
  */
 .block-info-set
-	margin 0 0 3em
-	clear both
-	overflow hidden
+  margin 0 0 3em
+  clear both
+  overflow hidden
 
-	li
-		.btn
-			margin: 0;
-			width: 100%;
-			text-align: center;
+  li
+    .btn
+      margin: 0;
+      width: 100%;
+      text-align: center;
 
-	img
-		width 100%
+  img
+    width 100%
 
-	.label
-		margin 0
-		padding .45em 0 0
-		border-top 1px solid color-text-gray
+  .label
+    margin 0
+    padding .45em 0 0
+    border-top 1px solid color-text-gray
 
-	.first .label
-		border 0 none
+  .first .label
+    border 0 none
 
-	.value
-		margin 0 0 1em
+  .value
+    margin 0 0 1em
 
 /*
  *  General Close (x) btn styles
  */
 .close
-	box-shadow none
-	background transparent
+  box-shadow none
+  background transparent
 
 
 
 #IModalOverlay
-	background-color #fff !important
-	opacity .75 !important
+  background-color #fff !important
+  opacity .75 !important
 
 
 /*
