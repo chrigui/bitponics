@@ -45,6 +45,30 @@
   
   .btn {
     margin-left 0
+    
+    &.loading {
+      padding-bottom 1.8em
+      text-align center
+      .loading-meter{
+        height 1em
+        //width 20%
+      }
+    }
+      
+    .loading-meter {
+      height 0
+      position absolute
+      width 0
+      background color-logo-green
+      bottom 0
+      left 0
+      transition all .5s ease-out
+    }
+
+    &.connect {
+      min-width 13em
+    }
+      
   }
 
   .custom-dropdown-wrap {
@@ -66,7 +90,7 @@
     height 5em
   }
 
-  .device-connect-timer
+
   
   
   .selectedNetworkSsid {

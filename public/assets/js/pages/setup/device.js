@@ -60,60 +60,100 @@ function (angular, domReady, feBeUtils) {
       '$http',
       'sharedDataService',
       'ngDialog',
-      function($scope, $location, $http, sharedDataService, ngDialog){
+      '$timeout',
+      '$interval',
+      function($scope, $location, $http, sharedDataService, ngDialog, $timeout, $interval){
         $scope.sharedDataService = sharedDataService;
 
+        $scope.connectText = "Connect to Base Station";
+
+        $scope.getConnectButtonClass = function(){
+          var classes = ["btn connect", "next-step-btn"];
+          if ($scope.connecting){
+            classes.push("loading");
+          }
+          return classes.join(' ');
+        }
 
         $scope.connect = function(){
+          if ($scope.connecting){ return; }
+
+          var connectStartedAt = (new Date()).valueOf(),
+              waitMilliseconds = 60000,
+              interval = waitMilliseconds / 60,
+              completeAt = connectStartedAt + waitMilliseconds,
+              connectTimeout,
+              progressInterval;
           
-          $.ajax({
-            url : $scope.deviceUrl,
-            timeout : 5000,
-            success : function (data) {
-              console.log(data);
-              if (typeof data === 'string'){
-                data = JSON.parse(data);
-              }
+          $scope.connecting = true;
+          $scope.progressPercent = 0;
+          $scope.connectText = "Connecting...         ";
 
-              // Data will be in the following form:
-              /*
-              //  row count, Security Mode, SSID
-              { 
-                “mac”: “00:06:66:72:11:cf”,
-                “networks”:  [ 
-                  “01,01,5HMV5”,
-                  “02,03,55378008”
-                ]
-              }
-              */
-              $scope.dataToPostAfterSuccess.deviceMacAddress = data.mac.replace(/:/g, '');
-              
-              $.each(data.networks, function(index, networkString){
-                var parts = networkString.split(','),
-                  ssid = parts[2],
-                  securityModeKey = parts[1];
+          connectTimeout = $timeout(function(){
+            $interval.cancel(progressInterval);
+
+            $.ajax({
+              url : $scope.deviceUrl,
+              timeout : 5000,
+              success : function (data) {
+                console.log(data);
+                if (typeof data === 'string'){
+                  data = JSON.parse(data);
+                }
+
+                // Data will be in the following form:
+                /*
+                //  row count, Security Mode, SSID
+                { 
+                  “mac”: “00:06:66:72:11:cf”,
+                  “networks”:  [ 
+                    “01,01,5HMV5”,
+                    “02,03,55378008”
+                  ]
+                }
+                */
+                $scope.dataToPostAfterSuccess.deviceMacAddress = data.mac.replace(/:/g, '');
                 
-                $scope.scannedWifiNetworks.push({
-                  ssid : ssid, 
-                  securityMode : $scope.securityModeMap[securityModeKey]
+                $.each(data.networks, function(index, networkString){
+                  var parts = networkString.split(','),
+                    ssid = parts[2],
+                    securityModeKey = parts[1];
+                  
+                  $scope.scannedWifiNetworks.push({
+                    ssid : ssid, 
+                    securityMode : $scope.securityModeMap[securityModeKey]
+                  });
                 });
-              });
 
-              $scope.scannedWifiNetworks.push({ ssid: "Join Other Network...", securityMode: null, isOtherNetwork: true });
+                $scope.scannedWifiNetworks.push({ ssid: "Join Other Network...", securityMode: null, isOtherNetwork: true });
 
-              $scope.scannedWifiNetworks.sort(function(a, b){
-                return ((a.ssid < b.ssid) ? -1 : 1);
-              });
+                $scope.scannedWifiNetworks.sort(function(a, b){
+                  return ((a.ssid < b.ssid) ? -1 : 1);
+                });
 
-              $location.path("/wifi");
-              $scope.$apply();
-            },
-            error : function (data, textStatus) {
-              $scope.$apply(function() {
-                $scope.sharedDataService.activeOverlay = { is: 'ErrorOverlay' };
-              });
-            }
-          }); 
+                $location.path("/wifi");
+                $scope.$apply();
+              },
+              error : function (data, textStatus) {
+                $scope.$apply(function() {
+                  $scope.sharedDataService.activeOverlay = { is: 'ErrorOverlay' };
+                });
+              }
+            });
+          }, waitMilliseconds)
+
+          var advanceProgress = function(){
+            
+            var nowAsMilliseconds = (new Date()).valueOf();
+            $scope.progressPercent = 20 + (1 - (completeAt - nowAsMilliseconds)/waitMilliseconds) * 85;
+            console.log('advanceProgress', $scope.progressPercent);
+          };
+
+          $scope.progressPercent = 20;
+
+          progressInterval = $interval(advanceProgress, interval, waitMilliseconds/interval);
+
+           
         };
       }
     ]

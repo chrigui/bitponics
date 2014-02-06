@@ -39,8 +39,13 @@ block head
           p Once you're connected, click the button below to connect your Base Station.
       
       div(class="step-footer")
-        a(class="btn next-step-btn", id="connect-to-device", href, ng-click="connect()") Connect to Base Station
-        //-div.device-connect-timer
+        a(
+          ng-class="getConnectButtonClass()", 
+          id="connect-to-device", 
+          href,
+          ng-click="connect()"
+          ) {{connectText}}
+          div.loading-meter(style="width:{{progressPercent}}%")
 
   script(type='text/ng-template', id='wifi.html')
 
