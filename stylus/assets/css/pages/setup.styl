@@ -13,13 +13,13 @@
   }
 }
 
-.setup {
+.app-page.setup {
   * {
     color: color-text-gray
   }
 
   .content-module.middle {
-    padding 3.5em 0 0!important
+    //padding 0
   }
   .page-heading-small {
     font-size 1em
@@ -59,27 +59,16 @@
     }
   }
 
-	.led-indicator {
-		  //-webkit-animation-duration: 1s;
-  		//-webkit-animation-name: led-indicator;
-  		//-webkit-animation-iteration-count: infinite;
+  .icon_device_led_red,
+  .icon_device_led_blue,
+  .icon_device_led_green {
+    width 5em
+    height 5em
+  }
 
-  		width:20px;
-  		height:20px;
-  		border-radius: 5px;
-      border: 1px solid #ccc;
-      display: block;
-
-      &.scan {
-        background: red;
-        //-webkit-animation-duration: .5s;
-      }
-
-      &.adhoc {
-        background: blue;
-      }
-  }	
-
+  .device-connect-timer
+  
+  
   .selectedNetworkSsid {
     font-style:italic;
   }

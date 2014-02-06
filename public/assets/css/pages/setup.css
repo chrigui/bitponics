@@ -215,66 +215,57 @@ a {
 a:hover {
   text-decoration: underline;
 }
-.setup * {
+.app-page.setup * {
   color: #999;
 }
-.setup .content-module.middle {
-  padding: 3.5em 0 0 !important;
-}
-.setup .page-heading-small {
+.app-page.setup .page-heading-small {
   font-size: 1em;
   margin: 0.35em 0;
 }
-.setup .unstyled-list {
+.app-page.setup .unstyled-list {
   list-style: none;
   padding-left: 0;
 }
-.setup .list-style > li {
+.app-page.setup .list-style > li {
   font-size: 2.25em;
 }
-.setup .list-style p,
-.setup .list-style label,
-.setup .list-style button {
+.app-page.setup .list-style p,
+.app-page.setup .list-style label,
+.app-page.setup .list-style button {
   font-size: 0.5em;
 }
-.setup .list-style p,
-.setup .list-style label {
+.app-page.setup .list-style p,
+.app-page.setup .list-style label {
   color: #999;
 }
-.setup .btn {
+.app-page.setup .btn {
   margin-left: 0;
 }
-.setup .custom-dropdown-wrap select.custom-dropdown {
+.app-page.setup .custom-dropdown-wrap select.custom-dropdown {
   margin-top: 0;
   width: 100%;
   max-width: 20em;
 }
-.setup .custom-dropdown-wrap select.custom-dropdown:focus {
+.app-page.setup .custom-dropdown-wrap select.custom-dropdown:focus {
   border: 1px solid #fff;
 }
-.setup .led-indicator {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  display: block;
+.app-page.setup .icon_device_led_red,
+.app-page.setup .icon_device_led_blue,
+.app-page.setup .icon_device_led_green {
+  width: 5em;
+  height: 5em;
 }
-.setup .led-indicator.scan {
-  background: #f00;
-}
-.setup .led-indicator.adhoc {
-  background: #00f;
-}
-.setup .selectedNetworkSsid {
+.app-page.setup .device-connect-timer,
+.app-page.setup .selectedNetworkSsid {
   font-style: italic;
 }
-.setup input[readonly] {
+.app-page.setup input[readonly] {
   border: 2px inset;
 }
-.setup input[readonly]:focus {
+.app-page.setup input[readonly]:focus {
   background: #c1c2c4;
 }
-.setup .serial {
+.app-page.setup .serial {
   width: 20em;
 }
 @-moz-keyframes led-indicator {

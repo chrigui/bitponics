@@ -1,3 +1,5 @@
+block vars
+  - pageClassName = 'app-page setup device'
 
 extends ../layout
 
@@ -13,31 +15,32 @@ block head
         | When in setup mode, the Base Station broadcasts a Wifi network named "BitponicsSetup". 
         | By connecting your computer to that network, you're able to send setup information to the device. 
       p We'll walk you through the process below. If at any time you need assistance, please contact us at our 
-        a(href="/help") help page
+        a(class="intercom-trigger", href="/help") help page
         | .
       ol.list-style
         li
-          h4.page-heading-small Prepare your Base Station
+          h4.page-heading-small Prepare
           p 
-            | Make sure the device does not have its power supply plugged in. Plug in all sensors. [TO DO : insert imagery of each sensor]. Finally, plug in the device power supply.
+            | Make sure the device does not have its power supply plugged in. Plug in all sensors: pH, water temperature, light, and EC if you have it. As part of the bootup process, the device verifies that its probes are working, so you need these plugged in before powering on.
         li
-          h4.page-heading-small Power up your Base Station
-          p 
-            | Plug your Base Station into a power outlet. Your Base Station has a status light located here: [TODO: insert diagram]
+          h4.page-heading-small Power up
+          p Plug your your power cord into a power outlet and then into the Base Station (this must be done in this order, or you risk short-circuiting your device). 
+          p Your Base Station has a status light located on the front of the device.
+          p When you first power up your device, this light will be red, indicating that it's booting up. 
+          div.icon_device_led_red
           p
-            | When you first plug in your Base Station, this light will be red, indicating that it's starting up. 
-            span.led-indicator.scan
             | Once the light switches to blue, your device has started broadcasting the "BitponicsSetup" network, and you're ready for the next step. 
-            span.led-indicator.adhoc
+          div.icon_device_led_blue
         li
           h4.page-heading-small Connect to "BitponicsSetup"
-          p Open your computer's WiFi settings. You should see a new network listed called "BitponicsSetup". Connect to it. This may take up to 1 minute. 
+          p Open your computer's WiFi settings. You should see a new network listed called "BitponicsSetup". We've seen this take a couple scans through "Looking for Networks..." to show up, so allow up to 1 minute for it appear in your network list. Connect to it.
         li
-          h4.page-heading-small Link Base Station
-          p Once you're connected, click the button below to link your Base Station.
+          h4.page-heading-small Connect to Base Station
+          p Once you're connected, click the button below to connect your Base Station.
+      
       div(class="step-footer")
-        a(class="btn next-step-btn", id="connect-to-device", href, ng-click="connect()") Connect to Base Station 
-        //- a(id="connect-to-device", href="javascript:void(0)", style="color:blue;") Connect to Base Station
+        a(class="btn next-step-btn", id="connect-to-device", href, ng-click="connect()") Connect to Base Station
+        //-div.device-connect-timer
 
   script(type='text/ng-template', id='wifi.html')
 
@@ -90,11 +93,10 @@ block head
       ol(class="list-style")
         li(id="wifi-data-submitted", value="5")
           h4.page-heading-small Disconnect and Reconnect
-          p Great! The Bitponics device is now connecting to the 
-            span.selectedNetworkSsid {{sharedDataService.selectedWifiNetwork.ssid}} network.
+          p Great! The Bitponics device is now connecting to your Wifi network.
           p Now, disconnect your computer from the BitponicsSetup Wifi network and reconnect it to your home network.
           
-          p After you're back on your old wifi network, close this page and check back on the previous tab.
+          p After you're back on your old Wifi network, close this page and check back on the previous tab.
             | That page will notify you once your device is paired with your account. You can also check the status of all 
             | devices paired with your account at 
             a(target="_self", href="/account/devices") /account/devices

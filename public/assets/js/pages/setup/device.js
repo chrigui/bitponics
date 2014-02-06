@@ -59,8 +59,11 @@ function (angular, domReady, feBeUtils) {
       '$location',
       '$http',
       'sharedDataService',
-      function($scope, $location, $http, sharedDataService){
+      'ngDialog',
+      function($scope, $location, $http, sharedDataService, ngDialog){
         $scope.sharedDataService = sharedDataService;
+
+
         $scope.connect = function(){
           
           $.ajax({

@@ -189,6 +189,7 @@ define(['moment'], function(moment){
     ]
   };
 
+
   /**
    * Sensor reading units
    */
@@ -535,13 +536,11 @@ define(['moment'], function(moment){
   };
 
   utils.convertFromCelsiusToFahrenheit = function(value) {
-    var newValue = value;
-    return newValue;
+    return (((value * 9) / 5) + 32);
   };
   
   utils.convertFromCelsiusToFahrenheit = function(value) {
-    var newValue = value;
-    return newValue;
+    return (((value - 32) * 5) / 9);
   };
   
   utils.convertFromCentimetersToInches = function(value) {

@@ -18,7 +18,7 @@ block content
         h1.page-heading Setting up your Bitponics Base Station
         div(ng-show="key == undefined", class="separator-top")
           h4.page-heading-small Device Serial
-          label(for='wifi-manual-ssid') Enter the serial number from the sticker on your BITPONICS Base Station
+          label(for='wifi-manual-ssid') Enter the serial number from the sticker on the back of your Bitponics device.
           input#serial(autofocus="autofocus", ng-model="serial", name="serial", bpn-directives-uppercase, ui-mask="{{serialMask}}")  
           button(type='submit', class="btn next-step-btn", ng-click="sendSerialToServer()") Send
 
