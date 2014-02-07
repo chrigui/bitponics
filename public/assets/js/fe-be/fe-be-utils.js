@@ -608,5 +608,10 @@ define(['moment'], function(moment){
     return ~maxIndex;
   };
 
+
+  utils.floorToNearestMultiple = function(input, multiple){
+    return Math.floor(input / multiple) * multiple;
+  };
+
   return utils;
 });

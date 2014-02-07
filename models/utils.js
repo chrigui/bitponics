@@ -6,7 +6,8 @@ module.exports = {};
 
 /**
  * Log a sensorLog to the sensorLog collection as well as the
- * device.recentSensorLogs & growPlanInstance.recentSensorLogs. 
+ * device.recentSensorLogs & growPlanInstance.recentSensorLogs.
+ * Increment GardenPreaggregation
  * Verify against IdealRanges and trigger Actions if necessary.
  *
  * @alias module:models/Utils.logSensorLog
@@ -20,11 +21,14 @@ module.exports = {};
  * @param {function(err)} callback 
  */
 module.exports.logSensorLog = function (options, callback){
-  var GrowPlanModel = require('./growPlan').growPlan.model,
+  const GrowPlanModel = require('./growPlan').growPlan.model,
       async = require('async'),
       SensorLogModel = require('./sensorLog').model,
+      GardenPreaggregationModel = require('./gardenPreaggregation').model,
       requirejs = require('../lib/requirejs-wrapper'),
-      feBeUtils = requirejs('fe-be-utils');
+      feBeUtils = requirejs('fe-be-utils'),
+      moment = require('moment'),
+      timestamp;
 
   var pendingSensorLog = options.pendingSensorLog,
       growPlanInstance = options.growPlanInstance,
@@ -45,6 +49,8 @@ module.exports.logSensorLog = function (options, callback){
   if (!pendingSensorLog.ts){
     pendingSensorLog.ts = new Date();
   }
+
+  timestamp = pendingSensorLog.ts;
   
   async.parallel(
     [
@@ -67,6 +73,46 @@ module.exports.logSensorLog = function (options, callback){
     },
     function saveSensorLog(innerCallback){
       pendingSensorLog.save(innerCallback);
+    },
+    function updateGardenPreaggregation(innerCallback){
+      if (!growPlanInstance){ return innerCallback(); }
+      
+      var timestampMoment = moment.utc(timestamp),
+        dateMoment = moment.utc(timestamp).startOf('day'),
+        date = dateMoment.toDate(),
+        hour = timestampMoment.hour(),
+        minute = timestampMoment.minute(),
+        fiveMinutes = feBeUtils.floorToNearestMultiple(minute, 5);
+        
+      var incrementClauses = {};
+      
+      pendingSensorLog.logs.forEach(function(log){
+        incrementClauses["totals.sensors." + log.sCode + ".sum"] = log.val;
+        incrementClauses["totals.sensors." + log.sCode + ".count"] = 1;
+        incrementClauses[hour.toString() + ".totals.sensors." + log.sCode + ".sum"] = log.val;
+        incrementClauses[hour.toString() + ".totals.sensors." + log.sCode + ".count"] = 1;
+        incrementClauses[hour.toString() + "." + fiveMinutes.toString() + ".totals.sensors." + log.sCode + ".sum"] = log.val;
+        incrementClauses[hour.toString() + "." + fiveMinutes.toString() + ".totals.sensors." + log.sCode + ".count"] = 1;
+      });
+
+      if (device){
+        incrementClauses["totals.deviceLogCount"] = 1;
+        incrementClauses[hour.toString() + ".totals.deviceLogCount"] = 1;
+        incrementClauses[hour.toString() + "." + fiveMinutes.toString() + ".totals.deviceLogCount"] = 1;
+      }
+
+      GardenPreaggregationModel.update(
+        { g: growPlanInstance._id, date : date }, 
+        {
+          $set : {
+            g: growPlanInstance._id, 
+            date : date
+          },
+          $inc: incrementClauses
+        }, 
+        { upsert: true },
+        innerCallback
+      );
     },
     function checkIdealRanges(innerCallback){
       if (!growPlanInstance) { return innerCallback();}
@@ -161,8 +207,9 @@ module.exports.logSensorLog = function (options, callback){
       });
     }
     ], 
-    function parallelFinal(err, result){
-      return callback(err);
+    function parallelFinal(err, results){
+      console.log("RESULTS[3]", results[3])
+      return callback(err, results);
     }
   );
 };
