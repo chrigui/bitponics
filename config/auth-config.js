@@ -1,7 +1,8 @@
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     HmacStrategy = require('../lib/passport-hmac').Strategy,
-    User = require('../models/user').model,    
+    FacebookStrategy = require('passport-facebook').Strategy,
+    User = require('../models/user').model,
     oauthConfigs = {
         fb: {
           appId: '260907493994161',
@@ -58,6 +59,17 @@ passport.deserializeUser(function(id, done) {
 });
 
 module.exports = function(app){
-        
+   /*
+   * Passport Facebook Strategy
+   */
+  passport.use(new FacebookStrategy({
+      clientID: oauthConfigs.fb.appId,
+      clientSecret: oauthConfigs.fb.appSecret,
+      callbackURL: app.config.appUrl + '/auth/facebook/callback'
+    },
+    function(accessToken, refreshToken, profile, done) {
+      User.findOrCreate(accessToken, refreshToken, profile, done);
+    }
+  ));     
 };
 

@@ -44,6 +44,7 @@ mixin requirejs(dataMain)
   - var lvlServicesUUID = CDN('/assets/js/libs/angular/lvl-uuid.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var lvlDirectivesFileUpload = CDN('/assets/js/libs/angular/lvl-file-upload.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var moment = CDN('/assets/js/libs/moment.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
+  - var ngFacebook = CDN('/assets/js/libs/ngFacebook.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var overlay = CDN('/assets/js/shared/overlay.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var scrollto = CDN('/assets/js/libs/jquery/jquery.scrollTo.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
   - var select2 = CDN('/assets/js/libs/jquery/select2.min.js', { 'raw' : true }).replace(/\.js\r*\n*$/, '').trim();
@@ -64,8 +65,8 @@ mixin requirejs(dataMain)
   script
     require.config({
       paths: {
-        'angular': '#{angular}',
-        // 'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular',
+        // 'angular': '#{angular}',
+        'angular': '//ajax.googleapis.com/ajax/libs/angularjs/1.2.9/angular',
         'angular-flexslider' : '#{angularFlexslider}',
         'angular-mask' : '#{angularMask}',
         'angularAnimate' : '#{angularAnimate}',
@@ -96,6 +97,7 @@ mixin requirejs(dataMain)
         'd3' : '#{d3v3}',
         'domReady': '#{domReady}',
         'es5shim': '#{es5shim}',
+        // 'facebook' : '//connect.facebook.net/en_US/all',
         'fileSaver' : '#{fileSaver}',
         'fe-be-utils': '#{feBeUtils}',
         'flexslider': '#{flexslider}',
@@ -105,6 +107,7 @@ mixin requirejs(dataMain)
         'lvl.services.uuid': '#{lvlServicesUUID}',
         'lvl.directives.fileUpload': '#{lvlDirectivesFileUpload}',
         'moment': '#{moment}',
+        'ngFacebook' : '#{ngFacebook}',
         'overlay': '#{overlay}',
         'scrollto': '#{scrollto}',
         'select2' : '#{select2}',
@@ -147,11 +150,17 @@ mixin requirejs(dataMain)
         'angularUIBootstrap': { 
           deps: [ 'angular' ] 
         },
+        // 'facebook' : {
+        //   exports: 'FB'
+        // },
         'fileSaver' : {
           exports : 'saveAs'
         },
         'jquery': { 
           exports : '$'
+        },
+        'ngFacebook': { 
+          deps : ['angular']
         },
         'select2': {
           deps : ['jquery']

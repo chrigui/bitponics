@@ -16,13 +16,15 @@ var mongoose = require('mongoose'),
 	winston = require('winston'),
 	timezone = require('../lib/timezone-wrapper'),	
 	EmailConfig = require('../config/email-config'),
-  mongooseConnection = require('../config/mongoose-connection').defaultConnection,
-  async = require('async'),
-  requirejs = require('../lib/requirejs-wrapper'),
-  feBeUtils = requirejs('fe-be-utils'),
-  ejs = require('../config/ejs-config'),
-  fs = require('fs'),
-  path = require('path'),
+	mongooseConnection = require('../config/mongoose-connection').defaultConnection,
+	async = require('async'),
+	requirejs = require('../lib/requirejs-wrapper'),
+	feBeUtils = requirejs('fe-be-utils'),
+	ejs = require('../config/ejs-config'),
+	fs = require('fs'),
+	path = require('path'),
+	passport = require('passport'),
+  	FacebookStrategy = require('passport-facebook').Strategy,
   
   // emailVariables is passed in by a function call later in the startup process
   emailVariables = {
@@ -143,9 +145,9 @@ UserSchema = new Schema({
     countryCode : { type: String, default: 'US' }
   },
   
-  salt: { type: String, required: true },
+  salt: { type: String },
   
-  hash: { type: String, required: true },
+  hash: { type: String },
   
   locale: { 
   	lang: { type: String, default : 'en' },
@@ -271,6 +273,7 @@ UserSchema.static('authenticate', function(email, password, done) {
   this.findOne({ email: email.toLowerCase() }, function(err, user) {
       if (err) { return done(err); }
       if (!user) { return done(new Error('No user found with that email'), false); }
+      if (user && !user.hash) { return done(new Error('Incorrect password. Did you sign up through a 3rd party?'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return done(err); }
         if (!passwordCorrect) { return done(new Error('Incorrect password'), false); }
@@ -302,6 +305,45 @@ UserSchema.static('getByPublicApiKey', function(key, done) {
 
       return done(null, user, user.apiKey);
   });
+});
+
+UserSchema.static('findOrCreate', function(accessToken, refreshToken, profile, done) {
+	console.log("PROFILE::");
+	console.log(profile);
+	var email = profile.email || profile.emails ? profile.emails[0].value : '',
+		// newUser = new User({
+		newUser = {
+			email: email,
+			name: {
+				first: profile.name.givenName,
+				last: profile.name.familyName
+			}
+		};
+		// });
+	if (email) {
+		User.findOneAndUpdate(
+			{ 
+				email: email 
+			},
+			// newUser.toJSON(), 
+			newUser, 
+			{ 
+				upsert: true 
+			}, 
+			function(err, user) {
+				if (err) { 
+					console.log('ERR::');
+					console.log(err);
+					return done(err); 
+				}
+				console.log('save user')
+				user.save();
+				return done(null, user);
+			}
+		);
+	} else {
+		return done(new Error("No email associated with account."))
+	}
 });
 /************************** END STATIC METHODS  ***************************/
 
