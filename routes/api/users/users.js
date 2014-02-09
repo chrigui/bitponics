@@ -84,33 +84,47 @@ module.exports = function(app) {
     }
   );
 
-  /*
-   * Update a user
-   *
-   * To test:
-   * jQuery.ajax({
-   *     url: "/api/users/${id}",
-   *     type: "PUT",
-   *     data: {
-   *       "actionBelowMin": "actionid"
-   *     },
-   *     success: function (data, textStatus, jqXHR) {
-   *         console.log("Post response:");
-   *         console.dir(data);
-   *         console.log(textStatus);
-   *         console.dir(jqXHR);
-   *     }
-   * });
-   */
-  app.put('/api/users/:id', 
+
+  app.post('/api/users/:id', 
     routeUtils.middleware.ensureSecure, 
-    routeUtils.middleware.ensureUserIsAdmin, 
+    routeUtils.middleware.ensureLoggedIn, 
     function (req, res, next){
       return UserModel.findById(req.params.id, function (err, user) {
         if (err) { return next(err); }
-        user.actionBelowMin = req.body.actionBelowMin;
+
+        var keys = Object.keys(req.body);
+
+        if (!routeUtils.checkResourceModifyAccess(user, req.user)){
+          return res.send(401, "Only resource owner may modify a resource.");
+        }
+
+// {
+//   _id: '52ef08691101fd5c8128241c',
+//   name: { last: 'Bishop', first: 'Jack' },
+//   email: 'john.bishop@marist.edu',
+//   locale: { lang: 'en', territory: 'US' },
+//   timezone: 'America/New_York',
+//   active: true,
+//   notificationPreferences: { email: true, sms: false },
+//   deviceKeys: [],
+//   apiKey: { public: 'fd4ae0988ac3db51' },
+//   socialPreferences: { 
+//     facebook: { permissions: [Object], accessToken: 'CAADtS0JZCrrEBANO8Ez0hhBQkZBLdOfWxv45ZBzK6kZCCZCzXBWotgK1eS3MDAGfu63b4wOfoseZAfsDtfAqlMVP16d7Q8D8ZA7a62WmrBZAlOAVupFAvrhHWt2zZC3R7lUbHhZAmJVGWfQoLv3fIj1AOzNDOAeyJa06F4Wx81NFbumBFeEf45c3FQZAMUaZBP5hmqkztTiQlumgqgZDZD' },
+//     twitter: { permissions: {} },
+//     google: { permissions: {} } 
+//   } 
+// }
+        keys.forEach(function(key){
+          if (typeof req.body[key] !== 'undefined') {
+            user[key] = req.body[key];
+          }
+        });
+
+        console.log(user.socialPreferences);
         return user.save(function (err) {
+          console.log(err);
           if (err) { return next(err); }
+          console.log(user.socialPreferences);
           return res.send(user);
         });
       });
@@ -162,10 +176,16 @@ module.exports = function(app) {
   // authentication has failed.
   app.get('/auth/facebook/callback',
     passport.authenticate('facebook', {
-      scope: ['read_stream', 'publish_actions'],
-      successRedirect: '/gardens',
+      // scope: ['read_stream', 'publish_actions'],
+      // successRedirect: '/gardens',
       failureRedirect: '/login'
-    })
+    }),
+    function(req, res) {
+      console.dir('req.query');
+      console.dir(req.query);
+      // console.dir(res);
+      res.redirect(req.query.redirect)
+    }
   );
   
 };

@@ -1,6 +1,7 @@
 require([
   'angular',
   'domReady',
+  'view-models',
   'fe-be-utils',
   'angularResource',
   'es5shim',
@@ -8,13 +9,15 @@ require([
   'angularUIBootstrap',
   'bpn',
   // 'facebook',
-  'ngFacebook'
+  'ngFacebook',
+  'bpn.services.user'
 ],
-function (angular, domReady, feBeUtils) {
+function (angular, domReady, viewModels, feBeUtils) {
   'use strict';
 
   var profileApp = angular.module('bpn.apps.account.profile', ['bpn', 'ngResource', 'ui', 'ui.bootstrap', 'facebook']);
- 
+
+
   profileApp.config(['$facebookProvider', function($facebookProvider) {
       $facebookProvider.init({
           appId: '260907493994161'
@@ -23,8 +26,9 @@ function (angular, domReady, feBeUtils) {
 
   profileApp.factory('sharedDataService', 
     [
-      function(){
-        return {
+      'UserModel',
+      function(UserModel){
+        var sharedData = {
           activeOverlay : { is: undefined },
           modalOptions : {
             backdrop: true,
@@ -33,6 +37,10 @@ function (angular, domReady, feBeUtils) {
             dialogClass : 'overlay auto-size'
           }
         };
+
+        sharedData.user = viewModels.initUserViewModel(new UserModel(bpn.user));
+
+        return sharedData;
       }
     ]
   );
@@ -43,18 +51,19 @@ function (angular, domReady, feBeUtils) {
       '$filter',
       'sharedDataService',
       '$facebook',
-      function ($scope, $filter, sharedDataService, $facebook) {
+      'UserModel',
+      function ($scope, $filter, sharedDataService, $facebook, UserModel) {
 
-        $facebook.getLoginStatus().then(
-            function(response) {
-                console.info('getLoginStatus()')
-                console.info(response);
-            },
-            function(response) {
-                console.info('getLoginStatus()#2')
-                console.info(response);
-            }
-        );
+        // $facebook.getLoginStatus().then(
+        //     function(response) {
+        //         console.info('getLoginStatus()')
+        //         console.info(response);
+        //     },
+        //     function(response) {
+        //         console.info('getLoginStatus()#2')
+        //         console.info(response);
+        //     }
+        // );
 
         // $scope.$on('facebook.auth.authResponseChange', function(response) {
         //     console.info('facebook.auth.authResponseChange');
@@ -70,41 +79,63 @@ function (angular, domReady, feBeUtils) {
       'sharedDataService',
       '$facebook',
       function ($scope, sharedDataService, $facebook) {
-        $scope.enabled = false;
+        $scope.sharedDataService = sharedDataService;
+        $scope.user = $scope.sharedDataService.user;
+        $scope.enabled = typeof $scope.user.socialPreferences !== 'undefined' && 
+                          $scope.user.socialPreferences.facebook && 
+                          $scope.user.socialPreferences.facebook.permissions &&
+                          $scope.user.socialPreferences.facebook.permissions.publish;
+
 
         $scope.enablePublishingToFacebook = function(checkbox) {
-          //TODO: start using User service model to update permissions
-          if (checkbox.enabled) {
-            $facebook.login({ scope: 'publish_actions' }).then(
+          $scope.setPublishPermission(checkbox.enabled);
+        };
 
+        $scope.setPublishPermission = function(enable) {
+          var method,
+              setAndSave = function(user, enable, accessToken) {
+                $scope.enabled = user.socialPreferences.facebook.permissions.publish = enable;
+                user.socialPreferences.facebook.accessToken = accessToken;
+                user.$save();
+              };
+
+          if (enable) {
+            method = 'POST';
+            $facebook.login({ scope: 'publish_actions' }).then(
               function(response) {
-                debugger;
                 if (response.authResponse) {
-                  // $scope.enabled = true;
-                  // console.info('Welcome!  Fetching your information.... ');
-                  // $facebook.api('/me').then(
-                  //   function(response) {
-                  //     console.info('Good to see you, ' + response.name + '.');
-                  //   },
-                  //   function(response) {
-                  //     console.info('Bad to see you, ' + response.name + '.');
-                  //   }
-                  // );
+                  // $facebook.api('/me/permissions', method).then(
+                  console.info(response);
+                  setAndSave($scope.user, true, response.authResponse.accessToken);
                 } else {
                   console.info('User cancelled login or did not fully authorize.');
-                  $scope.enabled = false;
+                  setAndSave($scope.user, false);
                 }
               },
               function(response) {
-                console.info('error fb');
-                console.info(response);
-                $scope.enabled = false;
+                console.info('Login error so do not assume we have permission.');
+                setAndSave($scope.user, false);
+              }
+            );
+          } else {
+            method = 'DELETE';
+            $facebook.login().then(
+              function(response) {
+                $facebook.api('/me/permissions/publish_actions', method).then(
+                  function(response) {
+                    console.info('DELETE /me/permissions/publish_actions');
+                    console.info(response);
+                    setAndSave($scope.user, false);
+                  },
+                  function(response) {
+                    console.info('Bad to see you, ' + response.name + '.');
+                    setAndSave($scope.user, false);
+                  }
+                );
               }
             );
           }
         }
-
-        $scope.enablePublishingToFacebook();
 
       }
     ]

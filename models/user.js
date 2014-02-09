@@ -189,6 +189,15 @@ UserSchema = new Schema({
   	 * Private API key is a 32-char random hex string
   	 */
   	private: String
+  },
+
+  socialPreferences: {
+  	facebook: {
+  		accessToken: { type: String },
+  		permissions: {
+  			publish: { type: Boolean }
+  		}
+  	}
   }
 },
 { id : false, toObject : { virtuals: true }, toJSON : { virtuals : true } });
@@ -273,7 +282,7 @@ UserSchema.static('authenticate', function(email, password, done) {
   this.findOne({ email: email.toLowerCase() }, function(err, user) {
       if (err) { return done(err); }
       if (!user) { return done(new Error('No user found with that email'), false); }
-      if (user && !user.hash) { return done(new Error('Incorrect password. Did you sign up through a 3rd party?'), false); }
+      if (user && !user.hash) { return done(new Error('Incorrect password. Did you sign up through a social account?'), false); }
       user.verifyPassword(password, function(err, passwordCorrect) {
         if (err) { return done(err); }
         if (!passwordCorrect) { return done(new Error('Incorrect password'), false); }
@@ -366,6 +375,7 @@ UserSchema.method('toPublicJSON', function() {
   	timezone: this.timezone,
   	active : this.active,
   	notificationPreferences: this.notificationPreferences,
+  	socialPreferences: this.socialPreferences,
   	deviceKeys : this.deviceKeys.map(
   		function(el){ 
   			return { device : el.device, 'public' : el.public};

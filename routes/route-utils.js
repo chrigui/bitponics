@@ -177,7 +177,7 @@ module.exports = {
   /**
    * Check whether a user is allowed to modify a certain piece of data
    * 
-   * Assumes resource has "owner" and "users" properties
+   * Assumes resource has "owner" and "users" properties or that user is modifying self
    * Assumes resource.owner and resource.users[] contain ObjectIds, not populated User documents
    *
    * @param {Object} resource
@@ -192,7 +192,8 @@ module.exports = {
     return (  user.admin ||
               (resource.owner ? resource.owner.equals(userId) : false) ||
               (resource.createdBy ? resource.createdBy.equals(userId) : false) ||
-              (resource.users ? resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) : false) 
+              (resource.users ? resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) : false) ||
+              (resource._id.equals(userId))
         );
   },
 
