@@ -1,4 +1,4 @@
-define(['angular', 'moment', 'fe-be-utils'], function(moment, utils){
+define(['angular', 'moment', 'fe-be-utils'], function(angular, moment, utils){
   var viewModels = {};
 
 

@@ -31,22 +31,24 @@ require([
   'flexslider',
   'angular-flexslider',
   'throttle-debounce',
-  'lvl.directives.fileUpload'
+  'lvl.directives.fileUpload',
+  'ngFacebook',
+  'bpn.services.user'
 ],
   function (angular, domReady, moment, feBeUtils, viewModels, d3) {
     'use strict';
 
-
-    var dashboardApp = angular.module('bpn.apps.dashboard', ['bpn', 'ui', 'ui.bootstrap', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload']);
+    var dashboardApp = angular.module('bpn.apps.dashboard', ['bpn', 'ui', 'ui.bootstrap', 'angular-flexslider', 'ngRoute', 'lvl.directives.fileupload', 'facebook']);
 
     dashboardApp.factory('sharedDataService', 
       [
         'GardenModel',
         'PhotosModel',
+        'UserModel',
         'bpn.services.socket',
         '$http',
         '$q',
-        function(GardenModel, PhotosModel, socket, $http, $q){
+        function(GardenModel, PhotosModel, UserModel, socket, $http, $q){
           
           /**
            * All the properties this service will expose
@@ -74,6 +76,7 @@ require([
             units : feBeUtils.UNITS,
             gardenModel : new GardenModel(bpn.pageData.growPlanInstance),
             photosModel : PhotosModel,
+            user : new UserModel(bpn.user),
             userCanModify : bpn.pageData.userCanModify
           };
 
@@ -345,6 +348,18 @@ require([
         }
       ]
     );
+    
+
+    dashboardApp.config(
+      [
+        '$facebookProvider',
+        function($facebookProvider) {
+          $facebookProvider.init({
+            appId: '260907493994161'
+          });
+        }
+      ]
+    );
 
 
     dashboardApp.factory('sensorLogsService', function(){
@@ -544,15 +559,18 @@ require([
     dashboardApp.controller('bpn.controllers.dashboard.Photos',
       [
         '$scope',
+        '$window',
         'sharedDataService',
         '$anchorScroll',
         'bpn.services.analytics',
-        function($scope, sharedDataService, $anchorScroll, analytics){
+        '$facebook',
+        function($scope, $window, sharedDataService, $anchorScroll, analytics, $facebook){
           $scope.sharedDataService = sharedDataService;
+          $scope.user = $scope.sharedDataService.user;
           $scope.modalOptions = {
             dialogClass : 'overlay photo'
           };
-
+          
           $scope.open = function(photoId, index){
             // $scope.sharedDataService.activeOverlay = 'PhotosOverlay-' + photoId;
             //$scope.startAt = $scope.sharedDataService.photos.length - index;
@@ -584,6 +602,67 @@ require([
               sharedDataService.photos.push(photo);
             });
             analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "upload photo" });
+
+            if ($scope.user.socialPreferences.facebook.permissions.publish) {
+              $facebook.login({ scope: 'publish_actions' }).then(
+                function(response) {
+                  debugger;
+                  if (response.authResponse) {
+                    $facebook.api(
+                      '/me/photos', 
+                      'POST',
+                      { 
+                        'url': $window.location.origin + completedPhotos[0].url 
+                        // 'url': 'https://www.bitponics.com/photos/52fa2d3cc926f50200000271',
+                        'message': 
+                          'My ' + sharedDataService.gardenModel.name + ', ' + 
+                          sharedDataService.activeDate.growPlanPhase.name + ' Phase, ' +
+                          'Day ' + sharedDataService.activeDate.dayOfPhase
+                      }
+                    ).then(
+                      function(response) {
+                        if (response && !response.error) {
+                          console.info('success');
+                          console.info(response);
+                        } else {
+                          console.info('fail');
+                          console.info(response);
+                        }
+                      },
+                      function(response) {
+                        console.info('no success?');
+                        console.info(response);
+                      }
+                    );
+
+                  } else {
+                    console.info('User cancelled login or did not fully authorize.');
+                  }
+                },
+                function(response) {
+                  console.info('Login error so do not assume we have permission.');
+                }
+              );
+
+              // FB.ui({
+              //   method: 'feed',
+              //   name: 'Bitponics',
+              //   caption: 'Check out my garden on bitponics.com',
+              //   description: (
+              //     'This is the description.'
+              //   ),
+              //   link: $window.location,
+              //   picture: completedPhotos[0].url
+              // },
+              // function(response) {
+              //     if (response && response.post_id) {
+              //       alert('Post was published.');
+              //     } else {
+              //       alert('Post was not published.');
+              //     }
+              // });
+            }
+
           };
      
           $scope.getData = function(files) { 

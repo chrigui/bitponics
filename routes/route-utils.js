@@ -189,12 +189,12 @@ module.exports = {
     // else, return false
     if (!user._id){ return false; }
     var userId = user._id;
+    if (resource._id && resource._id.toString() === userId.toString()) { return true; }
     return (  user.admin ||
-              (resource.owner ? resource.owner.equals(userId) : false) ||
-              (resource.createdBy ? resource.createdBy.equals(userId) : false) ||
-              (resource.users ? resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) : false) ||
-              (resource._id.equals(userId))
-        );
+          (resource.owner ? resource.owner.equals(userId) : false) ||
+          (resource.createdBy ? resource.createdBy.equals(userId) : false) ||
+          (resource.users ? resource.users.some(function(resourceUser){ return resourceUser.equals(userId);}) : false)
+    );
   },
 
   /**

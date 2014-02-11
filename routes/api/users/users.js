@@ -97,34 +97,15 @@ module.exports = function(app) {
         if (!routeUtils.checkResourceModifyAccess(user, req.user)){
           return res.send(401, "Only resource owner may modify a resource.");
         }
-
-// {
-//   _id: '52ef08691101fd5c8128241c',
-//   name: { last: 'Bishop', first: 'Jack' },
-//   email: 'john.bishop@marist.edu',
-//   locale: { lang: 'en', territory: 'US' },
-//   timezone: 'America/New_York',
-//   active: true,
-//   notificationPreferences: { email: true, sms: false },
-//   deviceKeys: [],
-//   apiKey: { public: 'fd4ae0988ac3db51' },
-//   socialPreferences: { 
-//     facebook: { permissions: [Object], accessToken: 'CAADtS0JZCrrEBANO8Ez0hhBQkZBLdOfWxv45ZBzK6kZCCZCzXBWotgK1eS3MDAGfu63b4wOfoseZAfsDtfAqlMVP16d7Q8D8ZA7a62WmrBZAlOAVupFAvrhHWt2zZC3R7lUbHhZAmJVGWfQoLv3fIj1AOzNDOAeyJa06F4Wx81NFbumBFeEf45c3FQZAMUaZBP5hmqkztTiQlumgqgZDZD' },
-//     twitter: { permissions: {} },
-//     google: { permissions: {} } 
-//   } 
-// }
+        
         keys.forEach(function(key){
           if (typeof req.body[key] !== 'undefined') {
             user[key] = req.body[key];
           }
         });
 
-        console.log(user.socialPreferences);
         return user.save(function (err) {
-          console.log(err);
           if (err) { return next(err); }
-          console.log(user.socialPreferences);
           return res.send(user);
         });
       });
