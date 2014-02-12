@@ -7,7 +7,8 @@ var UserModel = require('../../../models/user').model,
     routeUtils = require('../../route-utils'),
     requirejs = require('../../../lib/requirejs-wrapper'),
     feBeUtils = requirejs('fe-be-utils'),
-    apiUtils = require('../utils');
+    apiUtils = require('../utils'),
+    passport = require('passport');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -83,31 +84,26 @@ module.exports = function(app) {
     }
   );
 
-  /*
-   * Update a user
-   *
-   * To test:
-   * jQuery.ajax({
-   *     url: "/api/users/${id}",
-   *     type: "PUT",
-   *     data: {
-   *       "actionBelowMin": "actionid"
-   *     },
-   *     success: function (data, textStatus, jqXHR) {
-   *         console.log("Post response:");
-   *         console.dir(data);
-   *         console.log(textStatus);
-   *         console.dir(jqXHR);
-   *     }
-   * });
-   */
-  app.put('/api/users/:id', 
+
+  app.post('/api/users/:id', 
     routeUtils.middleware.ensureSecure, 
-    routeUtils.middleware.ensureUserIsAdmin, 
+    routeUtils.middleware.ensureLoggedIn, 
     function (req, res, next){
       return UserModel.findById(req.params.id, function (err, user) {
         if (err) { return next(err); }
-        user.actionBelowMin = req.body.actionBelowMin;
+
+        var keys = Object.keys(req.body);
+
+        if (!routeUtils.checkResourceModifyAccess(user, req.user)){
+          return res.send(401, "Only resource owner may modify a resource.");
+        }
+        
+        keys.forEach(function(key){
+          if (typeof req.body[key] !== 'undefined') {
+            user[key] = req.body[key];
+          }
+        });
+
         return user.save(function (err) {
           if (err) { return next(err); }
           return res.send(user);
@@ -144,4 +140,31 @@ module.exports = function(app) {
       });
     }
   );
+
+
+  /*
+   * Facebook login Passportjs Strategy
+   *
+   */
+  // Redirect the user to Facebook for authentication.  When complete,
+  // Facebook will redirect the user back to the application at
+  //     /auth/facebook/callback
+  app.get('/auth/facebook', passport.authenticate('facebook'));
+
+  // Facebook will redirect the user to this URL after approval.  Finish the
+  // authentication process by attempting to obtain an access token.  If
+  // access was granted, the user will be logged in.  Otherwise,
+  // authentication has failed.
+  app.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+      // scope: ['read_stream', 'publish_actions'],
+      // successRedirect: '/gardens',
+      failureRedirect: '/login'
+    }),
+    function(req, res) {
+      // res.redirect(req.query.redirect)
+      res.redirect('/gardens');
+    }
+  );
+  
 };

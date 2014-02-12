@@ -1,5 +1,5 @@
 block vars
-  - pageClassName = 'app-page single-page profile'
+  - pageClassName = 'app-page profile'
 
 extends ../layout
 
@@ -18,7 +18,7 @@ block content
   section#main(role="main", class="main", ng-controller="bpn.controllers.account.profile.Main")
     div#profile.content-module.middle
       h1.page-heading Account Profile
-      form(id="profile-form", method="POST", action="/account/profile")
+      form(id="profile-form", method="POST", action="/account/profile", class="separator-top")
         input(type="hidden", name="_method", value="PUT")
         label(for="email") Email
         input(id="email", name="email", type="email", value="#{user.email}")
@@ -32,8 +32,10 @@ block content
         label(for="locale_timezone", class="display-ib") Timezone
         //not working
         //button(id="detect", class="display-i") Detect
-        include ../misc/timezone_select_html
-        include ../misc/timezone_country_select_html
+        div(class="custom-dropdown-wrap")
+          include ../misc/timezone_select_html
+        div(class="custom-dropdown-wrap")
+          include ../misc/timezone_country_select_html
 
         div.overflow
           | <img id="timezone-image" src="/assets/img/timezone_map_gray-400.png" width="400" height="200" usemap="#timezone-map" />
@@ -47,7 +49,7 @@ block content
         //- input(id="addressline1", name="addressline1", type="number")
         //- input(id="addressline2", name="addressline2", type="number")
         
-        label Garden Notifications
+        h3.page-heading-small Garden Notifications
         
         label.notification-email
           input.unstyled(
@@ -56,6 +58,18 @@ block content
             type="checkbox", 
             checked=user.notificationPreferences.email)
           | Email
+
+        h3.page-heading-small Social Options
+
+        label(for="facebook", ng-controller="bpn.controllers.account.profile.PostToFacebook") 
+          input.unstyled(
+              id="facebook", 
+              name="facebook", 
+              type="checkbox", 
+              ng-model="enabled",
+              ng-change="enablePublishingToFacebook(this)")
+          | Publish garden images to Facebook
+
         
         //- input(class="display-i", id="notifications_sms", name="notifications_sms", 
         //-   type="checkbox", checked=user.notificationPreferences.sms)

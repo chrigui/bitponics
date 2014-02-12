@@ -28,6 +28,16 @@ define([
                   return json;
                 }
               },
+              save : {
+                method: 'POST',
+                transformRequest: function(data, headersGetter){
+                  return angular.toJson(data);
+                }
+                // ,
+                // transformResponse : function(data, headersGetter){
+                //   return viewModels.initUserViewModel(JSON.parse(data));
+                // }
+              }
             }
 					);
 				}

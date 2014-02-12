@@ -40,6 +40,7 @@
     "passport": ">= 0.1.1",
     "passport.socketio" : "2.2.1",
     "passport-local": ">= 0.1.6",
+    "passport-facebook": "latest",
     "socket.io": "0.9.16",
     "redis" : "0.10.0",
     "requirejs": ">=2.1.2",

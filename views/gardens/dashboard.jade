@@ -237,6 +237,7 @@ block content
                     li
                       h3(class="page-heading page-heading-small") {{photo.date | photoDate }}
                       img(ng-src="{{photo.url}}")
+                      div(class="fb-share-button", data-href="{{$window.location.protocol + '//' + $window.location.host + photo.url}}", data-type="button")
 
                         
     

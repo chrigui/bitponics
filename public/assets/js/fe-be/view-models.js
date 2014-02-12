@@ -1,4 +1,4 @@
-define(['moment', 'fe-be-utils'], function(moment, utils){
+define(['angular', 'moment', 'fe-be-utils'], function(angular, moment, utils){
   var viewModels = {};
 
 
@@ -876,6 +876,39 @@ define(['moment', 'fe-be-utils'], function(moment, utils){
     notification.sortDateValue = sortDate ? sortDate.valueOf() : 0;
 
     return notification;
+  };
+
+  /**
+   * Adds/calculates properties necessary for UI presentation
+   * Makes changes in-place on provided object
+   *
+   * Adds the following properties if not present:
+   * - user.socialPreferences {} - Describes any social network accounts and permissions
+   *
+   * @param {UserServerModel} user
+   *
+   * @returns {UserViewModel} - The modified User object.
+   */
+  viewModels.initUserViewModel = function(user){
+    user.socialPreferences = angular.extend(
+      {
+        facebook: {
+          permissions: {},
+          accessToken: undefined
+        },
+        twitter: {
+          permissions: {},
+          accessToken: undefined
+        },
+        google: {
+          permissions: {},
+          accessToken: undefined
+        }
+      },
+      user.socialPreferences
+    );
+
+    return user;
   };
 
 
