@@ -600,69 +600,9 @@ require([
             completedPhotos.forEach(function(photo){
               viewModels.initPhotoViewModel(photo);
               sharedDataService.photos.push(photo);
+              $scope.sharePhoto(photo);
             });
             analytics.track("garden interaction", { "garden id" : $scope.sharedDataService.gardenModel._id, action : "upload photo" });
-
-            if ($scope.user.socialPreferences.facebook.permissions.publish) {
-              $facebook.login({ scope: 'publish_actions' }).then(
-                function(response) {
-                  debugger;
-                  if (response.authResponse) {
-                    $facebook.api(
-                      '/me/photos', 
-                      'POST',
-                      { 
-                        'url': $window.location.origin + completedPhotos[0].url 
-                        // 'url': 'https://www.bitponics.com/photos/52fa2d3cc926f50200000271',
-                        'message': 
-                          'My ' + sharedDataService.gardenModel.name + ', ' + 
-                          sharedDataService.activeDate.growPlanPhase.name + ' Phase, ' +
-                          'Day ' + sharedDataService.activeDate.dayOfPhase
-                      }
-                    ).then(
-                      function(response) {
-                        if (response && !response.error) {
-                          console.info('success');
-                          console.info(response);
-                        } else {
-                          console.info('fail');
-                          console.info(response);
-                        }
-                      },
-                      function(response) {
-                        console.info('no success?');
-                        console.info(response);
-                      }
-                    );
-
-                  } else {
-                    console.info('User cancelled login or did not fully authorize.');
-                  }
-                },
-                function(response) {
-                  console.info('Login error so do not assume we have permission.');
-                }
-              );
-
-              // FB.ui({
-              //   method: 'feed',
-              //   name: 'Bitponics',
-              //   caption: 'Check out my garden on bitponics.com',
-              //   description: (
-              //     'This is the description.'
-              //   ),
-              //   link: $window.location,
-              //   picture: completedPhotos[0].url
-              // },
-              // function(response) {
-              //     if (response && response.post_id) {
-              //       alert('Post was published.');
-              //     } else {
-              //       alert('Post was not published.');
-              //     }
-              // });
-            }
-
           };
      
           $scope.getData = function(files) { 
@@ -687,7 +627,43 @@ require([
               errorMessage = "Sorry, there was an error uploading your photo' + we can't process that many files at a time. 5 files max please!";
             }
             writeFiles(files);
-          }
+          };
+
+          $scope.sharePhoto = function(photo) {
+            var prefs = $scope.user.socialPreferences;
+            if (prefs.facebook.permissions.publish) {
+              $facebook.login({ scope: 'publish_actions' }).then(
+                function(response) {
+                  if (response.authResponse) {
+                    $facebook.api('/me/photos', 'POST',
+                      { 
+                        // 'url': 'https://www.bitponics.com/photos/52fa2d3cc926f50200000271', //for testing locally need a public-facing image
+                        'url': $window.location.origin + photo.url,
+                        'message':  sharedDataService.gardenModel.name + ', ' + 
+                                    sharedDataService.activeDate.growPlanPhase.name + ' Phase, ' +
+                                    'Day ' + sharedDataService.activeDate.dayOfPhase
+                      }
+                    ).then(
+                      function(response) {
+                        if (response && !response.error) {
+                          console.info('success');
+                        } else {
+                          console.info('fail' + response.error);
+                        }
+                      }
+                    );
+                  } else {
+                    console.info('User cancelled login or did not fully authorize.');
+                  }
+                },
+                function(response) {
+                  console.info('Login error so do not assume we have permission.');
+                }
+              );
+            } else if (prefs.twitter.permissions.publish) {
+              //TODO: twitter share integration
+            }
+          };
      
           function writeFiles(files) 
           {
@@ -696,6 +672,7 @@ require([
               console.log('\t' + files[i].name);
             }
           }
+
         }
       ]
     );
