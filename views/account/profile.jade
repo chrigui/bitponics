@@ -61,15 +61,14 @@ block content
 
         h3.page-heading-small Social Options
 
-        div(ng-controller="bpn.controllers.account.profile.PostToFacebook")
-          label(for="facebook") 
-            input.unstyled(
-                id="facebook", 
-                name="facebook", 
-                type="checkbox", 
-                ng-model="enabled",
-                ng-change="enablePublishingToFacebook(this)")
-            | Publish garden images to Facebook
+        label(for="facebook", ng-controller="bpn.controllers.account.profile.PostToFacebook") 
+          input.unstyled(
+              id="facebook", 
+              name="facebook", 
+              type="checkbox", 
+              ng-model="enabled",
+              ng-change="enablePublishingToFacebook(this)")
+          | Publish garden images to Facebook
 
         
         //- input(class="display-i", id="notifications_sms", name="notifications_sms", 

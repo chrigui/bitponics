@@ -565,6 +565,7 @@ require([
         'bpn.services.analytics',
         '$facebook',
         function($scope, $window, sharedDataService, $anchorScroll, analytics, $facebook){
+          $scope.$window = $window;
           $scope.sharedDataService = sharedDataService;
           $scope.user = $scope.sharedDataService.user;
           $scope.modalOptions = {

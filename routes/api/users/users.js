@@ -162,10 +162,8 @@ module.exports = function(app) {
       failureRedirect: '/login'
     }),
     function(req, res) {
-      console.dir('req.query');
-      console.dir(req.query);
-      // console.dir(res);
-      res.redirect(req.query.redirect)
+      // res.redirect(req.query.redirect)
+      res.redirect('/gardens');
     }
   );
   
