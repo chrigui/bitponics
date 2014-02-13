@@ -367,7 +367,7 @@ label {
   color: #fff;
 }
 .data-module.empty {
-  background-color: #cbffd1;
+  background-color: #86ff94;
 }
 .data-module.warning,
 .data-module.remove {
@@ -578,6 +578,27 @@ ol.list-style {
 .btn-compact.remove {
   color: #fac400;
   font-weight: bold;
+}
+.btn.loading,
+.btn-composite.loading,
+.btn-compact.loading {
+  text-align: center;
+}
+.btn.loading .loading-meter,
+.btn-composite.loading .loading-meter,
+.btn-compact.loading .loading-meter {
+  height: 0.5em;
+}
+.btn .loading-meter,
+.btn-composite .loading-meter,
+.btn-compact .loading-meter {
+  height: 0;
+  position: absolute;
+  width: 0;
+  background: #00e36c;
+  bottom: 0;
+  left: 0;
+  transition: all 0.5s ease-out;
 }
 .btn-composite,
 .btn-compact {
@@ -1037,6 +1058,10 @@ img.page-spinner.spinner {
 .close {
   box-shadow: none;
   background: transparent;
+}
+#IModalOverlay {
+  background-color: #fff !important;
+  opacity: 0.75 !important;
 }
 /*
  * Overlay
@@ -1803,8 +1828,18 @@ body.ngdialog-open {
   bottom: auto;
   position: absolute;
 }
+.ngdialog-theme-menu.ngdialog-closing .ngdialog-overlay {
+  animation-duration: 0;
+}
+.ngdialog-theme-menu .ngdialog-content {
+  animation-duration: 0.2s;
+}
+.ngdialog-theme-menu.ngdialog-closing .ngdialog-content {
+  animation-duration: 0.2s;
+}
 .ngdialog-theme-menu .ngdialog-overlay {
   background: none;
+  animation-duration: 0.2s;
 }
 .ngdialog-theme-menu .ngdialog-content {
   width: 20em;
@@ -1889,7 +1924,8 @@ body.ngdialog-open {
 /*
  * Dialog Overlay
  */
-.ngdialog-theme-overlay .ngdialog-content {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
   position: absolute;
   top: 50%;
   left: 5%;
@@ -1904,19 +1940,48 @@ body.ngdialog-open {
   border: 1px solid #d8d8d8;
   box-shadow: 0px 2px 5px 0px #d8d8d8;
 }
-.ngdialog-theme-overlay .ngdialog-content h2,
-.ngdialog-theme-overlay .ngdialog-content div,
-.ngdialog-theme-overlay .ngdialog-content p,
-.ngdialog-theme-overlay .ngdialog-content a {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay .ngdialog-content div,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content div,
+.ngdialog.ngdialog-theme-overlay .ngdialog-content p,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content p {
   color: #999;
 }
-.ngdialog-theme-overlay .ngdialog-content h2 {
+.ngdialog.ngdialog-theme-overlay .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2 {
   padding-top: 0.5em;
   margin: 0 0 0.5em;
   border-bottom: 1px solid #d8d8d8;
 }
-.ngdialog-theme-overlay .ngdialog-close {
+.ngdialog.ngdialog-theme-overlay .ngdialog-close,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-close {
   display: none;
+}
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
+  padding: 2em;
+}
+@media  screen and (min-width: 50em) {
+  .ngdialog.ngdialog-theme-overlay-message .ngdialog-content {
+    left: 20%;
+    width: 60%;
+  }
+}
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h2,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content h3,
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content p {
+  text-align: center;
+  width: 100%;
+}
+.ngdialog.ngdialog-theme-overlay-message .ngdialog-content .btn {
+  margin: 0;
+}
+.ngdialog.ngdialog-theme-overlay-message.error .ngdialog-content {
+  border-color: #fac400;
+  box-shadow: 0px 2px 5px 0px #fac400;
+}
+.ngdialog.ngdialog-theme-overlay-message.error h3 {
+  color: #fac400;
 }
 /*
  * Grow Plan List
@@ -2071,7 +2136,10 @@ body.ngdialog-open {
 }
 .header .notifications-icon .icon-glyph,
 .header .help-icon .icon-glyph,
-.header .menu-icon .icon-glyph {
+.header .menu-icon .icon-glyph,
+.header .notifications-icon .icon-glyph-new,
+.header .help-icon .icon-glyph-new,
+.header .menu-icon .icon-glyph-new {
   top: 50%;
   margin: 0;
   position: absolute;
@@ -3183,6 +3251,21 @@ input[type='checkbox']:checked + label.btn {
   background: #00e36c;
   color: #fff;
 }
+[placeholder]:focus:-webkit-input-placeholder,
+[placeholder]:focus:-moz-placeholder,
+[placeholder]:focus:-ms-input-placeholder {
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+[contentEditable=true]:empty:not(:focus):before {
+  content: attr(data-placeholder);
+}
 .hide-unchecked-items input[type='radio'] + label.btn,
 .hide-unchecked-items input[type='checkbox'] + label.btn {
   display: none;
@@ -3642,8 +3725,12 @@ label.newsletter.inline {
 .dashboard .manual-entry-form textarea {
   margin: 1em 0;
 }
-.dashboard .manual-entry-form .sensor-reading-unit {
+.dashboard .manual-entry-form .sensor-reading-unit,
+.dashboard .manual-entry-form .sensor-unit {
   margin: 0.5em;
+}
+.dashboard .manual-entry-form .sensor-unit {
+  display: inline-block;
 }
 .dashboard .manual-entry-form .custom-dropdown-wrap {
   margin: 0;
@@ -5738,6 +5825,24 @@ button.close {
 .growplans.app-page .btn {
   padding: 0.5em;
 }
+.growplans .btn.add .icon-glyph-new,
+.growplans.app-page .btn.add .icon-glyph-new {
+  top: 0;
+  font-size: 1em;
+}
+.growplans .toggle,
+.growplans.app-page .toggle {
+  padding: 0.2em 0.5em;
+  margin: 0 0 1em;
+}
+.growplans .toggle.filter,
+.growplans.app-page .toggle.filter {
+  clear: both;
+}
+.growplans .toggle.advanced,
+.growplans.app-page .toggle.advanced {
+  margin-left: 1em;
+}
 .growplans .overlay .btn,
 .growplans.app-page .overlay .btn {
   margin: 0;
@@ -5808,6 +5913,14 @@ button.close {
 .growplans.app-page .phase-tabs .btn .icon-glyph-new {
   color: #00e36c;
 }
+.growplans .question.plants,
+.growplans.app-page .question.plants {
+  margin: 0;
+}
+.growplans .question .question-title,
+.growplans.app-page .question .question-title {
+  margin-top: 0.75em;
+}
 .growplans .question .grid li,
 .growplans.app-page .question .grid li {
   margin: 0;
@@ -5823,13 +5936,6 @@ button.close {
   float: left;
   clear: left;
   margin: 0.7em 1em 1em 0;
-}
-.growplans .icon-glyph-new,
-.growplans.app-page .icon-glyph-new {
-  height: 1em;
-  font-size: 1.25em;
-  position: relative;
-  top: 0.15em;
 }
 .growplans .header-action,
 .growplans.app-page .header-action {
@@ -6124,6 +6230,7 @@ button.close {
 .growplans.app-page .grow-plan-customize h2.page-heading {
   max-width: 49%;
   clear: left;
+  min-height: 1.2em;
 }
 .growplans .grow-plan-customize h2.page-heading .garden-name,
 .growplans.app-page .grow-plan-customize h2.page-heading .garden-name {

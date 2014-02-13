@@ -334,43 +334,49 @@ module.exports = function(app){
 					pageType: "landing-page"
 			    };
 
-		  if(req.query.verify){ //user coming back to verify account
-        	return UserModel.findOne({ activationToken: req.query.verify }, 
-		    	function (err, user) {
-			    	if (err) { return next(err); }
-			    		if (user) {
-			    			mixpanel.track(user, "activate registration");
-			    		}
-						if (user && user.activationToken !== '') {
-							user.active = true;
-							user.sentEmail = true; //if we get here, this should be true
-							user.save( function(err, user){
-								if (err) { return next(err); }
-								locals.header =  "All set!";
-                				locals.message = 'Your account is now verified.';
-								locals.link = '/setup/grow-plan';
-								// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
-								locals.user = user;
+		  	if(req.query.verify){ //user coming back to verify account
+	        	return UserModel.findOne({ activationToken: req.query.verify }, 
+			    	function (err, user) {
+				    	if (err) { return next(err); }
+				    		if (user) {
+				    			mixpanel.track(user, "activate registration");
+				    		}
+							if (user && user.activationToken !== '') {
+								user.active = true;
+								user.sentEmail = true; //if we get here, this should be true
+								user.save( function(err, user){
+									if (err) { return next(err); }
+									locals.header =  "All set!";
+	                				locals.message = 'Your account is now verified.';
+									locals.link = '/setup/grow-plan';
+									// locals.message = 'Your registration was successfull. Have you preordered a device yet?';
+									locals.user = user;
+									res.render('register', locals);
+								});
+							} else {
+								locals.message = 'There was an error validating your account. Please try signing up again.';
 								res.render('register', locals);
-							});
-						} else {
-							locals.message = 'There was an error validating your account. Please try signing up again.';
-							res.render('register', locals);
-						}
-		    	}
-	    	);
-	    } else if(req.query.status == 'success') { //user preordered successfully
-			locals.message = 'You\'ve successfully preordered a Bitponics device';
-			//TODO: here we could also collect additional info on user (amazon setting)
-	    } else if(req.query.status == 'abandon') { //user cancelled preorder process mid-way
-		    locals.message = 'Issues preordering the device?';
-		} else { //user just signed up, tell them to check email to verify
-		  	locals.header =  "Thanks for signing up!";
-	        locals.message = "We've sent you a welcome email. When you get a chance, click the activation link in that email.<br/><br/>In the meanwhile, let's get you growing!";
-	        locals.link = '/setup/grow-plan';
-		}
+							}
+			    	}
+		    	);
+		    } else if(req.query.status == 'success') { //user preordered successfully
+				locals.message = 'You\'ve successfully preordered a Bitponics device';
+				//TODO: here we could also collect additional info on user (amazon setting)
+		    } else if(req.query.status == 'abandon') { //user cancelled preorder process mid-way
+			    locals.message = 'Issues preordering the device?';
+			} else { //user has signed up, so tell them to check email to verify or if already verified then redirect to /gardens
+			  	
+				if (req.user.active) {
+					return res.redirect('/gardens');
+				} else {
+				  	locals.header =  "Thanks for signing up!";
+			        locals.message = "We've sent you a welcome email. When you get a chance, click the activation link in that email.<br/><br/>In the meanwhile, let's get you growing!";
+			        locals.link = '/setup/grow-plan';
+			    }
 
-		  	return res.render('register', locals);
+			}
+			
+			return res.render('register', locals);
 		}
 	);
 
@@ -388,7 +394,7 @@ module.exports = function(app){
 	require('./grow-plans')(app);
 	require('./guides')(app);
 	require('./photos')(app);
-  require('./profiles')(app);
+  	require('./profiles')(app);
 	require('./reset')(app);
 	require('./setup')(app);
 	require('./sockets')(app);

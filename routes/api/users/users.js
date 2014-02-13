@@ -7,8 +7,7 @@ var UserModel = require('../../../models/user').model,
     routeUtils = require('../../route-utils'),
     requirejs = require('../../../lib/requirejs-wrapper'),
     feBeUtils = requirejs('fe-be-utils'),
-    apiUtils = require('../utils'),
-    passport = require('passport');
+    apiUtils = require('../utils');
 
 /**
  * module.exports : function to be immediately invoked when this file is require()'ed 
@@ -142,29 +141,5 @@ module.exports = function(app) {
   );
 
 
-  /*
-   * Facebook login Passportjs Strategy
-   *
-   */
-  // Redirect the user to Facebook for authentication.  When complete,
-  // Facebook will redirect the user back to the application at
-  //     /auth/facebook/callback
-  app.get('/auth/facebook', passport.authenticate('facebook'));
-
-  // Facebook will redirect the user to this URL after approval.  Finish the
-  // authentication process by attempting to obtain an access token.  If
-  // access was granted, the user will be logged in.  Otherwise,
-  // authentication has failed.
-  app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-      // scope: ['read_stream', 'publish_actions'],
-      // successRedirect: '/gardens',
-      failureRedirect: '/login'
-    }),
-    function(req, res) {
-      // res.redirect(req.query.redirect)
-      res.redirect('/gardens');
-    }
-  );
   
 };

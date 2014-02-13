@@ -18,7 +18,8 @@ block content
         input(type='submit', value='Submit')
 
         div
-          a(href="/auth/facebook?redirect="+formAction) Login with Facebook.
+          a(href="/auth/facebook"+formAction.replace('/login', '')) Login with Facebook.
+          //- a(href="/auth/facebook") Login with Facebook.
 
         div
           span Don't have an account?  

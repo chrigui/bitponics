@@ -17,4 +17,5 @@ module.exports = function(app){
 
   require('./profile')(app);
   require('./devices')(app);
-};
+  require('./social')(app);
+}
