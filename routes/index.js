@@ -12,7 +12,11 @@ module.exports = function(app){
 	// global middleware
 	app.all('*', function (req, res, next){
 		res.locals({
-			user : req.user
+			user : req.user,
+			title: 'Bitponics',
+			pageDescription: 'Bitponics is your personal gardening assistant.',
+			pageImage: 'http://www.bitponics.com/assets/img/home/Bitponics_social_default.png',
+			pageUrl: 'http://www.bitponics.com'
 		});
 		next();
 	});
