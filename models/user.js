@@ -346,8 +346,10 @@ UserSchema.static('findOrCreate', function(accessToken, refreshToken, profile, d
 					return done(err); 
 				}
 				console.log('save user')
-				user.save();
-				return done(null, user);
+				user.save(function(err) {
+					if (err) return done(err);
+					return done(null, user);
+				});
 			}
 		);
 	} else {
