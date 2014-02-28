@@ -114,6 +114,11 @@ module.exports = function(app) {
     function (req, res, next){
       return GrowPlanInstanceModel.findById(req.params.id, function (err, growPlanInstance) {
         if (err) { return next(err); }
+        
+        if (!growPlanInstance) {
+          return res.send(404, "The grow plan instance was not found.");
+        }
+
         if (!routeUtils.checkResourceReadAccess(growPlanInstance, req.user)){
           return res.send(401, "The grow plan instance is private and only the owner may access its data.");
         }

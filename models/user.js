@@ -334,7 +334,6 @@ UserSchema.static('findOrCreate', function(accessToken, refreshToken, profile, d
 			{ 
 				email: email 
 			},
-			// newUser.toJSON(), 
 			newUser, 
 			{ 
 				upsert: true 

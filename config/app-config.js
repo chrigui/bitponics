@@ -187,20 +187,22 @@ module.exports = function(app){
             return passport.authenticate('api', {session: false})(req, res, next);
           default:
             if (req.user){
-              return next();
-            } else {
-              return connect.basicAuth(
-                function(basicAuthUsername, basicAuthPassword){
-                  switch (basicAuthUsername) {
-                    case "bitponics":
-                      return basicAuthPassword === "8bitpass";
-                    case "braintree":
-                      return basicAuthPassword === "dendrite";
-                  }
-                  return false;
-                }
-              )(req, res, next);
-            } 
+              //not currently doing anything here
+            }
+
+            // return connect.basicAuth(
+            //   function(basicAuthUsername, basicAuthPassword){
+            //     switch (basicAuthUsername) {
+            //       case "bitponics":
+            //         return basicAuthPassword === "8bitpass";
+            //       case "braintree":
+            //         return basicAuthPassword === "dendrite";
+            //     }
+            //     return false;
+            //   }
+            // )(req, res, next);
+
+            return next();
         }
       });
       break;

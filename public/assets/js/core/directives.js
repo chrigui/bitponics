@@ -181,6 +181,7 @@ define(['angular', 'jquery', 'throttle-debounce'],
           }
         ],
         link: function(scope, element, attrs) {
+          debugger;
           var growPlan = scope.growPlan,
               plants = growPlan.plants,
               length = plants.length,

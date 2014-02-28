@@ -36,25 +36,29 @@ function (angular, domReady, viewModels, moment, feBeUtils) {
       });
 
       $scope.init = function(){
+        var userID = bpn.user && bpn.user._id;
+        $scope.userGardenResults = [];
         $scope.communityGardenResults = GardenModel.query(
           { 
-            where : JSON.stringify({ 'users' : { '$ne' : bpn.user._id }}),
+            where : userID ? JSON.stringify({ 'users' : { '$ne' : userID }}) : '',
             select : 'name,startDate,owner.name,growPlan.name,growPlan.plants'
           },
           function success(data){
             console.log(data);
           }
         );
-
-        $scope.userGardenResults = GardenModel.query(
-          { 
-            where : JSON.stringify({ 'users' : bpn.user._id }),
-            select : 'name,startDate,growPlan.name,growPlan.plants'
-          },
-          function success(data){
-            console.log(data);
-          }
-        );
+        
+        if (userID) {
+          $scope.userGardenResults = GardenModel.query(
+            { 
+              where : JSON.stringify({ 'users' : userID }),
+              select : 'name,startDate,growPlan.name,growPlan.plants'
+            },
+            function success(data){
+              console.log(data);
+            }
+          );
+        }
       };
 
 

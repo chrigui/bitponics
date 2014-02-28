@@ -11,6 +11,13 @@ module.exports = {
 			}
 			next();
 		},
+
+    ensureLoggedIn : function(req, res, next){
+      if( !(req.user && req.user._id)){
+        return res.redirect('/login?redirect=' + req.url);
+      }
+      next();
+    },
 /*
     ensureDeviceKeyVerified : function(req, res, next){
     	var async = require('async'),
@@ -187,7 +194,7 @@ module.exports = {
   checkResourceModifyAccess : function(resource, user){
     // return true if user is in allowed list or user is admin.
     // else, return false
-    if (!user._id){ return false; }
+    if (!user || !user._id){ return false; }
     var userId = user._id;
     if (resource._id && resource._id.toString() === userId.toString()) { return true; }
     return (  user.admin ||

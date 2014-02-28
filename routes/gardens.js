@@ -23,22 +23,22 @@ module.exports = function(app){
 	 */
 	app.get('/gardens', 
 		routeUtils.middleware.ensureSecure,
-		routeUtils.middleware.ensureLoggedIn,
+		// routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
 				className: "gardens app-page single-page",
-  			pageType: "app-page",
-        plants : []
+	  			pageType: "app-page",
+		        plants : []
 			};
 
 			PlantModel.find()
-      .select('_id name')
-      .lean()
-      .exec(function(err, plants){
-        if (err) { return next(err); }
-        locals.plants = plants;
-        res.render('gardens', locals);  
-      });
+				.select('_id name')
+				.lean()
+				.exec(function(err, plants){
+					if (err) { return next(err); }
+					locals.plants = plants;
+					res.render('gardens', locals);  
+				});
 		}
 	);
 
@@ -49,7 +49,7 @@ module.exports = function(app){
 	 */
 	app.get('/gardens/:growPlanInstanceId',
 		routeUtils.middleware.ensureSecure,
-		routeUtils.middleware.ensureLoggedIn,
+		// routeUtils.middleware.ensureLoggedIn,
 		function (req, res, next) {
 			var locals = {
 				title : 'Bitponics - Dashboard',

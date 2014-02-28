@@ -43,7 +43,7 @@ module.exports = {
 
 	 	
 	 	return [
-	 		routeUtils.middleware.ensureLoggedIn,
+	 		// routeUtils.middleware.ensureLoggedIn,
 	 		function(req, res, next){
 
 		 		var response = {
@@ -70,17 +70,17 @@ module.exports = {
 					function checkIfParentModel(innerCallback){
 						if (!ParentModel){ return innerCallback(); }
 
-		 			ParentModel.findById(req.params.id)
-			 			.select('owner users createdBy visibility')
-			 			.exec(function(err, parentModelResult){
-              if (!routeUtils.checkResourceReadAccess(parentModelResult, req.user)){
-				        response = {
-				        	statusCode : 401,
-				        	body : "The parent resource is private and only the owner may access its data."
-				        }
-				      } 
-			        return innerCallback();
-			 			});
+  		 			ParentModel.findById(req.params.id)
+  			 			.select('owner users createdBy visibility')
+  			 			.exec(function(err, parentModelResult){
+                if (!routeUtils.checkResourceReadAccess(parentModelResult, req.user)){
+  				        response = {
+  				        	statusCode : 401,
+  				        	body : "The parent resource is private and only the owner may access its data."
+  				        }
+  				      } 
+  			        return innerCallback();
+  			 			});
 			 		},
 					function countResults(innerCallback){
 						if (response.statusCode !== 200){
@@ -102,11 +102,16 @@ module.exports = {
 
             
             if (options.restrictByVisibility){
-              if (req.user.admin){
+              var restrictedQuery = [];
+              if (req.user && req.user.admin){
                 // no condition
-              } else {
-                query.or([{ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC }, { owner: req.user._id }]); 
               }
+              if (req.user && req.user._id) {
+                restrictedQuery.push({ owner: req.user && req.user._id });
+              }
+              restrictedQuery.push({ visibility: feBeUtils.VISIBILITY_OPTIONS.PUBLIC });
+              console.log(restrictedQuery);
+              query.or(restrictedQuery);
             }
 
             // Now handle the "where". First read the options.defaultWhere
@@ -123,6 +128,7 @@ module.exports = {
             if (req.query['where']){
               var queryWhere;
               try {
+                console.log("req.query['where']::", req.query['where']);
                 queryWhere = JSON.parse(req.query['where']);
               } catch(e){
                 winston.error(e);
