@@ -12,6 +12,6 @@ cd `dirname $0`
 mongod&
 redis-server&
 npm install
-sudo node-dev app.js
+sudo -E node-dev app.js
 
 exit 
